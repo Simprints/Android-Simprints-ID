@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/simprints_blue"
+    tools:context=".activities.AlertActivity">
+
+    <TextView
+        android:id="@+id/title"
+        android:text=""
+        android:textColor="@color/simprints_white"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:gravity="center" />
+
+    <ImageView
+        android:id="@+id/graphic"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"/>
+
+    <TextView
+        android:id="@+id/message"
+        android:text=""
+        android:textColor="@color/simprints_white"
+        android:textSize="18dp"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/simprints_separator"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/left_button"
+            android:textColor="@color/simprints_white"
+            android:background="@color/simprints_blue"
+            android:textSize="20dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="1dp"
+            android:layout_height="match_parent"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/right_button"
+            android:textColor="@color/simprints_white"
+            android:background="@color/simprints_blue"
+            android:textSize="20dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="1dp"
+            android:layout_height="match_parent"
+            android:gravity="center"/>
+    </LinearLayout>
+
+</LinearLayout>

@@ -3,4 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="simprints_blue">#478bca</color>
+    <color name="simprints_white">#FFFFFF</color>
+    <color name="simprints_grey">#EEEEEE</color>
+    <color name="simprints_separator">#C0C0C0</color>
 </resources>

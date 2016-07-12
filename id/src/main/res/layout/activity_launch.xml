@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/simprints_blue"
+    tools:context=".activities.LaunchActivity">
+
+    <ImageView
+        android:src="@drawable/launch_background"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6"/>
+
+    <TextView
+        android:text="Loading"
+        android:textColor="@color/simprints_white"
+        android:textSize="20dp"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="invisible"
+        android:indeterminateDrawable="@drawable/progress_spinner" >
+    </ProgressBar>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+</LinearLayout>
