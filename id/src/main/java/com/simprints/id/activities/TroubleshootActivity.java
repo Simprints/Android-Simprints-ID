@@ -3,7 +3,7 @@ package com.simprints.id.activities;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 
-public class TutorialActivity extends BaseNavigationActivity {
+public class TroubleshootActivity extends BaseNavigationActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
