@@ -18,6 +18,10 @@ android {
         }
     }
 }
+repositories {
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -25,4 +29,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile 'com.android.support:design:24.0.0'
     compile 'com.android.support:support-v4:24.0.0'
+    compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
+    compile 'com.simprints:libsimprints:1.0.0'
+    compile 'com.simprints:libscanner:1.0.14'
+    compile 'com.simprints:libdata:1.0.2'
+    compile 'com.simprints:libcommon:1.0.11'
 }

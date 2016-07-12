@@ -10,7 +10,9 @@ public class HelpActivity extends BaseNavigationActivity {
         super.onCreate(savedInstanceState);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+        if (actionBar != null) {
+            actionBar.show();
+        }
 
     }
 }
