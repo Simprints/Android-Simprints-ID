@@ -6,8 +6,6 @@
 
     <string name="action_settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="help_title">Help</string>
     <string name="settings_title">Settings</string>
     <string name="tutorial_title">Tutorial</string>
@@ -20,4 +18,8 @@
     <string name="about_menu">About</string>
     <string name="help_and_support_menu">Help and Support</string>
     <string name="configuration_menu">Configuration</string>
+    <string name="consent_title">Consent</string>
+    <string name="alert_title">Alert</string>
+    <string name="register_title">Enrollment</string>
+    <string name="identify_title">Identify</string>
 </resources>
