@@ -48,7 +48,7 @@ dependencies {
     compile 'com.simprints:libsimprints:1.0.0'
     compile 'com.simprints:libscanner:1.0.14'
     compile 'com.simprints:libdata:1.0.2'
-    compile 'com.simprints:libcommon:1.0.11'
+    compile 'com.simprints:libcommon:1.0.13'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.0@aar') {
         transitive = true;
     }

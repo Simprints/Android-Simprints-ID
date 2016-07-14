@@ -15,24 +15,23 @@
         android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="0"/>
 
     <LinearLayout
         android:orientation="vertical"
+        android:background="#FFFFFF"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="7">
 
         <ImageView
             android:id="@+id/finger_image"
-            android:background="#FFFFFF"
             android:layout_gravity="center"
-            android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="4"
-            android:layout_marginTop="25dp"
-            android:visibility="invisible"/>
+            android:visibility="invisible"
+            android:gravity="top|center_horizontal"/>
         <ProgressBar
             android:id="@+id/finger_progress_bar"
             style="?android:attr/progressBarStyleLarge"
@@ -40,7 +39,6 @@
             android:layout_height="0dp"
             android:layout_weight="4"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="25dp"
             android:gravity="center_horizontal"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
@@ -54,7 +52,7 @@
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:layout_marginTop="5dp"
             android:visibility="visible"/>
 

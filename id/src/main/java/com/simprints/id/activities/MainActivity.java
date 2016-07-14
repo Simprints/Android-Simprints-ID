@@ -1,7 +1,9 @@
 package com.simprints.id.activities;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -25,25 +27,12 @@ import com.simprints.id.BaseApplication;
 import com.simprints.id.R;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
+import com.simprints.libcommon.FingerConfig;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Context context;
-    private int operation;
-    private String guid;
-
-    private ImageView r5IndicatorTextView;
-    private ImageView r4IndicatorTextView;
-    private ImageView r3IndicatorTextView;
-    private ImageView r2IndicatorTextView;
-    private ImageView r1IndicatorTextView;
-    private ImageView l1IndicatorTextView;
-    private ImageView l2IndicatorTextView;
-    private ImageView l3IndicatorTextView;
-    private ImageView l4IndicatorTextView;
-    private ImageView l5IndicatorTextView;
-
     private Button scanButton;
 
     private static ViewPager viewPager;
@@ -52,9 +41,42 @@ public class MainActivity extends AppCompatActivity
 
     private static FingerFragment[] fingerFragments = new FingerFragment[10];
     private static ImageView[] fingerIndicators = new ImageView[10];
+//    private static int[] fingerConfiguration = {
+//            Finger.DO_NOT_COLLECT,
+//            Finger.DO_NOT_COLLECT,
+//            Finger.DO_NOT_COLLECT,
+//            Finger.OPTIONAL,
+//            Finger.REQUIRED,
+//            Finger.REQUIRED,
+//            Finger.OPTIONAL,
+//            Finger.DO_NOT_COLLECT,
+//            Finger.DO_NOT_COLLECT,
+//            Finger.DO_NOT_COLLECT };
+    private static FingerConfig.FingerConfiguration[] fingerConfiguration = {
+        FingerConfig.FingerConfiguration.DO_NOT_COLLECT,
+        FingerConfig.FingerConfiguration.REQUIRED,
+        FingerConfig.FingerConfiguration.REQUIRED,
+        FingerConfig.FingerConfiguration.REQUIRED,
+        FingerConfig.FingerConfiguration.REQUIRED,
+        FingerConfig.FingerConfiguration.REQUIRED,
+        FingerConfig.FingerConfiguration.REQUIRED,
+        FingerConfig.FingerConfiguration.REQUIRED,
+        FingerConfig.FingerConfiguration.REQUIRED,
+        FingerConfig.FingerConfiguration.REQUIRED};
     private static int[] fingerStatus = new int[10];
     private static String[] fingerName = new String[10];
-    private static boolean[] fingerRequired = { false, false, false, false, true, true, false, false, false, false };
+    private static int[] fingerGraphic = {
+            R.drawable.hand_bb_r5_c1,
+            R.drawable.hand_bb_r4_c1,
+            R.drawable.hand_bb_r3_c1,
+            R.drawable.hand_bb_r2_c1,
+            R.drawable.hand_bb_r1_c1,
+            R.drawable.hand_bb_l1_c1,
+            R.drawable.hand_bb_l2_c1,
+            R.drawable.hand_bb_l3_c1,
+            R.drawable.hand_bb_l4_c1,
+            R.drawable.hand_bb_l5_c1
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,12 +95,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            operation = extras.getInt("operation");
-            guid = extras.getString("guid");
-        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.show();
@@ -129,11 +145,15 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 if (fingerStatus[currentFingerNo] != Finger.COLLECTING) {
                     fingerStatus[currentFingerNo] = Finger.COLLECTING;
-                    scanButton.setText("CANCEL");
+                    scanButton.setText(R.string.cancel_button);
+                    scanButton.setTextColor(Color.WHITE);
+                    scanButton.setBackgroundColor(Color.RED);
                 }
                 else {
                     fingerStatus[currentFingerNo] = Finger.NOT_COLLECTED;
                     scanButton.setText(R.string.scan_label);
+                    scanButton.setTextColor(Color.WHITE);
+                    scanButton.setBackgroundColor(Color.BLUE);
                 }
             }
         });
@@ -160,50 +180,50 @@ public class MainActivity extends AppCompatActivity
     private void setFingers() {
         noOfFingers = 0;
         for (int fingerNo = 0; fingerNo < 10; fingerNo++) {
-            if (fingerRequired[fingerNo]) {
+            if (fingerConfiguration[fingerNo] == FingerConfig.FingerConfiguration.REQUIRED || fingerConfiguration[fingerNo] == FingerConfig.FingerConfiguration.ADDED) {
                 switch (fingerNo) {
                     case 0:
                         fingerIndicators[noOfFingers] = (ImageView) findViewById(R.id.r_5_indicator);
-                        fingerName[noOfFingers] = getString(R.string.r_5_finger_name);
+                        fingerName[noOfFingers] = "<font color=gray>Please scan <br/><font color=blue>" + getString(R.string.r_5_finger_name);
                         break;
                     case 1:
                         fingerIndicators[noOfFingers] = (ImageView) findViewById(R.id.r_4_indicator);
-                        fingerName[noOfFingers] = getString(R.string.r_4_finger_name);
+                        fingerName[noOfFingers] = "<font color=gray>Please scan <br/><font color=blue>" + getString(R.string.r_4_finger_name);
                         break;
                     case 2:
                         fingerIndicators[noOfFingers] = (ImageView) findViewById(R.id.r_3_indicator);
-                        fingerName[noOfFingers] = getString(R.string.r_3_finger_name);
+                        fingerName[noOfFingers] = "<font color=gray>Please scan <br/><font color=blue>" + getString(R.string.r_3_finger_name);
                         break;
                     case 3:
                         fingerIndicators[noOfFingers] = (ImageView) findViewById(R.id.r_2_indicator);
-                        fingerName[noOfFingers] = getString(R.string.r_2_finger_name);
+                        fingerName[noOfFingers] = "<font color=gray>Please scan <br/><font color=blue>" + getString(R.string.r_2_finger_name);
                         break;
                     case 4:
                         fingerIndicators[noOfFingers] = (ImageView) findViewById(R.id.r_1_indicator);
-                        fingerName[noOfFingers] = getString(R.string.r_1_finger_name);
+                        fingerName[noOfFingers] = "<font color=gray>Please scan <br/><font color=blue>" + getString(R.string.r_1_finger_name);
                         break;
                     case 5:
                         fingerIndicators[noOfFingers] = (ImageView) findViewById(R.id.l_1_indicator);
-                        fingerName[noOfFingers] = getString(R.string.l_1_finger_name);
+                        fingerName[noOfFingers] = "<font color=gray>Please scan <br/><font color=blue>" + getString(R.string.l_1_finger_name);
                         break;
                     case 6:
                         fingerIndicators[noOfFingers] = (ImageView) findViewById(R.id.l_2_indicator);
-                        fingerName[noOfFingers] = getString(R.string.l_2_finger_name);
+                        fingerName[noOfFingers] = "<font color=gray>Please scan <br/><font color=blue>" + getString(R.string.l_2_finger_name);
                         break;
                     case 7:
                         fingerIndicators[noOfFingers] = (ImageView) findViewById(R.id.l_3_indicator);
-                        fingerName[noOfFingers] = getString(R.string.l_3_finger_name);
+                        fingerName[noOfFingers] = "<font color=gray>Please scan <br/><font color=blue>" + getString(R.string.l_3_finger_name);
                         break;
                     case 8:
                         fingerIndicators[noOfFingers] = (ImageView) findViewById(R.id.l_4_indicator);
-                        fingerName[noOfFingers] = getString(R.string.l_4_finger_name);
+                        fingerName[noOfFingers] = "<font color=gray>Please scan <br/><font color=blue>" + getString(R.string.l_4_finger_name);
                         break;
                     case 9:
                         fingerIndicators[noOfFingers] = (ImageView) findViewById(R.id.l_5_indicator);
-                        fingerName[noOfFingers] = getString(R.string.l_5_finger_name);
+                        fingerName[noOfFingers] = "<font color=gray>Please scan <br/><font color=blue>" + getString(R.string.l_5_finger_name);
                         break;
                 }
-                FingerFragment fingerFragment = FingerFragment.newInstance(fingerNo, fingerName[noOfFingers]);
+                FingerFragment fingerFragment = FingerFragment.newInstance(fingerNo, fingerName[noOfFingers], fingerGraphic[noOfFingers]);
                 fingerFragments[noOfFingers] = fingerFragment;
                 fingerIndicators[noOfFingers].setVisibility(View.VISIBLE);
                 fingerStatus[noOfFingers] = Finger.NOT_COLLECTED;
@@ -242,6 +262,7 @@ public class MainActivity extends AppCompatActivity
 
     protected void onActionForward() {
         if (BaseApplication.getMode() == BaseApplication.REGISTER_SUBJECT) {
+            //TODO: return registration class from libsimprints
             finish();
         }
         else {
@@ -282,6 +303,9 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if (id == R.id.nav_add) {
+            addFinger();
+        }
         if (id == R.id.nav_help) {
             Intent intent = new Intent(this, HelpActivity.class);
             startActivity(intent);
@@ -306,5 +330,76 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void addFinger() {
+        final Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.dialog_add);
+        dialog.setTitle("Add Finger(s)");
+
+        Button r5Button = (Button) dialog.findViewById(R.id.r_5_button);
+        if (fingerConfiguration[0] == FingerConfig.FingerConfiguration.OPTIONAL) {
+            r5Button.setVisibility(View.VISIBLE);
+            r5Button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fingerConfiguration[0] = FingerConfig.FingerConfiguration.ADDED;
+                    setFingers();
+                    dialog.dismiss();
+                }
+            });
+        }
+        else {
+            r5Button.setVisibility(View.GONE);
+        }
+
+        Button r4Button = (Button) dialog.findViewById(R.id.r_4_button);
+        if (fingerConfiguration[1] == FingerConfig.FingerConfiguration.OPTIONAL) {
+            r4Button.setVisibility(View.VISIBLE);
+            r4Button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fingerConfiguration[1] = FingerConfig.FingerConfiguration.ADDED;
+                    setFingers();
+                    dialog.dismiss();
+                }
+            });
+        }
+        else {
+            r4Button.setVisibility(View.GONE);
+        }
+
+        Button r3Button = (Button) dialog.findViewById(R.id.r_3_button);
+        if (fingerConfiguration[2] == FingerConfig.FingerConfiguration.OPTIONAL) {
+            r3Button.setVisibility(View.VISIBLE);
+            r3Button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fingerConfiguration[2] = FingerConfig.FingerConfiguration.ADDED;
+                    setFingers();
+                    dialog.dismiss();
+                }
+            });
+        }
+        else {
+            r3Button.setVisibility(View.GONE);
+        }
+
+        Button l3Button = (Button) dialog.findViewById(R.id.l_3_button);
+        if (fingerConfiguration[6] == FingerConfig.FingerConfiguration.OPTIONAL) {
+            l3Button.setVisibility(View.VISIBLE);
+            l3Button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fingerConfiguration[6] = FingerConfig.FingerConfiguration.ADDED;
+                    setFingers();
+                    dialog.dismiss();
+                }
+            });
+        }
+        else {
+            l3Button.setVisibility(View.GONE);
+        }
+        dialog.show();
     }
 }

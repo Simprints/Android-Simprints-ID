@@ -4,11 +4,16 @@ import java.util.ArrayList;
 
 public class Finger {
 
-    public static int NOT_REQUIRED = 0;
-    public static int NOT_COLLECTED = 1;
-    public static int COLLECTING = 2;
-    public static int GOOD_SCAN = 3;
-    public static int BAD_SCAN = 4;
+    //TODO: turn these into enums
+    public static int DO_NOT_COLLECT = 0;
+    public static int OPTIONAL = 1;
+    public static int REQUIRED = 2;
+    public static int ADDED = 3;
+    public static int NOT_COLLECTED = 4;
+    public static int COLLECTING = 5;
+    public static int GOOD_SCAN = 6;
+    public static int BAD_SCAN = 7;
+    public static int NO_SCAN = 8;
 
     public static ArrayList<Finger> fingers = new ArrayList<Finger>();
 
