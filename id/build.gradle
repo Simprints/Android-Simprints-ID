@@ -44,6 +44,7 @@ dependencies {
     compile 'com.android.support:design:24.0.0'
     compile 'com.android.support:support-v4:24.0.0'
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
+    compile 'com.android.volley:volley:1.0.0'
     compile 'com.simprints:libsimprints:1.0.0'
     compile 'com.simprints:libscanner:1.0.14'
     compile 'com.simprints:libdata:1.0.2'

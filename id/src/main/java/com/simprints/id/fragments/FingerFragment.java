@@ -15,6 +15,10 @@ import com.simprints.id.R;
 
 public class FingerFragment extends Fragment {
 
+    private int fingerNo;
+    private String fingerName;
+    private String title;
+    private String text;
     private TextView titleTextView;
     private TextView fingerTextView;
     private ImageView fingerImageView;
@@ -23,7 +27,8 @@ public class FingerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_finger, container, false);
-        final int finger = getArguments().getInt("finger");
+        fingerNo = getArguments().getInt("fingerNo");
+        fingerName = getArguments().getString("fingerName)");
         final String title = getArguments().getString("title");
         final String text = getArguments().getString("text");
         titleTextView = (TextView) view.findViewById(R.id.title);
@@ -31,18 +36,21 @@ public class FingerFragment extends Fragment {
         fingerImageView = (ImageView) view.findViewById(R.id.finger_image);
         fingerProgressBar = (ProgressBar) view.findViewById(R.id.finger_progress_bar);
         titleTextView.setText(getArguments().getString("title"));
-        fingerTextView.setText(getArguments().getString("text"));
+        fingerTextView.setText(fingerName);
         return view;
     }
 
-    public static FingerFragment newInstance(int finger, String title, String text) {
+    public static FingerFragment newInstance(int fingerNo, String fingerName) {
         FingerFragment fingerFragment = new FingerFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt("finger", finger);
-        bundle.putString("title", title);
-        bundle.putString("text", text);
+        bundle.putInt("fingerNo", fingerNo);
+        bundle.putString("fingerName", fingerName);
         fingerFragment.setArguments(bundle);
         return fingerFragment;
+    }
+
+    public int getFingerNo() {
+        return fingerNo;
     }
 
     public void showProgressBar(int visibility) {
