@@ -4,6 +4,7 @@ import android.graphics.ColorFilter;
 import android.graphics.ColorMatrixColorFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ public class FingerFragment extends Fragment {
 
     private int fingerNo;
     private String fingerName;
+    private int fingerImage;
     private String title;
     private String text;
     private TextView titleTextView;
@@ -28,23 +30,25 @@ public class FingerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_finger, container, false);
         fingerNo = getArguments().getInt("fingerNo");
-        fingerName = getArguments().getString("fingerName)");
-        final String title = getArguments().getString("title");
-        final String text = getArguments().getString("text");
+        fingerName = getArguments().getString("fingerName");
+        fingerImage = getArguments().getInt("fingerImage");
         titleTextView = (TextView) view.findViewById(R.id.title);
         fingerTextView = (TextView) view.findViewById(R.id.finger_text);
         fingerImageView = (ImageView) view.findViewById(R.id.finger_image);
         fingerProgressBar = (ProgressBar) view.findViewById(R.id.finger_progress_bar);
         titleTextView.setText(getArguments().getString("title"));
-        fingerTextView.setText(fingerName);
+        fingerTextView.setText(Html.fromHtml(fingerName));
+        fingerImageView.setImageResource(fingerImage);
+        fingerImageView.setVisibility(View.VISIBLE);
         return view;
     }
 
-    public static FingerFragment newInstance(int fingerNo, String fingerName) {
+    public static FingerFragment newInstance(int fingerNo, String fingerName, int fingerImage) {
         FingerFragment fingerFragment = new FingerFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("fingerNo", fingerNo);
         bundle.putString("fingerName", fingerName);
+        bundle.putInt("fingerImage", fingerImage);
         fingerFragment.setArguments(bundle);
         return fingerFragment;
     }

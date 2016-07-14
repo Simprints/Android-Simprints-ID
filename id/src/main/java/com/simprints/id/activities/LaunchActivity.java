@@ -41,6 +41,8 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
 
     private LoadingTask loadingTask;
 
+    private boolean isExiting = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,9 +80,6 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                 BaseApplication.setGuid(guid);
             }
         }
-        else {
-            //finish();
-        }
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         loadingTask = new LoadingTask();
@@ -106,6 +105,8 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         @Override
         protected Integer doInBackground(Void... arg0) {
 
+            //TODO: capture current time, use to make sure that if apikey and/or scanner return in less than requried time we display loading screen for the difference
+
             // initial display minimum
             try {
                 Thread.sleep(INITIAL_DISPLAY_MINIMUM);
@@ -116,7 +117,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
             }
 
             // check for mandatory parameters
-            if (apiKey == null) {
+            if (isExiting == false && apiKey == null) {
                 Intent intent = new Intent(context, AlertActivity.class);
                 intent.putExtra("alertType", BaseApplication.MISSING_API_KEY);
                 startActivity(intent);
@@ -126,6 +127,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
             else {
                 BaseApplication.getData().validateApiKey(apiKey);
             }
+
 
             // subsequent display maximum
             try {
@@ -155,6 +157,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK: {
                 loadingTask.cancel(true);
+                isExiting = true;
                 finish();
                 return true;
             }

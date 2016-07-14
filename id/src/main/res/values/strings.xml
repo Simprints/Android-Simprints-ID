@@ -23,16 +23,16 @@
     <string name="register_title">Enrollment</string>
     <string name="identify_title">Identify</string>
 
-    <string name="l_5_finger_name">LEFT 5TH FINGER</string>
-    <string name="l_4_finger_name">LEFT 4TH FINGER</string>
-    <string name="l_3_finger_name">LEFT 3RD FINGER</string>
+    <string name="l_5_finger_name">LEFT FIFTH FINGER</string>
+    <string name="l_4_finger_name">LEFT FOURTH FINGER</string>
+    <string name="l_3_finger_name">LEFT THIRD FINGER</string>
     <string name="l_2_finger_name">LEFT INDEX FINGER</string>
     <string name="l_1_finger_name">LEFT THUMB</string>
     <string name="r_1_finger_name">RIGHT THUMB</string>
     <string name="r_2_finger_name">RIGHT INDEX FINGER</string>
-    <string name="r_3_finger_name">RIGHT 3RD FINGER</string>
-    <string name="r_4_finger_name">RIGHT 4TH FINGER</string>
-    <string name="r_5_finger_name">RIGHT 5TH FINGER</string>
+    <string name="r_3_finger_name">RIGHT THIRD FINGER</string>
+    <string name="r_4_finger_name">RIGHT FOURTH FINGER</string>
+    <string name="r_5_finger_name">RIGHT FIFTH FINGER</string>
 
     <string name="scan_label">SCAN</string>
 
@@ -53,5 +53,6 @@
     <string name="application_not_authorised_message">The application is not authorised, please contact your system administrator</string>
     <string name="close">CLOSE</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="cancel_button">CANCEL</string>
 
 </resources>

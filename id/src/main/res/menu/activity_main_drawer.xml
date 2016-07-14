@@ -3,7 +3,7 @@
 
     <item android:title="@string/fingerprints_menu">
         <menu>
-            <item android:id="@+id/nav_fingerprint" android:icon="@drawable/ic_menu_fingerprint"
+            <item android:id="@+id/nav_add" android:icon="@drawable/ic_menu_fingerprint"
                 android:title="Add" />
         </menu>
     </item>
