@@ -1,19 +1,32 @@
 package com.simprints.id;
 
 import android.app.Application;
+import android.content.Context;
+
+import com.simprints.libdata.Data;
+import com.simprints.libscanner.Scanner;
 
 public class BaseApplication extends Application {
 
+    private static Context context = null;
+
+    public static Context getContext() { return context; }
+
+    public static void setContext(Context context) {
+        BaseApplication.context = context;
+    }
+
     final public static int MISSING_API_KEY = 0;
     final public static int INVALID_API_KEY = 1;
+    final public static int VALIDATION_FAILED = 2;
 
     final public static int REGISTER_SUBJECT = 0;
     final public static int IDENTIFY_SUBJECT = 1;
-    private static int operation;
+    private static int mode;
 
-    public static int getOperation() { return operation; }
+    public static int getMode() { return mode; }
 
-    public static void setOperation(int operation) { BaseApplication.operation = operation; }
+    public static void setMode(int mode) { BaseApplication.mode = mode; }
 
     private static String apiKey = null;
 
@@ -44,4 +57,26 @@ public class BaseApplication extends Application {
     public static String getGuid() { return guid; }
 
     public static void setGuid(String guid) { BaseApplication.guid = guid; }
+
+    private static Scanner scanner;
+
+    public static Scanner getScanner() {
+        if (scanner == null) {
+
+        }
+        return BaseApplication.scanner;
+    }
+
+    public static void setScanner(Scanner scanner) { BaseApplication.scanner = scanner; }
+
+    private static Data data;
+
+    public static Data getData() {
+        if (data == null) {
+            data = new Data(context);
+        }
+        return data;
+    }
+
+    public static void setData(Data data) { BaseApplication.data = data; }
 }
