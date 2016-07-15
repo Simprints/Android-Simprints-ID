@@ -66,6 +66,14 @@ public class AlertActivity extends AppCompatActivity {
             alertRightButtonTextView.setVisibility(View.GONE);
         }
 
+        if (alertType == BaseApplication.INVALID_API_KEY) {
+            alertTitleTextView.setText(R.string.configuration_error_title);
+            alertMessageTextView.setText(R.string.invalid_apikey_message);
+            alertGraphicImageView.setImageResource(R.drawable.configuration_error);
+            alertLeftButtonTextView.setText(R.string.close);
+            alertRightButtonTextView.setVisibility(View.GONE);
+        }
+
         if (alertType == BaseApplication.NO_SCANNER_FOUND) {
             alertTitleTextView.setText(R.string.no_scanner_found_title);
             alertMessageTextView.setText(R.string.no_scanner_found_message);
