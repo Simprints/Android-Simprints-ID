@@ -1,7 +1,6 @@
 package com.simprints.id.activities;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -9,7 +8,6 @@ import android.widget.TextView;
 
 import com.simprints.id.BaseApplication;
 import com.simprints.id.R;
-import com.simprints.libsimprints.Constants;
 
 public class AlertActivity extends AppCompatActivity {
 
@@ -66,6 +64,22 @@ public class AlertActivity extends AppCompatActivity {
             alertGraphicImageView.setImageResource(R.drawable.configuration_error);
             alertLeftButtonTextView.setText(R.string.close);
             alertRightButtonTextView.setVisibility(View.GONE);
+        }
+
+        if (alertType == BaseApplication.NO_SCANNER_FOUND) {
+            alertTitleTextView.setText(R.string.no_scanner_found_title);
+            alertMessageTextView.setText(R.string.no_scanner_found_message);
+            alertGraphicImageView.setImageResource(R.drawable.no_scanner_found);
+            alertLeftButtonTextView.setText(R.string.close);
+            alertRightButtonTextView.setText("Settings");
+        }
+
+        if (alertType == BaseApplication.MULTIPLE_SCANNERS_FOUND) {
+            alertTitleTextView.setText(R.string.multiple_scanners_found_title);
+            alertMessageTextView.setText(R.string.multiple_scanners_found_message);
+            alertGraphicImageView.setImageResource(R.drawable.multiple_scanners_found);
+            alertLeftButtonTextView.setText(R.string.close);
+            alertRightButtonTextView.setText("Settings");
         }
     }
 }

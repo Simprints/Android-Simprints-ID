@@ -41,15 +41,18 @@
     <string name="long_consent">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
 
     <string name="configuration_error_title">CONFIGURATION ERROR</string>
-    <string name="bluetooth_not_supported_title">BLUETOOTH NOT SUPPORTED</string>
-    <string name="bluetooth_not_enabled_title">BLUETOOTH NOT ENABLED</string>
-    <string name="more_than_one_scanner_found_title">MULTIPLE SCANNERS FOUND</string>
-    <string name="cannot_connect_to_scanner_title">CANNOT CONNECT TO SCANNER</string>
-    <string name="connection_lost_title">CONNECTION LOST</string>
     <string name="missing_user_id_message">A configuration error has occurred (missing user id), please contact your system administrator</string>
     <string name="missing_device_id_message">A configuration error has occurred (missing device id), please contact your system administrator</string>
     <string name="missing_apikey_message">A configuration error has occurred (missing apikey), please contact your system administrator</string>
     <string name="missing_calling_package_message">A configuration error has occurred (missing calling package) please contact your system administrator</string>
+    <string name="bluetooth_not_supported_title">BLUETOOTH NOT SUPPORTED</string>
+    <string name="bluetooth_not_enabled_title">BLUETOOTH NOT ENABLED</string>
+    <string name="no_scanner_found_title">NO SCANNER FOUND</string>
+    <string name="no_scanner_found_message">No scanner has been found, please make sure it is switched on, in range and paired via Bluetooth</string>
+    <string name="multiple_scanners_found_title">MULTIPLE SCANNERS FOUND</string>
+    <string name="multiple_scanners_found_message">More than one scanner has been found, please ensure you are connecting to the correct one</string>
+    <string name="cannot_connect_to_scanner_title">CANNOT CONNECT TO SCANNER</string>
+    <string name="connection_lost_title">CONNECTION LOST</string>
     <string name="application_not_authorised_message">The application is not authorised, please contact your system administrator</string>
     <string name="close">CLOSE</string>
     <string name="title_activity_main">MainActivity</string>

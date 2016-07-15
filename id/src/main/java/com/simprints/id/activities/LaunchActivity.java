@@ -18,6 +18,7 @@ import com.simprints.libdata.EVENT;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
 
+import java.util.List;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
@@ -42,6 +43,10 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     private LoadingTask loadingTask;
 
     private boolean isExiting = false;
+
+    private Scanner scanner;
+
+    private Data data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +86,16 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
             }
         }
 
+        // set scanner instance and set in singleton
+        scanner = new Scanner();
+        scanner.setScannerListener(this);
+        BaseApplication.setScanner(scanner);
+
+        // get data instance and set in singleton
+        data = new Data(context);
+        data.setDataListener(this);
+        BaseApplication.setData(data);
+
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         loadingTask = new LoadingTask();
         loadingTask.execute();
@@ -97,6 +112,10 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     }
 
     private class LoadingTask extends AsyncTask<Void, Void, Integer> {
+
+        private long startTime;
+        private long currentTime;
+
         @Override
         protected void onPreExecute() {
             progressBar.setVisibility(View.VISIBLE);
@@ -105,15 +124,32 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         @Override
         protected Integer doInBackground(Void... arg0) {
 
-            //TODO: capture current time, use to make sure that if apikey and/or scanner return in less than requried time we display loading screen for the difference
+            startTime = System.currentTimeMillis();
+
+            /*
+            // look for paired scanners
+            int noOfPairedScanners = 0;
+            String macAddress = null;
+            List<String> pairedScanners = Scanner.getPairedScanners();
+            for (String pairedScanner : pairedScanners) {
+                if (Scanner.isScannerAddress(pairedScanner)) {
+                    Log.w("Simprints", "paired mac address = " + pairedScanner);
+                    macAddress = pairedScanner;
+                    noOfPairedScanners += 1;
+                }
+            }
+            */
 
             // initial display minimum
-            try {
-                Thread.sleep(INITIAL_DISPLAY_MINIMUM);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-                finish();
+            currentTime = System.currentTimeMillis();
+            if (currentTime - startTime < INITIAL_DISPLAY_MINIMUM) {
+                try {
+                    Thread.sleep(INITIAL_DISPLAY_MINIMUM - currentTime - startTime);
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                    finish();
+                }
             }
 
             // check for mandatory parameters
@@ -128,6 +164,25 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                 BaseApplication.getData().validateApiKey(apiKey);
             }
 
+            /*
+            // check for no scanner found
+            if (noOfPairedScanners == 0) {
+                Intent intent = new Intent(context, AlertActivity.class);
+                intent.putExtra("alertType", BaseApplication.NO_SCANNER_FOUND);
+                startActivity(intent);
+                finish();
+                return 0;
+            }
+
+            // check for multiple scanners found
+            if (noOfPairedScanners > 1) {
+                Intent intent = new Intent(context, AlertActivity.class);
+                intent.putExtra("alertType", BaseApplication.MULTIPLE_SCANNERS_FOUND);
+                startActivity(intent);
+                finish();
+                return 0;
+            }
+            */
 
             // subsequent display maximum
             try {
