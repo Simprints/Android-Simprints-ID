@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -21,16 +20,16 @@ import com.simprints.libsimprints.Constants;
 import java.util.List;
 import java.util.UUID;
 
-import io.fabric.sdk.android.Fabric;
-import com.crashlytics.android.Crashlytics;
-
 public class LaunchActivity extends AppCompatActivity implements Scanner.ScannerListener, Data.DataListener {
 
     private Context context;
     private ProgressBar progressBar;
 
-    private static int INITIAL_DISPLAY_MINIMUM = 2000;
-    private static int SUBSEQUENT_DISPLAY_MAXIMUM = 5000;
+    private static int INITIAL_DISPLAY_MINIMUM = 5000;
+    private static int SUBSEQUENT_DISPLAY_MAXIMUM = 30000;
+
+    private static int NOT_READY = 0;
+    private static int READY = 1;
 
     private String userId = null;
     private String deviceId = null;
@@ -39,17 +38,17 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     private String guid = null;
 
     private int mode;
-
-    private LoadingTask loadingTask;
-
     private boolean isExiting = false;
 
     private Scanner scanner = null;
     public final Scanner.ScannerListener scannerListener = this;
+    private boolean scannerConnected = false;
 
     private Data data = null;
     public final Data.DataListener dataListener = this;
     private boolean apiKeyValid = false;
+
+    private long startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,140 +92,112 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         }
 
         // start loading task
+        startTime = System.currentTimeMillis();
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-        loadingTask = new LoadingTask();
-        loadingTask.execute();
+        progressBar.setVisibility(View.VISIBLE);
+
+        // check for mandatory apiKey parameter
+        if (isExiting == false && apiKey == null) {
+            Intent intent = new Intent(context, AlertActivity.class);
+            intent.putExtra("alertType", BaseApplication.MISSING_API_KEY);
+            startActivity(intent);
+            finish();
+        }
+
+        // set data instance and persist in singleton
+        data = new Data(context);
+        data.setDataListener(dataListener);
+        BaseApplication.setData(data);
+        BaseApplication.getData().validateApiKey(apiKey);
+
+        int noOfPairedScanners = 0;
+        String macAddress = null;
+        List<String> pairedScanners = Scanner.getPairedScanners();
+        for (String pairedScanner : pairedScanners) {
+            if (Scanner.isScannerAddress(pairedScanner)) {
+                macAddress = pairedScanner;
+                noOfPairedScanners += 1;
+            }
+        }
+
+        // check for no scanner found
+        if (noOfPairedScanners == 0) {
+            Intent intent = new Intent(context, AlertActivity.class);
+            intent.putExtra("alertType", BaseApplication.NO_SCANNER_FOUND);
+            startActivity(intent);
+            isExiting = true;
+            finish();
+        }
+
+        // check for multiple scanners found
+        if (noOfPairedScanners > 1) {
+            Intent intent = new Intent(context, AlertActivity.class);
+            intent.putExtra("alertType", BaseApplication.MULTIPLE_SCANNERS_FOUND);
+            startActivity(intent);
+            isExiting = true;
+            finish();
+        }
+
+        // set scanner instance and set in singleton
+        scanner = new Scanner(macAddress);
+        scanner.setScannerListener(scannerListener);
+        BaseApplication.setScanner(scanner);
+        scanner.connect();
     }
 
     @Override
     public void onScannerEvent(com.simprints.libscanner.EVENT event) {
         Log.w("Simprints", "ID: onScannerEvent event name = " + event.name() + " detail = " + event.details());
+        if (event.equals(com.simprints.libscanner.EVENT.CONNECTION_SUCCESS)) {
+            scannerConnected = true;
+            Log.w("Simprints", "ID: scannerConnected = true");
+            checkApiKeyAndScannerConnected();
+        }
     }
 
     @Override
     public void onDataEvent(EVENT event) {
         Log.w("Simprints", "ID: onDataEvent event name = " + event.name() + " details = " + event.details());
-        if (event.equals(EVENT.API_KEY_VALID)) {
+        if (event.equals(com.simprints.libdata.EVENT.API_KEY_VALID)) {
             apiKeyValid = true;
+            Log.w("Simprints", "ID: apiKeyValid = true");
+            checkApiKeyAndScannerConnected();
         }
-        else if (event.equals(EVENT.API_KEY_INVALID)) {
+        else if (event.equals(com.simprints.libdata.EVENT.API_KEY_INVALID)) {
             apiKeyValid = false;
             Intent intent = new Intent(context, AlertActivity.class);
             intent.putExtra("alertType", BaseApplication.INVALID_API_KEY);
             startActivity(intent);
-            loadingTask.cancel(true);
             isExiting = true;
             finish();
         }
     }
 
-    private class LoadingTask extends AsyncTask<Void, Void, Integer> {
-
-        private long startTime;
-        private long currentTime;
-
-        @Override
-        protected void onPreExecute() {
-            progressBar.setVisibility(View.VISIBLE);
+    private void checkApiKeyAndScannerConnected() {
+        if (apiKeyValid && scannerConnected) {
+            DelayAndContinueTask delayAndContinueTask = new DelayAndContinueTask();
+            delayAndContinueTask.execute();
         }
+    }
+
+    private class DelayAndContinueTask extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected Integer doInBackground(Void... arg0) {
-
-            startTime = System.currentTimeMillis();
-
-            // look for paired scanners
-            int noOfPairedScanners = 0;
-            String macAddress = null;
-            List<String> pairedScanners = Scanner.getPairedScanners();
-            for (String pairedScanner : pairedScanners) {
-                if (Scanner.isScannerAddress(pairedScanner)) {
-                    Log.w("Simprints", "paired mac address = " + pairedScanner);
-                    macAddress = pairedScanner;
-                    noOfPairedScanners += 1;
-                }
-            }
-
-            // initial display minimum
-            //currentTime = System.currentTimeMillis();
-            //if (currentTime - startTime < INITIAL_DISPLAY_MINIMUM) {
+        protected Void doInBackground(Void... voids) {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - startTime < INITIAL_DISPLAY_MINIMUM) {
                 try {
-                    Thread.sleep(INITIAL_DISPLAY_MINIMUM);
+                    Thread.sleep(INITIAL_DISPLAY_MINIMUM - (currentTime - startTime));
                 }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
-                    finish();
-                }
-            //}
-
-            // set data instance and persist in singleton
-            data = new Data(context);
-            data.setDataListener(dataListener);
-            BaseApplication.setData(data);
-
-            // check for mandatory parameters
-            if (isExiting == false && apiKey == null) {
-                Intent intent = new Intent(context, AlertActivity.class);
-                intent.putExtra("alertType", BaseApplication.MISSING_API_KEY);
-                startActivity(intent);
-                loadingTask.cancel(true);
-                isExiting = true;
-                finish();
-                return 0;
+                catch (InterruptedException e) { }
             }
-            else {
-                BaseApplication.getData().validateApiKey(apiKey);
-            }
-
-            // check for no scanner found
-            if (noOfPairedScanners == 0) {
-                Intent intent = new Intent(context, AlertActivity.class);
-                intent.putExtra("alertType", BaseApplication.NO_SCANNER_FOUND);
-                startActivity(intent);
-                loadingTask.cancel(true);
-                isExiting = true;
-                finish();
-                return 0;
-            }
-
-            // check for multiple scanners found
-            if (noOfPairedScanners > 1) {
-                Intent intent = new Intent(context, AlertActivity.class);
-                intent.putExtra("alertType", BaseApplication.MULTIPLE_SCANNERS_FOUND);
-                startActivity(intent);
-                loadingTask.cancel(true);
-                isExiting = true;
-                finish();
-                return 0;
-            }
-
-            // set scanner instance and set in singleton
-            scanner = new Scanner(macAddress);
-            scanner.setScannerListener(scannerListener);
-            BaseApplication.setScanner(scanner);
-
-            // attempt connection to scanner
-            scanner.connect();
-
-            // subsequent display maximum
-            try {
-                Thread.sleep(SUBSEQUENT_DISPLAY_MAXIMUM);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-                finish();
-            }
-
-            return 1;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(Integer result) {
-            progressBar.setVisibility(View.INVISIBLE);
-            if (result == 1) {
-                Intent intent = new Intent(context, ConsentActivity.class);
-                startActivity(intent);
-            }
+        protected void onPostExecute(Void result) {
+            Intent intent = new Intent(context, ConsentActivity.class);
+            startActivity(intent);
             finish();
         }
     }
@@ -235,7 +206,6 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK: {
-                loadingTask.cancel(true);
                 isExiting = true;
                 finish();
                 return true;

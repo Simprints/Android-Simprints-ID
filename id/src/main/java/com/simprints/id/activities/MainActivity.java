@@ -29,14 +29,16 @@ import com.simprints.id.R;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 import com.simprints.libcommon.FingerConfig;
+import com.simprints.libscanner.EVENT;
 import com.simprints.libscanner.Scanner;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, Scanner.ScannerListener {
 
     private Context context;
     private boolean isExiting = false;
 
+    private Scanner scanner = null;
     private Button scanButton;
 
     private static ViewPager viewPager;
@@ -110,6 +112,9 @@ public class MainActivity extends AppCompatActivity
             actionBar.setTitle(R.string.identify_title);
         }
 
+        scanner = BaseApplication.getScanner();
+        scanner.setScannerListener(this);
+
         setFingers();
 
         viewPager = (ViewPager) findViewById(R.id.view_pager);
@@ -158,9 +163,15 @@ public class MainActivity extends AppCompatActivity
                     scanButton.setText(R.string.scan_label);
                     scanButton.setTextColor(Color.WHITE);
                     scanButton.setBackgroundColor(Color.BLUE);
+                    scanner.captureImage();
                 }
             }
         });
+    }
+
+    @Override
+    public void onScannerEvent(EVENT event) {
+
     }
 
     private class FingerPageAdapter extends FragmentPagerAdapter {
