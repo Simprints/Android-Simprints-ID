@@ -44,9 +44,11 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
 
     private boolean isExiting = false;
 
-    private Scanner scanner;
+    private Scanner scanner = null;
+    public final Scanner.ScannerListener scannerListener = this;
 
-    private Data data;
+    private Data data = null;
+    public final Data.DataListener dataListener = this;
     private boolean apiKeyValid = false;
 
     @Override
@@ -89,16 +91,6 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                 BaseApplication.setGuid(guid);
             }
         }
-
-        // set scanner instance and set in singleton
-        scanner = new Scanner();
-        scanner.setScannerListener(this);
-        BaseApplication.setScanner(scanner);
-
-        // get data instance and set in singleton
-        data = new Data(context);
-        data.setDataListener(this);
-        BaseApplication.setData(data);
 
         // start loading task
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -167,6 +159,11 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                 }
             //}
 
+            // set data instance and persist in singleton
+            data = new Data(context);
+            data.setDataListener(dataListener);
+            BaseApplication.setData(data);
+
             // check for mandatory parameters
             if (isExiting == false && apiKey == null) {
                 Intent intent = new Intent(context, AlertActivity.class);
@@ -203,6 +200,14 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                 return 0;
             }
 
+            // set scanner instance and set in singleton
+            scanner = new Scanner(macAddress);
+            scanner.setScannerListener(scannerListener);
+            BaseApplication.setScanner(scanner);
+
+            // attempt connection to scanner
+            scanner.connect();
+
             // subsequent display maximum
             try {
                 Thread.sleep(SUBSEQUENT_DISPLAY_MAXIMUM);
@@ -237,5 +242,15 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
             }
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (isExiting == true) {
+            if (scanner != null) {
+                scanner.disconnect();
+            }
+        }
     }
 }
