@@ -2,16 +2,19 @@ package com.simprints.id.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.simprints.id.BaseApplication;
 import com.simprints.id.R;
+import com.simprints.libscanner.Scanner;
 
 public class AlertActivity extends AppCompatActivity {
 
     private int alertType;
+    private boolean isExiting = false;
 
     private TextView alertTitleTextView;
     private ImageView alertGraphicImageView;
@@ -88,6 +91,29 @@ public class AlertActivity extends AppCompatActivity {
             alertGraphicImageView.setImageResource(R.drawable.multiple_scanners_found);
             alertLeftButtonTextView.setText(R.string.close);
             alertRightButtonTextView.setText("Settings");
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK: {
+                isExiting = true;
+                finish();
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (isExiting == true) {
+            Scanner scanner = BaseApplication.getScanner();
+            if (scanner != null) {
+                scanner.disconnect();
+            }
         }
     }
 }

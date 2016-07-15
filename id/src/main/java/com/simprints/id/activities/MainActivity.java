@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -28,11 +29,14 @@ import com.simprints.id.R;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 import com.simprints.libcommon.FingerConfig;
+import com.simprints.libscanner.Scanner;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Context context;
+    private boolean isExiting = false;
+
     private Button scanButton;
 
     private static ViewPager viewPager;
@@ -401,5 +405,28 @@ public class MainActivity extends AppCompatActivity
             l3Button.setVisibility(View.GONE);
         }
         dialog.show();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK: {
+                isExiting = true;
+                finish();
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (isExiting == true) {
+            Scanner scanner = BaseApplication.getScanner();
+            if (scanner != null) {
+                scanner.disconnect();
+            }
+        }
     }
 }
