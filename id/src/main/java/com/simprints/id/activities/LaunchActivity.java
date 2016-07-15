@@ -47,6 +47,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     private Scanner scanner;
 
     private Data data;
+    private boolean apiKeyValid = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
 
         //Fabric.with(this, new Crashlytics());
 
+        // get parameters
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             userId = extras.getString(Constants.SIMPRINTS_USER_ID);
@@ -66,12 +68,14 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
             guid = extras.getString(Constants.SIMPRINTS_GUID);
         }
 
+        // persist in singleton
         BaseApplication.setUserId(userId);
         BaseApplication.setDeviceId(deviceId);
         BaseApplication.setApiKey(apiKey);
         BaseApplication.setCallingPackage(callingPackage);
         BaseApplication.setGuid(guid);
 
+        // check intents, set mode and get additional parameters if appropriate
         if (getIntent().getAction().equals(Constants.SIMPRINTS_IDENTIFY_INTENT)) {
             mode = BaseApplication.IDENTIFY_SUBJECT;
             BaseApplication.setMode(mode);
@@ -96,6 +100,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         data.setDataListener(this);
         BaseApplication.setData(data);
 
+        // start loading task
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         loadingTask = new LoadingTask();
         loadingTask.execute();
@@ -109,6 +114,18 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     @Override
     public void onDataEvent(EVENT event) {
         Log.w("Simprints", "ID: onDataEvent event name = " + event.name() + " details = " + event.details());
+        if (event.equals(EVENT.API_KEY_VALID)) {
+            apiKeyValid = true;
+        }
+        else if (event.equals(EVENT.API_KEY_INVALID)) {
+            apiKeyValid = false;
+            Intent intent = new Intent(context, AlertActivity.class);
+            intent.putExtra("alertType", BaseApplication.INVALID_API_KEY);
+            startActivity(intent);
+            loadingTask.cancel(true);
+            isExiting = true;
+            finish();
+        }
     }
 
     private class LoadingTask extends AsyncTask<Void, Void, Integer> {
@@ -126,7 +143,6 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
 
             startTime = System.currentTimeMillis();
 
-            /*
             // look for paired scanners
             int noOfPairedScanners = 0;
             String macAddress = null;
@@ -138,25 +154,26 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                     noOfPairedScanners += 1;
                 }
             }
-            */
 
             // initial display minimum
-            currentTime = System.currentTimeMillis();
-            if (currentTime - startTime < INITIAL_DISPLAY_MINIMUM) {
+            //currentTime = System.currentTimeMillis();
+            //if (currentTime - startTime < INITIAL_DISPLAY_MINIMUM) {
                 try {
-                    Thread.sleep(INITIAL_DISPLAY_MINIMUM - currentTime - startTime);
+                    Thread.sleep(INITIAL_DISPLAY_MINIMUM);
                 }
                 catch (InterruptedException e) {
                     e.printStackTrace();
                     finish();
                 }
-            }
+            //}
 
             // check for mandatory parameters
             if (isExiting == false && apiKey == null) {
                 Intent intent = new Intent(context, AlertActivity.class);
                 intent.putExtra("alertType", BaseApplication.MISSING_API_KEY);
                 startActivity(intent);
+                loadingTask.cancel(true);
+                isExiting = true;
                 finish();
                 return 0;
             }
@@ -164,12 +181,13 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                 BaseApplication.getData().validateApiKey(apiKey);
             }
 
-            /*
             // check for no scanner found
             if (noOfPairedScanners == 0) {
                 Intent intent = new Intent(context, AlertActivity.class);
                 intent.putExtra("alertType", BaseApplication.NO_SCANNER_FOUND);
                 startActivity(intent);
+                loadingTask.cancel(true);
+                isExiting = true;
                 finish();
                 return 0;
             }
@@ -179,10 +197,11 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                 Intent intent = new Intent(context, AlertActivity.class);
                 intent.putExtra("alertType", BaseApplication.MULTIPLE_SCANNERS_FOUND);
                 startActivity(intent);
+                loadingTask.cancel(true);
+                isExiting = true;
                 finish();
                 return 0;
             }
-            */
 
             // subsequent display maximum
             try {
