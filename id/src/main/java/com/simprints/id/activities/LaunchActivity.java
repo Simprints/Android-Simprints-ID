@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -27,6 +28,8 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
 
     private static int INITIAL_DISPLAY_MINIMUM = 5000;
     private static int SUBSEQUENT_DISPLAY_MAXIMUM = 30000;
+    private static Handler handler;
+    private static Runnable runnable;
 
     private static int NOT_READY = 0;
     private static int READY = 1;
@@ -104,12 +107,28 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
             finish();
         }
 
+        // set timeout for api key validation and/or scanner connected
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!apiKeyValid || !scannerConnected) {
+                    Intent intent = new Intent(context, AlertActivity.class);
+                    intent.putExtra("alertType", BaseApplication.NO_SCANNER_FOUND);
+                    startActivity(intent);
+                    isExiting = true;
+                    finish();
+                }
+            }
+        };
+        handler.postDelayed(runnable, SUBSEQUENT_DISPLAY_MAXIMUM);
+
         // set data instance and persist in singleton
         data = new Data(context);
         data.setDataListener(dataListener);
         BaseApplication.setData(data);
         BaseApplication.getData().validateApiKey(apiKey);
 
+        // get list of paired scanners
         int noOfPairedScanners = 0;
         String macAddress = null;
         List<String> pairedScanners = Scanner.getPairedScanners();
@@ -150,7 +169,6 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         Log.w("Simprints", "ID: onScannerEvent event name = " + event.name() + " detail = " + event.details());
         if (event.equals(com.simprints.libscanner.EVENT.CONNECTION_SUCCESS)) {
             scannerConnected = true;
-            Log.w("Simprints", "ID: scannerConnected = true");
             checkApiKeyAndScannerConnected();
         }
     }
@@ -160,10 +178,10 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         Log.w("Simprints", "ID: onDataEvent event name = " + event.name() + " details = " + event.details());
         if (event.equals(com.simprints.libdata.EVENT.API_KEY_VALID)) {
             apiKeyValid = true;
-            Log.w("Simprints", "ID: apiKeyValid = true");
             checkApiKeyAndScannerConnected();
         }
-        else if (event.equals(com.simprints.libdata.EVENT.API_KEY_INVALID)) {
+        else
+        if (event.equals(com.simprints.libdata.EVENT.API_KEY_INVALID)) {
             apiKeyValid = false;
             Intent intent = new Intent(context, AlertActivity.class);
             intent.putExtra("alertType", BaseApplication.INVALID_API_KEY);
@@ -181,7 +199,6 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     }
 
     private class DelayAndContinueTask extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected Void doInBackground(Void... voids) {
             long currentTime = System.currentTimeMillis();
