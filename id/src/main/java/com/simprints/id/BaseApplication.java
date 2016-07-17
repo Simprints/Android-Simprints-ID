@@ -23,6 +23,7 @@ public class BaseApplication extends Application {
     final public static int BLUETOOTH_NOT_ENABLED = 4;
     final public static int NO_SCANNER_FOUND = 5;
     final public static int MULTIPLE_SCANNERS_FOUND = 6;
+    final public static int TIMEOUT_OCCURED = 7;
 
     final public static int REGISTER_SUBJECT = 0;
     final public static int IDENTIFY_SUBJECT = 1;
