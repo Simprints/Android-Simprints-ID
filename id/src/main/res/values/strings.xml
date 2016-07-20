@@ -47,16 +47,23 @@
     <string name="missing_calling_package_message">A configuration error has occurred (missing calling package) please contact your system administrator</string>
     <string name="invalid_apikey_message">A configuration error has occurred (invalid apikey), please contact your system administrator</string>
     <string name="bluetooth_not_supported_title">BLUETOOTH NOT SUPPORTED</string>
+    <string name="bluetooth_not_supported_message">Bluetooth not supported on this device, please contact your system administrator</string>
     <string name="bluetooth_not_enabled_title">BLUETOOTH NOT ENABLED</string>
+    <string name="bluetooth_not_enabled_message">Bluettooth not enabled, please make sure it is enabled in settings and try again</string>
     <string name="no_scanner_found_title">NO SCANNER FOUND</string>
     <string name="no_scanner_found_message">No scanner has been found, please make sure it is switched on, in range and paired via Bluetooth</string>
     <string name="multiple_scanners_found_title">MULTIPLE SCANNERS FOUND</string>
     <string name="multiple_scanners_found_message">More than one scanner has been found, please ensure you are connecting to the correct one</string>
     <string name="cannot_connect_to_scanner_title">CANNOT CONNECT TO SCANNER</string>
+    <string name="cannot_connect_to_scanner_message">Unable to connect to scanner, please check it is powered on and in range</string>
+    <string name="timeout_occured_title">AN ERROR OCCURED</string>
+    <string name="timeout_occured_message">An error occured, please check scanner is powered on and in range or contact your system administrator</string>
     <string name="connection_lost_title">CONNECTION LOST</string>
     <string name="application_not_authorised_message">The application is not authorised, please contact your system administrator</string>
     <string name="close">CLOSE</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="cancel_button">CANCEL</string>
+    <string name="try_again_label">Try Again</string>
+    <string name="settings_label">Settings</string>
 
 </resources>

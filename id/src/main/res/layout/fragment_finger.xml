@@ -1,37 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:background="#1F000000"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+    android:background="@color/simprints_grey">
 
-    <TextView
-        android:id="@+id/title"
-        android:text=""
-        android:layout_marginTop="20dp"
-        android:textSize="20dp"
-        android:textStyle="bold"
-        android:textColor="#7F000000"
-        android:gravity="center_horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0"/>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:background="#FFFFFF"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="7">
-
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
         <ImageView
+            android:gravity="top|center_horizontal"
+            android:layout_gravity="top|center_horizontal"
+            android:scaleType="fitStart"
             android:id="@+id/finger_image"
-            android:layout_gravity="center"
+            android:src="@drawable/hand_bb_l1_c1"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="4"
-            android:visibility="invisible"
-            android:gravity="top|center_horizontal"/>
+            android:visibility="visible"/>
         <ProgressBar
             android:id="@+id/finger_progress_bar"
             style="?android:attr/progressBarStyleLarge"
@@ -55,7 +42,5 @@
             android:layout_weight="1"
             android:layout_marginTop="5dp"
             android:visibility="visible"/>
-
-    </LinearLayout>
 
 </LinearLayout>
