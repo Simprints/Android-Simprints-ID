@@ -19,6 +19,7 @@ public class AlertActivity extends AppCompatActivity {
 
     private Context context;
     private int alertType;
+    private String alertMessage;
     private boolean isExiting = false;
 
     private String userId = null;
@@ -42,6 +43,9 @@ public class AlertActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             alertType = extras.getInt("alertType");
+            if (alertType == BaseApplication.GENERIC_FAILURE) {
+                alertMessage = extras.getString("alertMessage");
+            }
             userId = extras.getString(Constants.SIMPRINTS_USER_ID);
             deviceId = extras.getString(Constants.SIMPRINTS_DEVICE_ID);
             apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
@@ -65,6 +69,7 @@ public class AlertActivity extends AppCompatActivity {
                         finish();
                         break;
 
+                    case BaseApplication.GENERIC_FAILURE:
                     case BaseApplication.BLUETOOTH_NOT_ENABLED:
                     case BaseApplication.NO_SCANNER_FOUND:
                     case BaseApplication.MULTIPLE_SCANNERS_FOUND:
@@ -103,6 +108,14 @@ public class AlertActivity extends AppCompatActivity {
                 }
             }
         });
+
+        if (alertType == BaseApplication.GENERIC_FAILURE) {
+            alertTitleTextView.setText(R.string.error_occured_title);
+            alertMessageTextView.setText("Sorry, an unforeseen error occured (" + alertMessage + "), press close to continue");
+            alertGraphicImageView.setImageResource(R.drawable.generic_failure);
+            alertLeftButtonTextView.setText(R.string.close);
+            alertRightButtonTextView.setVisibility(View.GONE);
+        }
 
         if (alertType == BaseApplication.BLUETOOTH_NOT_SUPPORTED) {
             alertTitleTextView.setText(R.string.bluetooth_not_supported_title);

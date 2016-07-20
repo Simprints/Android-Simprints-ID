@@ -31,9 +31,13 @@ import com.simprints.id.R;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 import com.simprints.libcommon.FingerConfig;
+import com.simprints.libcommon.FingerStatus;
+import com.simprints.libcommon.Template;
 import com.simprints.libdata.Data;
 import com.simprints.libscanner.EVENT;
 import com.simprints.libscanner.Scanner;
+
+import java.util.ArrayList;
 
 import static com.simprints.libscanner.EVENT.EXTRACT_IMAGE_QUALITY_SUCCESS;
 
@@ -41,22 +45,6 @@ public class MainActivity extends AppCompatActivity implements
             NavigationView.OnNavigationItemSelectedListener,
             Scanner.ScannerListener,
             Data.DataListener {
-
-    private enum State {
-        UNKNOWN,
-        IDLE,
-        CONNECTING,
-        CONNECTED,
-        DISCONNECTING,
-        WAITING_FOR_TRIGGER,
-        CAPTURING_IMAGE,
-        EXTRACTING_IMAGE_QUALITY,
-        GENERATING_TEMPLATE,
-        EXTRACTING_TEMPLATE,
-        EXTRACTING_IMAGE
-    };
-
-    private State state = State.UNKNOWN;
 
     private Context context;
     private boolean isExiting = false;
@@ -69,9 +57,10 @@ public class MainActivity extends AppCompatActivity implements
     private static ViewPager viewPager;
     private static int noOfFingers = 0;
     private static int currentFingerNo = 0;
-    private static FingerFragment currentFingerFragment = null;
 
     private static FingerFragment[] fingerFragments = new FingerFragment[10];
+
+    //TODO: change the following to use Finger, FingerStatus, FingerConfig classes (ask Tris)
     private static ImageView[] fingerIndicators = new ImageView[10];
 //    private static int[] fingerConfiguration = {
 //            Finger.DO_NOT_COLLECT,
@@ -85,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements
 //            Finger.DO_NOT_COLLECT,
 //            Finger.DO_NOT_COLLECT };
     private static FingerConfig.FingerConfiguration[] fingerConfiguration = {
-        FingerConfig.FingerConfiguration.DO_NOT_COLLECT,
+        FingerConfig.FingerConfiguration.REQUIRED,
         FingerConfig.FingerConfiguration.REQUIRED,
         FingerConfig.FingerConfiguration.REQUIRED,
         FingerConfig.FingerConfiguration.REQUIRED,
@@ -95,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements
         FingerConfig.FingerConfiguration.REQUIRED,
         FingerConfig.FingerConfiguration.REQUIRED,
         FingerConfig.FingerConfiguration.REQUIRED};
-    private static int[] fingerStatus = new int[10];
+    private static FingerStatus[] fingerStatus = new FingerStatus[10];
     private static String[] fingerName = new String[10];
     private static int[] fingerGraphic = {
             R.drawable.hand_bb_r5_c1,
@@ -109,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements
             R.drawable.hand_bb_l4_c1,
             R.drawable.hand_bb_l5_c1
     };
+    private static Template[] fingerTemplate = new Template[10];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,6 +134,44 @@ public class MainActivity extends AppCompatActivity implements
         data = BaseApplication.getData();
         data.setDataListener(this);
 
+        scanButton = (Button) findViewById(R.id.scan_button);
+        scanButton.setText(R.string.scan_label);
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (fingerStatus[currentFingerNo].equals(FingerStatus.GOOD_SCAN)) {
+                    fingerStatus[currentFingerNo] = FingerStatus.COLLECTING;
+                    scanButton.setText(R.string.cancel_button);
+                    scanButton.setTextColor(Color.WHITE);
+                    scanButton.setBackgroundColor(Color.BLUE);
+                    scanner.startContinuousCapture();
+                }
+                else
+                if (fingerStatus[currentFingerNo] == FingerStatus.BAD_SCAN) {
+                    fingerStatus[currentFingerNo] = FingerStatus.COLLECTING;
+                    scanButton.setText(R.string.cancel_button);
+                    scanButton.setTextColor(Color.WHITE);
+                    scanButton.setBackgroundColor(Color.BLUE);
+                    scanner.startContinuousCapture();
+                }
+                else
+                if (fingerStatus[currentFingerNo] == FingerStatus.NOT_COLLECTED) {
+                    fingerStatus[currentFingerNo] = FingerStatus.COLLECTING;
+                    scanButton.setText(R.string.cancel_button);
+                    scanButton.setTextColor(Color.WHITE);
+                    scanButton.setBackgroundColor(Color.BLUE);
+                    scanner.startContinuousCapture();
+                }
+                else {
+                    fingerStatus[currentFingerNo] = FingerStatus.NOT_COLLECTED;
+                    scanner.stopContinuousCapture();
+                    scanButton.setText(R.string.scan_label);
+                    scanButton.setTextColor(Color.WHITE);
+                    scanButton.setBackgroundColor(Color.GRAY);
+                }
+            }
+        });
+
         setFingers();
 
         viewPager = (ViewPager) findViewById(R.id.view_pager);
@@ -157,6 +185,23 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onPageSelected(int position) {
                 currentFingerNo = position;
+                if (fingerStatus[currentFingerNo] == FingerStatus.NOT_COLLECTED) {
+                    scanButton.setText(R.string.scan_label);
+                    scanButton.setTextColor(Color.WHITE);
+                    scanButton.setBackgroundColor(Color.GRAY);
+                }
+                else
+                if (fingerStatus[currentFingerNo] == FingerStatus.GOOD_SCAN) {
+                    scanButton.setText(R.string.rescan_label);
+                    scanButton.setTextColor(Color.WHITE);
+                    scanButton.setBackgroundColor(Color.GREEN);
+                }
+                else
+                if (fingerStatus[currentFingerNo] == FingerStatus.BAD_SCAN) {
+                    scanButton.setText(R.string.rescan_label);
+                    scanButton.setTextColor(Color.WHITE);
+                    scanButton.setBackgroundColor(Color.RED);
+                }
                 refreshFingers();
             }
 
@@ -167,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements
         viewPager.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (fingerStatus[currentFingerNo] == Finger.COLLECTING) {
+                if (fingerStatus[currentFingerNo] == FingerStatus.COLLECTING) {
                     return true;
                 }
                 else {
@@ -179,44 +224,6 @@ public class MainActivity extends AppCompatActivity implements
         viewPager.setPageMargin(-margin);
         viewPager.setPadding(margin, 0, margin, 0);
         viewPager.setClipToPadding(false);
-
-        scanButton = (Button) findViewById(R.id.scan_button);
-        scanButton.setText(R.string.scan_label);
-        scanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (fingerStatus[currentFingerNo] == Finger.GOOD_SCAN) {
-                    fingerStatus[currentFingerNo] = Finger.COLLECTING;
-                    scanButton.setText(R.string.cancel_button);
-                    scanButton.setTextColor(Color.WHITE);
-                    scanButton.setBackgroundColor(Color.BLUE);
-                    scanner.startContinuousCapture();
-                }
-                else
-                if (fingerStatus[currentFingerNo] == Finger.BAD_SCAN) {
-                    fingerStatus[currentFingerNo] = Finger.COLLECTING;
-                    scanButton.setText(R.string.cancel_button);
-                    scanButton.setTextColor(Color.WHITE);
-                    scanButton.setBackgroundColor(Color.BLUE);
-                    scanner.startContinuousCapture();
-                }
-                else
-                if (fingerStatus[currentFingerNo] == Finger.NOT_COLLECTED) {
-                    fingerStatus[currentFingerNo] = Finger.COLLECTING;
-                    scanButton.setText(R.string.cancel_button);
-                    scanButton.setTextColor(Color.WHITE);
-                    scanButton.setBackgroundColor(Color.BLUE);
-                    scanner.startContinuousCapture();
-                }
-                else {
-                    fingerStatus[currentFingerNo] = Finger.NOT_COLLECTED;
-                    scanner.stopContinuousCapture();
-                    scanButton.setText(R.string.scan_label);
-                    scanButton.setTextColor(Color.WHITE);
-                    scanButton.setBackgroundColor(Color.GRAY);
-                }
-            }
-        });
     }
 
     @Override
@@ -229,22 +236,35 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case EXTRACT_IMAGE_QUALITY_SUCCESS: // Image quality extracted successfully
-                Log.w("Simprints", "ID: image quality = " + scanner.getImageQuality());
+                FingerFragment fingerFragment = fingerFragments[currentFingerNo];
                 int imageQuality = scanner.getImageQuality();
                 if (imageQuality >= 50) {
-                    currentFingerFragment.setFingerText("<font color=green>Good Image<br/><font color=grey>Please scan next finger");
-                    fingerStatus[currentFingerNo] = Finger.GOOD_SCAN;
+                    if (fingerFragment != null) {
+                        fingerFragment.setFingerText(getString(R.string.good_scan_message));
+                    }
+                    fingerStatus[currentFingerNo] = FingerStatus.GOOD_SCAN;
                     scanButton.setBackgroundColor(Color.GREEN);
-                    scanButton.setText("Re-scan");
+                    scanButton.setText(R.string.rescan_label);
                 }
                 else {
-                    fingerStatus[currentFingerNo] = Finger.BAD_SCAN;
+                    fingerStatus[currentFingerNo] = FingerStatus.BAD_SCAN;
                     scanButton.setBackgroundColor(Color.RED);
-                    scanButton.setText("Re-scan");
+                    scanButton.setText(R.string.rescan_label);
                 }
+                scanner.generateTemplate();
+                refreshFingers();
                 break;
 
-            // info messages
+            case GENERATE_TEMPLATE_SUCCESS: // Template generated successfully
+                scanner.extractTemplate();
+                break;
+
+            case EXTRACT_TEMPLATE_SUCCESS: // Template extracted successfully
+                scanner.getTemplate();
+                fingerTemplate[currentFingerNo] = scanner.getTemplate();
+                break;
+
+                // info messages
             case CONNECTION_INITIATED: // Connection initiated
             case DISCONNECTION_INITIATED: // Disconnection initiated
             case TRIGGER_PRESSED: // Trigger pressed
@@ -260,8 +280,6 @@ public class MainActivity extends AppCompatActivity implements
             case UPDATE_SENSOR_INFO_SUCCESS: // Sensor info was successfully updated
             case SET_UI_SUCCESS: // UI was successfully set
             case EXTRACT_IMAGE_SUCCESS: // Image extracted successfully
-            case EXTRACT_TEMPLATE_SUCCESS: // Template extracted successfully
-            case GENERATE_TEMPLATE_SUCCESS: // Template generated successfully
             case UN20_WAKEUP_SUCCESS: // UN20 woken up successfully
             case UN20_SHUTDOWN_SUCCESS: // UN20 shut down successfully
             case EXTRACT_CRASH_LOG_SUCCESS: // Crash log extracted successfully
@@ -321,30 +339,11 @@ public class MainActivity extends AppCompatActivity implements
             default:
                 break;
         }
-        if (event.equals(EVENT.CAPTURE_IMAGE_SUCCESS)) {
-            scanner.extractImageQuality();
-        }
-        else
-        if (event.equals(EXTRACT_IMAGE_QUALITY_SUCCESS)) {
-
-        }
     }
 
     @Override
     public void onDataEvent(com.simprints.libdata.EVENT event) {
         Log.w("Simprints", "ID: onDataEvent event name = " + event.name() + " details = " + event.details());
-    }
-
-    public void scannerBusyError() {
-
-    }
-
-    public void scannerNotConnectedError() {
-
-    }
-
-    public void scannerNotRespondingError() {
-
     }
 
     private class FingerPageAdapter extends FragmentPagerAdapter {
@@ -355,8 +354,7 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         public Fragment getItem(int pos) {
-            currentFingerFragment = fingerFragments[pos];
-            return currentFingerFragment;
+            return fingerFragments[pos];
         }
 
         @Override
@@ -414,7 +412,7 @@ public class MainActivity extends AppCompatActivity implements
                 FingerFragment fingerFragment = FingerFragment.newInstance(fingerNo, fingerName[noOfFingers], fingerGraphic[noOfFingers]);
                 fingerFragments[noOfFingers] = fingerFragment;
                 fingerIndicators[noOfFingers].setVisibility(View.VISIBLE);
-                fingerStatus[noOfFingers] = Finger.NOT_COLLECTED;
+                fingerStatus[noOfFingers] = FingerStatus.NOT_COLLECTED;
                 noOfFingers += 1;
             }
         }
@@ -424,24 +422,27 @@ public class MainActivity extends AppCompatActivity implements
     private void refreshFingers() {
         for (int fingerNo = 0; fingerNo < noOfFingers; fingerNo++) {
             if (fingerNo == currentFingerNo) {
-                if (fingerStatus[fingerNo] == Finger.NOT_COLLECTED) {
+                if (fingerStatus[fingerNo] == FingerStatus.NOT_COLLECTED) {
                     fingerIndicators[fingerNo].setImageResource(R.drawable.ic_blank_selected);
+                    scanButton.setText(R.string.scan_label);
                 }
-                if (fingerStatus[fingerNo] == Finger.GOOD_SCAN) {
+                if (fingerStatus[fingerNo] == FingerStatus.GOOD_SCAN) {
                     fingerIndicators[fingerNo].setImageResource(R.drawable.ic_ok_selected);
+                    scanButton.setText(R.string.rescan_label);
                 }
-                if (fingerStatus[fingerNo] == Finger.BAD_SCAN) {
+                if (fingerStatus[fingerNo] == FingerStatus.BAD_SCAN) {
                     fingerIndicators[fingerNo].setImageResource(R.drawable.ic_alert_selected);
+                    scanButton.setText(R.string.rescan_label);
                 }
             }
             else {
-                if (fingerStatus[fingerNo] == Finger.NOT_COLLECTED) {
+                if (fingerStatus[fingerNo] == FingerStatus.NOT_COLLECTED) {
                     fingerIndicators[fingerNo].setImageResource(R.drawable.ic_blank_deselected);
                 }
-                if (fingerStatus[fingerNo] == Finger.GOOD_SCAN) {
+                if (fingerStatus[fingerNo] == FingerStatus.GOOD_SCAN) {
                     fingerIndicators[fingerNo].setImageResource(R.drawable.ic_ok_deselected);
                 }
-                if (fingerStatus[fingerNo] == Finger.BAD_SCAN) {
+                if (fingerStatus[fingerNo] == FingerStatus.BAD_SCAN) {
                     fingerIndicators[fingerNo].setImageResource(R.drawable.ic_alert_deselected);
                 }
             }

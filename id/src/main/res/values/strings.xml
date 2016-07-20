@@ -65,5 +65,9 @@
     <string name="cancel_button">CANCEL</string>
     <string name="try_again_label">Try Again</string>
     <string name="settings_label">Settings</string>
+    <string name="rescan_label">Re-scan</string>
+    <string name="good_scan_message"><![CDATA[<font color=green>Good Image<br/><font color=grey>Please scan next finger]]></string>
+    <string name="poor_scan_message"><![CDATA[<font color=red>Poor Image<br/><font color=grey>Please re-scan]]></string>
+    <string name="error_occured_title">ERROR OCCURED</string>
 
 </resources>
