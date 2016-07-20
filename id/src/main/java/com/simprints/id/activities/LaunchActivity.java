@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.simprints.id.BaseApplication;
 import com.simprints.id.R;
@@ -79,6 +80,10 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
             BaseApplication.setCallingPackage(callingPackage);
             BaseApplication.setGuid(guid);
 
+            if (getIntent().getAction().equals(null)) {
+                mode = BaseApplication.getMode();
+            }
+            else
             if (getIntent().getAction().equals(Constants.SIMPRINTS_IDENTIFY_INTENT)) {
                 mode = BaseApplication.IDENTIFY_SUBJECT;
                 BaseApplication.setMode(mode);

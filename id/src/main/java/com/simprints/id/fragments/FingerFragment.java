@@ -5,6 +5,7 @@ import android.graphics.ColorMatrixColorFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.simprints.id.R;
 
 public class FingerFragment extends Fragment {
 
+    protected View view;
     private int fingerNo;
     private String fingerName;
     private int fingerImage;
@@ -25,7 +27,7 @@ public class FingerFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_finger, container, false);
+        view = inflater.inflate(R.layout.fragment_finger, container, false);
         fingerNo = getArguments().getInt("fingerNo");
         fingerName = getArguments().getString("fingerName");
         fingerImage = getArguments().getInt("fingerImage");
@@ -61,6 +63,8 @@ public class FingerFragment extends Fragment {
     }
 
     public void setFingerText(String fingerText) {
+        fingerTextView = (TextView) view.findViewById(R.id.finger_text);
+        Log.w("Simprints", "ID: set fingerText to " + fingerText);
         fingerTextView.setText(Html.fromHtml(fingerText));
     }
 
