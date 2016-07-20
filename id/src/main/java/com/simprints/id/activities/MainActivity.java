@@ -471,6 +471,7 @@ public class MainActivity extends AppCompatActivity implements
             }
             Person person = new Person(BaseApplication.getGuid(), fingerprints);
             data.savePerson(BaseApplication.getApiKey(), person);
+            scanner.disconnect();
             finish();
         }
         else {
