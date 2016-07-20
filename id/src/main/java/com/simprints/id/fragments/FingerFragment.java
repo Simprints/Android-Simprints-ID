@@ -19,9 +19,6 @@ public class FingerFragment extends Fragment {
     private int fingerNo;
     private String fingerName;
     private int fingerImage;
-    private String title;
-    private String text;
-    private TextView titleTextView;
     private TextView fingerTextView;
     private ImageView fingerImageView;
     private ProgressBar fingerProgressBar;
@@ -32,11 +29,9 @@ public class FingerFragment extends Fragment {
         fingerNo = getArguments().getInt("fingerNo");
         fingerName = getArguments().getString("fingerName");
         fingerImage = getArguments().getInt("fingerImage");
-        titleTextView = (TextView) view.findViewById(R.id.title);
         fingerTextView = (TextView) view.findViewById(R.id.finger_text);
         fingerImageView = (ImageView) view.findViewById(R.id.finger_image);
         fingerProgressBar = (ProgressBar) view.findViewById(R.id.finger_progress_bar);
-        titleTextView.setText(getArguments().getString("title"));
         fingerTextView.setText(Html.fromHtml(fingerName));
         fingerImageView.setImageResource(fingerImage);
         fingerImageView.setVisibility(View.VISIBLE);
@@ -66,7 +61,7 @@ public class FingerFragment extends Fragment {
     }
 
     public void setFingerText(String fingerText) {
-        fingerTextView.setText(fingerText);
+        fingerTextView.setText(Html.fromHtml(fingerText));
     }
 
     public void showFingerImage(int visibility) {
