@@ -31,13 +31,20 @@ import com.simprints.id.R;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 import com.simprints.libcommon.FingerConfig;
+import com.simprints.libcommon.FingerIdentifier;
 import com.simprints.libcommon.FingerStatus;
+import com.simprints.libcommon.Fingerprint;
+import com.simprints.libcommon.Person;
 import com.simprints.libcommon.Template;
 import com.simprints.libdata.Data;
 import com.simprints.libscanner.EVENT;
 import com.simprints.libscanner.Scanner;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import static com.simprints.libscanner.EVENT.EXTRACT_IMAGE_QUALITY_SUCCESS;
 
@@ -451,7 +458,19 @@ public class MainActivity extends AppCompatActivity implements
 
     protected void onActionForward() {
         if (BaseApplication.getMode() == BaseApplication.REGISTER_SUBJECT) {
-            //TODO: return registration class from libsimprints
+            ArrayList<Fingerprint> fingerprints = new ArrayList<>();
+            for (int fingerNo = 0; fingerNo < noOfFingers; fingerNo++) {
+                //TODO: need to add toByteArray method to template object
+                try {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    ObjectOutputStream os = new ObjectOutputStream(out);
+                    os.writeObject(fingerTemplate[fingerNo]);
+                    fingerprints.add(new Fingerprint(FingerIdentifier.fromInt(fingerNo), out.toByteArray()));
+                }
+                catch (IOException e) { }
+            }
+            Person person = new Person(BaseApplication.getGuid(), fingerprints);
+            data.savePerson(BaseApplication.getApiKey(), person);
             finish();
         }
         else {
