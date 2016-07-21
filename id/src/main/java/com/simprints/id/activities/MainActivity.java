@@ -38,6 +38,7 @@ import com.simprints.libcommon.Person;
 import com.simprints.libcommon.Template;
 import com.simprints.libdata.Data;
 import com.simprints.libscanner.EVENT;
+import com.simprints.libscanner.Message;
 import com.simprints.libscanner.Scanner;
 
 import java.io.ByteArrayOutputStream;
@@ -106,6 +107,10 @@ public class MainActivity extends AppCompatActivity implements
             R.drawable.hand_bb_l5_c1
     };
     private static Template[] fingerTemplate = new Template[10];
+
+    private boolean enableTrigger = false;
+    private Message.LED_STATE[] leds = new Message.LED_STATE[Message.LED_MAX_COUNT];
+    private short vibrationDuration = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements
                     scanButton.setTextColor(Color.WHITE);
                     scanButton.setBackgroundColor(Color.RED);
                 }
+                scanner.setUI(false, leds, 0);
                 refreshFingers();
             }
 
