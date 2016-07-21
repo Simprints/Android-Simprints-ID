@@ -8,7 +8,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 
-import com.simprints.id.BaseApplication;
+import com.simprints.id.AppState;
 import com.simprints.id.R;
 import com.simprints.libscanner.Scanner;
 
@@ -51,7 +51,7 @@ public class ConsentActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         if (isExiting == true) {
-            Scanner scanner = BaseApplication.getScanner();
+            Scanner scanner = AppState.getInstance().getScanner();
             if (scanner != null) {
                 scanner.disconnect();
             }

@@ -14,7 +14,7 @@ public class Finger {
         GOOD_SCAN,
         BAD_SCAN,
         NO_SCAN
-    };
+    }
 
     public static ArrayList<Finger> fingers = new ArrayList<Finger>();
 

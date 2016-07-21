@@ -1,23 +1,22 @@
 package com.simprints.id.activities;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import com.simprints.id.BaseApplication;
+import com.simprints.id.AppState;
 import com.simprints.id.R;
 import com.simprints.libdata.Data;
 import com.simprints.libdata.EVENT;
-import com.simprints.libscanner.Message;
+import com.simprints.libscanner.BluetoothCom;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
 
@@ -26,288 +25,247 @@ import java.util.UUID;
 
 public class LaunchActivity extends AppCompatActivity implements Scanner.ScannerListener, Data.DataListener {
 
-    private Context context;
-    private ProgressBar progressBar;
+    private final static int INITIAL_DISPLAY_MINIMUM = 2500;
+    private final static int SUBSEQUENT_DISPLAY_MAXIMUM = 10000;
 
-    private static int INITIAL_DISPLAY_MINIMUM = 2500;
-    private static int SUBSEQUENT_DISPLAY_MAXIMUM = 10000;
+
+    private AppState appState;
     private static Handler handler;
-    private static Runnable runnable;
-
-    private String userId = null;
-    private String deviceId = null;
-    private String apiKey = null;
-    private String callingPackage = null;
-    private String guid = null;
-
-    private int mode;
-    private boolean isExiting = false;
-
-    private Scanner scanner = null;
-    public final Scanner.ScannerListener scannerListener = this;
-    private boolean scannerConnected = false;
-    private static int noOfPairedScanners = 0;
-    private static String macAddress = null;
-
-    private Data data = null;
-    public final Data.DataListener dataListener = this;
-    private boolean apiKeyValid = false;
-
+    private boolean validApiKey;
     private long startTime;
+    private boolean stayConnected;
+
+    private Runnable timeout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launch);
-        context = this;
-        BaseApplication.setContext(context);
-
         //Fabric.with(this, new Crashlytics());
 
-        // get parameters
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            userId = extras.getString(Constants.SIMPRINTS_USER_ID);
-            deviceId = extras.getString(Constants.SIMPRINTS_DEVICE_ID);
-            apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
-            callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
-            guid = extras.getString(Constants.SIMPRINTS_GUID);
-
-            // persist in singleton
-            BaseApplication.setUserId(userId);
-            BaseApplication.setDeviceId(deviceId);
-            BaseApplication.setApiKey(apiKey);
-            BaseApplication.setCallingPackage(callingPackage);
-            BaseApplication.setGuid(guid);
-
-            if (getIntent().getAction().equals(null)) {
-                mode = BaseApplication.getMode();
-            }
-            else
-            if (getIntent().getAction().equals(Constants.SIMPRINTS_IDENTIFY_INTENT)) {
-                mode = BaseApplication.IDENTIFY_SUBJECT;
-                BaseApplication.setMode(mode);
-            }
-            else
-            if (getIntent().getAction().equals(Constants.SIMPRINTS_REGISTER_INTENT)) {
-                mode = BaseApplication.REGISTER_SUBJECT;
-                BaseApplication.setMode(mode);
-                if (guid == null) {
-                    guid = UUID.randomUUID().toString();
-                    BaseApplication.setGuid(guid);
-                }
-            }
-        }
-
-        // start loading task
-        startTime = System.currentTimeMillis();
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        appState = AppState.getInstance();
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         progressBar.setVisibility(View.VISIBLE);
-
-        // check for mandatory apiKey parameter
-        if (isExiting == false && apiKey == null) {
-            Intent intent = new Intent(context, AlertActivity.class);
-            intent.putExtra("alertType", BaseApplication.MISSING_API_KEY);
-            intent.putExtra("userId", userId);
-            intent.putExtra("deviceId", deviceId);
-            intent.putExtra("apiKey", apiKey);
-            intent.putExtra("callingPackage", callingPackage);
-            intent.putExtra("guid", guid);
-            startActivity(intent);
-            finish();
-        }
-
-        // set timeout for api key validation and/or scanner connected
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (!apiKeyValid || !scannerConnected) {
-                    Intent intent = new Intent(context, AlertActivity.class);
-                    intent.putExtra("alertType", BaseApplication.NO_SCANNER_FOUND);
-                    startActivity(intent);
-                    isExiting = true;
-                    finish();
-                }
-            }
-        };
         handler = new Handler();
-        handler.postDelayed(runnable, SUBSEQUENT_DISPLAY_MAXIMUM);
+        validApiKey = false;
+        startTime = SystemClock.elapsedRealtime();
+        stayConnected = false;
 
-        // set data instance and persist in singleton
-        data = new Data(context);
-        data.setDataListener(dataListener);
-        BaseApplication.setData(data);
-        BaseApplication.getData().validateApiKey(apiKey);
-
-        DelayAndContinueTask delayAndContinueTask = new DelayAndContinueTask();
-        delayAndContinueTask.execute();
-
-    }
-
-    @Override
-    public void onScannerEvent(com.simprints.libscanner.EVENT event) {
-        Log.w("Simprints", "ID: onScannerEvent event name = " + event.name() + " detail = " + event.details());
-        if (event.equals(com.simprints.libscanner.EVENT.CONNECTION_SUCCESS)) {
-            scannerConnected = true;
-            checkApiKeyAndScannerConnected();
+        Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            Log.d("Simprints", "Trace LaunchActivity: no extras");
+            finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null);
+            return;
         }
-        if (event.equals(com.simprints.libscanner.EVENT.UN20_WAKEUP_SUCCESS)) {
-            Intent intent = new Intent(context, ConsentActivity.class);
-            startActivity(intent);
-            finish();
-        }
-    }
-
-    @Override
-    public void onDataEvent(EVENT event) {
-        Log.w("Simprints", "ID: onDataEvent event name = " + event.name() + " details = " + event.details());
-        if (event.equals(com.simprints.libdata.EVENT.API_KEY_VALID)) {
-            apiKeyValid = true;
-            checkApiKeyAndScannerConnected();
-        }
-        else
-        if (event.equals(com.simprints.libdata.EVENT.API_KEY_INVALID)) {
-            apiKeyValid = false;
-            Intent intent = new Intent(context, AlertActivity.class);
-            intent.putExtra("alertType", BaseApplication.INVALID_API_KEY);
-            intent.putExtra("userId", userId);
-            intent.putExtra("deviceId", deviceId);
-            intent.putExtra("apiKey", apiKey);
-            intent.putExtra("callingPackage", callingPackage);
-            intent.putExtra("guid", guid);
-            startActivity(intent);
-            isExiting = true;
-            finish();
-        }
-    }
-
-    private void checkApiKeyAndScannerConnected() {
-        if (apiKeyValid && scannerConnected) {
-            scanner.un20Wakeup();
-            handler.removeCallbacksAndMessages(null);
-        }
-    }
-
-    private class DelayAndContinueTask extends AsyncTask<Void, Void, Void> {
-
-        private boolean bluetoothNotSupported = false;
-        private boolean bluetoothNotEnabled = false;
-
-        @Override
-        protected void onPreExecute() {
-            progressBar.setVisibility(View.VISIBLE);
-
-            // check bluetooth supported
-            BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (mBluetoothAdapter == null) {
-                bluetoothNotSupported = true;
+        // If the intent contain a valid random code, then it is an internal
+        // call from AlertActivity and we don't have to set the AppState singleton
+        // again.
+        // Else, we have to
+        else {
+            switch(getIntent().getAction()) {
+                case Constants.SIMPRINTS_IDENTIFY_INTENT:
+                    appState.setMode(MODE.IDENTIFY_SUBJECT);
+                    break;
+                case Constants.SIMPRINTS_REGISTER_INTENT:
+                    appState.setMode(MODE.REGISTER_SUBJECT);
+                    break;
+                default:
+                    finishWith(Constants.SIMPRINTS_INVALID_INTENT_ACTION, null);
+                    return;
             }
 
-            // check bluetooth enabled
-            else if (!mBluetoothAdapter.isEnabled()) {
-                bluetoothNotEnabled = true;
-            }
+            if (!appState.checkRandomCode(extras.getString(AppState.randomCodeKey))) {
+                Log.d("Simprints", "Trace LaunchActivity: external call");
+                // Sets apiKey
+                String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
+                if (apiKey == null) {
+                    startAlert(ALERT_TYPE.MISSING_API_KEY);
+                    return;
+                }
+                appState.setApiKey(apiKey);
+                Log.d("Simprints", String.format("Trace LaunchActivity: apiKey = %s", apiKey));
 
-            // get list of paired scanners
-            else {
-                noOfPairedScanners = 0;
-                List<String> pairedScanners = Scanner.getPairedScanners();
-                for (String pairedScanner : pairedScanners) {
-                    if (Scanner.isScannerAddress(pairedScanner)) {
-                        macAddress = pairedScanner;
-                        noOfPairedScanners += 1;
+                // Sets guid (to specified value, or random one)
+                String guid = extras.getString(Constants.SIMPRINTS_GUID);
+                appState.setGuid(guid == null ? UUID.randomUUID().toString() : guid);
+                Log.d("Simprints", String.format("Trace LaunchActivity: guid = %s", guid));
+
+                // These 3 fields are set but not used for the time being
+                appState.setUserId(extras.getString(Constants.SIMPRINTS_USER_ID));
+                appState.setDeviceId(extras.getString(Constants.SIMPRINTS_DEVICE_ID));
+                appState.setCallingPackage(extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE));
+
+                // Set the persistant data object
+                appState.setData(new Data(getApplicationContext()));
+                appState.getData().setDataListener(this);
+                Log.d("Simprints", "Trace LaunchActivity: data object created, listener set");
+
+                // Sets the persistant scanner object
+                BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+                if (adapter == null) {
+                    Log.d("Simprints", "Trace LaunchActivity: bluetooth not supported");
+                    startAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
+                    return;
+                } else if (!adapter.isEnabled()) {
+                    Log.d("Simprints", "Trace LaunchActivity: bluetooth not enabled");
+                    startAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
+                    return;
+                } else {
+                    List<String> pairedScanners = Scanner.getPairedScanners();
+                    switch (pairedScanners.size()) {
+                        case 0:
+                            Log.d("Simprints", "Trace LaunchActivity: no scanner found");
+                            startAlert(ALERT_TYPE.NO_SCANNER_FOUND);
+                            return;
+                        case 1:
+                            String macAddress = pairedScanners.get(0);
+                            Log.d("Simprints",
+                                    String.format("Trace LaunchActivity: 1 scanner found with mac address %s",
+                                            macAddress));
+                            appState.setScanner(new Scanner(macAddress));
+                            appState.getScanner().setScannerListener(this);
+                            break;
+                        default:
+                            Log.d("Simprints", "Trace LaunchActivity: multiple scanners found");
+                            startAlert(ALERT_TYPE.MULTIPLE_SCANNERS_FOUND);
+                            return;
                     }
                 }
             }
         }
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            long currentTime = System.currentTimeMillis();
-            if (currentTime - startTime < INITIAL_DISPLAY_MINIMUM) {
-                try {
-                    Thread.sleep(INITIAL_DISPLAY_MINIMUM - (currentTime - startTime));
+        // Initiate scanner connection and apiKey validation
+        Log.d("Simprints", "Trace LaunchActivity: initiating scanner connection");
+        appState.getScanner().connect();
+        Log.d("Simprints", "Trace LaunchActivity: initiating apiKey validation");
+        appState.getData().validateApiKey(appState.getApiKey());
+
+
+        timeout = new Runnable() {
+            @Override
+            public void run() {
+                Scanner scanner = appState.getScanner();
+                Log.d("Simprints", String.format(
+                        "Trace LaunchActivity: TIMEOUT. validApiKey=%s, scanner=%s, connectionStatus=%s",
+                        validApiKey, scanner, (scanner == null) ? null : scanner.getConnectionStatus().name()));
+                if (!validApiKey || scanner == null || scanner.getConnectionStatus() != BluetoothCom.BLUETOOTH_STATUS.CONNECTED)
+                {
+                    // The user can't do anything anyway, so unexpected error
+                    startAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                } else {
+                    checkApiKeyAndScannerConnected();
                 }
-                catch (InterruptedException e) { }
             }
+        };
+        // Just in case, program a timeout event
+        handler.postDelayed(timeout, SUBSEQUENT_DISPLAY_MAXIMUM);
+        Log.d("Simprints", "Trace LaunchActivity: timeout set");
 
-            return null;
+    }
+
+    private void finishWith(final int resultCode, final Intent intent) {
+        if (resultCode >= 0) {
+            setResult(resultCode);
         }
+        final long remainingTime = Math.max(0, startTime + INITIAL_DISPLAY_MINIMUM - SystemClock.elapsedRealtime());
+        Log.d("Simprints", String.format(
+                "Trace LaunchActivity: finish with result code %d and intent %s programmed in %d ms",
+                resultCode, (intent == null) ? null : intent.toString(), remainingTime));
 
-        @Override
-        protected void onPostExecute(Void result) {
-            // bluetooth not supported
-            if (bluetoothNotSupported == true) {
-                Intent intent = new Intent(context, AlertActivity.class);
-                intent.putExtra("alertType", BaseApplication.BLUETOOTH_NOT_SUPPORTED);
-                intent.putExtra("userId", userId);
-                intent.putExtra("deviceId", deviceId);
-                intent.putExtra("apiKey", apiKey);
-                intent.putExtra("callingPackage", callingPackage);
-                intent.putExtra("guid", guid);
-                startActivity(intent);
-                isExiting = true;
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("Simprints", String.format(
+                        "Trace LaunchActivity: finish with result code %d and intent %s",
+                        resultCode, (intent == null) ? null : intent.toString()));
+                if (intent != null) {
+                    startActivity(intent);
+                }
                 finish();
             }
+        }, remainingTime);
+    }
 
-            // bluetooth not enabled
-            else if (bluetoothNotEnabled == true) {
-                Intent intent = new Intent(context, AlertActivity.class);
-                intent.putExtra("alertType", BaseApplication.BLUETOOTH_NOT_ENABLED);
-                intent.putExtra("userId", userId);
-                intent.putExtra("deviceId", deviceId);
-                intent.putExtra("apiKey", apiKey);
-                intent.putExtra("callingPackage", callingPackage);
-                intent.putExtra("guid", guid);
-                startActivity(intent);
-                isExiting = true;
-                finish();
-            }
+    private void startAlert(ALERT_TYPE alertType) {
+        Intent intent = new Intent(this, AlertActivity.class);
+        intent.putExtra("alertType", alertType);
+        finishWith(-1, intent);
+    }
 
-            // check for no scanner found
-            else if (noOfPairedScanners == 0) {
-                Intent intent = new Intent(context, AlertActivity.class);
-                intent.putExtra("alertType", BaseApplication.NO_SCANNER_FOUND);
-                intent.putExtra("userId", userId);
-                intent.putExtra("deviceId", deviceId);
-                intent.putExtra("apiKey", apiKey);
-                intent.putExtra("callingPackage", callingPackage);
-                intent.putExtra("guid", guid);
-                startActivity(intent);
-                isExiting = true;
-                finish();
-            }
 
-            // check for multiple scanners found
-            else if (noOfPairedScanners > 1) {
-                Intent intent = new Intent(context, AlertActivity.class);
-                intent.putExtra("alertType", BaseApplication.MULTIPLE_SCANNERS_FOUND);
-                intent.putExtra("userId", userId);
-                intent.putExtra("deviceId", deviceId);
-                intent.putExtra("apiKey", apiKey);
-                intent.putExtra("callingPackage", callingPackage);
-                intent.putExtra("guid", guid);
-                startActivity(intent);
-                isExiting = true;
-                finish();
-            }
 
-            // get scanner instance and set in singleton and then try connection
-            else {
-                scanner = new Scanner(macAddress);
-                scanner.setScannerListener(scannerListener);
-                BaseApplication.setScanner(scanner);
-                scanner.connect();
-            }
+    @Override
+    public void onScannerEvent(com.simprints.libscanner.EVENT event) {
+        Log.d("Simprints", String.format("Trace LaunchActivity: onScannerEvent %s, %s",
+                event.name(), event.details()));
+        switch (event) {
+            case CONNECTION_SUCCESS:
+            case CONNECTION_ALREADY_CONNECTED:
+                checkApiKeyAndScannerConnected();
+                break;
+            case CONNECTION_BLUETOOTH_DISABLED:
+                startAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
+                break;
+            case CONNECTION_SCANNER_UNBONDED:
+                startAlert(ALERT_TYPE.BLUETOOTH_UNBONDED_SCANNER);
+                break;
+            // THESE SHOULD NOT HAPPEN, BUT YOU ARE NEVER TOO PRUDENT
+            case CONNECTION_IO_ERROR:
+            case CONNECTION_BAD_SCANNER_FEATURE:
+                startAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                break;
+            //
+
+            case UN20_WAKEUP_SUCCESS:
+            case UN20_WAKEUP_INVALID_STATE:
+                stayConnected = true;
+                Intent intent = new Intent(this, ConsentActivity.class);
+                finishWith(-1, intent);
+                break;
+                // THESE SHOULD NOT HAPPEN, BUT YOU ARE NEVER TOO PRUDENT
+            case UN20_WAKEUP_FAILURE:
+                startAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                break;
+        }
+    }
+
+    @Override
+    public void onDataEvent(EVENT event) {
+        Log.d("Simprints", String.format("Trace LaunchActivity: onDataEvent %s, %s",
+                event.name(), event.details()));
+        switch (event) {
+            case API_KEY_VALID:
+                validApiKey = true;
+                checkApiKeyAndScannerConnected();
+                break;
+            case API_KEY_INVALID:
+                validApiKey = false;
+                startAlert(ALERT_TYPE.INVALID_API_KEY);
+                break;
+        }
+    }
+
+    private void checkApiKeyAndScannerConnected() {
+        Scanner scanner = appState.getScanner();
+        Log.d("Simprints", String.format(
+                "Trace LaunchActivity: checkApiKeyAndScannerConnected, validApiKey=%s, scanner=%s, connStatus=%s",
+                validApiKey, scanner, (scanner == null) ? null : scanner.getConnectionStatus().name()));
+        if (validApiKey && scanner != null && scanner.getConnectionStatus() == BluetoothCom.BLUETOOTH_STATUS.CONNECTED)
+        {
+            Log.d("Simprints",
+                    "Trace LaunchActivity: checkApiKeyAndScannerConnected, un20wakeup and remove timeout callback");
+            scanner.un20Wakeup();
+            handler.removeCallbacks(timeout);
         }
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.d("Simprints", String.format(
+                "Trace LaunchActivity: onKeyDown, keyCode %d", keyCode));
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK: {
-                isExiting = true;
-                finish();
+                finishWith(Activity.RESULT_CANCELED, null);
                 return true;
             }
         }
@@ -317,12 +275,14 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (isExiting == true) {
+        handler.removeCallbacksAndMessages(null);
+        Log.d("Simprints", String.format(
+                "Trace LaunchActivity: onDestroy, stayConnected=%s", stayConnected));
+        if (!stayConnected) {
+            Scanner scanner = AppState.getInstance().getScanner();
             if (scanner != null) {
-                scanner.un20Shutdown();
                 scanner.disconnect();
             }
-            handler.removeCallbacksAndMessages(null);
         }
     }
 }
