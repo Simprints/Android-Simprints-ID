@@ -49,7 +49,9 @@
     <string name="bluetooth_not_supported_title">BLUETOOTH NOT SUPPORTED</string>
     <string name="bluetooth_not_supported_message">Bluetooth not supported on this device, please contact your system administrator</string>
     <string name="bluetooth_not_enabled_title">BLUETOOTH NOT ENABLED</string>
-    <string name="bluetooth_not_enabled_message">Bluettooth not enabled, please make sure it is enabled in settings and try again</string>
+    <string name="unbonded_scanner_title">SCANNER NOT PAIRED</string>
+    <string name="unbonded_scanner_message">Scanner not paired, please make sure it is paired in settings and try again</string>
+    <string name="bluetooth_not_enabled_message">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
     <string name="no_scanner_found_title">NO SCANNER FOUND</string>
     <string name="no_scanner_found_message">No scanner has been found, please make sure it is switched on, in range and paired via Bluetooth</string>
     <string name="multiple_scanners_found_title">MULTIPLE SCANNERS FOUND</string>
@@ -69,5 +71,8 @@
     <string name="good_scan_message"><![CDATA[<font color=green>Good Image<br/><font color=grey>Please scan next finger]]></string>
     <string name="poor_scan_message"><![CDATA[<font color=red>Poor Image<br/><font color=grey>Please re-scan]]></string>
     <string name="error_occured_title">ERROR OCCURED</string>
+    <string name="please_scan"><![CDATA[<font color=gray>Please scan <br/><font color=blue>]]></string>
+    <string name="empty" />
+    <string name="unforeseen_error_message">Sorry, an unforeseen error occured, press close to continue</string>
 
 </resources>
