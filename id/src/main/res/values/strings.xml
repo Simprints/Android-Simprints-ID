@@ -68,11 +68,14 @@
     <string name="try_again_label">Try Again</string>
     <string name="settings_label">Settings</string>
     <string name="rescan_label">Re-scan</string>
-    <string name="good_scan_message"><![CDATA[<font color=green>Good Image<br/><font color=grey>Please scan next finger]]></string>
-    <string name="poor_scan_message"><![CDATA[<font color=red>Poor Image<br/><font color=grey>Please re-scan]]></string>
     <string name="error_occured_title">ERROR OCCURED</string>
-    <string name="please_scan"><![CDATA[<font color=gray>Please scan <br/><font color=blue>]]></string>
+    <string name="good_scan_message"><![CDATA[<font color=green>Good Image<br/><font color=grey>Please scan next finger]]></string>
+    <string name="poor_scan_message"><![CDATA[<font color=red>Poor Image<br/><font color=grey>Please re-scan<br/><font color=blue>%1$s]]></string>
+    <string name="please_scan"><![CDATA[<font color=gray>Please scan <br/><font color=blue>%1$s]]></string>
     <string name="empty" />
     <string name="unforeseen_error_message">Sorry, an unforeseen error occured, press close to continue</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="scan">SCAN</string>
 
 </resources>

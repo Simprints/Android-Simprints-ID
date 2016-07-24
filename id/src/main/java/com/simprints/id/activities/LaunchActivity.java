@@ -210,6 +210,8 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                 startAlert(ALERT_TYPE.BLUETOOTH_UNBONDED_SCANNER);
                 break;
             // THESE SHOULD NOT HAPPEN, BUT YOU ARE NEVER TOO PRUDENT
+            case NO_RESPONSE:
+            case SEND_REQUEST_IO_ERROR:
             case CONNECTION_IO_ERROR:
             case CONNECTION_BAD_SCANNER_FEATURE:
                 startAlert(ALERT_TYPE.UNEXPECTED_ERROR);
