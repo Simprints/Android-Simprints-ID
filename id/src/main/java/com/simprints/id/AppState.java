@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 
+@SuppressWarnings("unused")
 public class AppState {
 
     private final static class RandomCodeGenerator {

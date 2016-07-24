@@ -22,9 +22,7 @@
             android:layout_height="0dp"
             android:layout_weight="8"
             android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
-            android:background="#FFFFFFFF">
-
+            android:layout_marginRight="40dp">
         </android.support.v4.view.ViewPager>
 
         <TextView
@@ -33,145 +31,12 @@
             android:layout_height="0dp"/>
 
         <LinearLayout
+            android:id="@+id/indicator_layout"
             android:orientation="horizontal"
-            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight=".5">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:id="@+id/r_5_indicator"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_blank_deselected"
-                android:visibility="invisible"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight=".25"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:id="@+id/r_4_indicator"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_blank_deselected"
-                android:visibility="invisible"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight=".25"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:id="@+id/r_3_indicator"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_blank_deselected"
-                android:visibility="invisible"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight=".25"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:id="@+id/r_2_indicator"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_blank_deselected"
-                android:visibility="invisible"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight=".25"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:id="@+id/r_1_indicator"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_blank_deselected"
-                android:visibility="invisible"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight=".25"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:id="@+id/l_1_indicator"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_blank_deselected"
-                android:visibility="invisible"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight=".25"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:id="@+id/l_2_indicator"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_blank_deselected"
-                android:visibility="invisible"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight=".25"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:id="@+id/l_3_indicator"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_blank_deselected"
-                android:visibility="invisible"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight=".25"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:id="@+id/l_4_indicator"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_blank_deselected"
-                android:visibility="invisible"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight=".25"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:id="@+id/l_5_indicator"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_blank_deselected"
-                android:visibility="invisible"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_height="match_parent"/>
+            android:layout_weight=".5"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal">
 
         </LinearLayout>
 
@@ -182,8 +47,8 @@
 
         <Button
             android:id="@+id/scan_button"
-            android:text="SCAN"
-            android:textSize="20dp"
+            android:text="@string/scan"
+            android:textSize="20sp"
             android:textColor="#7F000000"
             android:layout_width="match_parent"
             android:layout_height="0dp"

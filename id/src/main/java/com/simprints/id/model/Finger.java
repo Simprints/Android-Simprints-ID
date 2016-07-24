@@ -1,63 +1,152 @@
 package com.simprints.id.model;
 
-import java.util.ArrayList;
+import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-public class Finger {
+import com.simprints.id.R;
+import com.simprints.libsimprints.FingerIdentifier;
 
-    public enum FingerStatus {
-        DO_NOT_COLLECT,
-        OPTIONAL,
-        REQUIRED,
-        ADDED,
-        NOT_COLLECTED,
-        COLLECTING,
-        GOOD_SCAN,
-        BAD_SCAN,
-        NO_SCAN
+
+public class Finger implements Parcelable, Comparable<Finger> {
+
+    public final static int NB_OF_FINGERS = 10;
+
+    public enum Status {
+        NOT_COLLECTED(R.drawable.ic_blank_selected, R.drawable.ic_blank_deselected,
+                R.string.scan_label, Color.WHITE, Color.GRAY),
+        COLLECTING(R.drawable.ic_blank_selected, R.drawable.ic_blank_deselected,
+                R.string.cancel_button, Color.WHITE, Color.BLUE),
+        GOOD_SCAN(R.drawable.ic_ok_selected, R.drawable.ic_ok_deselected,
+                R.string.rescan_label, Color.WHITE, Color.GREEN),
+        BAD_SCAN(R.drawable.ic_alert_selected, R.drawable.ic_alert_deselected,
+                R.string.rescan_label, Color.WHITE, Color.RED);
+
+        private int selectedDrawableId;
+        private int deselectedDrawableId;
+        private int textId;
+        private int textColor;
+        private int bgColor;
+
+        Status(int selectedDrawableId, int deselectedDrawableId, int textId,
+               int textColor, int bgColor)
+        {
+            this.selectedDrawableId = selectedDrawableId;
+            this.deselectedDrawableId = deselectedDrawableId;
+            this.textId = textId;
+            this.textColor = textColor;
+            this.bgColor = bgColor;
+        }
+
+        public int getDrawableId(boolean selected) {
+            return selected ? selectedDrawableId : deselectedDrawableId;
+        }
+
+        public int getTextId() {
+            return textId;
+        }
+
+        public int getTextColor() {
+            return textColor;
+        }
+
+        public int getBgColor() {
+            return bgColor;
+        }
     }
 
-    public static ArrayList<Finger> fingers = new ArrayList<Finger>();
+    private FingerIdentifier id;
+    private boolean isActive;
+    private Status status;
+    private byte[] template;
 
-    private int fingerPos;
-    private int fingerNo;
-    private FingerStatus fingerStatus;
-    private byte[] fingerTemplate;
-
-    public Finger(int fingerPos, int fingerNo, FingerStatus fingerStatus) {
-        this.fingerNo = fingerNo;
-        this.fingerStatus = fingerStatus;
-        fingers.set(fingerPos, this);
+    public Finger(FingerIdentifier id, boolean isActive) {
+        this.id = id;
+        this.isActive = isActive;
+        this.status = Status.NOT_COLLECTED;
+        this.template = null;
     }
 
-    public int getFingerPos() {
-        return fingerPos;
+
+    public FingerIdentifier getId() {
+        return id;
     }
 
-    public void setFingerPos(int fingerPos) {
-        this.fingerPos = fingerPos;
+    public boolean isActive() {
+        return isActive;
     }
 
-    public int getFingerNo() {
-        return fingerNo;
+    public Status getStatus() {
+        return status;
     }
 
-    public void setFingerNo(int fingerNo) {
-        this.fingerNo = fingerNo;
+    public byte[] getTemplate() {
+        return template;
     }
 
-    public FingerStatus getFingerStatus() {
-        return fingerStatus;
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
-    public void setFingerStatus(FingerStatus fingerStatus) {
-        this.fingerStatus = fingerStatus;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
-    public byte[] getFingerTemplate() {
-        return fingerTemplate;
+    public void setTemplate(byte[] template) {
+        this.template = template;
     }
 
-    public void setFingerTemplate(byte[] fingerTemplate) {
-        this.fingerTemplate = fingerTemplate;
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeInt(id.ordinal());
+        out.writeInt(isActive ? 1 : 0);
+        out.writeInt(status.ordinal());
+        if (status == Status.GOOD_SCAN || status == Status.BAD_SCAN) {
+            out.writeByteArray(template);
+        }
+    }
+
+    public static final Parcelable.Creator<Finger> CREATOR
+            = new Parcelable.Creator<Finger>() {
+        public Finger createFromParcel(Parcel in) {
+            return new Finger(in);
+        }
+
+        public Finger[] newArray(int size) {
+            return new Finger[size];
+        }
+    };
+
+    private Finger(Parcel in) {
+        this.id = FingerIdentifier.values()[in.readInt()];
+        this.isActive = in.readInt() == 1;
+        this.status = Status.values()[in.readInt()];
+        if (status == Status.GOOD_SCAN || status == Status.BAD_SCAN) {
+            in.readByteArray(this.template);
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Finger finger = (Finger) o;
+
+        return id.equals(finger.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public int compareTo(@NonNull Finger other) {
+        return this.id.ordinal() - other.id.ordinal();
     }
 }
