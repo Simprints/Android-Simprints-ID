@@ -12,7 +12,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,6 +29,7 @@ import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
+import com.simprints.id.tools.Log;
 import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
@@ -37,7 +37,9 @@ import com.simprints.libcommon.ScanConfig;
 import com.simprints.libdata.Data;
 import com.simprints.libscanner.Message;
 import com.simprints.libscanner.Scanner;
+import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.FingerIdentifier;
+import com.simprints.libsimprints.Registration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,19 +68,20 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private AppState appState;
+
     private Finger[] fingers = new Finger[Finger.NB_OF_FINGERS];
     private List<Finger> activeFingers;
     private int currentActiveFingerNo;
-    private List<ImageView> indicators;
+
     private Message.LED_STATE[] leds;
 
+    private boolean personSent;
+    private boolean sessionSent;
+
+    private List<ImageView> indicators;
     private Button scanButton;
     private ViewPager viewPager;
     private FingerPageAdapter pageAdapter;
-
-    public static void log(String s) {
-        Log.d("Simprints", String.format("TRACE MainActivity: %s", s));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,15 +91,19 @@ public class MainActivity extends AppCompatActivity implements
         appState = AppState.getInstance();
         appState.getScanner().setScannerListener(this);
         appState.getData().setDataListener(this);
+
         fingers = new Finger[Finger.NB_OF_FINGERS];
         activeFingers = new ArrayList<>();
         currentActiveFingerNo = 0;
+
         indicators = new ArrayList<>();
         leds = new Message.LED_STATE[Message.LED_MAX_COUNT];
 
+        personSent = false;
+        sessionSent = false;
+
         scanButton = (Button) findViewById(R.id.scan_button);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
-
 
         initActiveFingers();
         initBarAndDrawer();
@@ -107,11 +114,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initActiveFingers() {
-        log("Initializing active fingers from default config");
+        Log.d(this, "Initializing active fingers from default config");
         for (int i = 0; i < Finger.NB_OF_FINGERS; i++) {
             FingerIdentifier id = FingerIdentifier.values()[i];
             fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED);
-            log(String.format("Finger %s is %s",
+            Log.d(this, String.format("Finger %s is %s",
                     fingers[i].getId().name(),
                     fingers[i].isActive() ? "active" : "inactive"));
             if (fingers[i].isActive()) {
@@ -121,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initBarAndDrawer() {
-        log("Initializing action bar and navigation drawer");
+        Log.d(this, "Initializing action bar and navigation drawer");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -137,14 +144,11 @@ public class MainActivity extends AppCompatActivity implements
         ActionBar actionBar = getSupportActionBar();
         //noinspection ConstantConditions
         actionBar.show();
-        actionBar.setTitle(appState.getMode() == MODE.REGISTER_SUBJECT
-                ? R.string.register_title
-                : R.string.identify_title);
-
+        actionBar.setTitle(appState.isEnrol() ? R.string.register_title : R.string.identify_title);
     }
 
     private void initIndicators() {
-        log("Initializing indicators");
+        Log.d(this, "Initializing indicators");
         LinearLayout indicatorLayout = (LinearLayout) findViewById(R.id.indicator_layout);
         indicatorLayout.removeAllViewsInLayout();
         indicators.clear();
@@ -158,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initScanButton() {
-        log("Initializing scanner button");
+        Log.d(this, "Initializing scanner button");
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -182,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initViewPager() {
-        log("Initializing view pager");
+        Log.d(this, "Initializing view pager");
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
         viewPager.setAdapter(pageAdapter);
         viewPager.setOffscreenPageLimit(1);
@@ -193,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onPageSelected(int position) {
-                log(String.format(Locale.UK, "Page %d selected", position));
+                Log.d(MainActivity.this, String.format(Locale.UK, "Page %d selected", position));
                 currentActiveFingerNo = position;
                 refreshDisplay();
                 if (leds[0] != Message.LED_STATE.LED_STATE_OFF) {
@@ -212,15 +216,11 @@ public class MainActivity extends AppCompatActivity implements
                 return activeFingers.get(currentActiveFingerNo).getStatus() == Finger.Status.COLLECTING;
             }
         });
-//        int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
-//        viewPager.setPageMargin(-margin);
-//        viewPager.setPadding(margin, 0, margin, 0);
-//        viewPager.setClipToPadding(false);
         viewPager.setCurrentItem(currentActiveFingerNo);
     }
 
     private void refreshDisplay() {
-        log("Refreshing display");
+        Log.d(this, "Refreshing display");
         // Update indicators display
         for (int i = 0; i < activeFingers.size(); i++) {
             boolean selected = currentActiveFingerNo == i;
@@ -240,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void finishWithUnexpectedError() {
+        Log.d(this, "UNEXPECTED ERROR");
         Intent intent = new Intent(this, AlertActivity.class);
         intent.putExtra("alertType", ALERT_TYPE.UNEXPECTED_ERROR);
         startActivity(intent);
@@ -248,9 +249,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onScannerEvent(com.simprints.libscanner.EVENT event) {
-        Log.w("Simprints", "ID: onScannerEvent event name = " + event.name() + " details = " + event.details());
-        switch (event) {
+        Log.d(this, String.format(Locale.UK, "onScannerEvent %s %s", event.name(), event.details()));
 
+        switch (event) {
             case CONTINUOUS_CAPTURE_SUCCESS: // Image captured successfully
                 appState.getScanner().extractImageQuality();
                 break;
@@ -358,8 +359,6 @@ public class MainActivity extends AppCompatActivity implements
             case SET_HARDWARE_CONFIG_INVALID_STATE: // Hardware configuration failed because UN20 is not shutdown
             case SET_HARDWARE_CONFIG_INVALID_CONFIG: // Hardware configuration failed because an invalid config was specified
             case SET_HARDWARE_CONFIG_FAILURE: // Hardware configuration failed for abnormal reasons, SHOULD NOT HAPPEN
-                MainActivity.log(String.format("unexpected error, event %s, details %s",
-                        event.name(), event.details()));
                 finishWithUnexpectedError();
                 break;
 
@@ -378,37 +377,71 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDataEvent(com.simprints.libdata.EVENT event) {
-        Log.w("Simprints", "ID: onDataEvent event name = " + event.name() + " details = " + event.details());
+        Log.d(this, String.format(Locale.UK, "onDataEvent %s %s", event.name(), event.details()));
+
+        switch (event) {
+            case SAVE_PERSON_SUCCESS:
+            case SAVE_PERSON_FAILURE:
+                personSent = true;
+                if (sessionSent) {
+                    Log.d(this, "Finishing with RESULT_OK");
+                    finish();
+                }
+                break;
+
+            case SAVE_SESSION_SUCCESS:
+            case SAVE_SESSION_FAILURE:
+                sessionSent = true;
+                if (personSent) {
+                    Log.d(this, "Finishing with RESULT_OK");
+                    finish();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
 
     protected void onActionForward() {
-        if (AppState.getInstance().getMode() == MODE.REGISTER_SUBJECT) {
-            ArrayList<Fingerprint> fingerprints = new ArrayList<>();
-            int nbRequiredFingerprints = 0;
-            for (Finger finger : activeFingers) {
-                if (finger.getStatus() == Finger.Status.GOOD_SCAN) {
-                    fingerprints.add(new Fingerprint(finger.getId(), finger.getTemplate()));
-                    if (DEFAULT_CONFIG.get(finger.getId()) == FingerConfig.REQUIRED) {
-                        nbRequiredFingerprints++;
-                    }
-                    break;
+        // Gathers the fingerprints in a list
+        Log.d(this, "onActionForward()");
+        ArrayList<Fingerprint> fingerprints = new ArrayList<>();
+        int nbRequiredFingerprints = 0;
+
+        for (Finger finger : activeFingers) {
+            if (finger.getStatus() == Finger.Status.GOOD_SCAN) {
+                fingerprints.add(new Fingerprint(finger.getId(), finger.getTemplate()));
+                if (DEFAULT_CONFIG.get(finger.getId()) == FingerConfig.REQUIRED) {
+                    nbRequiredFingerprints++;
                 }
             }
-            if (nbRequiredFingerprints < 1) {
-                Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show();
-            } else {
-                Person person = new Person(AppState.getInstance().getGuid(), fingerprints);
-                appState.getData().savePerson(AppState.getInstance().getApiKey(), person);
+        }
+        Log.d(this, String.format(Locale.UK, "%d required fingerprints scanned", nbRequiredFingerprints));
 
+        if (nbRequiredFingerprints < 1) {
+            Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show();
+        } else {
+            Person person = new Person(appState.getGuid(), fingerprints);
+            if (appState.isEnrol()) {
+                Log.d(this, "Creating registration object");
+                Registration registration = new Registration(appState.getGuid());
+                for (Fingerprint fp : fingerprints) {
+                    registration.setTemplate(fp.getFingerIdentifier(), fp.getIsoTemplate());
+                }
+                appState.setResultCode(RESULT_OK);
+                appState.getResultData().putExtra(Constants.SIMPRINTS_REGISTRATION, registration);
+
+                Log.d(this, "Saving person and session");
+                appState.getData().savePerson(appState.getApiKey(), person);
+                appState.getData().saveSession(appState.getApiKey(), appState.getReadyToSendSession());
+            } else {
+                Log.d(this, "Starting matching activity");
+                Intent intent = new Intent(this, MatchingActivity.class);
+                intent.putExtra("Person", person);
+                startActivity(intent);
                 finish();
             }
-        }
-        else {
-            Toast.makeText(this, "TODO", Toast.LENGTH_LONG).show();
-//            Intent intent = new Intent(this, MatchingActivity.class);
-//            startActivity(intent);
-//            finish();
         }
     }
 
@@ -438,7 +471,6 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -489,7 +521,8 @@ public class MainActivity extends AppCompatActivity implements
                             case OPTIONAL:
                                 checked[i] = isChecked;
                                 finger.setActive(isChecked);
-                                Log.d("Simprints", String.format("%s is now %s",
+                                Log.d(MainActivity.this, String.format(Locale.UK,
+                                        "%s is now %s",
                                         finger.getId().name(), finger.isActive() ? "active" : "inactive"));
                                 break;
                             case REQUIRED:
@@ -512,9 +545,9 @@ public class MainActivity extends AppCompatActivity implements
                             }
                         }
                         Collections.sort(activeFingers);
-                        log("New active fingers:");
+                        Log.d(MainActivity.this, "New active fingers:");
                         for (Finger finger : activeFingers) {
-                            log(String.format("Finger %s", finger.getId().name()));
+                            Log.d(MainActivity.this, String.format("Finger %s", finger.getId().name()));
                         }
 
                         if (currentActiveFinger.isActive()) {
@@ -533,15 +566,18 @@ public class MainActivity extends AppCompatActivity implements
         builder.create().show();
     }
 
+
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_BACK: {
-                finish();
-                return true;
-            }
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Log.d(this, "Finishing with RESULT_CANCELED");
+            appState.setResultCode(RESULT_CANCELED);
+            finish();
+            return true;
+        } else {
+            return super.onKeyDown(keyCode, event);
         }
-        return super.onKeyDown(keyCode, event);
     }
 
     @Override
@@ -549,6 +585,7 @@ public class MainActivity extends AppCompatActivity implements
         Scanner scanner = appState.getScanner();
         if (scanner != null) {
             scanner.destroy();
+            appState.setScanner(null);
         }
         super.onDestroy();
     }

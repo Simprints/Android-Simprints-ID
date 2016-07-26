@@ -5,13 +5,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.ViewGroup;
 
-import com.simprints.id.activities.MainActivity;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class FingerPageAdapter extends FragmentStatePagerAdapter {
@@ -27,7 +25,6 @@ public class FingerPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int pos) {
-        MainActivity.log(String.format(Locale.UK, "FingerPageAdapter supplied fragment %d", pos));
         FingerFragment fragment = FingerFragment.newInstance(activeFingers.get(pos));
         fragmentsMap.put(pos, fragment);
         return fragment;
