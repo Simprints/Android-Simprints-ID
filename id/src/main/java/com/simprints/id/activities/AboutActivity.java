@@ -5,9 +5,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.simprints.id.BaseApplication;
+import com.simprints.id.AppState;
 import com.simprints.id.R;
-import com.simprints.libscanner.Scanner;
 
 public class AboutActivity extends AppCompatActivity {
 
@@ -23,7 +22,7 @@ public class AboutActivity extends AppCompatActivity {
         actionBar.show();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        if (BaseApplication.getScanner() != null) {
+        if (AppState.getInstance().getScanner() != null) {
             /*
                     busy = false;
         bt = new BluetoothCom(macAddr, new DefaultNotifier());
