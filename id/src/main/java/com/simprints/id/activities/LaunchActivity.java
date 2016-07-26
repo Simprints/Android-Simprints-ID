@@ -9,6 +9,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.simprints.id.AppState;
 import com.simprints.id.R;
 import com.simprints.id.tools.InternalConstants;
@@ -18,10 +21,13 @@ import com.simprints.libdata.EVENT;
 import com.simprints.libscanner.BluetoothCom;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
+import com.appsee.Appsee;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+
+import io.fabric.sdk.android.Fabric;
 
 public class LaunchActivity extends AppCompatActivity implements Scanner.ScannerListener, Data.DataListener {
 
@@ -40,7 +46,8 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launch);
-        //Fabric.with(this, new Crashlytics());
+        Fabric.with(this, new Crashlytics());
+        Appsee.start(getString(R.string.com_appsee_apikey));
 
         appState = AppState.getInstance();
         handler = new Handler();
@@ -71,6 +78,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
         if (apiKey == null) {
             launchAlert(ALERT_TYPE.MISSING_API_KEY);
+            Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
             return;
         }
         Log.d(this, String.format(Locale.UK, "apiKey = %s", apiKey));
@@ -262,11 +270,24 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
             case API_KEY_VALID:
                 validApiKey = true;
                 continueIfReady();
+
+                if(appState.isEnrol()) {
+                    Answers.getInstance().logCustom(new CustomEvent("Login")
+                            .putCustomAttribute("API Key", appState.getApiKey())
+                            .putCustomAttribute("Type", "Enrol"));
+                }else{
+                    Answers.getInstance().logCustom(new CustomEvent("Login")
+                            .putCustomAttribute("API Key", appState.getApiKey())
+                            .putCustomAttribute("Type", "Identify"));
+                }
+
                 break;
 
             case API_KEY_INVALID:
                 validApiKey = false;
                 launchAlert(ALERT_TYPE.INVALID_API_KEY);
+                Answers.getInstance().logCustom(new CustomEvent("Invalid API Key")
+                        .putCustomAttribute("API Key", appState.getApiKey()));
                 break;
 
             case NETWORK_FAILURE:

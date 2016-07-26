@@ -83,4 +83,7 @@
     <string name="network_failure_message">Network failure, please make sure you are connected to the internet</string>
     <string name="please_wait">Please wait while we proceed to identification</string>
 
+    <!--Appsee API Key-->
+    <string name="com.appsee.apikey" translatable="false">6664c6771410480c95c83acddeab349c</string>
+
 </resources>
