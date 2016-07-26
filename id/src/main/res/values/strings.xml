@@ -53,7 +53,7 @@
     <string name="unbonded_scanner_message">Scanner not paired, please make sure it is paired in settings and try again</string>
     <string name="bluetooth_not_enabled_message">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
     <string name="no_scanner_found_title">NO SCANNER FOUND</string>
-    <string name="no_scanner_found_message">No scanner has been found, please make sure it is switched on, in range and paired via Bluetooth</string>
+    <string name="no_scanner_found_message">No scanner found, please make sure it is switched on, in range and paired via Bluetooth</string>
     <string name="multiple_scanners_found_title">MULTIPLE SCANNERS FOUND</string>
     <string name="multiple_scanners_found_message">More than one scanner has been found, please ensure you are connecting to the correct one</string>
     <string name="cannot_connect_to_scanner_title">CANNOT CONNECT TO SCANNER</string>
@@ -77,5 +77,10 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="scan">SCAN</string>
+    <string name="launch_background_description">Simprint\'s logo as background image</string>
+    <string name="loading">Loading</string>
+    <string name="network_failure_title">NETWORK FAILURE</string>
+    <string name="network_failure_message">Network failure, please make sure you are connected to the internet</string>
+    <string name="please_wait">Please wait while we proceed to identification</string>
 
 </resources>
