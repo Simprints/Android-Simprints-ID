@@ -83,4 +83,7 @@
     <string name="please_wait">Please wait while we proceed to identification</string>
     <string name="finger_image_description">Hands with arrow pointing to a finger</string>
 
+    <!--Appsee API Key-->
+    <string name="com.appsee.apikey" translatable="false">6664c6771410480c95c83acddeab349c</string>
+
 </resources>

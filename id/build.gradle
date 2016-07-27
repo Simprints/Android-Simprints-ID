@@ -9,7 +9,7 @@ android {
         applicationId "com.simprints.id"
         minSdkVersion 9
         targetSdkVersion 24
-        versionCode 1
+        versionCode 7
         versionName "1.0"
     }
     buildTypes {
@@ -52,6 +52,12 @@ dependencies {
     compile 'com.simprints:libcommon:1.0.21'
     compile 'com.simprints:libmatcher:1.0.8'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.0@aar') {
+        transitive = true;
+    }
+    compile('com.appsee:appsee-android:2.2@aar') {
+        transitive = true;
+    }
+    compile('io.fabric.sdk.android:fabric:1.3.10@aar') {
         transitive = true;
     }
 }
