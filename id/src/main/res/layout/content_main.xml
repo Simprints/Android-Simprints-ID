@@ -1,65 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.simprints.id.activities.MainActivity"
     tools:showIn="@layout/app_bar_main"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
     android:background="@color/simprints_grey">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".activities.MainActivity">
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/view_pager"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="8"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp">
-        </android.support.v4.view.ViewPager>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_gravity="center_horizontal" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_weight=".75"
-            android:layout_height="0dp"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_weight=".5"
+        android:layout_height="0dp"/>
 
-        <LinearLayout
-            android:id="@+id/indicator_layout"
-            android:orientation="horizontal"
-            android:layout_height="0dp"
-            android:layout_weight=".5"
-            android:layout_width="wrap_content"
-            android:layout_gravity="center_horizontal">
+    <LinearLayout
+        android:id="@+id/indicator_layout"
+        android:layout_height="0dp"
+        android:layout_weight=".5"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"/>
 
-        </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_weight=".5"
+        android:layout_height="0dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_weight=".75"
-            android:layout_height="0dp"/>
+    <Button
+        android:id="@+id/scan_button"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:text="@string/scan"
+        android:textSize="20sp"
+        android:textColor="#7F000000" />
 
-        <Button
-            android:id="@+id/scan_button"
-            android:text="@string/scan"
-            android:textSize="20sp"
-            android:textColor="#7F000000"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1.75"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="50dp"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_weight="1.5"
-            android:layout_height="0dp"/>
-
-    </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

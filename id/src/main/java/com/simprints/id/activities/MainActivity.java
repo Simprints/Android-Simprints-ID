@@ -3,6 +3,7 @@ package com.simprints.id.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements
             Scanner.ScannerListener,
             Data.DataListener {
 
+    private final static long AUTO_SWIPE_DELAY = 500;
+
     private final static ScanConfig DEFAULT_CONFIG;
     static {
         DEFAULT_CONFIG = new ScanConfig();
@@ -69,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private AppState appState;
 
+    private Handler handler;
+
     private Finger[] fingers = new Finger[Finger.NB_OF_FINGERS];
     private List<Finger> activeFingers;
     private int currentActiveFingerNo;
@@ -78,10 +83,13 @@ public class MainActivity extends AppCompatActivity implements
     private boolean personSent;
     private boolean sessionSent;
 
+    private Finger.Status previousStatus;
+
     private List<ImageView> indicators;
     private Button scanButton;
     private ViewPager viewPager;
     private FingerPageAdapter pageAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,18 +100,25 @@ public class MainActivity extends AppCompatActivity implements
         appState.getScanner().setScannerListener(this);
         appState.getData().setDataListener(this);
 
+        handler = new Handler();
+
         fingers = new Finger[Finger.NB_OF_FINGERS];
         activeFingers = new ArrayList<>();
         currentActiveFingerNo = 0;
 
-        indicators = new ArrayList<>();
         leds = new Message.LED_STATE[Message.LED_MAX_COUNT];
 
         personSent = false;
         sessionSent = false;
 
+        previousStatus = Finger.Status.NOT_COLLECTED;
+
+        indicators = new ArrayList<>();
         scanButton = (Button) findViewById(R.id.scan_button);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
+        pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
+
+
 
         initActiveFingers();
         initBarAndDrawer();
@@ -155,6 +170,13 @@ public class MainActivity extends AppCompatActivity implements
         for (int i = 0; i < activeFingers.size(); i++) {
             ImageView indicator = new ImageView(this);
             indicator.setAdjustViewBounds(true);
+            final int finalI = i;
+            indicator.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    viewPager.setCurrentItem(finalI);
+                }
+            });
             indicators.add(indicator);
             indicatorLayout.addView(indicator, new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -171,12 +193,13 @@ public class MainActivity extends AppCompatActivity implements
                     case GOOD_SCAN:
                     case BAD_SCAN:
                     case NOT_COLLECTED:
+                        previousStatus = finger.getStatus();
                         finger.setStatus(Finger.Status.COLLECTING);
                         refreshDisplay();
                         appState.getScanner().startContinuousCapture();
                         break;
                     case COLLECTING:
-                        finger.setStatus(Finger.Status.NOT_COLLECTED);
+                        finger.setStatus(previousStatus);
                         refreshDisplay();
                         appState.getScanner().stopContinuousCapture();
                         break;
@@ -187,7 +210,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initViewPager() {
         Log.d(this, "Initializing view pager");
-        pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
         viewPager.setAdapter(pageAdapter);
         viewPager.setOffscreenPageLimit(1);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -284,6 +306,15 @@ public class MainActivity extends AppCompatActivity implements
                 Arrays.fill(leds, Message.LED_STATE.LED_STATE_GREEN);
                 activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.GOOD_SCAN);
                 refreshDisplay();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(MainActivity.this, "AutoScroll");
+                        if (currentActiveFingerNo < activeFingers.size()) {
+                            viewPager.setCurrentItem(currentActiveFingerNo+1);
+                        }
+                    }
+                }, AUTO_SWIPE_DELAY);
                 break;
 
 
@@ -323,11 +354,17 @@ public class MainActivity extends AppCompatActivity implements
             case SET_HARDWARE_CONFIG_SUCCESS: // Hardware configuration was successfully set
                 break;
 
+            case SEND_REQUEST_IO_ERROR: // Request sending failed because of an IO error
+                Intent intent = new Intent(this, AlertActivity.class);
+                intent.putExtra("alertType", ALERT_TYPE.DISCONNECTED);
+                startActivity(intent);
+                finish();
+                break;
+
                 // error conditions
             case SCANNER_BUSY: // Cannot perform request because the scanner is busy
             case NOT_CONNECTED: // Cannot perform request because the phone is not connected to the scanner
             case NO_RESPONSE: // The scanner is not answering
-            case SEND_REQUEST_IO_ERROR: // Request sending failed because of an IO error
             case CONNECTION_ALREADY_CONNECTED: // Connection failed because the phone is already connected/connecting/disconnecting
             case CONNECTION_BLUETOOTH_DISABLED: // Connection failed because phone's bluetooth is disabled
             case CONNECTION_SCANNER_UNBONDED: // Connection failed because the scanner is not bonded to the phone
@@ -338,16 +375,9 @@ public class MainActivity extends AppCompatActivity implements
             case SET_SENSOR_CONFIG_SUCCESS: // Sensor configuration was successfully set
             case SET_SENSOR_CONFIG_FAILURE: // Setting sensor configuration failed for abnormal reasons, SHOULD NOT HAPPEN
             case SET_UI_FAILURE: // Setting UI failed for abnormal reasons, SHOULD NOT HAPPEN
-            case PAIR_SUCCESS:
-                break;
-            case PAIR_FAILURE:
-                break;
-            case CAPTURE_IMAGE_SUCCESS:
-                break;
             case CAPTURE_IMAGE_SDK_ERROR: // Image capture failed because of an error in UN20 SDK
             case CAPTURE_IMAGE_INVALID_STATE: // Image capture failed because the un20 is not awaken
             case CAPTURE_IMAGE_FAILURE: // Image capture failed for abnormal reasons, SHOULD NOT HAPPEN
-            case EXTRACT_IMAGE_IO_ERROR: // Image extraction failed because of an IO error
             case EXTRACT_IMAGE_NO_IMAGE: // Image extraction failed because there is no image available
             case EXTRACT_IMAGE_FAILURE: // Image extraction failed for abnormal reasons, SHOULD NOT HAPPEN
             case UN20_SHUTDOWN_INVALID_STATE: // UN20 shut down failed because it is already shut / waking up or down
@@ -360,6 +390,9 @@ public class MainActivity extends AppCompatActivity implements
             case SET_HARDWARE_CONFIG_INVALID_CONFIG: // Hardware configuration failed because an invalid config was specified
             case SET_HARDWARE_CONFIG_FAILURE: // Hardware configuration failed for abnormal reasons, SHOULD NOT HAPPEN
                 finishWithUnexpectedError();
+                break;
+
+            case CAPTURE_IMAGE_SUCCESS:
                 break;
 
             case CONTINUOUS_CAPTURE_ERROR:
@@ -567,7 +600,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -578,15 +610,5 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             return super.onKeyDown(keyCode, event);
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        Scanner scanner = appState.getScanner();
-        if (scanner != null) {
-            scanner.destroy();
-            appState.setScanner(null);
-        }
-        super.onDestroy();
     }
 }
