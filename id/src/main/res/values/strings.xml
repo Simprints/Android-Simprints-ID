@@ -49,18 +49,15 @@
     <string name="bluetooth_not_supported_title">BLUETOOTH NOT SUPPORTED</string>
     <string name="bluetooth_not_supported_message">Bluetooth not supported on this device, please contact your system administrator</string>
     <string name="bluetooth_not_enabled_title">BLUETOOTH NOT ENABLED</string>
+    <string name="bluetooth_not_enabled_message">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
     <string name="unbonded_scanner_title">SCANNER NOT PAIRED</string>
     <string name="unbonded_scanner_message">Scanner not paired, please make sure it is paired in settings and try again</string>
-    <string name="bluetooth_not_enabled_message">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
-    <string name="no_scanner_found_title">NO SCANNER FOUND</string>
-    <string name="no_scanner_found_message">No scanner found, please make sure it is switched on, in range and paired via Bluetooth</string>
-    <string name="multiple_scanners_found_title">MULTIPLE SCANNERS FOUND</string>
-    <string name="multiple_scanners_found_message">More than one scanner has been found, please ensure you are connecting to the correct one</string>
-    <string name="cannot_connect_to_scanner_title">CANNOT CONNECT TO SCANNER</string>
-    <string name="cannot_connect_to_scanner_message">Unable to connect to scanner, please check it is powered on and in range</string>
-    <string name="timeout_occured_title">AN ERROR OCCURED</string>
-    <string name="timeout_occured_message">An error occured, please check scanner is powered on and in range or contact your system administrator</string>
-    <string name="connection_lost_title">CONNECTION LOST</string>
+    <string name="multiple_scanners_found_title">MULTIPLE PAIRED SCANNERS</string>
+    <string name="multiple_scanners_found_message">More than one scanner is paired to the phone, please unpair un-needed scanners</string>
+    <string name="scanner_unreachable">SCANNER UNREACHABLE</string>
+    <string name="scanner_unreachable_message">The scanner is unreachable, please make sure it is powered on and close to the phone</string>
+    <string name="disconnected_title">DISCONNECTED FROM SCANNER</string>
+    <string name="disconnected_message">Got disconnected from the scanner, please make sure it is powered on and close to the phone, then reconnect</string>
     <string name="application_not_authorised_message">The application is not authorised, please contact your system administrator</string>
     <string name="close">CLOSE</string>
     <string name="title_activity_main">MainActivity</string>
@@ -68,6 +65,8 @@
     <string name="try_again_label">Try Again</string>
     <string name="settings_label">Settings</string>
     <string name="rescan_label">Re-scan</string>
+    <string name="rescan_label_question">Re-scan?</string>
+    <string name="reconnect_label">Re-connect</string>
     <string name="error_occured_title">ERROR OCCURED</string>
     <string name="good_scan_message"><![CDATA[<font color=green>Good Image<br/><font color=grey>Please scan next finger]]></string>
     <string name="poor_scan_message"><![CDATA[<font color=red>Poor Image<br/><font color=grey>Please re-scan<br/><font color=blue>%1$s]]></string>
@@ -82,5 +81,6 @@
     <string name="network_failure_title">NETWORK FAILURE</string>
     <string name="network_failure_message">Network failure, please make sure you are connected to the internet</string>
     <string name="please_wait">Please wait while we proceed to identification</string>
+    <string name="finger_image_description">Hands with arrow pointing to a finger</string>
 
 </resources>

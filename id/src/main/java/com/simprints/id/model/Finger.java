@@ -19,9 +19,9 @@ public class Finger implements Parcelable, Comparable<Finger> {
         COLLECTING(R.drawable.ic_blank_selected, R.drawable.ic_blank_deselected,
                 R.string.cancel_button, Color.WHITE, Color.BLUE),
         GOOD_SCAN(R.drawable.ic_ok_selected, R.drawable.ic_ok_deselected,
-                R.string.rescan_label, Color.WHITE, Color.GREEN),
+                R.string.rescan_label_question, Color.WHITE, Color.argb(255, 0, 204, 0)),
         BAD_SCAN(R.drawable.ic_alert_selected, R.drawable.ic_alert_deselected,
-                R.string.rescan_label, Color.WHITE, Color.RED);
+                R.string.rescan_label, Color.WHITE, Color.argb(255, 204, 0, 0));
 
         private int selectedDrawableId;
         private int deselectedDrawableId;

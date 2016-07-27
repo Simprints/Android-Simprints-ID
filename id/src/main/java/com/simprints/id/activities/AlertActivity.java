@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.simprints.id.AppState;
 import com.simprints.id.R;
 import com.simprints.id.tools.InternalConstants;
-import com.simprints.libscanner.Scanner;
 
 public class AlertActivity extends AppCompatActivity {
 
@@ -36,18 +35,18 @@ public class AlertActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.message)).setText(alertType.getAlertMessageId());
 
         TextView alertLeftButtonTextView = (TextView) findViewById(R.id.left_button);
-        alertLeftButtonTextView.setVisibility(alertType.isLeftButtonVisible() ? View.VISIBLE : View.INVISIBLE);
-        if (alertType.isLeftButtonVisible()) {
+        if (alertType.isLeftButtonActive()) {
             alertLeftButtonTextView.setText(alertType.getAlertLeftButtonTextId());
             alertLeftButtonTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     switch (alertType) {
                         case BLUETOOTH_NOT_ENABLED:
-                        case BLUETOOTH_UNBONDED_SCANNER:
-                        case NO_PAIRED_SCANNER:
+                        case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
                         case NETWORK_FAILURE:
+                        case SCANNER_UNREACHABLE:
+                        case DISCONNECTED:
                             appState.setResultCode(InternalConstants.RESULT_TRY_AGAIN);
                             finish();
                             break;
@@ -62,17 +61,15 @@ public class AlertActivity extends AppCompatActivity {
         }
 
         TextView alertRightButtonTextView = (TextView) findViewById(R.id.right_button);
-        alertRightButtonTextView.setVisibility(alertType.isRightButtonVisible() ? View.VISIBLE : View.INVISIBLE);
-        if (alertType.isRightButtonVisible()) {
+        if (alertType.isRightButtonActive()) {
             alertRightButtonTextView.setText(alertType.getAlertRightButtonTextId());
             alertRightButtonTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     switch (alertType) {
                         case BLUETOOTH_NOT_ENABLED:
-                        case NO_PAIRED_SCANNER:
+                        case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
-                        case BLUETOOTH_UNBONDED_SCANNER:
                             Intent intent = new Intent();
                             intent.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
                             startActivity(intent);
@@ -92,15 +89,5 @@ public class AlertActivity extends AppCompatActivity {
         } else {
             return super.onKeyDown(keyCode, event);
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        Scanner scanner = appState.getScanner();
-        if (scanner != null) {
-            scanner.destroy();
-            appState.setScanner(null);
-        }
-        super.onDestroy();
     }
 }
