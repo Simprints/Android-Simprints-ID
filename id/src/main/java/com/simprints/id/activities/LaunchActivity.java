@@ -41,6 +41,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     private boolean validApiKey;
     private long minEndTime;
     private boolean childActivityLaunched;
+    boolean finishing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +55,12 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         validApiKey = false;
         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
         childActivityLaunched = false;
+        finishing = false;
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             Log.d(this, "finishing with SIMPRINTS_INVALID_API_KEY");
-            finishWith(Constants.SIMPRINTS_INVALID_API_KEY);
+            finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null);
             return;
         }
 
@@ -70,7 +72,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                 appState.setEnrol(true);
                 break;
             default:
-                finishWith(Constants.SIMPRINTS_INVALID_INTENT_ACTION);
+                finishWith(Constants.SIMPRINTS_INVALID_INTENT_ACTION, null);
                 return;
         }
 
@@ -114,38 +116,40 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         appState.getData().setDataListener(this);
         Log.d(this, "Data object initialised");
 
-        // Initializes the session Scanner object
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if (adapter == null) {
-            launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
-            return;
-        }
-        if (!adapter.isEnabled()) {
-            launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
-            return;
-        }
-        List<String> pairedScanners = Scanner.getPairedScanners();
-        if (pairedScanners.size() == 0) {
-            launchAlert(ALERT_TYPE.NO_PAIRED_SCANNER);
-            return;
-        }
-        if (pairedScanners.size() > 1) {
-            launchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS);
-            return;
-        }
-        String macAddress = pairedScanners.get(0);
-        appState.setMacAddress(macAddress);
-        appState.setScanner(new Scanner(macAddress));
-        appState.getScanner().setScannerListener(this);
-        Log.d(this, String.format("Scanner object initialised (MAC address = %s)",
-                macAddress));
-
         validateAndConnect();
     }
 
     private void validateAndConnect() {
+        // Initializes the session Scanner object if necessary
+        if (appState.getScanner() == null) {
+            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+            if (adapter == null) {
+                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
+                return;
+            }
+            if (!adapter.isEnabled()) {
+                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
+                return;
+            }
+            List<String> pairedScanners = Scanner.getPairedScanners();
+            if (pairedScanners.size() == 0) {
+                launchAlert(ALERT_TYPE.NOT_PAIRED);
+                return;
+            }
+            if (pairedScanners.size() > 1) {
+                launchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS);
+                return;
+            }
+            String macAddress = pairedScanners.get(0);
+            appState.setMacAddress(macAddress);
+            appState.setScanner(new Scanner(macAddress));
+            Log.d(this, String.format("Scanner object initialised (MAC address = %s)",
+                    macAddress));
+        }
+
         // Initiate scanner connection and apiKey validation
         Log.d(this, "Initiating scanner connection and apiKey validation");
+        appState.getScanner().setScannerListener(this);
         appState.getScanner().connect();
         appState.getData().validateApiKey(appState.getApiKey());
 
@@ -182,7 +186,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         }
     }
 
-    private void finishWith(final int resultCode) {
+    private void finishWith(final int resultCode, final Intent resultData) {
         // The activity must last at least MINIMUM_DISPLAY_DURATION
         // to avoid disorienting the user.
         final long remainingTime = Math.max(0, minEndTime - SystemClock.elapsedRealtime());
@@ -194,7 +198,8 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
             public void run() {
                 Log.d(LaunchActivity.this, String.format(Locale.UK,
                         "Finishing with result code %d", resultCode));
-                setResult(resultCode);
+                setResult(resultCode, resultData);
+                finishing = true;
                 finish();
             }
         }, remainingTime);
@@ -206,7 +211,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         final long remainingTime = Math.max(0, minEndTime - SystemClock.elapsedRealtime());
         Log.d(this, String.format(Locale.UK, "Waiting %d ms to start child activity %s",
                 remainingTime, intent.getAction()));
-
+        handler.removeCallbacksAndMessages(null);
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -241,7 +246,10 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                 launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
                 break;
             case CONNECTION_SCANNER_UNBONDED:
-                launchAlert(ALERT_TYPE.BLUETOOTH_UNBONDED_SCANNER);
+                launchAlert(ALERT_TYPE.NOT_PAIRED);
+                break;
+            case CONNECTION_SCANNER_UNREACHABLE:
+                launchAlert(ALERT_TYPE.SCANNER_UNREACHABLE);
                 break;
             case NOT_CONNECTED:
             case NO_RESPONSE:
@@ -307,10 +315,13 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         // If just went back from a child activity
         if (childActivityLaunched) {
             if (appState.getResultCode() == InternalConstants.RESULT_TRY_AGAIN) {
+                validApiKey = false;
+                minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
+                childActivityLaunched = false;
+                finishing = false;
                 validateAndConnect();
             } else {
-                setResult(appState.getResultCode(), appState.getResultData());
-                finish();
+                finishWith(appState.getResultCode(), appState.getResultData());
             }
         }
 
@@ -321,8 +332,7 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Log.d(this, String.format(Locale.UK, "onKeyDown, keyCode %d", keyCode));
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            setResult(RESULT_CANCELED);
-            finish();
+            finishWith(RESULT_CANCELED, null);
             return true;
         } else {
             return super.onKeyDown(keyCode, event);
@@ -333,9 +343,8 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     @Override
     public void onDestroy() {
         handler.removeCallbacksAndMessages(null);
-        Scanner scanner = appState.getScanner();
-        if (scanner != null) {
-            scanner.destroy();
+        if (finishing && appState.getScanner() != null) {
+            appState.getScanner().destroy();
             appState.setScanner(null);
         }
         super.onDestroy();

@@ -4,43 +4,34 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent">
+    android:background="@color/simprints_white">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-        <ImageView
-            android:gravity="top|center_horizontal"
-            android:layout_gravity="top|center_horizontal"
-            android:scaleType="fitStart"
-            android:id="@+id/finger_image"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="4"
-            android:visibility="visible"/>
-        <ProgressBar
-            android:id="@+id/finger_progress_bar"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="120dp"
-            android:layout_height="0dp"
-            android:layout_weight="4"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_horizontal"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:visibility="gone"
-            android:indeterminateDrawable="@drawable/progress_spinner" />
-        <TextView
-            android:id="@+id/finger_text"
-            android:text="Tap here to scan"
-            android:textSize="20dp"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="5dp"
-            android:visibility="visible"/>
+    <ImageView
+        android:id="@+id/finger_image"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center_horizontal"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/finger_image_description"
+        android:layout_marginTop="10dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/finger_text"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text=""
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="10dp"/>
+
 
 </LinearLayout>
