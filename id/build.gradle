@@ -47,7 +47,7 @@ dependencies {
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.simprints:libsimprints:1.0.3'
-    compile 'com.simprints:libscanner:1.0.26'
+    compile 'com.simprints:libscanner:1.0.35'
     compile 'com.simprints:libdata:1.0.8'
     compile 'com.simprints:libcommon:1.0.21'
     compile 'com.simprints:libmatcher:1.0.8'
