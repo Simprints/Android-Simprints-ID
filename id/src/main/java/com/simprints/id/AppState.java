@@ -25,6 +25,7 @@ public class AppState {
     private Scanner scanner;
     private Data data;
     private Session session;
+    //private GoogleApiClient googleApiClient;
     private int resultCode;
     private Intent resultData;
 
@@ -32,6 +33,7 @@ public class AppState {
         scanner = null;
         data = null;
         session = new Session();
+//        googleApiClient = null;
         Calendar c = Calendar.getInstance();
         session.setStartTime(c.getTime());
         resultCode = 0;
@@ -74,6 +76,14 @@ public class AppState {
     public Data getData() { return data; }
 
     public void setData(Data data) { this.data = data; }
+
+   /* public GoogleApiClient getGoogleApiClient() {
+        return googleApiClient;
+    }
+
+    public void setGoogleApiClient(GoogleApiClient googleApiClient) {
+        this.googleApiClient = googleApiClient;
+    }*/
 
     public int getResultCode() {
         return resultCode;
