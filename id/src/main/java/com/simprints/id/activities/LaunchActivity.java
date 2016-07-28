@@ -2,13 +2,17 @@ package com.simprints.id.activities;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
+import android.widget.Toast;
 
+import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
@@ -21,7 +25,6 @@ import com.simprints.libdata.EVENT;
 import com.simprints.libscanner.BluetoothCom;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
-import com.appsee.Appsee;
 
 import java.util.List;
 import java.util.Locale;
@@ -29,16 +32,19 @@ import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
 
-public class LaunchActivity extends AppCompatActivity implements Scanner.ScannerListener, Data.DataListener {
+public class LaunchActivity extends AppCompatActivity
+        implements Scanner.ScannerListener, Data.DataListener/*,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener*/ {
 
     private final static int MINIMUM_DISPLAY_DURATION = 2500;
     private final static int CONNECTION_AND_VALIDATION_TIMEOUT = 10000;
-
+    private final static int COMMCARE_PERMISSION_REQUEST = 0;
 
     private AppState appState;
     private static Handler handler;
 
-    private boolean validApiKey;
+    private String callingPackage;
+    private boolean isDataReady;
     private long minEndTime;
     private boolean childActivityLaunched;
     boolean finishing;
@@ -52,10 +58,11 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
 
         appState = AppState.getInstance();
         handler = new Handler();
-        validApiKey = false;
+        isDataReady = false;
         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
         childActivityLaunched = false;
         finishing = false;
+        callingPackage = null;
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
@@ -105,21 +112,39 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         Log.d(this, String.format(Locale.UK, "deviceId = %s", deviceId));
         appState.setDeviceId(deviceId);
 
+        // Sets calling package
+        callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
+        Log.d(this, String.format(Locale.UK, "callingPackage = %s", callingPackage));
+
+
         // Initializes result
         appState.setResultCode(RESULT_CANCELED);
         appState.setResultData(new Intent(appState.isEnrol()
                 ? Constants.SIMPRINTS_REGISTER_INTENT
                 : Constants.SIMPRINTS_IDENTIFY_INTENT));
 
+        /*// Initializes the google API client
+        appState.setGoogleApiClient(
+                new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .build());*/
+
         // Initializes the session Data object
         appState.setData(new Data(getApplicationContext()));
         appState.getData().setDataListener(this);
         Log.d(this, "Data object initialised");
+        Log.d(this, "Validating apiKey");
+        appState.getData().validateApiKey(appState.getApiKey());
 
-        validateAndConnect();
+
+
+
+        connect();
     }
 
-    private void validateAndConnect() {
+    private void connect() {
         // Initializes the session Scanner object if necessary
         if (appState.getScanner() == null) {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -148,10 +173,9 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         }
 
         // Initiate scanner connection and apiKey validation
-        Log.d(this, "Initiating scanner connection and apiKey validation");
+        Log.d(this, "Initiating scanner connection");
         appState.getScanner().setScannerListener(this);
         appState.getScanner().connect();
-        appState.getData().validateApiKey(appState.getApiKey());
 
         // Program a timeout event after CONNECTION_AND_VALIDATION_TIMEOUT ms
         handler.postDelayed(new Runnable() {
@@ -159,10 +183,10 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
             public void run() {
                 boolean connected = appState.getScanner().getConnectionStatus() == BluetoothCom.BLUETOOTH_STATUS.CONNECTED;
                 Log.d(LaunchActivity.this, String.format(Locale.UK,
-                        "TIMEOUT, apiKey validated: %s, connected to scanner: %s",
-                        validApiKey ? "YES" : "NO", connected ? "YES" : "NO"));
+                        "TIMEOUT, Data object ready: %s, connected to scanner: %s",
+                        isDataReady ? "YES" : "NO", connected ? "YES" : "NO"));
 
-                if (!validApiKey || !connected) {
+                if (!isDataReady || !connected) {
                     if (connected) {
                         appState.getScanner().disconnect();
                     }
@@ -177,10 +201,10 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     private void continueIfReady() {
         boolean connected = appState.getScanner().getConnectionStatus() == BluetoothCom.BLUETOOTH_STATUS.CONNECTED;
         Log.d(LaunchActivity.this, String.format(Locale.UK,
-                "continueIfReady, apiKey validated: %s, connected to scanner: %s",
-                validApiKey ? "YES" : "NO", connected ? "YES" : "NO"));
+                "continueIfReady, Data object ready: %s, connected to scanner: %s",
+                isDataReady ? "YES" : "NO", connected ? "YES" : "NO"));
 
-        if (validApiKey && connected) {
+        if (isDataReady && connected) {
             handler.removeCallbacksAndMessages(null);
             appState.getScanner().un20Wakeup();
         }
@@ -264,8 +288,16 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
 
             case UN20_WAKEUP_SUCCESS:
             case UN20_WAKEUP_INVALID_STATE:
+                appState.getScanner().setUI(true, null, (short)-1);
+                break;
+
+            case SET_UI_SUCCESS:
                 Intent intent = new Intent(this, ConsentActivity.class);
                 launch(intent);
+                break;
+
+            case SET_UI_FAILURE:
+                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 break;
         }
     }
@@ -276,26 +308,36 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
 
         switch (event) {
             case API_KEY_VALID:
-                validApiKey = true;
-                continueIfReady();
-
-                if(appState.isEnrol()) {
+                if (appState.isEnrol()) {
                     Answers.getInstance().logCustom(new CustomEvent("Login")
                             .putCustomAttribute("API Key", appState.getApiKey())
                             .putCustomAttribute("Type", "Enrol"));
-                }else{
+                } else {
                     Answers.getInstance().logCustom(new CustomEvent("Login")
                             .putCustomAttribute("API Key", appState.getApiKey())
                             .putCustomAttribute("Type", "Identify"));
                 }
-
+                if (InternalConstants.COMMCARE_PACKAGE.equals(callingPackage)) {
+                    resolveCommCareDatabase();
+                } else {
+                    isDataReady = true;
+                    continueIfReady();
+                }
                 break;
 
             case API_KEY_INVALID:
-                validApiKey = false;
                 launchAlert(ALERT_TYPE.INVALID_API_KEY);
                 Answers.getInstance().logCustom(new CustomEvent("Invalid API Key")
                         .putCustomAttribute("API Key", appState.getApiKey()));
+                break;
+
+            case DATABASE_RESOLVER_FAILURE:
+                Toast.makeText(this, "Warning: could not synchronize with CommCare",
+                        Toast.LENGTH_LONG).show();
+                Crashlytics.log(0, "CommCare DB resolution", "Failure");
+            case DATABASE_RESOLVER_SUCCESS:
+                isDataReady = true;
+                continueIfReady();
                 break;
 
             case NETWORK_FAILURE:
@@ -303,6 +345,64 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
                 break;
         }
     }
+
+    private void resolveCommCareDatabase() {
+        if (ContextCompat.checkSelfPermission(this, "org.commcare.dalvik.provider.cases.read")
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{"org.commcare.dalvik.provider.cases.read"},
+                    COMMCARE_PERMISSION_REQUEST);
+        } else {
+            appState.getData().commCareDatabaseResolver(getContentResolver(), appState.getApiKey());
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults)
+    {
+        switch (requestCode) {
+            case COMMCARE_PERMISSION_REQUEST:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    resolveCommCareDatabase();
+                } else {
+                    Toast.makeText(this, "Warning: could not synchronize with CommCare",
+                            Toast.LENGTH_LONG).show();
+                    Crashlytics.log(0, "CommCare DB resolution", "No permission");
+                    isDataReady = true;
+                    continueIfReady();
+                }
+                break;
+        }
+    }
+
+    /*@Override
+    public void onConnected(@Nullable Bundle bundle) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    COMMCARE_PERMISSION_REQUEST);
+        } else {
+            appState.getData().commCareDatabaseResolver(getContentResolver(), appState.getApiKey());
+        }
+        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                appState.getGoogleApiClient());
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }*/
 
     @Override
     protected void onRestart() {
@@ -315,11 +415,10 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         // If just went back from a child activity
         if (childActivityLaunched) {
             if (appState.getResultCode() == InternalConstants.RESULT_TRY_AGAIN) {
-                validApiKey = false;
                 minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
                 childActivityLaunched = false;
                 finishing = false;
-                validateAndConnect();
+                connect();
             } else {
                 finishWith(appState.getResultCode(), appState.getResultData());
             }
@@ -328,20 +427,24 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
     }
 
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        Log.d(this, String.format(Locale.UK, "onKeyDown, keyCode %d", keyCode));
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            finishWith(RESULT_CANCELED, null);
-            return true;
-        } else {
-            return super.onKeyDown(keyCode, event);
-        }
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        Log.d(this, String.format(Locale.UK, "onKeyDown, keyCode %d", keyCode));
+//        if (keyCode != KeyEvent.KEYCODE_BACK) {
+//            return true;
+//        } else {
+//            return super.onKeyDown(keyCode, event);
+//        }
+//    }
 
+    @Override
+    public void onBackPressed() {
+        // Neutralize back press
+    }
 
     @Override
     public void onDestroy() {
+        Log.d(this, "onDestroy");
         handler.removeCallbacksAndMessages(null);
         if (finishing && appState.getScanner() != null) {
             appState.getScanner().destroy();
@@ -349,5 +452,4 @@ public class LaunchActivity extends AppCompatActivity implements Scanner.Scanner
         }
         super.onDestroy();
     }
-
 }

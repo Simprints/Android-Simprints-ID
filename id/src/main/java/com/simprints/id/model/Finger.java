@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.R;
+import com.simprints.libcommon.Template;
 import com.simprints.libsimprints.FingerIdentifier;
 
 
@@ -59,9 +60,9 @@ public class Finger implements Parcelable, Comparable<Finger> {
     private FingerIdentifier id;
     private boolean isActive;
     private Status status;
-    private byte[] template;
+    private Template template;
 
-    public Finger(FingerIdentifier id, boolean isActive) {
+    public Finger(@NonNull FingerIdentifier id, boolean isActive) {
         this.id = id;
         this.isActive = isActive;
         this.status = Status.NOT_COLLECTED;
@@ -81,7 +82,7 @@ public class Finger implements Parcelable, Comparable<Finger> {
         return status;
     }
 
-    public byte[] getTemplate() {
+    public Template getTemplate() {
         return template;
     }
 
@@ -93,7 +94,7 @@ public class Finger implements Parcelable, Comparable<Finger> {
         this.status = status;
     }
 
-    public void setTemplate(byte[] template) {
+    public void setTemplate(Template template) {
         this.template = template;
     }
 
@@ -105,8 +106,9 @@ public class Finger implements Parcelable, Comparable<Finger> {
         out.writeInt(id.ordinal());
         out.writeInt(isActive ? 1 : 0);
         out.writeInt(status.ordinal());
-        if (status == Status.GOOD_SCAN || status == Status.BAD_SCAN) {
-            out.writeByteArray(template);
+        out.writeInt(template != null ? 1 : 0);
+        if (template != null) {
+            out.writeParcelable(template, 0);
         }
     }
 
@@ -122,11 +124,13 @@ public class Finger implements Parcelable, Comparable<Finger> {
     };
 
     private Finger(Parcel in) {
-        this.id = FingerIdentifier.values()[in.readInt()];
-        this.isActive = in.readInt() == 1;
-        this.status = Status.values()[in.readInt()];
-        if (status == Status.GOOD_SCAN || status == Status.BAD_SCAN) {
-            in.readByteArray(this.template);
+        id = FingerIdentifier.values()[in.readInt()];
+        isActive = in.readInt() == 1;
+        status = Status.values()[in.readInt()];
+        if (in.readInt() == 1) {
+            template = in.readParcelable(Template.class.getClassLoader());
+        } else {
+            template = null;
         }
     }
 
