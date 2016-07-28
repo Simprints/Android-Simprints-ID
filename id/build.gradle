@@ -9,8 +9,8 @@ android {
         applicationId "com.simprints.id"
         minSdkVersion 9
         targetSdkVersion 24
-        versionCode 8
-        versionName "1.8"
+        versionCode 9
+        versionName "1.0.9"
     }
     buildTypes {
         release {
