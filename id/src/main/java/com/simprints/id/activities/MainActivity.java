@@ -188,24 +188,29 @@ public class MainActivity extends AppCompatActivity implements
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Finger finger = activeFingers.get(currentActiveFingerNo);
-                switch (finger.getStatus()) {
-                    case GOOD_SCAN:
-                    case BAD_SCAN:
-                    case NOT_COLLECTED:
-                        previousStatus = finger.getStatus();
-                        finger.setStatus(Finger.Status.COLLECTING);
-                        refreshDisplay();
-                        appState.getScanner().startContinuousCapture();
-                        break;
-                    case COLLECTING:
-                        finger.setStatus(previousStatus);
-                        refreshDisplay();
-                        appState.getScanner().stopContinuousCapture();
-                        break;
-                }
+                toggleContinuousCapture();
             }
         });
+    }
+
+    private void toggleContinuousCapture() {
+        Finger finger = activeFingers.get(currentActiveFingerNo);
+        switch (finger.getStatus()) {
+            case GOOD_SCAN:
+            case BAD_SCAN:
+            case NOT_COLLECTED:
+                previousStatus = finger.getStatus();
+                finger.setStatus(Finger.Status.COLLECTING);
+                refreshDisplay();
+                appState.getScanner().startContinuousCapture();
+                break;
+            case COLLECTING:
+                finger.setStatus(previousStatus);
+                refreshDisplay();
+                scanButton.setEnabled(false);
+                appState.getScanner().stopContinuousCapture();
+                break;
+        }
     }
 
     private void initViewPager() {
@@ -274,25 +279,20 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(this, String.format(Locale.UK, "onScannerEvent %s %s", event.name(), event.details()));
 
         switch (event) {
+            case TRIGGER_PRESSED: // Trigger pressed
+                toggleContinuousCapture();
+                break;
+
             case CONTINUOUS_CAPTURE_SUCCESS: // Image captured successfully
                 appState.getScanner().extractImageQuality();
                 break;
 
             case CONTINUOUS_CAPTURE_STOPPED: // Continous capture stopped
+                scanButton.setEnabled(true);
                 break;
 
-
             case EXTRACT_IMAGE_QUALITY_SUCCESS: // Image quality extracted successfully
-                int imageQuality = appState.getScanner().getImageQuality();
-                if (imageQuality >= 50) {
-                    appState.getScanner().generateTemplate();
-                }
-                else {
-                    activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.BAD_SCAN);
-                    appState.getScanner().setBadCaptureUI();
-                    Arrays.fill(leds, Message.LED_STATE.LED_STATE_RED);
-                    refreshDisplay();
-                }
+                appState.getScanner().generateTemplate();
                 break;
 
 
@@ -301,10 +301,31 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case EXTRACT_TEMPLATE_SUCCESS: // Template extracted successfully
-                activeFingers.get(currentActiveFingerNo).setTemplate(appState.getScanner().getTemplate().getBytes());
-                appState.getScanner().setGoodCaptureUI();
-                Arrays.fill(leds, Message.LED_STATE.LED_STATE_GREEN);
-                activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.GOOD_SCAN);
+                int quality = appState.getScanner().getImageQuality();
+                Finger currentFinger = activeFingers.get(currentActiveFingerNo);
+
+                Log.d(this, String.format(Locale.UK,
+                        "Extracted new template of quality %d for finger %s",
+                        quality, currentFinger.getId().name()));
+
+                if (currentFinger.getTemplate() == null ||
+                        currentFinger.getTemplate().getQuality() < quality)
+                {
+                    Log.d(this, "Set template");
+                    activeFingers.get(currentActiveFingerNo).setTemplate(appState.getScanner().getTemplate());
+                }
+
+                if (quality >= 50) {
+                    activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.GOOD_SCAN);
+                    appState.getScanner().setGoodCaptureUI();
+                    Arrays.fill(leds, Message.LED_STATE.LED_STATE_GREEN);
+                }
+                else {
+                    activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.BAD_SCAN);
+                    appState.getScanner().setBadCaptureUI();
+                    Arrays.fill(leds, Message.LED_STATE.LED_STATE_RED);
+                }
+
                 refreshDisplay();
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -337,7 +358,6 @@ public class MainActivity extends AppCompatActivity implements
                 // info messages
             case CONNECTION_INITIATED: // Connection initiated
             case DISCONNECTION_INITIATED: // Disconnection initiated
-            case TRIGGER_PRESSED: // Trigger pressed
             case CONTINUOUS_CAPTURE_STARTED: // Continous capture started
                 break;
 
@@ -444,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements
 
         for (Finger finger : activeFingers) {
             if (finger.getStatus() == Finger.Status.GOOD_SCAN) {
-                fingerprints.add(new Fingerprint(finger.getId(), finger.getTemplate()));
+                fingerprints.add(new Fingerprint(finger.getId(), finger.getTemplate().getBytes()));
                 if (DEFAULT_CONFIG.get(finger.getId()) == FingerConfig.REQUIRED) {
                     nbRequiredFingerprints++;
                 }
