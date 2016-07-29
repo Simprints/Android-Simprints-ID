@@ -68,10 +68,6 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
             case GET_PEOPLE_FAILURE:
                 Log.d(this, "Error loading candidates");
                 break;
-
-            case SAVE_SESSION_SUCCESS:
-            case SAVE_SESSION_FAILURE:
-                finish();
         }
     }
 
@@ -113,10 +109,10 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
                         break;
                     }
                 }
-                // Prepare for finish after session is saved
+                // finish
                 appState.setResultCode(RESULT_OK);
                 appState.getResultData().putExtra(Constants.SIMPRINTS_IDENTIFICATIONS, top5Candidates);
-                appState.getData().saveSession(appState.getApiKey(), appState.getReadyToSendSession());
+                finish();
                 break;
         }
     }

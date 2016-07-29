@@ -80,9 +80,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private Message.LED_STATE[] leds;
 
-    private boolean personSent;
-    private boolean sessionSent;
-
     private Finger.Status previousStatus;
 
     private List<ImageView> indicators;
@@ -107,9 +104,6 @@ public class MainActivity extends AppCompatActivity implements
         currentActiveFingerNo = 0;
 
         leds = new Message.LED_STATE[Message.LED_MAX_COUNT];
-
-        personSent = false;
-        sessionSent = false;
 
         previousStatus = Finger.Status.NOT_COLLECTED;
 
@@ -194,19 +188,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void toggleContinuousCapture() {
-        Finger finger = activeFingers.get(currentActiveFingerNo);
-        switch (finger.getStatus()) {
+        switch (activeFingers.get(currentActiveFingerNo).getStatus()) {
             case GOOD_SCAN:
             case BAD_SCAN:
             case NOT_COLLECTED:
-                previousStatus = finger.getStatus();
-                finger.setStatus(Finger.Status.COLLECTING);
-                refreshDisplay();
+                scanButton.setEnabled(false);
                 appState.getScanner().startContinuousCapture();
                 break;
             case COLLECTING:
-                finger.setStatus(previousStatus);
-                refreshDisplay();
                 scanButton.setEnabled(false);
                 appState.getScanner().stopContinuousCapture();
                 break;
@@ -277,18 +266,31 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onScannerEvent(com.simprints.libscanner.EVENT event) {
         Log.d(this, String.format(Locale.UK, "onScannerEvent %s %s", event.name(), event.details()));
+        Finger finger = activeFingers.get(currentActiveFingerNo);
 
         switch (event) {
             case TRIGGER_PRESSED: // Trigger pressed
                 toggleContinuousCapture();
                 break;
 
+            case CONTINUOUS_CAPTURE_STARTED:
+                previousStatus = finger.getStatus();
+                finger.setStatus(Finger.Status.COLLECTING);
+                refreshDisplay();
+                scanButton.setEnabled(true);
+                break;
+
+            case CONTINUOUS_CAPTURE_STOPPED: // Continous capture stopped
+                finger.setStatus(previousStatus);
+                refreshDisplay();
+                scanButton.setEnabled(true);
+                break;
+
             case CONTINUOUS_CAPTURE_SUCCESS: // Image captured successfully
                 appState.getScanner().extractImageQuality();
                 break;
 
-            case CONTINUOUS_CAPTURE_STOPPED: // Continous capture stopped
-                scanButton.setEnabled(true);
+            case CONTINUOUS_CAPTURE_ERROR:
                 break;
 
             case EXTRACT_IMAGE_QUALITY_SUCCESS: // Image quality extracted successfully
@@ -302,14 +304,13 @@ public class MainActivity extends AppCompatActivity implements
 
             case EXTRACT_TEMPLATE_SUCCESS: // Template extracted successfully
                 int quality = appState.getScanner().getImageQuality();
-                Finger currentFinger = activeFingers.get(currentActiveFingerNo);
 
                 Log.d(this, String.format(Locale.UK,
                         "Extracted new template of quality %d for finger %s",
-                        quality, currentFinger.getId().name()));
+                        quality, finger.getId().name()));
 
-                if (currentFinger.getTemplate() == null ||
-                        currentFinger.getTemplate().getQuality() < quality)
+                if (finger.getTemplate() == null ||
+                        finger.getTemplate().getQuality() < quality)
                 {
                     Log.d(this, "Set template");
                     activeFingers.get(currentActiveFingerNo).setTemplate(appState.getScanner().getTemplate());
@@ -354,11 +355,17 @@ public class MainActivity extends AppCompatActivity implements
                 finishWithUnexpectedError();
                 break;
 
+            case CAPTURE_IMAGE_INVALID_STATE: // Image capture failed because the un20 is not awaken
+                appState.getScanner().un20Wakeup();
+
+            case UN20_WAKEUP_SUCCESS: // UN20 woken up successfully
+                appState.getScanner().startContinuousCapture();
+                break;
+
 
                 // info messages
             case CONNECTION_INITIATED: // Connection initiated
             case DISCONNECTION_INITIATED: // Disconnection initiated
-            case CONTINUOUS_CAPTURE_STARTED: // Continous capture started
                 break;
 
             // success conditions
@@ -368,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements
             case UPDATE_SENSOR_INFO_SUCCESS: // Sensor info was successfully updated
             case SET_UI_SUCCESS: // UI was successfully set
             case EXTRACT_IMAGE_SUCCESS: // Image extracted successfully
-            case UN20_WAKEUP_SUCCESS: // UN20 woken up successfully
+
             case UN20_SHUTDOWN_SUCCESS: // UN20 shut down successfully
             case EXTRACT_CRASH_LOG_SUCCESS: // Crash log extracted successfully
             case SET_HARDWARE_CONFIG_SUCCESS: // Hardware configuration was successfully set
@@ -396,7 +403,6 @@ public class MainActivity extends AppCompatActivity implements
             case SET_SENSOR_CONFIG_FAILURE: // Setting sensor configuration failed for abnormal reasons, SHOULD NOT HAPPEN
             case SET_UI_FAILURE: // Setting UI failed for abnormal reasons, SHOULD NOT HAPPEN
             case CAPTURE_IMAGE_SDK_ERROR: // Image capture failed because of an error in UN20 SDK
-            case CAPTURE_IMAGE_INVALID_STATE: // Image capture failed because the un20 is not awaken
             case CAPTURE_IMAGE_FAILURE: // Image capture failed for abnormal reasons, SHOULD NOT HAPPEN
             case EXTRACT_IMAGE_NO_IMAGE: // Image extraction failed because there is no image available
             case EXTRACT_IMAGE_FAILURE: // Image extraction failed for abnormal reasons, SHOULD NOT HAPPEN
@@ -415,8 +421,6 @@ public class MainActivity extends AppCompatActivity implements
             case CAPTURE_IMAGE_SUCCESS:
                 break;
 
-            case CONTINUOUS_CAPTURE_ERROR:
-                break;
             case UN20_CANNOT_CHECK_STATE:
                 break;
             case UN20_SHUTTING_DOWN:
@@ -435,21 +439,10 @@ public class MainActivity extends AppCompatActivity implements
         switch (event) {
             case SAVE_PERSON_SUCCESS:
             case SAVE_PERSON_FAILURE:
-                personSent = true;
-                if (sessionSent) {
-                    Log.d(this, "Finishing with RESULT_OK");
-                    finish();
-                }
+                Log.d(this, "Finishing with RESULT_OK");
+                finish();
                 break;
 
-            case SAVE_SESSION_SUCCESS:
-            case SAVE_SESSION_FAILURE:
-                sessionSent = true;
-                if (personSent) {
-                    Log.d(this, "Finishing with RESULT_OK");
-                    finish();
-                }
-                break;
             default:
                 break;
         }
@@ -485,9 +478,8 @@ public class MainActivity extends AppCompatActivity implements
                 appState.setResultCode(RESULT_OK);
                 appState.getResultData().putExtra(Constants.SIMPRINTS_REGISTRATION, registration);
 
-                Log.d(this, "Saving person and session");
+                Log.d(this, "Saving person");
                 appState.getData().savePerson(appState.getApiKey(), person);
-                appState.getData().saveSession(appState.getApiKey(), appState.getReadyToSendSession());
             } else {
                 Log.d(this, "Starting matching activity");
                 Intent intent = new Intent(this, MatchingActivity.class);
@@ -623,10 +615,14 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Log.d(this, "Finishing with RESULT_CANCELED");
-            appState.setResultCode(RESULT_CANCELED);
-            finish();
-            return true;
+            if (activeFingers.get(currentActiveFingerNo).getStatus() == Finger.Status.COLLECTING) {
+                toggleContinuousCapture();
+            } else {
+                Log.d(this, "Finishing with RESULT_CANCELED");
+                appState.setResultCode(RESULT_CANCELED);
+                finish();
+            }
+                return true;
         } else {
             return super.onKeyDown(keyCode, event);
         }
