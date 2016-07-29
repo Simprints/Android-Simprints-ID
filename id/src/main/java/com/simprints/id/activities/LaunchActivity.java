@@ -1,12 +1,15 @@
 package com.simprints.id.activities;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +19,9 @@ import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.simprints.id.AppState;
 import com.simprints.id.R;
 import com.simprints.id.tools.InternalConstants;
@@ -33,12 +39,13 @@ import java.util.UUID;
 import io.fabric.sdk.android.Fabric;
 
 public class LaunchActivity extends AppCompatActivity
-        implements Scanner.ScannerListener, Data.DataListener/*,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener*/ {
+        implements Scanner.ScannerListener, Data.DataListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final static int MINIMUM_DISPLAY_DURATION = 2500;
     private final static int CONNECTION_AND_VALIDATION_TIMEOUT = 10000;
     private final static int COMMCARE_PERMISSION_REQUEST = 0;
+    private final static int LOCATION_PERMISSION_REQUEST = 1;
 
     private AppState appState;
     private static Handler handler;
@@ -123,13 +130,13 @@ public class LaunchActivity extends AppCompatActivity
                 ? Constants.SIMPRINTS_REGISTER_INTENT
                 : Constants.SIMPRINTS_IDENTIFY_INTENT));
 
-        /*// Initializes the google API client
+        // Initializes the google API client
         appState.setGoogleApiClient(
                 new GoogleApiClient.Builder(this)
                         .addConnectionCallbacks(this)
                         .addOnConnectionFailedListener(this)
                         .addApi(LocationServices.API)
-                        .build());*/
+                        .build());
 
         // Initializes the session Data object
         appState.setData(new Data(getApplicationContext()));
@@ -137,8 +144,6 @@ public class LaunchActivity extends AppCompatActivity
         Log.d(this, "Data object initialised");
         Log.d(this, "Validating apiKey");
         appState.getData().validateApiKey(appState.getApiKey());
-
-
 
 
         connect();
@@ -172,7 +177,7 @@ public class LaunchActivity extends AppCompatActivity
                     macAddress));
         }
 
-        // Initiate scanner connection and apiKey validation
+        // Initiate scanner connection
         Log.d(this, "Initiating scanner connection");
         appState.getScanner().setScannerListener(this);
         appState.getScanner().connect();
@@ -199,7 +204,9 @@ public class LaunchActivity extends AppCompatActivity
     }
 
     private void continueIfReady() {
-        boolean connected = appState.getScanner().getConnectionStatus() == BluetoothCom.BLUETOOTH_STATUS.CONNECTED;
+        Scanner scanner = appState.getScanner();
+        boolean connected = (scanner != null &&
+                scanner.getConnectionStatus() == BluetoothCom.BLUETOOTH_STATUS.CONNECTED);
         Log.d(LaunchActivity.this, String.format(Locale.UK,
                 "continueIfReady, Data object ready: %s, connected to scanner: %s",
                 isDataReady ? "YES" : "NO", connected ? "YES" : "NO"));
@@ -249,6 +256,7 @@ public class LaunchActivity extends AppCompatActivity
     }
 
     private void launchAlert(ALERT_TYPE alertType) {
+        handler.removeCallbacksAndMessages(null);
         Intent intent = new Intent(this, AlertActivity.class);
         intent.putExtra(InternalConstants.ALERT_TYPE_EXTRA, alertType);
         launch(intent);
@@ -334,7 +342,9 @@ public class LaunchActivity extends AppCompatActivity
             case DATABASE_RESOLVER_FAILURE:
                 Toast.makeText(this, "Warning: could not synchronize with CommCare",
                         Toast.LENGTH_LONG).show();
-                Crashlytics.log(0, "CommCare DB resolution", "Failure");
+                Answers.getInstance().logCustom(new CustomEvent("CommCare DB resolution failed")
+                        .putCustomAttribute("API Key", appState.getApiKey())
+                        .putCustomAttribute("MAC Address", appState.getMacAddress()));
             case DATABASE_RESOLVER_SUCCESS:
                 isDataReady = true;
                 continueIfReady();
@@ -375,22 +385,35 @@ public class LaunchActivity extends AppCompatActivity
                     continueIfReady();
                 }
                 break;
+            case LOCATION_PERMISSION_REQUEST:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    onConnected(null);
+                }
+                break;
         }
     }
 
-    /*@Override
+    @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    COMMCARE_PERMISSION_REQUEST);
+                    LOCATION_PERMISSION_REQUEST);
         } else {
-            appState.getData().commCareDatabaseResolver(getContentResolver(), appState.getApiKey());
+            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    appState.getGoogleApiClient());
+            if (lastLocation != null) {
+                appState.setLatitude(String.valueOf(lastLocation.getLatitude()));
+                appState.setLongitude(String.valueOf(lastLocation.getLongitude()));
+                Log.d(this, String.format(Locale.UK, "Last location: %f %f",
+                        lastLocation.getLatitude(), lastLocation.getLongitude()));
+            } else {
+                Log.d(this, "Last known location is null");
+            }
         }
-        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                appState.getGoogleApiClient());
 
     }
 
@@ -402,13 +425,13 @@ public class LaunchActivity extends AppCompatActivity
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-    }*/
+    }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
+    protected void onResume() {
+        super.onResume();
         Log.d(this, String.format(Locale.UK,
-                "onRestart, returning from child activity ? %s, resultCode = %d, resultData = %s",
+                "onResume, returning from child activity ? %s, resultCode = %d, resultData = %s",
                 childActivityLaunched ? "yes" : "no",
                 appState.getResultCode(), appState.getResultData()));
 
@@ -426,17 +449,6 @@ public class LaunchActivity extends AppCompatActivity
 
     }
 
-
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        Log.d(this, String.format(Locale.UK, "onKeyDown, keyCode %d", keyCode));
-//        if (keyCode != KeyEvent.KEYCODE_BACK) {
-//            return true;
-//        } else {
-//            return super.onKeyDown(keyCode, event);
-//        }
-//    }
-
     @Override
     public void onBackPressed() {
         // Neutralize back press
@@ -446,6 +458,7 @@ public class LaunchActivity extends AppCompatActivity
     public void onDestroy() {
         Log.d(this, "onDestroy");
         handler.removeCallbacksAndMessages(null);
+        appState.getData().saveSession(appState.getApiKey(), appState.getReadyToSendSession());
         if (finishing && appState.getScanner() != null) {
             appState.getScanner().destroy();
             appState.setScanner(null);
