@@ -2,6 +2,7 @@ package com.simprints.id;
 
 import android.content.Intent;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.simprints.libcommon.Session;
 import com.simprints.libdata.Data;
 import com.simprints.libscanner.Scanner;
@@ -25,7 +26,7 @@ public class AppState {
     private Scanner scanner;
     private Data data;
     private Session session;
-    //private GoogleApiClient googleApiClient;
+    private GoogleApiClient googleApiClient;
     private int resultCode;
     private Intent resultData;
 
@@ -33,7 +34,7 @@ public class AppState {
         scanner = null;
         data = null;
         session = new Session();
-//        googleApiClient = null;
+        googleApiClient = null;
         Calendar c = Calendar.getInstance();
         session.setStartTime(c.getTime());
         resultCode = 0;
@@ -77,13 +78,29 @@ public class AppState {
 
     public void setData(Data data) { this.data = data; }
 
-   /* public GoogleApiClient getGoogleApiClient() {
+    public GoogleApiClient getGoogleApiClient() {
         return googleApiClient;
     }
 
     public void setGoogleApiClient(GoogleApiClient googleApiClient) {
         this.googleApiClient = googleApiClient;
-    }*/
+    }
+
+    public void setLatitude(String latitude) {
+        session.setLatitude(latitude);
+    }
+
+    public String getLatitude() {
+        return session.getLatitude();
+    }
+
+    public void setLongitude(String longitude) {
+        session.setLongitude(longitude);
+    }
+
+    public String getLongitude() {
+        return session.getLongitude();
+    }
 
     public int getResultCode() {
         return resultCode;

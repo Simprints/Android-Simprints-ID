@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.CustomEvent;
 import com.simprints.id.AppState;
 import com.simprints.id.R;
 import com.simprints.id.tools.InternalConstants;
@@ -27,6 +29,13 @@ public class AlertActivity extends AppCompatActivity {
         assert extras != null;
         final ALERT_TYPE alertType = (ALERT_TYPE) extras.get("alertType");
         assert alertType != null;
+
+        if (alertType.mustBeLogged()) {
+            Answers.getInstance().logCustom(new CustomEvent("Alert Triggered")
+                    .putCustomAttribute("Alert Type", alertType.name())
+                    .putCustomAttribute("API Key", appState.getApiKey())
+                    .putCustomAttribute("MAC Address", appState.getMacAddress()));
+        }
 
         ((TextView) findViewById(R.id.title)).setText(alertType.getAlertTitleId());
 
