@@ -523,6 +523,9 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (id) {
             case R.id.nav_add:
+                if (activeFingers.get(currentActiveFingerNo).getStatus() == Finger.Status.COLLECTING) {
+                    toggleContinuousCapture();
+                }
                 addFinger();
                 break;
             case R.id.nav_help:
