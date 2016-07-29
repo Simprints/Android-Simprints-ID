@@ -615,10 +615,14 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Log.d(this, "Finishing with RESULT_CANCELED");
-            appState.setResultCode(RESULT_CANCELED);
-            finish();
-            return true;
+            if (activeFingers.get(currentActiveFingerNo).getStatus() == Finger.Status.COLLECTING) {
+                toggleContinuousCapture();
+            } else {
+                Log.d(this, "Finishing with RESULT_CANCELED");
+                appState.setResultCode(RESULT_CANCELED);
+                finish();
+            }
+                return true;
         } else {
             return super.onKeyDown(keyCode, event);
         }
