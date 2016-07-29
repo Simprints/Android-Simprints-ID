@@ -1,13 +1,15 @@
 package com.simprints.id.activities;
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.simprints.id.AppState;
 import com.simprints.id.R;
+import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Log;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.Data;
@@ -41,6 +43,11 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
         appState.getData().setDataListener(this);
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        int progressBarColor = ContextCompat.getColor(this, R.color.simprints_blue);
+        progressBar.getIndeterminateDrawable().setColorFilter(
+                progressBarColor, PorterDuff.Mode.SRC_IN);
+        progressBar.getProgressDrawable().setColorFilter(
+                progressBarColor, PorterDuff.Mode.SRC_IN);
 
         Bundle extras = getIntent().getExtras();
         probe = extras.getParcelable("Person");

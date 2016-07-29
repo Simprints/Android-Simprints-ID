@@ -24,12 +24,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.simprints.id.AppState;
 import com.simprints.id.R;
 import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
+import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Log;
 import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
@@ -49,9 +49,9 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements
-            NavigationView.OnNavigationItemSelectedListener,
-            Scanner.ScannerListener,
-            Data.DataListener {
+        NavigationView.OnNavigationItemSelectedListener,
+        Scanner.ScannerListener,
+        Data.DataListener {
 
     private final static long AUTO_SWIPE_DELAY = 500;
 
@@ -320,6 +320,15 @@ public class MainActivity extends AppCompatActivity implements
                     activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.GOOD_SCAN);
                     appState.getScanner().setGoodCaptureUI();
                     Arrays.fill(leds, Message.LED_STATE.LED_STATE_GREEN);
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d(MainActivity.this, "AutoScroll");
+                            if (currentActiveFingerNo < activeFingers.size()) {
+                                viewPager.setCurrentItem(currentActiveFingerNo + 1);
+                            }
+                        }
+                    }, AUTO_SWIPE_DELAY);
                 }
                 else {
                     activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.BAD_SCAN);
@@ -328,15 +337,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 refreshDisplay();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.d(MainActivity.this, "AutoScroll");
-                        if (currentActiveFingerNo < activeFingers.size()) {
-                            viewPager.setCurrentItem(currentActiveFingerNo+1);
-                        }
-                    }
-                }, AUTO_SWIPE_DELAY);
+
                 break;
 
 
@@ -363,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
 
-                // info messages
+            // info messages
             case CONNECTION_INITIATED: // Connection initiated
             case DISCONNECTION_INITIATED: // Disconnection initiated
                 break;
@@ -388,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements
                 finish();
                 break;
 
-                // error conditions
+            // error conditions
             case SCANNER_BUSY: // Cannot perform request because the scanner is busy
             case NOT_CONNECTED: // Cannot perform request because the phone is not connected to the scanner
             case NO_RESPONSE: // The scanner is not answering
@@ -522,22 +523,30 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (id) {
             case R.id.nav_add:
+                if (activeFingers.get(currentActiveFingerNo).getStatus() == Finger.Status.COLLECTING) {
+                    toggleContinuousCapture();
+                }
                 addFinger();
                 break;
             case R.id.nav_help:
-                startActivity(new Intent(this, HelpActivity.class));
+                Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(this, HelpActivity.class));
                 break;
             case R.id.nav_tutorial:
-                startActivity(new Intent(this, TutorialActivity.class));
+                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(this, TutorialActivity.class));
                 break;
             case R.id.nav_troubleshoot:
-                startActivity(new Intent(this, TroubleshootActivity.class));
+                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(this, TroubleshootActivity.class));
                 break;
             case R.id.nav_about:
-                startActivity(new Intent(this, AboutActivity.class));
+                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(this, AboutActivity.class));
                 break;
             case R.id.nav_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
+                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(this, SettingsActivity.class));
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -622,7 +631,7 @@ public class MainActivity extends AppCompatActivity implements
                 appState.setResultCode(RESULT_CANCELED);
                 finish();
             }
-                return true;
+            return true;
         } else {
             return super.onKeyDown(keyCode, event);
         }

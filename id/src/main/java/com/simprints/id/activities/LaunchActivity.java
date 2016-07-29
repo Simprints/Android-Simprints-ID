@@ -1,15 +1,12 @@
 package com.simprints.id.activities;
 
-import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -19,13 +16,11 @@ import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.simprints.id.AppState;
 import com.simprints.id.R;
+import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Log;
+import com.simprints.id.tools.PositionTracker;
 import com.simprints.libdata.Data;
 import com.simprints.libdata.EVENT;
 import com.simprints.libscanner.BluetoothCom;
@@ -39,15 +34,13 @@ import java.util.UUID;
 import io.fabric.sdk.android.Fabric;
 
 public class LaunchActivity extends AppCompatActivity
-        implements Scanner.ScannerListener, Data.DataListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        implements Scanner.ScannerListener, Data.DataListener {
 
     private final static int MINIMUM_DISPLAY_DURATION = 2500;
     private final static int CONNECTION_AND_VALIDATION_TIMEOUT = 10000;
-    private final static int COMMCARE_PERMISSION_REQUEST = 0;
-    private final static int LOCATION_PERMISSION_REQUEST = 1;
 
     private AppState appState;
+    private PositionTracker positionTracker;
     private static Handler handler;
 
     private String callingPackage;
@@ -64,6 +57,8 @@ public class LaunchActivity extends AppCompatActivity
         Appsee.start(getString(R.string.com_appsee_apikey));
 
         appState = AppState.getInstance();
+        positionTracker = new PositionTracker(this);
+        positionTracker.start();
         handler = new Handler();
         isDataReady = false;
         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
@@ -130,13 +125,9 @@ public class LaunchActivity extends AppCompatActivity
                 ? Constants.SIMPRINTS_REGISTER_INTENT
                 : Constants.SIMPRINTS_IDENTIFY_INTENT));
 
-        // Initializes the google API client
-        appState.setGoogleApiClient(
-                new GoogleApiClient.Builder(this)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(LocationServices.API)
-                        .build());
+        // Initializes the position tracker
+
+
 
         // Initializes the session Data object
         appState.setData(new Data(getApplicationContext()));
@@ -235,7 +226,7 @@ public class LaunchActivity extends AppCompatActivity
             }
         }, remainingTime);
     }
-    
+
     private void launch(@NonNull final Intent intent) {
         // The activity must last at least MINIMUM_DISPLAY_DURATION
         // to avoid disorienting the user.
@@ -252,7 +243,7 @@ public class LaunchActivity extends AppCompatActivity
                 startActivity(intent);
             }
         }, remainingTime);
-        
+
     }
 
     private void launchAlert(ALERT_TYPE alertType) {
@@ -362,7 +353,7 @@ public class LaunchActivity extends AppCompatActivity
         {
             ActivityCompat.requestPermissions(this,
                     new String[]{"org.commcare.dalvik.provider.cases.read"},
-                    COMMCARE_PERMISSION_REQUEST);
+                    InternalConstants.COMMCARE_PERMISSION_REQUEST);
         } else {
             appState.getData().commCareDatabaseResolver(getContentResolver(), appState.getApiKey());
         }
@@ -372,8 +363,9 @@ public class LaunchActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults)
     {
+        positionTracker.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case COMMCARE_PERMISSION_REQUEST:
+            case InternalConstants.COMMCARE_PERMISSION_REQUEST:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     resolveCommCareDatabase();
@@ -385,46 +377,13 @@ public class LaunchActivity extends AppCompatActivity
                     continueIfReady();
                 }
                 break;
-            case LOCATION_PERMISSION_REQUEST:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    onConnected(null);
-                }
-                break;
         }
     }
 
     @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_PERMISSION_REQUEST);
-        } else {
-            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    appState.getGoogleApiClient());
-            if (lastLocation != null) {
-                appState.setLatitude(String.valueOf(lastLocation.getLatitude()));
-                appState.setLongitude(String.valueOf(lastLocation.getLongitude()));
-                Log.d(this, String.format(Locale.UK, "Last location: %f %f",
-                        lastLocation.getLatitude(), lastLocation.getLongitude()));
-            } else {
-                Log.d(this, "Last known location is null");
-            }
-        }
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        positionTracker.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -459,6 +418,7 @@ public class LaunchActivity extends AppCompatActivity
         Log.d(this, "onDestroy");
         handler.removeCallbacksAndMessages(null);
         appState.getData().saveSession(appState.getApiKey(), appState.getReadyToSendSession());
+        positionTracker.finish();
         if (finishing && appState.getScanner() != null) {
             appState.getScanner().destroy();
             appState.setScanner(null);
