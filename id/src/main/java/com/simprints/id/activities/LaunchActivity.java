@@ -417,7 +417,9 @@ public class LaunchActivity extends AppCompatActivity
     public void onDestroy() {
         Log.d(this, "onDestroy");
         handler.removeCallbacksAndMessages(null);
-        appState.getData().saveSession(appState.getApiKey(), appState.getReadyToSendSession());
+        if(appState.getData() != null && appState.getReadyToSendSession() != null) {
+            appState.getData().saveSession(appState.getApiKey(), appState.getReadyToSendSession());
+        }
         positionTracker.finish();
         if (finishing && appState.getScanner() != null) {
             appState.getScanner().destroy();

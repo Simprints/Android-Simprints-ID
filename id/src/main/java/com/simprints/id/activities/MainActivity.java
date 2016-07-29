@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements
                     activeFingers.get(currentActiveFingerNo).setTemplate(appState.getScanner().getTemplate());
                 }
 
-                if (quality >= 50) {
+                if (quality >= 80) {
                     activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.GOOD_SCAN);
                     appState.getScanner().setGoodCaptureUI();
                     Arrays.fill(leds, Message.LED_STATE.LED_STATE_GREEN);
