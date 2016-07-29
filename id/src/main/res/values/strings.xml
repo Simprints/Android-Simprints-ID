@@ -85,5 +85,6 @@
 
     <!--Appsee API Key-->
     <string name="com.appsee.apikey" translatable="false">6664c6771410480c95c83acddeab349c</string>
+    <string name="coming_soon">Coming soon...</string>
 
 </resources>

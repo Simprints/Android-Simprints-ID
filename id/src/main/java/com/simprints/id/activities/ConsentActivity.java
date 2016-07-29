@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 
-import com.simprints.id.AppState;
 import com.simprints.id.R;
+import com.simprints.id.tools.AppState;
 
 public class ConsentActivity extends AppCompatActivity {
 
