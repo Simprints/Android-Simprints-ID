@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
-import com.simprints.id.AppState;
 import com.simprints.id.R;
+import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 
 public class AlertActivity extends AppCompatActivity {
