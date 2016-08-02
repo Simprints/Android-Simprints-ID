@@ -79,9 +79,14 @@ public class AlertActivity extends AppCompatActivity {
                         case BLUETOOTH_NOT_ENABLED:
                         case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
+                        case SCANNER_UNREACHABLE:
                             Intent intent = new Intent();
                             intent.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
                             startActivity(intent);
+                            break;
+                        case UNEXPECTED_ERROR:
+                            appState.setResultCode(InternalConstants.RESULT_TRY_AGAIN);
+                            finish();
                             break;
                     }
                 }
