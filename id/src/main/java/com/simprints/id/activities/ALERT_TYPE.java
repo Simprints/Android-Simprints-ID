@@ -26,7 +26,7 @@ public enum ALERT_TYPE {
     NETWORK_FAILURE(R.string.network_failure_title, R.string.network_failure_message,
             R.drawable.generic_failure, R.string.try_again_label, R.string.empty, false),
 
-    UNEXPECTED_ERROR(R.string.error_occured_title, R.string.unforeseen_error_message,
+    UNEXPECTED_ERROR(R.string.error_occurred_title, R.string.unforeseen_error_message,
             R.drawable.generic_failure, R.string.close, R.string.try_again_label, true);
 
     private int alertTitleId;

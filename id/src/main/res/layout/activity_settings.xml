@@ -27,9 +27,14 @@
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/nude_mode"
+            android:text="@string/nudge_mode_checkbox_name"
             android:id="@+id/nudgeCheckBox"
-            android:onClick="onCheckBoxClicked"/>
+            android:onClick="onCheckBoxClicked"
+            android:textSize="20sp"
+            android:layout_marginLeft="20dp"
+            android:padding="10dp"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginTop="30dp" />
 
 
     </LinearLayout>
