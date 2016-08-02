@@ -38,7 +38,43 @@
 
     <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your health records.\nIf that’s not OK or you have any questions let me know, otherwise please place your left index finger flat on the sensor.</string>
 
-    <string name="long_consent">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+    <string name="long_consent">
+        <b><u>Privacy and Consent</u></b>\n\n
+        If you put your finger on the scanner, it will record information about your fingerprint. It will also record the approximate location where this scan took place, and the time and date of the scan. \n \n
+        All this information of yours will be stored by Simprints Technology Limited, which is a British NGO. \n\n
+        Simprints will use your information to help Possible identify you in the future, and match you to your medical records. As part of this, Simprints will share your fingerprint information with Possible. \n\n
+        Simprints may also use your information to improve the accuracy of its service, and may share it with other experts for this purpose. \n\n
+        Simprints may also use your information to get a better understanding of healthcare provision in Nepal. \n\n
+        In the future, Simprints may also use your information to help other partner development organisations to identify you, and may share your information with those organisations for that purpose. \n\n
+        Simprints expects that its work here in Nepal will last until at least 2019. Simprints will keep your information for the duration of its work here in Nepal, and for 2 years after that work has finished. Simprints will then delete your information. \n\n
+        Simprints will not store any fingerprint images. \n\n
+        Simprints will not give any information that it holds on you to any state, unless required to do so by law. \n\n
+        You do not have to agree to give Simprints any information to get medical care. But if you do not then healthcare organisations may find it harder to find your medical records in the future.\n\n
+        If you have previously been happy for Simprints to store and use your information, but you have changed your mind and you do not want this to continue, then please speak to me. \n\n
+
+        <b><u>Frequently asked Questions</u></b> \n\n
+        <b>I am no longer happy for Simprints to keep and use my information. What should I do?</b>\n\n
+        You are free to ask Simprints to delete your information at any time. To do so, you will have to give your fingerprints to the healthworker one last time, so that Simprints can identify you. Once you have done that, Simprints will delete all the information it has that relates to you.\n\n
+        You should, however, bear in mind that if Simprints deletes your information then healthcare organisations may find it harder to find your medical records.\n\n
+        <b>Who are Simprints?</b>\n\n
+        Simprints Technology Limited is a British NGO that is helping Possible to match patients like you to their medical records.\n\n
+        <b>What information will Simprints store about me?</b>\n\n
+        Simprints will store information about your scanned fingerprints. It will also store the approximate location where any scan takes place, together with the time and date of any such scan.\n\n
+        Simprints will not store any other identifying information about you, such as your name or date of birth. Simprints will not store any of your medical records. Simprints will not store any images of your fingerprints.\n\n
+        <b>What will Simprints do with my information?</b>\n\n
+        Simprints will use your information to help Possible identify you in the future, and match you to your medical records. As part of this, Simprints will share your fingerprint information with Possible.\n\n
+        Simprints may also use your information to improve the accuracy of its service, and may share it with other experts for this purpose.\n\n
+        Simprints may also use your information to get a better understanding of healthcare provision in Nepal.\n\n
+        In the future, Simprints may also use your information to help other partner development organisations to identify you, and may share this information with those organisations for that purpose.\n\n
+        <b>How long will Simprints keep my information for?</b>\n\n
+        Simprints expects that its work here in Nepal will last until at least 2019. Simprints will keep your information for the duration of its work here in Nepal, and for 2 years after that work has finished. Simprints will then delete your information.\n\n
+        <b>Will Simprints store any fingerprint images?</b>\n\n
+        Simprints will not store any fingerprint images.\n\n
+        <b>Will Simprints give my information to the Nepali Government?</b>\n\n
+        Simprints will not give any information that it holds on you to the Nepali Government, unless required to do so by law.\n\n
+        <b>Do I have to agree to my fingerprints being taken?</b>\n\n
+        You do not have to agree to give Simprints any information to get medical care. But if you do not then healthcare organisations may find it harder to find your medical records in the future. \n\n
+    </string>
 
     <string name="configuration_error_title">CONFIGURATION ERROR</string>
     <string name="missing_user_id_message">A configuration error has occurred (missing user id), please contact your system administrator</string>
@@ -95,5 +131,6 @@
     <!--Shared Pref Key -->
     <string name="preference_file_key">b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a</string>
     <string name="nudge_mode_bool">NudgeModeBoll</string>
+    <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
 
 </resources>

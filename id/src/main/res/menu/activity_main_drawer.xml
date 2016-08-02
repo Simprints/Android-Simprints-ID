@@ -12,12 +12,14 @@
         <menu>
             <item android:id="@+id/nav_help" android:icon="@drawable/ic_menu_help"
                 android:title="@string/help_menu" />
-            <item android:id="@+id/nav_tutorial" android:icon="@drawable/ic_menu_tutorial"
-                android:title="@string/tutorial_menu" />
-            <item android:id="@+id/nav_troubleshoot" android:icon="@drawable/ic_menu_troubleshoot"
-                android:title="@string/troubleshoot_menu" />
-            <item android:id="@+id/nav_about" android:icon="@drawable/ic_menu_about"
-                android:title="@string/about_menu" />
+            <!--<item android:id="@+id/nav_tutorial" android:icon="@drawable/ic_menu_tutorial"-->
+                <!--android:title="@string/tutorial_menu" />-->
+            <!--<item android:id="@+id/nav_troubleshoot" android:icon="@drawable/ic_menu_troubleshoot"-->
+                <!--android:title="@string/troubleshoot_menu" />-->
+            <item android:id="@+id/privacy" android:icon="@drawable/ic_menu_about"
+                android:title="@string/privacy_and_consent" />
+            <!--<item android:id="@+id/nav_about" android:icon="@drawable/ic_menu_about"-->
+                <!--android:title="@string/about_menu" />-->
         </menu>
     </item>
 
