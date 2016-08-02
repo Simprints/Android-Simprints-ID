@@ -56,11 +56,12 @@ public class MainActivity extends AppCompatActivity implements
     private final static long AUTO_SWIPE_DELAY = 500;
 
     private final static ScanConfig DEFAULT_CONFIG;
+
     static {
         DEFAULT_CONFIG = new ScanConfig();
         DEFAULT_CONFIG.set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED);
         DEFAULT_CONFIG.set(FingerIdentifier.LEFT_INDEX_FINGER, FingerConfig.REQUIRED);
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_3RD_FINGER, FingerConfig.DO_NOT_COLLECT);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_3RD_FINGER, FingerConfig.OPTIONAL);
         DEFAULT_CONFIG.set(FingerIdentifier.LEFT_4TH_FINGER, FingerConfig.DO_NOT_COLLECT);
         DEFAULT_CONFIG.set(FingerIdentifier.LEFT_5TH_FINGER, FingerConfig.DO_NOT_COLLECT);
         DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_5TH_FINGER, FingerConfig.DO_NOT_COLLECT);
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(this, "Initializing active fingers from default config");
         for (int i = 0; i < Finger.NB_OF_FINGERS; i++) {
             FingerIdentifier id = FingerIdentifier.values()[i];
-            fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED);
+            fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, false);
             Log.d(this, String.format("Finger %s is %s",
                     fingers[i].getId().name(),
                     fingers[i].isActive() ? "active" : "inactive"));
@@ -132,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements
                 activeFingers.add(fingers[i]);
             }
         }
+
+        activeFingers.get(activeFingers.size() - 1).setLastFinger(true);
     }
 
     private void initBarAndDrawer() {
@@ -308,8 +311,7 @@ public class MainActivity extends AppCompatActivity implements
                         quality, finger.getId().name()));
 
                 if (finger.getTemplate() == null ||
-                        finger.getTemplate().getQuality() < quality)
-                {
+                        finger.getTemplate().getQuality() < quality) {
                     Log.d(this, "Set template");
                     activeFingers.get(currentActiveFingerNo).setTemplate(appState.getScanner().getTemplate());
                 }
@@ -327,8 +329,7 @@ public class MainActivity extends AppCompatActivity implements
                             }
                         }
                     }, AUTO_SWIPE_DELAY);
-                }
-                else {
+                } else {
                     activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.BAD_SCAN);
                     appState.getScanner().setBadCaptureUI();
                     Arrays.fill(leds, Message.LED_STATE.LED_STATE_RED);
@@ -587,7 +588,9 @@ public class MainActivity extends AppCompatActivity implements
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        //TODO
                         Finger currentActiveFinger = activeFingers.get(currentActiveFingerNo);
+                        activeFingers.get(activeFingers.size() - 1).setLastFinger(false);
                         for (Finger finger : fingers) {
                             if (finger.isActive() && !activeFingers.contains(finger)) {
                                 activeFingers.add(finger);
@@ -607,6 +610,7 @@ public class MainActivity extends AppCompatActivity implements
                         } else {
                             currentActiveFingerNo = 0;
                         }
+                        activeFingers.get(activeFingers.size() - 1).setLastFinger(true);
 
                         initIndicators();
                         pageAdapter.notifyDataSetChanged();
