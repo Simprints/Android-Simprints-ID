@@ -63,7 +63,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="cancel_button">CANCEL</string>
     <string name="try_again_label">Try Again</string>
-    <string name="settings_label">Settings</string>
+    <string name="settings_label">Phone settings</string>
     <string name="rescan_label">Re-scan</string>
     <string name="rescan_label_question">Re-scan?</string>
     <string name="reconnect_label">Re-connect</string>
