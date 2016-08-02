@@ -191,6 +191,10 @@ public class MainActivity extends AppCompatActivity implements
     private void toggleContinuousCapture() {
         switch (activeFingers.get(currentActiveFingerNo).getStatus()) {
             case GOOD_SCAN:
+                activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.RESCAN_GOOD_SCAN);
+                refreshDisplay();
+                break;
+            case RESCAN_GOOD_SCAN:
             case BAD_SCAN:
             case NOT_COLLECTED:
                 scanButton.setEnabled(false);
@@ -271,7 +275,9 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (event) {
             case TRIGGER_PRESSED: // Trigger pressed
-                toggleContinuousCapture();
+                if (finger.getStatus() != Finger.Status.GOOD_SCAN) {
+                    toggleContinuousCapture();
+                }
                 break;
 
             case CONTINUOUS_CAPTURE_STARTED:
