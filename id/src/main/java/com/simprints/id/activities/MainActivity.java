@@ -1,7 +1,9 @@
 package com.simprints.id.activities;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -53,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements
         Scanner.ScannerListener,
         Data.DataListener {
 
-    private final static long AUTO_SWIPE_DELAY = 500;
+    private final static long AUTO_SWIPE_DELAY = 2000;
 
     private final static ScanConfig DEFAULT_CONFIG;
 
@@ -268,6 +270,24 @@ public class MainActivity extends AppCompatActivity implements
         finish();
     }
 
+    private void nudgeMode() {
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        boolean nudge = sharedPref.getBoolean(getString(R.string.nudge_mode_bool), false);
+
+        if (nudge) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(MainActivity.this, "AutoScroll");
+                    if (currentActiveFingerNo < activeFingers.size()) {
+                        viewPager.setCurrentItem(currentActiveFingerNo + 1);
+                    }
+                }
+            }, AUTO_SWIPE_DELAY);
+        }
+    }
+
     @Override
     public void onScannerEvent(com.simprints.libscanner.EVENT event) {
         Log.d(this, String.format(Locale.UK, "onScannerEvent %s %s", event.name(), event.details()));
@@ -326,15 +346,7 @@ public class MainActivity extends AppCompatActivity implements
                     activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.GOOD_SCAN);
                     appState.getScanner().setGoodCaptureUI();
                     Arrays.fill(leds, Message.LED_STATE.LED_STATE_GREEN);
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d(MainActivity.this, "AutoScroll");
-                            if (currentActiveFingerNo < activeFingers.size()) {
-                                viewPager.setCurrentItem(currentActiveFingerNo + 1);
-                            }
-                        }
-                    }, AUTO_SWIPE_DELAY);
+                    nudgeMode();
                 } else {
                     activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.BAD_SCAN);
                     appState.getScanner().setBadCaptureUI();
@@ -550,8 +562,8 @@ public class MainActivity extends AppCompatActivity implements
 //                startActivity(new Intent(this, AboutActivity.class));
                 break;
             case R.id.nav_settings:
-                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(this, SettingsActivity.class));
+                //Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
