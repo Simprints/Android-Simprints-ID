@@ -10,7 +10,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 24
         versionCode 0
-        versionName "1.0.11"
+        versionName "1.0.12"
     }
     buildTypes {
         release {
@@ -44,11 +44,11 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'com.android.support:design:24.1.1'
     compile 'com.android.support:support-v4:24.1.1'
-    compile 'com.google.android.gms:play-services-location:9.4.0'
+    compile 'com.google.android.gms:play-services-location:9.2.1'
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.simprints:libsimprints:1.0.3'
-    compile 'com.simprints:libscanner:1.0.40'
+    compile 'com.simprints:libscanner:1.0.39'
     compile 'com.simprints:libdata:1.0.8'
     compile 'com.simprints:libcommon:1.0.22'
     compile 'com.simprints:libmatcher:1.0.8'
