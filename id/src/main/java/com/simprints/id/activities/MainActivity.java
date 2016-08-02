@@ -243,9 +243,9 @@ public class MainActivity extends AppCompatActivity implements
         }
         // Update scan button display
         Finger.Status activeStatus = activeFingers.get(currentActiveFingerNo).getStatus();
-        scanButton.setText(activeStatus.getTextId());
-        scanButton.setTextColor(activeStatus.getTextColor());
-        scanButton.setBackgroundColor(activeStatus.getBgColor());
+        scanButton.setText(activeStatus.getButtonTextId());
+        scanButton.setTextColor(activeStatus.getButtonTextColor());
+        scanButton.setBackgroundColor(activeStatus.getButtonBgColor());
         //
         FingerFragment fragment = pageAdapter.getFragment(currentActiveFingerNo);
         if (fragment != null) {
