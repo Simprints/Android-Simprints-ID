@@ -466,7 +466,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-
     protected void onActionForward() {
         // Gathers the fingerprints in a list
         Log.d(this, "onActionForward()");
@@ -549,18 +548,21 @@ public class MainActivity extends AppCompatActivity implements
                 Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show();
 //                startActivity(new Intent(this, HelpActivity.class));
                 break;
-            case R.id.nav_tutorial:
-                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(this, TutorialActivity.class));
+            case R.id.privacy:
+                startActivity(new Intent(this, PrivacyActivity.class));
                 break;
-            case R.id.nav_troubleshoot:
-                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(this, TroubleshootActivity.class));
-                break;
-            case R.id.nav_about:
-                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(this, AboutActivity.class));
-                break;
+//            case R.id.nav_tutorial:
+//                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
+////                startActivity(new Intent(this, TutorialActivity.class));
+//                break;
+//            case R.id.nav_troubleshoot:
+//                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
+////                startActivity(new Intent(this, TroubleshootActivity.class));
+//                break;
+//            case R.id.nav_about:
+//                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
+////                startActivity(new Intent(this, AboutActivity.class));
+//                break;
             case R.id.nav_settings:
                 //Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(this, SettingsActivity.class));

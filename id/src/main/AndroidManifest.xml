@@ -4,8 +4,9 @@
     package="com.simprints.id">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="org.commcare.dalvik.provider.cases.read" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -25,7 +26,6 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
-
             </intent-filter>
             <intent-filter>
                 <action android:name="com.simprints.id.REGISTER" />
@@ -41,12 +41,12 @@
             android:name=".activities.AlertActivity"
             android:label="@string/alert_title"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.MainActivity"
             android:label="Main"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.MatchingActivity"
             android:label="Matching"
@@ -57,7 +57,7 @@
             android:name=".activities.HelpActivity"
             android:label="@string/help_title"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/settings_title"
@@ -68,7 +68,7 @@
             android:name=".activities.TutorialActivity"
             android:label="@string/tutorial_title"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.TroubleshootActivity"
             android:label="@string/troubleshoot_title"
@@ -79,12 +79,15 @@
             android:name=".activities.AboutActivity"
             android:label="@string/about_title"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activities.PrivacyActivity"
+            android:label="Privacy" />
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value=".activities.MainActivity" />
-
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="897ed2ef7a2d43e09bcd42998f2533acbb9657e7" />
