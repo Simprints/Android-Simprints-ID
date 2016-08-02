@@ -1,8 +1,8 @@
 package com.simprints.id.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +17,21 @@ import com.simprints.id.model.FingerRes;
 public class FingerFragment extends Fragment {
 
     private final static String FINGER_ARG = "finger";
-    private TextView fingerTextView;
+    private TextView resultText;
+    private TextView fingerNumber;
+    private TextView directionText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_finger, container, false);
-        fingerTextView = (TextView) view.findViewById(R.id.finger_text);
+        resultText = (TextView) view.findViewById(R.id.finger_result_text);
+        fingerNumber = (TextView) view.findViewById(R.id.finger_number_text);
+        directionText = (TextView) view.findViewById(R.id.finger_direction_text);
 
         Finger finger = (Finger) getArguments().get(FINGER_ARG);
         assert finger != null;
+
+        FingerRes.setFingerRes(4);
 
         ImageView fingerImageView = (ImageView) view.findViewById(R.id.finger_image);
         fingerImageView.setImageResource(FingerRes.get(finger).getDrawableId());
@@ -41,20 +47,18 @@ public class FingerFragment extends Fragment {
         assert finger != null;
 
         FingerRes fingerRes = FingerRes.get(finger);
-        switch (finger.getStatus()) {
-            case NOT_COLLECTED:
-            case COLLECTING:
-                setText(String.format(getString(R.string.please_scan),
-                        getString(fingerRes.getNameId())));
-                break;
-            case GOOD_SCAN:
-                setText(getString(R.string.good_scan_message));
-                break;
-            case BAD_SCAN:
-                setText(String.format(getString(R.string.poor_scan_message),
-                        getString(fingerRes.getNameId())));
-                break;
+
+        resultText.setText(finger.getStatus().getTextResult());
+        resultText.setTextColor(finger.getStatus().getTextResultColor());
+        fingerNumber.setText(fingerRes.getNameId());
+        fingerNumber.setTextColor(Color.BLUE);
+        if(finger.isLastFinger() && (finger.getStatus() == Finger.Status.GOOD_SCAN
+                || finger.getStatus() == Finger.Status.RESCAN_GOOD_SCAN)) {
+            directionText.setText(R.string.last_scan_message);
+        }else{
+            directionText.setText(finger.getStatus().getTextDirection());
         }
+        directionText.setTextColor(finger.getStatus().getTextDirectionColor());
     }
 
     public static FingerFragment newInstance(Finger finger) {
@@ -63,15 +67,6 @@ public class FingerFragment extends Fragment {
         bundle.putParcelable(FINGER_ARG, finger);
         fingerFragment.setArguments(bundle);
         return fingerFragment;
-    }
-
-    private void setText(String fingerText) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            fingerTextView.setText(Html.fromHtml(fingerText, Html.FROM_HTML_MODE_LEGACY));
-        } else {
-            //noinspection deprecation
-            fingerTextView.setText(Html.fromHtml(fingerText));
-        }
     }
 
     public Finger getFinger() {
