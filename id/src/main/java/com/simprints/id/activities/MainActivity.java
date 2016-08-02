@@ -112,8 +112,6 @@ public class MainActivity extends AppCompatActivity implements
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
 
-
-
         initActiveFingers();
         initBarAndDrawer();
         initIndicators();
