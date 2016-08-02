@@ -73,6 +73,7 @@
     <string name="good_scan_direction">Swipe left to next finger</string>
     <string name="poor_scan_direction">Please re-scan</string>
     <string name="please_scan">Please scan</string>
+    <string name="last_scan_message">Press arrow to continue</string>
     <string name="empty" />
     <string name="unforeseen_error_message">Sorry, an unforeseen error occurred, press close to continue</string>
     <string name="ok">OK</string>

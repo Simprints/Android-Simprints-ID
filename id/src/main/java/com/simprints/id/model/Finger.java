@@ -27,12 +27,14 @@ public class Finger implements Parcelable, Comparable<Finger> {
     private boolean isActive;
     private Status status;
     private Template template;
+    private boolean lastFinger;
 
-    public Finger(@NonNull FingerIdentifier id, boolean isActive) {
+    public Finger(@NonNull FingerIdentifier id, boolean isActive, boolean isLastFinger) {
         this.id = id;
         this.isActive = isActive;
         this.status = Status.NOT_COLLECTED;
         this.template = null;
+        this.lastFinger = isLastFinger;
     }
 
 
@@ -107,6 +109,14 @@ public class Finger implements Parcelable, Comparable<Finger> {
     @Override
     public int compareTo(@NonNull Finger other) {
         return this.id.ordinal() - other.id.ordinal();
+    }
+
+    public boolean isLastFinger() {
+        return lastFinger;
+    }
+
+    public void setLastFinger(boolean lastFinger) {
+        this.lastFinger = lastFinger;
     }
 
     public enum Status {
