@@ -12,17 +12,22 @@
         android:src="@drawable/launch_background"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="6"
+        android:layout_weight="4"
         android:contentDescription="@string/launch_background_description" />
 
     <TextView
-        android:text="@string/loading"
-        android:textColor="@color/simprints_white"
-        android:textSize="20sp"
-        android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="4"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="center_horizontal"
+        android:text="@string/short_consent"
+        android:textColor="@color/simprints_white"
+        android:textSize="20sp"
+        />
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -36,9 +41,18 @@
         android:indeterminateDrawable="@drawable/progress_spinner" >
     </ProgressBar>
 
-    <View
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/confirm_consent_text_view"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="2"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:text="@string/confirm_consent"
+        android:visibility="gone"
+        android:textColor="@color/simprints_white"
+        android:textSize="20sp"
+        />
+
 
 </LinearLayout>

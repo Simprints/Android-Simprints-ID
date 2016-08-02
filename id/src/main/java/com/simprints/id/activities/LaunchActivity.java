@@ -10,6 +10,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appsee.Appsee;
@@ -46,8 +50,12 @@ public class LaunchActivity extends AppCompatActivity
     private String callingPackage;
     private boolean isDataReady;
     private long minEndTime;
+    boolean waitingForConfirmation;
     private boolean childActivityLaunched;
     boolean finishing;
+
+    ProgressBar progressBar;
+    TextView confirmConsentTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +68,16 @@ public class LaunchActivity extends AppCompatActivity
         positionTracker = new PositionTracker(this);
         positionTracker.start();
         handler = new Handler();
+
+        callingPackage = null;
         isDataReady = false;
         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
+        waitingForConfirmation = false;
         childActivityLaunched = false;
         finishing = false;
-        callingPackage = null;
+
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        confirmConsentTextView = (TextView) findViewById(R.id.confirm_consent_text_view);
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
@@ -253,6 +266,21 @@ public class LaunchActivity extends AppCompatActivity
         launch(intent);
     }
 
+    private void waitForConfirmation() {
+        waitingForConfirmation = true;
+        progressBar.setVisibility(View.GONE);
+        confirmConsentTextView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (waitingForConfirmation) {
+            launch(new Intent(LaunchActivity.this, MainActivity.class));
+            return true;
+        } else {
+            return super.onTouchEvent(event);
+        }
+    }
 
     @Override
     public void onScannerEvent(com.simprints.libscanner.EVENT event) {
@@ -291,8 +319,13 @@ public class LaunchActivity extends AppCompatActivity
                 break;
 
             case SET_UI_SUCCESS:
-                Intent intent = new Intent(this, ConsentActivity.class);
-                launch(intent);
+                waitForConfirmation();
+                break;
+
+            case TRIGGER_PRESSED:
+                if (waitingForConfirmation) {
+                    launch(new Intent(LaunchActivity.this, MainActivity.class));
+                }
                 break;
 
             case SET_UI_FAILURE:

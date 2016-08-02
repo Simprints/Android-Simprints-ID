@@ -36,7 +36,7 @@
 
     <string name="scan_label">SCAN</string>
 
-    <string name="short_consent"></string>
+    <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your health records.\nIf that’s not OK or you have any questions let me know, otherwise please place your left index finger flat on the sensor.</string>
 
     <string name="long_consent">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
 
@@ -89,5 +89,6 @@
     <!--Appsee API Key-->
     <string name="com.appsee.apikey" translatable="false">6664c6771410480c95c83acddeab349c</string>
     <string name="coming_soon">Coming soon...</string>
+    <string name="confirm_consent">Tap here to confirm consent</string>
 
 </resources>
