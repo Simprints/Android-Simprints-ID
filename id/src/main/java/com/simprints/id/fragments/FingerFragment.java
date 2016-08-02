@@ -27,6 +27,8 @@ public class FingerFragment extends Fragment {
         Finger finger = (Finger) getArguments().get(FINGER_ARG);
         assert finger != null;
 
+        FingerRes.setFingerRes(4);
+
         ImageView fingerImageView = (ImageView) view.findViewById(R.id.finger_image);
         fingerImageView.setImageResource(FingerRes.get(finger).getDrawableId());
         fingerImageView.setVisibility(View.VISIBLE);
