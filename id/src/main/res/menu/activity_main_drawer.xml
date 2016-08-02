@@ -16,7 +16,7 @@
                 <!--android:title="@string/tutorial_menu" />-->
             <!--<item android:id="@+id/nav_troubleshoot" android:icon="@drawable/ic_menu_troubleshoot"-->
                 <!--android:title="@string/troubleshoot_menu" />-->
-            <item android:id="@+id/privacy" android:icon="@drawable/ic_menu_about"
+            <item android:id="@+id/privacy" android:icon="@drawable/ic_menu_privacy"
                 android:title="@string/privacy_and_consent" />
             <!--<item android:id="@+id/nav_about" android:icon="@drawable/ic_menu_about"-->
                 <!--android:title="@string/about_menu" />-->
