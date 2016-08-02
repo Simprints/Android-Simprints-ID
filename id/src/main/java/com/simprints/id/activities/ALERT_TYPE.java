@@ -18,7 +18,7 @@ public enum ALERT_TYPE {
     MULTIPLE_PAIRED_SCANNERS(R.string.multiple_scanners_found_title, R.string.multiple_scanners_found_message,
             R.drawable.multiple_scanners_found, R.string.try_again_label, R.string.settings_label, true),
     SCANNER_UNREACHABLE(R.string.scanner_unreachable, R.string.scanner_unreachable_message,
-            R.drawable.generic_failure, R.string.try_again_label, R.string.empty, true),
+            R.drawable.generic_failure, R.string.try_again_label, R.string.settings_label, true),
 
     DISCONNECTED(R.string.disconnected_title, R.string.disconnected_message,
             R.drawable.no_scanner_found, R.string.reconnect_label, R.string.empty, true),
@@ -26,8 +26,8 @@ public enum ALERT_TYPE {
     NETWORK_FAILURE(R.string.network_failure_title, R.string.network_failure_message,
             R.drawable.generic_failure, R.string.try_again_label, R.string.empty, false),
 
-    UNEXPECTED_ERROR(R.string.error_occurred_title, R.string.unforeseen_error_message,
-            R.drawable.generic_failure, R.string.close, R.string.empty, true);
+    UNEXPECTED_ERROR(R.string.error_occured_title, R.string.unforeseen_error_message,
+            R.drawable.generic_failure, R.string.close, R.string.try_again_label, true);
 
     private int alertTitleId;
     private int alertMessageId;
