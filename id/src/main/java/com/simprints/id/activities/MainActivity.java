@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements
     private ViewPager viewPager;
     private FingerPageAdapter pageAdapter;
 
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -519,7 +520,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.main, menu);
+
         return true;
     }
 

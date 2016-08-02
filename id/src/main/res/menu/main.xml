@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/action_forward" android:orderInCategory="99"
+    <item
+        android:id="@+id/action_forward"
         android:icon="@drawable/ic_menu_forward"
-        android:title="@string/action_settings" app:showAsAction="always" />
+        android:orderInCategory="99"
+        android:title="@string/action_settings"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_forward_disabled"
+        android:icon="@drawable/ic_menu_forward_grey"
+        android:orderInCategory="99"
+        android:title="@string/action_settings"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_forward_prompt"
+        android:icon="@drawable/ic_menu_forward_green"
+        android:orderInCategory="99"
+        android:title="@string/action_settings"
+        app:showAsAction="always" />
 </menu>
