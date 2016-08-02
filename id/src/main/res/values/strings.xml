@@ -86,10 +86,13 @@
     <string name="network_failure_message">Network failure, please make sure you are connected to the internet</string>
     <string name="please_wait">Please wait while we proceed to identification</string>
     <string name="finger_image_description">Hands with arrow pointing to a finger</string>
+    <string name="coming_soon">Coming soon...</string>
+    <string name="confirm_consent">Tap here to confirm consent</string>
+    <string name="nude_mode">Nude Mode</string>
 
     <!--Appsee API Key-->
     <string name="com.appsee.apikey" translatable="false">6664c6771410480c95c83acddeab349c</string>
-    <string name="coming_soon">Coming soon...</string>
-    <string name="confirm_consent">Tap here to confirm consent</string>
+    <!--Shared Pref Key -->
+    <string name="preference_file_key">b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a</string>
 
 </resources>
