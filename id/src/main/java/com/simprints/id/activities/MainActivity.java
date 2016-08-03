@@ -33,6 +33,7 @@ import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Log;
+import com.simprints.id.tools.ViewPagerCustom;
 import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
@@ -50,14 +51,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import static com.simprints.id.model.Finger.*;
+import static com.simprints.id.model.Finger.NB_OF_FINGERS;
+import static com.simprints.id.model.Finger.Status;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         Scanner.ScannerListener,
         Data.DataListener {
 
-    private final static long AUTO_SWIPE_DELAY = 2000;
+    private final static long AUTO_SWIPE_DELAY = 500;
+    private final static int FAST_SWIPE_SPEED = 100;
+    private final static int SLOW_SWIPE_SPEED = 1500;
 
     private final static ScanConfig DEFAULT_CONFIG;
 
@@ -89,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private List<ImageView> indicators;
     private Button scanButton;
-    private ViewPager viewPager;
+    private ViewPagerCustom viewPager;
     private FingerPageAdapter pageAdapter;
 
     private boolean allGreen;
@@ -116,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements
 
         indicators = new ArrayList<>();
         scanButton = (Button) findViewById(R.id.scan_button);
-        viewPager = (ViewPager) findViewById(R.id.view_pager);
+        viewPager = (ViewPagerCustom) findViewById(R.id.view_pager);
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
 
         allGreen = false;
@@ -230,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements
                 currentActiveFingerNo = position;
                 refreshDisplay();
                 if (leds[0] != Message.LED_STATE.LED_STATE_OFF) {
-                    if(appState.getScanner() != null) {
+                    if (appState.getScanner() != null) {
                         appState.getScanner().resetUI();
                         Arrays.fill(leds, Message.LED_STATE.LED_STATE_OFF);
                     }
@@ -282,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements
             fragment.updateTextAccordingToStatus();
         }
 
-        if(goWhite) {
+        if (goWhite) {
             continueItem.setIcon(R.drawable.ic_menu_forward_white);
             continueItem.setEnabled(true);
         }
@@ -311,7 +315,9 @@ public class MainActivity extends AppCompatActivity implements
                 public void run() {
                     Log.d(MainActivity.this, "AutoScroll");
                     if (currentActiveFingerNo < activeFingers.size()) {
+                        viewPager.setScrollDuration(SLOW_SWIPE_SPEED);
                         viewPager.setCurrentItem(currentActiveFingerNo + 1);
+                        viewPager.setScrollDuration(FAST_SWIPE_SPEED);
                     }
                 }
             }, AUTO_SWIPE_DELAY);
