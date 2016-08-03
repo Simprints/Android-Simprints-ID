@@ -34,9 +34,7 @@
     <string name="r_4_finger_name">RIGHT FOURTH FINGER</string>
     <string name="r_5_finger_name">RIGHT FIFTH FINGER</string>
 
-    <string name="scan_label">SCAN</string>
-
-    <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your health records.\nIf that’s not OK or you have any questions let me know, otherwise please place your left index finger flat on the sensor.</string>
+    <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your health records. If that’s not OK or you have any questions let me know, otherwise please place your left index finger flat on the sensor.</string>
 
     <string name="long_consent">
         <b><u>Privacy and Consent</u></b>\n\n
@@ -74,8 +72,21 @@
         Simprints will not give any information that it holds on you to the Nepali Government, unless required to do so by law.\n\n
         <b>Do I have to agree to my fingerprints being taken?</b>\n\n
         You do not have to agree to give Simprints any information to get medical care. But if you do not then healthcare organisations may find it harder to find your medical records in the future. \n\n
+
+        <b><u>Health Worker Consent</u></b>\n\n
+        Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other community health workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to patients.
     </string>
 
+    <!--Appsee API Key-->
+    <string name="com.appsee.apikey" translatable="false">6664c6771410480c95c83acddeab349c</string>
+    <!--Shared Pref Key -->
+    <string name="preference_file_key">b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a</string>
+    <string name="pref_nudge_mode_bool">NudgeModeBool</string>
+    <string name="pref_consent_bool">ConsentBool</string>
+    <string name="pref_quality_theshold">QualityThresholdInt</string>
+
+    <!--Main app-->
+    <string name="scan_label">SCAN</string>
     <string name="configuration_error_title">CONFIGURATION ERROR</string>
     <string name="missing_user_id_message">A configuration error has occurred (missing user id), please contact your system administrator</string>
     <string name="missing_device_id_message">A configuration error has occurred (missing device id), please contact your system administrator</string>
@@ -125,12 +136,9 @@
     <string name="coming_soon">Coming soon...</string>
     <string name="confirm_consent">Tap here to confirm consent</string>
     <string name="nudge_mode_checkbox_name">Nudge Mode</string>
-
-    <!--Appsee API Key-->
-    <string name="com.appsee.apikey" translatable="false">6664c6771410480c95c83acddeab349c</string>
-    <!--Shared Pref Key -->
-    <string name="preference_file_key">b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a</string>
-    <string name="nudge_mode_bool">NudgeModeBoll</string>
+    <string name="healthworker_consent_checkbox">I agree to Simprints using this data in these ways.</string>
     <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
+    <string name="quality_threshold_text_view">Quality Threshold</string>
+    <string name="menu_continue">Continue</string>
 
 </resources>
