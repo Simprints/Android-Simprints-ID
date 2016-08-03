@@ -70,11 +70,11 @@ public class MainActivity extends AppCompatActivity implements
         DEFAULT_CONFIG.set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED);
         DEFAULT_CONFIG.set(FingerIdentifier.LEFT_INDEX_FINGER, FingerConfig.REQUIRED);
         DEFAULT_CONFIG.set(FingerIdentifier.LEFT_3RD_FINGER, FingerConfig.OPTIONAL);
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_4TH_FINGER, FingerConfig.DO_NOT_COLLECT);
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_5TH_FINGER, FingerConfig.DO_NOT_COLLECT);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_5TH_FINGER, FingerConfig.DO_NOT_COLLECT);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_4TH_FINGER, FingerConfig.DO_NOT_COLLECT);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_3RD_FINGER, FingerConfig.DO_NOT_COLLECT);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_4TH_FINGER, FingerConfig.OPTIONAL);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_5TH_FINGER, FingerConfig.OPTIONAL);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_5TH_FINGER, FingerConfig.OPTIONAL);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_4TH_FINGER, FingerConfig.OPTIONAL);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_3RD_FINGER, FingerConfig.OPTIONAL);
         DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_THUMB, FingerConfig.OPTIONAL);
         DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_INDEX_FINGER, FingerConfig.OPTIONAL);
     }
@@ -361,26 +361,11 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case EXTRACT_IMAGE_QUALITY_SUCCESS: // Image quality extracted successfully
-                appState.getScanner().generateTemplate();
-                break;
-
-
-            case GENERATE_TEMPLATE_SUCCESS: // Template generated successfully
-                appState.getScanner().extractTemplate();
-                break;
-
-            case EXTRACT_TEMPLATE_SUCCESS: // Template extracted successfully
                 int quality = appState.getScanner().getImageQuality();
 
                 Log.d(this, String.format(Locale.UK,
                         "Extracted new template of quality %d for finger %s",
                         quality, finger.getId().name()));
-
-                if (finger.getTemplate() == null ||
-                        finger.getTemplate().getQuality() < quality) {
-                    Log.d(this, "Set template");
-                    activeFingers.get(currentActiveFingerNo).setTemplate(appState.getScanner().getTemplate());
-                }
 
                 SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
                         getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -388,14 +373,37 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
 
                 if (quality >= qualityScore) {
-                    activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
                     appState.getScanner().setGoodCaptureUI();
                     Arrays.fill(leds, Message.LED_STATE.LED_STATE_GREEN);
+                } else {
+                    appState.getScanner().setBadCaptureUI();
+                    Arrays.fill(leds, Message.LED_STATE.LED_STATE_RED);
+                }
+                break;
+
+            case GENERATE_TEMPLATE_SUCCESS: // Template generated successfully
+                appState.getScanner().extractTemplate();
+                break;
+
+            case EXTRACT_TEMPLATE_SUCCESS: // Template extracted successfully
+                int quality1 = appState.getScanner().getImageQuality();
+
+                if (finger.getTemplate() == null ||
+                        finger.getTemplate().getQuality() < quality1) {
+                    Log.d(this, "Set template");
+                    activeFingers.get(currentActiveFingerNo).setTemplate(appState.getScanner().getTemplate());
+                }
+
+                SharedPreferences sharedPref1 = getApplicationContext().getSharedPreferences(
+                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                int qualityScore1 = sharedPref1.getInt(getString(R.string.pref_quality_theshold), 60);
+                Log.d(this, "Quality Score: " + String.valueOf(qualityScore1));
+
+                if (quality1 >= qualityScore1) {
+                    activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
                     nudgeMode();
                 } else {
                     activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
-                    appState.getScanner().setBadCaptureUI();
-                    Arrays.fill(leds, Message.LED_STATE.LED_STATE_RED);
                 }
 
                 refreshDisplay();
@@ -425,22 +433,22 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
 
-            // info messages
-            case CONNECTION_INITIATED: // Connection initiated
+            case CONNECTION_SCANNER_UNREACHABLE:
+                break;
             case DISCONNECTION_INITIATED: // Disconnection initiated
                 break;
 
             // success conditions
             case SEND_REQUEST_SUCCESS: // Request sent successfully
+            case CONNECTION_INITIATED:
+                break;
             case CONNECTION_SUCCESS: // Successfully connected to scanner
             case DISCONNECTION_SUCCESS: // Successfully disconnected from scanner
             case UPDATE_SENSOR_INFO_SUCCESS: // Sensor info was successfully updated
             case SET_UI_SUCCESS: // UI was successfully set
-            case EXTRACT_IMAGE_SUCCESS: // Image extracted successfully
-
-            case UN20_SHUTDOWN_SUCCESS: // UN20 shut down successfully
-            case EXTRACT_CRASH_LOG_SUCCESS: // Crash log extracted successfully
-            case SET_HARDWARE_CONFIG_SUCCESS: // Hardware configuration was successfully set
+                if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
+                    appState.getScanner().generateTemplate();
+                }
                 break;
 
             case SEND_REQUEST_IO_ERROR: // Request sending failed because of an IO error
@@ -480,6 +488,10 @@ public class MainActivity extends AppCompatActivity implements
                 finishWithUnexpectedError();
                 break;
 
+            case PAIR_SUCCESS:
+                break;
+            case PAIR_FAILURE:
+                break;
             case CAPTURE_IMAGE_SUCCESS:
                 break;
 
@@ -488,6 +500,16 @@ public class MainActivity extends AppCompatActivity implements
             case UN20_SHUTTING_DOWN:
                 break;
             case UN20_WAKING_UP:
+                break;
+            case EXTRACT_IMAGE_SUCCESS:
+                break;
+            case EXTRACT_IMAGE_IO_ERROR:
+                break;
+            case UN20_SHUTDOWN_SUCCESS:
+                break;
+            case EXTRACT_CRASH_LOG_SUCCESS:
+                break;
+            case SET_HARDWARE_CONFIG_SUCCESS:
                 break;
             default:
                 break;
