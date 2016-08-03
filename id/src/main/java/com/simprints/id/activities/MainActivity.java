@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements
                 scanButton.setEnabled(true);
                 break;
 
-            case CONTINUOUS_CAPTURE_STOPPED: // Continous capture stopped
+            case CONTINUOUS_CAPTURE_STOPPED: // Continuous capture stopped
                 finger.setStatus(previousStatus);
                 refreshDisplay();
                 scanButton.setEnabled(true);
@@ -494,7 +494,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case CAPTURE_IMAGE_SUCCESS:
                 break;
-
             case UN20_CANNOT_CHECK_STATE:
                 break;
             case UN20_SHUTTING_DOWN:
@@ -675,7 +674,6 @@ public class MainActivity extends AppCompatActivity implements
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //TODO
                         Finger currentActiveFinger = activeFingers.get(currentActiveFingerNo);
                         activeFingers.get(activeFingers.size() - 1).setLastFinger(false);
                         for (Finger finger : fingers) {
