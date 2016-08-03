@@ -19,18 +19,37 @@
 
     </android.support.design.widget.AppBarLayout>
 
-        <ScrollView
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/scrollView">
+            android:orientation="vertical">
+
             <TextView
-                android:id="@+id/textView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="@string/long_consent"
-                android:paddingBottom="20dp" />
-        </ScrollView>
+                android:text="@string/long_consent" />
+
+            <CheckBox
+                android:id="@+id/consentCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginStart="20dp"
+                android:onClick="onCheckBoxClicked"
+                android:padding="10dp"
+                android:paddingBottom="20dp"
+                android:text="@string/healthworker_consent_checkbox" />
+
+        </LinearLayout>
+
+
+    </ScrollView>
 
 
 </LinearLayout>

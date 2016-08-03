@@ -50,6 +50,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import static com.simprints.id.model.Finger.*;
+
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         Scanner.ScannerListener,
@@ -77,20 +79,21 @@ public class MainActivity extends AppCompatActivity implements
 
     private Handler handler;
 
-    private Finger[] fingers = new Finger[Finger.NB_OF_FINGERS];
+    private Finger[] fingers = new Finger[NB_OF_FINGERS];
     private List<Finger> activeFingers;
     private int currentActiveFingerNo;
 
     private Message.LED_STATE[] leds;
 
-    private Finger.Status previousStatus;
+    private Status previousStatus;
 
     private List<ImageView> indicators;
     private Button scanButton;
     private ViewPager viewPager;
     private FingerPageAdapter pageAdapter;
 
-    private Menu menu;
+    private boolean allGreen;
+    private MenuItem continueItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,18 +106,20 @@ public class MainActivity extends AppCompatActivity implements
 
         handler = new Handler();
 
-        fingers = new Finger[Finger.NB_OF_FINGERS];
+        fingers = new Finger[NB_OF_FINGERS];
         activeFingers = new ArrayList<>();
         currentActiveFingerNo = 0;
 
         leds = new Message.LED_STATE[Message.LED_MAX_COUNT];
 
-        previousStatus = Finger.Status.NOT_COLLECTED;
+        previousStatus = Status.NOT_COLLECTED;
 
         indicators = new ArrayList<>();
         scanButton = (Button) findViewById(R.id.scan_button);
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
+
+        allGreen = false;
 
         initActiveFingers();
         initBarAndDrawer();
@@ -126,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initActiveFingers() {
         Log.d(this, "Initializing active fingers from default config");
-        for (int i = 0; i < Finger.NB_OF_FINGERS; i++) {
+        for (int i = 0; i < NB_OF_FINGERS; i++) {
             FingerIdentifier id = FingerIdentifier.values()[i];
             fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, false);
             Log.d(this, String.format("Finger %s is %s",
@@ -194,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements
     private void toggleContinuousCapture() {
         switch (activeFingers.get(currentActiveFingerNo).getStatus()) {
             case GOOD_SCAN:
-                activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.RESCAN_GOOD_SCAN);
+                activeFingers.get(currentActiveFingerNo).setStatus(Status.RESCAN_GOOD_SCAN);
                 refreshDisplay();
                 break;
             case RESCAN_GOOD_SCAN:
@@ -237,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements
         viewPager.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                return activeFingers.get(currentActiveFingerNo).getStatus() == Finger.Status.COLLECTING;
+                return activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING;
             }
         });
         viewPager.setCurrentItem(currentActiveFingerNo);
@@ -246,13 +251,26 @@ public class MainActivity extends AppCompatActivity implements
     private void refreshDisplay() {
         Log.d(this, "Refreshing display");
         // Update indicators display
+        boolean goGreen = true;
+        boolean goWhite = false;
+
         for (int i = 0; i < activeFingers.size(); i++) {
             boolean selected = currentActiveFingerNo == i;
             Finger finger = activeFingers.get(i);
             indicators.get(i).setImageResource(finger.getStatus().getDrawableId(selected));
+
+            if (finger.getStatus() != Status.GOOD_SCAN
+                    && finger.getStatus() != Status.RESCAN_GOOD_SCAN) {
+                goGreen = false;
+            }
+            if (finger.getStatus() != Status.NOT_COLLECTED
+                    && finger.getStatus() != Status.COLLECTING) {
+                goWhite = true;
+            }
         }
+
         // Update scan button display
-        Finger.Status activeStatus = activeFingers.get(currentActiveFingerNo).getStatus();
+        Status activeStatus = activeFingers.get(currentActiveFingerNo).getStatus();
         scanButton.setText(activeStatus.getButtonTextId());
         scanButton.setTextColor(activeStatus.getButtonTextColor());
         scanButton.setBackgroundColor(activeStatus.getButtonBgColor());
@@ -260,6 +278,15 @@ public class MainActivity extends AppCompatActivity implements
         FingerFragment fragment = pageAdapter.getFragment(currentActiveFingerNo);
         if (fragment != null) {
             fragment.updateTextAccordingToStatus();
+        }
+
+        if(goWhite) {
+            continueItem.setIcon(R.drawable.ic_menu_forward_white);
+            continueItem.setEnabled(true);
+        }
+        if (goGreen) {
+            allGreen = true;
+            continueItem.setIcon(R.drawable.ic_menu_forward_green);
         }
     }
 
@@ -274,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements
     private void nudgeMode() {
         SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        boolean nudge = sharedPref.getBoolean(getString(R.string.nudge_mode_bool), false);
+        boolean nudge = sharedPref.getBoolean(getString(R.string.pref_nudge_mode_bool), false);
 
         if (nudge) {
             handler.postDelayed(new Runnable() {
@@ -296,14 +323,18 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (event) {
             case TRIGGER_PRESSED: // Trigger pressed
-                if (finger.getStatus() != Finger.Status.GOOD_SCAN) {
+                if (finger.getStatus() != Status.GOOD_SCAN) {
                     toggleContinuousCapture();
+                } else if (activeFingers.get(activeFingers.size() - 1).isLastFinger()) {
+                    if (allGreen) {
+                        onActionForward();
+                    }
                 }
                 break;
 
             case CONTINUOUS_CAPTURE_STARTED:
                 previousStatus = finger.getStatus();
-                finger.setStatus(Finger.Status.COLLECTING);
+                finger.setStatus(Status.COLLECTING);
                 refreshDisplay();
                 scanButton.setEnabled(true);
                 break;
@@ -343,13 +374,18 @@ public class MainActivity extends AppCompatActivity implements
                     activeFingers.get(currentActiveFingerNo).setTemplate(appState.getScanner().getTemplate());
                 }
 
-                if (quality >= 80) {
-                    activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.GOOD_SCAN);
+                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                int qualityScore = sharedPref.getInt(getString(R.string.pref_quality_theshold), 60);
+                Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
+
+                if (quality >= qualityScore) {
+                    activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
                     appState.getScanner().setGoodCaptureUI();
                     Arrays.fill(leds, Message.LED_STATE.LED_STATE_GREEN);
                     nudgeMode();
                 } else {
-                    activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.BAD_SCAN);
+                    activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
                     appState.getScanner().setBadCaptureUI();
                     Arrays.fill(leds, Message.LED_STATE.LED_STATE_RED);
                 }
@@ -357,7 +393,6 @@ public class MainActivity extends AppCompatActivity implements
                 refreshDisplay();
 
                 break;
-
 
             case EXTRACT_IMAGE_QUALITY_NO_IMAGE: // Image quality extraction failed because there is no image available
             case EXTRACT_IMAGE_QUALITY_SDK_ERROR: // Image quality extraction failed because of an error in UN20 SDK
@@ -369,7 +404,7 @@ public class MainActivity extends AppCompatActivity implements
             case EXTRACT_TEMPLATE_NO_TEMPLATE: // Template extraction failed because there is no template available
             case EXTRACT_TEMPLATE_IO_ERROR: // Template extraction failed because of an IO error
             case EXTRACT_TEMPLATE_FAILURE: // Template extraction failed for abnormal reasons, SHOULD NOT HAPPEN
-                activeFingers.get(currentActiveFingerNo).setStatus(Finger.Status.NOT_COLLECTED);
+                activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
                 refreshDisplay();
                 finishWithUnexpectedError();
                 break;
@@ -474,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements
         int nbRequiredFingerprints = 0;
 
         for (Finger finger : activeFingers) {
-            if (finger.getStatus() == Finger.Status.GOOD_SCAN) {
+            if (finger.getStatus() == Status.GOOD_SCAN || finger.getStatus() == Status.BAD_SCAN) {
                 fingerprints.add(new Fingerprint(finger.getId(), finger.getTemplate().getBytes()));
                 if (DEFAULT_CONFIG.get(finger.getId()) == FingerConfig.REQUIRED) {
                     nbRequiredFingerprints++;
@@ -520,9 +555,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        this.menu = menu;
         getMenuInflater().inflate(R.menu.main, menu);
-
+        continueItem = menu.findItem(R.id.action_forward);
         return true;
     }
 
@@ -542,7 +576,7 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (id) {
             case R.id.nav_add:
-                if (activeFingers.get(currentActiveFingerNo).getStatus() == Finger.Status.COLLECTING) {
+                if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
                     toggleContinuousCapture();
                 }
                 addFinger();
@@ -649,7 +683,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (activeFingers.get(currentActiveFingerNo).getStatus() == Finger.Status.COLLECTING) {
+            if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
                 toggleContinuousCapture();
             } else {
                 Log.d(this, "Finishing with RESULT_CANCELED");
