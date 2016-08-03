@@ -230,8 +230,10 @@ public class MainActivity extends AppCompatActivity implements
                 currentActiveFingerNo = position;
                 refreshDisplay();
                 if (leds[0] != Message.LED_STATE.LED_STATE_OFF) {
-                    appState.getScanner().resetUI();
-                    Arrays.fill(leds, Message.LED_STATE.LED_STATE_OFF);
+                    if(appState.getScanner() != null) {
+                        appState.getScanner().resetUI();
+                        Arrays.fill(leds, Message.LED_STATE.LED_STATE_OFF);
+                    }
                 }
             }
 
