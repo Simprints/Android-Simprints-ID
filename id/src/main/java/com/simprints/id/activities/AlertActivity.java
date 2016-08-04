@@ -41,7 +41,12 @@ public class AlertActivity extends AppCompatActivity {
 
         ((ImageView) findViewById(R.id.graphic)).setImageResource(alertType.getAlertMainDrawableId());
 
-        ((ImageView) findViewById(R.id.hintGraphic)).setImageResource(alertType.getAlertHintDrawableId());
+        ImageView alertHint = (ImageView) findViewById(R.id.hintGraphic);
+        if (alertType.getAlertHintDrawableId() != -1) {
+            alertHint.setImageResource(alertType.getAlertHintDrawableId());
+        } else {
+            alertHint.setVisibility(View.GONE);
+        }
 
         ((TextView) findViewById(R.id.message)).setText(alertType.getAlertMessageId());
 
