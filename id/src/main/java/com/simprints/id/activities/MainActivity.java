@@ -273,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements
         // Update indicators display
         int nbCollected = 0;
 
-        boolean goGreen = true;
+        promptContinue = true;
 
         for (int i = 0; i < activeFingers.size(); i++) {
             boolean selected = currentActiveFingerNo == i;
@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements
             }
             if(finger.getStatus() != Status.GOOD_SCAN
                     && finger.getStatus() != Status.RESCAN_GOOD_SCAN){
-                goGreen = false;
+                promptContinue = false;
             }
         }
 
@@ -307,9 +307,8 @@ public class MainActivity extends AppCompatActivity implements
             } else {
                 if (nbCollected == 0) {
                     continueItem.setIcon(R.drawable.ic_menu_forward_grey);
-                } else if (goGreen) {
+                } else if (promptContinue) {
                     continueItem.setIcon(R.drawable.ic_menu_forward_green);
-                    promptContinue = true;
                 } else if (nbCollected > 0){
                     continueItem.setIcon(R.drawable.ic_menu_forward_white);
                 }
