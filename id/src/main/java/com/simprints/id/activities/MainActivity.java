@@ -63,6 +63,12 @@ public class MainActivity extends AppCompatActivity implements
     private final static int FAST_SWIPE_SPEED = 100;
     private final static int SLOW_SWIPE_SPEED = 1500;
 
+    private final static int ALERT_ACTIVITY_REQUEST_CODE = 0;
+    private final static int MATCHING_ACTIVITY_REQUEST_CODE = 1;
+    private final static int SETTINGS_ACTIVITY_REQUEST_CODE = 2;
+    private final static int PRIVACY_ACTIVITY_REQUEST_CODE = 3;
+
+
     private final static ScanConfig DEFAULT_CONFIG;
 
     static {
@@ -96,13 +102,16 @@ public class MainActivity extends AppCompatActivity implements
     private ViewPagerCustom viewPager;
     private FingerPageAdapter pageAdapter;
 
-    private boolean allGreen;
+    private Registration registrationResult;
+
     private MenuItem continueItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.d(this, "Creating MainActivity");
 
         appState = AppState.getInstance();
         appState.getScanner().setScannerListener(this);
@@ -123,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements
         viewPager = (ViewPagerCustom) findViewById(R.id.view_pager);
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
 
-        allGreen = false;
+        registrationResult = null;
 
         initActiveFingers();
         initBarAndDrawer();
@@ -257,21 +266,15 @@ public class MainActivity extends AppCompatActivity implements
     private void refreshDisplay() {
         Log.d(this, "Refreshing display");
         // Update indicators display
-        boolean goGreen = true;
-        boolean goWhite = false;
+        int nbCollected = 0;
 
         for (int i = 0; i < activeFingers.size(); i++) {
             boolean selected = currentActiveFingerNo == i;
             Finger finger = activeFingers.get(i);
             indicators.get(i).setImageResource(finger.getStatus().getDrawableId(selected));
 
-            if (finger.getStatus() != Status.GOOD_SCAN
-                    && finger.getStatus() != Status.RESCAN_GOOD_SCAN) {
-                goGreen = false;
-            }
-            if (finger.getStatus() != Status.NOT_COLLECTED
-                    && finger.getStatus() != Status.COLLECTING) {
-                goWhite = true;
+            if (finger.getTemplate() != null) {
+                nbCollected++;
             }
         }
 
@@ -286,13 +289,20 @@ public class MainActivity extends AppCompatActivity implements
             fragment.updateTextAccordingToStatus();
         }
 
-        if (goWhite) {
-            continueItem.setIcon(R.drawable.ic_menu_forward_white);
-            continueItem.setEnabled(true);
-        }
-        if (goGreen) {
-            allGreen = true;
-            continueItem.setIcon(R.drawable.ic_menu_forward_green);
+        if (continueItem != null) {
+            if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
+                continueItem.setIcon(R.drawable.ic_menu_forward_grey);
+                continueItem.setEnabled(false);
+            } else {
+                if (nbCollected == 0) {
+                    continueItem.setIcon(R.drawable.ic_menu_forward_grey);
+                } else if (nbCollected == activeFingers.size()) {
+                    continueItem.setIcon(R.drawable.ic_menu_forward_green);
+                } else {
+                    continueItem.setIcon(R.drawable.ic_menu_forward_white);
+                }
+                continueItem.setEnabled(nbCollected > 0);
+            }
         }
     }
 
@@ -300,8 +310,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(this, "UNEXPECTED ERROR");
         Intent intent = new Intent(this, AlertActivity.class);
         intent.putExtra("alertType", ALERT_TYPE.UNEXPECTED_ERROR);
-        startActivity(intent);
-        finish();
+        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
     private void nudgeMode() {
@@ -334,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements
                 if (finger.getStatus() != Status.GOOD_SCAN) {
                     toggleContinuousCapture();
                 } else if (activeFingers.get(activeFingers.size() - 1).isLastFinger()) {
-                    if (allGreen) {
+                    if (continueItem.isEnabled()) {
                         onActionForward();
                     }
                 }
@@ -454,8 +463,7 @@ public class MainActivity extends AppCompatActivity implements
             case SEND_REQUEST_IO_ERROR: // Request sending failed because of an IO error
                 Intent intent = new Intent(this, AlertActivity.class);
                 intent.putExtra("alertType", ALERT_TYPE.DISCONNECTED);
-                startActivity(intent);
-                finish();
+                startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
                 break;
 
             // error conditions
@@ -523,6 +531,9 @@ public class MainActivity extends AppCompatActivity implements
             case SAVE_PERSON_SUCCESS:
             case SAVE_PERSON_FAILURE:
                 Log.d(this, "Finishing with RESULT_OK");
+                Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
+                resultData.putExtra(Constants.SIMPRINTS_REGISTRATION, registrationResult);
+                setResult(RESULT_OK, resultData);
                 finish();
                 break;
 
@@ -534,11 +545,17 @@ public class MainActivity extends AppCompatActivity implements
     protected void onActionForward() {
         // Gathers the fingerprints in a list
         Log.d(this, "onActionForward()");
+        activeFingers.get(currentActiveFingerNo);
+
+
         ArrayList<Fingerprint> fingerprints = new ArrayList<>();
         int nbRequiredFingerprints = 0;
 
         for (Finger finger : activeFingers) {
-            if (finger.getStatus() == Status.GOOD_SCAN || finger.getStatus() == Status.BAD_SCAN) {
+            if (finger.getStatus() == Status.GOOD_SCAN ||
+                    finger.getStatus() == Status.BAD_SCAN ||
+                    finger.getStatus() == Status.RESCAN_GOOD_SCAN)
+            {
                 fingerprints.add(new Fingerprint(finger.getId(), finger.getTemplate().getBytes()));
                 if (DEFAULT_CONFIG.get(finger.getId()) == FingerConfig.REQUIRED) {
                     nbRequiredFingerprints++;
@@ -553,21 +570,17 @@ public class MainActivity extends AppCompatActivity implements
             Person person = new Person(appState.getGuid(), fingerprints);
             if (appState.isEnrol()) {
                 Log.d(this, "Creating registration object");
-                Registration registration = new Registration(appState.getGuid());
+                registrationResult = new Registration(appState.getGuid());
                 for (Fingerprint fp : fingerprints) {
-                    registration.setTemplate(fp.getFingerIdentifier(), fp.getIsoTemplate());
+                    registrationResult.setTemplate(fp.getFingerIdentifier(), fp.getIsoTemplate());
                 }
-                appState.setResultCode(RESULT_OK);
-                appState.getResultData().putExtra(Constants.SIMPRINTS_REGISTRATION, registration);
-
                 Log.d(this, "Saving person");
                 appState.getData().savePerson(appState.getApiKey(), person);
             } else {
                 Log.d(this, "Starting matching activity");
                 Intent intent = new Intent(this, MatchingActivity.class);
                 intent.putExtra("Person", person);
-                startActivity(intent);
-                finish();
+                startActivityForResult(intent, MATCHING_ACTIVITY_REQUEST_CODE);
             }
         }
     }
@@ -586,6 +599,7 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         continueItem = menu.findItem(R.id.action_forward);
+        refreshDisplay();
         return true;
     }
 
@@ -615,7 +629,8 @@ public class MainActivity extends AppCompatActivity implements
 //                startActivity(new Intent(this, HelpActivity.class));
                 break;
             case R.id.privacy:
-                startActivity(new Intent(this, PrivacyActivity.class));
+                startActivityForResult(new Intent(this, PrivacyActivity.class),
+                        PRIVACY_ACTIVITY_REQUEST_CODE);
                 break;
 //            case R.id.nav_tutorial:
 //                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
@@ -631,7 +646,8 @@ public class MainActivity extends AppCompatActivity implements
 //                break;
             case R.id.nav_settings:
                 //Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(this, SettingsActivity.class));
+                startActivityForResult(new Intent(this, SettingsActivity.class),
+                        SETTINGS_ACTIVITY_REQUEST_CODE);
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -707,6 +723,21 @@ public class MainActivity extends AppCompatActivity implements
         builder.create().show();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(this, String.format(Locale.UK,
+                "onActivityresult(%d, %d, %s)", requestCode, resultCode, data));
+        switch (requestCode) {
+            case SETTINGS_ACTIVITY_REQUEST_CODE:
+            case PRIVACY_ACTIVITY_REQUEST_CODE:
+                super.onActivityResult(requestCode, resultCode, data);
+                break;
+            default:
+                setResult(resultCode, data);
+                finish();
+                break;
+        }
+    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -715,7 +746,7 @@ public class MainActivity extends AppCompatActivity implements
                 toggleContinuousCapture();
             } else {
                 Log.d(this, "Finishing with RESULT_CANCELED");
-                appState.setResultCode(RESULT_CANCELED);
+                setResult(RESULT_CANCELED);
                 finish();
             }
             return true;

@@ -39,16 +39,9 @@ public class AlertActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.title)).setText(alertType.getAlertTitleId());
 
-        ((ImageView) findViewById(R.id.graphic)).setImageResource(alertType.getAlertMainDrawableId());
+        ((ImageView) findViewById(R.id.graphic)).setImageResource(alertType.getAlertDrawableId());
 
         ((TextView) findViewById(R.id.message)).setText(alertType.getAlertMessageId());
-
-        ImageView hintImageView = (ImageView) findViewById(R.id.hintGraphic);
-        if (alertType.getAlertHintDrawableId() != -1) {
-            hintImageView.setImageResource(alertType.getAlertHintDrawableId());
-        } else {
-            hintImageView.setVisibility(View.GONE);
-        }
 
         TextView alertLeftButtonTextView = (TextView) findViewById(R.id.left_button);
         if (alertType.isLeftButtonActive()) {
@@ -60,15 +53,15 @@ public class AlertActivity extends AppCompatActivity {
                         case BLUETOOTH_NOT_ENABLED:
                         case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
+                        case NETWORK_FAILURE:
+                        case SCANNER_UNREACHABLE:
                         case DISCONNECTED:
-                        case UNEXPECTED_ERROR:
-                            appState.setResultCode(InternalConstants.RESULT_TRY_AGAIN);
+                            setResult(InternalConstants.RESULT_TRY_AGAIN);
                             finish();
                             break;
-                        case INVALID_API_KEY:
-                        case BLUETOOTH_NOT_SUPPORTED:
+
                         default:
-                            appState.setResultCode(RESULT_CANCELED);
+                            setResult(RESULT_CANCELED);
                             finish();
                             break;
                     }
@@ -83,21 +76,16 @@ public class AlertActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     switch (alertType) {
-                        case INVALID_API_KEY:
-                            break;
-                        case BLUETOOTH_NOT_SUPPORTED:
-                            break;
                         case BLUETOOTH_NOT_ENABLED:
                         case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
-                        case DISCONNECTED:
+                        case SCANNER_UNREACHABLE:
                             Intent intent = new Intent();
                             intent.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
                             startActivity(intent);
                             break;
                         case UNEXPECTED_ERROR:
-                        default:
-                            appState.setResultCode(RESULT_CANCELED);
+                            setResult(InternalConstants.RESULT_TRY_AGAIN);
                             finish();
                             break;
                     }
@@ -109,7 +97,7 @@ public class AlertActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            appState.setResultCode(RESULT_CANCELED);
+            setResult(RESULT_CANCELED);
             finish();
             return true;
         } else {
