@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements
     private Registration registrationResult;
 
     private MenuItem continueItem;
+    private boolean promptContinue = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -272,6 +273,8 @@ public class MainActivity extends AppCompatActivity implements
         // Update indicators display
         int nbCollected = 0;
 
+        boolean goGreen = true;
+
         for (int i = 0; i < activeFingers.size(); i++) {
             boolean selected = currentActiveFingerNo == i;
             Finger finger = activeFingers.get(i);
@@ -279,6 +282,10 @@ public class MainActivity extends AppCompatActivity implements
 
             if (finger.getTemplate() != null) {
                 nbCollected++;
+            }
+            if(finger.getStatus() != Status.GOOD_SCAN
+                    && finger.getStatus() != Status.RESCAN_GOOD_SCAN){
+                goGreen = false;
             }
         }
 
@@ -300,9 +307,10 @@ public class MainActivity extends AppCompatActivity implements
             } else {
                 if (nbCollected == 0) {
                     continueItem.setIcon(R.drawable.ic_menu_forward_grey);
-                } else if (nbCollected == activeFingers.size()) {
+                } else if (goGreen) {
                     continueItem.setIcon(R.drawable.ic_menu_forward_green);
-                } else {
+                    promptContinue = true;
+                } else if (nbCollected > 0){
                     continueItem.setIcon(R.drawable.ic_menu_forward_white);
                 }
                 continueItem.setEnabled(nbCollected > 0);
@@ -346,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements
             case TRIGGER_PRESSED: // Trigger pressed
                 if (finger.getStatus() != Status.GOOD_SCAN) {
                     toggleContinuousCapture();
-                } else if (activeFingers.get(activeFingers.size() - 1).isLastFinger()) {
+                } else if (promptContinue) {
                     if (continueItem.isEnabled()) {
                         onActionForward();
                     }
