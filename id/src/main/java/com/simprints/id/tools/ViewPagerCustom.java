@@ -35,7 +35,9 @@ public class ViewPagerCustom extends ViewPager {
     }
 
     public void setScrollDuration(int duration) {
-        mScroller.setScrollDuration(duration);
+        if (mScroller != null) {
+            mScroller.setScrollDuration(duration);
+        }
     }
 
     private class FixedSpeedScroller extends Scroller {

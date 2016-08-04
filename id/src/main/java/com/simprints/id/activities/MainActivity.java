@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements
     private void nudgeMode() {
         SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        boolean nudge = sharedPref.getBoolean(getString(R.string.pref_nudge_mode_bool), false);
+        boolean nudge = sharedPref.getBoolean(getString(R.string.pref_nudge_mode_bool), true);
 
         if (nudge) {
             handler.postDelayed(new Runnable() {
