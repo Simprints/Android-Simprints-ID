@@ -102,11 +102,11 @@ public class AppState {
         return session;
     }
 
-    public void setHardwareVersion(byte hardwareVersion) {
+    public void setHardwareVersion(short hardwareVersion) {
         session.setHardwareVersion(hardwareVersion);
     }
 
-    public byte getHardwareVersion() {
+    public short getHardwareVersion() {
         return session.getHardwareVersion();
     }
 }
