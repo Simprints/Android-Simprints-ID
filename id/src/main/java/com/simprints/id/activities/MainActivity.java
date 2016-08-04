@@ -219,7 +219,11 @@ public class MainActivity extends AppCompatActivity implements
             case BAD_SCAN:
             case NOT_COLLECTED:
                 scanButton.setEnabled(false);
-                appState.getScanner().startContinuousCapture();
+                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                int qualityScore = sharedPref.getInt(getString(R.string.pref_quality_theshold), 60);
+                Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
+                appState.getScanner().startContinuousCapture(qualityScore);
                 break;
             case COLLECTING:
                 scanButton.setEnabled(false);
@@ -363,42 +367,23 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case CONTINUOUS_CAPTURE_SUCCESS: // Image captured successfully
-                appState.getScanner().extractImageQuality();
+                Arrays.fill(leds, Message.LED_STATE.LED_STATE_ON);
+                appState.getScanner().generateTemplate();
                 break;
 
             case CONTINUOUS_CAPTURE_ERROR:
                 break;
 
-            case EXTRACT_IMAGE_QUALITY_SUCCESS: // Image quality extracted successfully
-                int quality = appState.getScanner().getImageQuality();
-
-                Log.d(this, String.format(Locale.UK,
-                        "Extracted new template of quality %d for finger %s",
-                        quality, finger.getId().name()));
-
-                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                int qualityScore = sharedPref.getInt(getString(R.string.pref_quality_theshold), 60);
-                Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
-
-                if (quality >= qualityScore) {
-                    appState.getScanner().setGoodCaptureUI();
-                    Arrays.fill(leds, Message.LED_STATE.LED_STATE_GREEN);
-                } else {
-                    appState.getScanner().setBadCaptureUI();
-                    Arrays.fill(leds, Message.LED_STATE.LED_STATE_RED);
-                }
-                break;
 
             case GENERATE_TEMPLATE_SUCCESS: // Template generated successfully
                 appState.getScanner().extractTemplate();
                 break;
 
             case EXTRACT_TEMPLATE_SUCCESS: // Template extracted successfully
-                int quality1 = appState.getScanner().getImageQuality();
+                int quality = appState.getScanner().getImageQuality();
 
                 if (finger.getTemplate() == null ||
-                        finger.getTemplate().getQuality() < quality1) {
+                        finger.getTemplate().getQuality() < quality) {
                     Log.d(this, "Set template");
                     activeFingers.get(currentActiveFingerNo).setTemplate(appState.getScanner().getTemplate());
                 }
@@ -408,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements
                 int qualityScore1 = sharedPref1.getInt(getString(R.string.pref_quality_theshold), 60);
                 Log.d(this, "Quality Score: " + String.valueOf(qualityScore1));
 
-                if (quality1 >= qualityScore1) {
+                if (quality >= qualityScore1) {
                     activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
                     nudgeMode();
                 } else {
@@ -438,7 +423,11 @@ public class MainActivity extends AppCompatActivity implements
                 appState.getScanner().un20Wakeup();
 
             case UN20_WAKEUP_SUCCESS: // UN20 woken up successfully
-                appState.getScanner().startContinuousCapture();
+                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                int qualityScore = sharedPref.getInt(getString(R.string.pref_quality_theshold), 60);
+                Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
+                appState.getScanner().startContinuousCapture(qualityScore);
                 break;
 
 
@@ -455,9 +444,6 @@ public class MainActivity extends AppCompatActivity implements
             case DISCONNECTION_SUCCESS: // Successfully disconnected from scanner
             case UPDATE_SENSOR_INFO_SUCCESS: // Sensor info was successfully updated
             case SET_UI_SUCCESS: // UI was successfully set
-                if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
-                    appState.getScanner().generateTemplate();
-                }
                 break;
 
             case SEND_REQUEST_IO_ERROR: // Request sending failed because of an IO error
