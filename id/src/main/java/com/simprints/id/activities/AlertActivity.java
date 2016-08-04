@@ -56,12 +56,12 @@ public class AlertActivity extends AppCompatActivity {
                         case NETWORK_FAILURE:
                         case SCANNER_UNREACHABLE:
                         case DISCONNECTED:
-                            appState.setResultCode(InternalConstants.RESULT_TRY_AGAIN);
+                            setResult(InternalConstants.RESULT_TRY_AGAIN);
                             finish();
                             break;
 
                         default:
-                            appState.setResultCode(RESULT_CANCELED);
+                            setResult(RESULT_CANCELED);
                             finish();
                             break;
                     }
@@ -85,7 +85,7 @@ public class AlertActivity extends AppCompatActivity {
                             startActivity(intent);
                             break;
                         case UNEXPECTED_ERROR:
-                            appState.setResultCode(InternalConstants.RESULT_TRY_AGAIN);
+                            setResult(InternalConstants.RESULT_TRY_AGAIN);
                             finish();
                             break;
                     }
@@ -97,7 +97,7 @@ public class AlertActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            appState.setResultCode(RESULT_CANCELED);
+            setResult(RESULT_CANCELED);
             finish();
             return true;
         } else {
