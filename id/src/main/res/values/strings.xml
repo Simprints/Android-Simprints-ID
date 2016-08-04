@@ -87,6 +87,7 @@
 
     <!--Main app-->
     <string name="scan_label">SCAN</string>
+    <string name="bluetooth_error_title">BLUETOOTH ERROR</string>
     <string name="configuration_error_title">CONFIGURATION ERROR</string>
     <string name="missing_user_id_message">A configuration error has occurred (missing user id), please contact your system administrator</string>
     <string name="missing_device_id_message">A configuration error has occurred (missing device id), please contact your system administrator</string>
