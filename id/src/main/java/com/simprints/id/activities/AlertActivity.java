@@ -61,10 +61,12 @@ public class AlertActivity extends AppCompatActivity {
                         case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
                         case DISCONNECTED:
+                        case UNEXPECTED_ERROR:
                             appState.setResultCode(InternalConstants.RESULT_TRY_AGAIN);
                             finish();
                             break;
-
+                        case INVALID_API_KEY:
+                        case BLUETOOTH_NOT_SUPPORTED:
                         default:
                             appState.setResultCode(RESULT_CANCELED);
                             finish();
@@ -81,6 +83,10 @@ public class AlertActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     switch (alertType) {
+                        case INVALID_API_KEY:
+                            break;
+                        case BLUETOOTH_NOT_SUPPORTED:
+                            break;
                         case BLUETOOTH_NOT_ENABLED:
                         case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
@@ -90,7 +96,8 @@ public class AlertActivity extends AppCompatActivity {
                             startActivity(intent);
                             break;
                         case UNEXPECTED_ERROR:
-                            appState.setResultCode(InternalConstants.RESULT_TRY_AGAIN);
+                        default:
+                            appState.setResultCode(RESULT_CANCELED);
                             finish();
                             break;
                     }
