@@ -35,7 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
         sharedPref = getApplicationContext().getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
-        boolean nudge = sharedPref.getBoolean(getString(R.string.pref_nudge_mode_bool), false);
+        boolean nudge = sharedPref.getBoolean(getString(R.string.pref_nudge_mode_bool), true);
         CheckBox checkBox = (CheckBox) findViewById(R.id.nudgeCheckBox);
         checkBox.setChecked(nudge);
 

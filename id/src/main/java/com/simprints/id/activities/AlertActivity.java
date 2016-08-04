@@ -39,9 +39,16 @@ public class AlertActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.title)).setText(alertType.getAlertTitleId());
 
-        ((ImageView) findViewById(R.id.graphic)).setImageResource(alertType.getAlertDrawableId());
+        ((ImageView) findViewById(R.id.graphic)).setImageResource(alertType.getAlertMainDrawableId());
 
         ((TextView) findViewById(R.id.message)).setText(alertType.getAlertMessageId());
+
+        ImageView hintImageView = (ImageView) findViewById(R.id.hintGraphic);
+        if (alertType.getAlertHintDrawableId() != -1) {
+            hintImageView.setImageResource(alertType.getAlertHintDrawableId());
+        } else {
+            hintImageView.setVisibility(View.GONE);
+        }
 
         TextView alertLeftButtonTextView = (TextView) findViewById(R.id.left_button);
         if (alertType.isLeftButtonActive()) {
@@ -53,8 +60,6 @@ public class AlertActivity extends AppCompatActivity {
                         case BLUETOOTH_NOT_ENABLED:
                         case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
-                        case NETWORK_FAILURE:
-                        case SCANNER_UNREACHABLE:
                         case DISCONNECTED:
                             appState.setResultCode(InternalConstants.RESULT_TRY_AGAIN);
                             finish();
@@ -79,7 +84,7 @@ public class AlertActivity extends AppCompatActivity {
                         case BLUETOOTH_NOT_ENABLED:
                         case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
-                        case SCANNER_UNREACHABLE:
+                        case DISCONNECTED:
                             Intent intent = new Intent();
                             intent.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
                             startActivity(intent);

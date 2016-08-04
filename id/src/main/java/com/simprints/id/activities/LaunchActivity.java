@@ -42,20 +42,17 @@ public class LaunchActivity extends AppCompatActivity
 
     private final static int MINIMUM_DISPLAY_DURATION = 2500;
     private final static int CONNECTION_AND_VALIDATION_TIMEOUT = 10000;
-
+    private static Handler handler;
+    boolean waitingForConfirmation;
+    boolean finishing;
+    ProgressBar progressBar;
+    TextView confirmConsentTextView;
     private AppState appState;
     private PositionTracker positionTracker;
-    private static Handler handler;
-
     private String callingPackage;
     private boolean isDataReady;
     private long minEndTime;
-    boolean waitingForConfirmation;
     private boolean childActivityLaunched;
-    boolean finishing;
-
-    ProgressBar progressBar;
-    TextView confirmConsentTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +83,7 @@ public class LaunchActivity extends AppCompatActivity
             return;
         }
 
-        switch(getIntent().getAction()) {
+        switch (getIntent().getAction()) {
             case Constants.SIMPRINTS_IDENTIFY_INTENT:
                 appState.setEnrol(false);
                 break;
@@ -101,7 +98,7 @@ public class LaunchActivity extends AppCompatActivity
         // Sets apiKey
         String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
         if (apiKey == null) {
-            launchAlert(ALERT_TYPE.MISSING_API_KEY);
+            finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null);
             Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
             return;
         }
@@ -131,7 +128,6 @@ public class LaunchActivity extends AppCompatActivity
         callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
         Log.d(this, String.format(Locale.UK, "callingPackage = %s", callingPackage));
 
-
         // Initializes result
         appState.setResultCode(RESULT_CANCELED);
         appState.setResultData(new Intent(appState.isEnrol()
@@ -140,16 +136,13 @@ public class LaunchActivity extends AppCompatActivity
 
         // Initializes the position tracker
 
-
-
         // Initializes the session Data object
         appState.setData(new Data(getApplicationContext()));
         appState.getData().setDataListener(this);
         Log.d(this, "Data object initialised");
         Log.d(this, "Validating apiKey");
         appState.getData().validateApiKey(appState.getApiKey());
-
-
+        
         connect();
     }
 
@@ -300,7 +293,7 @@ public class LaunchActivity extends AppCompatActivity
                 launchAlert(ALERT_TYPE.NOT_PAIRED);
                 break;
             case CONNECTION_SCANNER_UNREACHABLE:
-                launchAlert(ALERT_TYPE.SCANNER_UNREACHABLE);
+                launchAlert(ALERT_TYPE.DISCONNECTED);
                 break;
             case NOT_CONNECTED:
             case NO_RESPONSE:
@@ -315,7 +308,7 @@ public class LaunchActivity extends AppCompatActivity
 
             case UN20_WAKEUP_SUCCESS:
             case UN20_WAKEUP_INVALID_STATE:
-                appState.getScanner().setUI(true, null, (short)-1);
+                appState.getScanner().setUI(true, null, (short) -1);
                 break;
 
             case SET_UI_SUCCESS:
@@ -375,15 +368,13 @@ public class LaunchActivity extends AppCompatActivity
                 break;
 
             case NETWORK_FAILURE:
-                launchAlert(ALERT_TYPE.NETWORK_FAILURE);
                 break;
         }
     }
 
     private void resolveCommCareDatabase() {
         if (ContextCompat.checkSelfPermission(this, "org.commcare.dalvik.provider.cases.read")
-                != PackageManager.PERMISSION_GRANTED)
-        {
+                != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{"org.commcare.dalvik.provider.cases.read"},
                     InternalConstants.COMMCARE_PERMISSION_REQUEST);
@@ -394,8 +385,7 @@ public class LaunchActivity extends AppCompatActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
-                                           @NonNull int[] grantResults)
-    {
+                                           @NonNull int[] grantResults) {
         positionTracker.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case InternalConstants.COMMCARE_PERMISSION_REQUEST:
@@ -450,7 +440,7 @@ public class LaunchActivity extends AppCompatActivity
     public void onDestroy() {
         Log.d(this, "onDestroy");
         handler.removeCallbacksAndMessages(null);
-        if(appState.getData() != null && appState.getReadyToSendSession() != null) {
+        if (appState.getData() != null && appState.getReadyToSendSession() != null) {
             appState.getData().saveSession(appState.getApiKey(), appState.getReadyToSendSession());
         }
         positionTracker.finish();

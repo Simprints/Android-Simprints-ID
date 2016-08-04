@@ -4,45 +4,47 @@ import com.simprints.id.R;
 
 public enum ALERT_TYPE {
 
-    MISSING_API_KEY(R.string.configuration_error_title, R.string.missing_apikey_message,
-            R.drawable.configuration_error, R.string.close, R.string.empty, false),
+    //Configuration errors
     INVALID_API_KEY(R.string.configuration_error_title, R.string.invalid_apikey_message,
-            R.drawable.configuration_error, R.string.close, R.string.empty, false),
+            R.drawable.configuration_error, R.drawable.error_hint_key, R.string.close, R.string.empty, false),
 
-    BLUETOOTH_NOT_SUPPORTED(R.string.bluetooth_not_supported_title, R.string.bluetooth_not_supported_message,
-            R.drawable.bluetooth_not_supported, R.string.close, R.string.empty, false),
-    BLUETOOTH_NOT_ENABLED(R.string.bluetooth_not_enabled_title, R.string.bluetooth_not_enabled_message,
-            R.drawable.bluetooth_not_enabled, R.string.try_again_label, R.string.settings_label, false),
-    NOT_PAIRED(R.string.unbonded_scanner_title, R.string.unbonded_scanner_message,
-            R.drawable.no_scanner_found, R.string.try_again_label, R.string.settings_label, true),
-    MULTIPLE_PAIRED_SCANNERS(R.string.multiple_scanners_found_title, R.string.multiple_scanners_found_message,
-            R.drawable.multiple_scanners_found, R.string.try_again_label, R.string.settings_label, true),
-    SCANNER_UNREACHABLE(R.string.scanner_unreachable, R.string.scanner_unreachable_message,
-            R.drawable.generic_failure, R.string.try_again_label, R.string.settings_label, true),
+    //Bluetooth errors
+    BLUETOOTH_NOT_SUPPORTED(R.string.bluetooth_error_title, R.string.bluetooth_not_supported_message,
+            R.drawable.bluetooth_not_supported, R.drawable.bluetooth_not_supported,
+            R.string.try_again_label, R.string.settings_label, false),
+    BLUETOOTH_NOT_ENABLED(R.string.bluetooth_error_title, R.string.bluetooth_not_enabled_message,
+            R.drawable.bluetooth_not_supported, R.drawable.bluetooth_not_enabled,
+            R.string.try_again_label, R.string.settings_label, true),
+    NOT_PAIRED(R.string.bluetooth_error_title, R.string.unbonded_scanner_message,
+            R.drawable.bluetooth_not_supported, R.drawable.no_scanner_found,
+            R.string.try_again_label, R.string.settings_label, true),
+    MULTIPLE_PAIRED_SCANNERS(R.string.bluetooth_error_title, R.string.multiple_scanners_found_message,
+            R.drawable.bluetooth_not_supported, R.drawable.multiple_scanners_found,
+            R.string.try_again_label, R.string.settings_label, true),
 
+    //Scanner connection errors
     DISCONNECTED(R.string.disconnected_title, R.string.disconnected_message,
-            R.drawable.no_scanner_found, R.string.reconnect_label, R.string.empty, true),
+            R.drawable.no_scanner_found, -1, R.string.reconnect_label, R.string.empty, true),
 
-    NETWORK_FAILURE(R.string.network_failure_title, R.string.network_failure_message,
-            R.drawable.generic_failure, R.string.try_again_label, R.string.empty, false),
-
+    //Unexpected errors
     UNEXPECTED_ERROR(R.string.error_occurred_title, R.string.unforeseen_error_message,
-            R.drawable.generic_failure, R.string.close, R.string.try_again_label, true);
+            R.drawable.generic_failure, -1, R.string.close, R.string.try_again_label, true);
 
     private int alertTitleId;
     private int alertMessageId;
-    private int alertDrawableId;
+    private int alertMainDrawableId;
+    private int alertHintDrawableId;
     private int alertLeftButtonTextId;
     private int alertRightButtonTextId;
     private boolean mustBeLogged;
 
-    ALERT_TYPE(int alertTitleId, int alertMessageId, int alertDrawableId,
+    ALERT_TYPE(int alertTitleId, int alertMessageId, int alertDrawableId, int alertHintDrawableId,
                int alertLeftButtonTextId, int alertRightButtonTextId,
-               boolean mustBeLogged)
-    {
+               boolean mustBeLogged) {
         this.alertTitleId = alertTitleId;
         this.alertMessageId = alertMessageId;
-        this.alertDrawableId = alertDrawableId;
+        this.alertMainDrawableId = alertDrawableId;
+        this.alertHintDrawableId = alertHintDrawableId;
         this.alertLeftButtonTextId = alertLeftButtonTextId;
         this.alertRightButtonTextId = alertRightButtonTextId;
         this.mustBeLogged = mustBeLogged;
@@ -56,8 +58,8 @@ public enum ALERT_TYPE {
         return alertMessageId;
     }
 
-    public int getAlertDrawableId() {
-        return alertDrawableId;
+    public int getAlertMainDrawableId() {
+        return alertMainDrawableId;
     }
 
     public boolean isLeftButtonActive() {
@@ -78,5 +80,13 @@ public enum ALERT_TYPE {
 
     public boolean mustBeLogged() {
         return mustBeLogged;
+    }
+
+    public int getAlertHintDrawableId() {
+        return alertHintDrawableId;
+    }
+
+    public void setAlertHintDrawableId(int alertHintDrawableId) {
+        this.alertHintDrawableId = alertHintDrawableId;
     }
 }
