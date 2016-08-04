@@ -10,21 +10,21 @@ public enum ALERT_TYPE {
 
     //Bluetooth errors
     BLUETOOTH_NOT_SUPPORTED(R.string.bluetooth_error_title, R.string.bluetooth_not_supported_message,
-            R.drawable.bluetooth_not_supported, R.drawable.bluetooth_not_supported,
+            R.drawable.bt_error_icon, R.drawable.bluetooth_not_enabled,
             R.string.try_again_label, R.string.settings_label, false),
     BLUETOOTH_NOT_ENABLED(R.string.bluetooth_error_title, R.string.bluetooth_not_enabled_message,
-            R.drawable.bluetooth_not_supported, R.drawable.bluetooth_not_enabled,
+            R.drawable.bt_error_icon, R.drawable.bluetooth_not_enabled,
             R.string.try_again_label, R.string.settings_label, true),
     NOT_PAIRED(R.string.bluetooth_error_title, R.string.unbonded_scanner_message,
-            R.drawable.bluetooth_not_supported, R.drawable.no_scanner_found,
+            R.drawable.bt_error_icon, R.drawable.scanner_error_icon,
             R.string.try_again_label, R.string.settings_label, true),
     MULTIPLE_PAIRED_SCANNERS(R.string.bluetooth_error_title, R.string.multiple_scanners_found_message,
-            R.drawable.bluetooth_not_supported, R.drawable.multiple_scanners_found,
+            R.drawable.bt_error_icon, R.drawable.multiple_scanners_found,
             R.string.try_again_label, R.string.settings_label, true),
 
     //Scanner connection errors
     DISCONNECTED(R.string.disconnected_title, R.string.disconnected_message,
-            R.drawable.no_scanner_found, -1, R.string.try_again_label, R.string.settings_label, true),
+            R.drawable.scanner_error_icon, -1, R.string.try_again_label, R.string.settings_label, true),
 
     //Unexpected errors
     UNEXPECTED_ERROR(R.string.error_occurred_title, R.string.unforeseen_error_message,
