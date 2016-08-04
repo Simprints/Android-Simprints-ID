@@ -3,8 +3,10 @@
 
     <item android:title="@string/fingerprints_menu">
         <menu>
+            <item android:id="@+id/nav_autoAdd" android:icon="@drawable/ic_menu_add_finger"
+                android:title="@string/nav_add_finger" />
             <item android:id="@+id/nav_add" android:icon="@drawable/ic_menu_fingerprint"
-                android:title="Add" />
+                android:title="@string/nav_select_finger" />
         </menu>
     </item>
 
@@ -26,7 +28,7 @@
     <item android:title="@string/configuration_menu">
         <menu>
             <item android:id="@+id/nav_settings" android:icon="@drawable/ic_menu_manage"
-                android:title="Settings" />
+                android:title="@string/nav_settings" />
         </menu>
     </item>
 
