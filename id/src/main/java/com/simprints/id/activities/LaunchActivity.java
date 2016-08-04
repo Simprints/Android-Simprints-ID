@@ -51,7 +51,6 @@ public class LaunchActivity extends AppCompatActivity
     private boolean isDataReady;
     private long minEndTime;
     boolean waitingForConfirmation;
-    private boolean childActivityLaunched;
     boolean finishing;
 
     ProgressBar progressBar;
@@ -73,7 +72,6 @@ public class LaunchActivity extends AppCompatActivity
         isDataReady = false;
         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
         waitingForConfirmation = false;
-        childActivityLaunched = false;
         finishing = false;
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -130,16 +128,6 @@ public class LaunchActivity extends AppCompatActivity
         // Sets calling package
         callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
         Log.d(this, String.format(Locale.UK, "callingPackage = %s", callingPackage));
-
-
-        // Initializes result
-        appState.setResultCode(RESULT_CANCELED);
-        appState.setResultData(new Intent(appState.isEnrol()
-                ? Constants.SIMPRINTS_REGISTER_INTENT
-                : Constants.SIMPRINTS_IDENTIFY_INTENT));
-
-        // Initializes the position tracker
-
 
 
         // Initializes the session Data object
@@ -240,30 +228,36 @@ public class LaunchActivity extends AppCompatActivity
         }, remainingTime);
     }
 
-    private void launch(@NonNull final Intent intent) {
-        // The activity must last at least MINIMUM_DISPLAY_DURATION
-        // to avoid disorienting the user.
-        final long remainingTime = Math.max(0, minEndTime - SystemClock.elapsedRealtime());
-        Log.d(this, String.format(Locale.UK, "Waiting %d ms to start child activity %s",
-                remainingTime, intent.getAction()));
+    private void launch(@NonNull final Intent intent, boolean delayed) {
         handler.removeCallbacksAndMessages(null);
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(LaunchActivity.this, String.format(Locale.UK,
-                        "Starting child activity %s", intent.getAction()));
-                childActivityLaunched = true;
-                startActivity(intent);
-            }
-        }, remainingTime);
+        // The activity must last at least MINIMUM_DISPLAY_DURATION
+        // Before throwing an alert screen to avoid disorienting the user.
+        if (delayed) {
+            final long remainingTime = Math.max(0, minEndTime - SystemClock.elapsedRealtime());
+            Log.d(this, String.format(Locale.UK, "Waiting %d ms to start child activity %s",
+                    remainingTime, intent.getAction()));
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(LaunchActivity.this, String.format(Locale.UK,
+                            "Starting child activity %s", intent.getAction()));
+                    startActivityForResult(intent, 0);
+                }
+            }, remainingTime);
+        } else {
+            Log.d(LaunchActivity.this, String.format(Locale.UK,
+                    "Starting child activity %s", intent.getAction()));
+            startActivityForResult(intent, 0);
+        }
 
     }
 
     private void launchAlert(ALERT_TYPE alertType) {
+        appState.setScanner(null);
         handler.removeCallbacksAndMessages(null);
         Intent intent = new Intent(this, AlertActivity.class);
         intent.putExtra(InternalConstants.ALERT_TYPE_EXTRA, alertType);
-        launch(intent);
+        launch(intent, true);
     }
 
     private void waitForConfirmation() {
@@ -275,7 +269,8 @@ public class LaunchActivity extends AppCompatActivity
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (waitingForConfirmation) {
-            launch(new Intent(LaunchActivity.this, MainActivity.class));
+            waitingForConfirmation = false;
+            launch(new Intent(LaunchActivity.this, MainActivity.class), false);
             return true;
         } else {
             return super.onTouchEvent(event);
@@ -294,12 +289,15 @@ public class LaunchActivity extends AppCompatActivity
                 break;
 
             case CONNECTION_BLUETOOTH_DISABLED:
+                appState.setScanner(null);
                 launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
                 break;
             case CONNECTION_SCANNER_UNBONDED:
+                appState.setScanner(null);
                 launchAlert(ALERT_TYPE.NOT_PAIRED);
                 break;
             case CONNECTION_SCANNER_UNREACHABLE:
+                appState.setScanner(null);
                 launchAlert(ALERT_TYPE.SCANNER_UNREACHABLE);
                 break;
             case NOT_CONNECTED:
@@ -324,7 +322,7 @@ public class LaunchActivity extends AppCompatActivity
 
             case TRIGGER_PRESSED:
                 if (waitingForConfirmation) {
-                    launch(new Intent(LaunchActivity.this, MainActivity.class));
+                    launch(new Intent(LaunchActivity.this, MainActivity.class), false);
                 }
                 break;
 
@@ -415,31 +413,25 @@ public class LaunchActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(this, String.format(Locale.UK,
+                "onActivityResult, resultCode = %d", resultCode));
+
         positionTracker.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == InternalConstants.RESULT_TRY_AGAIN) {
+            progressBar.setVisibility(View.VISIBLE);
+            confirmConsentTextView.setVisibility(View.GONE);
+            minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
+            finishing = false;
+            connect();
+        } else {
+            finishWith(resultCode, data);
+        }
+
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(this, String.format(Locale.UK,
-                "onResume, returning from child activity ? %s, resultCode = %d, resultData = %s",
-                childActivityLaunched ? "yes" : "no",
-                appState.getResultCode(), appState.getResultData()));
 
-        // If just went back from a child activity
-        if (childActivityLaunched) {
-            if (appState.getResultCode() == InternalConstants.RESULT_TRY_AGAIN) {
-                minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
-                childActivityLaunched = false;
-                finishing = false;
-                connect();
-            } else {
-                finishWith(appState.getResultCode(), appState.getResultData());
-            }
-        }
-
-    }
 
     @Override
     public void onBackPressed() {
