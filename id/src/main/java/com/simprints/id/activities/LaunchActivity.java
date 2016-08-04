@@ -324,7 +324,7 @@ public class LaunchActivity extends AppCompatActivity
                 break;
 
             case UPDATE_SENSOR_INFO_SUCCESS:
-                appState.setHardwareVersion(appState.getScanner().getHardwareVersion());
+                appState.setHardwareVersion(appState.getScanner().getUcVersion());
                 waitForConfirmation();
                 break;
 
