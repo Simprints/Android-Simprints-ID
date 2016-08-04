@@ -300,6 +300,7 @@ public class LaunchActivity extends AppCompatActivity
                 appState.setScanner(null);
                 launchAlert(ALERT_TYPE.SCANNER_UNREACHABLE);
                 break;
+
             case NOT_CONNECTED:
             case NO_RESPONSE:
             case SEND_REQUEST_IO_ERROR:
@@ -308,6 +309,8 @@ public class LaunchActivity extends AppCompatActivity
             case UN20_WAKEUP_FAILURE:
             case SCANNER_BUSY:
             case UN20_CANNOT_CHECK_STATE:
+            case SET_UI_FAILURE:
+            case UPDATE_SENSOR_INFO_FAILURE:
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 break;
 
@@ -317,6 +320,11 @@ public class LaunchActivity extends AppCompatActivity
                 break;
 
             case SET_UI_SUCCESS:
+                appState.getScanner().updateSensorInfo();
+                break;
+
+            case UPDATE_SENSOR_INFO_SUCCESS:
+                appState.setHardwareVersion(appState.getScanner().getHardwareVersion());
                 waitForConfirmation();
                 break;
 
@@ -324,10 +332,6 @@ public class LaunchActivity extends AppCompatActivity
                 if (waitingForConfirmation) {
                     launch(new Intent(LaunchActivity.this, MainActivity.class), false);
                 }
-                break;
-
-            case SET_UI_FAILURE:
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 break;
         }
     }
