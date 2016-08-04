@@ -101,4 +101,12 @@ public class AppState {
         session.setEndTime(c.getTime());
         return session;
     }
+
+    public void setHardwareVersion(byte hardwareVersion) {
+        session.setHardwareVersion(hardwareVersion);
+    }
+
+    public byte getHardwareVersion() {
+        return session.getHardwareVersion();
+    }
 }
