@@ -142,7 +142,7 @@ public class LaunchActivity extends AppCompatActivity
         Log.d(this, "Data object initialised");
         Log.d(this, "Validating apiKey");
         appState.getData().validateApiKey(appState.getApiKey());
-        
+
         connect();
     }
 

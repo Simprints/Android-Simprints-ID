@@ -6,7 +6,7 @@ public enum ALERT_TYPE {
 
     //Configuration errors
     INVALID_API_KEY(R.string.configuration_error_title, R.string.invalid_apikey_message,
-            R.drawable.configuration_error, R.drawable.error_hint_key, R.string.close, R.string.empty, false),
+            R.drawable.error_icon, R.drawable.error_hint_key, R.string.close, R.string.empty, false),
 
     //Bluetooth errors
     BLUETOOTH_NOT_SUPPORTED(R.string.bluetooth_error_title, R.string.bluetooth_not_supported_message,
@@ -24,11 +24,11 @@ public enum ALERT_TYPE {
 
     //Scanner connection errors
     DISCONNECTED(R.string.disconnected_title, R.string.disconnected_message,
-            R.drawable.no_scanner_found, -1, R.string.reconnect_label, R.string.empty, true),
+            R.drawable.no_scanner_found, -1, R.string.try_again_label, R.string.settings_label, true),
 
     //Unexpected errors
     UNEXPECTED_ERROR(R.string.error_occurred_title, R.string.unforeseen_error_message,
-            R.drawable.generic_failure, -1, R.string.close, R.string.try_again_label, true);
+            R.drawable.error_icon, -1, R.string.try_again_label, R.string.close, true);
 
     private int alertTitleId;
     private int alertMessageId;

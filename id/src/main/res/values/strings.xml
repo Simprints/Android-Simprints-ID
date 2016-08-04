@@ -102,10 +102,8 @@
     <string name="unbonded_scanner_message">Scanner not paired, please make sure it is paired in settings and try again</string>
     <string name="multiple_scanners_found_title">MULTIPLE PAIRED SCANNERS</string>
     <string name="multiple_scanners_found_message">More than one scanner is paired to the phone, please unpair un-needed scanners</string>
-    <string name="scanner_unreachable">SCANNER UNREACHABLE</string>
-    <string name="scanner_unreachable_message">The scanner is unreachable, please make sure it is powered on and close to the phone</string>
-    <string name="disconnected_title">DISCONNECTED FROM SCANNER</string>
-    <string name="disconnected_message">Got disconnected from the scanner, please make sure it is powered on and close to the phone, then reconnect</string>
+    <string name="disconnected_title">SCANNER NOT FOUND</string>
+    <string name="disconnected_message">The scanner is unreachable, please make sure it is powered on and close to the phone</string>
     <string name="application_not_authorised_message">The application is not authorised, please contact your system administrator</string>
     <string name="close">CLOSE</string>
     <string name="title_activity_main">MainActivity</string>
