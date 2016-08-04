@@ -39,7 +39,14 @@ public class AlertActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.title)).setText(alertType.getAlertTitleId());
 
-        ((ImageView) findViewById(R.id.graphic)).setImageResource(alertType.getAlertDrawableId());
+        ((ImageView) findViewById(R.id.graphic)).setImageResource(alertType.getAlertMainDrawableId());
+
+        ImageView alertHint = (ImageView) findViewById(R.id.hintGraphic);
+        if (alertType.getAlertHintDrawableId() != -1) {
+            alertHint.setImageResource(alertType.getAlertHintDrawableId());
+        } else {
+            alertHint.setVisibility(View.GONE);
+        }
 
         ((TextView) findViewById(R.id.message)).setText(alertType.getAlertMessageId());
 
@@ -50,16 +57,16 @@ public class AlertActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     switch (alertType) {
+                        case UNEXPECTED_ERROR:
                         case BLUETOOTH_NOT_ENABLED:
                         case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
-                        case NETWORK_FAILURE:
-                        case SCANNER_UNREACHABLE:
                         case DISCONNECTED:
                             setResult(InternalConstants.RESULT_TRY_AGAIN);
                             finish();
                             break;
-
+                        case INVALID_API_KEY:
+                        case BLUETOOTH_NOT_SUPPORTED:
                         default:
                             setResult(RESULT_CANCELED);
                             finish();
@@ -79,13 +86,16 @@ public class AlertActivity extends AppCompatActivity {
                         case BLUETOOTH_NOT_ENABLED:
                         case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
-                        case SCANNER_UNREACHABLE:
+                        case DISCONNECTED:
                             Intent intent = new Intent();
                             intent.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
                             startActivity(intent);
                             break;
+                        case INVALID_API_KEY:
+                        case BLUETOOTH_NOT_SUPPORTED:
                         case UNEXPECTED_ERROR:
-                            setResult(InternalConstants.RESULT_TRY_AGAIN);
+                        default:
+                            setResult(RESULT_CANCELED);
                             finish();
                             break;
                     }
