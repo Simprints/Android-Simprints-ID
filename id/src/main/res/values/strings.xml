@@ -34,7 +34,7 @@
     <string name="r_4_finger_name">RIGHT FOURTH FINGER</string>
     <string name="r_5_finger_name">RIGHT FIFTH FINGER</string>
 
-    <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your health records. If that’s not OK or you have any questions let me know, otherwise please place your left index finger flat on the sensor.</string>
+    <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your health records. If that’s not OK or you have any questions let me know, otherwise please place your left thumb flat on the sensor.</string>
 
     <string name="long_consent">
         <b><u>Privacy and Consent</u></b>\n\n
@@ -139,5 +139,8 @@
     <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
     <string name="quality_threshold_text_view">Quality Threshold</string>
     <string name="menu_continue">Continue</string>
+    <string name="nav_add_finger">Add Finger</string>
+    <string name="nav_select_finger">Select Finger</string>
+    <string name="nav_settings">Settings</string>
 
 </resources>

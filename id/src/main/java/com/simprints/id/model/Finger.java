@@ -1,5 +1,6 @@
 package com.simprints.id.model;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -10,7 +11,7 @@ import com.simprints.libcommon.Template;
 import com.simprints.libsimprints.FingerIdentifier;
 
 
-public class Finger implements Parcelable, Comparable<Finger> {
+public class Finger implements Parcelable, Comparable<Finger>{
 
     public final static int NB_OF_FINGERS = 10;
     public static final Parcelable.Creator<Finger> CREATOR
@@ -28,13 +29,15 @@ public class Finger implements Parcelable, Comparable<Finger> {
     private Status status;
     private Template template;
     private boolean lastFinger;
+    private int priority;
 
-    public Finger(@NonNull FingerIdentifier id, boolean isActive, boolean isLastFinger) {
+    public Finger(@NonNull FingerIdentifier id, boolean isActive, boolean isLastFinger, int priority) {
         this.id = id;
         this.isActive = isActive;
         this.status = Status.NOT_COLLECTED;
         this.template = null;
         this.lastFinger = isLastFinger;
+        this.priority = priority;
     }
 
 
@@ -108,7 +111,7 @@ public class Finger implements Parcelable, Comparable<Finger> {
 
     @Override
     public int compareTo(@NonNull Finger other) {
-        return this.id.ordinal() - other.id.ordinal();
+        return this.priority - other.priority;
     }
 
     public boolean isLastFinger() {
@@ -117,6 +120,10 @@ public class Finger implements Parcelable, Comparable<Finger> {
 
     public void setLastFinger(boolean lastFinger) {
         this.lastFinger = lastFinger;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 
     public enum Status {
