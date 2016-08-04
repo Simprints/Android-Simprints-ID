@@ -1,7 +1,5 @@
 package com.simprints.id.tools;
 
-import android.content.Intent;
-
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.simprints.libcommon.Session;
 import com.simprints.libdata.Data;
@@ -27,8 +25,6 @@ public class AppState {
     private Data data;
     private Session session;
     private GoogleApiClient googleApiClient;
-    private int resultCode;
-    private Intent resultData;
 
     protected AppState() {
         scanner = null;
@@ -37,8 +33,6 @@ public class AppState {
         googleApiClient = null;
         Calendar c = Calendar.getInstance();
         session.setStartTime(c.getTime());
-        resultCode = 0;
-        resultData = null;
     }
 
 
@@ -102,25 +96,17 @@ public class AppState {
         return session.getLongitude();
     }
 
-    public int getResultCode() {
-        return resultCode;
-    }
-
-    public void setResultCode(int resultCode) {
-        this.resultCode = resultCode;
-    }
-
-    public Intent getResultData() {
-        return resultData;
-    }
-
-    public void setResultData(Intent resultData) {
-        this.resultData = resultData;
-    }
-
     public Session getReadyToSendSession() {
         Calendar c = Calendar.getInstance();
         session.setEndTime(c.getTime());
         return session;
+    }
+
+    public void setHardwareVersion(byte hardwareVersion) {
+        session.setHardwareVersion(hardwareVersion);
+    }
+
+    public byte getHardwareVersion() {
+        return session.getHardwareVersion();
     }
 }

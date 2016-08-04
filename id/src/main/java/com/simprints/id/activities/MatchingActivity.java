@@ -1,5 +1,6 @@
 package com.simprints.id.activities;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
@@ -117,8 +118,9 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
                     }
                 }
                 // finish
-                appState.setResultCode(RESULT_OK);
-                appState.getResultData().putExtra(Constants.SIMPRINTS_IDENTIFICATIONS, top5Candidates);
+                Intent resultData = new Intent(Constants.SIMPRINTS_IDENTIFY_INTENT);
+                resultData.putExtra(Constants.SIMPRINTS_IDENTIFICATIONS, top5Candidates);
+                setResult(RESULT_OK, resultData);
                 finish();
                 break;
         }
