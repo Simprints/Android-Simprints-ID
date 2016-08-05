@@ -20,11 +20,10 @@ public class SettingsActivity extends AppCompatActivity {
     private final static int MAX_QUALITY = 99;
     private final static int MIN_NB_OF_IDS = 1;
     private final static int MAX_NB_OF_IDS = 20;
-
-    private SharedPreferences sharedPref;
     ToggleButton nudgeToggleButton;
     SeekBar qualitySeekbar;
     SeekBar nbOfIdsSeekbar;
+    private SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +59,7 @@ public class SettingsActivity extends AppCompatActivity {
         final int qualityThreshold = sharedPref.getInt(
                 getString(R.string.pref_quality_theshold), 60) - MIN_QUALITY;
         qualitySeekbar = (SeekBar) findViewById(R.id.qualitySeekBar);
-        qualitySeekbar.setMax(MAX_QUALITY-MIN_QUALITY);
+        qualitySeekbar.setMax(MAX_QUALITY - MIN_QUALITY);
         qualitySeekbar.setProgress(qualityThreshold);
         qualityThresholdTextView.setText(String.format(
                 getString(R.string.quality_threshold_value), qualityThreshold + MIN_QUALITY));
@@ -73,10 +72,12 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         ((TextView) findViewById(R.id.minNbOfIdsTextView)).setText(String.valueOf(MIN_NB_OF_IDS));
@@ -97,10 +98,12 @@ public class SettingsActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
     }
 
