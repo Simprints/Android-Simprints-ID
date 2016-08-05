@@ -41,7 +41,7 @@ public class LaunchActivity extends AppCompatActivity
         implements Scanner.ScannerListener, Data.DataListener {
 
     private final static int MINIMUM_DISPLAY_DURATION = 2500;
-    private final static int CONNECTION_AND_VALIDATION_TIMEOUT = 10000;
+    private final static int CONNECTION_AND_VALIDATION_TIMEOUT = 15000;
     private static Handler handler;
     boolean waitingForConfirmation;
     boolean finishing;
