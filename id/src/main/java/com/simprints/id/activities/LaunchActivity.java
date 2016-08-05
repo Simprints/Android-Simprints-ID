@@ -77,7 +77,8 @@ public class LaunchActivity extends AppCompatActivity
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             Log.d(this, "finishing with SIMPRINTS_INVALID_API_KEY");
-
+            finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null);
+            Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
             return;
         }
 
@@ -96,6 +97,7 @@ public class LaunchActivity extends AppCompatActivity
         // Sets apiKey
         String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
         if (apiKey == null) {
+            Log.d(this, "finishing with SIMPRINTS_INVALID_API_KEY");
             finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null);
             Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
             return;
@@ -180,9 +182,6 @@ public class LaunchActivity extends AppCompatActivity
                         isDataReady ? "YES" : "NO", connected ? "YES" : "NO"));
 
                 if (!isDataReady || !connected) {
-                    if (connected) {
-                        appState.getScanner().disconnect();
-                    }
                     // The user can't do anything anyway, so unexpected error
                     launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
@@ -249,7 +248,10 @@ public class LaunchActivity extends AppCompatActivity
     }
 
     private void launchAlert(ALERT_TYPE alertType) {
-        appState.setScanner(null);
+        if (appState.getScanner() != null) {
+            appState.getScanner().destroy();
+            appState.setScanner(null);
+        }
         handler.removeCallbacksAndMessages(null);
         Intent intent = new Intent(this, AlertActivity.class);
         intent.putExtra(InternalConstants.ALERT_TYPE_EXTRA, alertType);
@@ -286,15 +288,12 @@ public class LaunchActivity extends AppCompatActivity
                 break;
 
             case CONNECTION_BLUETOOTH_DISABLED:
-                appState.setScanner(null);
                 launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
                 break;
             case CONNECTION_SCANNER_UNBONDED:
-                appState.setScanner(null);
                 launchAlert(ALERT_TYPE.NOT_PAIRED);
                 break;
             case CONNECTION_SCANNER_UNREACHABLE:
-                appState.setScanner(null);
                 launchAlert(ALERT_TYPE.DISCONNECTED);
                 break;
 
@@ -355,6 +354,7 @@ public class LaunchActivity extends AppCompatActivity
                 }
                 break;
             case API_KEY_INVALID:
+
                 launchAlert(ALERT_TYPE.INVALID_API_KEY);
                 Answers.getInstance().logCustom(new CustomEvent("Invalid API Key")
                         .putCustomAttribute("API Key", appState.getApiKey()));
