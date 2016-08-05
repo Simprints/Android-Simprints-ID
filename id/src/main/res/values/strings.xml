@@ -84,6 +84,7 @@
     <string name="pref_nudge_mode_bool">NudgeModeBool</string>
     <string name="pref_consent_bool">ConsentBool</string>
     <string name="pref_quality_theshold">QualityThresholdInt</string>
+    <string name="pref_nb_of_ids">NbOfIdsInt</string>
 
     <!--Main app-->
     <string name="scan_label">SCAN</string>
@@ -142,5 +143,9 @@
     <string name="nav_add_finger">Add Finger</string>
     <string name="nav_select_finger">Select Finger</string>
     <string name="nav_settings">Settings</string>
+    <string name="quality_threshold_empty">Quality Threshold:</string>
+    <string name="quality_threshold_value">Quality Threshold: %1$d</string>
+    <string name="nb_of_ids_empty">Number of returned identifications:</string>
+    <string name="nb_of_ids_value">Number of returned identifications: %1$d</string>
 
 </resources>

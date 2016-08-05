@@ -1,6 +1,8 @@
 package com.simprints.id.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
@@ -102,24 +104,29 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
                 Toast.makeText(MatchingActivity.this, e.details(), Toast.LENGTH_LONG).show();
                 break;
             case MATCH_COMPLETED:
-                // Get the top 5 (or less) candidates and their scores
+                // Get the top candidates and their scores
                 Collections.sort(candidates, new Comparator<Person>() {
                     @Override
                     public int compare(Person person1, Person person2) {
                         return person2.getScore() - person1.getScore();
                     }
                 });
-                ArrayList<Identification> top5Candidates = new ArrayList<>();
+
+                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                int nbOfResults = sharedPref.getInt(getString(R.string.pref_nb_of_ids), 10);
+
+                ArrayList<Identification> topCandidates = new ArrayList<>();
                 for (Person candidate : candidates) {
-                    top5Candidates.add(new Identification(candidate.getGuid(),
+                    topCandidates.add(new Identification(candidate.getGuid(),
                             candidate.getScore(), computeTier(candidate.getScore())));
-                    if (top5Candidates.size() == 5) {
+                    if (topCandidates.size() == nbOfResults) {
                         break;
                     }
                 }
                 // finish
                 Intent resultData = new Intent(Constants.SIMPRINTS_IDENTIFY_INTENT);
-                resultData.putExtra(Constants.SIMPRINTS_IDENTIFICATIONS, top5Candidates);
+                resultData.putExtra(Constants.SIMPRINTS_IDENTIFICATIONS, topCandidates);
                 setResult(RESULT_OK, resultData);
                 finish();
                 break;
