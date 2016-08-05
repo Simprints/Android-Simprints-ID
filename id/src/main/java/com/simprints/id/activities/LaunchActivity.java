@@ -134,7 +134,6 @@ public class LaunchActivity extends AppCompatActivity
         Log.d(this, "Validating apiKey");
         appState.getData().validateApiKey(appState.getApiKey());
 
-
         connect();
     }
 
@@ -261,6 +260,7 @@ public class LaunchActivity extends AppCompatActivity
         waitingForConfirmation = true;
         progressBar.setVisibility(View.GONE);
         confirmConsentTextView.setVisibility(View.VISIBLE);
+        //TODO add back button
     }
 
     @Override
@@ -429,6 +429,13 @@ public class LaunchActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         // Neutralize back press
+        if (waitingForConfirmation) {
+            waitingForConfirmation = false;
+            finishing = true;
+            setResult(RESULT_CANCELED);
+            finish();
+            super.onBackPressed();
+        }
     }
 
     @Override
