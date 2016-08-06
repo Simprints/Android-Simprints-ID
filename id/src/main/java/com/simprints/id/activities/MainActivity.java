@@ -640,12 +640,10 @@ public class MainActivity extends AppCompatActivity implements
 //                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
 ////                startActivity(new Intent(this, TroubleshootActivity.class));
 //                break;
-//            case R.id.nav_about:
-//                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
-////                startActivity(new Intent(this, AboutActivity.class));
-//                break;
+            case R.id.nav_about:
+                startActivity(new Intent(this, AboutActivity.class));
+                break;
             case R.id.nav_settings:
-                //Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
                 startActivityForResult(new Intent(this, SettingsActivity.class),
                         SETTINGS_ACTIVITY_REQUEST_CODE);
                 break;

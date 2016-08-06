@@ -70,12 +70,6 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.TroubleshootActivity"
-            android:label="@string/troubleshoot_title"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.ActionBar" />
-        <activity
             android:name=".activities.AboutActivity"
             android:label="@string/about_title"
             android:launchMode="singleTask"

@@ -3,32 +3,45 @@
 
     <item android:title="@string/fingerprints_menu">
         <menu>
-            <item android:id="@+id/nav_autoAdd" android:icon="@drawable/ic_menu_add_finger"
+            <item
+                android:id="@+id/nav_autoAdd"
+                android:icon="@drawable/ic_menu_add_finger"
                 android:title="@string/nav_add_finger" />
-            <item android:id="@+id/nav_add" android:icon="@drawable/ic_menu_fingerprint"
+            <item
+                android:id="@+id/nav_add"
+                android:icon="@drawable/ic_menu_fingerprint"
                 android:title="@string/nav_select_finger" />
         </menu>
     </item>
 
     <item android:title="@string/help_and_support_menu">
         <menu>
-            <item android:id="@+id/nav_help" android:icon="@drawable/ic_menu_help"
+            <item
+                android:id="@+id/nav_help"
+                android:icon="@drawable/ic_menu_help"
                 android:title="@string/help_menu" />
             <!--<item android:id="@+id/nav_tutorial" android:icon="@drawable/ic_menu_tutorial"-->
-                <!--android:title="@string/tutorial_menu" />-->
+            <!--android:title="@string/tutorial_menu" />-->
             <!--<item android:id="@+id/nav_troubleshoot" android:icon="@drawable/ic_menu_troubleshoot"-->
-                <!--android:title="@string/troubleshoot_menu" />-->
-            <item android:id="@+id/privacy" android:icon="@drawable/ic_menu_privacy"
+            <!--android:title="@string/troubleshoot_menu" />-->
+            <item
+                android:id="@+id/privacy"
+                android:icon="@drawable/ic_menu_privacy"
                 android:title="@string/privacy_and_consent" />
-            <!--<item android:id="@+id/nav_about" android:icon="@drawable/ic_menu_about"-->
-                <!--android:title="@string/about_menu" />-->
+
         </menu>
     </item>
 
     <item android:title="@string/configuration_menu">
         <menu>
-            <item android:id="@+id/nav_settings" android:icon="@drawable/ic_menu_manage"
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_menu_manage"
                 android:title="@string/nav_settings" />
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_menu_about"
+                android:title="@string/about_menu" />
         </menu>
     </item>
 

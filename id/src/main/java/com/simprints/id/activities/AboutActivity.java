@@ -1,9 +1,13 @@
 package com.simprints.id.activities;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
@@ -19,30 +23,42 @@ public class AboutActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.show();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.show();
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
-        if (AppState.getInstance().getScanner() != null) {
-            /*
-                    busy = false;
-        bt = new BluetoothCom(macAddr, new DefaultNotifier());
-        hwConfig = Message.HARDWARE_CONFIG.HW_MODE_UNKNOWN;
-        ucVersion = NO_INFO;
-        un20Version = NO_INFO;
-        batteryLevel1 = NO_INFO;
-        batteryLevel2 = NO_INFO;
-        crashLogValid = false;
-        hwVersion = NO_INFO;
-        un20State = Message.UN20_STATE.UN20_STATE_UNKNOWN;
-        continuousCapture = false;
-        imageQuality = NO_INFO;
-        imageFragmentsStream = new ByteArrayOutputStream();
-        imageBytes = NO_BYTES;
-        templateFragmentsStream = new ByteArrayOutputStream();
-        template = null;
-        crashLog = Message.CRASH_LOG_STATUS.UNKNOWN;
-        scannerListener = null;
-             */
+        PackageInfo pInfo;
+        String version = "";
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        ((TextView) findViewById(R.id.appVersionTextView)).setText(version);
+
+        ((TextView) findViewById(R.id.libSimprintsVersionTextView)).setText("1.0.3");
+
+        AppState appState = AppState.getInstance();
+        short firmwareVersion = 0;
+        try {
+            firmwareVersion = appState.getHardwareVersion();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ((TextView) findViewById(R.id.firmwareVersionTextView)).setText(
+                String.valueOf(firmwareVersion));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
