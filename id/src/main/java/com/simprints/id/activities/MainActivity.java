@@ -569,7 +569,7 @@ public class MainActivity extends AppCompatActivity implements
                     registrationResult.setTemplate(fp.getFingerIdentifier(), fp.getIsoTemplate());
                 }
                 Log.d(this, "Saving person");
-                appState.getData().savePerson(appState.getApiKey(), person);
+                appState.getData().savePerson(person);
             } else {
                 Log.d(this, "Starting matching activity");
                 Intent intent = new Intent(this, MatchingActivity.class);

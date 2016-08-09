@@ -55,7 +55,7 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
         Bundle extras = getIntent().getExtras();
         probe = extras.getParcelable("Person");
 
-        appState.getData().loadPeople(appState.getApiKey());
+        appState.getData().loadPeople();
     }
 
     @Override
@@ -120,6 +120,7 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
                 for (Person candidate : candidates) {
                     topCandidates.add(new Identification(candidate.getGuid(),
                             candidate.getScore(), computeTier(candidate.getScore())));
+                    Log.d(this, "RETURN ID: " + candidate.getGuid() + " " + Integer.toString(candidate.getScore()));
                     if (topCandidates.size() == nbOfResults) {
                         break;
                     }
