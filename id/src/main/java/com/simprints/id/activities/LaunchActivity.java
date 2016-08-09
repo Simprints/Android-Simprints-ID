@@ -381,7 +381,7 @@ public class LaunchActivity extends AppCompatActivity
                     new String[]{"org.commcare.dalvik.provider.cases.read"},
                     InternalConstants.COMMCARE_PERMISSION_REQUEST);
         } else {
-            appState.getData().commCareDatabaseResolver(getContentResolver(), appState.getApiKey());
+            appState.getData().databaseResolver(getContentResolver());
         }
     }
 
@@ -443,7 +443,7 @@ public class LaunchActivity extends AppCompatActivity
         Log.d(this, "onDestroy");
         handler.removeCallbacksAndMessages(null);
         if (appState.getData() != null && appState.getReadyToSendSession() != null) {
-            appState.getData().saveSession(appState.getApiKey(), appState.getReadyToSendSession());
+            appState.getData().saveSession(appState.getReadyToSendSession());
         }
         positionTracker.finish();
         if (finishing && appState.getScanner() != null) {
