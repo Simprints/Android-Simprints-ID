@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private MenuItem continueItem;
     private boolean promptContinue = false;
+    private MenuItem syncItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements
         appState = AppState.getInstance();
         appState.getScanner().setScannerListener(this);
         appState.getData().setDataListener(this);
+        appState.getData().sync();
 
         handler = new Handler();
 
@@ -530,12 +532,26 @@ public class MainActivity extends AppCompatActivity implements
             case API_KEY_INVALID:
                 break;
             case SYNC_STARTED:
+                if (syncItem != null) {
+                    syncItem.setEnabled(false);
+                    syncItem.setTitle("Syncing...");
+                }
                 break;
             case SYNC_UPDATE:
                 break;
             case SYNC_SUCCESS:
+                if (syncItem != null) {
+                    syncItem.setEnabled(true);
+                    syncItem.setTitle("Sync Complete");
+                    syncItem.setIcon(R.drawable.ic_menu_sync_good);
+                }
                 break;
             case SYNC_FAILURE:
+                if (syncItem != null) {
+                    syncItem.setEnabled(true);
+                    syncItem.setTitle("Syncing Failed");
+                    syncItem.setIcon(R.drawable.ic_menu_sync_bad);
+                }
                 break;
             case SYNC_ALL_SUCCESS:
                 break;
@@ -631,6 +647,7 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         continueItem = menu.findItem(R.id.action_forward);
+        syncItem = menu.findItem(R.id.nav_sync);
         refreshDisplay();
         return true;
     }
@@ -670,6 +687,12 @@ public class MainActivity extends AppCompatActivity implements
                 startActivityForResult(new Intent(this, PrivacyActivity.class),
                         PRIVACY_ACTIVITY_REQUEST_CODE);
                 break;
+            case R.id.nav_sync:
+                if (appState.getData() != null) {
+                    syncItem = item;
+                    appState.getData().sync();
+                }
+                return true;
 //            case R.id.nav_tutorial:
 //                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
 ////                startActivity(new Intent(this, TutorialActivity.class));
