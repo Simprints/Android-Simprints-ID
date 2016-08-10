@@ -55,7 +55,9 @@ public class PositionTracker implements
     }
 
     public void start() {
-        appState.getGoogleApiClient().connect();
+        if (appState.getGoogleApiClient() != null) {
+            appState.getGoogleApiClient().connect();
+        }
     }
 
     public void finish() {
@@ -92,7 +94,9 @@ public class PositionTracker implements
                 break;
 
             case InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST:
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == Activity.RESULT_OK &&
+                        appState.getGoogleApiClient() != null)
+                {
                     appState.getGoogleApiClient().connect();
                 }
                 break;
@@ -165,7 +169,9 @@ public class PositionTracker implements
                 activity, Manifest.permission.ACCESS_FINE_LOCATION
         );
 
-        if (locationPermission == PackageManager.PERMISSION_GRANTED) {
+        if (locationPermission == PackageManager.PERMISSION_GRANTED &&
+                appState.getGoogleApiClient() != null)
+        {
             Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     appState.getGoogleApiClient());
             if (lastLocation != null) {
@@ -181,38 +187,40 @@ public class PositionTracker implements
                 .addLocationRequest(locationRequest)
                 .build();
 
-        PendingResult<LocationSettingsResult> result =
-                LocationServices.SettingsApi.checkLocationSettings(
-                        appState.getGoogleApiClient(),
-                        settingsRequest
-                );
+        if (appState.getGoogleApiClient() != null) {
+            PendingResult<LocationSettingsResult> result =
+                    LocationServices.SettingsApi.checkLocationSettings(
+                            appState.getGoogleApiClient(),
+                            settingsRequest
+                    );
 
-        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-            @Override
-            public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
-                Status status = locationSettingsResult.getStatus();
-                switch (status.getStatusCode()) {
+            result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+                @Override
+                public void onResult(@NonNull LocationSettingsResult locationSettingsResult) {
+                    Status status = locationSettingsResult.getStatus();
+                    switch (status.getStatusCode()) {
 
-                    case LocationSettingsStatusCodes.SUCCESS:
-                        Log.d(activity, "startLocationUpdates() -> SUCCESS");
-                        requestLocationUpdates();
-                        break;
+                        case LocationSettingsStatusCodes.SUCCESS:
+                            Log.d(activity, "startLocationUpdates() -> SUCCESS");
+                            requestLocationUpdates();
+                            break;
 
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        Log.d(activity, "startLocationUpdates() -> RESOLUTION");
-                        try {
-                            status.startResolutionForResult(
-                                    activity, InternalConstants.RESOLUTION_REQUEST
-                            );
-                        } catch (IntentSender.SendIntentException ignored) {
-                        }
-                        break;
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            Log.d(activity, "startLocationUpdates() -> RESOLUTION");
+                            try {
+                                status.startResolutionForResult(
+                                        activity, InternalConstants.RESOLUTION_REQUEST
+                                );
+                            } catch (IntentSender.SendIntentException ignored) {
+                            }
+                            break;
 
-                    default:
-                        Log.d(activity, "startLocationUpdates() -> FAILURE");
+                        default:
+                            Log.d(activity, "startLocationUpdates() -> FAILURE");
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private void requestLocationUpdates() {
@@ -222,7 +230,8 @@ public class PositionTracker implements
                 Manifest.permission.ACCESS_FINE_LOCATION
         );
 
-        if (locationPermission == PackageManager.PERMISSION_GRANTED) {
+        if (locationPermission == PackageManager.PERMISSION_GRANTED &&
+                appState.getGoogleApiClient() != null) {
             LocationServices.FusedLocationApi.requestLocationUpdates(
                     appState.getGoogleApiClient(),
                     locationRequest,
