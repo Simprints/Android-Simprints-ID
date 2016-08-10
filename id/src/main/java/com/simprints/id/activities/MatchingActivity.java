@@ -125,6 +125,12 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
                         break;
                     }
                 }
+
+                Data data = appState.getData();
+                if(data != null && topCandidates.size() > 0){
+                    data.saveIdentification(probe, topCandidates);
+                }
+
                 // finish
                 Intent resultData = new Intent(Constants.SIMPRINTS_IDENTIFY_INTENT);
                 resultData.putExtra(Constants.SIMPRINTS_IDENTIFICATIONS, topCandidates);

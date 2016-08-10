@@ -14,6 +14,15 @@
         </menu>
     </item>
 
+    <item android:title="Sync">
+        <menu>
+            <item
+                android:id="@+id/nav_sync"
+                android:icon="@drawable/ic_menu_sync"
+                android:title="Sync" />
+        </menu>
+    </item>
+
     <item android:title="@string/help_and_support_menu">
         <menu>
             <item
