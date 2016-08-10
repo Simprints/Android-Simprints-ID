@@ -49,8 +49,8 @@ dependencies {
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.simprints:libsimprints:1.0.4'
     compile 'com.simprints:libscanner:1.0.44'
-    compile 'com.simprints:libdata:0.0.126'
-    compile 'com.simprints:libcommon:1.0.26'
+    compile 'com.simprints:libdata:1.0.17'
+    compile 'com.simprints:libcommon:1.0.29'
     compile 'com.simprints:libmatcher:1.0.8'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.0@aar') {
         transitive = true;
