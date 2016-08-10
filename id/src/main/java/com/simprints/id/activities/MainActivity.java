@@ -523,6 +523,24 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(this, String.format(Locale.UK, "onDataEvent %s %s", event.name(), event.details()));
 
         switch (event) {
+            case API_KEY_VALID:
+                break;
+            case API_KEY_WARNING:
+                break;
+            case API_KEY_INVALID:
+                break;
+            case SYNC_STARTED:
+                break;
+            case SYNC_UPDATE:
+                break;
+            case SYNC_SUCCESS:
+                break;
+            case SYNC_FAILURE:
+                break;
+            case SYNC_ALL_SUCCESS:
+                break;
+            case SYNC_ALL_FAILURE:
+                break;
             case SAVE_PERSON_SUCCESS:
             case SAVE_PERSON_FAILURE:
                 Log.d(this, "Finishing with RESULT_OK");
@@ -532,6 +550,26 @@ public class MainActivity extends AppCompatActivity implements
                 finish();
                 break;
 
+            case SAVE_SESSION_SUCCESS:
+                break;
+            case SAVE_SESSION_FAILURE:
+                break;
+            case GET_PEOPLE_SUCCESS:
+                break;
+            case GET_PEOPLE_FAILURE:
+                break;
+            case SAVE_IDENTIFICATION_SUCCESS:
+                break;
+            case SAVE_IDENTIFICATION_FAILURE:
+                break;
+            case NETWORK_FAILURE:
+                break;
+            case PERMISSION_FAILURE:
+                break;
+            case DATABASE_RESOLVER_SUCCESS:
+                break;
+            case DATABASE_RESOLVER_FAILURE:
+                break;
             default:
                 break;
         }

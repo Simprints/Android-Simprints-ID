@@ -150,5 +150,7 @@
     <string name="about_app_version">App Version:</string>
     <string name="about_libsimprints_version">LibSimprints Version:</string>
     <string name="about_scanner_version">Scanner Version:</string>
+    <string name="menu_header">Simprints ID</string>
+    <string name="menu_subheader">Every person counts!</string>
 
 </resources>
