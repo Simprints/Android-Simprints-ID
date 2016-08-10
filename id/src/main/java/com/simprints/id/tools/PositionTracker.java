@@ -59,10 +59,13 @@ public class PositionTracker implements
     }
 
     public void finish() {
-        if (appState.getGoogleApiClient().isConnected()) {
+        GoogleApiClient client = appState.getGoogleApiClient();
+        if (client != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(
                     appState.getGoogleApiClient(), this);
-            appState.getGoogleApiClient().disconnect();
+            if (client.isConnected()) {
+                appState.getGoogleApiClient().disconnect();
+            }
             appState.setGoogleApiClient(null);
         }
     }
