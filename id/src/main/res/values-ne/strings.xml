@@ -70,4 +70,5 @@
     <string name="settings_title">सेटिंगहरु</string>
     <string name="nb_of_ids_empty">पहिचान गरिएकाहरु:</string>
     <string name="nb_of_ids_value">पहिचान गरिएकाहरु: %1$d</string>
+    <string name="about_libsimprints_version">LibSimprints संस्करण</string>
 </resources>
