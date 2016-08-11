@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Id</string>
+    <string name="disconnected_title">स्क्यानर भेटिएन </string>
+    <string name="disconnected_message">स्क्यानरसंग सम्पर्क हुन सकेन, अन गर्नुहोस र फोनको नजिक राख्नुहोस </string>
+    <string name="try_again_label">फेरी प्रयास गर्नुहोस </string>
+    <string name="settings_label">फोनको सेटिंगहरु </string>
+    <string name="fingerprints_menu">औंलाको छापहरु </string>
+    <string name="nav_add_finger">अर्को औंला थप्नुहोस </string>
+    <string name="nav_select_finger">औंला छान्नुहोस्</string>
+    <string name="help_and_support_menu">सहयोग र समर्थन </string>
+    <string name="help_menu">सहयोग </string>
+    <string name="help_title">सहयोग </string>
+    <string name="configuration_menu">कन्फिगरेसन </string>
+    <string name="action_settings">सेटिंगहरु</string>
+    <string name="l_1_finger_name">देब्रे बुढी औंला </string>
+    <string name="l_2_finger_name">देब्रे चोर औंला </string>
+    <string name="r_1_finger_name">दाहिने बुढी औंला </string>
+    <string name="r_2_finger_name">दाहिने चोर औंला </string>
+    <string name="l_3_finger_name">देब्रे माझी औंला </string>
 </resources>
