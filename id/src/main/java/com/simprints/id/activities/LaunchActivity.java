@@ -23,6 +23,7 @@ import com.crashlytics.android.answers.CustomEvent;
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
+import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.libdata.Data;
@@ -56,6 +57,8 @@ public class LaunchActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
+                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
         Appsee.start(getString(R.string.com_appsee_apikey));
@@ -424,7 +427,6 @@ public class LaunchActivity extends AppCompatActivity
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-
 
     @Override
     public void onBackPressed() {

@@ -85,6 +85,7 @@
     <string name="pref_consent_bool" translatable="false">ConsentBool</string>
     <string name="pref_quality_theshold" translatable="false">QualityThresholdInt</string>
     <string name="pref_nb_of_ids" translatable="false">NbOfIdsInt</string>
+    <string name="pref_language" translatable="false">SelectedLanguage</string>
 
     <!--Main app-->
     <string name="scan_label">SCAN</string>
@@ -153,5 +154,6 @@
     <string name="menu_header">Simprints ID</string>
     <string name="menu_subheader">Every person counts!</string>
     <string name="nav_sync">Sync</string>
+    <string name="settings_select_language">Select Language</string>
 
 </resources>
