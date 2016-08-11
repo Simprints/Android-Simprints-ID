@@ -14,12 +14,12 @@
         </menu>
     </item>
 
-    <item android:title="Sync">
+    <item android:title="@string/nav_sync">
         <menu>
             <item
                 android:id="@+id/nav_sync"
                 android:icon="@drawable/ic_menu_sync_good"
-                android:title="Sync" />
+                android:title="@string/nav_sync" />
         </menu>
     </item>
 
