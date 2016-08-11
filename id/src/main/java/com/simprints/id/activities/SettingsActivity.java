@@ -1,5 +1,6 @@
 package com.simprints.id.activities;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,14 +8,18 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.simprints.id.R;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private final static int MIN_QUALITY = 40;
     private final static int MAX_QUALITY = 99;
@@ -42,6 +47,12 @@ public class SettingsActivity extends AppCompatActivity {
         sharedPref = getApplicationContext().getSharedPreferences(
                 getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
+        Spinner spinner = (Spinner) findViewById(R.id.language_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.language_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
 
         boolean nudgeMode = sharedPref.getBoolean(getString(R.string.pref_nudge_mode_bool), true);
         nudgeToggleButton = (ToggleButton) findViewById(R.id.nudgeToggleButton);
@@ -144,5 +155,26 @@ public class SettingsActivity extends AppCompatActivity {
         super.onPause();
         saveQualityThreshold();
         saveNbOfIds();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long i) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        switch (pos){
+            case 0:
+                editor.putString(getString(R.string.pref_language), "");
+                break;
+            case 1:
+                editor.putString(getString(R.string.pref_language), "ne");
+                break;
+        }
+
+        editor.apply();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 }
