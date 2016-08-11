@@ -47,7 +47,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:9.4.0'
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.volley:volley:1.0.0'
-    compile 'com.simprints:libsimprints:1.0.4'
+    compile 'com.simprints:libsimprints:1.0.5'
     compile 'com.simprints:libscanner:1.0.44'
     compile 'com.simprints:libdata:1.0.18'
     compile 'com.simprints:libcommon:1.0.30'

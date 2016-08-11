@@ -9,8 +9,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.TextView;
 
 import com.simprints.id.R;
+import com.simprints.id.tools.Language;
 
 public class PrivacyActivity extends AppCompatActivity {
     private SharedPreferences sharedPref;
@@ -18,6 +20,8 @@ public class PrivacyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
+                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_privacy);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
