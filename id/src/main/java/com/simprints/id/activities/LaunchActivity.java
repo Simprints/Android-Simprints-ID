@@ -381,7 +381,7 @@ public class LaunchActivity extends AppCompatActivity
                     new String[]{"org.commcare.dalvik.provider.cases.read"},
                     InternalConstants.COMMCARE_PERMISSION_REQUEST);
         } else {
-            appState.getData().databaseResolver(getContentResolver());
+            appState.getData().resolveDatabase(getContentResolver());
         }
     }
 
