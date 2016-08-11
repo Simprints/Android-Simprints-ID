@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.simprints.id.R;
+import com.simprints.id.tools.Language;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -33,6 +34,8 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
+                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_settings);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
@@ -53,6 +56,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
+        spinner.setSelection(sharedPref.getInt(getString(R.string.pref_language_position), 0));
 
         boolean nudgeMode = sharedPref.getBoolean(getString(R.string.pref_nudge_mode_bool), true);
         nudgeToggleButton = (ToggleButton) findViewById(R.id.nudgeToggleButton);
@@ -161,12 +165,14 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long i) {
         SharedPreferences.Editor editor = sharedPref.edit();
 
-        switch (pos){
+        switch (pos) {
             case 0:
                 editor.putString(getString(R.string.pref_language), "");
+                editor.putInt(getString(R.string.pref_language_position), 0);
                 break;
             case 1:
                 editor.putString(getString(R.string.pref_language), "ne");
+                editor.putInt(getString(R.string.pref_language_position), 1);
                 break;
         }
 

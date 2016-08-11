@@ -11,12 +11,15 @@ import android.widget.TextView;
 
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
+import com.simprints.id.tools.Language;
 
 public class AboutActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
+                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_about);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_about);

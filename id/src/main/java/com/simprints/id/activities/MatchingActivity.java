@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
+import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.Data;
@@ -40,6 +41,8 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
+                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_matching);
 
         appState = AppState.getInstance();

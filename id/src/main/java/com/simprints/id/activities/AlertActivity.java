@@ -13,6 +13,7 @@ import com.crashlytics.android.answers.CustomEvent;
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
+import com.simprints.id.tools.Language;
 
 public class AlertActivity extends AppCompatActivity {
 
@@ -21,6 +22,8 @@ public class AlertActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
+                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_alert);
 
         appState = AppState.getInstance();

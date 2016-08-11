@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Id</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
 
@@ -16,8 +16,8 @@
     <string name="about_menu">About</string>
     <string name="help_and_support_menu">Help and Support</string>
     <string name="configuration_menu">Configuration</string>
-    <string name="consent_title">Consent</string>
-    <string name="alert_title">Alert</string>
+    <string name="consent_title" translatable="false">Consent</string>
+    <string name="alert_title" translatable="false">Alert</string>
     <string name="register_title">Enrollment</string>
     <string name="identify_title">Identify</string>
 
@@ -84,6 +84,7 @@
     <string name="pref_quality_theshold" translatable="false">QualityThresholdInt</string>
     <string name="pref_nb_of_ids" translatable="false">NbOfIdsInt</string>
     <string name="pref_language" translatable="false">SelectedLanguage</string>
+    <string name="pref_language_position" translatable="false">SelectedLanguagePosition</string>
 
     <!--Main app-->
     <string name="scan_label">SCAN</string>
@@ -94,13 +95,13 @@
     <string name="missing_apikey_message">A configuration error has occurred (missing API key), please contact your system administrator</string>
     <string name="missing_calling_package_message" translatable="false">A configuration error has occurred (missing calling package) please contact your system administrator</string>
     <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
-    <string name="bluetooth_not_supported_title">BLUETOOTH NOT SUPPORTED</string>
-    <string name="bluetooth_not_supported_message">Bluetooth not supported on this device, please contact your system administrator</string>
-    <string name="bluetooth_not_enabled_title">BLUETOOTH NOT ENABLED</string>
-    <string name="bluetooth_not_enabled_message">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
-    <string name="unbonded_scanner_title">SCANNER NOT PAIRED</string>
+    <string name="bluetooth_not_supported_title" translatable="false">BLUETOOTH NOT SUPPORTED</string>
+    <string name="bluetooth_not_supported_message" translatable="false">Bluetooth not supported on this device, please contact your system administrator</string>
+    <string name="bluetooth_not_enabled_title" translatable="false">BLUETOOTH NOT ENABLED</string>
+    <string name="bluetooth_not_enabled_message" translatable="false">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
+    <string name="unbonded_scanner_title" translatable="false">SCANNER NOT PAIRED</string>
     <string name="unbonded_scanner_message">Scanner not paired, please make sure it is paired in settings and try again</string>
-    <string name="multiple_scanners_found_title">MULTIPLE PAIRED SCANNERS</string>
+    <string name="multiple_scanners_found_title" translatable="false">MULTIPLE PAIRED SCANNERS</string>
     <string name="multiple_scanners_found_message">More than one scanner is paired to the phone, please unpair un-needed scanners</string>
     <string name="disconnected_title">SCANNER NOT FOUND</string>
     <string name="disconnected_message">The scanner is unreachable, please make sure it is powered on and close to the phone</string>
@@ -111,7 +112,7 @@
     <string name="settings_label">Phone settings</string>
     <string name="rescan_label">Re-scan</string>
     <string name="rescan_label_question">Re-scan?</string>
-    <string name="reconnect_label">Re-connect</string>
+    <string name="reconnect_label" translatable="false">Re-connect</string>
     <string name="error_occurred_title">ERROR OCCURRED</string>
     <string name="good_scan_message">Good Scan</string>
     <string name="poor_scan_message">Poor Scan</string>
@@ -126,9 +127,9 @@
     <string name="cancel">Cancel</string>
     <string name="scan">SCAN</string>
     <string name="launch_background_description" translatable="false">Simprint\'s logo as background image</string>
-    <string name="loading">Loading</string>
-    <string name="network_failure_title">NETWORK FAILURE</string>
-    <string name="network_failure_message">Network failure, please make sure you are connected to the internet</string>
+    <string name="loading" translatable="false">Loading</string>
+    <string name="network_failure_title" translatable="false">NETWORK FAILURE</string>
+    <string name="network_failure_message" translatable="false">Network failure, please make sure you are connected to the internet</string>
     <string name="please_wait">Please wait while we proceed to identification</string>
     <string name="finger_image_description" translatable="false">Hands with arrow pointing to a finger</string>
     <string name="coming_soon">Coming soon...</string>
@@ -137,7 +138,7 @@
     <string name="healthworker_consent_checkbox">I agree to Simprints using this data in these ways.</string>
     <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
     <string name="quality_threshold_text_view">Quality Threshold</string>
-    <string name="menu_continue">Continue</string>
+    <string name="menu_continue" translatable="false">Continue</string>
     <string name="nav_add_finger">Add Finger</string>
     <string name="nav_select_finger">Select Finger</string>
     <string name="nav_settings">Settings</string>
@@ -150,7 +151,7 @@
     <string name="about_scanner_version">Scanner Version:</string>
     <string name="menu_header">Simprints ID</string>
     <string name="menu_subheader">Every person counts!</string>
-    <string name="nav_sync">Sync</string>
-    <string name="settings_select_language">Select Language</string>
+    <string name="nav_sync" translatable="false">Sync</string>
+    <string name="settings_select_language" translatable="false">Select Language</string>
 
 </resources>
