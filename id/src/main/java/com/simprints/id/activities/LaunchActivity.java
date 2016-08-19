@@ -1,6 +1,7 @@
 package com.simprints.id.activities;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
+import com.simprints.id.tools.BackgroundSync;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
@@ -131,13 +133,16 @@ public class LaunchActivity extends AppCompatActivity
         callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
         Log.d(this, String.format(Locale.UK, "callingPackage = %s", callingPackage));
 
-
         // Initializes the session Data object
-        appState.setData(new Data(getApplicationContext()));
+        appState.setData(Data.getInstance(getApplicationContext()));
         appState.getData().setDataListener(this);
         Log.d(this, "Data object initialised");
         Log.d(this, "Validating apiKey");
         appState.getData().validateApiKey(appState.getApiKey());
+
+        //Start the background sync service incase it has failed for some reason
+        Intent pushIntent = new Intent(getApplicationContext(), BackgroundSync.class);
+        getApplicationContext().startService(pushIntent);
 
         connect();
     }
@@ -265,7 +270,6 @@ public class LaunchActivity extends AppCompatActivity
         waitingForConfirmation = true;
         progressBar.setVisibility(View.GONE);
         confirmConsentTextView.setVisibility(View.VISIBLE);
-        //TODO add back button
     }
 
     @Override

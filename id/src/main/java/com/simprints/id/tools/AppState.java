@@ -20,7 +20,6 @@ public class AppState {
         return singleton;
     }
 
-
     private Scanner scanner;
     private Data data;
     private Session session;
