@@ -41,7 +41,7 @@ public class BackgroundSync extends IntentService {
                                 stopSelf();
                             }
                         }
-                    }, 0, 10, TimeUnit.SECONDS);
+                    }, 0, 10, TimeUnit.MINUTES);
 
             running = true;
         }
