@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!--CommCare Permission-->
+    <!-- CommCare Permission -->
     <uses-permission android:name="org.commcare.dalvik.provider.cases.read" />
 
     <application
@@ -39,6 +39,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
 
                 <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.FrontActivity"
+            android:label="@string/title_activity_front"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
@@ -78,7 +88,6 @@
             android:label="@string/about_title"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".activities.PrivacyActivity"
             android:label="Privacy" />
@@ -89,6 +98,7 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="897ed2ef7a2d43e09bcd42998f2533acbb9657e7" />
+
 
     </application>
 

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -27,7 +26,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.simprints.id.R;
 import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.fragments.FingerFragment;
@@ -41,17 +39,16 @@ import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
 import com.simprints.libcommon.ScanConfig;
-import com.simprints.libdata.Data;
+import com.simprints.libdata.DatabaseEventListener;
+import com.simprints.libdata.Event;
 import com.simprints.libscanner.Message;
 import com.simprints.libscanner.Scanner;
-import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.FingerIdentifier;
 import com.simprints.libsimprints.Registration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -61,7 +58,7 @@ import static com.simprints.id.model.Finger.Status;
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         Scanner.ScannerListener,
-        Data.DataListener {
+        DatabaseEventListener {
 
     private final static long AUTO_SWIPE_DELAY = 500;
     private final static int FAST_SWIPE_SPEED = 100;
@@ -122,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements
 
         appState = AppState.getInstance();
         appState.getScanner().setScannerListener(this);
-        appState.getData().setDataListener(this);
+        appState.getData().setListener(this);
         appState.getData().sync();
 
         handler = new Handler();
@@ -398,9 +395,9 @@ public class MainActivity extends AppCompatActivity implements
                 int quality = appState.getScanner().getImageQuality();
 
                 if (finger.getTemplate() == null ||
-                        finger.getTemplate().getQuality() < quality) {
+                        finger.getTemplate().getQualityScore() < quality) {
                     Log.d(this, "Set template");
-                    activeFingers.get(currentActiveFingerNo).setTemplate(appState.getScanner().getTemplate());
+                    activeFingers.get(currentActiveFingerNo).setTemplate(new Fingerprint(finger.getId(), appState.getScanner().getTemplate()));
                 }
 
                 SharedPreferences sharedPref1 = getApplicationContext().getSharedPreferences(
@@ -525,23 +522,15 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onDataEvent(com.simprints.libdata.EVENT event) {
+    public void onDataEvent(Event event) {
         Log.d(this, String.format(Locale.UK, "onDataEvent %s %s", event.name(), event.details()));
-
         switch (event) {
-            case API_KEY_VALID:
-                break;
-            case API_KEY_WARNING:
-                break;
-            case API_KEY_INVALID:
-                break;
-            case SYNC_STARTED:
+            case SYNC_INTERRUPTED:
                 if (syncItem != null) {
-                    syncItem.setEnabled(false);
-                    syncItem.setTitle("Syncing...");
+                    syncItem.setEnabled(true);
+                    syncItem.setTitle("Syncing Failed");
+                    syncItem.setIcon(R.drawable.ic_menu_sync_bad);
                 }
-                break;
-            case SYNC_UPDATE:
                 break;
             case SYNC_SUCCESS:
                 if (syncItem != null) {
@@ -549,48 +538,6 @@ public class MainActivity extends AppCompatActivity implements
                     syncItem.setTitle("Sync Complete");
                     syncItem.setIcon(R.drawable.ic_menu_sync_good);
                 }
-                break;
-            case SYNC_FAILURE:
-                if (syncItem != null) {
-                    syncItem.setEnabled(true);
-                    syncItem.setTitle("Syncing Failed");
-                    syncItem.setIcon(R.drawable.ic_menu_sync_bad);
-                }
-                break;
-            case SYNC_ALL_SUCCESS:
-                break;
-            case SYNC_ALL_FAILURE:
-                break;
-            case SAVE_PERSON_SUCCESS:
-            case SAVE_PERSON_FAILURE:
-                Log.d(this, "Finishing with RESULT_OK");
-                Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
-                resultData.putExtra(Constants.SIMPRINTS_REGISTRATION, registrationResult);
-                setResult(RESULT_OK, resultData);
-                finish();
-                break;
-
-            case SAVE_SESSION_SUCCESS:
-                break;
-            case SAVE_SESSION_FAILURE:
-                break;
-            case GET_PEOPLE_SUCCESS:
-                break;
-            case GET_PEOPLE_FAILURE:
-                break;
-            case SAVE_IDENTIFICATION_SUCCESS:
-                break;
-            case SAVE_IDENTIFICATION_FAILURE:
-                break;
-            case NETWORK_FAILURE:
-                break;
-            case PERMISSION_FAILURE:
-                break;
-            case DATABASE_RESOLVER_SUCCESS:
-                break;
-            case DATABASE_RESOLVER_FAILURE:
-                break;
-            default:
                 break;
         }
     }
@@ -608,7 +555,7 @@ public class MainActivity extends AppCompatActivity implements
             if (finger.getStatus() == Status.GOOD_SCAN ||
                     finger.getStatus() == Status.BAD_SCAN ||
                     finger.getStatus() == Status.RESCAN_GOOD_SCAN) {
-                fingerprints.add(new Fingerprint(finger.getId(), finger.getTemplate().getBytes()));
+                fingerprints.add(new Fingerprint(finger.getId(), finger.getTemplate().getTemplateBytes()));
                 if (DEFAULT_CONFIG.get(finger.getId()) == FingerConfig.REQUIRED) {
                     nbRequiredFingerprints++;
                 }
@@ -624,7 +571,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(this, "Creating registration object");
                 registrationResult = new Registration(appState.getGuid());
                 for (Fingerprint fp : fingerprints) {
-                    registrationResult.setTemplate(fp.getFingerIdentifier(), fp.getIsoTemplate());
+                    registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
                 }
                 Log.d(this, "Saving person");
                 appState.getData().savePerson(person);
@@ -694,8 +641,11 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.nav_sync:
                 if (appState.getData() != null) {
                     syncItem = item;
+                    syncItem.setEnabled(false);
+                    syncItem.setTitle("Syncing...");
                     appState.getData().sync();
                 }
+
                 return true;
 //            case R.id.nav_tutorial:
 //                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();

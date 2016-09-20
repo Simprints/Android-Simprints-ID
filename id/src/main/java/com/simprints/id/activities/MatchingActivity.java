@@ -16,10 +16,12 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.libcommon.Person;
-import com.simprints.libdata.Data;
-import com.simprints.libdata.EVENT;
+import com.simprints.libdata.DatabaseEventListener;
+import com.simprints.libdata.Event;
+import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
 import com.simprints.libmatcher.Progress;
+import com.simprints.libmatcher.sourceafis.MatcherEventListener;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.Identification;
 import com.simprints.libsimprints.Tier;
@@ -30,11 +32,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-public class MatchingActivity extends AppCompatActivity implements Data.DataListener, LibMatcher.MatcherListener {
+public class MatchingActivity extends AppCompatActivity implements DatabaseEventListener, MatcherEventListener {
 
     private AppState appState;
     private Person probe;
     private List<Person> candidates;
+    private List<Float> scores;
     private ProgressBar progressBar;
     private Handler handler = new Handler();
 
@@ -46,7 +49,7 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
         setContentView(R.layout.activity_matching);
 
         appState = AppState.getInstance();
-        appState.getData().setDataListener(this);
+        appState.getData().setListener(this);
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         int progressBarColor = ContextCompat.getColor(this, R.color.simprints_blue);
@@ -58,28 +61,24 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
         Bundle extras = getIntent().getExtras();
         probe = extras.getParcelable("Person");
 
-        appState.getData().loadPeople();
+        appState.getData().loadPeople(candidates);
     }
 
     @Override
-    public void onDataEvent(EVENT event) {
+    public void onDataEvent(Event event) {
         switch (event) {
-            case GET_PEOPLE_SUCCESS:
-                candidates = appState.getData().getPeople();
+            case LOAD_PEOPLE_FINISHED:
                 Log.d(MatchingActivity.this, String.format(Locale.UK,
                         "Succesfully loaded %d candidates", candidates.size()));
 
                 // Start lengthy operation in a background thread
                 new Thread(new Runnable() {
                     public void run() {
-                        LibMatcher matcher = new LibMatcher(probe, candidates, LibMatcher.MATCHER_TYPE.SOURCEAFIS, 10);
-                        matcher.setMatcherListener(MatchingActivity.this);
+                        LibMatcher matcher = new LibMatcher(probe, candidates,
+                                LibMatcher.MATCHER_TYPE.SOURCEAFIS, scores, MatchingActivity.this, 1);
                         matcher.start();
                     }
                 }).start();
-                break;
-            case GET_PEOPLE_FAILURE:
-                Log.d(this, "Error loading candidates");
                 break;
         }
     }
@@ -99,12 +98,12 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
     }
 
     @Override
-    public void onMatcherEvent(com.simprints.libmatcher.EVENT e) {
-        switch (e) {
+    public void onMatcherEvent(EVENT event) {
+        switch (event) {
             case MATCH_ALREADY_RUNNING:
             case MATCH_CANCELLED:
             case MATCH_NOT_RUNNING:
-                Toast.makeText(MatchingActivity.this, e.details(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MatchingActivity.this, event.details(), Toast.LENGTH_LONG).show();
                 break;
             case MATCH_COMPLETED:
                 // Get the top candidates and their scores
@@ -129,9 +128,8 @@ public class MatchingActivity extends AppCompatActivity implements Data.DataList
                     }
                 }
 
-                Data data = appState.getData();
-                if(data != null && topCandidates.size() > 0){
-                    data.saveIdentification(probe, topCandidates);
+                if (appState.getData() != null && topCandidates.size() > 0) {
+                    appState.getData().saveIdentification(probe, topCandidates);
                 }
 
                 // finish

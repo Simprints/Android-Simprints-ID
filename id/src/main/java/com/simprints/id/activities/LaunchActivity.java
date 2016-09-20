@@ -26,8 +26,9 @@ import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
-import com.simprints.libdata.Data;
-import com.simprints.libdata.EVENT;
+import com.simprints.libdata.DatabaseContext;
+import com.simprints.libdata.DatabaseEventListener;
+import com.simprints.libdata.Event;
 import com.simprints.libscanner.BluetoothCom;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
@@ -39,7 +40,7 @@ import java.util.UUID;
 import io.fabric.sdk.android.Fabric;
 
 public class LaunchActivity extends AppCompatActivity
-        implements Scanner.ScannerListener, Data.DataListener {
+        implements Scanner.ScannerListener, DatabaseEventListener {
 
     private final static int MINIMUM_DISPLAY_DURATION = 2500;
     private final static int CONNECTION_AND_VALIDATION_TIMEOUT = 15000;
@@ -133,11 +134,11 @@ public class LaunchActivity extends AppCompatActivity
 
 
         // Initializes the session Data object
-        appState.setData(new Data(getApplicationContext()));
-        appState.getData().setDataListener(this);
+        DatabaseContext.initActiveAndroid(getApplicationContext());
+        appState.setData(new DatabaseContext(apiKey, getApplicationContext(), this));
         Log.d(this, "Data object initialised");
         Log.d(this, "Validating apiKey");
-        appState.getData().validateApiKey(appState.getApiKey());
+        appState.getData().validateApiKey();
 
         connect();
     }
@@ -335,48 +336,6 @@ public class LaunchActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onDataEvent(EVENT event) {
-        Log.d(this, String.format(Locale.UK, "onDataEvent %s, %s", event.name(), event.details()));
-        switch (event) {
-            case API_KEY_VALID:
-                if (appState.isEnrol()) {
-                    Answers.getInstance().logCustom(new CustomEvent("Login")
-                            .putCustomAttribute("API Key", appState.getApiKey())
-                            .putCustomAttribute("Type", "Enrol"));
-                } else {
-                    Answers.getInstance().logCustom(new CustomEvent("Login")
-                            .putCustomAttribute("API Key", appState.getApiKey())
-                            .putCustomAttribute("Type", "Identify"));
-                }
-                if (InternalConstants.COMMCARE_PACKAGE.equals(callingPackage)) {
-                    resolveCommCareDatabase();
-                } else {
-                    isDataReady = true;
-                    continueIfReady();
-                }
-                break;
-            case API_KEY_INVALID:
-
-                launchAlert(ALERT_TYPE.INVALID_API_KEY);
-                Answers.getInstance().logCustom(new CustomEvent("Invalid API Key")
-                        .putCustomAttribute("API Key", appState.getApiKey()));
-                break;
-            case DATABASE_RESOLVER_FAILURE:
-                Toast.makeText(this, "Warning: could not synchronize with CommCare",
-                        Toast.LENGTH_LONG).show();
-                Answers.getInstance().logCustom(new CustomEvent("CommCare DB resolution failed")
-                        .putCustomAttribute("API Key", appState.getApiKey())
-                        .putCustomAttribute("MAC Address", appState.getMacAddress()));
-            case DATABASE_RESOLVER_SUCCESS:
-                isDataReady = true;
-                continueIfReady();
-                break;
-            case NETWORK_FAILURE:
-                break;
-        }
-    }
-
     private void resolveCommCareDatabase() {
         if (ContextCompat.checkSelfPermission(this, "org.commcare.dalvik.provider.cases.read")
                 != PackageManager.PERMISSION_GRANTED) {
@@ -384,7 +343,7 @@ public class LaunchActivity extends AppCompatActivity
                     new String[]{"org.commcare.dalvik.provider.cases.read"},
                     InternalConstants.COMMCARE_PERMISSION_REQUEST);
         } else {
-            appState.getData().resolveDatabase(getContentResolver());
+            appState.getData().resolveCommCare(getContentResolver());
         }
     }
 
@@ -453,5 +412,40 @@ public class LaunchActivity extends AppCompatActivity
             appState.setScanner(null);
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onDataEvent(Event event) {
+        switch (event){
+
+            case API_KEY_VALID:
+                if (appState.isEnrol()) {
+                    Answers.getInstance().logCustom(new CustomEvent("Login")
+                            .putCustomAttribute("API Key", appState.getApiKey())
+                            .putCustomAttribute("Type", "Enrol"));
+                } else {
+                    Answers.getInstance().logCustom(new CustomEvent("Login")
+                            .putCustomAttribute("API Key", appState.getApiKey())
+                            .putCustomAttribute("Type", "Identify"));
+                }
+                if (InternalConstants.COMMCARE_PACKAGE.equals(callingPackage)) {
+                    resolveCommCareDatabase();
+                } else {
+                    isDataReady = true;
+                    continueIfReady();
+                }
+                break;
+            case API_KEY_INVALID:
+                launchAlert(ALERT_TYPE.INVALID_API_KEY);
+                Answers.getInstance().logCustom(new CustomEvent("Invalid API Key")
+                        .putCustomAttribute("API Key", appState.getApiKey()));
+                break;
+            case API_KEY_UNVERIFIED:
+                break;
+            case DATABASE_RESOLVED:
+                isDataReady = true;
+                continueIfReady();
+                break;
+        }
     }
 }
