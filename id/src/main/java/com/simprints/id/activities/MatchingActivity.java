@@ -27,6 +27,7 @@ import com.simprints.libsimprints.Identification;
 import com.simprints.libsimprints.Tier;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -100,32 +101,34 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
     @Override
     public void onMatcherEvent(EVENT event) {
         switch (event) {
-            case MATCH_ALREADY_RUNNING:
-            case MATCH_CANCELLED:
             case MATCH_NOT_RUNNING:
                 Toast.makeText(MatchingActivity.this, event.details(), Toast.LENGTH_LONG).show();
                 break;
             case MATCH_COMPLETED:
-                // Get the top candidates and their scores
-                Collections.sort(candidates, new Comparator<Person>() {
-                    @Override
-                    public int compare(Person person1, Person person2) {
-                        return person2.getScore() - person1.getScore();
-                    }
-                });
-
                 SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
                         getString(R.string.preference_file_key), Context.MODE_PRIVATE);
                 int nbOfResults = sharedPref.getInt(getString(R.string.pref_nb_of_ids), 10);
 
                 ArrayList<Identification> topCandidates = new ArrayList<>();
-                for (Person candidate : candidates) {
-                    topCandidates.add(new Identification(candidate.getGuid(),
-                            candidate.getScore(), computeTier(candidate.getScore())));
-                    Log.d(this, "RETURN ID: " + candidate.getGuid() + " " + Integer.toString(candidate.getScore()));
-                    if (topCandidates.size() == nbOfResults) {
-                        break;
+
+                // Sort the indices of the person by decreasing score
+                final Integer[] idx = new Integer[candidates.size()];
+                for (int i = 0; i < candidates.size(); i++) {
+                    idx[i] = i;
+                }
+
+                Arrays.sort(idx, new Comparator<Integer>() {
+                    @Override
+                    public int compare(final Integer i1, final Integer i2) {
+                        return Float.compare(scores.get(i2), scores.get(i1));
                     }
+                });
+
+                for (int i = 0; i < Math.min(nbOfResults, candidates.size()); i++) {
+                    Person candidate = candidates.get(idx[i]);
+
+                    topCandidates.add(new Identification(candidate.getGuid(),
+                            scores.get(idx[i]).intValue(), computeTier(scores.get(idx[i]))));
                 }
 
                 if (appState.getData() != null && topCandidates.size() > 0) {
