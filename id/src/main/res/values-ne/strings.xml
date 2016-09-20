@@ -60,7 +60,6 @@
     <string name="error_occurred_title">गल्ती भयो</string>
     <string name="unforeseen_error_message">माफ गर्नुहोस, नचिताएको गल्ती भयो | बन्द गर्नुहोस र अगाडी बढ्नुहोस |</string>
     <string name="about_app_version">एप्स संस्करण</string>
-    <string name="alert_title"></string>
     <string name="cancel">रद्द गर्नुहोस</string>
     <string name="invalid_apikey_message">API Key मिलेन | कृपया सिस्टम प्रशासकलाइ खबर गर्नुहोस |</string>
     <string name="privacy_and_consent"><![CDATA[गोपनियता तथा स्वीकृति]]></string>

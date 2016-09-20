@@ -28,7 +28,6 @@ import com.simprints.libsimprints.Tier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -37,8 +36,8 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
 
     private AppState appState;
     private Person probe;
-    private List<Person> candidates;
-    private List<Float> scores;
+    private List<Person> candidates = new ArrayList<>();
+    private List<Float> scores = new ArrayList<>();
     private ProgressBar progressBar;
     private Handler handler = new Handler();
 
