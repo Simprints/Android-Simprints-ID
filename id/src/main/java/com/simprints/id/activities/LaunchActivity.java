@@ -22,6 +22,7 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
+import com.simprints.id.tools.BackgroundSync;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
@@ -132,13 +133,14 @@ public class LaunchActivity extends AppCompatActivity
         callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
         Log.d(this, String.format(Locale.UK, "callingPackage = %s", callingPackage));
 
-
         // Initializes the session Data object
         DatabaseContext.initActiveAndroid(getApplicationContext());
         appState.setData(new DatabaseContext(apiKey, getApplicationContext(), this));
-        Log.d(this, "Data object initialised");
-        Log.d(this, "Validating apiKey");
         appState.getData().validateApiKey();
+
+        //Start the background sync service incase it has failed for some reason
+        Intent pushIntent = new Intent(getApplicationContext(), BackgroundSync.class);
+        getApplicationContext().startService(pushIntent);
 
         connect();
     }
@@ -266,7 +268,6 @@ public class LaunchActivity extends AppCompatActivity
         waitingForConfirmation = true;
         progressBar.setVisibility(View.GONE);
         confirmConsentTextView.setVisibility(View.VISIBLE);
-        //TODO add back button
     }
 
     @Override
@@ -448,4 +449,5 @@ public class LaunchActivity extends AppCompatActivity
                 break;
         }
     }
+
 }
