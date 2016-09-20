@@ -153,5 +153,9 @@
     <string name="menu_subheader">Every person counts!</string>
     <string name="nav_sync" translatable="false">Sync</string>
     <string name="settings_select_language" translatable="false">Select Language</string>
+    <string name="title_activity_front">Simprints ID</string>
+    <string name="simprintsVersionText">"Simprints: "</string>
+    <string name="front_libSimprints_version">LibSimprints: 1.0.5</string>
+    <string name="front_simprints_version">Simprints: </string>
 
 </resources>

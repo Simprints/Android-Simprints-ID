@@ -2,7 +2,7 @@ package com.simprints.id.tools;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.simprints.libcommon.Session;
-import com.simprints.libdata.Data;
+import com.simprints.libdata.DatabaseContext;
 import com.simprints.libscanner.Scanner;
 
 import java.util.Calendar;
@@ -22,7 +22,7 @@ public class AppState {
 
 
     private Scanner scanner;
-    private Data data;
+    private DatabaseContext data;
     private Session session;
     private GoogleApiClient googleApiClient;
 
@@ -68,9 +68,9 @@ public class AppState {
         session.setMacAddress(macAddress);
     }
 
-    public Data getData() { return data; }
+    public DatabaseContext getData() { return data; }
 
-    public void setData(Data data) { this.data = data; }
+    public void setData(DatabaseContext data) { this.data = data; }
 
     public GoogleApiClient getGoogleApiClient() {
         return googleApiClient;

@@ -41,7 +41,7 @@ public class AboutActivity extends AppCompatActivity {
         }
         ((TextView) findViewById(R.id.appVersionTextView)).setText(version);
 
-        ((TextView) findViewById(R.id.libSimprintsVersionTextView)).setText("1.0.4");
+        ((TextView) findViewById(R.id.libSimprintsVersionTextView)).setText("1.0.5");
 
         AppState appState = AppState.getInstance();
         short firmwareVersion = 0;

@@ -1,13 +1,13 @@
 package com.simprints.id.model;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.R;
-import com.simprints.libcommon.Template;
+import com.simprints.libcommon.Fingerprint;
+import com.simprints.libmatcher.sourceafis.templates.Template;
 import com.simprints.libsimprints.FingerIdentifier;
 
 
@@ -27,7 +27,7 @@ public class Finger implements Parcelable, Comparable<Finger>{
     private FingerIdentifier id;
     private boolean isActive;
     private Status status;
-    private Template template;
+    private Fingerprint template;
     private boolean lastFinger;
     private int priority;
 
@@ -46,7 +46,7 @@ public class Finger implements Parcelable, Comparable<Finger>{
         isActive = in.readInt() == 1;
         status = Status.values()[in.readInt()];
         if (in.readInt() == 1) {
-            template = in.readParcelable(Template.class.getClassLoader());
+            template = in.readParcelable(Fingerprint.class.getClassLoader());
         } else {
             template = null;
         }
@@ -72,11 +72,11 @@ public class Finger implements Parcelable, Comparable<Finger>{
         this.status = status;
     }
 
-    public Template getTemplate() {
+    public Fingerprint getTemplate() {
         return template;
     }
 
-    public void setTemplate(Template template) {
+    public void setTemplate(Fingerprint template) {
         this.template = template;
     }
 
