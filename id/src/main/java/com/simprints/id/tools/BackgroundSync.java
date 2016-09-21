@@ -8,6 +8,11 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.simprints.libdata.DatabaseContext;
+import com.simprints.libdata.DatabaseEventListener;
+import com.simprints.libdata.Event;
+import com.simprints.libdata.models.M_ApiKey;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +38,14 @@ public class BackgroundSync extends IntentService {
                     (new Runnable() {
                         public void run() {
                             if (isConnected()) {
-                                //Data.getInstance(context).syncAll();
+                                for (M_ApiKey m_apiKey : DatabaseContext.syncAll()) {
+                                    new DatabaseContext(m_apiKey.asString(),
+                                            getApplicationContext(), new DatabaseEventListener() {
+                                        @Override
+                                        public void onDataEvent(Event event) {
+                                        }
+                                    });
+                                }
                             } else {
                                 enableReceiver();
                                 stopSelf();
