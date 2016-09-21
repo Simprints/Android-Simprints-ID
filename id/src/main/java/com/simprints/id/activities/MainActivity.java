@@ -43,6 +43,7 @@ import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
 import com.simprints.libscanner.Message;
 import com.simprints.libscanner.Scanner;
+import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.FingerIdentifier;
 import com.simprints.libsimprints.Registration;
 
@@ -575,6 +576,10 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 Log.d(this, "Saving person");
                 appState.getData().savePerson(person);
+                Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
+                resultData.putExtra(Constants.SIMPRINTS_REGISTRATION, registrationResult);
+                setResult(RESULT_OK, resultData);
+                finish();
             } else {
                 Log.d(this, "Starting matching activity");
                 Intent intent = new Intent(this, MatchingActivity.class);

@@ -3,7 +3,7 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    buildToolsVersion "24.0.2"
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 24
@@ -47,18 +47,28 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    //Tests
     testCompile 'junit:junit:4.12'
+    //Google
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
     compile 'com.android.support:support-v4:24.2.1'
     compile 'com.google.android.gms:play-services-location:9.4.0'
+    //Active Android
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
+    //Volley
     compile 'com.android.volley:volley:1.0.0'
+    //LibSimprints
     compile 'com.simprints:libsimprints:1.0.5'
+    //LibScanner
     compile 'com.simprints:libscanner:1.0.45'
-    compile 'com.simprints:libdata:1.0.19'
+    //LibData
+    compile 'com.simprints:libdata:1.0.20'
+    //LibCommon
     compile 'com.simprints:libcommon:1.0.41'
+    //LibMatcher
     compile 'com.simprints:libmatcher:1.0.11'
+    //Fabric
     compile('com.crashlytics.sdk.android:crashlytics:2.6.3@aar') {
         transitive = true;
     }

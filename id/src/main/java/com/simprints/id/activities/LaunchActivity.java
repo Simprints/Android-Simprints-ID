@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -39,6 +40,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
+import io.fabric.sdk.android.services.concurrency.AsyncTask;
 
 public class LaunchActivity extends AppCompatActivity
         implements Scanner.ScannerListener, DatabaseEventListener {
@@ -55,6 +57,8 @@ public class LaunchActivity extends AppCompatActivity
     private String callingPackage;
     private boolean isDataReady;
     private long minEndTime;
+
+    private int connectCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,11 +142,18 @@ public class LaunchActivity extends AppCompatActivity
         appState.setData(new DatabaseContext(apiKey, getApplicationContext(), this));
         appState.getData().validateApiKey();
 
-        //Start the background sync service incase it has failed for some reason
+        //Start the background sync service in case it has failed for some reason
         Intent pushIntent = new Intent(getApplicationContext(), BackgroundSync.class);
         getApplicationContext().startService(pushIntent);
 
-        connect();
+        new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... voids) {
+                Looper.prepare();
+                connect();
+                return null;
+            }
+        }.execute();
     }
 
     private void connect() {
@@ -299,6 +310,12 @@ public class LaunchActivity extends AppCompatActivity
                 launchAlert(ALERT_TYPE.NOT_PAIRED);
                 break;
             case CONNECTION_SCANNER_UNREACHABLE:
+                if(connectCount < 2){
+                    Log.d(this, "RECONNECT AFTER UNREACHABLE");
+                    appState.setScanner(null);
+                    connect();
+                    break;
+                }
                 launchAlert(ALERT_TYPE.DISCONNECTED);
                 break;
 
