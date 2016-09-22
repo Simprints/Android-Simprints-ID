@@ -21,6 +21,7 @@ import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+import com.facebook.stetho.Stetho;
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.BackgroundSync;
@@ -66,6 +67,7 @@ public class LaunchActivity extends AppCompatActivity
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
         Appsee.start(getString(R.string.com_appsee_apikey));
+        Stetho.initializeWithDefaults(this);
 
         appState = AppState.getInstance();
         positionTracker = new PositionTracker(this);
@@ -395,12 +397,11 @@ public class LaunchActivity extends AppCompatActivity
                     continueIfReady();
                 }
                 break;
+            case API_KEY_UNVERIFIED:
             case API_KEY_INVALID:
                 launchAlert(ALERT_TYPE.INVALID_API_KEY);
                 Answers.getInstance().logCustom(new CustomEvent("Invalid API Key")
                         .putCustomAttribute("API Key", appState.getApiKey()));
-                break;
-            case API_KEY_UNVERIFIED:
                 break;
             case DATABASE_RESOLVED:
                 isDataReady = true;
