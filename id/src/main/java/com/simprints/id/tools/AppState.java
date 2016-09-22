@@ -1,11 +1,19 @@
 package com.simprints.id.tools;
 
+import android.content.Context;
+import android.os.Looper;
+
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.simprints.id.activities.LaunchActivity;
 import com.simprints.libcommon.Session;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libscanner.Scanner;
 
 import java.util.Calendar;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+
+import io.fabric.sdk.android.services.concurrency.AsyncTask;
 
 
 @SuppressWarnings("unused")
@@ -33,7 +41,6 @@ public class AppState {
         Calendar c = Calendar.getInstance();
         session.setStartTime(c.getTime());
     }
-
 
     public boolean isEnrol() { return session.isEnrol(); }
 

@@ -58,8 +58,6 @@ public class LaunchActivity extends AppCompatActivity
     private boolean isDataReady;
     private long minEndTime;
 
-    private int connectCount;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,49 +144,59 @@ public class LaunchActivity extends AppCompatActivity
         Intent pushIntent = new Intent(getApplicationContext(), BackgroundSync.class);
         getApplicationContext().startService(pushIntent);
 
-        new AsyncTask<Void, Void, Void>(){
+        backgroundConnect();
+    }
+
+    private void backgroundConnect() {
+        new AsyncTask<Void, Void, Boolean>() {
+
             @Override
-            protected Void doInBackground(Void... voids) {
+            protected Boolean doInBackground(Void... voids) {
                 Looper.prepare();
-                connect();
-                return null;
+
+                // Initializes the session Scanner object if necessary
+                if (appState.getScanner() == null) {
+                    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+                    if (adapter == null) {
+                        launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
+                        return false;
+                    }
+                    if (!adapter.isEnabled()) {
+                        launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
+                        return false;
+                    }
+                    List<String> pairedScanners = Scanner.getPairedScanners();
+                    if (pairedScanners.size() == 0) {
+                        launchAlert(ALERT_TYPE.NOT_PAIRED);
+                        return false;
+                    }
+                    if (pairedScanners.size() > 1) {
+                        launchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS);
+                        return false;
+                    }
+                    String macAddress = pairedScanners.get(0);
+                    appState.setMacAddress(macAddress);
+                    Log.d(LaunchActivity.this, String.format("Scanner object initialised (MAC address = %s)",
+                            macAddress));
+                }
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                if (result) {
+                    // Initiate scanner connection
+                    Log.d(LaunchActivity.this, "Initiating scanner connection");
+                    appState.setScanner(new Scanner(appState.getMacAddress()));
+                    appState.getScanner().setScannerListener(LaunchActivity.this);
+                    appState.getScanner().connect();
+                    setupTimeOut();
+                }
             }
         }.execute();
     }
 
-    private void connect() {
-        // Initializes the session Scanner object if necessary
-        if (appState.getScanner() == null) {
-            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-            if (adapter == null) {
-                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
-                return;
-            }
-            if (!adapter.isEnabled()) {
-                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
-                return;
-            }
-            List<String> pairedScanners = Scanner.getPairedScanners();
-            if (pairedScanners.size() == 0) {
-                launchAlert(ALERT_TYPE.NOT_PAIRED);
-                return;
-            }
-            if (pairedScanners.size() > 1) {
-                launchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS);
-                return;
-            }
-            String macAddress = pairedScanners.get(0);
-            appState.setMacAddress(macAddress);
-            appState.setScanner(new Scanner(macAddress));
-            Log.d(this, String.format("Scanner object initialised (MAC address = %s)",
-                    macAddress));
-        }
-
-        // Initiate scanner connection
-        Log.d(this, "Initiating scanner connection");
-        appState.getScanner().setScannerListener(this);
-        appState.getScanner().connect();
-
+    private void setupTimeOut() {
         // Program a timeout event after CONNECTION_AND_VALIDATION_TIMEOUT ms
         handler.postDelayed(new Runnable() {
             @Override
@@ -292,67 +300,6 @@ public class LaunchActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onScannerEvent(com.simprints.libscanner.EVENT event) {
-        Log.d(this, String.format(Locale.UK,
-                "onScannerEvent %s, %s", event.name(), event.details()));
-
-        switch (event) {
-            case CONNECTION_SUCCESS:
-            case CONNECTION_ALREADY_CONNECTED:
-                continueIfReady();
-                break;
-
-            case CONNECTION_BLUETOOTH_DISABLED:
-                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
-                break;
-            case CONNECTION_SCANNER_UNBONDED:
-                launchAlert(ALERT_TYPE.NOT_PAIRED);
-                break;
-            case CONNECTION_SCANNER_UNREACHABLE:
-                if(connectCount < 2){
-                    Log.d(this, "RECONNECT AFTER UNREACHABLE");
-                    appState.setScanner(null);
-                    connect();
-                    break;
-                }
-                launchAlert(ALERT_TYPE.DISCONNECTED);
-                break;
-
-            case NOT_CONNECTED:
-            case NO_RESPONSE:
-            case SEND_REQUEST_IO_ERROR:
-            case CONNECTION_IO_ERROR:
-            case CONNECTION_BAD_SCANNER_FEATURE:
-            case UN20_WAKEUP_FAILURE:
-            case SCANNER_BUSY:
-            case UN20_CANNOT_CHECK_STATE:
-            case SET_UI_FAILURE:
-            case UPDATE_SENSOR_INFO_FAILURE:
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                break;
-
-            case UN20_WAKEUP_SUCCESS:
-            case UN20_WAKEUP_INVALID_STATE:
-                appState.getScanner().setUI(true, null, (short) -1);
-                break;
-
-            case SET_UI_SUCCESS:
-                appState.getScanner().updateSensorInfo();
-                break;
-
-            case UPDATE_SENSOR_INFO_SUCCESS:
-                appState.setHardwareVersion(appState.getScanner().getUcVersion());
-                waitForConfirmation();
-                break;
-
-            case TRIGGER_PRESSED:
-                if (waitingForConfirmation) {
-                    launch(new Intent(LaunchActivity.this, MainActivity.class), false);
-                }
-                break;
-        }
-    }
 
     private void resolveCommCareDatabase() {
         if (ContextCompat.checkSelfPermission(this, "org.commcare.dalvik.provider.cases.read")
@@ -397,7 +344,7 @@ public class LaunchActivity extends AppCompatActivity
             confirmConsentTextView.setVisibility(View.GONE);
             minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
             finishing = false;
-            connect();
+            backgroundConnect();
         } else {
             finishWith(resultCode, data);
         }
@@ -434,7 +381,7 @@ public class LaunchActivity extends AppCompatActivity
 
     @Override
     public void onDataEvent(Event event) {
-        switch (event){
+        switch (event) {
 
             case API_KEY_VALID:
                 if (appState.isEnrol()) {
@@ -467,4 +414,59 @@ public class LaunchActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onScannerEvent(com.simprints.libscanner.EVENT event) {
+        Log.d(this, String.format(Locale.UK,
+                "onScannerEvent %s, %s", event.name(), event.details()));
+
+        switch (event) {
+            case CONNECTION_SUCCESS:
+            case CONNECTION_ALREADY_CONNECTED:
+                continueIfReady();
+                break;
+
+            case CONNECTION_BLUETOOTH_DISABLED:
+                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
+                break;
+            case CONNECTION_SCANNER_UNBONDED:
+                launchAlert(ALERT_TYPE.NOT_PAIRED);
+                break;
+            case CONNECTION_SCANNER_UNREACHABLE:
+                launchAlert(ALERT_TYPE.DISCONNECTED);
+                break;
+
+            case NOT_CONNECTED:
+            case NO_RESPONSE:
+            case SEND_REQUEST_IO_ERROR:
+            case CONNECTION_IO_ERROR:
+            case CONNECTION_BAD_SCANNER_FEATURE:
+            case UN20_WAKEUP_FAILURE:
+            case SCANNER_BUSY:
+            case UN20_CANNOT_CHECK_STATE:
+            case SET_UI_FAILURE:
+            case UPDATE_SENSOR_INFO_FAILURE:
+                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                break;
+
+            case UN20_WAKEUP_SUCCESS:
+            case UN20_WAKEUP_INVALID_STATE:
+                appState.getScanner().setUI(true, null, (short) -1);
+                break;
+
+            case SET_UI_SUCCESS:
+                appState.getScanner().updateSensorInfo();
+                break;
+
+            case UPDATE_SENSOR_INFO_SUCCESS:
+                appState.setHardwareVersion(appState.getScanner().getUcVersion());
+                waitForConfirmation();
+                break;
+
+            case TRIGGER_PRESSED:
+                if (waitingForConfirmation) {
+                    launch(new Intent(LaunchActivity.this, MainActivity.class), false);
+                }
+                break;
+        }
+    }
 }
