@@ -148,50 +148,51 @@ public class LaunchActivity extends AppCompatActivity
     }
 
     private void backgroundConnect() {
-        new AsyncTask<Void, Void, Boolean>() {
+        // Initializes the session Scanner object if necessary
+        if (appState.getScanner() == null) {
+            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+            if (adapter == null) {
+                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
+                return;
+            }
+            if (!adapter.isEnabled()) {
+                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
+                return;
+            }
+            List<String> pairedScanners = Scanner.getPairedScanners();
+            if (pairedScanners.size() == 0) {
+                launchAlert(ALERT_TYPE.NOT_PAIRED);
+                return;
+            }
+            if (pairedScanners.size() > 1) {
+                launchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS);
+                return;
+            }
+            String macAddress = pairedScanners.get(0);
+            appState.setMacAddress(macAddress);
 
+
+            // Initiate scanner connection
+            Log.d(LaunchActivity.this, "Initiating scanner connection");
+            appState.setScanner(new Scanner(appState.getMacAddress()));
+            appState.getScanner().setScannerListener(LaunchActivity.this);
+
+
+            Log.d(LaunchActivity.this, String.format("Scanner object initialised (MAC address = %s)",
+                    macAddress));
+        }
+
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            protected Boolean doInBackground(Void... voids) {
-                Looper.prepare();
-
-                // Initializes the session Scanner object if necessary
-                if (appState.getScanner() == null) {
-                    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-                    if (adapter == null) {
-                        launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
-                        return false;
-                    }
-                    if (!adapter.isEnabled()) {
-                        launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
-                        return false;
-                    }
-                    List<String> pairedScanners = Scanner.getPairedScanners();
-                    if (pairedScanners.size() == 0) {
-                        launchAlert(ALERT_TYPE.NOT_PAIRED);
-                        return false;
-                    }
-                    if (pairedScanners.size() > 1) {
-                        launchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS);
-                        return false;
-                    }
-                    String macAddress = pairedScanners.get(0);
-                    appState.setMacAddress(macAddress);
-                    Log.d(LaunchActivity.this, String.format("Scanner object initialised (MAC address = %s)",
-                            macAddress));
-                }
-                return true;
+            protected Void doInBackground(Void... voids) {
+                appState.getScanner().connect();
+                return null;
             }
 
             @Override
-            protected void onPostExecute(Boolean result) {
-                if (result) {
-                    // Initiate scanner connection
-                    Log.d(LaunchActivity.this, "Initiating scanner connection");
-                    appState.setScanner(new Scanner(appState.getMacAddress()));
-                    appState.getScanner().setScannerListener(LaunchActivity.this);
-                    appState.getScanner().connect();
-                    setupTimeOut();
-                }
+            protected void onPostExecute(Void result) {
+                setupTimeOut();
+
             }
         }.execute();
     }
