@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements
     private final static int MATCHING_ACTIVITY_REQUEST_CODE = 1;
     private final static int SETTINGS_ACTIVITY_REQUEST_CODE = 2;
     private final static int PRIVACY_ACTIVITY_REQUEST_CODE = 3;
-
+    private final static int ABOUT_ACTIVITY_REQUEST_CODE = 4;
 
     private final static ScanConfig DEFAULT_CONFIG;
 
@@ -661,7 +661,8 @@ public class MainActivity extends AppCompatActivity implements
 ////                startActivity(new Intent(this, TroubleshootActivity.class));
 //                break;
             case R.id.nav_about:
-                startActivity(new Intent(this, AboutActivity.class));
+                startActivityForResult(new Intent(this, AboutActivity.class),
+                        ABOUT_ACTIVITY_REQUEST_CODE);
                 break;
             case R.id.nav_settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class),
@@ -768,6 +769,7 @@ public class MainActivity extends AppCompatActivity implements
         switch (requestCode) {
             case SETTINGS_ACTIVITY_REQUEST_CODE:
             case PRIVACY_ACTIVITY_REQUEST_CODE:
+            case ABOUT_ACTIVITY_REQUEST_CODE:
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
             default:
