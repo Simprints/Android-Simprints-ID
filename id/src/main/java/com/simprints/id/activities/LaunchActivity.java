@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -17,7 +16,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.activeandroid.ActiveAndroid;
 import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
@@ -25,7 +23,7 @@ import com.crashlytics.android.answers.CustomEvent;
 import com.facebook.stetho.Stetho;
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.BackgroundSync;
+import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
@@ -144,7 +142,7 @@ public class LaunchActivity extends AppCompatActivity
         appState.getData().validateApiKey();
 
         //Start the background sync service in case it has failed for some reason
-        Intent pushIntent = new Intent(getApplicationContext(), BackgroundSync.class);
+        Intent pushIntent = new Intent(getApplicationContext(), SyncService.class);
         getApplicationContext().startService(pushIntent);
 
         backgroundConnect();
@@ -314,6 +312,7 @@ public class LaunchActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
         positionTracker.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         switch (requestCode) {
             case InternalConstants.COMMCARE_PERMISSION_REQUEST:
                 if (grantResults.length > 0
