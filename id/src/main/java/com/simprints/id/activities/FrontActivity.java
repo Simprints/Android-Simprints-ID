@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.facebook.stetho.Stetho;
 import com.simprints.id.R;
+import com.simprints.id.backgroundSync.SchedulerReceiver;
 import com.simprints.id.tools.Language;
 
 public class FrontActivity extends AppCompatActivity {
@@ -32,5 +33,7 @@ public class FrontActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.versionTextView)).setText(version);
         ((TextView) findViewById(R.id.libSimprintsTextView)).setText(R.string.front_libSimprints_version);
+
+        new SchedulerReceiver().setAlarm(getApplicationContext());
     }
 }
