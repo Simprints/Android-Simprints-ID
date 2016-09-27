@@ -21,8 +21,13 @@ import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.facebook.stetho.Stetho;
+import com.google.android.gms.gcm.GcmNetworkManager;
+import com.google.android.gms.gcm.PeriodicTask;
+import com.google.android.gms.gcm.Task;
 import com.simprints.id.R;
+import com.simprints.id.backgroundSync.GcmSyncService;
 import com.simprints.id.backgroundSync.SchedulerReceiver;
+import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.tools.InternalConstants;
@@ -143,7 +148,7 @@ public class LaunchActivity extends AppCompatActivity
         appState.getData().validateApiKey();
 
         //Start the background sync service in case it has failed for some reason
-        new SchedulerReceiver().setAlarm(getApplicationContext());
+        new SyncSetup(getApplicationContext()).initialize();
 
         backgroundConnect();
     }
