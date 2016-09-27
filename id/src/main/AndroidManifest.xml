@@ -105,25 +105,11 @@
             android:name=".activities.PrivacyActivity"
             android:label="Privacy" />
 
-        <receiver
-            android:name=".backgroundSync.SyncBroadcasts"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".backgroundSync.SchedulerReceiver"
-            android:process=":remote" />
-
         <receiver android:name=".receivers.CommCareReceiver">
             <intent-filter>
                 <action android:name="org.commcare.dalvik.api.action.case.selected" />
             </intent-filter>
         </receiver>
-
-        <service android:name=".backgroundSync.SyncService" />
 
         <service android:name=".backgroundSync.GcmSyncService"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"

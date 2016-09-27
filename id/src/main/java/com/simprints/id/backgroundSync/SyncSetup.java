@@ -33,8 +33,6 @@ public class SyncSetup {
                     .build();
 
             mGcmNetworkManager.schedule(task);
-        } else {
-            new SchedulerReceiver().setAlarm(context);
         }
     }
 
@@ -48,7 +46,7 @@ public class SyncSetup {
                 if(context instanceof Activity) {
                     availability.getErrorDialog((Activity) context, resultCode, RC_PLAY_SERVICES).show();
                 }
-                return true;
+                return false;
             } else {
                 // Unresolvable error
                 Toast.makeText(context, "Google Play Services error", Toast.LENGTH_SHORT).show();
