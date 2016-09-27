@@ -1,23 +1,20 @@
 package com.simprints.id.activities;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.PeriodicTask;
-import com.google.android.gms.gcm.Task;
 import com.simprints.id.R;
-import com.simprints.id.backgroundSync.GcmSyncService;
-import com.simprints.id.backgroundSync.SchedulerReceiver;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.Language;
+import com.simprints.id.tools.PermissionManager;
 
 public class FrontActivity extends AppCompatActivity {
 
@@ -45,7 +42,18 @@ public class FrontActivity extends AppCompatActivity {
 
         new SyncSetup(getApplicationContext()).initialize();
 
+        PermissionManager.requestPermissions(FrontActivity.this);
     }
 
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
 }
