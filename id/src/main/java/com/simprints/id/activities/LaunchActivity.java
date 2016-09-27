@@ -7,32 +7,25 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.facebook.stetho.Stetho;
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.PeriodicTask;
-import com.google.android.gms.gcm.Task;
 import com.simprints.id.R;
-import com.simprints.id.backgroundSync.GcmSyncService;
-import com.simprints.id.backgroundSync.SchedulerReceiver;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
+import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
@@ -149,6 +142,9 @@ public class LaunchActivity extends AppCompatActivity
 
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
+
+        //Check the android permissions
+        PermissionManager.requestPermissions(LaunchActivity.this);
 
         backgroundConnect();
     }
@@ -301,14 +297,9 @@ public class LaunchActivity extends AppCompatActivity
         }
     }
 
-
     private void resolveCommCareDatabase() {
         if (ContextCompat.checkSelfPermission(this, "org.commcare.dalvik.provider.cases.read")
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{"org.commcare.dalvik.provider.cases.read"},
-                    InternalConstants.COMMCARE_PERMISSION_REQUEST);
-        } else {
+                == PackageManager.PERMISSION_GRANTED) {
             appState.getData().resolveCommCare(getContentResolver());
         }
     }
@@ -316,23 +307,21 @@ public class LaunchActivity extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
-        positionTracker.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch (requestCode) {
-            case InternalConstants.COMMCARE_PERMISSION_REQUEST:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    resolveCommCareDatabase();
-                } else {
-                    Toast.makeText(this, "Warning: could not synchronize with CommCare",
-                            Toast.LENGTH_LONG).show();
-                    Crashlytics.log(0, "CommCare DB resolution", "No permission");
-                    isDataReady = true;
-                    continueIfReady();
-                }
-                break;
+        //If a permission is denied fail out safely
+        for (int permissionResult : grantResults) {
+            if (permissionResult == -1) {
+                waitingForConfirmation = false;
+                finishing = true;
+                setResult(RESULT_CANCELED);
+                finish();
+            }
         }
+
+        positionTracker.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        resolveCommCareDatabase();
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -384,7 +373,6 @@ public class LaunchActivity extends AppCompatActivity
     @Override
     public void onDataEvent(Event event) {
         switch (event) {
-
             case API_KEY_VALID:
                 if (appState.isEnrol()) {
                     Answers.getInstance().logCustom(new CustomEvent("Login")
