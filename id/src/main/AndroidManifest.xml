@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-feature android:name="android.hardware.location.gps" />
 
@@ -112,6 +113,10 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".backgroundSync.SchedulerReceiver"
+            android:process=":remote" />
+
         <receiver android:name=".receivers.CommCareReceiver">
             <intent-filter>
                 <action android:name="org.commcare.dalvik.api.action.case.selected" />
@@ -119,6 +124,14 @@
         </receiver>
 
         <service android:name=".backgroundSync.SyncService" />
+
+        <service android:name=".backgroundSync.GcmSyncService"
+            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY"/>
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
