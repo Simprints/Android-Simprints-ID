@@ -1,7 +1,6 @@
 package com.simprints.id.backgroundSync;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
@@ -12,7 +11,6 @@ import com.simprints.libdata.Event;
 import com.simprints.libdata.models.M_ApiKey;
 
 import java.util.List;
-
 
 public class GcmSyncService extends GcmTaskService {
 
@@ -34,7 +32,6 @@ public class GcmSyncService extends GcmTaskService {
                 @Override
                 public void onDataEvent(Event event) {
                     Log.d("GcmSyncService", event.toString());
-                    Toast.makeText(getApplicationContext(), event.toString(), Toast.LENGTH_SHORT).show();
                 }
             }).sync();
         }
