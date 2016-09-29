@@ -1,5 +1,6 @@
 package com.simprints.id.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -110,8 +111,9 @@ public class MainActivity extends AppCompatActivity implements
     private boolean promptContinue = false;
     private MenuItem syncItem;
 
-    @Override
+    private ProgressDialog un20WakeupDialog;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -144,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements
         initBarAndDrawer();
         initIndicators();
         initScanButton();
+        initUn20Dialog();
         initViewPager();
         refreshDisplay();
     }
@@ -227,6 +230,13 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
+    private void initUn20Dialog() {
+        un20WakeupDialog = new ProgressDialog(MainActivity.this);
+        un20WakeupDialog.setIndeterminate(true);
+        un20WakeupDialog.setCanceledOnTouchOutside(false);
+        un20WakeupDialog.setMessage("Re-Connecting...");
+    }
+
     private void toggleContinuousCapture() {
         switch (activeFingers.get(currentActiveFingerNo).getStatus()) {
             case GOOD_SCAN:
@@ -245,13 +255,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case COLLECTING:
                 scanButton.setEnabled(false);
-                if (appState.getScanner().stopContinuousCapture()) {
-                    break;
-                }
-//                else {
-//                    activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
-//                    refreshDisplay();
-//                }
+                appState.getScanner().stopContinuousCapture();
                 break;
         }
     }
@@ -338,6 +342,16 @@ public class MainActivity extends AppCompatActivity implements
                 continueItem.setEnabled(nbCollected > 0);
             }
         }
+    }
+
+    private void resetUIfromError() {
+        if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.NOT_COLLECTED) {
+            activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
+        } else {
+            activeFingers.get(currentActiveFingerNo).setStatus(previousStatus);
+        }
+        refreshDisplay();
+        scanButton.setEnabled(true);
     }
 
     private void finishWithUnexpectedError() {
@@ -430,7 +444,6 @@ public class MainActivity extends AppCompatActivity implements
 
                 break;
 
-            case CONTINUOUS_CAPTURE_ERROR:
             case EXTRACT_IMAGE_QUALITY_NO_IMAGE: // Image quality extraction failed because there is no image available
             case EXTRACT_IMAGE_QUALITY_SDK_ERROR: // Image quality extraction failed because of an error in UN20 SDK
             case EXTRACT_IMAGE_QUALITY_FAILURE: // Image quality extraction failed for abnormal reasons, SHOULD NOT HAPPEN
@@ -441,24 +454,23 @@ public class MainActivity extends AppCompatActivity implements
             case EXTRACT_TEMPLATE_NO_TEMPLATE: // Template extraction failed because there is no template available
             case EXTRACT_TEMPLATE_IO_ERROR: // Template extraction failed because of an IO error
             case EXTRACT_TEMPLATE_FAILURE: // Template extraction failed for abnormal reasons, SHOULD NOT HAPPEN
-                if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.NOT_COLLECTED) {
-                    activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
-                } else {
-                    activeFingers.get(currentActiveFingerNo).setStatus(previousStatus);
-                }
-                refreshDisplay();
-                scanButton.setEnabled(true);
+                resetUIfromError();
                 break;
 
+            case CONTINUOUS_CAPTURE_ERROR:
             case CAPTURE_IMAGE_INVALID_STATE: // Image capture failed because the un20 is not awaken
+                resetUIfromError();
                 appState.getScanner().un20Wakeup();
+                un20WakeupDialog.show();
+                break;
 
             case UN20_WAKEUP_SUCCESS: // UN20 woken up successfully
-                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                int qualityScore = sharedPref.getInt(getString(R.string.pref_quality_theshold), 60);
-                Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
-                appState.getScanner().startContinuousCapture(qualityScore);
+                un20WakeupDialog.cancel();
+//                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+//                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+//                int qualityScore = sharedPref.getInt(getString(R.string.pref_quality_theshold), 60);
+//                Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
+//                appState.getScanner().startContinuousCapture(qualityScore);
                 break;
 
             case CONNECTION_SCANNER_UNREACHABLE:
