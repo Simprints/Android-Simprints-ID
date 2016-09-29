@@ -54,6 +54,7 @@
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
         android:text="@string/scan"
+        android:longClickable="true"
         android:textSize="20sp"
         android:textColor="#7F000000" />
 

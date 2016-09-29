@@ -214,6 +214,17 @@ public class MainActivity extends AppCompatActivity implements
                 toggleContinuousCapture();
             }
         });
+        scanButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (activeFingers.get(currentActiveFingerNo).getStatus() != Status.COLLECTING) {
+                    activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
+                    activeFingers.get(currentActiveFingerNo).setTemplate(null);
+                    refreshDisplay();
+                }
+                return true;
+            }
+        });
     }
 
     private void toggleContinuousCapture() {
@@ -234,7 +245,13 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case COLLECTING:
                 scanButton.setEnabled(false);
-                appState.getScanner().stopContinuousCapture();
+                if (appState.getScanner().stopContinuousCapture()) {
+                    break;
+                }
+//                else {
+//                    activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
+//                    refreshDisplay();
+//                }
                 break;
         }
     }
@@ -384,10 +401,6 @@ public class MainActivity extends AppCompatActivity implements
                 appState.getScanner().generateTemplate();
                 break;
 
-            case CONTINUOUS_CAPTURE_ERROR:
-                break;
-
-
             case GENERATE_TEMPLATE_SUCCESS: // Template generated successfully
                 appState.getScanner().extractTemplate();
                 break;
@@ -417,6 +430,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 break;
 
+            case CONTINUOUS_CAPTURE_ERROR:
             case EXTRACT_IMAGE_QUALITY_NO_IMAGE: // Image quality extraction failed because there is no image available
             case EXTRACT_IMAGE_QUALITY_SDK_ERROR: // Image quality extraction failed because of an error in UN20 SDK
             case EXTRACT_IMAGE_QUALITY_FAILURE: // Image quality extraction failed for abnormal reasons, SHOULD NOT HAPPEN
@@ -427,9 +441,13 @@ public class MainActivity extends AppCompatActivity implements
             case EXTRACT_TEMPLATE_NO_TEMPLATE: // Template extraction failed because there is no template available
             case EXTRACT_TEMPLATE_IO_ERROR: // Template extraction failed because of an IO error
             case EXTRACT_TEMPLATE_FAILURE: // Template extraction failed for abnormal reasons, SHOULD NOT HAPPEN
-                activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
+                if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.NOT_COLLECTED) {
+                    activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
+                } else {
+                    activeFingers.get(currentActiveFingerNo).setStatus(previousStatus);
+                }
                 refreshDisplay();
-                finishWithUnexpectedError();
+                scanButton.setEnabled(true);
                 break;
 
             case CAPTURE_IMAGE_INVALID_STATE: // Image capture failed because the un20 is not awaken
@@ -443,7 +461,6 @@ public class MainActivity extends AppCompatActivity implements
                 appState.getScanner().startContinuousCapture(qualityScore);
                 break;
 
-
             case CONNECTION_SCANNER_UNREACHABLE:
                 break;
             case DISCONNECTION_INITIATED: // Disconnection initiated
@@ -452,7 +469,6 @@ public class MainActivity extends AppCompatActivity implements
             // success conditions
             case SEND_REQUEST_SUCCESS: // Request sent successfully
             case CONNECTION_INITIATED:
-                break;
             case CONNECTION_SUCCESS: // Successfully connected to scanner
             case DISCONNECTION_SUCCESS: // Successfully disconnected from scanner
             case UPDATE_SENSOR_INFO_SUCCESS: // Sensor info was successfully updated
