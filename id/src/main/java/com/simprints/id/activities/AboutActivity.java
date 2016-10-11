@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
+import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
 
 public class AboutActivity extends AppCompatActivity {
@@ -41,7 +42,8 @@ public class AboutActivity extends AppCompatActivity {
         }
         ((TextView) findViewById(R.id.appVersionTextView)).setText(version);
 
-        ((TextView) findViewById(R.id.libSimprintsVersionTextView)).setText("1.0.5");
+        ((TextView) findViewById(R.id.libSimprintsVersionTextView))
+                .setText(InternalConstants.LIBSIMPRINTS_VERSION);
 
         AppState appState = AppState.getInstance();
         short firmwareVersion = 0;
