@@ -1,7 +1,9 @@
 package com.simprints.id.activities;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,7 +20,6 @@ import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
-import com.facebook.stetho.Stetho;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.AppState;
@@ -65,7 +66,6 @@ public class LaunchActivity extends AppCompatActivity
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
         Appsee.start(getString(R.string.com_appsee_apikey));
-        Stetho.initializeWithDefaults(this);
 
         appState = AppState.getInstance();
         positionTracker = new PositionTracker(this);
@@ -138,6 +138,7 @@ public class LaunchActivity extends AppCompatActivity
         // Initializes the session Data object
         DatabaseContext.initActiveAndroid(getApplicationContext());
         appState.setData(new DatabaseContext(apiKey, getApplicationContext(), this));
+        checkDbReset();
         appState.getData().validateApiKey();
 
         //Start the background sync service in case it has failed for some reason
@@ -147,6 +148,22 @@ public class LaunchActivity extends AppCompatActivity
         PermissionManager.requestPermissions(LaunchActivity.this);
 
         backgroundConnect();
+    }
+
+    private void checkDbReset(){
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+                getApplicationContext().getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        int dbVersion = sharedPref.getInt(getApplicationContext().getString(R.string.db_version_int), 0);
+
+        if (dbVersion == 0) {
+            appState.getData().reset();
+            DatabaseContext.initActiveAndroid(getApplicationContext());
+            appState.setData(new DatabaseContext(appState.getApiKey(), getApplicationContext(), this));
+
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(getString(R.string.db_version_int), InternalConstants.DATABASE_VERSION_NUMBER);
+            editor.apply();
+        }
     }
 
     private void backgroundConnect() {

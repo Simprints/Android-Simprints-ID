@@ -1,6 +1,5 @@
 package com.simprints.id.activities;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -10,7 +9,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import com.facebook.stetho.Stetho;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.Language;
@@ -24,8 +22,6 @@ public class FrontActivity extends AppCompatActivity {
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_front);
-
-        Stetho.initializeWithDefaults(this);
 
         PackageInfo pInfo;
         String version = "";
