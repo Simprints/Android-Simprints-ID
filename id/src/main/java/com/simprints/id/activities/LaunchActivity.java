@@ -379,11 +379,6 @@ public class LaunchActivity extends AppCompatActivity
 
                     case RESULT_OK:
                     case RESULT_CANCELED:
-                        ArrayList<Identification> identifications = data.getParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS);
-                        for (Identification ids : identifications) {
-                            android.util.Log.d("Final return ids: ", ids.getGuid() + " " + ids.getConfidence());
-                        }
-
                         finishWith(resultCode, data);
                         break;
                 }
