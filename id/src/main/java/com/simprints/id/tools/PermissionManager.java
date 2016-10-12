@@ -10,7 +10,7 @@ public class PermissionManager {
 
     public static void requestPermissions(Activity context) {
         int PERMISSION_ALL = 1;
-        String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, "org.commcare.dalvik.provider.cases.read"};
+        String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, InternalConstants.COMMCARE_PERMISSION};
 
         if (!hasPermissions(context, PERMISSIONS)) {
             ActivityCompat.requestPermissions(context, PERMISSIONS, PERMISSION_ALL);

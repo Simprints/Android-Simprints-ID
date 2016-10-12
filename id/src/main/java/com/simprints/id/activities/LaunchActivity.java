@@ -317,7 +317,7 @@ public class LaunchActivity extends AppCompatActivity
     }
 
     private void resolveCommCareDatabase() {
-        if (ContextCompat.checkSelfPermission(this, "org.commcare.dalvik.provider.cases.read")
+        if (ContextCompat.checkSelfPermission(this, InternalConstants.COMMCARE_PERMISSION)
                 == PackageManager.PERMISSION_GRANTED) {
             appState.getData().resolveCommCare(getContentResolver());
         }
@@ -327,13 +327,15 @@ public class LaunchActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
 
-        //If a permission is denied fail out safely
-        for (int permissionResult : grantResults) {
-            if (permissionResult == -1) {
-                waitingForConfirmation = false;
-                finishing = true;
-                setResult(RESULT_CANCELED);
-                finish();
+        for (int x = 0; x < permissions.length; x++) {
+            if (grantResults[x] == -1) {
+                if (!permissions[x].equalsIgnoreCase(InternalConstants.COMMCARE_PERMISSION)) {
+                    finishLaunch();
+                } else {
+                    if (callingPackage != null && callingPackage.equalsIgnoreCase(InternalConstants.COMMCARE_PACKAGE)) {
+                        finishLaunch();
+                    }
+                }
             }
         }
 
@@ -341,6 +343,12 @@ public class LaunchActivity extends AppCompatActivity
         resolveCommCareDatabase();
     }
 
+    public void finishLaunch() {
+        waitingForConfirmation = false;
+        finishing = true;
+        setResult(RESULT_CANCELED);
+        finish();
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
