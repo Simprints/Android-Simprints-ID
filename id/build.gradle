@@ -7,7 +7,7 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 24
-        versionCode 22
+        versionCode 23
     }
     buildTypes {
         release {
@@ -18,11 +18,11 @@ android {
     productFlavors {
         development {
             applicationId 'com.simprints.id.development'
-            versionName '0.0.22'
+            versionName '0.0.23'
         }
         production {
             applicationId 'com.simprints.id'
-            versionName '1.0.22'
+            versionName '1.0.23'
         }
     }
 }

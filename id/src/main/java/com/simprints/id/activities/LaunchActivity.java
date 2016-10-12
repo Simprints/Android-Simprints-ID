@@ -24,7 +24,6 @@ import com.facebook.stetho.Stetho;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PermissionManager;
@@ -35,9 +34,7 @@ import com.simprints.libdata.Event;
 import com.simprints.libscanner.BluetoothCom;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
-import com.simprints.libsimprints.Identification;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -45,7 +42,16 @@ import java.util.UUID;
 import io.fabric.sdk.android.Fabric;
 import io.fabric.sdk.android.services.concurrency.AsyncTask;
 
-import static com.simprints.id.tools.InternalConstants.*;
+import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
+import static com.simprints.id.tools.InternalConstants.ALERT_TYPE_EXTRA;
+import static com.simprints.id.tools.InternalConstants.COMMCARE_PACKAGE;
+import static com.simprints.id.tools.InternalConstants.COMMCARE_PERMISSION;
+import static com.simprints.id.tools.InternalConstants.DATABASE_VERSION_NUMBER;
+import static com.simprints.id.tools.InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST;
+import static com.simprints.id.tools.InternalConstants.LOCATION_PERMISSION_REQUEST;
+import static com.simprints.id.tools.InternalConstants.MAIN_ACTIVITY_REQUEST;
+import static com.simprints.id.tools.InternalConstants.RESOLUTION_REQUEST;
+import static com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN;
 
 public class LaunchActivity extends AppCompatActivity
         implements Scanner.ScannerListener, DatabaseEventListener {
