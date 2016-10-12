@@ -467,11 +467,6 @@ public class MainActivity extends AppCompatActivity implements
 
             case UN20_WAKEUP_SUCCESS: // UN20 woken up successfully
                 un20WakeupDialog.cancel();
-//                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-//                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-//                int qualityScore = sharedPref.getInt(getString(R.string.pref_quality_theshold), 60);
-//                Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
-//                appState.getScanner().startContinuousCapture(qualityScore);
                 break;
 
             case CONNECTION_SCANNER_UNREACHABLE:
