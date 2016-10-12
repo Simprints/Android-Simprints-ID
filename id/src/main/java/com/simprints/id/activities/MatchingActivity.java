@@ -75,7 +75,7 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
                 new Thread(new Runnable() {
                     public void run() {
                         LibMatcher matcher = new LibMatcher(probe, candidates,
-                                LibMatcher.MATCHER_TYPE.SOURCEAFIS, scores, MatchingActivity.this, 1);
+                                LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY, scores, MatchingActivity.this, 1);
                         matcher.start();
                     }
                 }).start();

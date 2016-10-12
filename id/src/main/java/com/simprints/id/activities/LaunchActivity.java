@@ -35,13 +35,17 @@ import com.simprints.libdata.Event;
 import com.simprints.libscanner.BluetoothCom;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
+import com.simprints.libsimprints.Identification;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
 import io.fabric.sdk.android.services.concurrency.AsyncTask;
+
+import static com.simprints.id.tools.InternalConstants.*;
 
 public class LaunchActivity extends AppCompatActivity
         implements Scanner.ScannerListener, DatabaseEventListener {
@@ -160,7 +164,7 @@ public class LaunchActivity extends AppCompatActivity
             DatabaseContext.reset(getApplicationContext());
 
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt(getString(R.string.db_version_int), InternalConstants.DATABASE_VERSION_NUMBER);
+            editor.putInt(getString(R.string.db_version_int), DATABASE_VERSION_NUMBER);
             editor.apply();
         }
 
@@ -277,13 +281,13 @@ public class LaunchActivity extends AppCompatActivity
                 public void run() {
                     Log.d(LaunchActivity.this, String.format(Locale.UK,
                             "Starting child activity %s", intent.getAction()));
-                    startActivityForResult(intent, 1);
+                    startActivityForResult(intent, MAIN_ACTIVITY_REQUEST);
                 }
             }, remainingTime);
         } else {
             Log.d(LaunchActivity.this, String.format(Locale.UK,
                     "Starting child activity %s", intent.getAction()));
-            startActivityForResult(intent, 1);
+            startActivityForResult(intent, MAIN_ACTIVITY_REQUEST);
         }
 
     }
@@ -295,7 +299,7 @@ public class LaunchActivity extends AppCompatActivity
         }
         handler.removeCallbacksAndMessages(null);
         Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra(InternalConstants.ALERT_TYPE_EXTRA, alertType);
+        intent.putExtra(ALERT_TYPE_EXTRA, alertType);
         launch(intent, true);
     }
 
@@ -317,7 +321,7 @@ public class LaunchActivity extends AppCompatActivity
     }
 
     private void resolveCommCareDatabase() {
-        if (ContextCompat.checkSelfPermission(this, InternalConstants.COMMCARE_PERMISSION)
+        if (ContextCompat.checkSelfPermission(this, COMMCARE_PERMISSION)
                 == PackageManager.PERMISSION_GRANTED) {
             appState.getData().resolveCommCare(getContentResolver());
         }
@@ -329,10 +333,10 @@ public class LaunchActivity extends AppCompatActivity
 
         for (int x = 0; x < permissions.length; x++) {
             if (grantResults[x] == -1) {
-                if (!permissions[x].equalsIgnoreCase(InternalConstants.COMMCARE_PERMISSION)) {
+                if (!permissions[x].equalsIgnoreCase(COMMCARE_PERMISSION)) {
                     finishLaunch();
                 } else {
-                    if (callingPackage != null && callingPackage.equalsIgnoreCase(InternalConstants.COMMCARE_PACKAGE)) {
+                    if (callingPackage != null && callingPackage.equalsIgnoreCase(COMMCARE_PACKAGE)) {
                         finishLaunch();
                     }
                 }
@@ -353,20 +357,37 @@ public class LaunchActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(this, String.format(Locale.UK,
-                "onActivityResult, resultCode = %d", resultCode));
+                "onActivityResult, resultCode = %d, requestCode = %d", resultCode, requestCode));
 
-        if (requestCode == InternalConstants.RESOLUTION_REQUEST || requestCode == InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST) {
-            positionTracker.onActivityResult(requestCode, resultCode, data);
-        } else {
-            if (resultCode == InternalConstants.RESULT_TRY_AGAIN) {
-                progressBar.setVisibility(View.VISIBLE);
-                confirmConsentTextView.setVisibility(View.GONE);
-                minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
-                finishing = false;
-                backgroundConnect();
-            } else {
-                finishWith(0, data);
-            }
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQUEST:
+                break;
+            case RESOLUTION_REQUEST:
+            case GOOGLE_SERVICE_UPDATE_REQUEST:
+                positionTracker.onActivityResult(requestCode, resultCode, data);
+                break;
+            case MAIN_ACTIVITY_REQUEST:
+            case ALERT_ACTIVITY_REQUEST:
+                switch (resultCode) {
+                    case RESULT_TRY_AGAIN:
+                        progressBar.setVisibility(View.VISIBLE);
+                        confirmConsentTextView.setVisibility(View.GONE);
+                        minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
+                        finishing = false;
+                        backgroundConnect();
+                        break;
+
+                    case RESULT_OK:
+                    case RESULT_CANCELED:
+                        ArrayList<Identification> identifications = data.getParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS);
+                        for (Identification ids : identifications) {
+                            android.util.Log.d("Final return ids: ", ids.getGuid() + " " + ids.getConfidence());
+                        }
+
+                        finishWith(resultCode, data);
+                        break;
+                }
+                break;
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -413,7 +434,7 @@ public class LaunchActivity extends AppCompatActivity
                             .putCustomAttribute("API Key", appState.getApiKey())
                             .putCustomAttribute("Type", "Identify"));
                 }
-                if (InternalConstants.COMMCARE_PACKAGE.equals(callingPackage)) {
+                if (COMMCARE_PACKAGE.equals(callingPackage)) {
                     resolveCommCareDatabase();
                 } else {
                     isDataReady = true;
