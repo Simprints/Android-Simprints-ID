@@ -103,15 +103,6 @@ public class PositionTracker implements
         }
     }
 
-
-
-
-
-
-
-
-
-
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.d(activity, "onConnected");
@@ -138,8 +129,6 @@ public class PositionTracker implements
                         InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST).show();
         }
     }
-
-
 
     private boolean requestPermission() {
         int locationPermission = ContextCompat.checkSelfPermission(
@@ -240,7 +229,6 @@ public class PositionTracker implements
         }
     }
 
-
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
@@ -250,7 +238,5 @@ public class PositionTracker implements
                     location.getLatitude(), location.getLongitude()));
         }
     }
-
-
 
 }

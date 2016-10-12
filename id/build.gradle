@@ -64,7 +64,7 @@ dependencies {
     //LibScanner
     compile 'com.simprints:libscanner:1.0.45'
     //LibData
-    compile 'com.simprints:libdata:1.0.25'
+    compile 'com.simprints:libdata:1.0.26'
     //LibCommon
     compile 'com.simprints:libcommon:1.0.41'
     //LibMatcher
