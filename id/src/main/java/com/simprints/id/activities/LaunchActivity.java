@@ -138,10 +138,7 @@ public class LaunchActivity extends AppCompatActivity
         Log.d(this, String.format(Locale.UK, "callingPackage = %s", callingPackage));
 
         // Initializes the session Data object
-        DatabaseContext.initActiveAndroid(getApplicationContext());
-        appState.setData(new DatabaseContext(apiKey, getApplicationContext(), this));
-        checkDbReset();
-        appState.getData().validateApiKey();
+        initDatabase(appState.getApiKey());
 
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
@@ -152,20 +149,23 @@ public class LaunchActivity extends AppCompatActivity
         backgroundConnect();
     }
 
-    private void checkDbReset(){
+    private void initDatabase(String apiKey) {
+        DatabaseContext.initActiveAndroid(getApplicationContext());
+
         SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
                 getApplicationContext().getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         int dbVersion = sharedPref.getInt(getApplicationContext().getString(R.string.db_version_int), 0);
 
         if (dbVersion == 0) {
-            appState.getData().reset();
-            DatabaseContext.initActiveAndroid(getApplicationContext());
-            appState.setData(new DatabaseContext(appState.getApiKey(), getApplicationContext(), this));
+            DatabaseContext.reset(getApplicationContext());
 
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putInt(getString(R.string.db_version_int), InternalConstants.DATABASE_VERSION_NUMBER);
             editor.apply();
         }
+
+        appState.setData(new DatabaseContext(apiKey, getApplicationContext(), this));
+        appState.getData().validateApiKey();
     }
 
     private void backgroundConnect() {
@@ -277,13 +277,13 @@ public class LaunchActivity extends AppCompatActivity
                 public void run() {
                     Log.d(LaunchActivity.this, String.format(Locale.UK,
                             "Starting child activity %s", intent.getAction()));
-                    startActivityForResult(intent, 0);
+                    startActivityForResult(intent, 1);
                 }
             }, remainingTime);
         } else {
             Log.d(LaunchActivity.this, String.format(Locale.UK,
                     "Starting child activity %s", intent.getAction()));
-            startActivityForResult(intent, 0);
+            startActivityForResult(intent, 1);
         }
 
     }
@@ -347,16 +347,18 @@ public class LaunchActivity extends AppCompatActivity
         Log.d(this, String.format(Locale.UK,
                 "onActivityResult, resultCode = %d", resultCode));
 
-        positionTracker.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == InternalConstants.RESULT_TRY_AGAIN) {
-            progressBar.setVisibility(View.VISIBLE);
-            confirmConsentTextView.setVisibility(View.GONE);
-            minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
-            finishing = false;
-            backgroundConnect();
+        if (requestCode == InternalConstants.RESOLUTION_REQUEST || requestCode == InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST) {
+            positionTracker.onActivityResult(requestCode, resultCode, data);
         } else {
-            finishWith(resultCode, data);
+            if (resultCode == InternalConstants.RESULT_TRY_AGAIN) {
+                progressBar.setVisibility(View.VISIBLE);
+                confirmConsentTextView.setVisibility(View.GONE);
+                minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
+                finishing = false;
+                backgroundConnect();
+            } else {
+                finishWith(0, data);
+            }
         }
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -382,6 +384,7 @@ public class LaunchActivity extends AppCompatActivity
             appState.getData().saveSession(appState.getReadyToSendSession());
         }
         positionTracker.finish();
+        android.util.Log.d(this.getLocalClassName(), "finishing = " + finishing);
         if (finishing && appState.getScanner() != null) {
             appState.getScanner().destroy();
             appState.setScanner(null);

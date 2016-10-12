@@ -33,6 +33,7 @@ import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.tools.AppState;
+import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.ViewPagerCustom;
