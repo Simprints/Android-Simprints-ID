@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Id</string>
+    <string name="short_consent">আমি আপনার আঙুলের ছাপ এবং অবস্থান ব্যবহার করতে চাই যেন সিমপ্রিন্টস আপনার স্বাস্থ্য তথ্য সমূহ খুঁজে পায়। যদি আপনি এতে রাজী থাকেন অথবা আপনার কোন প্রশ্ন থেকে থাকে তবে আমাকে জানান অন্যথায় আপনার বামহাতের তর্জনী সেন্সরে সমানভাবে রাখুন"</string>
+     <string name="long_consent">
+        <b><u>Privacy and Consent</u></b>\n\n
+        আপনি যদি আপনার আঙুল স্ক্যানারে রাখেন তবে তা আপনার আঙুলের ছাপ সংগ্রহ করবে এটি আরো আপনার সম্ভাব্য অবস্থান, যেখানে ছাপ গ্রহন করা হয়েছে এবং সময় ও তারিখও নথিবদ্ধ করবে \n \n
+        একটি বৃটিশ বেসরকারী প্রতিষ্ঠান সিমপ্রিন্টস টেকনোলজি লিমিটেড আপনার এ তথ্য গুলো যাচাই করবে \n\n
+        ভবিষ্যতে আপনাকে চিহ্নিত করে আপনার স্বাস্থ্য বিষয়ক তথ্যের সাথে সমন্বয় সাধনের জন্য সিমপ্রিন্টস ব্র্যাককে সহায়তা করবে। এরই অংশ হিসাবে সিমপ্রিন্টস আপনার তথ্য সমূহের জন্য ব্র্যাকের সাথে অংশীদারি হবে \n\n
+        সিমপ্রিন্টস আপনার তথ্য আরো ব্যবহার করতে পারে তাদের সেবা প্রদানের উন্নয়নের জন্য এবং তার একই উদ্দেশ্য অন্যান্য বিশেষজ্ঞদের সাথেও আপনার তথ্য পর্যালোচনা করতে পারে \n\n
+        বাংলাদেশের স্বাস্থ্যব্যবস্থার উন্নততর প্রয়োগের জন্যও সিমপ্রিন্টস আপনার তথ্য ব্যবহার করতে পারে \n\n
+        ভবিষ্যতে আপনাকে চিহ্নিত করার জন্য এবং আপনার তথ্য সমূহ অন্যান্য অংশীদার উন্নয়ন প্রতিষ্ঠানের সাথে পর্যালোচনার জন্যও সিমপ্রিন্টস আপনার তথ্য ব্যবহার করতে পারে \n\n
+        সিমপ্রিন্টস আশা করে যে বাংলাদেশে এই কার্যক্রম ২০২০ সাল পর্যন্ত স্থায়ী হবে এই সময় কালের জন্য সিমপ্রিন্টস তাদের কাজের জন্য আপনার  তথ্য সমূহ সংরক্ষণ করবে এবং দুই বছর পর এই কাজ শেষ হয়ে গেলে সিমপ্রিন্টস আপনার তথ্য সমূহ মুছে দেবে \n\n
+        Simprints will not store any fingerprint images. \n\n
+        Simprints will not give any information that it holds on you to any state, unless required to do so by law. \n\n
+        You do not have to agree to give Simprints any information to get medical care. But if you do not then healthcare organisations may find it harder to find your medical records in the future.\n\n
+        If you have previously been happy for Simprints to store and use your information, but you have changed your mind and you do not want this to continue, then please speak to me. \n\n
+
+        <b><u>Frequently asked Questions</u></b> \n\n
+        <b>I am no longer happy for Simprints to keep and use my information. What should I do?</b>\n\n
+        You are free to ask Simprints to delete your information at any time. To do so, you will have to give your fingerprints to the healthworker one last time, so that Simprints can identify you. Once you have done that, Simprints will delete all the information it has that relates to you.\n\n
+        You should, however, bear in mind that if Simprints deletes your information then healthcare organisations may find it harder to find your medical records.\n\n
+        <b>Who are Simprints?</b>\n\n
+        Simprints Technology Limited is a British NGO that is helping Possible to match patients like you to their medical records.\n\n
+        <b>What information will Simprints store about me?</b>\n\n
+        Simprints will store information about your scanned fingerprints. It will also store the approximate location where any scan takes place, together with the time and date of any such scan.\n\n
+        Simprints will not store any other identifying information about you, such as your name or date of birth. Simprints will not store any of your medical records. Simprints will not store any images of your fingerprints.\n\n
+        <b>What will Simprints do with my information?</b>\n\n
+        Simprints will use your information to help Possible identify you in the future, and match you to your medical records. As part of this, Simprints will share your fingerprint information with Possible.\n\n
+        Simprints may also use your information to improve the accuracy of its service, and may share it with other experts for this purpose.\n\n
+        Simprints may also use your information to get a better understanding of healthcare provision in Nepal.\n\n
+        In the future, Simprints may also use your information to help other partner development organisations to identify you, and may share this information with those organisations for that purpose.\n\n
+        <b>How long will Simprints keep my information for?</b>\n\n
+        Simprints expects that its work here in Nepal will last until at least 2019. Simprints will keep your information for the duration of its work here in Nepal, and for 2 years after that work has finished. Simprints will then delete your information.\n\n
+        <b>Will Simprints store any fingerprint images?</b>\n\n
+        Simprints will not store any fingerprint images.\n\n
+        <b>Will Simprints give my information to the Nepali Government?</b>\n\n
+        Simprints will not give any information that it holds on you to the Nepali Government, unless required to do so by law.\n\n
+        <b>Do I have to agree to my fingerprints being taken?</b>\n\n
+        You do not have to agree to give Simprints any information to get medical care. But if you do not then healthcare organisations may find it harder to find your medical records in the future. \n\n
+
+        <b><u>Health Worker Consent</u></b>\n\n
+        Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other community health workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to patients.
+    </string>
+
+</resources>
