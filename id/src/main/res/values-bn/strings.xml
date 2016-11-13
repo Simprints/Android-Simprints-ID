@@ -42,5 +42,38 @@
         <b><u>Health Worker Consent</u></b>\n\n
         Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other community health workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to patients.
     </string>
+   <string name="scan">স্ক্যান</string>
+   <string name="scanning"></string>
+   <string name="scan_label">স্ক্যান</string>
+   <string name="rescan_label">পুনঃস্ক্যান</string>
+   <string name="rescan_label_question">পুনঃস্ক্যান?</string>
+   <string name="register_title">নিয়োগ</string>
+   <string name="please_scan">অনুগ্রহ করে স্ক্যান করুন</string>
+   <string name="r_2_finger_name">ডান তর্জনী</string>
+   <string name="l_2_finger_name">বাম তর্জনী</string>
+   <string name="l_1_finger_name">বাম বুড়ো আঙুল</string>
+   <string name="r_1_finger_name">ডান বুড়ো আঙুল</string>
+   <string name="good_scan_message">ভাল ছবি</string>
+   <string name="poor_scan_message">খারাপ ছবি</string>
+   <string name="good_scan_direction">দয়া করে পরবর্তী আঙুল স্ক্যান করুন</string>
+   <string name="r_3_finger_name">ডান ৩য় আঙুল</string>
+   <string name="r_4_finger_name">ডান ৪র্থ আঙুল</string>
+   <string name="r_5_finger_name">ডান ৫ম আঙুল</string>
+   <string name="l_3_finger_name">বাম ৩য় আঙুল</string>
+   <string name="l_4_finger_name">বাম ৪র্থ আঙুল</string>
+   <string name="l_5_finger_name">বাম ৫ম আঙুল</string>
+   <string name="action_settings">সেটিংস</string>
+   <string name="nav_settings">সেটিংস</string>
+   <string name="settings_title">সেটিংস</string>
+   <string name="close">বন্ধ করা</string>
+   <string name="try_again_label">আবার চেষ্টা করা</string>
+   <string name="settings_label">ফোন সেটিংস</string>
+   <string name="disconnected_title">স্ক্যানার পাওয়া যায়নি</string>
+   <string name="disconnected_message">স্ক্যানারটি পাওয়া যাচ্ছে না, দয়া করে নিশ্চিত করুন যে  এটি চালু এবং ফোনেরি</string>
+   <string name="configuration_error_title">কনফিগারেশন ত্রুটি</string>
+   <string name="invalid_apikey_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ API Key), আপনার সিস্টেম অ্যাডমিনস্ট্রেটরের সঙ্গে যোগাযোগ করুন</string>
+   <string name="missing_apikey_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ API Key), আপনার সিস্টেম অ্যাডমিনস্ট্রেটরের সঙ্গে যোগাযোগ করুন</string>
+   <string name="bluetooth_error_title">Bluetooth ত্রুটি</string>
+   <string name="unbonded_scanner_message">স্ক্যানার  যুক্ত করা নেই, নিশ্চিত করুন এটা সেটিংসে যুক্ত  করা এবং আবার চেষ্টা করুন</string>
 
 </resources>
