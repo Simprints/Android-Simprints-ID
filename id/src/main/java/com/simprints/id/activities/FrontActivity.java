@@ -9,22 +9,22 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import com.facebook.stetho.Stetho;
+import com.crashlytics.android.Crashlytics;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PermissionManager;
+import io.fabric.sdk.android.Fabric;
 
 public class FrontActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_front);
-
-        Stetho.initializeWithDefaults(this);
 
         PackageInfo pInfo;
         String version = "";

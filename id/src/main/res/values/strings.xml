@@ -86,6 +86,7 @@
     <string name="pref_language" translatable="false">SelectedLanguage</string>
     <string name="pref_language_position" translatable="false">SelectedLanguagePosition</string>
     <string name="db_version_int" translatable="false">DbVersionInt</string>
+    <string name="pref_matcher_type" translatable="false">MatcherType</string>
 
     <!--Main app-->
     <string name="scan_label">SCAN</string>

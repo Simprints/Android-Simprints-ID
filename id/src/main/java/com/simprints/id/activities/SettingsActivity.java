@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -120,6 +121,14 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
+
+        int matcher = sharedPref.getInt(getString(R.string.pref_matcher_type), 0);
+        if (matcher == 0) {
+            ((RadioButton) findViewById(R.id.radio_sourceAfis)).setChecked(true);
+        } else {
+            ((RadioButton) findViewById(R.id.radio_simAfis)).setChecked(true);
+
+        }
     }
 
     @Override
@@ -174,6 +183,10 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
                 editor.putString(getString(R.string.pref_language), "ne");
                 editor.putInt(getString(R.string.pref_language_position), 1);
                 break;
+            case 2:
+                editor.putString(getString(R.string.pref_language), "bn");
+                editor.putInt(getString(R.string.pref_language_position), 2);
+                break;
         }
 
         editor.apply();
@@ -182,5 +195,26 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    public void onRadioButtonClicked(View view) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch (view.getId()) {
+            case R.id.radio_sourceAfis:
+                if (checked)
+                    editor.putInt(getString(R.string.pref_matcher_type), 0);
+                break;
+            case R.id.radio_simAfis:
+                if (checked)
+                    editor.putInt(getString(R.string.pref_matcher_type), 1);
+                break;
+        }
+
+        editor.apply();
     }
 }

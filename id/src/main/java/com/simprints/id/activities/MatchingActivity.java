@@ -71,11 +71,28 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
                 Log.d(MatchingActivity.this, String.format(Locale.UK,
                         "Succesfully loaded %d candidates", candidates.size()));
 
+                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                int matcherType = sharedPref.getInt(getString(R.string.pref_matcher_type), 0);
+
+                final LibMatcher.MATCHER_TYPE matcher_type;
+
+                switch (matcherType) {
+                    case 0:
+                        matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS;
+                        break;
+                    case 1:
+                        matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
+                        break;
+                    default:
+                        matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS;
+                }
+
                 // Start lengthy operation in a background thread
                 new Thread(new Runnable() {
                     public void run() {
                         LibMatcher matcher = new LibMatcher(probe, candidates,
-                                LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY, scores, MatchingActivity.this, 1);
+                                matcher_type, scores, MatchingActivity.this, 1);
                         matcher.start();
                     }
                 }).start();
