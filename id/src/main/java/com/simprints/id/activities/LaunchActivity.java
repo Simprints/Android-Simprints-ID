@@ -20,7 +20,6 @@ import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
-import com.facebook.stetho.Stetho;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.AppState;
@@ -77,7 +76,6 @@ public class LaunchActivity extends AppCompatActivity
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
         Appsee.start(getString(R.string.com_appsee_apikey));
-        Stetho.initializeWithDefaults(this);
 
         appState = AppState.getInstance();
         positionTracker = new PositionTracker(this);

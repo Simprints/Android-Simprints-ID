@@ -7,7 +7,7 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 25
-        versionCode 23
+        versionCode 25
     }
     buildTypes {
         release {
@@ -18,11 +18,11 @@ android {
     productFlavors {
         development {
             applicationId 'com.simprints.id.development'
-            versionName '0.0.23'
+            versionName '0.0.25'
         }
         production {
             applicationId 'com.simprints.id'
-            versionName '1.0.23'
+            versionName '1.0.25'
         }
     }
 }
@@ -64,13 +64,13 @@ dependencies {
     //LibScanner
     compile 'com.simprints:libscanner:1.0.45'
     //LibData
-    compile 'com.simprints:libdata:1.0.26'
+    compile 'com.simprints:libdata:1.0.27'
     //LibCommon
     compile 'com.simprints:libcommon:1.0.41'
     //LibMatcher
     compile 'com.simprints:libmatcher:1.0.11'
     //Fabric
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.3@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
     compile('com.appsee:appsee-android:2.3@aar') {
