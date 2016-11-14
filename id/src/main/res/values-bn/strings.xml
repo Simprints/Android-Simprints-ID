@@ -86,14 +86,14 @@
     <string name="identify_title">Identify</string>
 
     <!--Main app-->
-    <string name="multiple_scanners_found_message">More than one scanner is paired to the phone, please unpair un-needed scanners</string>
-    <string name="cancel_button">CANCEL</string>
+    <string name="multiple_scanners_found_message">এর মধ্যে একটি স্ক্যানার ফোনের সাথে জোড়া করুন, দয়া করে অপ্রয়োজনীয় স্ক্যানার জোড়া বাতিল করুন।</string>
+    <string name="cancel_button">বন্ধ করুন</string>
     <string name="error_occurred_title">ERROR OCCURRED</string>
-    <string name="poor_scan_direction">Please re-scan</string>
+    <string name="poor_scan_direction">পুনরায় স্ক্যান</string>
     <string name="last_scan_message">Press arrow to continue</string>
-    <string name="unforeseen_error_message">Sorry, an unforeseen error occurred, press close to continue</string>
+    <string name="unforeseen_error_message">স্ক্যানার পাওয়া যাচ্ছেনা, দয়া করে নিশ্চিন হন এর পাওয়ার চালু আছে কিনা এবং ফোন বন্ধ আছে কিনা।</string>
     <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
+    <string name="cancel">বন্ধ করুন</string>
     <string name="please_wait">Please wait while we proceed to identification</string>
     <string name="coming_soon">Coming soon...</string>
     <string name="confirm_consent">Tap here to confirm consent</string>
