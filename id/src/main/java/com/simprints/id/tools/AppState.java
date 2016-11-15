@@ -1,19 +1,11 @@
 package com.simprints.id.tools;
 
-import android.content.Context;
-import android.os.Looper;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.simprints.id.activities.LaunchActivity;
 import com.simprints.libcommon.Session;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libscanner.Scanner;
 
 import java.util.Calendar;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
-
-import io.fabric.sdk.android.services.concurrency.AsyncTask;
 
 
 @SuppressWarnings("unused")
@@ -33,7 +25,7 @@ public class AppState {
     private Session session;
     private GoogleApiClient googleApiClient;
 
-    protected AppState() {
+    private AppState() {
         scanner = null;
         data = null;
         session = new Session();
