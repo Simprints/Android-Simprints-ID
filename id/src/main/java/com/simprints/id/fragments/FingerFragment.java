@@ -13,7 +13,6 @@ import com.simprints.id.R;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 
-@SuppressWarnings("unused")
 public class FingerFragment extends Fragment {
 
     private final static String FINGER_ARG = "finger";

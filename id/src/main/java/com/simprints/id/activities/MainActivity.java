@@ -574,9 +574,8 @@ public class MainActivity extends AppCompatActivity implements
                     finger.getStatus() == Status.BAD_SCAN ||
                     finger.getStatus() == Status.RESCAN_GOOD_SCAN) {
                 fingerprints.add(new Fingerprint(finger.getId(), finger.getTemplate().getTemplateBytes()));
-                if (DEFAULT_CONFIG.get(finger.getId()) == FingerConfig.REQUIRED) {
-                    nbRequiredFingerprints++;
-                }
+
+                nbRequiredFingerprints++;
             }
         }
         Log.d(this, String.format(Locale.UK, "%d required fingerprints scanned", nbRequiredFingerprints));
