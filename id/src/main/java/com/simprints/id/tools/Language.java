@@ -11,11 +11,8 @@ import java.util.Locale;
 
 public class Language {
     public static Configuration selectLanguage(Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        String languageToLoad = new SharedPrefHelper(context).getLanguageString();
 
-        String languageToLoad = sharedPref.getString(
-                context.getString(R.string.pref_language), "");
         Locale locale = new Locale(languageToLoad);
         Locale.setDefault(locale);
         Configuration config = new Configuration();

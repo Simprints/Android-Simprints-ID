@@ -1,10 +1,8 @@
 package com.simprints.id.activities;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -33,9 +31,9 @@ import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
+import com.simprints.id.tools.SharedPrefHelper;
 import com.simprints.id.tools.ViewPagerCustom;
 import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
@@ -248,9 +246,8 @@ public class MainActivity extends AppCompatActivity implements
             case BAD_SCAN:
             case NOT_COLLECTED:
                 scanButton.setEnabled(false);
-                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                int qualityScore = sharedPref.getInt(getString(R.string.pref_quality_theshold), 60);
+                int qualityScore = new SharedPrefHelper(getApplicationContext())
+                        .getQualityThresholdInt();
                 Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
                 appState.getScanner().startContinuousCapture(qualityScore);
                 break;
@@ -363,9 +360,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void nudgeMode() {
-        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        boolean nudge = sharedPref.getBoolean(getString(R.string.pref_nudge_mode_bool), true);
+        boolean nudge = new SharedPrefHelper(getApplicationContext()).getNudgeModeBool();
 
         if (nudge) {
             handler.postDelayed(new Runnable() {
@@ -429,9 +424,8 @@ public class MainActivity extends AppCompatActivity implements
                     activeFingers.get(currentActiveFingerNo).setTemplate(new Fingerprint(finger.getId(), appState.getScanner().getTemplate()));
                 }
 
-                SharedPreferences sharedPref1 = getApplicationContext().getSharedPreferences(
-                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                int qualityScore1 = sharedPref1.getInt(getString(R.string.pref_quality_theshold), 60);
+                int qualityScore1 = new SharedPrefHelper(getApplicationContext())
+                        .getQualityThresholdInt();
                 Log.d(this, "Quality Score: " + String.valueOf(qualityScore1));
 
                 if (quality >= qualityScore1) {
@@ -571,7 +565,6 @@ public class MainActivity extends AppCompatActivity implements
         // Gathers the fingerprints in a list
         Log.d(this, "onActionForward()");
         activeFingers.get(currentActiveFingerNo);
-
 
         ArrayList<Fingerprint> fingerprints = new ArrayList<>();
         int nbRequiredFingerprints = 0;
