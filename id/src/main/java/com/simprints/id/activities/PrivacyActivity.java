@@ -1,7 +1,5 @@
 package com.simprints.id.activities;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,13 +7,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.TextView;
 
 import com.simprints.id.R;
 import com.simprints.id.tools.Language;
+import com.simprints.id.tools.SharedPrefHelper;
 
 public class PrivacyActivity extends AppCompatActivity {
-    private SharedPreferences sharedPref;
+    private SharedPrefHelper sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,27 +31,22 @@ public class PrivacyActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        sharedPref = getApplicationContext().getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        sharedPref = new SharedPrefHelper(getApplicationContext());
 
-        boolean consent = sharedPref.getBoolean(getString(R.string.pref_consent_bool), false);
+        boolean consent = sharedPref.getConsentBool();
         CheckBox checkBox = (CheckBox) findViewById(R.id.consentCheckBox);
 
         checkBox.setChecked(consent);
     }
 
     public void onCheckBoxClicked(View view) {
-        // Is the view now checked?
-        SharedPreferences.Editor editor = sharedPref.edit();
-
         // Check which checkbox was clicked
         switch (view.getId()) {
             case R.id.consentCheckBox:
-                editor.putBoolean(getString(R.string.pref_consent_bool), true);
+                sharedPref.setConsentBool(true);
                 ((CheckBox) view).setChecked(true);
                 break;
         }
-        editor.apply();
     }
 
     @Override

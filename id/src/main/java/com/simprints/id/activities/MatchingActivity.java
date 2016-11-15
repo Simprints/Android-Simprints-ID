@@ -15,6 +15,7 @@ import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
+import com.simprints.id.tools.SharedPrefHelper;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
@@ -71,9 +72,7 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
                 Log.d(MatchingActivity.this, String.format(Locale.UK,
                         "Succesfully loaded %d candidates", candidates.size()));
 
-                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                int matcherType = sharedPref.getInt(getString(R.string.pref_matcher_type), 0);
+                int matcherType = new SharedPrefHelper(getApplicationContext()).getMatcherTypeInt();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -121,9 +120,7 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
                 Toast.makeText(MatchingActivity.this, event.details(), Toast.LENGTH_LONG).show();
                 break;
             case MATCH_COMPLETED:
-                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-                        getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                int nbOfResults = sharedPref.getInt(getString(R.string.pref_nb_of_ids), 10);
+                int nbOfResults = new SharedPrefHelper(getApplicationContext()).getReturnIdCountInt();
 
                 ArrayList<Identification> topCandidates = new ArrayList<>();
 

@@ -27,6 +27,7 @@ import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.PositionTracker;
+import com.simprints.id.tools.SharedPrefHelper;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
@@ -39,7 +40,6 @@ import java.util.Locale;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.services.concurrency.AsyncTask;
 
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.ALERT_TYPE_EXTRA;
@@ -160,16 +160,13 @@ public class LaunchActivity extends AppCompatActivity
     private void initDatabase(String apiKey) {
         DatabaseContext.initActiveAndroid(getApplicationContext());
 
-        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-                getApplicationContext().getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        int dbVersion = sharedPref.getInt(getApplicationContext().getString(R.string.db_version_int), 0);
+        SharedPrefHelper sharedPrefHelper = new SharedPrefHelper(getApplicationContext());
+        int dbVersion = sharedPrefHelper.getDbVersionInt();
 
         if (dbVersion == 0) {
             DatabaseContext.reset(getApplicationContext());
 
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt(getString(R.string.db_version_int), DATABASE_VERSION_NUMBER);
-            editor.apply();
+            sharedPrefHelper.setDbVersionInt(DATABASE_VERSION_NUMBER);
         }
 
         appState.setData(new DatabaseContext(apiKey, getApplicationContext(), this));
@@ -177,47 +174,38 @@ public class LaunchActivity extends AppCompatActivity
     }
 
     private void backgroundConnect() {
-        new AsyncTask<Void, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(Void... voids) {
-                // Initializes the session Scanner object if necessary
-                if (appState.getScanner() == null) {
-                    BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-                    if (adapter == null) {
-                        launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
-                        return false;
-                    }
-                    if (!adapter.isEnabled()) {
-                        launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
-                        return false;
-                    }
-                    List<String> pairedScanners = Scanner.getPairedScanners();
-                    if (pairedScanners.size() == 0) {
-                        launchAlert(ALERT_TYPE.NOT_PAIRED);
-                        return false;
-                    }
-                    if (pairedScanners.size() > 1) {
-                        launchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS);
-                        return false;
-                    }
-                    String macAddress = pairedScanners.get(0);
-                    appState.setMacAddress(macAddress);
-                }
-                return true;
+        // Initializes the session Scanner object if necessary
+        if (appState.getScanner() == null) {
+            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+            if (adapter == null) {
+                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
+                return;
+            }
+            if (!adapter.isEnabled()) {
+                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
+                return;
             }
 
-            @Override
-            protected void onPostExecute(Boolean result) {
-                if (result) {
-                    appState.setScanner(new Scanner(appState.getMacAddress()));
-                    // Initiate scanner connection
-                    Log.d(LaunchActivity.this, "Initiating scanner connection");
-                    appState.getScanner().setScannerListener(LaunchActivity.this);
-                    appState.getScanner().connect();
-                    setupTimeOut();
-                }
+            List<String> pairedScanners = Scanner.getPairedScanners();
+            if (pairedScanners.size() == 0) {
+                launchAlert(ALERT_TYPE.NOT_PAIRED);
+                return;
             }
-        }.execute();
+            if (pairedScanners.size() > 1) {
+                launchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS);
+                return;
+            }
+            String macAddress = pairedScanners.get(0);
+            appState.setMacAddress(macAddress);
+        }
+
+        appState.setScanner(new Scanner(appState.getMacAddress()));
+
+        // Initiate scanner connection
+        Log.d(LaunchActivity.this, "Initiating scanner connection");
+        appState.getScanner().setScannerListener(LaunchActivity.this);
+        appState.getScanner().connect();
+        setupTimeOut();
     }
 
     private void setupTimeOut() {
