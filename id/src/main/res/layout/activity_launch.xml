@@ -19,12 +19,12 @@
         android:layout_height="0dp"
         android:layout_weight="4"
         android:gravity="center_horizontal"
-        android:text="@string/short_consent"
-        android:textColor="@color/simprints_white"
-        android:textSize="20sp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:paddingTop="10dp" />
+        android:paddingTop="10dp"
+        android:text="@string/short_consent"
+        android:textColor="@color/simprints_white"
+        android:textSize="20sp" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -48,5 +48,14 @@
         android:textColor="@color/simprints_white"
         android:textSize="20sp"
         android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_loadingInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:text="@string/loading"
+        android:textColor="@color/simprints_white" />
 
 </LinearLayout>
