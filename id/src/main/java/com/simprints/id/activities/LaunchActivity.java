@@ -55,13 +55,13 @@ public class LaunchActivity extends AppCompatActivity
     private static Handler handler;
     boolean waitingForConfirmation;
     boolean finishing;
-    ProgressBar progressBar;
     TextView confirmConsentTextView;
     TextView loadingInfoTextView;
     private AppState appState;
     private PositionTracker positionTracker;
     private String callingPackage;
     private long minEndTime;
+    private ProgressBar launchProgress;
 
     /**
      * Launch booleans
@@ -91,7 +91,7 @@ public class LaunchActivity extends AppCompatActivity
         waitingForConfirmation = false;
         finishing = false;
 
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        launchProgress = (ProgressBar) findViewById(R.id.pb_launch_progress);
         confirmConsentTextView = (TextView) findViewById(R.id.confirm_consent_text_view);
         loadingInfoTextView = (TextView) findViewById(R.id.tv_loadingInfo);
 
@@ -169,6 +169,8 @@ public class LaunchActivity extends AppCompatActivity
             }
         }
 
+        launchProgress.setProgress(20);
+
         if (!apiKey) {
             loadingInfoTextView.setText(R.string.launch_loading_database);
             DatabaseContext.initActiveAndroid(getApplicationContext());
@@ -189,6 +191,8 @@ public class LaunchActivity extends AppCompatActivity
             return;
         }
 
+        launchProgress.setProgress(40);
+
         if (!ccResolver) {
             if (COMMCARE_PACKAGE.equals(callingPackage)) {
                 loadingInfoTextView.setText(R.string.launch_cc_resolve);
@@ -196,6 +200,8 @@ public class LaunchActivity extends AppCompatActivity
                 return;
             }
         }
+
+        launchProgress.setProgress(60);
 
         if (!btConnection) {
             setupTimeOut();
@@ -205,6 +211,8 @@ public class LaunchActivity extends AppCompatActivity
             return;
         }
 
+        launchProgress.setProgress(80);
+
         if (!un20WakeUp) {
             handler.removeCallbacksAndMessages(null);
             appState.getScanner().un20Wakeup();
@@ -213,9 +221,9 @@ public class LaunchActivity extends AppCompatActivity
         }
 
         appState.setHardwareVersion(appState.getScanner().getUcVersion());
+        launchProgress.setProgress(100);
 
         waitingForConfirmation = true;
-        progressBar.setVisibility(View.GONE);
         confirmConsentTextView.setVisibility(View.VISIBLE);
         loadingInfoTextView.setVisibility(View.INVISIBLE);
     }
@@ -370,7 +378,6 @@ public class LaunchActivity extends AppCompatActivity
             case ALERT_ACTIVITY_REQUEST:
                 switch (resultCode) {
                     case RESULT_TRY_AGAIN:
-                        progressBar.setVisibility(View.VISIBLE);
                         confirmConsentTextView.setVisibility(View.GONE);
                         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
                         finishing = false;

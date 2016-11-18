@@ -1,8 +1,6 @@
 package com.simprints.id.activities;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
@@ -52,7 +50,7 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
         appState = AppState.getInstance();
         appState.getData().setListener(this);
 
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        progressBar = (ProgressBar) findViewById(R.id.pb_identification);
         int progressBarColor = ContextCompat.getColor(this, R.color.simprints_blue);
         progressBar.getIndeterminateDrawable().setColorFilter(
                 progressBarColor, PorterDuff.Mode.SRC_IN);
@@ -70,7 +68,7 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
         switch (event) {
             case LOAD_PEOPLE_FINISHED:
                 Log.d(MatchingActivity.this, String.format(Locale.UK,
-                        "Succesfully loaded %d candidates", candidates.size()));
+                        "Successfully loaded %d candidates", candidates.size()));
 
                 int matcherType = new SharedPrefHelper(getApplicationContext()).getMatcherTypeInt();
 
