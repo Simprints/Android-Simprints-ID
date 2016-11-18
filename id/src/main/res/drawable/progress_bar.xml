@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <item android:id="@android:id/background">
+        <shape>
+            <corners android:radius="15dip" />
+            <solid android:color="#7EADFF" />
+        </shape>
+    </item>
+
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <size android:height="2dp" />
-                <gradient
-                    android:endColor="@color/simprints_white"
-                    android:startColor="@color/simprints_white" />
+                <corners android:radius="15dip" />
+                <solid android:color="@color/simprints_white" />
             </shape>
         </clip>
     </item>
