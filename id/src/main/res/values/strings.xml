@@ -88,6 +88,14 @@
     <string name="db_version_int" translatable="false">DbVersionInt</string>
     <string name="pref_matcher_type" translatable="false">MatcherType</string>
 
+    <!--Launch strings-->
+    <string name="launch_checking_permissions">Checking permissions...</string>
+    <string name="launch_loading_database">Loading database...</string>
+    <string name="launch_checking_api_key">Checking API key...</string>
+    <string name="launch_cc_resolve">Resolving database with CommCare...</string>
+    <string name="launch_bt_connect">Connecting to Vero...</string>
+    <string name="launch_wake_un20">Waking up UN20...</string>
+
     <!--Main app-->
     <string name="scan_label">SCAN</string>
     <string name="bluetooth_error_title">BLUETOOTH ERROR</string>
@@ -159,11 +167,5 @@
     <string name="simprintsVersionText" translatable="false">"Simprints: "</string>
     <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.5</string>
     <string name="front_simprints_version" translatable="false">Simprints: </string>
-    <string name="launch_checking_permissions">Checking permissions...</string>
-    <string name="launch_loading_database">Loading database...</string>
-    <string name="launch_checking_api_key">Checking API key...</string>
-    <string name="launch_cc_resolve">Resolving database with CommCare...</string>
-    <string name="launch_bt_connect">Connecting to Vero...</string>
-    <string name="launch_wake_un20">Waking up UN20...</string>
 
 </resources>
