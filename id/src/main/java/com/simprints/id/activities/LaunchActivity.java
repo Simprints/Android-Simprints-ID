@@ -1,15 +1,11 @@
 package com.simprints.id.activities;
 
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,7 +27,6 @@ import com.simprints.id.tools.SharedPrefHelper;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
-import com.simprints.libscanner.BluetoothCom;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
 
@@ -62,11 +57,20 @@ public class LaunchActivity extends AppCompatActivity
     boolean finishing;
     ProgressBar progressBar;
     TextView confirmConsentTextView;
+    TextView loadingInfoTextView;
     private AppState appState;
     private PositionTracker positionTracker;
     private String callingPackage;
-    private boolean isDataReady;
     private long minEndTime;
+
+    /**
+     * Launch booleans
+     */
+    Boolean apiKey = false;
+    Boolean ccResolver = false;
+    Boolean btConnection = false;
+    Boolean un20WakeUp = false;
+    Boolean permissions = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,13 +87,13 @@ public class LaunchActivity extends AppCompatActivity
         handler = new Handler();
 
         callingPackage = null;
-        isDataReady = false;
         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
         waitingForConfirmation = false;
         finishing = false;
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         confirmConsentTextView = (TextView) findViewById(R.id.confirm_consent_text_view);
+        loadingInfoTextView = (TextView) findViewById(R.id.tv_loadingInfo);
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
@@ -145,35 +149,78 @@ public class LaunchActivity extends AppCompatActivity
         callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
         Log.d(this, String.format(Locale.UK, "callingPackage = %s", callingPackage));
 
-        // Initializes the session Data object
-        initDatabase(appState.getApiKey());
 
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
 
-        //Check the android permissions
-        PermissionManager.requestPermissions(LaunchActivity.this);
-
-        backgroundConnect();
+        //Start the launching process
+        launch();
     }
 
-    private void initDatabase(String apiKey) {
-        DatabaseContext.initActiveAndroid(getApplicationContext());
+    private void launch() {
+        if (!permissions) {
+            loadingInfoTextView.setText(R.string.launch_checking_permissions);
+            Boolean permReady = PermissionManager.requestPermissions(LaunchActivity.this);
 
-        SharedPrefHelper sharedPrefHelper = new SharedPrefHelper(getApplicationContext());
-        int dbVersion = sharedPrefHelper.getDbVersionInt();
-
-        if (dbVersion == 0) {
-            DatabaseContext.reset(getApplicationContext());
-
-            sharedPrefHelper.setDbVersionInt(DATABASE_VERSION_NUMBER);
+            if (!permReady) {
+                return;
+            } else {
+                permissions = true;
+            }
         }
 
-        appState.setData(new DatabaseContext(apiKey, getApplicationContext(), this));
-        appState.getData().validateApiKey();
+        if (!apiKey) {
+            loadingInfoTextView.setText(R.string.launch_loading_database);
+            DatabaseContext.initActiveAndroid(getApplicationContext());
+
+            SharedPrefHelper sharedPrefHelper = new SharedPrefHelper(getApplicationContext());
+            int dbVersion = sharedPrefHelper.getDbVersionInt();
+            if (dbVersion == 0) {
+                DatabaseContext.reset(getApplicationContext());
+
+                sharedPrefHelper.setDbVersionInt(DATABASE_VERSION_NUMBER);
+            }
+
+            appState.setData(new DatabaseContext(appState.getApiKey(), getApplicationContext(), this));
+
+            loadingInfoTextView.setText(R.string.launch_checking_api_key);
+            appState.getData().validateApiKey();
+
+            return;
+        }
+
+        if (!ccResolver) {
+            if (COMMCARE_PACKAGE.equals(callingPackage)) {
+                loadingInfoTextView.setText(R.string.launch_cc_resolve);
+                appState.getData().resolveCommCare(getContentResolver());
+                return;
+            }
+        }
+
+        if (!btConnection) {
+            setupTimeOut();
+
+            loadingInfoTextView.setText(R.string.launch_bt_connect);
+            btConnect();
+            return;
+        }
+
+        if (!un20WakeUp) {
+            handler.removeCallbacksAndMessages(null);
+            appState.getScanner().un20Wakeup();
+            loadingInfoTextView.setText(R.string.launch_wake_un20);
+            return;
+        }
+
+        appState.setHardwareVersion(appState.getScanner().getUcVersion());
+
+        waitingForConfirmation = true;
+        progressBar.setVisibility(View.GONE);
+        confirmConsentTextView.setVisibility(View.VISIBLE);
+        loadingInfoTextView.setVisibility(View.INVISIBLE);
     }
 
-    private void backgroundConnect() {
+    private void btConnect() {
         // Initializes the session Scanner object if necessary
         if (appState.getScanner() == null) {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -205,7 +252,6 @@ public class LaunchActivity extends AppCompatActivity
         Log.d(LaunchActivity.this, "Initiating scanner connection");
         appState.getScanner().setScannerListener(LaunchActivity.this);
         appState.getScanner().connect();
-        setupTimeOut();
     }
 
     private void setupTimeOut() {
@@ -213,47 +259,23 @@ public class LaunchActivity extends AppCompatActivity
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                boolean connected = appState.getScanner().getConnectionStatus() == BluetoothCom.BLUETOOTH_STATUS.CONNECTED;
-                Log.d(LaunchActivity.this, String.format(Locale.UK,
-                        "TIMEOUT, Data object ready: %s, connected to scanner: %s",
-                        isDataReady ? "YES" : "NO", connected ? "YES" : "NO"));
-
-                if (!isDataReady || !connected) {
-                    // The user can't do anything anyway, so unexpected error
-                    launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                }
+                // The user can't do anything anyway, so unexpected error
+                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         }, CONNECTION_AND_VALIDATION_TIMEOUT);
-        Log.d(this, "Timeout set");
-    }
-
-    private void continueIfReady() {
-        Scanner scanner = appState.getScanner();
-        boolean connected = (scanner != null &&
-                scanner.getConnectionStatus() == BluetoothCom.BLUETOOTH_STATUS.CONNECTED);
-        Log.d(LaunchActivity.this, String.format(Locale.UK,
-                "continueIfReady, Data object ready: %s, connected to scanner: %s",
-                isDataReady ? "YES" : "NO", connected ? "YES" : "NO"));
-
-        if (isDataReady && connected) {
-            handler.removeCallbacksAndMessages(null);
-            appState.getScanner().un20Wakeup();
-        }
     }
 
     private void finishWith(final int resultCode, final Intent resultData) {
         // The activity must last at least MINIMUM_DISPLAY_DURATION
         // to avoid disorienting the user.
         final long remainingTime = Math.max(0, minEndTime - SystemClock.elapsedRealtime());
-        Log.d(this, String.format(Locale.UK, "Waiting %d ms to finish with result code %d",
-                resultCode, remainingTime));
 
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d(LaunchActivity.this, String.format(Locale.UK,
-                        "Finishing with result code %d", resultCode));
+                handler.removeCallbacksAndMessages(null);
                 setResult(resultCode, resultData);
+                waitingForConfirmation = false;
                 finishing = true;
                 finish();
             }
@@ -295,12 +317,6 @@ public class LaunchActivity extends AppCompatActivity
         launch(intent, true);
     }
 
-    private void waitForConfirmation() {
-        waitingForConfirmation = true;
-        progressBar.setVisibility(View.GONE);
-        confirmConsentTextView.setVisibility(View.VISIBLE);
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (waitingForConfirmation) {
@@ -312,38 +328,30 @@ public class LaunchActivity extends AppCompatActivity
         }
     }
 
-    private void resolveCommCareDatabase() {
-        if (ContextCompat.checkSelfPermission(this, COMMCARE_PERMISSION)
-                == PackageManager.PERMISSION_GRANTED) {
-            appState.getData().resolveCommCare(getContentResolver());
-        }
-    }
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+    public void onRequestPermissionsResult(int requestCode, @NonNull String rtnPermissions[],
                                            @NonNull int[] grantResults) {
+        positionTracker.onRequestPermissionsResult(requestCode, rtnPermissions, grantResults);
 
-        for (int x = 0; x < permissions.length; x++) {
+        if (requestCode == 11)
+            return;
+
+        for (int x = 0; x < rtnPermissions.length; x++) {
             if (grantResults[x] == -1) {
-                if (!permissions[x].equalsIgnoreCase(COMMCARE_PERMISSION)) {
-                    finishLaunch();
+                if (!rtnPermissions[x].equalsIgnoreCase(COMMCARE_PERMISSION)) {
+                    finishWith(RESULT_CANCELED, null);
+                    return;
                 } else {
                     if (callingPackage != null && callingPackage.equalsIgnoreCase(COMMCARE_PACKAGE)) {
-                        finishLaunch();
+                        finishWith(RESULT_CANCELED, null);
+                        return;
                     }
                 }
             }
         }
 
-        positionTracker.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        resolveCommCareDatabase();
-    }
-
-    public void finishLaunch() {
-        waitingForConfirmation = false;
-        finishing = true;
-        setResult(RESULT_CANCELED);
-        finish();
+        permissions = true;
+        launch();
     }
 
     @Override
@@ -366,7 +374,7 @@ public class LaunchActivity extends AppCompatActivity
                         confirmConsentTextView.setVisibility(View.GONE);
                         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
                         finishing = false;
-                        backgroundConnect();
+                        launch();
                         break;
 
                     case RESULT_OK:
@@ -412,21 +420,8 @@ public class LaunchActivity extends AppCompatActivity
     public void onDataEvent(Event event) {
         switch (event) {
             case API_KEY_VALID:
-                if (appState.isEnrol()) {
-                    Answers.getInstance().logCustom(new CustomEvent("Login")
-                            .putCustomAttribute("API Key", appState.getApiKey())
-                            .putCustomAttribute("Type", "Enrol"));
-                } else {
-                    Answers.getInstance().logCustom(new CustomEvent("Login")
-                            .putCustomAttribute("API Key", appState.getApiKey())
-                            .putCustomAttribute("Type", "Identify"));
-                }
-                if (COMMCARE_PACKAGE.equals(callingPackage)) {
-                    resolveCommCareDatabase();
-                } else {
-                    isDataReady = true;
-                    continueIfReady();
-                }
+                apiKey = true;
+                launch();
                 break;
             case API_KEY_UNVERIFIED:
             case API_KEY_INVALID:
@@ -435,8 +430,8 @@ public class LaunchActivity extends AppCompatActivity
                         .putCustomAttribute("API Key", appState.getApiKey()));
                 break;
             case DATABASE_RESOLVED:
-                isDataReady = true;
-                continueIfReady();
+                ccResolver = true;
+                launch();
                 break;
         }
     }
@@ -449,7 +444,8 @@ public class LaunchActivity extends AppCompatActivity
         switch (event) {
             case CONNECTION_SUCCESS:
             case CONNECTION_ALREADY_CONNECTED:
-                continueIfReady();
+                btConnection = true;
+                launch();
                 break;
 
             case CONNECTION_BLUETOOTH_DISABLED:
@@ -485,8 +481,8 @@ public class LaunchActivity extends AppCompatActivity
                 break;
 
             case UPDATE_SENSOR_INFO_SUCCESS:
-                appState.setHardwareVersion(appState.getScanner().getUcVersion());
-                waitForConfirmation();
+                un20WakeUp = true;
+                launch();
                 break;
 
             case TRIGGER_PRESSED:

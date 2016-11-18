@@ -3,7 +3,7 @@
     <string name="app_name">Id</string>
     <string name="short_consent">আমি আপনার আঙুলের ছাপ এবং অবস্থান ব্যবহার করতে চাই যেন সিমপ্রিন্টস আপনার স্বাস্থ্য তথ্য সমূহ খুঁজে পায়। যদি আপনি এতে রাজী থাকেন অথবা আপনার কোন প্রশ্ন থেকে থাকে তবে আমাকে জানান অন্যথায় আপনার বামহাতের তর্জনী সেন্সরে সমানভাবে রাখুন"</string>
      <string name="long_consent">
-        <b><u>Privacy and Consent</u></b>\n\n
+        <b><u>গোপনীয়তা এবং কনসেন্ট</u></b>\n\n
         আপনি যদি আপনার আঙুল স্ক্যানারে রাখেন তবে তা আপনার আঙুলের ছাপ সংগ্রহ করবে এটি আরো আপনার সম্ভাব্য অবস্থান, যেখানে ছাপ গ্রহন করা হয়েছে এবং সময় ও তারিখও নথিবদ্ধ করবে \n \n
         একটি বৃটিশ বেসরকারী প্রতিষ্ঠান সিমপ্রিন্টস টেকনোলজি লিমিটেড আপনার এ তথ্য গুলো যাচাই করবে \n\n
         ভবিষ্যতে আপনাকে চিহ্নিত করে আপনার স্বাস্থ্য বিষয়ক তথ্যের সাথে সমন্বয় সাধনের জন্য সিমপ্রিন্টস ব্র্যাককে সহায়তা করবে। এরই অংশ হিসাবে সিমপ্রিন্টস আপনার তথ্য সমূহের জন্য ব্র্যাকের সাথে অংশীদারি হবে \n\n
@@ -43,7 +43,7 @@
         Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other community health workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to patients.
     </string>
     <string name="scan">স্ক্যান</string>
-    <string name="scanning">Scanning...</string>
+    <string name="scanning">স্ক্যানিং...</string>
     <string name="scan_label">স্ক্যান</string>
     <string name="rescan_label">পুনঃস্ক্যান</string>
     <string name="rescan_label_question">পুনঃস্ক্যান?</string>
@@ -76,41 +76,42 @@
     <string name="bluetooth_error_title">Bluetooth ত্রুটি</string>
     <string name="unbonded_scanner_message">স্ক্যানার  যুক্ত করা নেই, নিশ্চিত করুন এটা সেটিংসে যুক্ত  করা এবং আবার চেষ্টা করুন</string>
 
-    <string name="help_title">Help</string>
-    <string name="about_title">About</string>
-    <string name="fingerprints_menu">Fingerprints</string>
-    <string name="help_menu">Help</string>
-    <string name="about_menu">About</string>
-    <string name="help_and_support_menu">Help and Support</string>
-    <string name="configuration_menu">Configuration</string>
-    <string name="identify_title">Identify</string>
+    <string name="help_title">সাহায্য</string>
+    <string name="about_title">সম্বন্ধে</string>
+    <string name="fingerprints_menu">আঙ্গুলের ছাপ</string>
+    <string name="help_menu">সাহায্য</string>
+    <string name="about_menu">সম্বন্ধে</string>
+    <string name="help_and_support_menu">সাহায্য এবং সহযোগিতা</string>
+    <string name="configuration_menu">কনফিগারেশন</string>
+    <string name="identify_title">সনাক্ত করুন</string>
 
     <!--Main app-->
     <string name="multiple_scanners_found_message">এর মধ্যে একটি স্ক্যানার ফোনের সাথে জোড়া করুন, দয়া করে অপ্রয়োজনীয় স্ক্যানার জোড়া বাতিল করুন।</string>
     <string name="cancel_button">বন্ধ করুন</string>
-    <string name="error_occurred_title">ERROR OCCURRED</string>
+    <string name="error_occurred_title">ত্রুটি ঘটেছে</string>
     <string name="poor_scan_direction">পুনরায় স্ক্যান</string>
-    <string name="last_scan_message">Press arrow to continue</string>
+    <string name="last_scan_message">চালিয়ে যেতে তীর চিহ্নটি টিপুন</string>
     <string name="unforeseen_error_message">স্ক্যানার পাওয়া যাচ্ছেনা, দয়া করে নিশ্চিন হন এর পাওয়ার চালু আছে কিনা এবং ফোন বন্ধ আছে কিনা।</string>
-    <string name="ok">OK</string>
+    <string name="ok">ঠিক আছে</string>
     <string name="cancel">বন্ধ করুন</string>
-    <string name="please_wait">Please wait while we proceed to identification</string>
-    <string name="coming_soon">Coming soon...</string>
-    <string name="confirm_consent">Tap here to confirm consent</string>
-    <string name="nudge_mode_checkbox_name">Nudge Mode</string>
-    <string name="healthworker_consent_checkbox">I agree to Simprints using this data in these ways.</string>
-    <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
-    <string name="quality_threshold_text_view">Quality Threshold</string>
-    <string name="nav_add_finger">Add Finger</string>
-    <string name="nav_select_finger">Select Finger</string>
-    <string name="quality_threshold_empty">Quality Threshold:</string>
-    <string name="quality_threshold_value">Quality Threshold: %1$d</string>
-    <string name="nb_of_ids_empty">Returned Identifications:</string>
-    <string name="nb_of_ids_value">Returned Identifications: %1$d</string>
+    <string name="please_wait">সনাক্তকরণ করার সময় অনুগ্রহ করে অপেক্ষা করুন</string>
+    <string name="coming_soon">শীঘ্রই আসছে...</string>
+    <string name="confirm_consent">সম্মতি নিশ্চিত করতে এখানে ট্যাপ করুন</string>
+    <string name="nudge_mode_checkbox_name">Nudge মোড</string>
+    <string name="healthworker_consent_checkbox">এই তথ্য এই উপায়ে ব্যবহার করার জন্য আমি Simprints এর সাথে সম্মত</string>
+    <string name="privacy_and_consent"><![CDATA[গোপনীয়তা এবং কনসেন্ট]]></string>
+    <string name="quality_threshold_text_view">কোয়ালিটি থ্রেশহোল্ড:</string>
+    <string name="nav_add_finger">আঙুল যোগ করুন</string>
+    <string name="nav_select_finger">আঙুল নির্বাচন</string>
+    <string name="quality_threshold_empty">কোয়ালিটি থ্রেশহোল্ড:</string>
+    <string name="quality_threshold_value">কোয়ালিটি থ্রেশহোল্ড: %1$d</string>
+    <string name="nb_of_ids_empty">ফিরে এসে সনাক্তকরণ:</string>
+    <string name="nb_of_ids_value">ফিরে এসে সনাক্তকরণ: %1$d</string>
     <string name="about_app_version">App Version:</string>
     <string name="about_libsimprints_version">LibSimprints Version:</string>
     <string name="about_scanner_version">Scanner Version:</string>
     <string name="menu_header">Simprints ID</string>
     <string name="menu_subheader">Every person counts!</string>
+    <string name="nav_sync">সিঙ্ক</string>
 
 </resources>

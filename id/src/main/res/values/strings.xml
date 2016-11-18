@@ -153,11 +153,17 @@
     <string name="about_scanner_version">Scanner Version:</string>
     <string name="menu_header">Simprints ID</string>
     <string name="menu_subheader">Every person counts!</string>
-    <string name="nav_sync" translatable="false">Sync</string>
+    <string name="nav_sync">Sync</string>
     <string name="settings_select_language" translatable="false">Select Language</string>
     <string name="title_activity_front" translatable="false">Simprints ID</string>
     <string name="simprintsVersionText" translatable="false">"Simprints: "</string>
     <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.5</string>
     <string name="front_simprints_version" translatable="false">Simprints: </string>
+    <string name="launch_checking_permissions">Checking permissions...</string>
+    <string name="launch_loading_database">Loading database...</string>
+    <string name="launch_checking_api_key">Checking API key...</string>
+    <string name="launch_cc_resolve">Resolving database with CommCare...</string>
+    <string name="launch_bt_connect">Connecting to Vero...</string>
+    <string name="launch_wake_un20">Waking up UN20...</string>
 
 </resources>

@@ -8,13 +8,15 @@ import static com.simprints.id.activities.FrontActivity.hasPermissions;
 
 public class PermissionManager {
 
-    public static void requestPermissions(Activity context) {
+    public static boolean requestPermissions(Activity context) {
         int PERMISSION_ALL = 1;
         String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, InternalConstants.COMMCARE_PERMISSION};
 
         if (!hasPermissions(context, PERMISSIONS)) {
             ActivityCompat.requestPermissions(context, PERMISSIONS, PERMISSION_ALL);
+            return false;
         }
+
+        return true;
     }
-    
 }
