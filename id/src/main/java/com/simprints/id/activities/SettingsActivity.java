@@ -120,9 +120,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
         int matcher = sharedPrefHelper.getMatcherTypeInt();
         if (matcher == 0) {
-            ((RadioButton) findViewById(R.id.radio_sourceAfis)).setChecked(true);
-        } else {
             ((RadioButton) findViewById(R.id.radio_simAfis)).setChecked(true);
+        } else if (matcher == 1) {
+            ((RadioButton) findViewById(R.id.radio_sourceAfis)).setChecked(true);
 
         }
     }
@@ -189,11 +189,11 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
         // Check which radio button was clicked
         switch (view.getId()) {
-            case R.id.radio_sourceAfis:
+            case R.id.radio_simAfis:
                 if (checked)
                     sharedPrefHelper.setMatcherTypeInt(0);
                 break;
-            case R.id.radio_simAfis:
+            case R.id.radio_sourceAfis:
                 if (checked)
                     sharedPrefHelper.setMatcherTypeInt(1);
                 break;
