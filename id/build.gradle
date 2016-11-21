@@ -68,7 +68,7 @@ dependencies {
     //LibCommon
     compile 'com.simprints:libcommon:1.0.41'
     //LibMatcher
-    compile 'com.simprints:libmatcher:0.0.62'
+    compile 'com.simprints:libmatcher:1.0.14'
     //Fabric
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
