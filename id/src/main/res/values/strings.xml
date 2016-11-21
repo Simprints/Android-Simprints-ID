@@ -167,5 +167,7 @@
     <string name="simprintsVersionText" translatable="false">"Simprints: "</string>
     <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.5</string>
     <string name="front_simprints_version" translatable="false">Simprints: </string>
+    <string name="sourceafis">SourceAFIS</string>
+    <string name="simafis_beta">SimAFIS (Beta)</string>
 
 </resources>
