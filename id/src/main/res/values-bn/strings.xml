@@ -113,5 +113,11 @@
     <string name="menu_header">Simprints ID</string>
     <string name="menu_subheader">Every person counts!</string>
     <string name="nav_sync">সিঙ্ক</string>
+    <string name="launch_wake_un20">UN20 নিদ্রাভঙ্গ আপ...</string>
+    <string name="launch_loading_database">ডাটাবেস লোড হচ্ছে...</string>
+    <string name="launch_checking_permissions">অনুমতি পরীক্ষা করা হচ্ছে...</string>
+    <string name="launch_checking_api_key">API কী পরীক্ষা করা হচ্ছে...</string>
+    <string name="launch_cc_resolve">CommCare সঙ্গে ডাটাবেস স্থির করা হচ্ছে...</string>
+    <string name="launch_bt_connect">Vero সংযুক্ত হচ্ছে...</string>
 
 </resources>
