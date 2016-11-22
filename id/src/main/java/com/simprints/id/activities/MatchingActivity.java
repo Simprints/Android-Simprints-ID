@@ -76,13 +76,13 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
 
                 switch (matcherType) {
                     case 0:
-                        matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS;
-                        break;
-                    case 1:
                         matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
                         break;
-                    default:
+                    case 1:
                         matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS;
+                        break;
+                    default:
+                        matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
                 }
 
                 // Start lengthy operation in a background thread
