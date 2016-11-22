@@ -56,14 +56,12 @@ public class LaunchActivity extends AppCompatActivity
     boolean finishing;
     TextView confirmConsentTextView;
     TextView loadingInfoTextView;
-    /**
-     * Launch booleans
-     */
     Boolean apiKey = false;
     Boolean ccResolver = false;
     Boolean btConnection = false;
     Boolean un20WakeUp = false;
     Boolean permissions = false;
+
     private AppState appState;
     private PositionTracker positionTracker;
     private String callingPackage;
@@ -365,11 +363,23 @@ public class LaunchActivity extends AppCompatActivity
             case ALERT_ACTIVITY_REQUEST:
                 switch (resultCode) {
                     case RESULT_TRY_AGAIN:
-                        finishing = true;
-                        finish();
-                        if (retryIntent != null) {
-                            startActivity(retryIntent);
+                        apiKey = false;
+                        ccResolver = false;
+                        btConnection = false;
+                        un20WakeUp = false;
+                        permissions = false;
+
+                        confirmConsentTextView.setVisibility(View.GONE);
+                        launchProgress.setProgress(0);
+                        minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
+                        finishing = false;
+
+                        if (appState.getScanner() != null) {
+                            appState.getScanner().destroy();
+                            appState.setScanner(null);
                         }
+
+                        launch();
                         break;
 
                     case RESULT_OK:
