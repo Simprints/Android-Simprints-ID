@@ -20,7 +20,6 @@ import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
-import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.SharedPrefHelper;
@@ -31,7 +30,6 @@ import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
@@ -53,7 +51,6 @@ public class LaunchActivity extends AppCompatActivity
     private final static int MINIMUM_DISPLAY_DURATION = 2500;
     private static Handler handler;
     boolean waitingForConfirmation;
-    boolean finishing;
     TextView confirmConsentTextView;
     TextView loadingInfoTextView;
     Boolean apiKey = false;
@@ -85,7 +82,6 @@ public class LaunchActivity extends AppCompatActivity
         callingPackage = null;
         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
         waitingForConfirmation = false;
-        finishing = false;
 
         launchProgress = (ProgressBar) findViewById(R.id.pb_launch_progress);
         confirmConsentTextView = (TextView) findViewById(R.id.confirm_consent_text_view);
@@ -93,7 +89,6 @@ public class LaunchActivity extends AppCompatActivity
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
-            Log.d(this, "finishing with SIMPRINTS_INVALID_API_KEY");
             finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null, true);
             Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
             return;
@@ -114,37 +109,29 @@ public class LaunchActivity extends AppCompatActivity
         // Sets apiKey
         String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
         if (apiKey == null) {
-            Log.d(this, "finishing with SIMPRINTS_INVALID_API_KEY");
             finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null, true);
             Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
             return;
         }
-        Log.d(this, String.format(Locale.UK, "apiKey = %s", apiKey));
         appState.setApiKey(apiKey);
 
         // Sets guid (to specified value, or random one)
         String guid = extras.getString(Constants.SIMPRINTS_GUID);
-        Log.d(this, String.format(Locale.UK, "guid = %s", guid));
         if (guid == null) {
             guid = UUID.randomUUID().toString();
-            Log.d(this, String.format(Locale.UK, "using random guid = %s", guid));
         }
         appState.setGuid(guid);
 
         // Sets userId
         String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
-        Log.d(this, String.format(Locale.UK, "userId = %s", userId));
         appState.setUserId(userId);
 
         // Sets deviceId
         String deviceId = extras.getString(Constants.SIMPRINTS_DEVICE_ID);
-        Log.d(this, String.format(Locale.UK, "deviceId = %s", deviceId));
         appState.setDeviceId(deviceId);
 
         // Sets calling package
         callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
-        Log.d(this, String.format(Locale.UK, "callingPackage = %s", callingPackage));
-
 
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
@@ -251,7 +238,6 @@ public class LaunchActivity extends AppCompatActivity
         appState.setScanner(new Scanner(appState.getMacAddress()));
 
         // Initiate scanner connection
-        Log.d(LaunchActivity.this, "Initiating scanner connection");
         appState.getScanner().setScannerListener(LaunchActivity.this);
         appState.getScanner().connect();
     }
@@ -271,7 +257,6 @@ public class LaunchActivity extends AppCompatActivity
             public void run() {
                 setResult(resultCode, resultData);
                 waitingForConfirmation = false;
-                finishing = true;
                 finish();
             }
         }, remainingTime);
@@ -347,8 +332,6 @@ public class LaunchActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(this, String.format(Locale.UK,
-                "onActivityResult, resultCode = %d, requestCode = %d", resultCode, requestCode));
 
         switch (requestCode) {
             case LOCATION_PERMISSION_REQUEST:
@@ -361,17 +344,16 @@ public class LaunchActivity extends AppCompatActivity
             case ALERT_ACTIVITY_REQUEST:
                 switch (resultCode) {
                     case RESULT_TRY_AGAIN:
-                        //permissions = false;
-                        //apiKey = false;
-                        //ccResolver = false;
+                        permissions = false;
+                        apiKey = false;
+                        ccResolver = false;
                         btConnection = false;
                         un20WakeUp = false;
 
                         confirmConsentTextView.setVisibility(View.INVISIBLE);
-                        loadingInfoTextView.setVisibility(View.INVISIBLE);
+                        loadingInfoTextView.setVisibility(View.VISIBLE);
                         launchProgress.setProgress(0);
                         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
-                        finishing = false;
 
                         if (appState.getScanner() != null) {
                             appState.getScanner().destroy();
@@ -400,14 +382,12 @@ public class LaunchActivity extends AppCompatActivity
 
     @Override
     public void onDestroy() {
-        Log.d(this, "onDestroy");
         handler.removeCallbacksAndMessages(null);
         if (appState.getData() != null && appState.getReadyToSendSession() != null) {
             appState.getData().saveSession(appState.getReadyToSendSession());
         }
         positionTracker.finish();
-        android.util.Log.d(this.getLocalClassName(), "finishing = " + finishing);
-        if (finishing && appState.getScanner() != null) {
+        if (appState.getScanner() != null) {
             appState.getScanner().destroy();
             appState.setScanner(null);
         }
@@ -436,8 +416,6 @@ public class LaunchActivity extends AppCompatActivity
 
     @Override
     public void onScannerEvent(com.simprints.libscanner.EVENT event) {
-        Log.d(this, String.format(Locale.UK,
-                "onScannerEvent %s, %s", event.name(), event.details()));
 
         switch (event) {
             case CONNECTION_SUCCESS:
