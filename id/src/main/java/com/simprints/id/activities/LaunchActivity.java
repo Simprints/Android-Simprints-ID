@@ -67,7 +67,6 @@ public class LaunchActivity extends AppCompatActivity
     private String callingPackage;
     private long minEndTime;
     private ProgressBar launchProgress;
-    private Intent retryIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +91,6 @@ public class LaunchActivity extends AppCompatActivity
         confirmConsentTextView = (TextView) findViewById(R.id.confirm_consent_text_view);
         loadingInfoTextView = (TextView) findViewById(R.id.tv_loadingInfo);
 
-        retryIntent = getIntent();
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             Log.d(this, "finishing with SIMPRINTS_INVALID_API_KEY");
@@ -363,13 +361,14 @@ public class LaunchActivity extends AppCompatActivity
             case ALERT_ACTIVITY_REQUEST:
                 switch (resultCode) {
                     case RESULT_TRY_AGAIN:
-                        apiKey = false;
-                        ccResolver = false;
+                        //permissions = false;
+                        //apiKey = false;
+                        //ccResolver = false;
                         btConnection = false;
                         un20WakeUp = false;
-                        permissions = false;
 
-                        confirmConsentTextView.setVisibility(View.GONE);
+                        confirmConsentTextView.setVisibility(View.INVISIBLE);
+                        loadingInfoTextView.setVisibility(View.INVISIBLE);
                         launchProgress.setProgress(0);
                         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
                         finishing = false;
