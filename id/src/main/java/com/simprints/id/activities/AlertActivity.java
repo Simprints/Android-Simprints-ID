@@ -65,6 +65,7 @@ public class AlertActivity extends AppCompatActivity {
                         case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
                         case DISCONNECTED:
+                        case UNVERIFIED_API_KEY:
                             setResult(InternalConstants.RESULT_TRY_AGAIN);
                             finish();
                             break;
@@ -97,6 +98,7 @@ public class AlertActivity extends AppCompatActivity {
                         case INVALID_API_KEY:
                         case BLUETOOTH_NOT_SUPPORTED:
                         case UNEXPECTED_ERROR:
+                        case UNVERIFIED_API_KEY:
                         default:
                             setResult(RESULT_CANCELED);
                             finish();
