@@ -402,10 +402,10 @@ public class LaunchActivity extends AppCompatActivity
                 launch();
                 break;
             case API_KEY_UNVERIFIED:
+                launchAlert(ALERT_TYPE.UNVERIFIED_API_KEY);
+                break;
             case API_KEY_INVALID:
                 launchAlert(ALERT_TYPE.INVALID_API_KEY);
-                Answers.getInstance().logCustom(new CustomEvent("Invalid API Key")
-                        .putCustomAttribute("API Key", appState.getApiKey()));
                 break;
             case DATABASE_RESOLVED:
                 ccResolver = true;

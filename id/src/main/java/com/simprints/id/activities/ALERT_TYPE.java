@@ -8,6 +8,10 @@ public enum ALERT_TYPE {
     INVALID_API_KEY(R.string.configuration_error_title, R.string.invalid_apikey_message,
             R.drawable.error_icon, R.drawable.error_hint_key, R.string.close, R.string.empty, false),
 
+    //Verification errors
+    UNVERIFIED_API_KEY(R.string.alert_api_key_verify_failed, R.string.alert_api_key_verify_failed_body,
+            R.drawable.error_icon, R.drawable.error_hint_wifi, R.string.try_again_label, R.string.close, true),
+
     //Bluetooth errors
     BLUETOOTH_NOT_SUPPORTED(R.string.bluetooth_error_title, R.string.bluetooth_not_supported_message,
             R.drawable.bt_error_icon, R.drawable.bluetooth_not_enabled,
