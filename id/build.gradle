@@ -47,16 +47,6 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    //Tests
-    //Google
-    //Active Android
-    //Volley
-    //LibSimprints
-    //LibScanner
-    //LibData
-    //LibCommon
-    //LibMatcher
-    //Fabric
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
@@ -69,8 +59,6 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics-ndk:1.1.4@aar') {
         transitive = true;
     }
-    //Stetho core
-    //Optional network helper
     compile 'com.android.support:appcompat-v7:25.0.1'
     compile 'com.android.support:design:25.0.1'
     compile 'com.android.support:support-v4:25.0.1'
@@ -79,7 +67,7 @@ dependencies {
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.simprints:libsimprints:1.0.5'
-    compile 'com.simprints:libscanner:1.0.45'
+    compile 'com.simprints:libscanner:0.0.53'
     compile 'com.simprints:libdata:1.0.27'
     compile 'com.simprints:libcommon:1.0.41'
     compile 'com.simprints:libmatcher:1.0.14'

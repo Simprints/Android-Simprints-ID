@@ -171,4 +171,5 @@
     <string name="simafis_beta" translatable="false">SimAFIS (Beta)</string>
     <string name="alert_api_key_verify_failed">Failed to verify API key</string>
     <string name="alert_api_key_verify_failed_body">"We could not verify your API key, please make sure you are connected to the internet and try again"</string>
+    <string name="main_error_graphic">main error graphic</string>
 </resources>
