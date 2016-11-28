@@ -14,6 +14,7 @@ import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PermissionManager;
+
 import io.fabric.sdk.android.Fabric;
 
 public class FrontActivity extends AppCompatActivity {
@@ -44,15 +45,10 @@ public class FrontActivity extends AppCompatActivity {
         PermissionManager.requestPermissions(FrontActivity.this);
     }
 
-    public static boolean hasPermissions(Context context, String... permissions) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    @Override
+    public void onBackPressed() {
+        finish();
+        super.onBackPressed();
     }
 
 }
