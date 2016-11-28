@@ -59,6 +59,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics-ndk:1.1.4@aar') {
         transitive = true;
     }
+    
     compile 'com.android.support:appcompat-v7:25.0.1'
     compile 'com.android.support:design:25.0.1'
     compile 'com.android.support:support-v4:25.0.1'
@@ -67,10 +68,12 @@ dependencies {
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.simprints:libsimprints:1.0.5'
-    compile 'com.simprints:libscanner:0.0.53'
+    compile 'com.simprints:libscanner:1.0.46'
     compile 'com.simprints:libdata:1.0.27'
     compile 'com.simprints:libcommon:1.0.41'
     compile 'com.simprints:libmatcher:1.0.14'
+    compile 'com.google.firebase:firebase-core:10.0.0'
+    compile 'com.google.firebase:firebase-crash:10.0.0'
     testCompile 'junit:junit:4.12'
     developmentCompile 'com.facebook.stetho:stetho:1.3.1'
     developmentCompile 'com.facebook.stetho:stetho-okhttp:1.3.1'
@@ -81,3 +84,5 @@ crashlytics {
     androidNdkOut 'src/main/obj'
     androidNdkLibsOut 'src/main/libs'
 }
+
+apply plugin: 'com.google.gms.google-services'
