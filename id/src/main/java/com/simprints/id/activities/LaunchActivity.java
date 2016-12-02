@@ -1,6 +1,5 @@
 package com.simprints.id.activities;
 
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,28 +7,22 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+import com.simprints.id.LaunchProcess;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
-import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.PositionTracker;
-import com.simprints.id.tools.SharedPrefHelper;
-import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
 
-import java.util.List;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
@@ -38,7 +31,6 @@ import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.ALERT_TYPE_EXTRA;
 import static com.simprints.id.tools.InternalConstants.COMMCARE_PACKAGE;
 import static com.simprints.id.tools.InternalConstants.COMMCARE_PERMISSION;
-import static com.simprints.id.tools.InternalConstants.DATABASE_VERSION_NUMBER;
 import static com.simprints.id.tools.InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST;
 import static com.simprints.id.tools.InternalConstants.LOCATION_PERMISSION_REQUEST;
 import static com.simprints.id.tools.InternalConstants.MAIN_ACTIVITY_REQUEST;
@@ -49,21 +41,15 @@ public class LaunchActivity extends AppCompatActivity
         implements Scanner.ScannerListener, DatabaseEventListener {
 
     private final static int MINIMUM_DISPLAY_DURATION = 2500;
-    private static Handler handler;
-    boolean waitingForConfirmation;
-    TextView confirmConsentTextView;
-    TextView loadingInfoTextView;
-    Boolean apiKey = false;
-    Boolean ccResolver = false;
-    Boolean btConnection = false;
-    Boolean un20WakeUp = false;
-    Boolean permissions = false;
+    public static Handler handler;
+    public boolean waitingForConfirmation;
 
-    private AppState appState;
+    public AppState appState;
     private PositionTracker positionTracker;
     private String callingPackage;
     private long minEndTime;
-    private ProgressBar launchProgress;
+
+    private LaunchProcess launchProcess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,10 +68,6 @@ public class LaunchActivity extends AppCompatActivity
         callingPackage = null;
         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
         waitingForConfirmation = false;
-
-        launchProgress = (ProgressBar) findViewById(R.id.pb_launch_progress);
-        confirmConsentTextView = (TextView) findViewById(R.id.confirm_consent_text_view);
-        loadingInfoTextView = (TextView) findViewById(R.id.tv_loadingInfo);
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
@@ -137,109 +119,8 @@ public class LaunchActivity extends AppCompatActivity
         new SyncSetup(getApplicationContext()).initialize();
 
         //Start the launching process
-        launch();
-    }
-
-    private void launch() {
-        if (!permissions) {
-            loadingInfoTextView.setText(R.string.launch_checking_permissions);
-            Boolean permReady = PermissionManager.requestPermissions(LaunchActivity.this);
-
-            if (!permReady) {
-                return;
-            } else {
-                permissions = true;
-            }
-        }
-
-        launchProgress.setProgress(20);
-
-        if (!apiKey) {
-            loadingInfoTextView.setText(R.string.launch_loading_database);
-            DatabaseContext.initActiveAndroid(getApplicationContext());
-
-            SharedPrefHelper sharedPrefHelper = new SharedPrefHelper(getApplicationContext());
-            int dbVersion = sharedPrefHelper.getDbVersionInt();
-            if (dbVersion == 0) {
-                DatabaseContext.reset(getApplicationContext());
-
-                sharedPrefHelper.setDbVersionInt(DATABASE_VERSION_NUMBER);
-            }
-
-            appState.setData(new DatabaseContext(appState.getApiKey(), getApplicationContext(), this));
-
-            loadingInfoTextView.setText(R.string.launch_checking_api_key);
-            appState.getData().validateApiKey();
-
-            return;
-        }
-
-        launchProgress.setProgress(40);
-
-        if (!ccResolver) {
-            if (COMMCARE_PACKAGE.equals(callingPackage)) {
-                loadingInfoTextView.setText(R.string.launch_cc_resolve);
-                appState.getData().resolveCommCare(getContentResolver());
-                return;
-            }
-        }
-
-        launchProgress.setProgress(60);
-
-        if (!btConnection) {
-            loadingInfoTextView.setText(R.string.launch_bt_connect);
-            btConnect();
-            return;
-        }
-
-        launchProgress.setProgress(80);
-
-        if (!un20WakeUp) {
-            handler.removeCallbacksAndMessages(null);
-            appState.getScanner().un20Wakeup();
-            loadingInfoTextView.setText(R.string.launch_wake_un20);
-            return;
-        }
-
-        appState.setHardwareVersion(appState.getScanner().getUcVersion());
-        launchProgress.setProgress(100);
-
-        waitingForConfirmation = true;
-        confirmConsentTextView.setVisibility(View.VISIBLE);
-        loadingInfoTextView.setVisibility(View.INVISIBLE);
-    }
-
-    private void btConnect() {
-        // Initializes the session Scanner object if necessary
-        if (appState.getScanner() == null) {
-            BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-            if (adapter == null) {
-                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
-                return;
-            }
-            if (!adapter.isEnabled()) {
-                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
-                return;
-            }
-
-            List<String> pairedScanners = Scanner.getPairedScanners();
-            if (pairedScanners.size() == 0) {
-                launchAlert(ALERT_TYPE.NOT_PAIRED);
-                return;
-            }
-            if (pairedScanners.size() > 1) {
-                launchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS);
-                return;
-            }
-            String macAddress = pairedScanners.get(0);
-            appState.setMacAddress(macAddress);
-        }
-
-        appState.setScanner(new Scanner(appState.getMacAddress()));
-
-        // Initiate scanner connection
-        appState.getScanner().setScannerListener(LaunchActivity.this);
-        appState.getScanner().connect();
+        launchProcess = new LaunchProcess(callingPackage, this);
+        launchProcess.launch();
     }
 
     private void finishWith(final int resultCode, final Intent resultData, boolean delay) {
@@ -281,7 +162,7 @@ public class LaunchActivity extends AppCompatActivity
 
     }
 
-    private void launchAlert(ALERT_TYPE alertType) {
+    public void launchAlert(ALERT_TYPE alertType) {
         if (appState.getScanner() != null) {
             appState.getScanner().destroy();
             appState.setScanner(null);
@@ -326,8 +207,8 @@ public class LaunchActivity extends AppCompatActivity
             }
         }
 
-        permissions = true;
-        launch();
+        launchProcess.permissions = true;
+        launchProcess.launch();
     }
 
     @Override
@@ -344,15 +225,6 @@ public class LaunchActivity extends AppCompatActivity
             case ALERT_ACTIVITY_REQUEST:
                 switch (resultCode) {
                     case RESULT_TRY_AGAIN:
-                        permissions = false;
-                        apiKey = false;
-                        ccResolver = false;
-                        btConnection = false;
-                        un20WakeUp = false;
-
-                        confirmConsentTextView.setVisibility(View.INVISIBLE);
-                        loadingInfoTextView.setVisibility(View.VISIBLE);
-                        launchProgress.setProgress(0);
                         minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
 
                         if (appState.getScanner() != null) {
@@ -360,7 +232,8 @@ public class LaunchActivity extends AppCompatActivity
                             appState.setScanner(null);
                         }
 
-                        launch();
+                        launchProcess = new LaunchProcess(callingPackage, this);
+                        launchProcess.launch();
                         break;
 
                     case RESULT_OK:
@@ -387,10 +260,13 @@ public class LaunchActivity extends AppCompatActivity
             appState.getData().saveSession(appState.getReadyToSendSession());
         }
         positionTracker.finish();
-        if (appState.getScanner() != null) {
+
+        try {
             appState.getScanner().destroy();
             appState.setScanner(null);
+        } catch (Exception ignored) {
         }
+
         super.onDestroy();
     }
 
@@ -398,8 +274,8 @@ public class LaunchActivity extends AppCompatActivity
     public void onDataEvent(Event event) {
         switch (event) {
             case API_KEY_VALID:
-                apiKey = true;
-                launch();
+                launchProcess.apiKey = true;
+                launchProcess.dataLunch();
                 break;
             case API_KEY_UNVERIFIED:
                 launchAlert(ALERT_TYPE.UNVERIFIED_API_KEY);
@@ -408,8 +284,8 @@ public class LaunchActivity extends AppCompatActivity
                 launchAlert(ALERT_TYPE.INVALID_API_KEY);
                 break;
             case DATABASE_RESOLVED:
-                ccResolver = true;
-                launch();
+                launchProcess.ccResolver = true;
+                launchProcess.dataLunch();
                 break;
         }
     }
@@ -420,8 +296,8 @@ public class LaunchActivity extends AppCompatActivity
         switch (event) {
             case CONNECTION_SUCCESS:
             case CONNECTION_ALREADY_CONNECTED:
-                btConnection = true;
-                launch();
+                launchProcess.btConnection = true;
+                launchProcess.scannerLaunch();
                 break;
 
             case CONNECTION_BLUETOOTH_DISABLED:
@@ -469,8 +345,8 @@ public class LaunchActivity extends AppCompatActivity
                 break;
 
             case UPDATE_SENSOR_INFO_SUCCESS:
-                un20WakeUp = true;
-                launch();
+                launchProcess.un20WakeUp = true;
+                launchProcess.scannerLaunch();
                 break;
 
             case TRIGGER_PRESSED:
