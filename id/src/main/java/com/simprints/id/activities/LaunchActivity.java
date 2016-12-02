@@ -2,8 +2,6 @@ package com.simprints.id.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
@@ -40,14 +38,11 @@ import static com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN;
 public class LaunchActivity extends AppCompatActivity
         implements Scanner.ScannerListener, DatabaseEventListener {
 
-    private final static int MINIMUM_DISPLAY_DURATION = 2500;
-    public static Handler handler;
     public boolean waitingForConfirmation;
 
     public AppState appState;
     private PositionTracker positionTracker;
     private String callingPackage;
-    private long minEndTime;
 
     private LaunchProcess launchProcess;
 
@@ -63,15 +58,13 @@ public class LaunchActivity extends AppCompatActivity
         appState = AppState.getInstance();
         positionTracker = new PositionTracker(this);
         positionTracker.start();
-        handler = new Handler();
 
         callingPackage = null;
-        minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
         waitingForConfirmation = false;
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
-            finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null, true);
+            finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null);
             Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
             return;
         }
@@ -84,14 +77,14 @@ public class LaunchActivity extends AppCompatActivity
                 appState.setEnrol(true);
                 break;
             default:
-                finishWith(Constants.SIMPRINTS_INVALID_INTENT_ACTION, null, true);
+                finishWith(Constants.SIMPRINTS_INVALID_INTENT_ACTION, null);
                 return;
         }
 
         // Sets apiKey
         String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
         if (apiKey == null) {
-            finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null, true);
+            finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null);
             Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
             return;
         }
@@ -123,62 +116,24 @@ public class LaunchActivity extends AppCompatActivity
         launchProcess.launch();
     }
 
-    private void finishWith(final int resultCode, final Intent resultData, boolean delay) {
-        handler.removeCallbacksAndMessages(null);
-
-        // The activity must last at least MINIMUM_DISPLAY_DURATION
-        // to avoid disorienting the user.
-        long remainingTime = 0;
-        if (delay) {
-            remainingTime = Math.max(0, minEndTime - SystemClock.elapsedRealtime());
-        }
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setResult(resultCode, resultData);
-                waitingForConfirmation = false;
-                finish();
-            }
-        }, remainingTime);
-    }
-
-    private void launch(@NonNull final Intent intent, boolean delayed) {
-        handler.removeCallbacksAndMessages(null);
-
-        // The activity must last at least MINIMUM_DISPLAY_DURATION
-        // Before throwing an alert screen to avoid disorienting the user.
-        long remainingTime = 0;
-        if (delayed) {
-            remainingTime = Math.max(0, minEndTime - SystemClock.elapsedRealtime());
-        }
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startActivityForResult(intent, MAIN_ACTIVITY_REQUEST);
-            }
-        }, remainingTime);
-
+    private void finishWith(final int resultCode, final Intent resultData) {
+        setResult(resultCode, resultData);
+        waitingForConfirmation = false;
+        finish();
     }
 
     public void launchAlert(ALERT_TYPE alertType) {
-        if (appState.getScanner() != null) {
-            appState.getScanner().destroy();
-            appState.setScanner(null);
-        }
-
-        handler.removeCallbacksAndMessages(null);
         Intent intent = new Intent(this, AlertActivity.class);
         intent.putExtra(ALERT_TYPE_EXTRA, alertType);
-        launch(intent, true);
+        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (waitingForConfirmation) {
             waitingForConfirmation = false;
-            launch(new Intent(LaunchActivity.this, MainActivity.class), false);
+            startActivityForResult(new Intent(LaunchActivity.this, MainActivity.class),
+                    MAIN_ACTIVITY_REQUEST);
             return true;
         } else {
             return super.onTouchEvent(event);
@@ -196,11 +151,11 @@ public class LaunchActivity extends AppCompatActivity
         for (int x = 0; x < rtnPermissions.length; x++) {
             if (grantResults[x] == -1) {
                 if (!rtnPermissions[x].equalsIgnoreCase(COMMCARE_PERMISSION)) {
-                    finishWith(RESULT_CANCELED, null, false);
+                    finishWith(RESULT_CANCELED, null);
                     return;
                 } else {
                     if (callingPackage != null && callingPackage.equalsIgnoreCase(COMMCARE_PACKAGE)) {
-                        finishWith(RESULT_CANCELED, null, false);
+                        finishWith(RESULT_CANCELED, null);
                         return;
                     }
                 }
@@ -225,8 +180,6 @@ public class LaunchActivity extends AppCompatActivity
             case ALERT_ACTIVITY_REQUEST:
                 switch (resultCode) {
                     case RESULT_TRY_AGAIN:
-                        minEndTime = SystemClock.elapsedRealtime() + MINIMUM_DISPLAY_DURATION;
-
                         if (appState.getScanner() != null) {
                             appState.getScanner().destroy();
                             appState.setScanner(null);
@@ -236,9 +189,9 @@ public class LaunchActivity extends AppCompatActivity
                         launchProcess.launch();
                         break;
 
-                    case RESULT_OK:
                     case RESULT_CANCELED:
-                        finishWith(resultCode, data, false);
+                    case RESULT_OK:
+                        finishWith(resultCode, data);
                         break;
                 }
                 break;
@@ -249,22 +202,21 @@ public class LaunchActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        finishWith(RESULT_CANCELED, null, false);
+        finishWith(RESULT_CANCELED, null);
         super.onBackPressed();
     }
 
     @Override
     public void onDestroy() {
-        handler.removeCallbacksAndMessages(null);
         if (appState.getData() != null && appState.getReadyToSendSession() != null) {
             appState.getData().saveSession(appState.getReadyToSendSession());
         }
+
         positionTracker.finish();
 
-        try {
+        if (appState.getScanner() != null) {
             appState.getScanner().destroy();
             appState.setScanner(null);
-        } catch (Exception ignored) {
         }
 
         super.onDestroy();
@@ -275,7 +227,7 @@ public class LaunchActivity extends AppCompatActivity
         switch (event) {
             case API_KEY_VALID:
                 launchProcess.apiKey = true;
-                launchProcess.dataLunch();
+                launchProcess.updateData();
                 break;
             case API_KEY_UNVERIFIED:
                 launchAlert(ALERT_TYPE.UNVERIFIED_API_KEY);
@@ -285,7 +237,7 @@ public class LaunchActivity extends AppCompatActivity
                 break;
             case DATABASE_RESOLVED:
                 launchProcess.ccResolver = true;
-                launchProcess.dataLunch();
+                launchProcess.updateData();
                 break;
         }
     }
@@ -297,7 +249,7 @@ public class LaunchActivity extends AppCompatActivity
             case CONNECTION_SUCCESS:
             case CONNECTION_ALREADY_CONNECTED:
                 launchProcess.btConnection = true;
-                launchProcess.scannerLaunch();
+                launchProcess.updateScanner();
                 break;
 
             case CONNECTION_BLUETOOTH_DISABLED:
@@ -308,9 +260,6 @@ public class LaunchActivity extends AppCompatActivity
                 break;
             case CONNECTION_SCANNER_UNREACHABLE:
                 launchAlert(ALERT_TYPE.DISCONNECTED);
-                break;
-
-            case SEND_REQUEST_SUCCESS:
                 break;
 
             case DISCONNECTION_IO_ERROR:
@@ -346,12 +295,13 @@ public class LaunchActivity extends AppCompatActivity
 
             case UPDATE_SENSOR_INFO_SUCCESS:
                 launchProcess.un20WakeUp = true;
-                launchProcess.scannerLaunch();
+                launchProcess.updateScanner();
                 break;
 
             case TRIGGER_PRESSED:
                 if (waitingForConfirmation) {
-                    launch(new Intent(LaunchActivity.this, MainActivity.class), false);
+                    startActivityForResult(new Intent(LaunchActivity.this, MainActivity.class),
+                            MAIN_ACTIVITY_REQUEST);
                 }
                 break;
         }
