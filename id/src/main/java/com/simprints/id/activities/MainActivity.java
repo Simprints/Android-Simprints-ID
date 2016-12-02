@@ -485,7 +485,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             // error conditions
-            case SCANNER_BUSY: // Cannot perform request because the scanner is busy
             case NOT_CONNECTED: // Cannot perform request because the phone is not connected to the scanner
             case NO_RESPONSE: // The scanner is not answering
             case CONNECTION_ALREADY_CONNECTED: // Connection failed because the phone is already connected/connecting/disconnecting
