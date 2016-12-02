@@ -120,4 +120,6 @@
     <string name="launch_checking_permissions">"अनुमति जाँच गर्दै... "</string>
     <string name="launch_loading_database">"डेटाबेस लोड... "</string>
     <string name="launch_wake_un20">" UN20 उठ्दै..."</string>
+    <string name="alert_api_key_verify_failed">एपीआई प्रमुख प्रमाणित गर्न असफल</string>
+    <string name="alert_api_key_verify_failed_body">\"हामी तपाईंको एपीआई प्रमुख प्रमाणित गर्न सक्दैन, कृपया पक्का इन्टरनेट जडान गर्दै छन् र फेरि प्रयास गर्नुहोस्\"</string>
 </resources>

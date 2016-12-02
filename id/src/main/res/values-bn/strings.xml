@@ -119,5 +119,7 @@
     <string name="launch_checking_api_key">API কী পরীক্ষা করা হচ্ছে...</string>
     <string name="launch_cc_resolve">CommCare সঙ্গে ডাটাবেস স্থির করা হচ্ছে...</string>
     <string name="launch_bt_connect">Vero সংযুক্ত হচ্ছে...</string>
+    <string name="alert_api_key_verify_failed">API কী যাচাই করতে ব্যর্থ</string>
+    <string name="alert_api_key_verify_failed_body">\"আমরা আপনার API কী যাচাই করতে পারিনি, দয়া করে নিশ্চিত করুন যে আপনি ইন্টারনেটের সাথে সংযুক্ত করা হয় এবং আবার চেষ্টা করুন\"</string>
 
 </resources>
