@@ -64,8 +64,8 @@ public class LaunchProcess {
 
         if (!asyncLaunched) {
             asyncLaunched = true;
-            dataLunch();
-            scannerLaunch();
+            updateData();
+            updateScanner();
         }
 
         launchProgress.setProgress(20);
@@ -103,7 +103,7 @@ public class LaunchProcess {
         loadingInfoTextView.setVisibility(View.INVISIBLE);
     }
 
-    public void dataLunch() {
+    public void updateData() {
         if (!apiKey) {
             DatabaseContext.initActiveAndroid(launchActivity.getApplicationContext());
 
@@ -136,7 +136,7 @@ public class LaunchProcess {
         launch();
     }
 
-    public void scannerLaunch() {
+    public void updateScanner() {
         if (!btConnection) {
             // Initializes the session Scanner object if necessary
             if (launchActivity.appState.getScanner() == null) {
@@ -163,11 +163,11 @@ public class LaunchProcess {
                 appState.setMacAddress(macAddress);
             }
 
-            appState.setScanner(new Scanner(launchActivity.appState.getMacAddress()));
+            launchActivity.appState.setScanner(new Scanner(appState.getMacAddress()));
 
             // Initiate scanner connection
-            appState.getScanner().setScannerListener(launchActivity);
-            appState.getScanner().connect();
+            launchActivity.appState.getScanner().setScannerListener(launchActivity);
+            launchActivity.appState.getScanner().connect();
 
             return;
         }
@@ -175,7 +175,6 @@ public class LaunchProcess {
         launch();
 
         if (!un20WakeUp) {
-            LaunchActivity.handler.removeCallbacksAndMessages(null);
             appState.getScanner().un20Wakeup();
             return;
         }
