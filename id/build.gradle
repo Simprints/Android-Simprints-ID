@@ -60,20 +60,22 @@ dependencies {
         transitive = true;
     }
 
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support:design:25.0.1'
-    compile 'com.android.support:support-v4:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:support-v4:25.1.0'
     compile 'com.google.android.gms:play-services-location:10.0.1'
     compile 'com.google.android.gms:play-services-gcm:10.0.1'
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.simprints:libsimprints:1.0.5'
     compile 'com.simprints:libscanner:0.0.54'
-    compile 'com.simprints:libdata:1.0.28'
+    compile 'com.simprints:libdata:0.0.147'
     compile 'com.simprints:libcommon:1.0.42'
     compile 'com.simprints:libmatcher:1.0.15'
     compile 'com.google.firebase:firebase-core:10.0.0'
     compile 'com.google.firebase:firebase-crash:10.0.0'
+    compile 'com.google.firebase:firebase-database:10.0.1'
+    compile 'com.google.firebase:firebase-auth:10.0.1'
     testCompile 'junit:junit:4.12'
     developmentCompile 'com.facebook.stetho:stetho:1.3.1'
     developmentCompile 'com.facebook.stetho:stetho-okhttp:1.3.1'
@@ -86,3 +88,4 @@ crashlytics {
 }
 
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'realm-android'

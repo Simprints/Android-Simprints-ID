@@ -5,10 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.simprints.id.tools.SharedPrefHelper;
 import com.simprints.libdata.DatabaseContext;
-import com.simprints.libdata.models.M_IdEvent;
+import com.simprints.libdata.DatabaseEventListener;
+import com.simprints.libdata.Event;
 
-public class CommCareReceiver extends BroadcastReceiver {
+public class CommCareReceiver extends BroadcastReceiver implements DatabaseEventListener {
+    private DatabaseContext data;
+    private String caseId;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
@@ -17,20 +22,26 @@ public class CommCareReceiver extends BroadcastReceiver {
             return;
         }
 
-        String caseId = extras.getString("case_id");
-
+        caseId = extras.getString("case_id");
         if (caseId == null || caseId.isEmpty()) {
             return;
         }
 
-        DatabaseContext.initActiveAndroid(context);
-        M_IdEvent idEvent = M_IdEvent.getLatest();
-
-        if (idEvent == null || idEvent.hasSelectedMatchGuid()) {
+        String user = DatabaseContext.signedInUserId();
+        if (user == null) {
             return;
         }
 
-        idEvent.setSelectedMatchGuid(caseId);
-        idEvent.save();
+        DatabaseContext.initDatabase(context, new SharedPrefHelper(context).getLastUserId());
+        data = new DatabaseContext(user, new SharedPrefHelper(context).getLastUserId(), context, this);
+    }
+
+    @Override
+    public void onDataEvent(Event event) {
+        switch (event) {
+            case SIGNED_IN:
+                data.updateIdentification(caseId);
+                break;
+        }
     }
 }

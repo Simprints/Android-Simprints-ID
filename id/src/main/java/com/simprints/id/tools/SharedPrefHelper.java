@@ -3,6 +3,7 @@ package com.simprints.id.tools;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.android.gms.iid.InstanceID;
 import com.simprints.id.R;
 
 
@@ -117,6 +118,20 @@ public class SharedPrefHelper {
     public void setMatcherTypeInt(int matcherTypeInt) {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(context.getString(R.string.pref_matcher_type), matcherTypeInt);
+        editor.apply();
+    }
+
+    /**
+     * Last given userID
+     */
+    public String getLastUserId() {
+        return sharedPref.getString(context.getString(R.string.pref_last_user_id),
+                InstanceID.getInstance(context).getId());
+    }
+
+    public void setLastUserId(String userId) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(context.getString(R.string.pref_last_user_id), userId);
         editor.apply();
     }
 }

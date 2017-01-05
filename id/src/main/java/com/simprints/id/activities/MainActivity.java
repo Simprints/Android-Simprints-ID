@@ -558,6 +558,18 @@ public class MainActivity extends AppCompatActivity implements
                     syncItem.setIcon(R.drawable.ic_menu_sync_good);
                 }
                 break;
+            case CONNECTED:
+                appState.setConnected(true);
+                break;
+            case DISCONNECTED:
+                appState.setConnected(false);
+                break;
+            case SIGNED_IN:
+                appState.setSignedIn(true);
+                break;
+            case SIGNED_OUT:
+                appState.setSignedIn(false);
+                break;
         }
     }
 
