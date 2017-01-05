@@ -773,10 +773,10 @@ public class MainActivity extends AppCompatActivity implements
     public void autoAdd() {
         activeFingers.get(activeFingers.size() - 1).setLastFinger(false);
 
-        for (int x = 0; x < fingers.length; x++) {
-            if (DEFAULT_CONFIG.get(fingers[x].getId()) != FingerConfig.DO_NOT_COLLECT && !activeFingers.contains(fingers[x])) {
-                activeFingers.add(fingers[x]);
-                fingers[x].setActive(true);
+        for (Finger finger : fingers) {
+            if (DEFAULT_CONFIG.get(finger.getId()) != FingerConfig.DO_NOT_COLLECT && !activeFingers.contains(finger)) {
+                activeFingers.add(finger);
+                finger.setActive(true);
                 break;
             }
         }
