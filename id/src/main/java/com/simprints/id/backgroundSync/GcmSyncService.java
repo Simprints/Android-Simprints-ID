@@ -25,8 +25,6 @@ public class GcmSyncService extends GcmTaskService implements DatabaseEventListe
 
         String userId = new SharedPrefHelper(getApplicationContext()).getLastUserId();
 
-        DatabaseContext.initDatabase(getApplicationContext(), userId);
-
         String key = DatabaseContext.signedInUserId();
         if (key != null) {
             databaseContext = new DatabaseContext(key, userId, getApplicationContext(), this);

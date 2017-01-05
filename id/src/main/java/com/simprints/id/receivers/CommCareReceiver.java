@@ -32,7 +32,6 @@ public class CommCareReceiver extends BroadcastReceiver implements DatabaseEvent
             return;
         }
 
-        DatabaseContext.initDatabase(context, new SharedPrefHelper(context).getLastUserId());
         data = new DatabaseContext(user, new SharedPrefHelper(context).getLastUserId(), context, this);
     }
 
