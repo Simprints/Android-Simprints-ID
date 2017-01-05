@@ -10,6 +10,7 @@ import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+import com.facebook.stetho.Stetho;
 import com.simprints.id.LaunchProcess;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
@@ -56,6 +57,7 @@ public class LaunchActivity extends AppCompatActivity
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
         Appsee.start(getString(R.string.com_appsee_apikey));
+        Stetho.initializeWithDefaults(getApplicationContext());
 
         SharedPrefHelper sharedPref = new SharedPrefHelper(getApplicationContext());
 
@@ -122,7 +124,6 @@ public class LaunchActivity extends AppCompatActivity
 
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
-        DatabaseContext.initDatabase(getApplicationContext(), appState.getUserId());
 
         //Start the launching process
         launchProcess = new LaunchProcess(this);
