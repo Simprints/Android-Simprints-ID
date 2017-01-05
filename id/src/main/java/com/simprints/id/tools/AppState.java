@@ -24,6 +24,9 @@ public class AppState {
     private DatabaseContext data;
     private Session session;
     private GoogleApiClient googleApiClient;
+    private boolean signedIn;
+    private boolean connected;
+    private String callingPackage;
 
     private AppState() {
         scanner = null;
@@ -134,5 +137,29 @@ public class AppState {
 
     public synchronized short getHardwareVersion() {
         return session.getHardwareVersion();
+    }
+
+    public synchronized boolean getSignedIn() {
+        return this.signedIn;
+    }
+
+    public synchronized void setSignedIn(boolean signedIn) {
+        this.signedIn = signedIn;
+    }
+
+    public synchronized boolean getSConnected() {
+        return this.connected;
+    }
+
+    public synchronized void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
+    public synchronized void setCallingPackage(String callingPackage) {
+        this.callingPackage = callingPackage;
+    }
+
+    public synchronized String getCallingPackage() {
+        return this.callingPackage;
     }
 }

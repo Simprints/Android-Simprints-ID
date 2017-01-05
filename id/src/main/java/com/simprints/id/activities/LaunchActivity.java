@@ -16,6 +16,8 @@ import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PositionTracker;
+import com.simprints.id.tools.SharedPrefHelper;
+import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
 import com.simprints.libscanner.Scanner;
@@ -54,6 +56,8 @@ public class LaunchActivity extends AppCompatActivity
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
         Appsee.start(getString(R.string.com_appsee_apikey));
+
+        SharedPrefHelper sharedPref = new SharedPrefHelper(getApplicationContext());
 
         appState = AppState.getInstance();
         positionTracker = new PositionTracker(this);
@@ -99,6 +103,13 @@ public class LaunchActivity extends AppCompatActivity
 
         // Sets userId
         String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
+        if (userId == null) {
+            userId = sharedPref.getLastUserId();
+        } else if (!userId.equals(sharedPref.getLastUserId())) {
+            DatabaseContext.updateUserId(getApplicationContext(), apiKey,
+                    sharedPref.getLastUserId(), userId);
+        }
+        new SharedPrefHelper(getApplicationContext()).setLastUserId(userId);
         appState.setUserId(userId);
 
         // Sets deviceId
@@ -107,12 +118,14 @@ public class LaunchActivity extends AppCompatActivity
 
         // Sets calling package
         callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
+        appState.setCallingPackage(callingPackage);
 
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
+        DatabaseContext.initDatabase(getApplicationContext(), appState.getUserId());
 
         //Start the launching process
-        launchProcess = new LaunchProcess(callingPackage, this);
+        launchProcess = new LaunchProcess(this);
         launchProcess.launch();
     }
 
@@ -185,7 +198,7 @@ public class LaunchActivity extends AppCompatActivity
                             appState.setScanner(null);
                         }
 
-                        launchProcess = new LaunchProcess(callingPackage, this);
+                        launchProcess = new LaunchProcess(this);
                         launchProcess.launch();
                         break;
 
@@ -210,6 +223,7 @@ public class LaunchActivity extends AppCompatActivity
     public void onDestroy() {
         if (appState.getData() != null && appState.getReadyToSendSession() != null) {
             appState.getData().saveSession(appState.getReadyToSendSession());
+            appState.getData().destroy();
         }
 
         positionTracker.finish();
@@ -239,12 +253,23 @@ public class LaunchActivity extends AppCompatActivity
                 launchProcess.ccResolver = true;
                 launchProcess.updateData();
                 break;
+            case CONNECTED:
+                appState.setConnected(true);
+                break;
+            case DISCONNECTED:
+                appState.setConnected(false);
+                break;
+            case SIGNED_IN:
+                appState.setSignedIn(true);
+                break;
+            case SIGNED_OUT:
+                appState.setSignedIn(false);
+                break;
         }
     }
 
     @Override
     public void onScannerEvent(com.simprints.libscanner.EVENT event) {
-
         switch (event) {
             case CONNECTION_SUCCESS:
             case CONNECTION_ALREADY_CONNECTED:

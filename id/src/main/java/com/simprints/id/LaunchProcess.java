@@ -19,7 +19,6 @@ import static com.simprints.id.tools.InternalConstants.COMMCARE_PACKAGE;
 import static com.simprints.id.tools.InternalConstants.DATABASE_VERSION_NUMBER;
 
 public class LaunchProcess {
-    private String callingPackage;
     private LaunchActivity launchActivity;
     private ProgressBar launchProgress;
     private TextView confirmConsentTextView;
@@ -35,8 +34,7 @@ public class LaunchProcess {
     public Boolean permissions = false;
 
 
-    public LaunchProcess(String callingPackage, LaunchActivity launchActivity) {
-        this.callingPackage = callingPackage;
+    public LaunchProcess(LaunchActivity launchActivity) {
         this.launchActivity = launchActivity;
 
         appState = AppState.getInstance();
@@ -105,17 +103,8 @@ public class LaunchProcess {
 
     public void updateData() {
         if (!apiKey) {
-            DatabaseContext.initActiveAndroid(launchActivity.getApplicationContext());
 
-            SharedPrefHelper sharedPrefHelper = new SharedPrefHelper(launchActivity.getApplicationContext());
-            int dbVersion = sharedPrefHelper.getDbVersionInt();
-            if (dbVersion == 0) {
-                DatabaseContext.reset(launchActivity.getApplicationContext());
-
-                sharedPrefHelper.setDbVersionInt(DATABASE_VERSION_NUMBER);
-            }
-
-            appState.setData(new DatabaseContext(appState.getApiKey(),
+            appState.setData(new DatabaseContext(appState.getApiKey(), appState.getUserId(),
                     launchActivity.getApplicationContext(), launchActivity));
             appState.getData().validateApiKey();
 
@@ -125,7 +114,7 @@ public class LaunchProcess {
         launch();
 
         if (!ccResolver) {
-            if (COMMCARE_PACKAGE.equals(callingPackage)) {
+            if (COMMCARE_PACKAGE.equals(appState.getCallingPackage())) {
                 appState.getData().resolveCommCare(launchActivity.getContentResolver());
                 return;
             } else {
