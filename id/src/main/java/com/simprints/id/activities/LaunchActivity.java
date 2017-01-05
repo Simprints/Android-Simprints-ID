@@ -11,6 +11,7 @@ import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.facebook.stetho.Stetho;
+import com.google.android.gms.iid.InstanceID;
 import com.simprints.id.LaunchProcess;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
@@ -104,10 +105,11 @@ public class LaunchActivity extends AppCompatActivity
         appState.setGuid(guid);
 
         // Sets userId
+        String instanceId = InstanceID.getInstance(getApplicationContext()).getId();
         String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
         if (userId == null) {
-            userId = sharedPref.getLastUserId();
-        } else if (!userId.equals(sharedPref.getLastUserId())) {
+            userId = instanceId;
+        } else if (sharedPref.getLastUserId().equals(instanceId)) {
             DatabaseContext.updateUserId(getApplicationContext(), apiKey,
                     sharedPref.getLastUserId(), userId);
         }
