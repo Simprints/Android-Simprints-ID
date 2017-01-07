@@ -41,6 +41,7 @@ import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
 import com.simprints.libcommon.ScanConfig;
 import com.simprints.libdata.DatabaseEventListener;
+import com.simprints.libdata.DatabaseSync;
 import com.simprints.libdata.Event;
 import com.simprints.libscanner.Message;
 import com.simprints.libscanner.Scanner;
@@ -123,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements
         appState = AppState.getInstance();
         appState.getScanner().setScannerListener(this);
         appState.getData().setListener(this);
-        appState.getData().sync();
+        DatabaseSync.sync(getApplicationContext(), this);
 
         handler = new Handler();
 
@@ -672,12 +673,11 @@ public class MainActivity extends AppCompatActivity implements
                         PRIVACY_ACTIVITY_REQUEST_CODE);
                 break;
             case R.id.nav_sync:
-                if (appState.getData() != null) {
-                    syncItem = item;
-                    syncItem.setEnabled(false);
-                    syncItem.setTitle("Syncing...");
-                    appState.getData().sync();
-                }
+                syncItem = item;
+                syncItem.setEnabled(false);
+                syncItem.setTitle("Syncing...");
+                DatabaseSync.sync(getApplicationContext(), this);
+
 
                 return true;
 //            case R.id.nav_tutorial:

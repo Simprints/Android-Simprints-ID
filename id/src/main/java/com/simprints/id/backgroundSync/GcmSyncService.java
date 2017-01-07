@@ -5,14 +5,11 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
-import com.simprints.id.tools.SharedPrefHelper;
-import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
+import com.simprints.libdata.DatabaseSync;
 import com.simprints.libdata.Event;
 
 public class GcmSyncService extends GcmTaskService implements DatabaseEventListener {
-    private DatabaseContext databaseContext;
-
     @Override
     public void onInitializeTasks() {
         super.onInitializeTasks();
@@ -23,12 +20,7 @@ public class GcmSyncService extends GcmTaskService implements DatabaseEventListe
     public int onRunTask(TaskParams taskParams) {
         Log.d("GcmSyncService", "onRunTask Called");
 
-        String userId = new SharedPrefHelper(getApplicationContext()).getLastUserId();
-
-        String key = DatabaseContext.signedInUserId();
-        if (key != null) {
-            databaseContext = new DatabaseContext(key, userId, getApplicationContext(), this);
-        }
+        DatabaseSync.sync(getApplicationContext(), this);
 
         return GcmNetworkManager.RESULT_SUCCESS;
     }
@@ -38,13 +30,13 @@ public class GcmSyncService extends GcmTaskService implements DatabaseEventListe
         switch (event) {
 
             case SYNC_INTERRUPTED:
-                databaseContext.sync();
+                Log.d("BACKGROUND SYNC", "SYNC_INTERRUPTED");
                 break;
             case SYNC_SUCCESS:
-                databaseContext.destroy();
+                Log.d("BACKGROUND SYNC", "SYNC_SUCCESS");
                 break;
             case SIGNED_IN:
-                databaseContext.sync();
+                Log.d("BACKGROUND SYNC", "SIGNED_IN");
                 break;
 
         }
