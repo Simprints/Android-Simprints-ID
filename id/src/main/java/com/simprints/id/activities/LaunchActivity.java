@@ -1,5 +1,6 @@
 package com.simprints.id.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,7 +12,6 @@ import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.facebook.stetho.Stetho;
-import com.google.android.gms.iid.InstanceID;
 import com.simprints.id.LaunchProcess;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
 
+import static android.provider.Settings.Secure;
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.ALERT_TYPE_EXTRA;
 import static com.simprints.id.tools.InternalConstants.COMMCARE_PACKAGE;
@@ -50,6 +51,7 @@ public class LaunchActivity extends AppCompatActivity
 
     private LaunchProcess launchProcess;
 
+    @SuppressLint("HardwareIds")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,11 +65,14 @@ public class LaunchActivity extends AppCompatActivity
         SharedPrefHelper sharedPref = new SharedPrefHelper(getApplicationContext());
 
         appState = AppState.getInstance();
+        appState.setDeviceId(Secure.getString(getApplicationContext().getContentResolver(),
+                Secure.ANDROID_ID));
         positionTracker = new PositionTracker(this);
         positionTracker.start();
 
         callingPackage = null;
         waitingForConfirmation = false;
+
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
@@ -104,21 +109,22 @@ public class LaunchActivity extends AppCompatActivity
         }
         appState.setGuid(guid);
 
+        // Sets deviceId
+        String deviceId = extras.getString(Constants.SIMPRINTS_DEVICE_ID);
+        if (deviceId != null && !deviceId.isEmpty()) {
+            appState.setDeviceId(deviceId);
+        }
+
         // Sets userId
-        String instanceId = InstanceID.getInstance(getApplicationContext()).getId();
         String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
         if (userId == null) {
-            userId = instanceId;
-        } else if (sharedPref.getLastUserId().equals(instanceId)) {
+            userId = appState.getDeviceId();
+        } else if (sharedPref.getLastUserId().equals(appState.getDeviceId())) {
             DatabaseContext.updateUserId(getApplicationContext(), apiKey,
                     sharedPref.getLastUserId(), userId);
         }
         new SharedPrefHelper(getApplicationContext()).setLastUserId(userId);
         appState.setUserId(userId);
-
-        // Sets deviceId
-        String deviceId = extras.getString(Constants.SIMPRINTS_DEVICE_ID);
-        appState.setDeviceId(deviceId);
 
         // Sets calling package
         callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);

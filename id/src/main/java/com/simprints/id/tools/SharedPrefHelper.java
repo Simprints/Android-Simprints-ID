@@ -1,9 +1,9 @@
 package com.simprints.id.tools;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.google.android.gms.iid.InstanceID;
 import com.simprints.id.R;
 
 
@@ -124,9 +124,9 @@ public class SharedPrefHelper {
     /**
      * Last given userID
      */
+    @SuppressLint("HardwareIds")
     public String getLastUserId() {
-        return sharedPref.getString(context.getString(R.string.pref_last_user_id),
-                InstanceID.getInstance(context).getId());
+        return sharedPref.getString(context.getString(R.string.pref_last_user_id), AppState.getInstance().getDeviceId());
     }
 
     public void setLastUserId(String userId) {
