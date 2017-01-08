@@ -31,6 +31,7 @@ import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
+import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
@@ -119,6 +120,8 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
 
         Log.d(this, "Creating MainActivity");
+
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "Main Screen");
 
         appState = AppState.getInstance();
         appState.getScanner().setScannerListener(this);

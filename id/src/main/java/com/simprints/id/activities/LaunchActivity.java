@@ -10,9 +10,11 @@ import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.simprints.id.LaunchProcess;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
+import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PositionTracker;
@@ -41,6 +43,7 @@ public class LaunchActivity extends AppCompatActivity
     public boolean waitingForConfirmation;
 
     public AppState appState;
+    public Analytics analytics;
     private PositionTracker positionTracker;
     private String callingPackage;
 
@@ -54,6 +57,9 @@ public class LaunchActivity extends AppCompatActivity
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
         Appsee.start(getString(R.string.com_appsee_apikey));
+
+        analytics = Analytics.getInstance(getApplicationContext());
+        analytics.setActivity(this, "Launch Screen");
 
         appState = AppState.getInstance();
         positionTracker = new PositionTracker(this);
@@ -107,6 +113,9 @@ public class LaunchActivity extends AppCompatActivity
 
         // Sets calling package
         callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
+
+        //Set user in analytics
+        analytics.setUser(appState.getUserId(), appState.getApiKey());
 
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
