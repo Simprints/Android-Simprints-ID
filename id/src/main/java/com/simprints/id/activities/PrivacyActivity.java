@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.CheckBox;
 
 import com.simprints.id.R;
+import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.SharedPrefHelper;
 
@@ -21,6 +22,7 @@ public class PrivacyActivity extends AppCompatActivity {
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_privacy);
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "Privacy Screen");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);

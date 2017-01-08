@@ -72,12 +72,14 @@ public class AlertActivity extends AppCompatActivity {
                         case DISCONNECTED:
                         case UNVERIFIED_API_KEY:
                             setResult(InternalConstants.RESULT_TRY_AGAIN);
+                            analytics.setAlert(alertType, true);
                             finish();
                             break;
                         case INVALID_API_KEY:
                         case BLUETOOTH_NOT_SUPPORTED:
                         default:
                             setResult(RESULT_CANCELED);
+                            analytics.setAlert(alertType, false);
                             finish();
                             break;
                     }
@@ -106,6 +108,7 @@ public class AlertActivity extends AppCompatActivity {
                         case UNVERIFIED_API_KEY:
                         default:
                             setResult(RESULT_CANCELED);
+                            analytics.setAlert(alertType, false);
                             finish();
                             break;
                     }

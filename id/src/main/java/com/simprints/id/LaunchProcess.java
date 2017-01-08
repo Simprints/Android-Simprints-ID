@@ -9,14 +9,12 @@ import com.simprints.id.activities.ALERT_TYPE;
 import com.simprints.id.activities.LaunchActivity;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.PermissionManager;
-import com.simprints.id.tools.SharedPrefHelper;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libscanner.Scanner;
 
 import java.util.List;
 
 import static com.simprints.id.tools.InternalConstants.COMMCARE_PACKAGE;
-import static com.simprints.id.tools.InternalConstants.DATABASE_VERSION_NUMBER;
 
 public class LaunchProcess {
     private LaunchActivity launchActivity;

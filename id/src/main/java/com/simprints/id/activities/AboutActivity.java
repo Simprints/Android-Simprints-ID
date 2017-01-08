@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.simprints.id.R;
+import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
@@ -22,6 +23,7 @@ public class AboutActivity extends AppCompatActivity {
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_about);
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "About Screen");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_about);
         setSupportActionBar(toolbar);
@@ -31,7 +33,7 @@ public class AboutActivity extends AppCompatActivity {
             actionBar.show();
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
+        
         PackageInfo pInfo;
         String version = "";
         try {

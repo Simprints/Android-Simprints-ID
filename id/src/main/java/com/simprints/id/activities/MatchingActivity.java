@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.simprints.id.R;
+import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
@@ -46,6 +47,7 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_matching);
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "Matching Screen");
 
         appState = AppState.getInstance();
         appState.getData().setListener(this);

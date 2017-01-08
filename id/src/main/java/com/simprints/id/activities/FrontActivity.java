@@ -1,11 +1,8 @@
 package com.simprints.id.activities;
 
-import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
@@ -27,9 +24,8 @@ public class FrontActivity extends AppCompatActivity {
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_front);
-
         Analytics.getInstance(getApplicationContext()).setActivity(this, "Home Screen");
-        
+
         PackageInfo pInfo;
         String version = "";
         try {

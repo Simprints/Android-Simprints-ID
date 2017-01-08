@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.simprints.id.R;
+import com.simprints.id.tools.Analytics;
 
 public class HelpActivity extends AppCompatActivity {
 
@@ -13,6 +14,7 @@ public class HelpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help);
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "Help Screen");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_help);
         setSupportActionBar(toolbar);
@@ -20,6 +22,5 @@ public class HelpActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.show();
         actionBar.setDisplayHomeAsUpEnabled(true);
-
     }
 }

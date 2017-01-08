@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.simprints.id.R;
+import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.SharedPrefHelper;
 
@@ -36,6 +37,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_settings);
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "Settings Screen");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
