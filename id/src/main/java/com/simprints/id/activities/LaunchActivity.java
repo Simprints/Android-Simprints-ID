@@ -11,11 +11,7 @@ import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
-<<<<<<< HEAD
 import com.facebook.stetho.Stetho;
-=======
-import com.google.firebase.analytics.FirebaseAnalytics;
->>>>>>> addAnalytics
 import com.simprints.id.LaunchProcess;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
@@ -123,6 +119,7 @@ public class LaunchActivity extends AppCompatActivity
         if (deviceId != null && !deviceId.isEmpty()) {
             appState.setDeviceId(deviceId);
         }
+        analytics.setDeviceId(appState.getDeviceId());
 
         // Sets userId
         String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
@@ -166,6 +163,7 @@ public class LaunchActivity extends AppCompatActivity
     public boolean onTouchEvent(MotionEvent event) {
         if (waitingForConfirmation) {
             waitingForConfirmation = false;
+            analytics.setScannerMac(appState.getMacAddress());
             startActivityForResult(new Intent(LaunchActivity.this, MainActivity.class),
                     MAIN_ACTIVITY_REQUEST);
             return true;

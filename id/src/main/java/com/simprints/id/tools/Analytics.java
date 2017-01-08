@@ -2,8 +2,11 @@ package com.simprints.id.tools;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crash.FirebaseCrash;
+import com.simprints.id.activities.ALERT_TYPE;
 
 public class Analytics {
 
@@ -40,4 +43,12 @@ public class Analytics {
         firebaseAnalytics.setUserProperty("Scanner ID", scannerMac);
     }
 
+    public void setAlert(ALERT_TYPE alertType, Boolean retry) {
+        FirebaseCrash.log(alertType.name());
+
+        Bundle bundle = new Bundle();
+        bundle.putString("alert_name", alertType.name());
+        bundle.putString("retry", retry.toString());
+        firebaseAnalytics.logEvent("alert", bundle);
+    }
 }
