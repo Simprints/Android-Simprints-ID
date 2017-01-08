@@ -36,6 +36,7 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.SharedPrefHelper;
+import com.simprints.id.tools.Vibrate;
 import com.simprints.id.tools.ViewPagerCustom;
 import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
@@ -437,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements
                     activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
                 }
 
+                Vibrate.vibrate(this, 100);
                 refreshDisplay();
 
                 break;

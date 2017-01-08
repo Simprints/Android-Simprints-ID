@@ -11,12 +11,14 @@ import com.simprints.id.activities.ALERT_TYPE;
 import com.simprints.id.activities.LaunchActivity;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.PermissionManager;
+import com.simprints.id.tools.Vibrate;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libscanner.Scanner;
 
 import java.util.List;
 
 import static com.simprints.id.tools.InternalConstants.COMMCARE_PACKAGE;
+import static com.simprints.id.tools.Vibrate.*;
 
 public class LaunchProcess {
     private LaunchActivity launchActivity;
@@ -95,16 +97,16 @@ public class LaunchProcess {
             return;
         }
 
-        if (!vib) {
-            vib = true;
-            ((Vibrator) launchActivity.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(100);
-        }
-
         launchProgress.setProgress(100);
 
         launchActivity.waitingForConfirmation = true;
         confirmConsentTextView.setVisibility(View.VISIBLE);
         loadingInfoTextView.setVisibility(View.INVISIBLE);
+
+        if (!vib) {
+            vib = true;
+            vibrate(launchActivity, 100);
+        }
     }
 
     public void updateData() {

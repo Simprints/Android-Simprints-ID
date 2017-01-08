@@ -33,6 +33,7 @@ public class Analytics {
     public void setUser(String userId, String apiKey) {
         firebaseAnalytics.setUserId(userId);
         firebaseAnalytics.setUserProperty("API Key", apiKey);
+        firebaseAnalytics.setUserProperty(FirebaseAnalytics.UserProperty.SIGN_UP_METHOD, apiKey);
     }
 
     public void setDeviceId(String deviceId) {
@@ -43,12 +44,18 @@ public class Analytics {
         firebaseAnalytics.setUserProperty("Scanner ID", scannerMac);
     }
 
-    public void setAlert(ALERT_TYPE alertType, Boolean retry) {
+    public void setAlert(ALERT_TYPE alertType, boolean retry) {
         FirebaseCrash.log(alertType.name());
 
         Bundle bundle = new Bundle();
         bundle.putString("alert_name", alertType.name());
-        bundle.putString("retry", retry.toString());
+        bundle.putBoolean("retry", retry);
         firebaseAnalytics.logEvent("alert", bundle);
+    }
+
+    public void setLogin(boolean enrol) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("Enrollment", enrol);
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
     }
 }
