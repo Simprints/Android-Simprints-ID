@@ -78,7 +78,6 @@ public class LaunchActivity extends AppCompatActivity
         callingPackage = null;
         waitingForConfirmation = false;
 
-
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null);
@@ -97,6 +96,7 @@ public class LaunchActivity extends AppCompatActivity
                 finishWith(Constants.SIMPRINTS_INVALID_INTENT_ACTION, null);
                 return;
         }
+        analytics.setLogin(appState.isEnrol());
 
         // Sets apiKey
         String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
