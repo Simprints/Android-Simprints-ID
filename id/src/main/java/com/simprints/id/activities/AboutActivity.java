@@ -33,7 +33,7 @@ public class AboutActivity extends AppCompatActivity {
             actionBar.show();
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        
+
         PackageInfo pInfo;
         String version = "";
         try {

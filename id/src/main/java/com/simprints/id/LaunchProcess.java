@@ -1,6 +1,8 @@
 package com.simprints.id;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.os.Vibrator;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,6 +32,7 @@ public class LaunchProcess {
     public Boolean btConnection = false;
     public Boolean un20WakeUp = false;
     public Boolean permissions = false;
+    private Boolean vib = false;
 
 
     public LaunchProcess(LaunchActivity launchActivity) {
@@ -90,6 +93,11 @@ public class LaunchProcess {
 
         if (!un20WakeUp) {
             return;
+        }
+
+        if (!vib) {
+            vib = true;
+            ((Vibrator) launchActivity.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(100);
         }
 
         launchProgress.setProgress(100);
