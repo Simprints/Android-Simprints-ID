@@ -11,10 +11,15 @@ import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+<<<<<<< HEAD
 import com.facebook.stetho.Stetho;
+=======
+import com.google.firebase.analytics.FirebaseAnalytics;
+>>>>>>> addAnalytics
 import com.simprints.id.LaunchProcess;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
+import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PositionTracker;
@@ -46,6 +51,7 @@ public class LaunchActivity extends AppCompatActivity
     public boolean waitingForConfirmation;
 
     public AppState appState;
+    public Analytics analytics;
     private PositionTracker positionTracker;
     private String callingPackage;
 
@@ -63,6 +69,9 @@ public class LaunchActivity extends AppCompatActivity
         Stetho.initializeWithDefaults(getApplicationContext());
 
         SharedPrefHelper sharedPref = new SharedPrefHelper(getApplicationContext());
+
+        analytics = Analytics.getInstance(getApplicationContext());
+        analytics.setActivity(this, "Launch Screen");
 
         appState = AppState.getInstance();
         appState.setDeviceId(Secure.getString(getApplicationContext().getContentResolver(),
@@ -129,6 +138,9 @@ public class LaunchActivity extends AppCompatActivity
         // Sets calling package
         callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
         appState.setCallingPackage(callingPackage);
+
+        //Set user in analytics
+        analytics.setUser(appState.getUserId(), appState.getApiKey());
 
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();

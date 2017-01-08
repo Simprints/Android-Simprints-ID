@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.simprints.id.R;
+import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
@@ -18,6 +19,7 @@ import com.simprints.id.tools.Language;
 public class AlertActivity extends AppCompatActivity {
 
     AppState appState;
+    Analytics analytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,8 @@ public class AlertActivity extends AppCompatActivity {
         setContentView(R.layout.activity_alert);
 
         appState = AppState.getInstance();
+        analytics = Analytics.getInstance(getApplicationContext());
+
 
         Bundle extras = getIntent().getExtras();
         assert extras != null;
@@ -39,6 +43,7 @@ public class AlertActivity extends AppCompatActivity {
                     .putCustomAttribute("API Key", appState.getApiKey())
                     .putCustomAttribute("MAC Address", appState.getMacAddress()));
         }
+        analytics.setActivity(this, alertType.name());
 
         ((TextView) findViewById(R.id.title)).setText(alertType.getAlertTitleId());
 
