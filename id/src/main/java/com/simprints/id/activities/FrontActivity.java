@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
+import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PermissionManager;
 
@@ -27,6 +28,8 @@ public class FrontActivity extends AppCompatActivity {
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_front);
 
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "Home Screen");
+        
         PackageInfo pInfo;
         String version = "";
         try {
