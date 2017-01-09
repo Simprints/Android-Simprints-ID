@@ -25,10 +25,4 @@ public class TutorialActivity extends AppCompatActivity {
         actionBar.show();
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "Tutorial Screen");
-    }
 }

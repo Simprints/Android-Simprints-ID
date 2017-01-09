@@ -119,12 +119,6 @@ public class AlertActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        analytics.setActivity(this, alertType.name());
-    }
-
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             setResult(RESULT_CANCELED);

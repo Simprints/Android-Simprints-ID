@@ -22,10 +22,4 @@ public class HelpActivity extends AppCompatActivity {
         actionBar.show();
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "Help Screen");
-    }
 }

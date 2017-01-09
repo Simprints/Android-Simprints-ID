@@ -146,12 +146,6 @@ public class LaunchActivity extends AppCompatActivity
         launchProcess.launch();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        analytics.setActivity(this, "Launch Screen");
-    }
-
     private void finishWith(final int resultCode, final Intent resultData) {
         setResult(resultCode, resultData);
         waitingForConfirmation = false;
