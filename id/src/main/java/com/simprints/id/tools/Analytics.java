@@ -24,6 +24,7 @@ public class Analytics {
     private Analytics(Context context) {
         firebaseAnalytics = FirebaseAnalytics.getInstance(context);
         firebaseAnalytics.setAnalyticsCollectionEnabled(true);
+        firebaseAnalytics.setMinimumSessionDuration(0);
     }
 
     public void setActivity(Activity activity, String screenName) {
