@@ -5,23 +5,6 @@
     android:layout_height="match_parent"
     android:background="@color/simprints_blue">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:contentDescription="@string/launch_background_description"
-        android:src="@drawable/launch_background" />
-
-    <TextView
-        android:id="@+id/versionTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="150dp"
-        android:text="Simprints"
-        android:textColor="@color/simprints_white"
-        android:textSize="20sp" />
-
     <TextView
         android:id="@+id/libSimprintsTextView"
         android:layout_width="wrap_content"
@@ -40,19 +23,37 @@
         android:layout_alignBottom="@+id/bt_sync"
         android:layout_alignTop="@+id/bt_sync"
         android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
         android:layout_toLeftOf="@+id/bt_sync"
         android:layout_toStartOf="@+id/bt_sync"
-        app:srcCompat="@drawable/ic_menu_sync_ready"
-        android:layout_marginRight="10dp" />
+        app:srcCompat="@drawable/ic_menu_sync_ready" />
 
     <Button
         android:id="@+id/bt_sync"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/versionTextView"
-        android:layout_alignStart="@+id/versionTextView"
-        android:layout_below="@+id/libSimprintsTextView"
-        android:layout_marginTop="15dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
         android:text="@string/sync_data" />
+
+    <TextView
+        android:id="@+id/versionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Simprints"
+        android:textColor="@color/simprints_white"
+        android:textSize="20sp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="250dp"
+        android:contentDescription="@string/launch_background_description"
+        android:src="@drawable/launch_background"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>
