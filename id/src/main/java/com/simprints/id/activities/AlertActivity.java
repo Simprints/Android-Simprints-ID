@@ -20,6 +20,7 @@ public class AlertActivity extends AppCompatActivity {
 
     AppState appState;
     Analytics analytics;
+    ALERT_TYPE alertType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class AlertActivity extends AppCompatActivity {
         assert extras != null;
         final ALERT_TYPE alertType = (ALERT_TYPE) extras.get("alertType");
         assert alertType != null;
+        this.alertType = alertType;
 
         if (alertType.mustBeLogged()) {
             Answers.getInstance().logCustom(new CustomEvent("Alert Triggered")
@@ -43,7 +45,6 @@ public class AlertActivity extends AppCompatActivity {
                     .putCustomAttribute("API Key", appState.getApiKey())
                     .putCustomAttribute("MAC Address", appState.getMacAddress()));
         }
-        analytics.setActivity(this, alertType.name());
 
         ((TextView) findViewById(R.id.title)).setText(alertType.getAlertTitleId());
 
@@ -115,6 +116,12 @@ public class AlertActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        analytics.setActivity(this, alertType.name());
     }
 
     @Override

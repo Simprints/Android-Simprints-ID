@@ -22,7 +22,6 @@ public class PrivacyActivity extends AppCompatActivity {
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_privacy);
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "Privacy Screen");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
@@ -39,6 +38,12 @@ public class PrivacyActivity extends AppCompatActivity {
         CheckBox checkBox = (CheckBox) findViewById(R.id.consentCheckBox);
 
         checkBox.setChecked(consent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "Privacy Screen");
     }
 
     public void onCheckBoxClicked(View view) {

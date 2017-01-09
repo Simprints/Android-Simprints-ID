@@ -47,7 +47,6 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_matching);
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "Matching Screen");
 
         appState = AppState.getInstance();
         appState.getData().setListener(this);
@@ -63,6 +62,12 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
         probe = extras.getParcelable("Person");
 
         appState.getData().loadPeople(candidates);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "Matching Screen");
     }
 
     @Override

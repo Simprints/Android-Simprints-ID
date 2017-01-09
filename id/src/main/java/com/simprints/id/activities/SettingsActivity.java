@@ -37,7 +37,6 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_settings);
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "Settings Screen");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
@@ -127,6 +126,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             ((RadioButton) findViewById(R.id.radio_sourceAfis)).setChecked(true);
 
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "Settings Screen");
     }
 
     @Override
