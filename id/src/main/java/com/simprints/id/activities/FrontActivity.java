@@ -15,7 +15,6 @@ import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PermissionManager;
-import com.simprints.libdata.Connection;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.DatabaseSync;
@@ -55,8 +54,6 @@ public class FrontActivity extends AppCompatActivity implements DatabaseEventLis
 
         PermissionManager.requestPermissions(FrontActivity.this);
 
-        setSyncButton();
-
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -71,52 +68,25 @@ public class FrontActivity extends AppCompatActivity implements DatabaseEventLis
     @Override
     protected void onResume() {
         super.onResume();
-        Connection.setListener(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Connection.release();
-    }
-
-    @Override
-    public void onBackPressed() {
-        finish();
-        super.onBackPressed();
-    }
-
-    @Override
-    public void onDataEvent(Event event) {
-        switch (event) {
-            case SYNC_INTERRUPTED:
-                setSyncButton();
-                syncStatus.setImageResource(R.drawable.ic_menu_sync_failed);
-                break;
-            case SYNC_SUCCESS:
-                setSyncButton();
-                syncStatus.setImageResource(R.drawable.ic_menu_sync_success);
-                break;
-            case CONNECTED:
-                setSyncButton();
-                break;
-            case DISCONNECTED:
-                syncButton.setEnabled(false);
-                syncButton.setText(R.string.offline);
-                syncStatus.setImageResource(R.drawable.ic_menu_sync_off);
-                break;
-        }
-    }
-
-    private void setSyncButton() {
         if (!DatabaseContext.signedIn()) {
             syncButton.setEnabled(false);
             syncButton.setText(R.string.not_signed_in);
             syncStatus.setImageResource(R.drawable.ic_menu_sync_failed);
-        } else {
-            syncButton.setEnabled(true);
-            syncButton.setText(R.string.sync_data);
-            syncStatus.setImageResource(R.drawable.ic_menu_sync_ready);
+        }
+    }
+
+    @Override
+    public void onDataEvent(Event event) {
+        syncButton.setEnabled(true);
+        syncButton.setText(R.string.sync_data);
+
+        switch (event) {
+            case SYNC_INTERRUPTED:
+                syncStatus.setImageResource(R.drawable.ic_menu_sync_failed);
+                break;
+            case SYNC_SUCCESS:
+                syncStatus.setImageResource(R.drawable.ic_menu_sync_success);
+                break;
         }
     }
 }
