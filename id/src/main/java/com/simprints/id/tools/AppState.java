@@ -147,7 +147,7 @@ public class AppState {
         this.signedIn = signedIn;
     }
 
-    public synchronized boolean getSConnected() {
+    public synchronized boolean isConnected() {
         return this.connected;
     }
 
