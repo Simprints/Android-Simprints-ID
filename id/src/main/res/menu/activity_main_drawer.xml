@@ -18,7 +18,7 @@
         <menu>
             <item
                 android:id="@+id/nav_sync"
-                android:icon="@drawable/ic_menu_sync_good"
+                android:icon="@drawable/ic_menu_sync_off"
                 android:title="@string/nav_sync" />
         </menu>
     </item>
