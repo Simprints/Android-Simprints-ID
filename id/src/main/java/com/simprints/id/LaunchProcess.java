@@ -1,8 +1,6 @@
 package com.simprints.id;
 
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
-import android.os.Vibrator;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -11,14 +9,13 @@ import com.simprints.id.activities.ALERT_TYPE;
 import com.simprints.id.activities.LaunchActivity;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.PermissionManager;
-import com.simprints.id.tools.Vibrate;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libscanner.Scanner;
 
 import java.util.List;
 
 import static com.simprints.id.tools.InternalConstants.COMMCARE_PACKAGE;
-import static com.simprints.id.tools.Vibrate.*;
+import static com.simprints.id.tools.Vibrate.vibrate;
 
 public class LaunchProcess {
     private LaunchActivity launchActivity;

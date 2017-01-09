@@ -176,4 +176,5 @@
     <string name="sync_data">Sync Data</string>
     <string name="syncing">Syncing...</string>
     <string name="not_signed_in">Not Signed In</string>
+    <string name="offline">Offline</string>
 </resources>
