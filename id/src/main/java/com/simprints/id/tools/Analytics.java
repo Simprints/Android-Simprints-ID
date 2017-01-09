@@ -36,16 +36,16 @@ public class Analytics {
 
     public void setUser(String userId, String apiKey) {
         firebaseAnalytics.setUserId(userId);
-        firebaseAnalytics.setUserProperty("API Key", apiKey);
+        firebaseAnalytics.setUserProperty("api_key", apiKey);
         firebaseAnalytics.setUserProperty(UserProperty.SIGN_UP_METHOD, apiKey);
     }
 
     public void setDeviceId(String deviceId) {
-        firebaseAnalytics.setUserProperty("Device ID", deviceId);
+        firebaseAnalytics.setUserProperty("device_id", deviceId);
     }
 
     public void setScannerMac(String scannerMac) {
-        firebaseAnalytics.setUserProperty("Scanner ID", scannerMac);
+        firebaseAnalytics.setUserProperty("scanner_id", scannerMac);
     }
 
     public void setAlert(ALERT_TYPE alertType, boolean retry) {

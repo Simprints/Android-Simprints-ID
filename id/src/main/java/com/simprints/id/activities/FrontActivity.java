@@ -47,7 +47,7 @@ public class FrontActivity extends AppCompatActivity implements DatabaseEventLis
             e.printStackTrace();
         }
 
-        ((TextView) findViewById(R.id.versionTextView)).setText(version);
+        ((TextView) findViewById(R.id.versionTextView)).setText(String.format("Simprints ID: %s", version));
         ((TextView) findViewById(R.id.libSimprintsTextView)).setText(R.string.front_libSimprints_version);
 
         new SyncSetup(getApplicationContext()).initialize();
