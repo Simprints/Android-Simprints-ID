@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.CheckBox;
 
 import com.simprints.id.R;
-import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.SharedPrefHelper;
 
@@ -38,12 +37,6 @@ public class PrivacyActivity extends AppCompatActivity {
         CheckBox checkBox = (CheckBox) findViewById(R.id.consentCheckBox);
 
         checkBox.setChecked(consent);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "Privacy Screen");
     }
 
     public void onCheckBoxClicked(View view) {

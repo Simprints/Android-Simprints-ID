@@ -65,12 +65,6 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "Matching Screen");
-    }
-
-    @Override
     public void onDataEvent(Event event) {
         switch (event) {
             case LOAD_PEOPLE_FINISHED:

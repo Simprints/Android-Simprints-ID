@@ -24,7 +24,7 @@ public class FrontActivity extends AppCompatActivity {
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_front);
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "Home Screen");
+        Analytics.getInstance(getApplicationContext());
 
         PackageInfo pInfo;
         String version = "";

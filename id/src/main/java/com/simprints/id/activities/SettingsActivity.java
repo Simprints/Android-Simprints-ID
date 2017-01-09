@@ -129,12 +129,6 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "Settings Screen");
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:

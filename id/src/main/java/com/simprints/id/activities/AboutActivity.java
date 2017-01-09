@@ -58,12 +58,6 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "About Screen");
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
