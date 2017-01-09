@@ -1,12 +1,15 @@
 package com.simprints.id.tools;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crash.FirebaseCrash;
 import com.simprints.id.activities.ALERT_TYPE;
+
+import static com.google.firebase.analytics.FirebaseAnalytics.Event;
+import static com.google.firebase.analytics.FirebaseAnalytics.Param;
+import static com.google.firebase.analytics.FirebaseAnalytics.UserProperty;
 
 public class Analytics {
 
@@ -27,14 +30,14 @@ public class Analytics {
         firebaseAnalytics.setMinimumSessionDuration(0);
     }
 
-    public void setActivity(Activity activity, String screenName) {
-        firebaseAnalytics.setCurrentScreen(activity, screenName, null);
+    public FirebaseAnalytics getFirebaseAnalytics() {
+        return firebaseAnalytics;
     }
 
     public void setUser(String userId, String apiKey) {
         firebaseAnalytics.setUserId(userId);
         firebaseAnalytics.setUserProperty("API Key", apiKey);
-        firebaseAnalytics.setUserProperty(FirebaseAnalytics.UserProperty.SIGN_UP_METHOD, apiKey);
+        firebaseAnalytics.setUserProperty(UserProperty.SIGN_UP_METHOD, apiKey);
     }
 
     public void setDeviceId(String deviceId) {
@@ -56,7 +59,14 @@ public class Analytics {
 
     public void setLogin(boolean enrol) {
         Bundle bundle = new Bundle();
-        bundle.putBoolean("Enrollment", enrol);
-        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
+        bundle.putString(Param.VALUE, String.valueOf(enrol));
+        firebaseAnalytics.logEvent(Event.LOGIN, bundle);
+    }
+
+    public void setBackgroundSync(boolean success, String deviceId) {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("success", success);
+        bundle.putString("device_id", deviceId);
+        firebaseAnalytics.logEvent("background_sync", bundle);
     }
 }

@@ -31,7 +31,6 @@ import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
-import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
@@ -121,6 +120,9 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        navView.setItemIconTintList(null);
+
         appState = AppState.getInstance();
         appState.getScanner().setScannerListener(this);
         appState.getData().setListener(this);
@@ -181,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        syncItem = navigationView.getMenu().findItem(R.id.nav_sync);
         navigationView.setNavigationItemSelectedListener(this);
 
         ActionBar actionBar = getSupportActionBar();
@@ -550,27 +553,31 @@ public class MainActivity extends AppCompatActivity implements
                 if (syncItem != null) {
                     syncItem.setEnabled(true);
                     syncItem.setTitle("Syncing Failed");
-                    syncItem.setIcon(R.drawable.ic_menu_sync_bad);
+                    syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                 }
                 break;
             case SYNC_SUCCESS:
                 if (syncItem != null) {
                     syncItem.setEnabled(true);
                     syncItem.setTitle("Sync Complete");
-                    syncItem.setIcon(R.drawable.ic_menu_sync_good);
+                    syncItem.setIcon(R.drawable.ic_menu_sync_success);
                 }
                 break;
             case CONNECTED:
                 appState.setConnected(true);
+                updateSyncStatus();
                 break;
             case DISCONNECTED:
                 appState.setConnected(false);
+                updateSyncStatus();
                 break;
             case SIGNED_IN:
                 appState.setSignedIn(true);
+                updateSyncStatus();
                 break;
             case SIGNED_OUT:
                 appState.setSignedIn(false);
+                updateSyncStatus();
                 break;
         }
     }
@@ -633,7 +640,6 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         continueItem = menu.findItem(R.id.action_forward);
-        syncItem = menu.findItem(R.id.nav_sync);
         refreshDisplay();
         return true;
     }
@@ -674,21 +680,12 @@ public class MainActivity extends AppCompatActivity implements
                         PRIVACY_ACTIVITY_REQUEST_CODE);
                 break;
             case R.id.nav_sync:
-                syncItem = item;
                 syncItem.setEnabled(false);
                 syncItem.setTitle("Syncing...");
+                syncItem.setIcon(R.drawable.ic_menu_syncing);
                 DatabaseSync.sync(getApplicationContext(), this);
 
-
                 return true;
-//            case R.id.nav_tutorial:
-//                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
-////                startActivity(new Intent(this, TutorialActivity.class));
-//                break;
-//            case R.id.nav_troubleshoot:
-//                Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
-////                startActivity(new Intent(this, TroubleshootActivity.class));
-//                break;
             case R.id.nav_about:
                 startActivityForResult(new Intent(this, AboutActivity.class),
                         ABOUT_ACTIVITY_REQUEST_CODE);
@@ -829,5 +826,23 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+    }
+
+    private void updateSyncStatus() {
+        if (syncItem == null)
+            return;
+        if (!appState.getSConnected()) {
+            syncItem.setEnabled(false);
+            syncItem.setTitle("Offline");
+            syncItem.setIcon(R.drawable.ic_menu_sync_off);
+        } else if (!appState.getSignedIn()) {
+            syncItem.setEnabled(false);
+            syncItem.setTitle("Signed Out");
+            syncItem.setIcon(R.drawable.ic_menu_sync_off);
+        } else if (appState.getSignedIn()) {
+            syncItem.setEnabled(true);
+            syncItem.setTitle("Sync");
+            syncItem.setIcon(R.drawable.ic_menu_sync_ready);
+        }
     }
 }
