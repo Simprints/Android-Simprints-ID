@@ -17,7 +17,6 @@ public class TutorialActivity extends AppCompatActivity {
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_tutorial);
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "Tutorial Screen");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_tutorial);
         setSupportActionBar(toolbar);
@@ -25,6 +24,11 @@ public class TutorialActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.show();
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "Tutorial Screen");
     }
 }

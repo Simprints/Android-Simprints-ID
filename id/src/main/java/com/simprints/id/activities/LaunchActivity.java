@@ -67,7 +67,6 @@ public class LaunchActivity extends AppCompatActivity
         SharedPrefHelper sharedPref = new SharedPrefHelper(getApplicationContext());
 
         analytics = Analytics.getInstance(getApplicationContext());
-        analytics.setActivity(this, "Launch Screen");
 
         appState = AppState.getInstance();
         appState.setDeviceId(Secure.getString(getApplicationContext().getContentResolver(),
@@ -145,6 +144,12 @@ public class LaunchActivity extends AppCompatActivity
         //Start the launching process
         launchProcess = new LaunchProcess(this);
         launchProcess.launch();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        analytics.setActivity(this, "Launch Screen");
     }
 
     private void finishWith(final int resultCode, final Intent resultData) {

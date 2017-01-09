@@ -23,7 +23,6 @@ public class AboutActivity extends AppCompatActivity {
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_about);
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "About Screen");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_about);
         setSupportActionBar(toolbar);
@@ -56,6 +55,12 @@ public class AboutActivity extends AppCompatActivity {
         }
         ((TextView) findViewById(R.id.firmwareVersionTextView)).setText(
                 String.valueOf(firmwareVersion));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "About Screen");
     }
 
     @Override

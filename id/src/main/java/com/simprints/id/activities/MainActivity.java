@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Analytics.getInstance(getApplicationContext()).setActivity(this, "Main Screen");
 
         appState = AppState.getInstance();
         appState.getScanner().setScannerListener(this);
@@ -828,6 +827,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onResume() {
         super.onResume();
+        Analytics.getInstance(getApplicationContext()).setActivity(this, "Main Screen");
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
     }
