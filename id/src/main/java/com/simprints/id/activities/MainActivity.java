@@ -126,7 +126,9 @@ public class MainActivity extends AppCompatActivity implements
         appState = AppState.getInstance();
         appState.getScanner().setScannerListener(this);
         appState.getData().setListener(this);
-        DatabaseSync.sync(getApplicationContext(), this);
+
+        if (appState.isConnected())
+            backgroundSync();
 
         handler = new Handler();
 
@@ -550,18 +552,15 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(this, String.format(Locale.UK, "onDataEvent %s %s", event.name(), event.details()));
         switch (event) {
             case SYNC_INTERRUPTED:
-                if (syncItem != null) {
-                    syncItem.setEnabled(true);
-                    syncItem.setTitle("Syncing Failed");
-                    syncItem.setIcon(R.drawable.ic_menu_sync_failed);
-                }
+                syncItem.setEnabled(true);
+                syncItem.setTitle("Syncing Failed");
+                syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                 break;
             case SYNC_SUCCESS:
-                if (syncItem != null) {
-                    syncItem.setEnabled(true);
-                    syncItem.setTitle("Sync Complete");
-                    syncItem.setIcon(R.drawable.ic_menu_sync_success);
-                }
+                syncItem.setEnabled(true);
+                syncItem.setTitle("Sync Complete");
+                syncItem.setIcon(R.drawable.ic_menu_sync_success);
+
                 break;
             case CONNECTED:
                 appState.setConnected(true);
@@ -673,18 +672,13 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.nav_help:
                 Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(this, HelpActivity.class));
                 break;
             case R.id.privacy:
                 startActivityForResult(new Intent(this, PrivacyActivity.class),
                         PRIVACY_ACTIVITY_REQUEST_CODE);
                 break;
             case R.id.nav_sync:
-                syncItem.setEnabled(false);
-                syncItem.setTitle("Syncing...");
-                syncItem.setIcon(R.drawable.ic_menu_syncing);
-                DatabaseSync.sync(getApplicationContext(), this);
-
+                backgroundSync();
                 return true;
             case R.id.nav_about:
                 startActivityForResult(new Intent(this, AboutActivity.class),
@@ -826,12 +820,11 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+        updateSyncStatus();
     }
 
     private void updateSyncStatus() {
-        if (syncItem == null)
-            return;
-        if (!appState.getSConnected()) {
+        if (!appState.isConnected()) {
             syncItem.setEnabled(false);
             syncItem.setTitle("Offline");
             syncItem.setIcon(R.drawable.ic_menu_sync_off);
@@ -843,6 +836,16 @@ public class MainActivity extends AppCompatActivity implements
             syncItem.setEnabled(true);
             syncItem.setTitle("Sync");
             syncItem.setIcon(R.drawable.ic_menu_sync_ready);
+        }
+    }
+
+    private void backgroundSync() {
+        DatabaseSync.sync(getApplicationContext(), this);
+
+        if (syncItem != null) {
+            syncItem.setEnabled(false);
+            syncItem.setTitle("Syncing...");
+            syncItem.setIcon(R.drawable.ic_menu_syncing);
         }
     }
 }
