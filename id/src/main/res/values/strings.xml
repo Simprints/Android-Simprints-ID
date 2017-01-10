@@ -173,8 +173,8 @@
     <string name="alert_api_key_verify_failed">Failed to verify API key</string>
     <string name="alert_api_key_verify_failed_body">"We could not verify your API key, please make sure you are connected to the internet and try again"</string>
     <string name="main_error_graphic" translatable="false">main error graphic</string>
-    <string name="sync_data">Sync Data</string>
-    <string name="syncing">Syncing...</string>
-    <string name="not_signed_in">Not Signed In</string>
-    <string name="offline">Offline</string>
+    <string name="sync_data" translatable="false">Sync Data</string>
+    <string name="syncing" translatable="false">Syncing...</string>
+    <string name="not_signed_in" translatable="false">Not Signed In</string>
+    <string name="offline" translatable="false">Offline</string>
 </resources>
