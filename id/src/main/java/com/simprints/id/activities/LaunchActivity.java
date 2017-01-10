@@ -271,9 +271,8 @@ public class LaunchActivity extends AppCompatActivity
                 break;
             case CONNECTED:
                 appState.setConnected(true);
-                if(!appState.getSignedIn()){
+                if (!appState.getSignedIn())
                     appState.getData().signIn();
-                }
                 break;
             case DISCONNECTED:
                 appState.setConnected(false);
