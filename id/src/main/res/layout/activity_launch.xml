@@ -10,7 +10,8 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4"
+        android:layout_weight="3"
+        android:layout_marginTop="35dp"
         android:contentDescription="@string/launch_background_description"
         android:src="@drawable/launch_background" />
 
@@ -21,7 +22,7 @@
         android:gravity="center_horizontal"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:paddingTop="10dp"
+        android:paddingTop="25dp"
         android:text="@string/short_consent"
         android:textColor="@color/simprints_white"
         android:textSize="20sp" />
