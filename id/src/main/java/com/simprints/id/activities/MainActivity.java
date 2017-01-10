@@ -560,10 +560,11 @@ public class MainActivity extends AppCompatActivity implements
                 syncItem.setEnabled(true);
                 syncItem.setTitle("Sync Complete");
                 syncItem.setIcon(R.drawable.ic_menu_sync_success);
-
                 break;
             case CONNECTED:
                 appState.setConnected(true);
+                if (!appState.getSignedIn())
+                    appState.getData().signIn();
                 updateSyncStatus();
                 break;
             case DISCONNECTED:
