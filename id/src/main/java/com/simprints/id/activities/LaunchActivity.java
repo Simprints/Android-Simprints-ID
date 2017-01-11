@@ -265,6 +265,10 @@ public class LaunchActivity extends AppCompatActivity
             case API_KEY_INVALID:
                 launchAlert(ALERT_TYPE.INVALID_API_KEY);
                 break;
+            case DATABASE_UPDATE_FINISHED:
+                launchProcess.databaseUpdate = true;
+                launchProcess.launch();
+                break;
             case DATABASE_RESOLVED:
                 launchProcess.ccResolver = true;
                 launchProcess.updateData();
