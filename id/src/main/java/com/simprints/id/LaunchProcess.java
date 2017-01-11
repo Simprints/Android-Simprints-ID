@@ -31,6 +31,7 @@ public class LaunchProcess {
     public Boolean btConnection = false;
     public Boolean un20WakeUp = false;
     public Boolean permissions = false;
+    public Boolean databaseUpdate = false;
     private Boolean vib = false;
 
 
@@ -58,6 +59,13 @@ public class LaunchProcess {
             } else {
                 permissions = true;
             }
+        }
+
+        loadingInfoTextView.setText(R.string.updating_database);
+        launchProgress.setProgress(10);
+
+        if (!databaseUpdate) {
+            return;
         }
 
         if (!asyncLaunched) {
