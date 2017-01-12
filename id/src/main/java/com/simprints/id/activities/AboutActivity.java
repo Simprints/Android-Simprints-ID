@@ -2,6 +2,7 @@ package com.simprints.id.activities;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,10 +11,10 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.simprints.id.R;
-import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
+import com.simprints.libdata.DatabaseContext;
 
 public class AboutActivity extends AppCompatActivity {
 
@@ -55,6 +56,14 @@ public class AboutActivity extends AppCompatActivity {
         }
         ((TextView) findViewById(R.id.firmwareVersionTextView)).setText(
                 String.valueOf(firmwareVersion));
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                DatabaseContext.fakeDb(getApplicationContext(), AppState.getInstance().getApiKey());
+                return null;
+            }
+        }.execute();
     }
 
     @Override

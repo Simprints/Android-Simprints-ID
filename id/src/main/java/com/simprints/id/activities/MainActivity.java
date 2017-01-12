@@ -128,8 +128,6 @@ public class MainActivity extends AppCompatActivity implements
         appState.getScanner().setScannerListener(this);
         appState.getData().setListener(this);
 
-        DatabaseContext.fakeDb(this, appState.getApiKey());
-
         if (appState.isConnected())
             backgroundSync();
 
@@ -555,11 +553,17 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(this, String.format(Locale.UK, "onDataEvent %s %s", event.name(), event.details()));
         switch (event) {
             case SYNC_INTERRUPTED:
+                if(syncItem == null)
+                    return;
+
                 syncItem.setEnabled(true);
                 syncItem.setTitle("Syncing Failed");
                 syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                 break;
             case SYNC_SUCCESS:
+                if(syncItem == null)
+                    return;
+
                 syncItem.setEnabled(true);
                 syncItem.setTitle("Sync Complete");
                 syncItem.setIcon(R.drawable.ic_menu_sync_success);
