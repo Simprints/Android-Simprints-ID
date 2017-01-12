@@ -3,6 +3,7 @@ package com.simprints.id.activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
@@ -11,6 +12,7 @@ import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+import com.facebook.stetho.Stetho;
 import com.simprints.id.LaunchProcess;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
@@ -61,6 +63,7 @@ public class LaunchActivity extends AppCompatActivity
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
         Appsee.start(getString(R.string.com_appsee_apikey));
+        Stetho.initializeWithDefaults(this);
 
         SharedPrefHelper sharedPref = new SharedPrefHelper(getApplicationContext());
 
@@ -123,10 +126,11 @@ public class LaunchActivity extends AppCompatActivity
         if (userId == null) {
             userId = appState.getDeviceId();
         } else if (sharedPref.getLastUserId().equals(appState.getDeviceId())) {
-            DatabaseContext.updateUserId(getApplicationContext(), apiKey,
+            //replace device ID with user ID
+            DatabaseContext.updateUserId(getApplicationContext(), appState.getApiKey(),
                     sharedPref.getLastUserId(), userId);
         }
-        new SharedPrefHelper(getApplicationContext()).setLastUserId(userId);
+        sharedPref.setLastUserId(userId);
         appState.setUserId(userId);
 
         // Sets calling package
@@ -265,10 +269,20 @@ public class LaunchActivity extends AppCompatActivity
             case API_KEY_INVALID:
                 launchAlert(ALERT_TYPE.INVALID_API_KEY);
                 break;
-            case DATABASE_UPDATE_FINISHED:
+            case DATABASE_INIT_SUCCESS:
                 launchProcess.databaseUpdate = true;
-                launchProcess.launch();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        launchProcess.launch();
+                    }
+                });
                 break;
+            case DATABASE_INIT_RESTART:
+                Intent intent = getIntent();
+                waitingForConfirmation = false;
+                finish();
+                startActivity(intent);
             case DATABASE_RESOLVED:
                 launchProcess.ccResolver = true;
                 launchProcess.updateData();

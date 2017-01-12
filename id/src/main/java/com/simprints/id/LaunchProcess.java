@@ -1,10 +1,13 @@
 package com.simprints.id;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.facebook.stetho.inspector.protocol.module.DatabaseConstants;
 import com.simprints.id.activities.ALERT_TYPE;
 import com.simprints.id.activities.LaunchActivity;
 import com.simprints.id.tools.AppState;
@@ -51,7 +54,7 @@ public class LaunchProcess {
 
     public void launch() {
         if (!permissions) {
-            loadingInfoTextView.setText(R.string.launch_checking_permissions);
+            this.loadingInfoTextView.setText(R.string.launch_checking_permissions);
             Boolean permReady = PermissionManager.requestPermissions(launchActivity);
 
             if (!permReady) {
@@ -61,10 +64,11 @@ public class LaunchProcess {
             }
         }
 
-        loadingInfoTextView.setText(R.string.updating_database);
         launchProgress.setProgress(10);
+        loadingInfoTextView.setText(R.string.updating_database);
 
         if (!databaseUpdate) {
+            DatabaseContext.initDatabase(launchActivity, launchActivity);
             return;
         }
 
@@ -74,8 +78,8 @@ public class LaunchProcess {
             updateScanner();
         }
 
-        launchProgress.setProgress(20);
-        loadingInfoTextView.setText(R.string.launch_checking_api_key);
+        this.launchProgress.setProgress(20);
+        this.loadingInfoTextView.setText(R.string.launch_checking_api_key);
 
         if (!apiKey) {
             return;
@@ -116,11 +120,9 @@ public class LaunchProcess {
 
     public void updateData() {
         if (!apiKey) {
-
             appState.setData(new DatabaseContext(appState.getApiKey(), appState.getUserId(),
                     launchActivity.getApplicationContext(), launchActivity));
             appState.getData().validateApiKey();
-
             return;
         }
 

@@ -41,6 +41,7 @@ import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
 import com.simprints.libcommon.ScanConfig;
+import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.DatabaseSync;
 import com.simprints.libdata.Event;
@@ -126,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements
         appState = AppState.getInstance();
         appState.getScanner().setScannerListener(this);
         appState.getData().setListener(this);
+
+        DatabaseContext.fakeDb(this, appState.getApiKey());
 
         if (appState.isConnected())
             backgroundSync();
