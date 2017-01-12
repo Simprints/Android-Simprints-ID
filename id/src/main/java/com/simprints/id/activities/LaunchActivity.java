@@ -3,7 +3,6 @@ package com.simprints.id.activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
@@ -196,7 +195,7 @@ public class LaunchActivity extends AppCompatActivity
         }
 
         launchProcess.permissions = true;
-        launchProcess.launch();
+        runLaunch();
     }
 
     @Override
@@ -219,7 +218,7 @@ public class LaunchActivity extends AppCompatActivity
                         }
 
                         launchProcess = new LaunchProcess(this);
-                        launchProcess.launch();
+                        runLaunch();
                         break;
 
                     case RESULT_CANCELED:
@@ -261,7 +260,7 @@ public class LaunchActivity extends AppCompatActivity
         switch (event) {
             case API_KEY_VALID:
                 launchProcess.apiKey = true;
-                launchProcess.updateData();
+                runUpdateData();
                 break;
             case API_KEY_UNVERIFIED:
                 launchAlert(ALERT_TYPE.UNVERIFIED_API_KEY);
@@ -271,21 +270,13 @@ public class LaunchActivity extends AppCompatActivity
                 break;
             case DATABASE_INIT_SUCCESS:
                 launchProcess.databaseUpdate = true;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        launchProcess.launch();
-                    }
-                });
+                runLaunch();
                 break;
             case DATABASE_INIT_RESTART:
-                Intent intent = getIntent();
-                waitingForConfirmation = false;
-                finish();
-                startActivity(intent);
+                runLaunch();
             case DATABASE_RESOLVED:
                 launchProcess.ccResolver = true;
-                launchProcess.updateData();
+                runUpdateData();
                 break;
             case CONNECTED:
                 appState.setConnected(true);
@@ -310,7 +301,7 @@ public class LaunchActivity extends AppCompatActivity
             case CONNECTION_SUCCESS:
             case CONNECTION_ALREADY_CONNECTED:
                 launchProcess.btConnection = true;
-                launchProcess.updateScanner();
+                runUpdateScanner();
                 break;
 
             case CONNECTION_BLUETOOTH_DISABLED:
@@ -356,7 +347,7 @@ public class LaunchActivity extends AppCompatActivity
 
             case UPDATE_SENSOR_INFO_SUCCESS:
                 launchProcess.un20WakeUp = true;
-                launchProcess.updateScanner();
+                runUpdateScanner();
                 break;
 
             case TRIGGER_PRESSED:
@@ -366,5 +357,32 @@ public class LaunchActivity extends AppCompatActivity
                 }
                 break;
         }
+    }
+
+    private void runLaunch() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                launchProcess.launch();
+            }
+        });
+    }
+
+    private void runUpdateData() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                launchProcess.updateData();
+            }
+        });
+    }
+
+    private void runUpdateScanner() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                launchProcess.updateScanner();
+            }
+        });
     }
 }
