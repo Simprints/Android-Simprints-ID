@@ -41,7 +41,6 @@ import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
 import com.simprints.libcommon.ScanConfig;
-import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.DatabaseSync;
 import com.simprints.libdata.Event;
@@ -553,7 +552,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(this, String.format(Locale.UK, "onDataEvent %s %s", event.name(), event.details()));
         switch (event) {
             case SYNC_INTERRUPTED:
-                if(syncItem == null)
+                if (syncItem == null)
                     return;
 
                 syncItem.setEnabled(true);
@@ -561,7 +560,7 @@ public class MainActivity extends AppCompatActivity implements
                 syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                 break;
             case SYNC_SUCCESS:
-                if(syncItem == null)
+                if (syncItem == null)
                     return;
 
                 syncItem.setEnabled(true);

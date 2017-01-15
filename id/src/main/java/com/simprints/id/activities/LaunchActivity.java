@@ -195,7 +195,7 @@ public class LaunchActivity extends AppCompatActivity
         }
 
         launchProcess.permissions = true;
-        runLaunch();
+        launchProcess.launch();
     }
 
     @Override
@@ -218,7 +218,7 @@ public class LaunchActivity extends AppCompatActivity
                         }
 
                         launchProcess = new LaunchProcess(this);
-                        runLaunch();
+                        launchProcess.launch();
                         break;
 
                     case RESULT_CANCELED:
@@ -260,7 +260,7 @@ public class LaunchActivity extends AppCompatActivity
         switch (event) {
             case API_KEY_VALID:
                 launchProcess.apiKey = true;
-                runUpdateData();
+                launchProcess.updateData();
                 break;
             case API_KEY_UNVERIFIED:
                 launchAlert(ALERT_TYPE.UNVERIFIED_API_KEY);
@@ -270,13 +270,13 @@ public class LaunchActivity extends AppCompatActivity
                 break;
             case DATABASE_INIT_SUCCESS:
                 launchProcess.databaseUpdate = true;
-                runLaunch();
+                launchProcess.updateData();
                 break;
             case DATABASE_INIT_RESTART:
-                runLaunch();
+                finishWith(RESULT_CANCELED, null);
             case DATABASE_RESOLVED:
                 launchProcess.ccResolver = true;
-                runUpdateData();
+                launchProcess.updateData();
                 break;
             case CONNECTED:
                 appState.setConnected(true);
@@ -301,7 +301,7 @@ public class LaunchActivity extends AppCompatActivity
             case CONNECTION_SUCCESS:
             case CONNECTION_ALREADY_CONNECTED:
                 launchProcess.btConnection = true;
-                runUpdateScanner();
+                launchProcess.updateScanner();
                 break;
 
             case CONNECTION_BLUETOOTH_DISABLED:
@@ -347,7 +347,7 @@ public class LaunchActivity extends AppCompatActivity
 
             case UPDATE_SENSOR_INFO_SUCCESS:
                 launchProcess.un20WakeUp = true;
-                runUpdateScanner();
+                launchProcess.updateScanner();
                 break;
 
             case TRIGGER_PRESSED:
@@ -357,32 +357,5 @@ public class LaunchActivity extends AppCompatActivity
                 }
                 break;
         }
-    }
-
-    private void runLaunch() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                launchProcess.launch();
-            }
-        });
-    }
-
-    private void runUpdateData() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                launchProcess.updateData();
-            }
-        });
-    }
-
-    private void runUpdateScanner() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                launchProcess.updateScanner();
-            }
-        });
     }
 }
