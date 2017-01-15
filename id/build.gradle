@@ -68,7 +68,7 @@ dependencies {
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.simprints:libsimprints:1.0.5'
     compile 'com.simprints:libscanner:0.0.54'
-    compile 'com.simprints:libdata:0.1.23'
+    compile 'com.simprints:libdata:0.1.24'
     compile 'com.simprints:libcommon:1.0.42'
     compile 'com.simprints:libmatcher:1.0.15'
     compile 'com.google.firebase:firebase-core:10.0.0'
