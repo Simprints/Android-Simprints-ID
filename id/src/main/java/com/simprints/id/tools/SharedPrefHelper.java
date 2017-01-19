@@ -121,17 +121,4 @@ public class SharedPrefHelper {
         editor.apply();
     }
 
-    /**
-     * Last given userID
-     */
-    @SuppressLint("HardwareIds")
-    public String getLastUserId() {
-        return sharedPref.getString(context.getString(R.string.pref_last_user_id), AppState.getInstance().getDeviceId());
-    }
-
-    public void setLastUserId(String userId) {
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(context.getString(R.string.pref_last_user_id), userId);
-        editor.apply();
-    }
 }

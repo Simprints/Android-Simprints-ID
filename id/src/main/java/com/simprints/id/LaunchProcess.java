@@ -128,7 +128,7 @@ public class LaunchProcess {
 
         if (!apiKey) {
             appState.setData(new DatabaseContext(appState.getApiKey(), appState.getUserId(),
-                    launchActivity));
+                    appState.getDeviceId(), launchActivity));
             appState.getData().setListener(launchActivity);
             appState.getData().validateApiKey();
             return;

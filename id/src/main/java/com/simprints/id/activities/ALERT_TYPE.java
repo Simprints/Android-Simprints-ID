@@ -8,6 +8,9 @@ public enum ALERT_TYPE {
     INVALID_API_KEY(R.string.configuration_error_title, R.string.invalid_apikey_message,
             R.drawable.error_icon, R.drawable.error_hint_key, R.string.close, R.string.empty, false),
 
+    MISSING_USER_ID(R.string.configuration_error_title, R.string.invalid_userId_message,
+            R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty, false),
+
     //Verification errors
     UNVERIFIED_API_KEY(R.string.alert_api_key_verify_failed, R.string.alert_api_key_verify_failed_body,
             R.drawable.error_icon, R.drawable.error_hint_wifi, R.string.try_again_label, R.string.close, true),

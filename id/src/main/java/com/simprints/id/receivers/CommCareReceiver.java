@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 
 import com.simprints.libdata.DatabaseContext;
 
@@ -22,6 +23,9 @@ public class CommCareReceiver extends BroadcastReceiver {
             return;
         }
 
-        DatabaseContext.updateIdentification(caseId);
+        String androidId = Settings.Secure.getString(context.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        DatabaseContext.updateIdentification(caseId, androidId);
     }
 }

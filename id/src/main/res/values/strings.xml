@@ -106,6 +106,7 @@
     <string name="missing_apikey_message">A configuration error has occurred (missing API key), please contact your system administrator</string>
     <string name="missing_calling_package_message" translatable="false">A configuration error has occurred (missing calling package) please contact your system administrator</string>
     <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
+    <string name="invalid_userId_message">A configuration error has occurred (no user ID), please contact your system administrator</string>
     <string name="bluetooth_not_supported_title" translatable="false">BLUETOOTH NOT SUPPORTED</string>
     <string name="bluetooth_not_supported_message" translatable="false">Bluetooth not supported on this device, please contact your system administrator</string>
     <string name="bluetooth_not_enabled_title" translatable="false">BLUETOOTH NOT ENABLED</string>

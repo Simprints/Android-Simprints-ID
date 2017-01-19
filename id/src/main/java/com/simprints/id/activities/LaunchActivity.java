@@ -61,10 +61,7 @@ public class LaunchActivity extends AppCompatActivity
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
-        Appsee.start(getString(R.string.com_appsee_apikey));
         Stetho.initializeWithDefaults(this);
-
-        SharedPrefHelper sharedPref = new SharedPrefHelper(getApplicationContext());
 
         analytics = Analytics.getInstance(getApplicationContext());
 
@@ -123,13 +120,10 @@ public class LaunchActivity extends AppCompatActivity
         // Sets userId
         String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
         if (userId == null) {
-            userId = appState.getDeviceId();
-        } else if (sharedPref.getLastUserId().equals(appState.getDeviceId())) {
-            //replace device ID with user ID
-            DatabaseContext.updateUserId(getApplicationContext(), appState.getApiKey(),
-                    sharedPref.getLastUserId(), userId);
+            launchAlert(ALERT_TYPE.MISSING_USER_ID);
+            Answers.getInstance().logCustom(new CustomEvent("Missing User ID"));
+            return;
         }
-        sharedPref.setLastUserId(userId);
         appState.setUserId(userId);
 
         // Sets calling package
