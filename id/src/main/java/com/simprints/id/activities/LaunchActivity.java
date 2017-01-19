@@ -274,6 +274,7 @@ public class LaunchActivity extends AppCompatActivity
                 break;
             case DATABASE_INIT_RESTART:
                 finishWith(RESULT_CANCELED, null);
+                break;
             case DATABASE_RESOLVED:
                 launchProcess.ccResolver = true;
                 launchProcess.updateData();
