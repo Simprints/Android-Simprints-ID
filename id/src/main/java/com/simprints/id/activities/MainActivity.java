@@ -32,6 +32,7 @@ import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.tools.AppState;
+import com.simprints.id.tools.Dialogs;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.SharedPrefHelper;
@@ -144,14 +145,13 @@ public class MainActivity extends AppCompatActivity implements
         scanButton = (Button) findViewById(R.id.scan_button);
         viewPager = (ViewPagerCustom) findViewById(R.id.view_pager);
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
-
+        un20WakeupDialog = Dialogs.getUn20Dialog(this);
         registrationResult = null;
 
         initActiveFingers();
         initBarAndDrawer();
         initIndicators();
         initScanButton();
-        initUn20Dialog();
         initViewPager();
         refreshDisplay();
     }
@@ -234,13 +234,6 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             }
         });
-    }
-
-    private void initUn20Dialog() {
-        un20WakeupDialog = new ProgressDialog(MainActivity.this);
-        un20WakeupDialog.setIndeterminate(true);
-        un20WakeupDialog.setCanceledOnTouchOutside(false);
-        un20WakeupDialog.setMessage("Re-Connecting...");
     }
 
     private void toggleContinuousCapture() {
@@ -847,7 +840,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void backgroundSync() {
-        DatabaseSync.sync(getApplicationContext(), this);
+        DatabaseSync.sync(getApplicationContext(), this, appState.getUserId());
 
         if (syncItem != null) {
             syncItem.setEnabled(false);

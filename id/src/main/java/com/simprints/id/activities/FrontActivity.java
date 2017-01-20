@@ -57,7 +57,7 @@ public class FrontActivity extends AppCompatActivity implements DatabaseEventLis
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatabaseSync.sync(getApplicationContext(), FrontActivity.this);
+                DatabaseSync.sync(getApplicationContext(), FrontActivity.this, null);
                 syncButton.setEnabled(false);
                 syncButton.setText(R.string.syncing);
                 syncStatus.setImageResource(R.drawable.ic_menu_syncing);

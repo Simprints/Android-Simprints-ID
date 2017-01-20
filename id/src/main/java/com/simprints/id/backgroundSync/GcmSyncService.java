@@ -29,7 +29,7 @@ public class GcmSyncService extends GcmTaskService implements DatabaseEventListe
         deviceId = Settings.Secure.getString(getApplicationContext().getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
-        DatabaseSync.sync(getApplicationContext(), this);
+        DatabaseSync.sync(getApplicationContext(), this, null);
 
         return GcmNetworkManager.RESULT_SUCCESS;
     }
