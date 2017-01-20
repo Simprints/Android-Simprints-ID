@@ -20,6 +20,7 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Dialogs;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PositionTracker;
+import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
 import com.simprints.libscanner.Scanner;
@@ -60,6 +61,9 @@ public class LaunchActivity extends AppCompatActivity
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
         Stetho.initializeWithDefaults(this);
+
+        //initialize remote config
+        RemoteConfig.init();
 
         analytics = Analytics.getInstance(getApplicationContext());
 
@@ -118,18 +122,19 @@ public class LaunchActivity extends AppCompatActivity
         // Sets userId
         String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
         if (userId == null) {
-            launchAlert(ALERT_TYPE.MISSING_USER_ID);
-            Answers.getInstance().logCustom(new CustomEvent("Missing User ID"));
-            return;
+            if (!RemoteConfig.get().getBoolean("enable_null_user_id")) {
+                launchAlert(ALERT_TYPE.MISSING_USER_ID);
+                return;
+            } else {
+                userId = com.simprints.libdata.tools.Constants.GLOBAL_USER_ID;
+            }
         }
         appState.setUserId(userId);
+        analytics.setUser(appState.getUserId(), appState.getApiKey());
 
         // Sets calling package
         callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
         appState.setCallingPackage(callingPackage);
-
-        //Set user in analytics
-        analytics.setUser(appState.getUserId(), appState.getApiKey());
 
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();

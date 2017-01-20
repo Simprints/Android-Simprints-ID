@@ -64,7 +64,7 @@ public class LaunchProcess {
         launchProgress.setProgress(10);
         loadingInfoTextView.setText(R.string.updating_database);
 
-        if(!databaseUpdate){
+        if (!databaseUpdate) {
             initDatabase();
             return;
         }
@@ -115,8 +115,8 @@ public class LaunchProcess {
         }
     }
 
-    public void initDatabase(){
-        if(!databaseUpdate){
+    public void initDatabase() {
+        if (!databaseUpdate) {
             DatabaseContext.initDatabase(launchActivity, launchActivity);
             return;
         }
