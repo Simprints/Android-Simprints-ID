@@ -60,7 +60,7 @@ public class AboutActivity extends AppCompatActivity {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                DatabaseContext.fakeSQLDb(getApplicationContext(), AppState.getInstance().getApiKey(), 20);
+                DatabaseContext.fakeSQLDb(getApplicationContext(), AppState.getInstance().getApiKey(), 100);
                 return null;
             }
         }.execute();

@@ -1,13 +1,13 @@
 package com.simprints.id.activities;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 
-import com.appsee.Appsee;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
@@ -17,10 +17,9 @@ import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
+import com.simprints.id.tools.Dialogs;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PositionTracker;
-import com.simprints.id.tools.SharedPrefHelper;
-import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
 import com.simprints.libscanner.Scanner;
@@ -45,13 +44,12 @@ public class LaunchActivity extends AppCompatActivity
         implements Scanner.ScannerListener, DatabaseEventListener {
 
     public boolean waitingForConfirmation;
-
     public AppState appState;
     public Analytics analytics;
     private PositionTracker positionTracker;
     private String callingPackage;
-
     private LaunchProcess launchProcess;
+    private ProgressDialog restartDialog;
 
     @SuppressLint("HardwareIds")
     @Override
@@ -141,7 +139,7 @@ public class LaunchActivity extends AppCompatActivity
         launchProcess.launch();
     }
 
-    private void finishWith(final int resultCode, final Intent resultData) {
+    public void finishWith(final int resultCode, final Intent resultData) {
         setResult(resultCode, resultData);
         waitingForConfirmation = false;
         finish();
@@ -264,10 +262,16 @@ public class LaunchActivity extends AppCompatActivity
                 break;
             case DATABASE_INIT_SUCCESS:
                 launchProcess.databaseUpdate = true;
-                launchProcess.updateData();
+                launchProcess.initDatabase();
                 break;
             case DATABASE_INIT_RESTART:
-                finishWith(RESULT_CANCELED, null);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        restartDialog = Dialogs.getRestartDialog(LaunchActivity.this);
+                        restartDialog.show();
+                    }
+                });
                 break;
             case DATABASE_RESOLVED:
                 launchProcess.ccResolver = true;
