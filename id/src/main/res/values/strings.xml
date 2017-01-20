@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Id</string>
 
+    <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.6</string>
+
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
@@ -167,7 +169,6 @@
     <string name="settings_select_language" translatable="false">Select Language</string>
     <string name="title_activity_front" translatable="false">Simprints ID</string>
     <string name="simprintsVersionText" translatable="false">"Simprints: "</string>
-    <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.5</string>
     <string name="front_simprints_version" translatable="false">Simprints: </string>
     <string name="sourceafis" translatable="false">SourceAFIS</string>
     <string name="simafis_beta" translatable="false">SimAFIS (Beta)</string>
