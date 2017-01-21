@@ -8,6 +8,7 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.simprints.id.tools.Analytics;
+import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.DatabaseSync;
 import com.simprints.libdata.Event;
@@ -25,6 +26,7 @@ public class GcmSyncService extends GcmTaskService implements DatabaseEventListe
     @Override
     public int onRunTask(TaskParams taskParams) {
         Log.d("GcmSyncService", "onRunTask Called");
+        RemoteConfig.init();
 
         deviceId = Settings.Secure.getString(getApplicationContext().getContentResolver(),
                 Settings.Secure.ANDROID_ID);

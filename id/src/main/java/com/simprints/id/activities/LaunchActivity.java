@@ -122,7 +122,7 @@ public class LaunchActivity extends AppCompatActivity
         // Sets userId
         String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
         if (userId == null) {
-            if (!RemoteConfig.get().getBoolean("enable_null_user_id")) {
+            if (!RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_EMPTY_USER_ID)) {
                 launchAlert(ALERT_TYPE.MISSING_USER_ID);
                 return;
             } else {

@@ -15,6 +15,7 @@ import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PermissionManager;
+import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.DatabaseSync;
@@ -34,6 +35,7 @@ public class FrontActivity extends AppCompatActivity implements DatabaseEventLis
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_front);
         Analytics.getInstance(getApplicationContext());
+        RemoteConfig.init();
 
         syncStatus = (ImageView) findViewById(R.id.iv_sync);
         syncButton = (Button) findViewById(R.id.bt_sync);
