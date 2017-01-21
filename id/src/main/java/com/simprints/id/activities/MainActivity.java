@@ -35,6 +35,7 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Dialogs;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
+import com.simprints.id.tools.RemoteConfig;
 import com.simprints.id.tools.SharedPrefHelper;
 import com.simprints.id.tools.Vibrate;
 import com.simprints.id.tools.ViewPagerCustom;
@@ -606,12 +607,16 @@ public class MainActivity extends AppCompatActivity implements
             Person person = new Person(appState.getGuid(), fingerprints);
             if (appState.isEnrol()) {
                 Log.d(this, "Creating registration object");
+                appState.getData().savePerson(person);
+
                 registrationResult = new Registration(appState.getGuid());
                 for (Fingerprint fp : fingerprints) {
-                    registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
+                    if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES))
+                        registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
+                    else
+                        registrationResult.setTemplate(fp.getFingerId(), new byte[1]);
                 }
-                Log.d(this, "Saving person");
-                appState.getData().savePerson(person);
+
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
                 resultData.putExtra(Constants.SIMPRINTS_REGISTRATION, registrationResult);
                 setResult(RESULT_OK, resultData);
