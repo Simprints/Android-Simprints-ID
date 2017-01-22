@@ -9,7 +9,6 @@ import com.simprints.id.activities.ALERT_TYPE;
 
 import static com.google.firebase.analytics.FirebaseAnalytics.Event;
 import static com.google.firebase.analytics.FirebaseAnalytics.Param;
-import static com.google.firebase.analytics.FirebaseAnalytics.UserProperty;
 
 public class Analytics {
 
@@ -36,8 +35,8 @@ public class Analytics {
 
     public void setUser(String userId, String apiKey) {
         firebaseAnalytics.setUserId(userId);
+        firebaseAnalytics.setUserProperty("user_id", userId);
         firebaseAnalytics.setUserProperty("api_key", apiKey);
-        firebaseAnalytics.setUserProperty(UserProperty.SIGN_UP_METHOD, apiKey);
     }
 
     public void setDeviceId(String deviceId) {
