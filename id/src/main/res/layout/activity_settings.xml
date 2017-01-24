@@ -128,6 +128,43 @@
                 android:layout_margin="15dp"
                 android:background="#3F000000" />
 
+            <TextView
+                android:id="@+id/tv_timeout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/timeout_empty"
+                android:textSize="20sp" />
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tv_minTimeout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center" />
+
+                <SeekBar
+                    android:id="@+id/sb_timeout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3" />
+
+                <TextView
+                    android:id="@+id/tv_maxTimeout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center" />
+
+            </TableRow>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="15dp"
+                android:background="#3F000000" />
+
             <TableRow>
 
                 <Spinner
