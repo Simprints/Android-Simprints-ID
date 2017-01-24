@@ -29,7 +29,6 @@ import com.simprints.libsimprints.Constants;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
-import io.fabric.sdk.android.services.concurrency.AsyncTask;
 
 import static android.provider.Settings.Secure;
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
@@ -253,7 +252,7 @@ public class LaunchActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDataEvent(Event event) {
+    public void onDataEvent(final Event event) {
         switch (event) {
             case API_KEY_VALID:
                 launchProcess.apiKey = true;
@@ -266,10 +265,17 @@ public class LaunchActivity extends AppCompatActivity
                 launchAlert(ALERT_TYPE.INVALID_API_KEY);
                 break;
             case DATABASE_INIT_SUCCESS:
-                launchProcess.databaseUpdate = true;
-                launchProcess.updateData();
+                //comes from static event so is separate thread
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        launchProcess.databaseUpdate = true;
+                        launchProcess.launch();
+                    }
+                });
                 break;
             case DATABASE_INIT_RESTART:
+                //comes from static event so is separate thread
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
