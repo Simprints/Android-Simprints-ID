@@ -1,66 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.simprints.id.activities.MainActivity"
-    tools:showIn="@layout/app_bar_main"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@color/simprints_grey"
     android:gravity="center_horizontal"
-    android:background="@color/simprints_grey">
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.simprints.id.activities.MainActivity"
+    tools:showIn="@layout/app_bar_main">
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1" />
 
     <com.simprints.id.tools.ViewPagerCustom
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
+        android:layout_gravity="center_horizontal"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
-        android:layout_gravity="center_horizontal" />
+        android:layout_weight="5" />
+
+    <ProgressBar
+        android:id="@+id/pb_timeout"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp" />
 
     <View
         android:layout_width="match_parent"
-        android:layout_weight=".5"
-        android:layout_height="0dp"/>
+        android:layout_height="0dp"
+        android:layout_weight=".5" />
 
     <LinearLayout
         android:id="@+id/indicator_layout"
-        android:layout_height="0dp"
-        android:layout_weight=".5"
         android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
-        android:orientation="horizontal"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_weight=".5"
+        android:orientation="horizontal" />
 
     <View
         android:layout_width="match_parent"
-        android:layout_weight=".5"
-        android:layout_height="0dp"/>
+        android:layout_height="0dp"
+        android:layout_weight=".5" />
 
     <Button
         android:id="@+id/scan_button"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
-        android:text="@string/scan"
+        android:layout_weight="1"
         android:longClickable="true"
-        android:textSize="20sp"
-        android:textColor="#7F000000" />
+        android:text="@string/scan"
+        android:textColor="#7F000000"
+        android:textSize="20sp" />
 
     <View
         android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="0dp"/>
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
 </LinearLayout>

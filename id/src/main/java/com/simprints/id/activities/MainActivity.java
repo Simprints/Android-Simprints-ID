@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -24,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.simprints.id.R;
@@ -110,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements
     private Button scanButton;
     private ViewPagerCustom viewPager;
     private FingerPageAdapter pageAdapter;
+    private ProgressBar timeoutBar;
 
     private Registration registrationResult;
 
@@ -152,6 +155,8 @@ public class MainActivity extends AppCompatActivity implements
         registrationResult = null;
 
         sharedPref = new SharedPref(getApplicationContext());
+
+        timeoutBar = (ProgressBar) findViewById(R.id.pb_timeout);
 
         initActiveFingers();
         initBarAndDrawer();
@@ -254,6 +259,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(this, "Quality Score: " + String.valueOf(sharedPref.getQualityThresholdInt()));
                 appState.getScanner().startContinuousCapture(sharedPref.getQualityThresholdInt(),
                         sharedPref.getTimeoutInt());
+                startTimeoutBar();
                 break;
             case COLLECTING:
                 scanButton.setEnabled(false);
@@ -854,5 +860,23 @@ public class MainActivity extends AppCompatActivity implements
             syncItem.setTitle("Syncing...");
             syncItem.setIcon(R.drawable.ic_menu_syncing);
         }
+    }
+
+    private void startTimeoutBar() {
+        final int[] i = {0, sharedPref.getTimeoutInt() * 1000};
+        timeoutBar.setProgress(i[0]);
+        CountDownTimer mCountDownTimer = new CountDownTimer(i[1], i[1] / 100) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                i[0]++;
+                timeoutBar.setProgress(i[0]);
+            }
+
+            @Override
+            public void onFinish() {
+                timeoutBar.setProgress(100);
+            }
+        };
+        mCountDownTimer.start();
     }
 }
