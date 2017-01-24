@@ -26,9 +26,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     private final static int MAX_QUALITY = 99;
     private final static int MIN_NB_OF_IDS = 1;
     private final static int MAX_NB_OF_IDS = 20;
+    private final static int MIN_TIMEOUT = 0;
+    private final static int MAX_TIMEOUT = 10;
     ToggleButton nudgeToggleButton;
-    SeekBar qualitySeekbar;
-    SeekBar nbOfIdsSeekbar;
+    SeekBar qualitySeekBar;
+    SeekBar nbOfIdsSeekBar;
+    SeekBar timeoutSeekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +73,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         ((TextView) findViewById(R.id.maxQualityTextView)).setText(String.valueOf(MAX_QUALITY));
         final TextView qualityThresholdTextView = (TextView) findViewById(R.id.qualityTextView);
         final int qualityThreshold = sharedPref.getQualityThresholdInt() - MIN_QUALITY;
-        qualitySeekbar = (SeekBar) findViewById(R.id.qualitySeekBar);
-        qualitySeekbar.setMax(MAX_QUALITY - MIN_QUALITY);
-        qualitySeekbar.setProgress(qualityThreshold);
+        qualitySeekBar = (SeekBar) findViewById(R.id.qualitySeekBar);
+        qualitySeekBar.setMax(MAX_QUALITY - MIN_QUALITY);
+        qualitySeekBar.setProgress(qualityThreshold);
         qualityThresholdTextView.setText(String.format(
                 getString(R.string.quality_threshold_value), qualityThreshold + MIN_QUALITY));
-        qualitySeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        qualitySeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
                 saveQualityThreshold();
@@ -96,17 +99,43 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         ((TextView) findViewById(R.id.maxNbOfIdsTextView)).setText(String.valueOf(MAX_NB_OF_IDS));
         final TextView nbOfIdsTextView = (TextView) findViewById(R.id.nbOfIdsTextView);
         final int nbOfIds = sharedPref.getReturnIdCountInt() - MIN_NB_OF_IDS;
-        nbOfIdsSeekbar = (SeekBar) findViewById(R.id.nbOfIdsSeekBar);
-        nbOfIdsSeekbar.setMax(MAX_NB_OF_IDS - MIN_NB_OF_IDS);
-        nbOfIdsSeekbar.setProgress(nbOfIds);
+        nbOfIdsSeekBar = (SeekBar) findViewById(R.id.nbOfIdsSeekBar);
+        nbOfIdsSeekBar.setMax(MAX_NB_OF_IDS - MIN_NB_OF_IDS);
+        nbOfIdsSeekBar.setProgress(nbOfIds);
         nbOfIdsTextView.setText(String.format(
                 getString(R.string.nb_of_ids_value), nbOfIds + MIN_NB_OF_IDS));
-        nbOfIdsSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        nbOfIdsSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
                 saveNbOfIds();
                 nbOfIdsTextView.setText(String.format(
                         getString(R.string.nb_of_ids_value), progress + MIN_NB_OF_IDS));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        ((TextView) findViewById(R.id.tv_minTimeout)).setText(String.valueOf(MIN_TIMEOUT));
+        ((TextView) findViewById(R.id.tv_maxTimeout)).setText(String.valueOf(MAX_TIMEOUT));
+        final TextView tv_timeout = (TextView) findViewById(R.id.tv_timeout);
+        final int timeout = sharedPref.getTimeoutInt() - MIN_TIMEOUT;
+        timeoutSeekBar = (SeekBar) findViewById(R.id.sb_timeout);
+        timeoutSeekBar.setMax(MAX_TIMEOUT - MIN_TIMEOUT);
+        timeoutSeekBar.setProgress(timeout);
+        tv_timeout.setText(String.format(
+                getString(R.string.timeout_value), timeout + MIN_TIMEOUT));
+        timeoutSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                saveTimeout();
+                tv_timeout.setText(String.format(
+                        getString(R.string.timeout_value), progress + MIN_TIMEOUT));
             }
 
             @Override
@@ -139,12 +168,16 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     }
 
     private void saveQualityThreshold() {
-        sharedPref.setQualityThresholdInt(qualitySeekbar.getProgress() + MIN_QUALITY);
+        sharedPref.setQualityThresholdInt(qualitySeekBar.getProgress() + MIN_QUALITY);
     }
 
 
     private void saveNbOfIds() {
-        sharedPref.setReturnIdCountInt(nbOfIdsSeekbar.getProgress() + MIN_NB_OF_IDS);
+        sharedPref.setReturnIdCountInt(nbOfIdsSeekBar.getProgress() + MIN_NB_OF_IDS);
+    }
+
+    private void saveTimeout() {
+        sharedPref.setTimeoutInt(timeoutSeekBar.getProgress() + MIN_TIMEOUT);
     }
 
     private void saveNudgeMode() {

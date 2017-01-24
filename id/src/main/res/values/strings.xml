@@ -146,6 +146,8 @@
     <string name="quality_threshold_value">Quality Threshold: %1$d</string>
     <string name="nb_of_ids_empty">Returned Identifications:</string>
     <string name="nb_of_ids_value">Returned Identifications: %1$d</string>
+    <string name="timeout_empty">Timeout (Seconds):</string>
+    <string name="timeout_value">Timeout (Seconds): %1$d</string>
     <string name="about_app_version">App Version:</string>
     <string name="about_libsimprints_version">LibSimprints Version:</string>
     <string name="about_scanner_version">Scanner Version:</string>
