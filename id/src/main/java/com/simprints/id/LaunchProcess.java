@@ -61,18 +61,17 @@ public class LaunchProcess {
             }
         }
 
-        launchProgress.setProgress(10);
-        loadingInfoTextView.setText(R.string.updating_database);
-
-        if (!databaseUpdate) {
-            initDatabase();
-            return;
-        }
-
         if (!asyncLaunched) {
             asyncLaunched = true;
             updateData();
             updateScanner();
+        }
+
+        launchProgress.setProgress(10);
+        loadingInfoTextView.setText(R.string.updating_database);
+
+        if (!databaseUpdate) {
+            return;
         }
 
         this.launchProgress.setProgress(20);
@@ -115,16 +114,14 @@ public class LaunchProcess {
         }
     }
 
-    public void initDatabase() {
+    public void updateData() {
         if (!databaseUpdate) {
             DatabaseContext.initDatabase(launchActivity, launchActivity);
             return;
         }
 
         launch();
-    }
 
-    public void updateData() {
         if (!apiKey) {
             appState.setData(new DatabaseContext(appState.getApiKey(), appState.getUserId(),
                     appState.getDeviceId(), launchActivity));

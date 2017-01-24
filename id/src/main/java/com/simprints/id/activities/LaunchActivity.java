@@ -29,6 +29,7 @@ import com.simprints.libsimprints.Constants;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
+import io.fabric.sdk.android.services.concurrency.AsyncTask;
 
 import static android.provider.Settings.Secure;
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
@@ -139,8 +140,7 @@ public class LaunchActivity extends AppCompatActivity
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
 
-        //Start the launching process
-        launchProcess = new LaunchProcess(this);
+        launchProcess = new LaunchProcess(LaunchActivity.this);
         launchProcess.launch();
     }
 
@@ -267,7 +267,7 @@ public class LaunchActivity extends AppCompatActivity
                 break;
             case DATABASE_INIT_SUCCESS:
                 launchProcess.databaseUpdate = true;
-                launchProcess.initDatabase();
+                launchProcess.updateData();
                 break;
             case DATABASE_INIT_RESTART:
                 runOnUiThread(new Runnable() {
