@@ -10,11 +10,10 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.simprints.id.R;
-import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
-import com.simprints.id.tools.SharedPrefHelper;
+import com.simprints.id.tools.SharedPref;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
@@ -71,7 +70,7 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
                 Log.d(MatchingActivity.this, String.format(Locale.UK,
                         "Successfully loaded %d candidates", candidates.size()));
 
-                int matcherType = new SharedPrefHelper(getApplicationContext()).getMatcherTypeInt();
+                int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -119,7 +118,7 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
                 Toast.makeText(MatchingActivity.this, event.details(), Toast.LENGTH_LONG).show();
                 break;
             case MATCH_COMPLETED:
-                int nbOfResults = new SharedPrefHelper(getApplicationContext()).getReturnIdCountInt();
+                int nbOfResults = new SharedPref(getApplicationContext()).getReturnIdCountInt();
 
                 ArrayList<Identification> topCandidates = new ArrayList<>();
 

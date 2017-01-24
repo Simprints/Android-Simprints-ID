@@ -16,12 +16,11 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.simprints.id.R;
-import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.Language;
-import com.simprints.id.tools.SharedPrefHelper;
+import com.simprints.id.tools.SharedPref;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    private SharedPrefHelper sharedPrefHelper;
+    private SharedPref sharedPref;
 
     private final static int MIN_QUALITY = 40;
     private final static int MAX_QUALITY = 99;
@@ -47,7 +46,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        sharedPrefHelper = new SharedPrefHelper(getApplicationContext());
+        sharedPref = new SharedPref(getApplicationContext());
 
         Spinner spinner = (Spinner) findViewById(R.id.language_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -55,9 +54,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
-        spinner.setSelection(sharedPrefHelper.getLanguagePositionInt());
+        spinner.setSelection(sharedPref.getLanguagePositionInt());
 
-        boolean nudgeMode = sharedPrefHelper.getNudgeModeBool();
+        boolean nudgeMode = sharedPref.getNudgeModeBool();
         nudgeToggleButton = (ToggleButton) findViewById(R.id.nudgeToggleButton);
         nudgeToggleButton.setChecked(nudgeMode);
         nudgeToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -70,7 +69,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         ((TextView) findViewById(R.id.minQualityTextView)).setText(String.valueOf(MIN_QUALITY));
         ((TextView) findViewById(R.id.maxQualityTextView)).setText(String.valueOf(MAX_QUALITY));
         final TextView qualityThresholdTextView = (TextView) findViewById(R.id.qualityTextView);
-        final int qualityThreshold = sharedPrefHelper.getQualityThresholdInt() - MIN_QUALITY;
+        final int qualityThreshold = sharedPref.getQualityThresholdInt() - MIN_QUALITY;
         qualitySeekbar = (SeekBar) findViewById(R.id.qualitySeekBar);
         qualitySeekbar.setMax(MAX_QUALITY - MIN_QUALITY);
         qualitySeekbar.setProgress(qualityThreshold);
@@ -96,7 +95,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         ((TextView) findViewById(R.id.minNbOfIdsTextView)).setText(String.valueOf(MIN_NB_OF_IDS));
         ((TextView) findViewById(R.id.maxNbOfIdsTextView)).setText(String.valueOf(MAX_NB_OF_IDS));
         final TextView nbOfIdsTextView = (TextView) findViewById(R.id.nbOfIdsTextView);
-        final int nbOfIds = sharedPrefHelper.getReturnIdCountInt() - MIN_NB_OF_IDS;
+        final int nbOfIds = sharedPref.getReturnIdCountInt() - MIN_NB_OF_IDS;
         nbOfIdsSeekbar = (SeekBar) findViewById(R.id.nbOfIdsSeekBar);
         nbOfIdsSeekbar.setMax(MAX_NB_OF_IDS - MIN_NB_OF_IDS);
         nbOfIdsSeekbar.setProgress(nbOfIds);
@@ -119,7 +118,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             }
         });
 
-        int matcher = sharedPrefHelper.getMatcherTypeInt();
+        int matcher = sharedPref.getMatcherTypeInt();
         if (matcher == 0) {
             ((RadioButton) findViewById(R.id.radio_simAfis)).setChecked(true);
         } else if (matcher == 1) {
@@ -140,16 +139,16 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     }
 
     private void saveQualityThreshold() {
-        sharedPrefHelper.setQualityThresholdInt(qualitySeekbar.getProgress() + MIN_QUALITY);
+        sharedPref.setQualityThresholdInt(qualitySeekbar.getProgress() + MIN_QUALITY);
     }
 
 
     private void saveNbOfIds() {
-        sharedPrefHelper.setReturnIdCountInt(nbOfIdsSeekbar.getProgress() + MIN_NB_OF_IDS);
+        sharedPref.setReturnIdCountInt(nbOfIdsSeekbar.getProgress() + MIN_NB_OF_IDS);
     }
 
     private void saveNudgeMode() {
-        sharedPrefHelper.setNudgeModeBool(nudgeToggleButton.isChecked());
+        sharedPref.setNudgeModeBool(nudgeToggleButton.isChecked());
     }
 
     @Override
@@ -163,18 +162,18 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long i) {
         switch (pos) {
             case 0:
-                sharedPrefHelper.setLanguageString("");
-                sharedPrefHelper.setLanguagePositionInt(0);
+                sharedPref.setLanguageString("");
+                sharedPref.setLanguagePositionInt(0);
 
                 break;
             case 1:
-                sharedPrefHelper.setLanguageString("ne");
-                sharedPrefHelper.setLanguagePositionInt(1);
+                sharedPref.setLanguageString("ne");
+                sharedPref.setLanguagePositionInt(1);
                 break;
             case 2:
 
-                sharedPrefHelper.setLanguageString("bn");
-                sharedPrefHelper.setLanguagePositionInt(2);
+                sharedPref.setLanguageString("bn");
+                sharedPref.setLanguagePositionInt(2);
                 break;
         }
     }
@@ -192,11 +191,11 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         switch (view.getId()) {
             case R.id.radio_simAfis:
                 if (checked)
-                    sharedPrefHelper.setMatcherTypeInt(0);
+                    sharedPref.setMatcherTypeInt(0);
                 break;
             case R.id.radio_sourceAfis:
                 if (checked)
-                    sharedPrefHelper.setMatcherTypeInt(1);
+                    sharedPref.setMatcherTypeInt(1);
                 break;
         }
     }

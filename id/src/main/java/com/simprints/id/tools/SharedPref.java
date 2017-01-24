@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 
-public class SharedPrefHelper {
+public class SharedPref {
     private SharedPreferences sharedPref;
 
     private static final String preference_file_key = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a";
@@ -18,7 +18,7 @@ public class SharedPrefHelper {
     private static final String matcher_type = "MatcherType";
     private static final String timeout_int = "TimeoutInt";
 
-    public SharedPrefHelper(Context context) {
+    public SharedPref(Context context) {
         sharedPref = context.getSharedPreferences(preference_file_key,
                 Context.MODE_PRIVATE);
     }
