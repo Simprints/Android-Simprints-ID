@@ -26,7 +26,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     private final static int MAX_QUALITY = 99;
     private final static int MIN_NB_OF_IDS = 1;
     private final static int MAX_NB_OF_IDS = 20;
-    private final static int MIN_TIMEOUT = 0;
+    private final static int MIN_TIMEOUT = 1;
     private final static int MAX_TIMEOUT = 10;
     ToggleButton nudgeToggleButton;
     SeekBar qualitySeekBar;
