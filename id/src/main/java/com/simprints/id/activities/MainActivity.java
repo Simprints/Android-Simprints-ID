@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements
                 int qualityScore = new SharedPrefHelper(getApplicationContext())
                         .getQualityThresholdInt();
                 Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
-                appState.getScanner().startContinuousCapture(qualityScore);
+                appState.getScanner().startContinuousCapture(qualityScore, 5);
                 break;
             case COLLECTING:
                 scanButton.setEnabled(false);
