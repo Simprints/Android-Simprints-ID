@@ -17,10 +17,10 @@ public enum ALERT_TYPE {
 
     //Bluetooth errors
     BLUETOOTH_NOT_SUPPORTED(R.string.bluetooth_error_title, R.string.bluetooth_not_supported_message,
-            R.drawable.bt_error_icon, R.drawable.bluetooth_not_enabled,
+            R.drawable.bt_error_icon, R.drawable.bt_not_enabled,
             R.string.try_again_label, R.string.settings_label, false),
     BLUETOOTH_NOT_ENABLED(R.string.bluetooth_error_title, R.string.bluetooth_not_enabled_message,
-            R.drawable.bt_error_icon, R.drawable.bluetooth_not_enabled,
+            R.drawable.bt_error_icon, R.drawable.bt_not_enabled,
             R.string.try_again_label, R.string.settings_label, true),
     NOT_PAIRED(R.string.bluetooth_error_title, R.string.unbonded_scanner_message,
             R.drawable.bt_error_icon, R.drawable.scanner_error_icon,
