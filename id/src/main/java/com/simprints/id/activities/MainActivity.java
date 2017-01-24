@@ -78,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private final static ScanConfig DEFAULT_CONFIG;
 
+    private SharedPref sharedPref;
+
     static {
         DEFAULT_CONFIG = new ScanConfig();
         DEFAULT_CONFIG.set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0);
@@ -148,6 +150,8 @@ public class MainActivity extends AppCompatActivity implements
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
         un20WakeupDialog = Dialogs.getUn20Dialog(this);
         registrationResult = null;
+
+        sharedPref = new SharedPref(getApplicationContext());
 
         initActiveFingers();
         initBarAndDrawer();
@@ -247,10 +251,9 @@ public class MainActivity extends AppCompatActivity implements
             case BAD_SCAN:
             case NOT_COLLECTED:
                 scanButton.setEnabled(false);
-                int qualityScore = new SharedPref(getApplicationContext())
-                        .getQualityThresholdInt();
-                Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
-                appState.getScanner().startContinuousCapture(qualityScore, 5);
+                Log.d(this, "Quality Score: " + String.valueOf(sharedPref.getQualityThresholdInt()));
+                appState.getScanner().startContinuousCapture(sharedPref.getQualityThresholdInt(),
+                        sharedPref.getTimeoutInt());
                 break;
             case COLLECTING:
                 scanButton.setEnabled(false);
@@ -361,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void nudgeMode() {
-        boolean nudge = new SharedPref(getApplicationContext()).getNudgeModeBool();
+        boolean nudge = sharedPref.getNudgeModeBool();
 
         if (nudge) {
             handler.postDelayed(new Runnable() {
@@ -425,8 +428,7 @@ public class MainActivity extends AppCompatActivity implements
                     activeFingers.get(currentActiveFingerNo).setTemplate(new Fingerprint(finger.getId(), appState.getScanner().getTemplate()));
                 }
 
-                int qualityScore1 = new SharedPref(getApplicationContext())
-                        .getQualityThresholdInt();
+                int qualityScore1 = sharedPref.getQualityThresholdInt();
                 Log.d(this, "Quality Score: " + String.valueOf(qualityScore1));
 
                 if (quality >= qualityScore1) {
