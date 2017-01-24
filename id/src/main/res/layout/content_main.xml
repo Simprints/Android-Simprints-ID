@@ -27,11 +27,14 @@
 
     <ProgressBar
         android:id="@+id/pb_timeout"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp" />
+        android:layout_marginRight="40dp"
+        android:progressDrawable="@drawable/timer_progress_bar"
+        android:maxHeight="10dip"
+        android:minHeight="10dp" />
 
     <View
         android:layout_width="match_parent"

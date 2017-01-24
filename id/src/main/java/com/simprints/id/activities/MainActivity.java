@@ -3,11 +3,15 @@ package com.simprints.id.activities;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -121,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements
     private MenuItem syncItem;
 
     private ProgressDialog un20WakeupDialog;
+    private static CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -264,6 +269,7 @@ public class MainActivity extends AppCompatActivity implements
             case COLLECTING:
                 scanButton.setEnabled(false);
                 appState.getScanner().stopContinuousCapture();
+                cancelTimeoutBar();
                 break;
         }
     }
@@ -329,7 +335,9 @@ public class MainActivity extends AppCompatActivity implements
         scanButton.setText(activeStatus.getButtonTextId());
         scanButton.setTextColor(activeStatus.getButtonTextColor());
         scanButton.setBackgroundColor(activeStatus.getButtonBgColor());
-        //
+
+        setProgressBar(activeStatus);
+
         FingerFragment fragment = pageAdapter.getFragment(currentActiveFingerNo);
         if (fragment != null) {
             fragment.updateTextAccordingToStatus();
@@ -417,6 +425,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case CONTINUOUS_CAPTURE_SUCCESS: // Image captured successfully
+                stopTimeoutBar();
                 Arrays.fill(leds, Message.LED_STATE.LED_STATE_ON);
                 appState.getScanner().generateTemplate();
                 break;
@@ -863,9 +872,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void startTimeoutBar() {
+        if (appState.getHardwareVersion() <= 4)
+            return;
+
         final int[] i = {0, sharedPref.getTimeoutInt() * 1000};
         timeoutBar.setProgress(i[0]);
-        CountDownTimer mCountDownTimer = new CountDownTimer(i[1], i[1] / 100) {
+        countDownTimer = new CountDownTimer(i[1], i[1] / 100) {
             @Override
             public void onTick(long millisUntilFinished) {
                 i[0]++;
@@ -877,6 +889,51 @@ public class MainActivity extends AppCompatActivity implements
                 timeoutBar.setProgress(100);
             }
         };
-        mCountDownTimer.start();
+        countDownTimer.start();
     }
+
+    private void stopTimeoutBar() {
+        if (countDownTimer == null)
+            return;
+
+        countDownTimer.cancel();
+        countDownTimer.onFinish();
+    }
+
+    private void cancelTimeoutBar() {
+        if (countDownTimer == null)
+            return;
+
+        countDownTimer.cancel();
+        timeoutBar.setProgress(0);
+    }
+
+    private void setProgressBar(Status status) {
+        timeoutBar.setProgress(0);
+        Drawable drawable;
+
+        switch (status) {
+            case NOT_COLLECTED:
+                drawable = ContextCompat.getDrawable(getApplicationContext(),
+                        R.drawable.timer_progress_bar);
+                break;
+
+            case GOOD_SCAN:
+                drawable = ContextCompat.getDrawable(getApplicationContext(),
+                        R.drawable.timer_progress_good);
+                break;
+
+            case BAD_SCAN:
+                drawable = ContextCompat.getDrawable(getApplicationContext(),
+                        R.drawable.timer_progress_bad);
+                break;
+
+            default:
+                return;
+
+        }
+
+        timeoutBar.setProgressDrawable(drawable);
+    }
+
 }
