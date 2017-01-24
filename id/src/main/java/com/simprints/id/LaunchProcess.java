@@ -114,7 +114,7 @@ public class LaunchProcess {
             vibrate(launchActivity, 100);
         }
     }
-    
+
     public void updateData() {
         if (!apiKey) {
             appState.setData(new DatabaseContext(appState.getApiKey(), appState.getUserId(),

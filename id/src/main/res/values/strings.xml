@@ -77,20 +77,6 @@
         Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other community health workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to patients.
     </string>
 
-    <!--Appsee API Key-->
-    <string name="com.appsee.apikey" translatable="false">6664c6771410480c95c83acddeab349c</string>
-    <!--Shared Pref Key -->
-    <string name="preference_file_key" translatable="false">b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a</string>
-    <string name="pref_nudge_mode_bool" translatable="false">NudgeModeBool</string>
-    <string name="pref_consent_bool" translatable="false">ConsentBool</string>
-    <string name="pref_quality_theshold" translatable="false">QualityThresholdInt</string>
-    <string name="pref_nb_of_ids" translatable="false">NbOfIdsInt</string>
-    <string name="pref_language" translatable="false">SelectedLanguage</string>
-    <string name="pref_language_position" translatable="false">SelectedLanguagePosition</string>
-    <string name="db_version_int" translatable="false">DbVersionInt</string>
-    <string name="pref_matcher_type" translatable="false">MatcherType</string>
-    <string name="pref_last_user_id" translatable="false">LastUserId</string>
-
     <!--Launch strings-->
     <string name="launch_checking_permissions">Checking permissions...</string>
     <string name="launch_loading_database">Loading database...</string>
