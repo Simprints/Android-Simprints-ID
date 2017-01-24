@@ -10,10 +10,10 @@ import android.widget.CheckBox;
 
 import com.simprints.id.R;
 import com.simprints.id.tools.Language;
-import com.simprints.id.tools.SharedPrefHelper;
+import com.simprints.id.tools.SharedPref;
 
 public class PrivacyActivity extends AppCompatActivity {
-    private SharedPrefHelper sharedPref;
+    private SharedPref sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,7 @@ public class PrivacyActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        sharedPref = new SharedPrefHelper(getApplicationContext());
+        sharedPref = new SharedPref(getApplicationContext());
 
         boolean consent = sharedPref.getConsentBool();
         CheckBox checkBox = (CheckBox) findViewById(R.id.consentCheckBox);

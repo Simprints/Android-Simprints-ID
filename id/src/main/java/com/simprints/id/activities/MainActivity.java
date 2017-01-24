@@ -36,7 +36,7 @@ import com.simprints.id.tools.Dialogs;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.RemoteConfig;
-import com.simprints.id.tools.SharedPrefHelper;
+import com.simprints.id.tools.SharedPref;
 import com.simprints.id.tools.Vibrate;
 import com.simprints.id.tools.ViewPagerCustom;
 import com.simprints.libcommon.FingerConfig;
@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements
             case BAD_SCAN:
             case NOT_COLLECTED:
                 scanButton.setEnabled(false);
-                int qualityScore = new SharedPrefHelper(getApplicationContext())
+                int qualityScore = new SharedPref(getApplicationContext())
                         .getQualityThresholdInt();
                 Log.d(this, "Quality Score: " + String.valueOf(qualityScore));
                 appState.getScanner().startContinuousCapture(qualityScore, 5);
@@ -361,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void nudgeMode() {
-        boolean nudge = new SharedPrefHelper(getApplicationContext()).getNudgeModeBool();
+        boolean nudge = new SharedPref(getApplicationContext()).getNudgeModeBool();
 
         if (nudge) {
             handler.postDelayed(new Runnable() {
@@ -425,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements
                     activeFingers.get(currentActiveFingerNo).setTemplate(new Fingerprint(finger.getId(), appState.getScanner().getTemplate()));
                 }
 
-                int qualityScore1 = new SharedPrefHelper(getApplicationContext())
+                int qualityScore1 = new SharedPref(getApplicationContext())
                         .getQualityThresholdInt();
                 Log.d(this, "Quality Score: " + String.valueOf(qualityScore1));
 
