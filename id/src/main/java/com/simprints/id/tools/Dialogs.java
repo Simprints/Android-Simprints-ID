@@ -9,6 +9,7 @@ import com.simprints.id.activities.LaunchActivity;
 import static android.app.Activity.RESULT_CANCELED;
 
 public class Dialogs {
+
     public static ProgressDialog getRestartDialog(final LaunchActivity launchActivity) {
         ProgressDialog dialog = new ProgressDialog(launchActivity);
         dialog.setCanceledOnTouchOutside(false);

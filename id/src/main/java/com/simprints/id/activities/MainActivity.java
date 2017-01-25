@@ -43,6 +43,7 @@ import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.id.tools.SharedPref;
+import com.simprints.id.tools.TimeoutBar;
 import com.simprints.id.tools.Vibrate;
 import com.simprints.id.tools.ViewPagerCustom;
 import com.simprints.libcommon.FingerConfig;
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements
     private Button scanButton;
     private ViewPagerCustom viewPager;
     private FingerPageAdapter pageAdapter;
-    private ProgressBar timeoutBar;
+    private TimeoutBar timeoutBar;
 
     private Registration registrationResult;
 
@@ -125,7 +126,6 @@ public class MainActivity extends AppCompatActivity implements
     private MenuItem syncItem;
 
     private ProgressDialog un20WakeupDialog;
-    private static CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,10 +158,9 @@ public class MainActivity extends AppCompatActivity implements
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
         un20WakeupDialog = Dialogs.getUn20Dialog(this);
         registrationResult = null;
-
         sharedPref = new SharedPref(getApplicationContext());
-
-        timeoutBar = (ProgressBar) findViewById(R.id.pb_timeout);
+        timeoutBar = new TimeoutBar(getApplicationContext(),
+                (ProgressBar) findViewById(R.id.pb_timeout));
 
         initActiveFingers();
         initBarAndDrawer();
@@ -264,12 +263,12 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(this, "Quality Score: " + String.valueOf(sharedPref.getQualityThresholdInt()));
                 appState.getScanner().startContinuousCapture(sharedPref.getQualityThresholdInt(),
                         sharedPref.getTimeoutInt());
-                startTimeoutBar();
+                timeoutBar.startTimeoutBar();
                 break;
             case COLLECTING:
                 scanButton.setEnabled(false);
                 appState.getScanner().stopContinuousCapture();
-                cancelTimeoutBar();
+                timeoutBar.cancelTimeoutBar();
                 break;
         }
     }
@@ -336,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements
         scanButton.setTextColor(activeStatus.getButtonTextColor());
         scanButton.setBackgroundColor(activeStatus.getButtonBgColor());
 
-        setProgressBar(activeStatus);
+        timeoutBar.setProgressBar(activeStatus);
 
         FingerFragment fragment = pageAdapter.getFragment(currentActiveFingerNo);
         if (fragment != null) {
@@ -425,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case CONTINUOUS_CAPTURE_SUCCESS: // Image captured successfully
-                stopTimeoutBar();
+                timeoutBar.stopTimeoutBar();
                 Arrays.fill(leds, Message.LED_STATE.LED_STATE_ON);
                 appState.getScanner().generateTemplate();
                 break;
@@ -869,71 +868,6 @@ public class MainActivity extends AppCompatActivity implements
             syncItem.setTitle("Syncing...");
             syncItem.setIcon(R.drawable.ic_menu_syncing);
         }
-    }
-
-    private void startTimeoutBar() {
-        if (appState.getHardwareVersion() <= 4)
-            return;
-
-        final int[] i = {0, sharedPref.getTimeoutInt() * 1000};
-        timeoutBar.setProgress(i[0]);
-        countDownTimer = new CountDownTimer(i[1], i[1] / 100) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                i[0]++;
-                timeoutBar.setProgress(i[0]);
-            }
-
-            @Override
-            public void onFinish() {
-                timeoutBar.setProgress(100);
-            }
-        };
-        countDownTimer.start();
-    }
-
-    private void stopTimeoutBar() {
-        if (countDownTimer == null)
-            return;
-
-        countDownTimer.cancel();
-        countDownTimer.onFinish();
-    }
-
-    private void cancelTimeoutBar() {
-        if (countDownTimer == null)
-            return;
-
-        countDownTimer.cancel();
-        timeoutBar.setProgress(0);
-    }
-
-    private void setProgressBar(Status status) {
-        timeoutBar.setProgress(0);
-        Drawable drawable;
-
-        switch (status) {
-            case NOT_COLLECTED:
-                drawable = ContextCompat.getDrawable(getApplicationContext(),
-                        R.drawable.timer_progress_bar);
-                break;
-
-            case GOOD_SCAN:
-                drawable = ContextCompat.getDrawable(getApplicationContext(),
-                        R.drawable.timer_progress_good);
-                break;
-
-            case BAD_SCAN:
-                drawable = ContextCompat.getDrawable(getApplicationContext(),
-                        R.drawable.timer_progress_bad);
-                break;
-
-            default:
-                return;
-
-        }
-
-        timeoutBar.setProgressDrawable(drawable);
     }
 
 }
