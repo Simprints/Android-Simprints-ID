@@ -8,6 +8,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 25
         versionCode 31
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
         release {
@@ -79,6 +80,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
     developmentCompile 'com.facebook.stetho:stetho:1.3.1'
     developmentCompile 'com.facebook.stetho:stetho-okhttp:1.3.1'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
 }
 
 crashlytics {
