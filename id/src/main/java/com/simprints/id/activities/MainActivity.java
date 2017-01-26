@@ -3,15 +3,10 @@ package com.simprints.id.activities;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -171,13 +166,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initActiveFingers() {
-        Log.d(this, "Initializing active fingers from default config");
         for (int i = 0; i < NB_OF_FINGERS; i++) {
             FingerIdentifier id = FingerIdentifier.values()[i];
             fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, false, DEFAULT_CONFIG.getPriority(id));
-            Log.d(this, String.format("Finger %s is %s",
-                    fingers[i].getId().name(),
-                    fingers[i].isActive() ? "active" : "inactive"));
             if (fingers[i].isActive()) {
                 activeFingers.add(fingers[i]);
             }
@@ -188,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initBarAndDrawer() {
-        Log.d(this, "Initializing action bar and navigation drawer");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -209,7 +199,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initIndicators() {
-        Log.d(this, "Initializing indicators");
         LinearLayout indicatorLayout = (LinearLayout) findViewById(R.id.indicator_layout);
         indicatorLayout.removeAllViewsInLayout();
         indicators.clear();
@@ -230,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initScanButton() {
-        Log.d(this, "Initializing scanner button");
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -260,7 +248,6 @@ public class MainActivity extends AppCompatActivity implements
             case BAD_SCAN:
             case NOT_COLLECTED:
                 scanButton.setEnabled(false);
-                Log.d(this, "Quality Score: " + String.valueOf(sharedPref.getQualityThresholdInt()));
                 appState.getScanner().startContinuousCapture(sharedPref.getQualityThresholdInt(),
                         sharedPref.getTimeoutInt());
                 timeoutBar.startTimeoutBar();
@@ -274,7 +261,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initViewPager() {
-        Log.d(this, "Initializing view pager");
         viewPager.setAdapter(pageAdapter);
         viewPager.setOffscreenPageLimit(1);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -284,7 +270,6 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onPageSelected(int position) {
-                Log.d(MainActivity.this, String.format(Locale.UK, "Page %d selected", position));
                 currentActiveFingerNo = position;
                 refreshDisplay();
                 if (leds[0] != Message.LED_STATE.LED_STATE_OFF) {
@@ -309,7 +294,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void refreshDisplay() {
-        Log.d(this, "Refreshing display");
         // Update indicators display
         int nbCollected = 0;
 
@@ -370,7 +354,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void finishWithUnexpectedError() {
-        Log.d(this, "UNEXPECTED ERROR");
         Intent intent = new Intent(this, AlertActivity.class);
         intent.putExtra("alertType", ALERT_TYPE.UNEXPECTED_ERROR);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
@@ -383,7 +366,6 @@ public class MainActivity extends AppCompatActivity implements
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(MainActivity.this, "AutoScroll");
                     if (currentActiveFingerNo < activeFingers.size()) {
                         viewPager.setScrollDuration(SLOW_SWIPE_SPEED);
                         viewPager.setCurrentItem(currentActiveFingerNo + 1);
@@ -438,12 +420,10 @@ public class MainActivity extends AppCompatActivity implements
 
                 if (finger.getTemplate() == null ||
                         finger.getTemplate().getQualityScore() < quality) {
-                    Log.d(this, "Set template");
                     activeFingers.get(currentActiveFingerNo).setTemplate(new Fingerprint(finger.getId(), appState.getScanner().getTemplate()));
                 }
 
                 int qualityScore1 = sharedPref.getQualityThresholdInt();
-                Log.d(this, "Quality Score: " + String.valueOf(qualityScore1));
 
                 if (quality >= qualityScore1) {
                     activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
@@ -474,6 +454,7 @@ public class MainActivity extends AppCompatActivity implements
             case CAPTURE_IMAGE_INVALID_STATE: // Image capture failed because the un20 is not awaken
                 resetUIfromError();
                 appState.getScanner().un20Wakeup();
+                timeoutBar.cancelTimeoutBar();
                 un20WakeupDialog.show();
                 break;
 
@@ -600,7 +581,6 @@ public class MainActivity extends AppCompatActivity implements
 
     protected void onActionForward() {
         // Gathers the fingerprints in a list
-        Log.d(this, "onActionForward()");
         activeFingers.get(currentActiveFingerNo);
 
         ArrayList<Fingerprint> fingerprints = new ArrayList<>();
@@ -615,14 +595,12 @@ public class MainActivity extends AppCompatActivity implements
                 nbRequiredFingerprints++;
             }
         }
-        Log.d(this, String.format(Locale.UK, "%d required fingerprints scanned", nbRequiredFingerprints));
 
         if (nbRequiredFingerprints < 1) {
             Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show();
         } else {
             Person person = new Person(appState.getGuid(), fingerprints);
             if (appState.isEnrol()) {
-                Log.d(this, "Creating registration object");
                 appState.getData().savePerson(person);
 
                 registrationResult = new Registration(appState.getGuid());
@@ -638,7 +616,6 @@ public class MainActivity extends AppCompatActivity implements
                 setResult(RESULT_OK, resultData);
                 finish();
             } else {
-                Log.d(this, "Starting matching activity");
                 Intent intent = new Intent(this, MatchingActivity.class);
                 intent.putExtra("Person", person);
                 startActivityForResult(intent, MATCHING_ACTIVITY_REQUEST_CODE);
@@ -736,9 +713,6 @@ public class MainActivity extends AppCompatActivity implements
                             case OPTIONAL:
                                 checked[i] = isChecked;
                                 finger.setActive(isChecked);
-                                Log.d(MainActivity.this, String.format(Locale.UK,
-                                        "%s is now %s",
-                                        finger.getId().name(), finger.isActive() ? "active" : "inactive"));
                                 break;
                             case REQUIRED:
                                 checked[i] = true;
@@ -761,10 +735,6 @@ public class MainActivity extends AppCompatActivity implements
                             }
                         }
                         Collections.sort(activeFingers);
-                        Log.d(MainActivity.this, "New active fingers:");
-                        for (Finger finger : activeFingers) {
-                            Log.d(MainActivity.this, String.format("Finger %s", finger.getId().name()));
-                        }
 
                         if (currentActiveFinger.isActive()) {
                             currentActiveFingerNo = activeFingers.indexOf(currentActiveFinger);
@@ -805,8 +775,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(this, String.format(Locale.UK,
-                "onActivityresult(%d, %d, %s)", requestCode, resultCode, data));
         switch (requestCode) {
             case SETTINGS_ACTIVITY_REQUEST_CODE:
             case PRIVACY_ACTIVITY_REQUEST_CODE:
@@ -826,7 +794,6 @@ public class MainActivity extends AppCompatActivity implements
             if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
                 toggleContinuousCapture();
             } else {
-                Log.d(this, "Finishing with RESULT_CANCELED");
                 setResult(RESULT_CANCELED);
                 finish();
             }

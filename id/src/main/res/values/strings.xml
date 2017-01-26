@@ -94,7 +94,7 @@
     <string name="missing_apikey_message">A configuration error has occurred (missing API key), please contact your system administrator</string>
     <string name="missing_calling_package_message" translatable="false">A configuration error has occurred (missing calling package) please contact your system administrator</string>
     <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
-    <string name="invalid_userId_message">A configuration error has occurred (no user ID), please contact your system administrator</string>
+    <string name="invalid_userId_message" translatable="false">A configuration error has occurred (no user ID), please contact your system administrator</string>
     <string name="bluetooth_not_supported_title" translatable="false">BLUETOOTH NOT SUPPORTED</string>
     <string name="bluetooth_not_supported_message" translatable="false">Bluetooth not supported on this device, please contact your system administrator</string>
     <string name="bluetooth_not_enabled_title" translatable="false">BLUETOOTH NOT ENABLED</string>
@@ -146,8 +146,8 @@
     <string name="quality_threshold_value">Quality Threshold: %1$d</string>
     <string name="nb_of_ids_empty">Returned Identifications:</string>
     <string name="nb_of_ids_value">Returned Identifications: %1$d</string>
-    <string name="timeout_empty">Timeout (Seconds):</string>
-    <string name="timeout_value">Timeout (Seconds): %1$d</string>
+    <string name="timeout_empty" translatable="false">Timeout (Seconds):</string>
+    <string name="timeout_value" translatable="false">Timeout (Seconds): %1$d</string>
     <string name="about_app_version">App Version:</string>
     <string name="about_libsimprints_version">LibSimprints Version:</string>
     <string name="about_scanner_version">Scanner Version:</string>

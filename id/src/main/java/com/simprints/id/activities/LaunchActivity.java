@@ -11,7 +11,6 @@ import android.view.MotionEvent;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
-import com.facebook.stetho.Stetho;
 import com.simprints.id.LaunchProcess;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
@@ -41,6 +40,8 @@ import static com.simprints.id.tools.InternalConstants.MAIN_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.RESOLUTION_REQUEST;
 import static com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN;
 
+@SuppressWarnings("deprecation")
+@SuppressLint("HardwareIds")
 public class LaunchActivity extends AppCompatActivity
         implements Scanner.ScannerListener, DatabaseEventListener {
 
@@ -52,7 +53,6 @@ public class LaunchActivity extends AppCompatActivity
     private LaunchProcess launchProcess;
     private ProgressDialog restartDialog;
 
-    @SuppressLint("HardwareIds")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +60,6 @@ public class LaunchActivity extends AppCompatActivity
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
-        Stetho.initializeWithDefaults(this);
 
         //initialize remote config
         RemoteConfig.init();
