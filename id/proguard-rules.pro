@@ -15,3 +15,10 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+#Firebase rules
+-keepattributes Signature
+
+-keepclassmembers class com.simprints.libdata.models.firebase** {
+  *;
+}
