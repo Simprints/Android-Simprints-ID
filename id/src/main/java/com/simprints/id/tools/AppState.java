@@ -27,6 +27,7 @@ public class AppState {
     private boolean signedIn;
     private boolean connected;
     private String callingPackage;
+    private String appKey;
 
     private AppState() {
         scanner = null;
@@ -37,129 +38,137 @@ public class AppState {
         session.setStartTime(c.getTime());
     }
 
-    public synchronized boolean isEnrol() {
+    public boolean isEnrol() {
         return session.isEnrol();
     }
 
-    public synchronized void setEnrol(boolean enrol) {
+    public void setEnrol(boolean enrol) {
         session.setEnrol(enrol);
     }
 
-    public synchronized String getApiKey() {
+    public String getApiKey() {
         return session.getApiKey();
     }
 
-    public synchronized void setApiKey(String apiKey) {
+    public void setApiKey(String apiKey) {
         session.setApiKey(apiKey);
     }
 
-    public synchronized String getDeviceId() {
+    public String getDeviceId() {
         return session.getDeviceId();
     }
 
-    public synchronized void setDeviceId(String deviceId) {
+    public void setDeviceId(String deviceId) {
         session.setDeviceId(deviceId);
     }
 
-    public synchronized String getUserId() {
+    public String getUserId() {
         return session.getUserId();
     }
 
-    public synchronized void setUserId(String userId) {
+    public void setUserId(String userId) {
         session.setUserId(userId);
     }
 
-    public synchronized String getGuid() {
+    public String getGuid() {
         return session.getPersonGuid();
     }
 
-    public synchronized void setGuid(String guid) {
+    public void setGuid(String guid) {
         session.setPersonGuid(guid);
     }
 
-    public synchronized Scanner getScanner() {
+    public Scanner getScanner() {
         return scanner;
     }
 
-    public synchronized void setScanner(Scanner scanner) {
+    public void setScanner(Scanner scanner) {
         this.scanner = scanner;
     }
 
-    public synchronized String getMacAddress() {
+    public String getMacAddress() {
         return session.getMacAddress();
     }
 
-    public synchronized void setMacAddress(String macAddress) {
+    public void setMacAddress(String macAddress) {
         session.setMacAddress(macAddress);
     }
 
-    public synchronized DatabaseContext getData() {
+    public DatabaseContext getData() {
         return data;
     }
 
-    public synchronized void setData(DatabaseContext data) {
+    public void setData(DatabaseContext data) {
         this.data = data;
     }
 
-    public synchronized GoogleApiClient getGoogleApiClient() {
+    public GoogleApiClient getGoogleApiClient() {
         return googleApiClient;
     }
 
-    public synchronized void setGoogleApiClient(GoogleApiClient googleApiClient) {
+    public void setGoogleApiClient(GoogleApiClient googleApiClient) {
         this.googleApiClient = googleApiClient;
     }
 
-    public synchronized void setLatitude(String latitude) {
+    public void setLatitude(String latitude) {
         session.setLatitude(latitude);
     }
 
-    public synchronized String getLatitude() {
+    public String getLatitude() {
         return session.getLatitude();
     }
 
-    public synchronized void setLongitude(String longitude) {
+    public void setLongitude(String longitude) {
         session.setLongitude(longitude);
     }
 
-    public synchronized String getLongitude() {
+    public String getLongitude() {
         return session.getLongitude();
     }
 
-    public synchronized Session getReadyToSendSession() {
+    public Session getReadyToSendSession() {
         Calendar c = Calendar.getInstance();
         session.setEndTime(c.getTime());
         return session;
     }
 
-    public synchronized void setHardwareVersion(short hardwareVersion) {
+    public void setHardwareVersion(short hardwareVersion) {
         session.setHardwareVersion(hardwareVersion);
     }
 
-    public synchronized short getHardwareVersion() {
+    public short getHardwareVersion() {
         return session.getHardwareVersion();
     }
 
-    public synchronized boolean getSignedIn() {
+    public boolean getSignedIn() {
         return this.signedIn;
     }
 
-    public synchronized void setSignedIn(boolean signedIn) {
+    public void setSignedIn(boolean signedIn) {
         this.signedIn = signedIn;
     }
 
-    public synchronized boolean isConnected() {
+    public boolean isConnected() {
         return this.connected;
     }
 
-    public synchronized void setConnected(boolean connected) {
+    public void setConnected(boolean connected) {
         this.connected = connected;
     }
 
-    public synchronized void setCallingPackage(String callingPackage) {
+    public void setCallingPackage(String callingPackage) {
         this.callingPackage = callingPackage;
     }
 
-    public synchronized String getCallingPackage() {
+    public String getCallingPackage() {
         return this.callingPackage;
+    }
+
+    public void setAppKey(String appKey) {
+        this.appKey = appKey;
+    }
+
+    public String getAppKey() {
+        return this.appKey;
     }
 }

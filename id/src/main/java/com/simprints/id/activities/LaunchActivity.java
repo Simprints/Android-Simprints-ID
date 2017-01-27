@@ -20,6 +20,7 @@ import com.simprints.id.tools.Dialogs;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
+import com.simprints.id.tools.SharedPref;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
 import com.simprints.libscanner.Scanner;
@@ -103,6 +104,8 @@ public class LaunchActivity extends AppCompatActivity
             return;
         }
         appState.setApiKey(apiKey);
+        appState.setAppKey(apiKey.substring(0, 8));
+        new SharedPref(getApplicationContext()).setAppKeyString(appState.getAppKey());
 
         // Sets guid (to specified value, or random one)
         String guid = extras.getString(Constants.SIMPRINTS_GUID);
@@ -264,24 +267,19 @@ public class LaunchActivity extends AppCompatActivity
                 launchAlert(ALERT_TYPE.INVALID_API_KEY);
                 break;
             case DATABASE_INIT_SUCCESS:
-                //comes from static event so is separate thread
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        launchProcess.databaseUpdate = true;
-                        launchProcess.launch();
-                    }
-                });
+                launchProcess.databaseUpdate = true;
+                launchProcess.launch();
                 break;
             case DATABASE_INIT_RESTART:
-                //comes from static event so is separate thread
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        restartDialog = Dialogs.getRestartDialog(LaunchActivity.this);
-                        restartDialog.show();
-                    }
-                });
+                if (appState.getData() != null) {
+                    appState.getData().destroy();
+                    appState.setData(null);
+                }
+
+                launchProcess = new LaunchProcess(this);
+                launchProcess.launch();
+//                restartDialog = Dialogs.getRestartDialog(LaunchActivity.this);
+//                restartDialog.show();
                 break;
             case DATABASE_RESOLVED:
                 launchProcess.ccResolver = true;

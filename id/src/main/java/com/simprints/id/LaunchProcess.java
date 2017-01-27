@@ -65,7 +65,12 @@ public class LaunchProcess {
         loadingInfoTextView.setText(R.string.updating_database);
 
         if (!databaseUpdate) {
-            DatabaseContext.initDatabase(launchActivity, launchActivity);
+            appState.setData(new DatabaseContext(appState.getApiKey(),
+                    appState.getUserId(),
+                    appState.getDeviceId(),
+                    launchActivity));
+            appState.getData().setListener(launchActivity);
+            appState.getData().initDatabase();
             return;
         }
 
@@ -117,10 +122,7 @@ public class LaunchProcess {
 
     public void updateData() {
         if (!apiKey) {
-            appState.setData(new DatabaseContext(appState.getApiKey(), appState.getUserId(),
-                    appState.getDeviceId(), launchActivity));
-            appState.getData().setListener(launchActivity);
-            appState.getData().validateApiKey();
+            appState.getData().signIn();
             return;
         }
 

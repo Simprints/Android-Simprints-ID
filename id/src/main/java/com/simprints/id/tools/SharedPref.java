@@ -17,6 +17,7 @@ public class SharedPref {
     private static final String db_version_int = "DbVersionInt";
     private static final String matcher_type = "MatcherType";
     private static final String timeout_int = "TimeoutInt";
+    private static final String app_key = "AppKey";
 
     public SharedPref(Context context) {
         sharedPref = context.getSharedPreferences(preference_file_key,
@@ -102,19 +103,6 @@ public class SharedPref {
     }
 
     /**
-     * The current database version of LibData
-     */
-    public int getDbVersionInt() {
-        return sharedPref.getInt(db_version_int, 0);
-    }
-
-    public void setDbVersionInt(int dbVersionInt) {
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(db_version_int, dbVersionInt);
-        editor.apply();
-    }
-
-    /**
      * Matcher type
      */
     public int getMatcherTypeInt() {
@@ -139,4 +127,18 @@ public class SharedPref {
         editor.putInt(timeout_int, timeoutInt);
         editor.apply();
     }
+
+    /**
+     * App Key
+     */
+    public String getAppKeyString() {
+        return sharedPref.getString(app_key, "");
+    }
+
+    public void setAppKeyString(String appKey) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(app_key, appKey);
+        editor.apply();
+    }
+
 }

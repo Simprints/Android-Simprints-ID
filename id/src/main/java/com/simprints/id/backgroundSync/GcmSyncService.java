@@ -9,6 +9,7 @@ import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.RemoteConfig;
+import com.simprints.id.tools.SharedPref;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.DatabaseSync;
 import com.simprints.libdata.Event;
@@ -30,8 +31,8 @@ public class GcmSyncService extends GcmTaskService implements DatabaseEventListe
 
         deviceId = Settings.Secure.getString(getApplicationContext().getContentResolver(),
                 Settings.Secure.ANDROID_ID);
-
-        DatabaseSync.sync(getApplicationContext(), this, null);
+        String appKey = new SharedPref(getApplicationContext()).getAppKeyString();
+        DatabaseSync.sync(getApplicationContext(), appKey, this, null);
 
         return GcmNetworkManager.RESULT_SUCCESS;
     }
