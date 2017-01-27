@@ -16,6 +16,7 @@ import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.RemoteConfig;
+import com.simprints.id.tools.SharedPref;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.DatabaseSync;
@@ -26,6 +27,7 @@ import io.fabric.sdk.android.Fabric;
 public class FrontActivity extends AppCompatActivity implements DatabaseEventListener {
     private ImageView syncStatus;
     private Button syncButton;
+    private SharedPref sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,7 @@ public class FrontActivity extends AppCompatActivity implements DatabaseEventLis
         setContentView(R.layout.activity_front);
         Analytics.getInstance(getApplicationContext());
         RemoteConfig.init();
+        sharedPref = new SharedPref(getApplicationContext());
 
         syncStatus = (ImageView) findViewById(R.id.iv_sync);
         syncButton = (Button) findViewById(R.id.bt_sync);
@@ -59,7 +62,8 @@ public class FrontActivity extends AppCompatActivity implements DatabaseEventLis
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatabaseSync.sync(getApplicationContext(), FrontActivity.this, null);
+                DatabaseSync.sync(getApplicationContext(), sharedPref.getAppKeyString(),
+                        FrontActivity.this, null);
                 syncButton.setEnabled(false);
                 syncButton.setText(R.string.syncing);
                 syncStatus.setImageResource(R.drawable.ic_menu_syncing);
@@ -70,7 +74,7 @@ public class FrontActivity extends AppCompatActivity implements DatabaseEventLis
     @Override
     protected void onResume() {
         super.onResume();
-        if (!DatabaseContext.signedIn()) {
+        if (!DatabaseContext.isSignedIn(sharedPref.getAppKeyString())) {
             syncButton.setEnabled(false);
             syncButton.setText(R.string.not_signed_in);
             syncStatus.setImageResource(R.drawable.ic_menu_sync_failed);

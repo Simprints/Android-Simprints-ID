@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements
     private List<Finger> activeFingers;
     private int currentActiveFingerNo;
 
-    private Message.LED_STATE[] leds;
+    private Message.LED_STATE[] LEDS;
 
     private Status previousStatus;
 
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements
         activeFingers = new ArrayList<>();
         currentActiveFingerNo = 0;
 
-        leds = new Message.LED_STATE[Message.LED_MAX_COUNT];
+        LEDS = new Message.LED_STATE[Message.LED_MAX_COUNT];
 
         previousStatus = Status.NOT_COLLECTED;
 
@@ -272,10 +272,10 @@ public class MainActivity extends AppCompatActivity implements
             public void onPageSelected(int position) {
                 currentActiveFingerNo = position;
                 refreshDisplay();
-                if (leds[0] != Message.LED_STATE.LED_STATE_OFF) {
+                if (LEDS[0] != Message.LED_STATE.LED_STATE_OFF) {
                     if (appState.getScanner() != null) {
                         appState.getScanner().resetUI();
-                        Arrays.fill(leds, Message.LED_STATE.LED_STATE_OFF);
+                        Arrays.fill(LEDS, Message.LED_STATE.LED_STATE_OFF);
                     }
                 }
             }
@@ -407,7 +407,7 @@ public class MainActivity extends AppCompatActivity implements
 
             case CONTINUOUS_CAPTURE_SUCCESS: // Image captured successfully
                 timeoutBar.stopTimeoutBar();
-                Arrays.fill(leds, Message.LED_STATE.LED_STATE_ON);
+                Arrays.fill(LEDS, Message.LED_STATE.LED_STATE_ON);
                 appState.getScanner().generateTemplate();
                 break;
 
@@ -828,7 +828,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void backgroundSync() {
-        DatabaseSync.sync(getApplicationContext(), this, appState.getUserId());
+        DatabaseSync.sync(getApplicationContext(), appState.getAppKey(), this, appState.getUserId());
 
         if (syncItem != null) {
             syncItem.setEnabled(false);
