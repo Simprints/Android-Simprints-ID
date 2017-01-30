@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
@@ -57,13 +58,17 @@ public class AboutActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.firmwareVersionTextView)).setText(
                 String.valueOf(firmwareVersion));
 
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                DatabaseContext.fakeSQLDb(getApplicationContext(), AppState.getInstance().getApiKey(), 100);
-                return null;
-            }
-        }.execute();
+        if (BuildConfig.FLAVOR.equals("development")) {
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    DatabaseContext.fakeSQLDb(getApplicationContext(),
+                            AppState.getInstance().getApiKey(), 100);
+                    return null;
+                }
+            }.execute();
+        }
+
     }
 
     @Override
