@@ -15,8 +15,8 @@ public class RemoteConfig {
     public final static String ENABLE_REFUSAL_FORMS = "enable_refusal_forms";
 
     private static HashMap<String, Object> getDefaults() {
-        configMap.put(ENABLE_EMPTY_USER_ID, false);
-        configMap.put(ENABLE_RETURNING_TEMPLATES, false);
+        configMap.put(ENABLE_EMPTY_USER_ID, true);
+        configMap.put(ENABLE_RETURNING_TEMPLATES, true);
         configMap.put(ENABLE_REFUSAL_FORMS, true);
 
         return configMap;

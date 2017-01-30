@@ -30,3 +30,12 @@
 -keepclassmembers class com.simprints.libdata.models.sql_OLD** {
     *;
 }
+
+#LibSimprints
+-keep class com.simprints.LibSimprints** {
+    *;
+}
+
+#Print mapping
+-printmapping mapping.txt
+
