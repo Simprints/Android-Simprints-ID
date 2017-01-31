@@ -29,6 +29,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     private final static int MIN_TIMEOUT = 1;
     private final static int MAX_TIMEOUT = 10;
     ToggleButton nudgeToggleButton;
+    ToggleButton vibrateToggleButton;
     SeekBar qualitySeekBar;
     SeekBar nbOfIdsSeekBar;
     SeekBar timeoutSeekBar;
@@ -66,6 +67,16 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 saveNudgeMode();
+            }
+        });
+
+        boolean vibrate = sharedPref.getVibrateBool();
+        vibrateToggleButton = (ToggleButton) findViewById(R.id.vibrateToggleButton);
+        vibrateToggleButton.setChecked(vibrate);
+        vibrateToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                saveVibrateMode();
             }
         });
 
@@ -182,6 +193,10 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
     private void saveNudgeMode() {
         sharedPref.setNudgeModeBool(nudgeToggleButton.isChecked());
+    }
+
+    private void saveVibrateMode() {
+        sharedPref.setVibrateBool(vibrateToggleButton.isChecked());
     }
 
     @Override
