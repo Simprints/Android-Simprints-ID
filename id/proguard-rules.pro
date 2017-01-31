@@ -31,8 +31,12 @@
     *;
 }
 
-#LibSimprints
--keep class com.simprints.LibSimprints** {
+#These three cause a crash
+-keep class com.simprints.libsimprints.** {
+    *;
+}
+
+-keep class com.simprints.libcommon.** {
     *;
 }
 
