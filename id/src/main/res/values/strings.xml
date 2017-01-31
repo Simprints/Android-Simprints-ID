@@ -168,4 +168,5 @@
     <string name="not_signed_in" translatable="false">Not Signed In</string>
     <string name="offline" translatable="false">Offline</string>
     <string name="updating_database" translatable="false">Updating project database...</string>
+    <string name="vibrate">Vibrate</string>
 </resources>

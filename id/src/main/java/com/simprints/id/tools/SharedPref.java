@@ -14,10 +14,10 @@ public class SharedPref {
     private static final String nb_of_ids = "NbOfIdsInt";
     private static final String language = "SelectedLanguage";
     private static final String language_position = "SelectedLanguagePosition";
-    private static final String db_version_int = "DbVersionInt";
     private static final String matcher_type = "MatcherType";
     private static final String timeout_int = "TimeoutInt";
     private static final String app_key = "AppKey";
+    private static final String vibrate_bool = "VibrateOn";
 
     public SharedPref(Context context) {
         sharedPref = context.getSharedPreferences(preference_file_key,
@@ -141,4 +141,16 @@ public class SharedPref {
         editor.apply();
     }
 
+    /**
+     * Vibrate. Is the vibrate on
+     */
+    public Boolean getVibrateBool() {
+        return sharedPref.getBoolean(vibrate_bool, true);
+    }
+
+    public void setVibrateBool(Boolean vibrateBool) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(vibrate_bool, vibrateBool);
+        editor.apply();
+    }
 }
