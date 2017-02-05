@@ -58,7 +58,7 @@ public class AboutActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.firmwareVersionTextView)).setText(
                 String.valueOf(firmwareVersion));
 
-        if (BuildConfig.FLAVOR.equals("development")) {
+        if (BuildConfig.DEBUG) {
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
