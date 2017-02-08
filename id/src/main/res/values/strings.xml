@@ -169,4 +169,14 @@
     <string name="offline" translatable="false">Offline</string>
     <string name="updating_database" translatable="false">Updating project database...</string>
     <string name="vibrate">Vibrate</string>
+    <string name="scanner_not_here">Scanner not here</string>
+    <string name="scanner_not_working">Scanner not working</string>
+    <string name="unable_to_capture_a_good_scan">Unable to capture a \'good scan</string>
+    <string name="beneficiary_was_physically_unable">Beneficiary was physically unable to give fingerprints (e.g. too painful, missing limbs)</string>
+    <string name="beneficiary_refused">Beneficiary refused</string>
+    <string name="other">Other</string>
+    <string name="hint_other_reason">More info...</string>
+    <string name="button_scan_prints">Scan Prints</string>
+    <string name="button_submit">Submit</string>
+    <string name="why_did_you_skip_fingerprinting">Why did you skip fingerprinting?</string>
 </resources>
