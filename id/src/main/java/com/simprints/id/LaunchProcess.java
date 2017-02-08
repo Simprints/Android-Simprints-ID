@@ -9,6 +9,7 @@ import com.simprints.id.activities.ALERT_TYPE;
 import com.simprints.id.activities.LaunchActivity;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.PermissionManager;
+import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libscanner.Scanner;
 
@@ -129,12 +130,13 @@ public class LaunchProcess {
         launch();
 
         if (!ccResolver) {
-            if (COMMCARE_PACKAGE.equals(appState.getCallingPackage())) {
-                appState.getData().resolveCommCare(launchActivity.getContentResolver());
-                return;
-            } else {
-                ccResolver = true;
+            if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_CCDBR_ON_LOADING)) {
+                if (COMMCARE_PACKAGE.equals(appState.getCallingPackage())) {
+                    appState.getData().resolveCommCare(launchActivity.getContentResolver());
+                    return;
+                }
             }
+            ccResolver = true;
         }
 
         launch();
