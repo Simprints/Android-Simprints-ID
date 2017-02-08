@@ -1,7 +1,6 @@
 package com.simprints.id.activities;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,7 +15,6 @@ import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.Dialogs;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
@@ -52,7 +50,6 @@ public class LaunchActivity extends AppCompatActivity
     private PositionTracker positionTracker;
     private String callingPackage;
     private LaunchProcess launchProcess;
-    private ProgressDialog restartDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -278,8 +275,6 @@ public class LaunchActivity extends AppCompatActivity
 
                 launchProcess = new LaunchProcess(this);
                 launchProcess.launch();
-//                restartDialog = Dialogs.getRestartDialog(LaunchActivity.this);
-//                restartDialog.show();
                 break;
             case DATABASE_RESOLVED:
                 launchProcess.ccResolver = true;
