@@ -13,11 +13,13 @@ public class RemoteConfig {
     public final static String ENABLE_EMPTY_USER_ID = "enable_empty_user_id";
     public final static String ENABLE_RETURNING_TEMPLATES = "enable_returning_templates";
     public final static String ENABLE_REFUSAL_FORMS = "enable_refusal_forms";
+    public final static String ENABLE_CCDBR_ON_LOADING = "enable_ccdbr_on_loading";
 
     private static HashMap<String, Object> getDefaults() {
         configMap.put(ENABLE_EMPTY_USER_ID, true);
-        configMap.put(ENABLE_RETURNING_TEMPLATES, true);
+        configMap.put(ENABLE_RETURNING_TEMPLATES, false);
         configMap.put(ENABLE_REFUSAL_FORMS, true);
+        configMap.put(ENABLE_CCDBR_ON_LOADING, false);
 
         return configMap;
     }
