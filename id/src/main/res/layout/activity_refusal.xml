@@ -92,6 +92,7 @@
         android:enabled="false"
         android:gravity="top|start"
         android:hint="@string/hint_other_reason"
+        android:imeOptions="actionDone"
         android:inputType="textMultiLine" />
 
     <LinearLayout
