@@ -1,6 +1,9 @@
 package com.simprints.id.tools;
 
+import android.support.annotation.Nullable;
+
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.simprints.libcommon.RefusalForm;
 import com.simprints.libcommon.Session;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libscanner.Scanner;
@@ -28,9 +31,11 @@ public class AppState {
     private boolean connected;
     private String callingPackage;
     private String appKey;
+    private RefusalForm refusalForm;
 
     private AppState() {
         scanner = null;
+        refusalForm = null;
         data = null;
         session = new Session();
         googleApiClient = null;
@@ -170,5 +175,18 @@ public class AppState {
 
     public String getAppKey() {
         return this.appKey;
+    }
+
+    public void setRefusalForm(RefusalForm refusalForm) {
+        this.refusalForm = refusalForm;
+    }
+
+    @Nullable
+    public RefusalForm getRefusalForm() {
+        return this.refusalForm;
+    }
+
+    public void destroy() {
+        singleton = null;
     }
 }

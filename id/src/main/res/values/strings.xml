@@ -171,7 +171,7 @@
     <string name="vibrate">Vibrate</string>
     <string name="scanner_not_here">Scanner not here</string>
     <string name="scanner_not_working">Scanner not working</string>
-    <string name="unable_to_capture_a_good_scan">Unable to capture a \'good scan'</string>
+    <string name="unable_to_capture_a_good_scan">Unable to capture a \'good scan\'</string>
     <string name="beneficiary_was_physically_unable">Beneficiary was physically unable to give fingerprints (e.g. too painful, missing fingers)</string>
     <string name="beneficiary_refused">Beneficiary refused</string>
     <string name="other">Other</string>
