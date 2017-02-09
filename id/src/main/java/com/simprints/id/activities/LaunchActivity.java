@@ -36,6 +36,7 @@ import static com.simprints.id.tools.InternalConstants.COMMCARE_PERMISSION;
 import static com.simprints.id.tools.InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST;
 import static com.simprints.id.tools.InternalConstants.LOCATION_PERMISSION_REQUEST;
 import static com.simprints.id.tools.InternalConstants.MAIN_ACTIVITY_REQUEST;
+import static com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.RESOLUTION_REQUEST;
 import static com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN;
 
@@ -50,6 +51,7 @@ public class LaunchActivity extends AppCompatActivity
     private PositionTracker positionTracker;
     private String callingPackage;
     private LaunchProcess launchProcess;
+    private boolean launchOutOfFocus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,9 +151,19 @@ public class LaunchActivity extends AppCompatActivity
     }
 
     public void launchAlert(ALERT_TYPE alertType) {
+        if (launchOutOfFocus)
+            return;
+
+        launchOutOfFocus = true;
+
         Intent intent = new Intent(this, AlertActivity.class);
         intent.putExtra(ALERT_TYPE_EXTRA, alertType);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST);
+    }
+
+    public void launchRefusal() {
+        launchOutOfFocus = true;
+        startActivityForResult(new Intent(this, RefusalActivity.class), REFUSAL_ACTIVITY_REQUEST);
     }
 
     @Override
@@ -204,9 +216,21 @@ public class LaunchActivity extends AppCompatActivity
                 positionTracker.onActivityResult(requestCode, resultCode, data);
                 break;
             case MAIN_ACTIVITY_REQUEST:
+                switch (resultCode) {
+                    case RESULT_CANCELED:
+                        launchRefusal();
+                        break;
+                    case RESULT_OK:
+                        finishWith(resultCode, data);
+                        break;
+                }
+                break;
             case ALERT_ACTIVITY_REQUEST:
+            case REFUSAL_ACTIVITY_REQUEST:
                 switch (resultCode) {
                     case RESULT_TRY_AGAIN:
+                        launchOutOfFocus = false;
+
                         if (appState.getScanner() != null) {
                             appState.getScanner().destroy();
                             appState.setScanner(null);
@@ -229,14 +253,16 @@ public class LaunchActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        finishWith(RESULT_CANCELED, null);
-        super.onBackPressed();
+        launchRefusal();
     }
 
     @Override
     public void onDestroy() {
         if (appState.getData() != null && appState.getReadyToSendSession() != null) {
-            appState.getData().saveSession(appState.getReadyToSendSession());
+            if (appState.getRefusalForm() != null)
+                appState.getData().saveSession(appState.getReadyToSendSession(), appState.getRefusalForm());
+            else
+                appState.getData().saveSession(appState.getReadyToSendSession());
             appState.getData().destroy();
         }
 
@@ -246,6 +272,8 @@ public class LaunchActivity extends AppCompatActivity
             appState.getScanner().destroy();
             appState.setScanner(null);
         }
+
+        appState.destroy();
 
         super.onDestroy();
     }

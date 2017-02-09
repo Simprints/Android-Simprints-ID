@@ -31,6 +31,7 @@
             android:id="@+id/rb_scannerNotHere"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
             android:text="@string/scanner_not_here"
             android:textColor="@color/simprints_white"
             android:textSize="20sp" />
@@ -39,6 +40,7 @@
             android:id="@+id/rb_scannerNotWorking"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
             android:text="@string/scanner_not_working"
             android:textColor="@color/simprints_white"
             android:textSize="20sp" />
@@ -47,6 +49,7 @@
             android:id="@+id/rb_unableToCapture"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
             android:text="@string/unable_to_capture_a_good_scan"
             android:textColor="@color/simprints_white"
             android:textSize="20sp" />
@@ -55,6 +58,7 @@
             android:id="@+id/rb_unableToGive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
             android:text="@string/beneficiary_was_physically_unable"
             android:textColor="@color/simprints_white"
             android:textSize="20sp" />
@@ -63,6 +67,7 @@
             android:id="@+id/rb_refused"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
             android:text="@string/beneficiary_refused"
             android:textColor="@color/simprints_white"
             android:textSize="20sp" />
@@ -71,6 +76,7 @@
             android:id="@+id/rb_other"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
             android:text="@string/other"
             android:textColor="@color/simprints_white"
             android:textSize="20sp" />
@@ -78,11 +84,13 @@
     </RadioGroup>
 
     <EditText
+        android:id="@+id/et_other_refusal_text"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="@color/simprints_white"
         android:enabled="false"
+        android:gravity="top|start"
         android:hint="@string/hint_other_reason"
         android:inputType="textMultiLine" />
 
@@ -95,12 +103,14 @@
         android:weightSum="2">
 
         <Button
+            android:id="@+id/bt_back_to_simprints"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/button_scan_prints" />
 
         <Button
+            android:id="@+id/bt_submit_refusal_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
