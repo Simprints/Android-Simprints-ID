@@ -121,5 +121,30 @@
     <string name="launch_bt_connect">Vero সংযুক্ত হচ্ছে...</string>
     <string name="alert_api_key_verify_failed">API কী যাচাই করতে ব্যর্থ</string>
     <string name="alert_api_key_verify_failed_body">\"আমরা আপনার API কী যাচাই করতে পারিনি, দয়া করে নিশ্চিত করুন যে আপনি ইন্টারনেটের সাথে সংযুক্ত করা হয় এবং আবার চেষ্টা করুন\"</string>
+    <string name="beneficiary_refused">সুবিধাভোগী প্রত্যাখ্যান করেছেন</string>
+    <string name="beneficiary_was_physically_unable">সুবিধাভোগী আঙুলের ছাপ দিতে শারীরিকভাবে অক্ষম ছিলেন (যেমন, অত্যন্ত ব্যথাময় ছিল, হাত ছিল না)</string>
+    <string name="other">অন্যান্য</string>
+    <string name="hint_other_reason">আরো তথ্য...</string>
+    <string name="button_scan_prints">আঙুলের ছাপ স্ক্যান করুন</string>
+    <string name="button_submit">জমা দিন</string>
+    <string name="unable_to_capture_a_good_scan">একটি ভালো স্ক্যান ক্যাপচার করতে অক্ষম</string>
+    <string name="scanner_not_working">স্ক্যানার কাজ করছে না</string>
+    <string name="scanner_not_here">এখানে স্ক্যানার নেই</string>
+    <string name="why_did_you_skip_fingerprinting">আপনি কেন আঙুলের ছাপ দেয়া এড়িয়ে গেছেন?</string>
+    <string name="vibrate">কাম্পান</string>
+    <string name="invalid_userId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (ইউজার আইডি নই)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="timeout_empty">সময়সীমা (সকেন্দে):</string>
+    <string name="timeout_value">সময়সীমা (সকেন্দে): %1$d</string>
+    <string name="loading">লোড হচ্ছে</string>
+    <string name="network_failure_message">নটেওর্য়াক র্ব্যথতা, দয়া করে নশ্চিতি করুন যে আপনি ইন্টারনটে এর সাথে সংযুক্ত</string>
+    <string name="not_signed_in">সাইন ইন করনেনি</string>
+    <string name="offline">অফলাইন</string>
+    <string name="sync_data">সঙ্কি ডাটা</string>
+    <string name="updating_database">সিঙ্ক করা হচ্ছেপ্রজক্টে ডাটাবসে আপডটে করা হচ্ছ...</string>
+    <string name="syncing">সিঙ্ক করা হচ্ছে...</string>
+    <string name="menu_continue">চালয়িে যান</string>
+    <string name="missing_device_id_message">একটি কনফগিারশেন ত্রুটি ঘটছেে (ডভিাইস আইডি অনুপস্থতি), আপনার সস্টিমে অ্যাডমনিস্ট্রিটেররে সাথে  যোগাযোগ করুন</string>
+    <string name="settings_select_language">ভাষা নর্বিাচন করুন</string>
+    <string name="missing_calling_package_message">একটি কনফগিারশেন ত্রুটি ঘটছেে (কলং প্যাকজে অনুপস্থতি), আপনার সস্টিমে অ্যাডমনিস্ট্রিটেররে সাথে  যোগাযোগ করুন</string>
 
 </resources>
