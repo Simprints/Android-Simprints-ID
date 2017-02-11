@@ -418,9 +418,10 @@ public class MainActivity extends AppCompatActivity implements
             case EXTRACT_TEMPLATE_SUCCESS: // Template extracted successfully
                 int quality = appState.getScanner().getImageQuality();
 
-                if (finger.getTemplate() == null ||
-                        finger.getTemplate().getQualityScore() < quality) {
-                    activeFingers.get(currentActiveFingerNo).setTemplate(new Fingerprint(finger.getId(), appState.getScanner().getTemplate()));
+                if (finger.getTemplate() == null || finger.getTemplate().getQualityScore() < quality) {
+                    activeFingers.get(currentActiveFingerNo)
+                            .setTemplate(new Fingerprint(finger.getId(), appState.getScanner()
+                                    .getTemplate()));
                 }
 
                 int qualityScore1 = sharedPref.getQualityThresholdInt();
@@ -437,6 +438,13 @@ public class MainActivity extends AppCompatActivity implements
 
                 break;
 
+            case EXTRACT_IMAGE_IO_ERROR:
+            case CAPTURE_IMAGE_WRONG:
+            case CAPTURE_IMAGE_INVALID_PARAM:
+            case CAPTURE_IMAGE_LINE_DROPPED:
+            case GENERATE_TEMPLATE_LOW_FEAT_NUMBER:
+            case GENERATE_TEMPLATE_INVALID_TYPE:
+            case GENERATE_TEMPLATE_EXTRACT_FAIL:
             case EXTRACT_IMAGE_QUALITY_NO_IMAGE: // Image quality extraction failed because there is no image available
             case EXTRACT_IMAGE_QUALITY_SDK_ERROR: // Image quality extraction failed because of an error in UN20 SDK
             case EXTRACT_IMAGE_QUALITY_FAILURE: // Image quality extraction failed for abnormal reasons, SHOULD NOT HAPPEN
@@ -447,6 +455,7 @@ public class MainActivity extends AppCompatActivity implements
             case EXTRACT_TEMPLATE_NO_TEMPLATE: // Template extraction failed because there is no template available
             case EXTRACT_TEMPLATE_IO_ERROR: // Template extraction failed because of an IO error
             case EXTRACT_TEMPLATE_FAILURE: // Template extraction failed for abnormal reasons, SHOULD NOT HAPPEN
+                appState.getScanner().setBadCaptureUI();
                 resetUIfromError();
                 break;
 
@@ -483,6 +492,8 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             // error conditions
+            case SCANNER_BUSY:
+                break;
             case NOT_CONNECTED: // Cannot perform request because the phone is not connected to the scanner
             case NO_RESPONSE: // The scanner is not answering
             case CONNECTION_ALREADY_CONNECTED: // Connection failed because the phone is already connected/connecting/disconnecting
@@ -509,31 +520,6 @@ public class MainActivity extends AppCompatActivity implements
             case SET_HARDWARE_CONFIG_INVALID_CONFIG: // Hardware configuration failed because an invalid config was specified
             case SET_HARDWARE_CONFIG_FAILURE: // Hardware configuration failed for abnormal reasons, SHOULD NOT HAPPEN
                 finishWithUnexpectedError();
-                break;
-
-            case PAIR_SUCCESS:
-                break;
-            case PAIR_FAILURE:
-                break;
-            case CAPTURE_IMAGE_SUCCESS:
-                break;
-            case UN20_CANNOT_CHECK_STATE:
-                break;
-            case UN20_SHUTTING_DOWN:
-                break;
-            case UN20_WAKING_UP:
-                break;
-            case EXTRACT_IMAGE_SUCCESS:
-                break;
-            case EXTRACT_IMAGE_IO_ERROR:
-                break;
-            case UN20_SHUTDOWN_SUCCESS:
-                break;
-            case EXTRACT_CRASH_LOG_SUCCESS:
-                break;
-            case SET_HARDWARE_CONFIG_SUCCESS:
-                break;
-            default:
                 break;
         }
     }
