@@ -359,10 +359,10 @@ public class LaunchActivity extends AppCompatActivity
             case CONNECTION_IO_ERROR:
             case CONNECTION_BAD_SCANNER_FEATURE:
             case UN20_WAKEUP_FAILURE:
-            case SCANNER_BUSY:
             case UN20_CANNOT_CHECK_STATE:
             case SET_UI_FAILURE:
             case UPDATE_SENSOR_INFO_FAILURE:
+            case SCANNER_BUSY:
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 break;
 

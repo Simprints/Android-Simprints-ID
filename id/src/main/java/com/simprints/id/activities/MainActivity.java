@@ -134,9 +134,6 @@ public class MainActivity extends AppCompatActivity implements
         appState.getScanner().setScannerListener(this);
         appState.getData().setListener(this);
 
-        if (appState.isConnected())
-            backgroundSync();
-
         handler = new Handler();
 
         fingers = new Finger[NB_OF_FINGERS];
