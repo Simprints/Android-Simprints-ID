@@ -24,8 +24,8 @@ public class SyncSetup {
 
             Task task = new PeriodicTask.Builder()
                     .setService(GcmSyncService.class)
-                    .setPeriod(60*5)
-                    .setFlex(60*4)
+                    .setPeriod(60 * 60 * 5) // 5 hours
+                    .setFlex(60 * 60 * 4) // 4 hours
                     .setPersisted(true)
                     .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                     .setTag("periodic_task")
@@ -43,7 +43,7 @@ public class SyncSetup {
         if (resultCode != ConnectionResult.SUCCESS) {
             if (availability.isUserResolvableError(resultCode)) {
                 // Show dialog to resolve the error if the calling context is an activity.
-                if(context instanceof Activity) {
+                if (context instanceof Activity) {
                     availability.getErrorDialog((Activity) context, resultCode, RC_PLAY_SERVICES).show();
                 }
                 return false;

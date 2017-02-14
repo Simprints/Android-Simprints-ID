@@ -11,6 +11,7 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libdata.DatabaseContext;
+import com.simprints.libscanner.Message;
 import com.simprints.libscanner.Scanner;
 
 import java.util.List;
