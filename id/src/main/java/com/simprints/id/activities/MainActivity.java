@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.simprints.id.R;
 import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.fragments.FingerFragment;
@@ -416,9 +417,17 @@ public class MainActivity extends AppCompatActivity implements
                 int quality = appState.getScanner().getImageQuality();
 
                 if (finger.getTemplate() == null || finger.getTemplate().getQualityScore() < quality) {
-                    activeFingers.get(currentActiveFingerNo)
-                            .setTemplate(new Fingerprint(finger.getId(), appState.getScanner()
-                                    .getTemplate()));
+                    try {
+                        activeFingers
+                                .get(currentActiveFingerNo)
+                                .setTemplate(
+                                        new Fingerprint(
+                                                finger.getId(),
+                                                appState.getScanner().getTemplate()));
+                    } catch (IllegalArgumentException ex) {
+                        FirebaseCrash.report(ex);
+                        resetUIfromError();
+                    }
                 }
 
                 int qualityScore1 = sharedPref.getQualityThresholdInt();
