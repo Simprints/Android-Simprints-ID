@@ -56,9 +56,9 @@ public class Analytics {
         firebaseAnalytics.logEvent("alert", bundle);
     }
 
-    public void setLogin(boolean enrol) {
+    public void setLogin(AppState.Callout callout) {
         Bundle bundle = new Bundle();
-        bundle.putString(Param.VALUE, String.valueOf(enrol));
+        bundle.putString(Param.VALUE, String.valueOf(callout.name()));
         firebaseAnalytics.logEvent(Event.LOGIN, bundle);
     }
 

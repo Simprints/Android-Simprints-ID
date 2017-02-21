@@ -29,6 +29,8 @@ import java.util.UUID;
 import io.fabric.sdk.android.Fabric;
 
 import static android.provider.Settings.Secure;
+import static com.simprints.id.tools.AppState.Callout;
+import static com.simprints.id.tools.AppState.getInstance;
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.ALERT_TYPE_EXTRA;
 import static com.simprints.id.tools.InternalConstants.COMMCARE_PACKAGE;
@@ -49,7 +51,6 @@ public class LaunchActivity extends AppCompatActivity
     public AppState appState;
     public Analytics analytics;
     private PositionTracker positionTracker;
-    private String callingPackage;
     private LaunchProcess launchProcess;
     private boolean launchOutOfFocus;
 
@@ -65,83 +66,24 @@ public class LaunchActivity extends AppCompatActivity
         RemoteConfig.init();
 
         analytics = Analytics.getInstance(getApplicationContext());
+        appState = getInstance();
 
-        appState = AppState.getInstance();
-        appState.setDeviceId(Secure.getString(getApplicationContext().getContentResolver(),
-                Secure.ANDROID_ID));
+        String deviceID = Secure.getString(getApplicationContext().getContentResolver(),
+                Secure.ANDROID_ID);
+        appState.setDeviceId(deviceID);
+        analytics.setDeviceId(appState.getDeviceId());
+
+        //Set position tracker
         positionTracker = new PositionTracker(this);
         positionTracker.start();
 
-        callingPackage = null;
         waitingForConfirmation = false;
 
-        Bundle extras = getIntent().getExtras();
-        if (extras == null) {
-            finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null);
-            Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
-            return;
-        }
-
-        switch (getIntent().getAction()) {
-            case Constants.SIMPRINTS_IDENTIFY_INTENT:
-                appState.setEnrol(false);
-                break;
-            case Constants.SIMPRINTS_REGISTER_INTENT:
-                appState.setEnrol(true);
-                break;
-            default:
-                finishWith(Constants.SIMPRINTS_INVALID_INTENT_ACTION, null);
-                return;
-        }
-        analytics.setLogin(appState.isEnrol());
-
-        // Sets apiKey
-        String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
-        if (apiKey == null) {
-            finishWith(Constants.SIMPRINTS_INVALID_API_KEY, null);
-            Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
-            return;
-        }
-        appState.setApiKey(apiKey);
-        appState.setAppKey(apiKey.substring(0, 8));
-        new SharedPref(getApplicationContext()).setAppKeyString(appState.getAppKey());
-
-        // Sets guid (to specified value, or random one)
-        String guid = extras.getString(Constants.SIMPRINTS_GUID);
-        if (guid == null) {
-            guid = UUID.randomUUID().toString();
-        }
-        appState.setGuid(guid);
-
-        // Sets deviceId
-        String deviceId = extras.getString(Constants.SIMPRINTS_DEVICE_ID);
-        if (deviceId != null && !deviceId.isEmpty()) {
-            appState.setDeviceId(deviceId);
-        }
-        analytics.setDeviceId(appState.getDeviceId());
-
-        // Sets userId
-        String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
-        if (userId == null) {
-            if (!RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_EMPTY_USER_ID)) {
-                launchAlert(ALERT_TYPE.MISSING_USER_ID);
-                return;
-            } else {
-                userId = com.simprints.libdata.tools.Constants.GLOBAL_USER_ID;
-            }
-        }
-        appState.setUserId(userId);
-        analytics.setUser(appState.getUserId(), appState.getApiKey());
-
-        // Sets calling package
-        callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
-        appState.setCallingPackage(callingPackage);
+        //Validate the callout
+        validateCallout(getIntent());
 
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
-
-        launchProcess = new LaunchProcess(LaunchActivity.this);
-        launchProcess.launch();
     }
 
     public void finishWith(final int resultCode, final Intent resultData) {
@@ -193,7 +135,8 @@ public class LaunchActivity extends AppCompatActivity
                     finishWith(RESULT_CANCELED, null);
                     return;
                 } else {
-                    if (callingPackage != null && callingPackage.equalsIgnoreCase(COMMCARE_PACKAGE)) {
+                    String callPack = appState.getCallingPackage();
+                    if (callPack != null && callPack.equalsIgnoreCase(COMMCARE_PACKAGE)) {
                         finishWith(RESULT_CANCELED, null);
                         return;
                     }
@@ -240,8 +183,7 @@ public class LaunchActivity extends AppCompatActivity
                         launchProcess.launch();
                         break;
 
-                    case RESULT_CANCELED:
-                    case RESULT_OK:
+                    default:
                         finishWith(resultCode, data);
                         break;
                 }
@@ -387,5 +329,80 @@ public class LaunchActivity extends AppCompatActivity
                 }
                 break;
         }
+    }
+
+    private void validateCallout(Intent intent) {
+
+        switch (intent.getAction()) {
+            case Constants.SIMPRINTS_IDENTIFY_INTENT:
+                appState.setCallout(Callout.IDENTIFY);
+                break;
+            case Constants.SIMPRINTS_REGISTER_INTENT:
+                appState.setCallout(Callout.REGISTER);
+                break;
+            case Constants.SIMPRINTS_UPDATE_INTENT:
+                appState.setCallout(Callout.UPDATE);
+                break;
+            case Constants.SIMPRINTS_VERIFY_INTENT:
+                appState.setCallout(Callout.VERIFY);
+                break;
+            default:
+                finishWith(Constants.SIMPRINTS_INVALID_INTENT_ACTION, null);
+                return;
+        }
+        analytics.setLogin(appState.getCallout());
+
+        Bundle extras = intent.getExtras();
+
+        if (extras == null || extras.isEmpty()) {
+            launchAlert(ALERT_TYPE.MISSING_API_KEY);
+            Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
+            return;
+        }
+
+        // Sets apiKey
+        String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
+        if (apiKey == null || apiKey.isEmpty()) {
+            launchAlert(ALERT_TYPE.MISSING_API_KEY);
+            Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
+            return;
+        }
+        appState.setApiKey(apiKey);
+        appState.setAppKey(apiKey.substring(0, 8));
+        new SharedPref(getApplicationContext()).setAppKeyString(appState.getAppKey());
+
+        // Sets userId
+        String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
+        if (userId == null || userId.isEmpty()) {
+            launchAlert(ALERT_TYPE.MISSING_USER_ID);
+            return;
+        }
+        appState.setUserId(userId);
+        analytics.setUser(appState.getUserId(), appState.getApiKey());
+
+        // Sets guid (to specified value, or random one)
+        if (appState.getCallout() == Callout.UPDATE) {
+            String guid = extras.getString(Constants.SIMPRINTS_UPDATE_GUID);
+            if (guid == null || guid.isEmpty()) {
+                launchAlert(ALERT_TYPE.MISSING_UPDATE_GUID);
+                return;
+            }
+            appState.setGuid(guid);
+        } else if (appState.getCallout() == Callout.REGISTER) {
+            appState.setGuid(UUID.randomUUID().toString());
+        }
+
+        String moduleId = extras.getString(Constants.SIMPRINTS_MODULE_ID);
+        if (moduleId == null || moduleId.isEmpty()) {
+            launchAlert(ALERT_TYPE.MISSING_MODULE_ID);
+            return;
+        }
+
+        // Sets calling package
+        appState.setCallingPackage(null);
+        appState.setCallingPackage(extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE));
+
+        launchProcess = new LaunchProcess(LaunchActivity.this);
+        launchProcess.launch();
     }
 }

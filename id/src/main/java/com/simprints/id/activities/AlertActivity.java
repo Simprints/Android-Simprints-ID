@@ -14,7 +14,7 @@ import com.simprints.id.R;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
-import com.simprints.id.tools.Language;
+import com.simprints.libsimprints.Constants;
 
 public class AlertActivity extends AppCompatActivity {
 
@@ -25,8 +25,6 @@ public class AlertActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_alert);
 
         appState = AppState.getInstance();
@@ -65,7 +63,23 @@ public class AlertActivity extends AppCompatActivity {
             alertLeftButtonTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
                     switch (alertType) {
+                        case MISSING_API_KEY:
+                            setResult(Constants.SIMPRINTS_MISSING_API_KEY);
+                            break;
+                        case MISSING_USER_ID:
+                            setResult(Constants.SIMPRINTS_MISSING_USER_ID);
+                            break;
+                        case MISSING_MODULE_ID:
+                            setResult(Constants.SIMPRINTS_MISSING_MODULE_ID);
+                            break;
+                        case MISSING_UPDATE_GUID:
+                            setResult(Constants.SIMPRINTS_MISSING_UPDATE_GUID);
+                            break;
+                        case INVALID_API_KEY:
+                            setResult(Constants.SIMPRINTS_INVALID_API_KEY);
+                            break;
                         case UNEXPECTED_ERROR:
                         case BLUETOOTH_NOT_ENABLED:
                         case NOT_PAIRED:
@@ -73,17 +87,15 @@ public class AlertActivity extends AppCompatActivity {
                         case DISCONNECTED:
                         case UNVERIFIED_API_KEY:
                             setResult(InternalConstants.RESULT_TRY_AGAIN);
-                            analytics.setAlert(alertType, true);
-                            finish();
                             break;
-                        case INVALID_API_KEY:
                         case BLUETOOTH_NOT_SUPPORTED:
                         default:
                             setResult(RESULT_CANCELED);
-                            analytics.setAlert(alertType, false);
-                            finish();
                             break;
                     }
+
+                    analytics.setAlert(alertType, false);
+                    finish();
                 }
             });
         }
@@ -103,10 +115,7 @@ public class AlertActivity extends AppCompatActivity {
                             intent.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
                             startActivity(intent);
                             break;
-                        case INVALID_API_KEY:
-                        case BLUETOOTH_NOT_SUPPORTED:
-                        case UNEXPECTED_ERROR:
-                        case UNVERIFIED_API_KEY:
+
                         default:
                             setResult(RESULT_CANCELED);
                             analytics.setAlert(alertType, false);

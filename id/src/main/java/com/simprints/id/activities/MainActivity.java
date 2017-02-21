@@ -193,7 +193,21 @@ public class MainActivity extends AppCompatActivity implements
         ActionBar actionBar = getSupportActionBar();
         //noinspection ConstantConditions
         actionBar.show();
-        actionBar.setTitle(appState.isEnrol() ? R.string.register_title : R.string.identify_title);
+
+        switch (appState.getCallout()) {
+            case REGISTER:
+                actionBar.setTitle(R.string.register_title);
+                break;
+            case IDENTIFY:
+                actionBar.setTitle(R.string.identify_title);
+                break;
+            case UPDATE:
+                actionBar.setTitle(R.string.update_title);
+                break;
+            case VERIFY:
+                actionBar.setTitle(R.string.verify_title);
+                break;
+        }
     }
 
     private void initIndicators() {
@@ -342,11 +356,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void resetUIfromError() {
-        if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.NOT_COLLECTED) {
-            activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
-        } else {
-            activeFingers.get(currentActiveFingerNo).setStatus(previousStatus);
-        }
+        activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
+        activeFingers.get(currentActiveFingerNo).setTemplate(null);
         refreshDisplay();
         scanButton.setEnabled(true);
     }
@@ -592,7 +603,7 @@ public class MainActivity extends AppCompatActivity implements
             Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show();
         } else {
             Person person = new Person(appState.getGuid(), fingerprints);
-            if (appState.isEnrol()) {
+            if (appState.getCallout() == AppState.Callout.REGISTER || appState.getCallout() == AppState.Callout.UPDATE) {
                 appState.getData().savePerson(person);
 
                 registrationResult = new Registration(appState.getGuid());

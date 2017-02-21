@@ -132,7 +132,7 @@
     <string name="scanner_not_here">এখানে স্ক্যানার নেই</string>
     <string name="why_did_you_skip_fingerprinting">আপনি কেন আঙুলের ছাপ দেয়া এড়িয়ে গেছেন?</string>
     <string name="vibrate">কাম্পান</string>
-    <string name="invalid_userId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (ইউজার আইডি নই)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="missing_userId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (ইউজার আইডি নই)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
     <string name="timeout_empty">সময়সীমা (সকেন্দে):</string>
     <string name="timeout_value">সময়সীমা (সকেন্দে): %1$d</string>
     <string name="loading">লোড হচ্ছে</string>
@@ -143,7 +143,6 @@
     <string name="updating_database">সিঙ্ক করা হচ্ছেপ্রজক্টে ডাটাবসে আপডটে করা হচ্ছ...</string>
     <string name="syncing">সিঙ্ক করা হচ্ছে...</string>
     <string name="menu_continue">চালয়িে যান</string>
-    <string name="missing_device_id_message">একটি কনফগিারশেন ত্রুটি ঘটছেে (ডভিাইস আইডি অনুপস্থতি), আপনার সস্টিমে অ্যাডমনিস্ট্রিটেররে সাথে  যোগাযোগ করুন</string>
     <string name="settings_select_language">ভাষা নর্বিাচন করুন</string>
     <string name="missing_calling_package_message">একটি কনফগিারশেন ত্রুটি ঘটছেে (কলং প্যাকজে অনুপস্থতি), আপনার সস্টিমে অ্যাডমনিস্ট্রিটেররে সাথে  যোগাযোগ করুন</string>
 

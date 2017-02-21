@@ -133,7 +133,7 @@
     <string name="scanner_not_here">स्क्यानर यहाँ छैन</string>
     <string name="why_did_you_skip_fingerprinting">किन तपाईंले औँठाछाप लगाउने छोड्नुभयो?</string>
     <string name="vibrate">कम्पन</string>
-    <string name="invalid_userId_message">कन्फिगरेसन त्रुटि फेला परेको छ (कुनै प्रयोगकर्ता आइडी छैन), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
+    <string name="missing_userId_message">कन्फिगरेसन त्रुटि फेला परेको छ (कुनै प्रयोगकर्ता आइडी छैन), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="timeout_empty">समय समाप्ति (सेकेण्ड):</string>
     <string name="timeout_value">समय समाप्ति (सेकेण्ड): %1$d</string>
     <string name="loading">लोड हुँदै</string>
@@ -145,6 +145,5 @@
     <string name="updating_database">परियोजना डाटाबेस अद्यावधिक गर्दै.....</string>
     <string name="menu_continue">लोड हुँदै</string>
     <string name="missing_calling_package_message">कन्फिगरेसन त्रुटि फेला परेको छ (कलिङ प्याकेज छुटेको), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="missing_device_id_message">कन्फिगरेसन त्रुटि फेला परेको छ (छुटेको यन्त्र आइडी), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="settings_select_language">भाषा चयन गर्नुहोस्</string>
 </resources>

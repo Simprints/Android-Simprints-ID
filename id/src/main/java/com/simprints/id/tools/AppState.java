@@ -32,6 +32,7 @@ public class AppState {
     private String callingPackage;
     private String appKey;
     private RefusalForm refusalForm;
+    private Callout callout;
 
     private AppState() {
         scanner = null;
@@ -39,16 +40,17 @@ public class AppState {
         data = null;
         session = new Session();
         googleApiClient = null;
+        callout = null;
         Calendar c = Calendar.getInstance();
         session.setStartTime(c.getTime());
     }
 
-    public boolean isEnrol() {
-        return session.isEnrol();
+    public void setCallout(Callout callout) {
+        this.callout = callout;
     }
 
-    public void setEnrol(boolean enrol) {
-        session.setEnrol(enrol);
+    public Callout getCallout() {
+        return this.callout;
     }
 
     public String getApiKey() {
@@ -188,5 +190,12 @@ public class AppState {
 
     public void destroy() {
         singleton = null;
+    }
+
+    public enum Callout {
+        REGISTER,
+        IDENTIFY,
+        UPDATE,
+        VERIFY
     }
 }
