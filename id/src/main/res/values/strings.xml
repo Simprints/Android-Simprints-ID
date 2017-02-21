@@ -89,12 +89,12 @@
     <string name="scan_label">SCAN</string>
     <string name="bluetooth_error_title">BLUETOOTH ERROR</string>
     <string name="configuration_error_title">CONFIGURATION ERROR</string>
-    <string name="missing_user_id_message" translatable="false">A configuration error has occurred (missing user id), please contact your system administrator</string>
-    <string name="missing_device_id_message">A configuration error has occurred (missing device id), please contact your system administrator</string>
     <string name="missing_apikey_message">A configuration error has occurred (missing API key), please contact your system administrator</string>
     <string name="missing_calling_package_message">A configuration error has occurred (missing calling package) please contact your system administrator</string>
     <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
-    <string name="invalid_userId_message">A configuration error has occurred (no user ID), please contact your system administrator</string>
+    <string name="missing_userId_message">A configuration error has occurred (no user ID), please contact your system administrator</string>
+    <string name="missing_moduleId_message">A configuration error has occurred (no module ID), please contact your system administrator</string>
+    <string name="missing_updateId_message">A configuration error has occurred (no update GUID), please contact your system administrator</string>
     <string name="bluetooth_not_supported_title" translatable="false">BLUETOOTH NOT SUPPORTED</string>
     <string name="bluetooth_not_supported_message" translatable="false">Bluetooth not supported on this device, please contact your system administrator</string>
     <string name="bluetooth_not_enabled_title" translatable="false">BLUETOOTH NOT ENABLED</string>
@@ -179,4 +179,8 @@
     <string name="button_scan_prints">Scan Fingerprints</string>
     <string name="button_submit">Submit</string>
     <string name="why_did_you_skip_fingerprinting">Why did you skip fingerprinting?</string>
+    <string name="refusal_label">Refusal Form</string>
+    <string name="privacy_label">Privacy</string>
+    <string name="update_title">Update</string>
+    <string name="verify_title">Verify</string>
 </resources>

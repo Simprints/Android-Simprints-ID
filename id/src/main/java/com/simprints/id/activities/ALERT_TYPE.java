@@ -8,7 +8,16 @@ public enum ALERT_TYPE {
     INVALID_API_KEY(R.string.configuration_error_title, R.string.invalid_apikey_message,
             R.drawable.error_icon, R.drawable.error_hint_key, R.string.close, R.string.empty, false),
 
-    MISSING_USER_ID(R.string.configuration_error_title, R.string.invalid_userId_message,
+    MISSING_API_KEY(R.string.configuration_error_title, R.string.missing_apikey_message,
+            R.drawable.error_icon, R.drawable.error_hint_key, R.string.close, R.string.empty, false),
+
+    MISSING_USER_ID(R.string.configuration_error_title, R.string.missing_userId_message,
+            R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty, false),
+
+    MISSING_MODULE_ID(R.string.configuration_error_title, R.string.missing_moduleId_message,
+            R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty, false),
+
+    MISSING_UPDATE_GUID(R.string.configuration_error_title, R.string.missing_updateId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty, false),
 
     //Verification errors
