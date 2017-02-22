@@ -245,14 +245,16 @@ public class MainActivity extends AppCompatActivity implements
             case RESCAN_GOOD_SCAN:
             case BAD_SCAN:
             case NOT_COLLECTED:
-                scanButton.setEnabled(false);
                 appState.getScanner().startContinuousCapture(sharedPref.getQualityThresholdInt(),
                         sharedPref.getTimeoutInt());
                 timeoutBar.startTimeoutBar();
                 break;
             case COLLECTING:
-                scanButton.setEnabled(false);
-                appState.getScanner().stopContinuousCapture();
+                if (!appState.getScanner().stopContinuousCapture()) {
+                    activeFingers.get(currentActiveFingerNo).setStatus(previousStatus);
+                    appState.getScanner().resetUI();
+                    refreshDisplay();
+                }
                 timeoutBar.cancelTimeoutBar();
                 break;
         }
@@ -427,6 +429,8 @@ public class MainActivity extends AppCompatActivity implements
                     } catch (IllegalArgumentException ex) {
                         FirebaseCrash.report(ex);
                         resetUIfromError();
+                        appState.getScanner().resetUI();
+                        return;
                     }
                 }
 
@@ -497,9 +501,9 @@ public class MainActivity extends AppCompatActivity implements
                 startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
                 break;
 
-            // error conditions
             case SCANNER_BUSY:
                 break;
+            // error conditions
             case NOT_CONNECTED: // Cannot perform request because the phone is not connected to the scanner
             case NO_RESPONSE: // The scanner is not answering
             case CONNECTION_ALREADY_CONNECTED: // Connection failed because the phone is already connected/connecting/disconnecting
