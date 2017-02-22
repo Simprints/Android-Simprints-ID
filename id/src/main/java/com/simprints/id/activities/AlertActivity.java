@@ -65,6 +65,18 @@ public class AlertActivity extends AppCompatActivity {
                 public void onClick(View view) {
 
                     switch (alertType) {
+
+                        case UNEXPECTED_ERROR:
+                        case BLUETOOTH_NOT_ENABLED:
+                        case NOT_PAIRED:
+                        case MULTIPLE_PAIRED_SCANNERS:
+                        case DISCONNECTED:
+                        case UNVERIFIED_API_KEY:
+                            analytics.setAlert(alertType, true);
+                            setResult(InternalConstants.RESULT_TRY_AGAIN);
+                            finish();
+                            return;
+
                         case MISSING_API_KEY:
                             setResult(Constants.SIMPRINTS_MISSING_API_KEY);
                             break;
@@ -79,14 +91,6 @@ public class AlertActivity extends AppCompatActivity {
                             break;
                         case INVALID_API_KEY:
                             setResult(Constants.SIMPRINTS_INVALID_API_KEY);
-                            break;
-                        case UNEXPECTED_ERROR:
-                        case BLUETOOTH_NOT_ENABLED:
-                        case NOT_PAIRED:
-                        case MULTIPLE_PAIRED_SCANNERS:
-                        case DISCONNECTED:
-                        case UNVERIFIED_API_KEY:
-                            setResult(InternalConstants.RESULT_TRY_AGAIN);
                             break;
                         case BLUETOOTH_NOT_SUPPORTED:
                         default:

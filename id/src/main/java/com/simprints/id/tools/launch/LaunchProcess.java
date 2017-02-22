@@ -1,10 +1,11 @@
-package com.simprints.id;
+package com.simprints.id.tools.launch;
 
 import android.bluetooth.BluetoothAdapter;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.simprints.id.R;
 import com.simprints.id.activities.ALERT_TYPE;
 import com.simprints.id.activities.LaunchActivity;
 import com.simprints.id.tools.AppState;
