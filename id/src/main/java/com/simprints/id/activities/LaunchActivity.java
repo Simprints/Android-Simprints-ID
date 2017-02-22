@@ -8,9 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 
 import com.crashlytics.android.Crashlytics;
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
-import com.simprints.id.LaunchProcess;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.tools.Analytics;
@@ -19,6 +16,7 @@ import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.id.tools.SharedPref;
+import com.simprints.id.tools.launch.LaunchProcess;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
 import com.simprints.libscanner.Scanner;
@@ -79,11 +77,11 @@ public class LaunchActivity extends AppCompatActivity
 
         waitingForConfirmation = false;
 
-        //Validate the callout
-        validateCallout(getIntent());
-
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
+
+        //Validate the callout
+        validateCalloutAndLaunch(getIntent());
     }
 
     public void finishWith(final int resultCode, final Intent resultData) {
@@ -331,7 +329,7 @@ public class LaunchActivity extends AppCompatActivity
         }
     }
 
-    private void validateCallout(Intent intent) {
+    private void validateCalloutAndLaunch(Intent intent) {
 
         switch (intent.getAction()) {
             case Constants.SIMPRINTS_IDENTIFY_INTENT:
@@ -356,7 +354,6 @@ public class LaunchActivity extends AppCompatActivity
 
         if (extras == null || extras.isEmpty()) {
             launchAlert(ALERT_TYPE.MISSING_API_KEY);
-            Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
             return;
         }
 
@@ -364,7 +361,6 @@ public class LaunchActivity extends AppCompatActivity
         String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
         if (apiKey == null || apiKey.isEmpty()) {
             launchAlert(ALERT_TYPE.MISSING_API_KEY);
-            Answers.getInstance().logCustom(new CustomEvent("Missing API Key"));
             return;
         }
         appState.setApiKey(apiKey);

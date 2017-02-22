@@ -345,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements
             } else {
                 if (nbCollected == 0) {
                     continueItem.setIcon(R.drawable.ic_menu_forward_grey);
-                } else if (promptContinue) {
+                } else if (nbCollected > 0 && promptContinue) {
                     continueItem.setIcon(R.drawable.ic_menu_forward_green);
                 } else if (nbCollected > 0) {
                     continueItem.setIcon(R.drawable.ic_menu_forward_white);
@@ -358,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements
     private void resetUIfromError() {
         activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
         activeFingers.get(currentActiveFingerNo).setTemplate(null);
+        appState.getScanner().resetUI();
         refreshDisplay();
         scanButton.setEnabled(true);
     }
@@ -438,6 +439,7 @@ public class MainActivity extends AppCompatActivity implements
                     } catch (IllegalArgumentException ex) {
                         FirebaseCrash.report(ex);
                         resetUIfromError();
+                        return;
                     }
                 }
 
