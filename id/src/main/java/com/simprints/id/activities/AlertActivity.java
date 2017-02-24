@@ -1,7 +1,9 @@
 package com.simprints.id.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -43,6 +45,11 @@ public class AlertActivity extends AppCompatActivity {
                     .putCustomAttribute("API Key", appState.getApiKey())
                     .putCustomAttribute("MAC Address", appState.getMacAddress()));
         }
+
+        int color = ResourcesCompat.getColor(getResources(), alertType.getBackgroundColor(), null);
+        findViewById(R.id.alertLayout).setBackgroundColor(color);
+        findViewById(R.id.left_button).setBackgroundColor(color);
+        findViewById(R.id.right_button).setBackgroundColor(color);
 
         ((TextView) findViewById(R.id.title)).setText(alertType.getAlertTitleId());
 
