@@ -95,6 +95,7 @@
     <string name="missing_userId_message">A configuration error has occurred (no user ID), please contact your system administrator</string>
     <string name="missing_moduleId_message">A configuration error has occurred (no module ID), please contact your system administrator</string>
     <string name="missing_updateId_message">A configuration error has occurred (no update GUID), please contact your system administrator</string>
+    <string name="missing_verifyId_message">A configuration error has occurred (no verify GUID), please contact your system administrator</string>
     <string name="bluetooth_not_supported_title" translatable="false">BLUETOOTH NOT SUPPORTED</string>
     <string name="bluetooth_not_supported_message" translatable="false">Bluetooth not supported on this device, please contact your system administrator</string>
     <string name="bluetooth_not_enabled_title" translatable="false">BLUETOOTH NOT ENABLED</string>

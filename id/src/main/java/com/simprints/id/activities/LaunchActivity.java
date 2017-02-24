@@ -331,17 +331,38 @@ public class LaunchActivity extends AppCompatActivity
 
     private void validateCalloutAndLaunch(Intent intent) {
 
+        // Check bundle
+        Bundle extras = intent.getExtras();
+        if (extras == null || extras.isEmpty()) {
+            launchAlert(ALERT_TYPE.MISSING_API_KEY);
+            return;
+        }
+
+        // Check action
         switch (intent.getAction()) {
             case Constants.SIMPRINTS_IDENTIFY_INTENT:
                 appState.setCallout(Callout.IDENTIFY);
                 break;
             case Constants.SIMPRINTS_REGISTER_INTENT:
                 appState.setCallout(Callout.REGISTER);
+                appState.setGuid(UUID.randomUUID().toString());
                 break;
             case Constants.SIMPRINTS_UPDATE_INTENT:
+                String updateId = extras.getString(Constants.SIMPRINTS_UPDATE_GUID);
+                if (updateId == null || updateId.isEmpty()) {
+                    launchAlert(ALERT_TYPE.MISSING_UPDATE_GUID);
+                    return;
+                }
+                appState.setGuid(updateId);
                 appState.setCallout(Callout.UPDATE);
                 break;
             case Constants.SIMPRINTS_VERIFY_INTENT:
+                String verifyId = extras.getString(Constants.SIMPRINTS_VERIFY_GUID);
+                if (verifyId == null || verifyId.isEmpty()) {
+                    launchAlert(ALERT_TYPE.MISSING_VERIFY_GUID);
+                    return;
+                }
+                appState.setGuid(verifyId);
                 appState.setCallout(Callout.VERIFY);
                 break;
             default:
@@ -350,14 +371,7 @@ public class LaunchActivity extends AppCompatActivity
         }
         analytics.setLogin(appState.getCallout());
 
-        Bundle extras = intent.getExtras();
-
-        if (extras == null || extras.isEmpty()) {
-            launchAlert(ALERT_TYPE.MISSING_API_KEY);
-            return;
-        }
-
-        // Sets apiKey
+        // Check apiKey
         String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
         if (apiKey == null || apiKey.isEmpty()) {
             launchAlert(ALERT_TYPE.MISSING_API_KEY);
@@ -367,7 +381,7 @@ public class LaunchActivity extends AppCompatActivity
         appState.setAppKey(apiKey.substring(0, 8));
         new SharedPref(getApplicationContext()).setAppKeyString(appState.getAppKey());
 
-        // Sets userId
+        // Check userId
         String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
         if (userId == null || userId.isEmpty()) {
             launchAlert(ALERT_TYPE.MISSING_USER_ID);
@@ -376,18 +390,7 @@ public class LaunchActivity extends AppCompatActivity
         appState.setUserId(userId);
         analytics.setUser(appState.getUserId(), appState.getApiKey());
 
-        // Sets guid (to specified value, or random one)
-        if (appState.getCallout() == Callout.UPDATE) {
-            String guid = extras.getString(Constants.SIMPRINTS_UPDATE_GUID);
-            if (guid == null || guid.isEmpty()) {
-                launchAlert(ALERT_TYPE.MISSING_UPDATE_GUID);
-                return;
-            }
-            appState.setGuid(guid);
-        } else if (appState.getCallout() == Callout.REGISTER) {
-            appState.setGuid(UUID.randomUUID().toString());
-        }
-
+        // Check moduleId
         String moduleId = extras.getString(Constants.SIMPRINTS_MODULE_ID);
         if (moduleId == null || moduleId.isEmpty()) {
             launchAlert(ALERT_TYPE.MISSING_MODULE_ID);

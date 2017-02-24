@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/alertLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/simprints_blue"
@@ -25,16 +26,15 @@
         android:id="@+id/graphic"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.55"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
+        android:layout_weight="0.55"
         android:contentDescription="@string/main_error_graphic" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.15"
-        android:background="@color/simprints_blue"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="10dp"
@@ -76,7 +76,6 @@
             android:layout_marginRight="1dp"
             android:layout_marginTop="2dp"
             android:layout_weight="1"
-            android:background="@color/simprints_blue"
             android:gravity="center"
             android:textColor="@color/simprints_white"
             android:textSize="24sp" />
@@ -89,7 +88,6 @@
             android:layout_marginStart="1dp"
             android:layout_marginTop="2dp"
             android:layout_weight="1"
-            android:background="@color/simprints_blue"
             android:gravity="center"
             android:textColor="@color/simprints_white"
             android:textSize="24sp" />
