@@ -49,8 +49,9 @@ import com.simprints.libcommon.ScanConfig;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.DatabaseSync;
 import com.simprints.libdata.Event;
-import com.simprints.libscanner.Message;
-import com.simprints.libscanner.Scanner;
+import com.simprints.libscanner.ButtonListener;
+import com.simprints.libscanner.ResultListener;
+import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.FingerIdentifier;
 import com.simprints.libsimprints.Registration;
@@ -66,7 +67,6 @@ import static com.simprints.id.model.Finger.Status;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
-        Scanner.ScannerListener,
         DatabaseEventListener {
 
     private final static long AUTO_SWIPE_DELAY = 500;
@@ -97,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements
         DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_INDEX_FINGER, FingerConfig.OPTIONAL, 3);
     }
 
+    private ButtonListener scannerButton;
+
     private AppState appState;
 
     private Handler handler;
@@ -104,10 +106,6 @@ public class MainActivity extends AppCompatActivity implements
     private Finger[] fingers = new Finger[NB_OF_FINGERS];
     private List<Finger> activeFingers;
     private int currentActiveFingerNo;
-
-    private Message.LED_STATE[] LEDS;
-
-    private Status previousStatus;
 
     private List<ImageView> indicators;
     private Button scanButton;
@@ -118,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements
     private Registration registrationResult;
 
     private MenuItem continueItem;
-    private boolean promptContinue = false;
     private MenuItem syncItem;
 
     private ProgressDialog un20WakeupDialog;
@@ -132,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements
         navView.setItemIconTintList(null);
 
         appState = AppState.getInstance();
-        appState.getScanner().setScannerListener(this);
         appState.getData().setListener(this);
 
         handler = new Handler();
@@ -141,9 +137,6 @@ public class MainActivity extends AppCompatActivity implements
         activeFingers = new ArrayList<>();
         currentActiveFingerNo = 0;
 
-        LEDS = new Message.LED_STATE[Message.LED_MAX_COUNT];
-
-        previousStatus = Status.NOT_COLLECTED;
 
         indicators = new ArrayList<>();
         scanButton = (Button) findViewById(R.id.scan_button);
@@ -231,6 +224,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initScanButton() {
+        scannerButton = new ButtonListener() {
+            @Override
+            public void onClick() {
+                toggleContinuousCapture();
+            }
+        };
+
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -259,15 +259,10 @@ public class MainActivity extends AppCompatActivity implements
             case RESCAN_GOOD_SCAN:
             case BAD_SCAN:
             case NOT_COLLECTED:
-                scanButton.setEnabled(false);
-                appState.getScanner().startContinuousCapture(sharedPref.getQualityThresholdInt(),
-                        sharedPref.getTimeoutInt());
-                timeoutBar.startTimeoutBar();
+                startContinuousCapture();
                 break;
             case COLLECTING:
-                scanButton.setEnabled(false);
-                appState.getScanner().stopContinuousCapture();
-                timeoutBar.cancelTimeoutBar();
+                stopContinuousCapture();
                 break;
         }
     }
@@ -284,12 +279,17 @@ public class MainActivity extends AppCompatActivity implements
             public void onPageSelected(int position) {
                 currentActiveFingerNo = position;
                 refreshDisplay();
-                if (LEDS[0] != Message.LED_STATE.LED_STATE_OFF) {
-                    if (appState.getScanner() != null) {
-                        appState.getScanner().resetUI();
-                        Arrays.fill(LEDS, Message.LED_STATE.LED_STATE_OFF);
+                appState.getScanner().resetUI(new ResultListener() {
+                    @Override
+                    public void onSuccess() {
+
                     }
-                }
+
+                    @Override
+                    public void onFailure(SCANNER_ERROR scanner_error) {
+
+                    }
+                });
             }
 
             @Override
@@ -309,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements
         // Update indicators display
         int nbCollected = 0;
 
-        promptContinue = true;
+        boolean promptContinue = true;
 
         for (int i = 0; i < activeFingers.size(); i++) {
             boolean selected = currentActiveFingerNo == i;
@@ -358,9 +358,25 @@ public class MainActivity extends AppCompatActivity implements
     private void resetUIfromError() {
         activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
         activeFingers.get(currentActiveFingerNo).setTemplate(null);
-        appState.getScanner().resetUI();
-        refreshDisplay();
-        scanButton.setEnabled(true);
+
+        appState.getScanner().resetUI(new ResultListener() {
+            @Override
+            public void onSuccess() {
+                refreshDisplay();
+                scanButton.setEnabled(true);
+            }
+
+            @Override
+            public void onFailure(SCANNER_ERROR scanner_error) {
+                switch (scanner_error) {
+                    case BUSY:
+                        resetUIfromError();
+                        break;
+                    default:
+                        finishWithUnexpectedError();
+                }
+            }
+        });
     }
 
     private void finishWithUnexpectedError() {
@@ -386,162 +402,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void onScannerEvent(com.simprints.libscanner.EVENT event) {
-        Log.d(this, String.format(Locale.UK, "onScannerEvent %s %s", event.name(), event.details()));
-        Finger finger = activeFingers.get(currentActiveFingerNo);
-
-        switch (event) {
-            case TRIGGER_PRESSED: // Trigger pressed
-                if (finger.getStatus() != Status.GOOD_SCAN) {
-                    toggleContinuousCapture();
-                } else if (promptContinue) {
-                    if (continueItem.isEnabled()) {
-                        onActionForward();
-                    }
-                }
-                break;
-
-            case CONTINUOUS_CAPTURE_STARTED:
-                previousStatus = finger.getStatus();
-                finger.setStatus(Status.COLLECTING);
-                refreshDisplay();
-                scanButton.setEnabled(true);
-                break;
-
-            case CONTINUOUS_CAPTURE_STOPPED: // Continuous capture stopped
-                finger.setStatus(previousStatus);
-                refreshDisplay();
-                scanButton.setEnabled(true);
-                break;
-
-            case CONTINUOUS_CAPTURE_SUCCESS: // Image captured successfully
-                timeoutBar.stopTimeoutBar();
-                Arrays.fill(LEDS, Message.LED_STATE.LED_STATE_ON);
-                appState.getScanner().generateTemplate();
-                break;
-
-            case GENERATE_TEMPLATE_SUCCESS: // Template generated successfully
-                appState.getScanner().extractTemplate();
-                break;
-
-            case EXTRACT_TEMPLATE_SUCCESS: // Template extracted successfully
-                int quality = appState.getScanner().getImageQuality();
-
-                if (finger.getTemplate() == null || finger.getTemplate().getQualityScore() < quality) {
-                    try {
-                        activeFingers
-                                .get(currentActiveFingerNo)
-                                .setTemplate(
-                                        new Fingerprint(
-                                                finger.getId(),
-                                                appState.getScanner().getTemplate()));
-                    } catch (IllegalArgumentException ex) {
-                        FirebaseCrash.report(ex);
-                        resetUIfromError();
-                        return;
-                    }
-                }
-
-                int qualityScore1 = sharedPref.getQualityThresholdInt();
-
-                if (quality >= qualityScore1) {
-                    activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
-                    nudgeMode();
-                } else {
-                    activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
-                }
-
-                Vibrate.vibrate(this, 100);
-                refreshDisplay();
-
-                break;
-
-            case EXTRACT_IMAGE_IO_ERROR:
-            case CAPTURE_IMAGE_WRONG:
-            case CAPTURE_IMAGE_INVALID_PARAM:
-            case CAPTURE_IMAGE_LINE_DROPPED:
-            case GENERATE_TEMPLATE_LOW_FEAT_NUMBER:
-            case GENERATE_TEMPLATE_INVALID_TYPE:
-            case GENERATE_TEMPLATE_EXTRACT_FAIL:
-            case EXTRACT_IMAGE_QUALITY_NO_IMAGE: // Image quality extraction failed because there is no image available
-            case EXTRACT_IMAGE_QUALITY_SDK_ERROR: // Image quality extraction failed because of an error in UN20 SDK
-            case EXTRACT_IMAGE_QUALITY_FAILURE: // Image quality extraction failed for abnormal reasons, SHOULD NOT HAPPEN
-            case GENERATE_TEMPLATE_NO_IMAGE: // Template generation failed because there is no image available
-            case GENERATE_TEMPLATE_NO_QUALITY: // Template generation failed because there is no image quality available
-            case GENERATE_TEMPLATE_SDK_ERROR: // Template generation failed because of an error in UN20 SDK
-            case GENERATE_TEMPLATE_FAILURE: // Template generation failed for abnormal reasons, SHOULD NOT HAPPEN
-            case EXTRACT_TEMPLATE_NO_TEMPLATE: // Template extraction failed because there is no template available
-            case EXTRACT_TEMPLATE_IO_ERROR: // Template extraction failed because of an IO error
-            case EXTRACT_TEMPLATE_FAILURE: // Template extraction failed for abnormal reasons, SHOULD NOT HAPPEN
-                appState.getScanner().setBadCaptureUI();
-                resetUIfromError();
-                break;
-
-            case CONTINUOUS_CAPTURE_ERROR:
-            case CAPTURE_IMAGE_INVALID_STATE: // Image capture failed because the un20 is not awaken
-                resetUIfromError();
-                appState.getScanner().un20Wakeup();
-                timeoutBar.cancelTimeoutBar();
-                un20WakeupDialog.show();
-                break;
-
-            case UN20_WAKEUP_SUCCESS: // UN20 woken up successfully
-                un20WakeupDialog.cancel();
-                break;
-
-            case CONNECTION_SCANNER_UNREACHABLE:
-                break;
-            case DISCONNECTION_INITIATED: // Disconnection initiated
-                break;
-
-            // success conditions
-            case SEND_REQUEST_SUCCESS: // Request sent successfully
-            case CONNECTION_INITIATED:
-            case CONNECTION_SUCCESS: // Successfully connected to scanner
-            case DISCONNECTION_SUCCESS: // Successfully disconnected from scanner
-            case UPDATE_SENSOR_INFO_SUCCESS: // Sensor info was successfully updated
-            case SET_UI_SUCCESS: // UI was successfully set
-                break;
-
-            case SEND_REQUEST_IO_ERROR: // Request sending failed because of an IO error
-                Intent intent = new Intent(this, AlertActivity.class);
-                intent.putExtra("alertType", ALERT_TYPE.DISCONNECTED);
-                startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
-                break;
-
-            // error conditions
-            case SCANNER_BUSY:
-                break;
-            case NOT_CONNECTED: // Cannot perform request because the phone is not connected to the scanner
-            case NO_RESPONSE: // The scanner is not answering
-            case CONNECTION_ALREADY_CONNECTED: // Connection failed because the phone is already connected/connecting/disconnecting
-            case CONNECTION_BLUETOOTH_DISABLED: // Connection failed because phone's bluetooth is disabled
-            case CONNECTION_SCANNER_UNBONDED: // Connection failed because the scanner is not bonded to the phone
-            case CONNECTION_BAD_SCANNER_FEATURE: // Connection failed because the scanner does not support the default UUID as it should
-            case CONNECTION_IO_ERROR: // Connection failed because of an IO error
-            case DISCONNECTION_IO_ERROR: // Disconnection failed because of an IO error
-            case UPDATE_SENSOR_INFO_FAILURE: // Updating sensor info failed for abnormal reasons, SHOULD NOT HAPPEN
-            case SET_SENSOR_CONFIG_SUCCESS: // Sensor configuration was successfully set
-            case SET_SENSOR_CONFIG_FAILURE: // Setting sensor configuration failed for abnormal reasons, SHOULD NOT HAPPEN
-            case SET_UI_FAILURE: // Setting UI failed for abnormal reasons, SHOULD NOT HAPPEN
-            case CAPTURE_IMAGE_SDK_ERROR: // Image capture failed because of an error in UN20 SDK
-            case CAPTURE_IMAGE_FAILURE: // Image capture failed for abnormal reasons, SHOULD NOT HAPPEN
-            case EXTRACT_IMAGE_NO_IMAGE: // Image extraction failed because there is no image available
-            case EXTRACT_IMAGE_FAILURE: // Image extraction failed for abnormal reasons, SHOULD NOT HAPPEN
-            case UN20_SHUTDOWN_INVALID_STATE: // UN20 shut down failed because it is already shut / waking up or down
-            case UN20_SHUTDOWN_FAILURE: // UN20 shut down failed for abnormal reasons, SHOULD NOT HAPPEN
-            case UN20_WAKEUP_INVALID_STATE: // UN20 wake up failed because it is already woken up / waking up or down
-            case UN20_WAKEUP_FAILURE: // UN20 wake up failed for abnormal reasons, SHOULD NOT HAPPEN
-            case EXTRACT_CRASH_LOG_NO_CRASHLOG: // Crash log extraction failed because there is no crash log available
-            case EXTRACT_CRASH_LOG_FAILURE: // Crash log extraction failed for abnormal reasons, SHOULD NOT HAPPEN
-            case SET_HARDWARE_CONFIG_INVALID_STATE: // Hardware configuration failed because UN20 is not shutdown
-            case SET_HARDWARE_CONFIG_INVALID_CONFIG: // Hardware configuration failed because an invalid config was specified
-            case SET_HARDWARE_CONFIG_FAILURE: // Hardware configuration failed for abnormal reasons, SHOULD NOT HAPPEN
-                finishWithUnexpectedError();
-                break;
-        }
-    }
 
     @Override
     public void onDataEvent(Event event) {
@@ -808,6 +668,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onResume() {
         super.onResume();
@@ -840,6 +701,120 @@ public class MainActivity extends AppCompatActivity implements
             syncItem.setTitle("Syncing...");
             syncItem.setIcon(R.drawable.ic_menu_syncing);
         }
+    }
+
+    private void startContinuousCapture() {
+        scanButton.setEnabled(false);
+        timeoutBar.startTimeoutBar();
+        unregisterScannerButton();
+
+        appState.getScanner().startContinuousCapture(sharedPref.getQualityThresholdInt(),
+                sharedPref.getTimeoutInt(), new ResultListener() {
+                    @Override
+                    public void onSuccess() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Finger finger = activeFingers.get(currentActiveFingerNo);
+                                int quality = appState.getScanner().getImageQuality();
+
+                                if (finger.getTemplate() == null || finger.getTemplate().getQualityScore() < quality) {
+                                    try {
+                                        activeFingers
+                                                .get(currentActiveFingerNo)
+                                                .setTemplate(
+                                                        new Fingerprint(
+                                                                finger.getId(),
+                                                                appState.getScanner().getTemplate()));
+                                    } catch (IllegalArgumentException ex) {
+                                        FirebaseCrash.report(ex);
+                                        resetUIfromError();
+                                        return;
+                                    }
+                                }
+
+                                int qualityScore1 = sharedPref.getQualityThresholdInt();
+
+                                if (quality >= qualityScore1) {
+                                    activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
+                                    nudgeMode();
+                                } else {
+                                    activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
+                                }
+
+                                Vibrate.vibrate(MainActivity.this, 100);
+                                refreshDisplay();
+
+                                registerScannerButton();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(final SCANNER_ERROR scanner_error) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                switch (scanner_error) {
+                                    case BUSY:
+                                        break;
+                                    case UN20_INVALID_STATE:
+                                        startUn20();
+                                        break;
+                                    case OUTDATED_SCANNER_INFO:
+                                        appState.getScanner().getHardwareVersion();
+                                    case UN20_SDK_ERROR:
+                                        resetUIfromError();
+                                        break;
+                                    default:
+                                        finishWithUnexpectedError();
+                                }
+                                registerScannerButton();
+                            }
+                        });
+                    }
+                });
+    }
+
+    private void stopContinuousCapture() {
+        appState.getScanner().stopContinuousCapture(new ResultListener() {
+            @Override
+            public void onSuccess() {
+                scanButton.setEnabled(false);
+                timeoutBar.cancelTimeoutBar();
+            }
+
+            @Override
+            public void onFailure(SCANNER_ERROR scanner_error) {
+
+            }
+        });
+    }
+
+    private void startUn20() {
+        timeoutBar.cancelTimeoutBar();
+        un20WakeupDialog.show();
+
+        appState.getScanner().un20Wakeup(new ResultListener() {
+            @Override
+            public void onSuccess() {
+                resetUIfromError();
+                un20WakeupDialog.cancel();
+            }
+
+            @Override
+            public void onFailure(SCANNER_ERROR scanner_error) {
+                finishWithUnexpectedError();
+            }
+        });
+    }
+
+    private void registerScannerButton() {
+        appState.getScanner().registerButtonListener(scannerButton);
+    }
+
+    private void unregisterScannerButton() {
+        appState.getScanner().unregisterButtonListener(scannerButton);
     }
 
 }

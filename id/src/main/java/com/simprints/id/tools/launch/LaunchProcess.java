@@ -1,6 +1,5 @@
 package com.simprints.id.tools.launch;
 
-import android.bluetooth.BluetoothAdapter;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -12,8 +11,10 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libdata.DatabaseContext;
-import com.simprints.libscanner.Message;
+import com.simprints.libscanner.ResultListener;
+import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
+import com.simprints.libscanner.ScannerUtils;
 
 import java.util.List;
 
@@ -31,11 +32,12 @@ public class LaunchProcess {
 
     public Boolean apiKey = false;
     public Boolean ccResolver = false;
-    public Boolean btConnection = false;
-    public Boolean un20WakeUp = false;
+    private Boolean btConnection = false;
+    private Boolean un20WakeUp = false;
     public Boolean permissions = false;
     public Boolean databaseUpdate = false;
     private Boolean vib = false;
+    private Boolean registerButton = false;
 
 
     public LaunchProcess(LaunchActivity launchActivity) {
@@ -101,6 +103,8 @@ public class LaunchProcess {
         loadingInfoTextView.setText(R.string.launch_bt_connect);
 
         if (!btConnection) {
+            btConnection = true;
+            updateScanner();
             return;
         }
 
@@ -108,6 +112,8 @@ public class LaunchProcess {
         loadingInfoTextView.setText(R.string.launch_wake_un20);
 
         if (!un20WakeUp) {
+            un20WakeUp = true;
+            updateScanner();
             return;
         }
 
@@ -120,6 +126,11 @@ public class LaunchProcess {
         if (!vib) {
             vib = true;
             vibrate(launchActivity, 100);
+        }
+
+        if (!registerButton) {
+            registerButton = true;
+            launchActivity.setButton();
         }
     }
 
@@ -144,21 +155,11 @@ public class LaunchProcess {
         launch();
     }
 
-    public void updateScanner() {
+    private void updateScanner() {
         if (!btConnection) {
             // Initializes the session Scanner object if necessary
             if (launchActivity.appState.getScanner() == null) {
-                BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-                if (adapter == null) {
-                    launchActivity.launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
-                    return;
-                }
-                if (!adapter.isEnabled()) {
-                    launchActivity.launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
-                    return;
-                }
-
-                List<String> pairedScanners = Scanner.getPairedScanners();
+                List<String> pairedScanners = ScannerUtils.getPairedScanners();
                 if (pairedScanners.size() == 0) {
                     launchActivity.launchAlert(ALERT_TYPE.NOT_PAIRED);
                     return;
@@ -174,20 +175,76 @@ public class LaunchProcess {
             launchActivity.appState.setScanner(new Scanner(appState.getMacAddress()));
 
             // Initiate scanner connection
-            launchActivity.appState.getScanner().setScannerListener(launchActivity);
-            launchActivity.appState.getScanner().connect();
+            launchActivity.appState.getScanner().connect(new ResultListener() {
+                @Override
+                public void onSuccess() {
+                    launchActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            launch();
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(final SCANNER_ERROR scanner_error) {
+                    launchActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            switch (scanner_error) {
+                                case INVALID_STATE:
+                                    btConnection = true;
+                                    launch();
+                                    break;
+                                case BLUETOOTH_DISABLED:
+                                    launchActivity.launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
+                                    return;
+                                case BLUETOOTH_NOT_SUPPORTED:
+                                    launchActivity.launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
+                                    return;
+                                case SCANNER_UNBONDED:
+                                    launchActivity.launchAlert(ALERT_TYPE.NOT_PAIRED);
+                                    break;
+                                default:
+                                    launchActivity.launchAlert(ALERT_TYPE.DISCONNECTED);
+                            }
+                        }
+                    });
+                }
+            });
 
             return;
         }
-
-        launch();
 
         if (!un20WakeUp) {
-            appState.getScanner().un20Wakeup();
-            return;
-        }
+            appState.getScanner().un20Wakeup(new ResultListener() {
+                @Override
+                public void onSuccess() {
+                    launchActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            appState.setHardwareVersion(appState.getScanner().getUcVersion());
+                            launch();
+                        }
+                    });
+                }
 
-        appState.setHardwareVersion(appState.getScanner().getUcVersion());
-        launch();
+                @Override
+                public void onFailure(final SCANNER_ERROR scanner_error) {
+                    launchActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            switch (scanner_error) {
+                                case UN20_INVALID_STATE:
+                                    launch();
+                                    break;
+                                default:
+                                    launchActivity.launchAlert(ALERT_TYPE.DISCONNECTED);
+                            }
+                        }
+                    });
+                }
+            });
+        }
     }
 }
