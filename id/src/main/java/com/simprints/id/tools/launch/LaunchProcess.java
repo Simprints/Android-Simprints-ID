@@ -19,7 +19,6 @@ import com.simprints.libscanner.ScannerUtils;
 import java.util.List;
 
 import static com.simprints.id.tools.InternalConstants.COMMCARE_PACKAGE;
-import static com.simprints.id.tools.Vibrate.vibrate;
 
 public class LaunchProcess {
     private LaunchActivity launchActivity;
@@ -36,8 +35,8 @@ public class LaunchProcess {
     private Boolean un20WakeUp = false;
     public Boolean permissions = false;
     public Boolean databaseUpdate = false;
-    private Boolean vib = false;
-    private Boolean registerButton = false;
+    private Boolean setContinue = false;
+    private Boolean resetUI = false;
 
 
     public LaunchProcess(LaunchActivity launchActivity) {
@@ -103,8 +102,6 @@ public class LaunchProcess {
         loadingInfoTextView.setText(R.string.launch_bt_connect);
 
         if (!btConnection) {
-            btConnection = true;
-            updateScanner();
             return;
         }
 
@@ -112,25 +109,17 @@ public class LaunchProcess {
         loadingInfoTextView.setText(R.string.launch_wake_un20);
 
         if (!un20WakeUp) {
-            un20WakeUp = true;
-            updateScanner();
             return;
         }
 
         launchProgress.setProgress(100);
 
-        launchActivity.waitingForConfirmation = true;
         confirmConsentTextView.setVisibility(View.VISIBLE);
         loadingInfoTextView.setVisibility(View.INVISIBLE);
 
-        if (!vib) {
-            vib = true;
-            vibrate(launchActivity, 100);
-        }
-
-        if (!registerButton) {
-            registerButton = true;
-            launchActivity.setButton();
+        if (!setContinue) {
+            setContinue = true;
+            launchActivity.readyToContinue();
         }
     }
 
@@ -178,71 +167,81 @@ public class LaunchProcess {
             launchActivity.appState.getScanner().connect(new ResultListener() {
                 @Override
                 public void onSuccess() {
-                    launchActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            launch();
-                        }
-                    });
+                    btConnection = true;
+                    updateScanner();
                 }
 
                 @Override
-                public void onFailure(final SCANNER_ERROR scanner_error) {
-                    launchActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            switch (scanner_error) {
-                                case INVALID_STATE:
-                                    btConnection = true;
-                                    launch();
-                                    break;
-                                case BLUETOOTH_DISABLED:
-                                    launchActivity.launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
-                                    return;
-                                case BLUETOOTH_NOT_SUPPORTED:
-                                    launchActivity.launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
-                                    return;
-                                case SCANNER_UNBONDED:
-                                    launchActivity.launchAlert(ALERT_TYPE.NOT_PAIRED);
-                                    break;
-                                default:
-                                    launchActivity.launchAlert(ALERT_TYPE.DISCONNECTED);
-                            }
-                        }
-                    });
+                public void onFailure(SCANNER_ERROR scanner_error) {
+                    switch (scanner_error) {
+                        case INVALID_STATE:
+                            btConnection = true;
+                            updateScanner();
+                            break;
+                        case BLUETOOTH_DISABLED:
+                            launchActivity.launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
+                            return;
+                        case BLUETOOTH_NOT_SUPPORTED:
+                            launchActivity.launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
+                            return;
+                        case SCANNER_UNBONDED:
+                            launchActivity.launchAlert(ALERT_TYPE.NOT_PAIRED);
+                            break;
+                        default:
+                            launchActivity.launchAlert(ALERT_TYPE.DISCONNECTED);
+                    }
                 }
             });
-
             return;
         }
+
+        launch();
+
+        if (!resetUI) {
+            appState.getScanner().resetUI(new ResultListener() {
+                @Override
+                public void onSuccess() {
+                    resetUI = true;
+                    updateScanner();
+                }
+
+                @Override
+                public void onFailure(SCANNER_ERROR scanner_error) {
+                    switch (scanner_error) {
+                        case BUSY:
+                            updateScanner();
+                            break;
+                        default:
+                            resetUI = true;
+                            updateScanner();
+                    }
+                }
+            });
+            return;
+        }
+
+        launch();
 
         if (!un20WakeUp) {
             appState.getScanner().un20Wakeup(new ResultListener() {
                 @Override
                 public void onSuccess() {
-                    launchActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            appState.setHardwareVersion(appState.getScanner().getUcVersion());
-                            launch();
-                        }
-                    });
+                    un20WakeUp = true;
+                    launch();
                 }
 
                 @Override
                 public void onFailure(final SCANNER_ERROR scanner_error) {
-                    launchActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            switch (scanner_error) {
-                                case UN20_INVALID_STATE:
-                                    launch();
-                                    break;
-                                default:
-                                    launchActivity.launchAlert(ALERT_TYPE.DISCONNECTED);
+                    switch (scanner_error) {
+                        case INVALID_STATE:
+                            if (appState.getScanner().isConnected()) {
+                                un20WakeUp = true;
+                                launch();
+                                return;
                             }
-                        }
-                    });
+                        default:
+                            launchActivity.launchAlert(ALERT_TYPE.DISCONNECTED);
+                    }
                 }
             });
         }
