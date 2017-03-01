@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements
     private ViewPagerCustom viewPager;
     private FingerPageAdapter pageAdapter;
     private TimeoutBar timeoutBar;
+    private Status previousStatus;
 
     private Registration registrationResult;
 
@@ -137,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements
         activeFingers = new ArrayList<>();
         currentActiveFingerNo = 0;
 
+        previousStatus = Status.NOT_COLLECTED;
 
         indicators = new ArrayList<>();
         scanButton = (Button) findViewById(R.id.scan_button);
@@ -230,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements
                 toggleContinuousCapture();
             }
         };
+        appState.getScanner().registerButtonListener(scannerButton);
 
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -237,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements
                 toggleContinuousCapture();
             }
         });
+
         scanButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -355,7 +359,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void resetUIfromError() {
+    private void resetUIFromError() {
         activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
         activeFingers.get(currentActiveFingerNo).setTemplate(null);
 
@@ -370,7 +374,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onFailure(SCANNER_ERROR scanner_error) {
                 switch (scanner_error) {
                     case BUSY:
-                        resetUIfromError();
+                        resetUIFromError();
                         break;
                     default:
                         finishWithUnexpectedError();
@@ -712,66 +716,72 @@ public class MainActivity extends AppCompatActivity implements
                 sharedPref.getTimeoutInt(), new ResultListener() {
                     @Override
                     public void onSuccess() {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Finger finger = activeFingers.get(currentActiveFingerNo);
-                                int quality = appState.getScanner().getImageQuality();
+                        Finger finger = activeFingers.get(currentActiveFingerNo);
+                        int quality = appState.getScanner().getImageQuality();
 
-                                if (finger.getTemplate() == null || finger.getTemplate().getQualityScore() < quality) {
-                                    try {
-                                        activeFingers
-                                                .get(currentActiveFingerNo)
-                                                .setTemplate(
-                                                        new Fingerprint(
-                                                                finger.getId(),
-                                                                appState.getScanner().getTemplate()));
-                                    } catch (IllegalArgumentException ex) {
-                                        FirebaseCrash.report(ex);
-                                        resetUIfromError();
-                                        return;
-                                    }
-                                }
-
-                                int qualityScore1 = sharedPref.getQualityThresholdInt();
-
-                                if (quality >= qualityScore1) {
-                                    activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
-                                    nudgeMode();
-                                } else {
-                                    activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
-                                }
-
-                                Vibrate.vibrate(MainActivity.this, 100);
-                                refreshDisplay();
-
-                                registerScannerButton();
+                        if (finger.getTemplate() == null || finger.getTemplate().getQualityScore() < quality) {
+                            try {
+                                activeFingers
+                                        .get(currentActiveFingerNo)
+                                        .setTemplate(
+                                                new Fingerprint(
+                                                        finger.getId(),
+                                                        appState.getScanner().getTemplate()));
+                            } catch (IllegalArgumentException ex) {
+                                FirebaseCrash.report(ex);
+                                resetUIFromError();
+                                return;
                             }
-                        });
+                        }
+
+                        int qualityScore1 = sharedPref.getQualityThresholdInt();
+
+                        if (quality >= qualityScore1) {
+                            activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
+                            nudgeMode();
+                        } else {
+                            activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
+                        }
+
+                        Vibrate.vibrate(MainActivity.this, 100);
+                        refreshDisplay();
+
+                        registerScannerButton();
                     }
 
                     @Override
                     public void onFailure(final SCANNER_ERROR scanner_error) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                switch (scanner_error) {
-                                    case BUSY:
-                                        break;
-                                    case UN20_INVALID_STATE:
-                                        startUn20();
-                                        break;
-                                    case OUTDATED_SCANNER_INFO:
-                                        appState.getScanner().getHardwareVersion();
-                                    case UN20_SDK_ERROR:
-                                        resetUIfromError();
-                                        break;
-                                    default:
-                                        finishWithUnexpectedError();
-                                }
-                                registerScannerButton();
-                            }
-                        });
+                        switch (scanner_error) {
+                            case BUSY:
+                                resetUIFromError();
+                                break;
+                            case INVALID_STATE:
+                            case IO_ERROR:
+                            case NO_RESPONSE:
+                            case UNEXPECTED:
+                            case SCANNER_UNREACHABLE:
+                            case UN20_FAILURE:
+                            case UN20_LOW_VOLTAGE:
+                            case UN20_SDK_ERROR:
+                                finishWithUnexpectedError();
+                                break;
+                            case UN20_INVALID_STATE:
+                                startUn20();
+                                break;
+                            case OUTDATED_SCANNER_INFO:
+                                appState.getScanner().getHardwareVersion();
+                                resetUIFromError();
+                                break;
+                            case NOT_CAPTURING:
+                                break;
+                            case INTERRUPTED:
+                                refreshDisplay();
+                                break;
+                            case TIMEOUT:
+                                refreshDisplay();
+                                break;
+                        }
+                        registerScannerButton();
                     }
                 });
     }
@@ -798,7 +808,7 @@ public class MainActivity extends AppCompatActivity implements
         appState.getScanner().un20Wakeup(new ResultListener() {
             @Override
             public void onSuccess() {
-                resetUIfromError();
+                resetUIFromError();
                 un20WakeupDialog.cancel();
             }
 

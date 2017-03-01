@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/simprints_grey"
+    android:background="@color/simprints_main_bg"
     android:gravity="center_horizontal"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -32,9 +32,9 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
-        android:progressDrawable="@drawable/timer_progress_bar"
         android:maxHeight="10dip"
-        android:minHeight="10dp" />
+        android:minHeight="10dp"
+        android:progressDrawable="@drawable/timer_progress_bar" />
 
     <View
         android:layout_width="match_parent"
