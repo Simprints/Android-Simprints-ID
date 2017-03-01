@@ -19,7 +19,9 @@ import com.simprints.id.tools.SharedPref;
 import com.simprints.id.tools.launch.LaunchProcess;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
-import com.simprints.libscanner.Scanner;
+import com.simprints.libscanner.ButtonListener;
+import com.simprints.libscanner.ResultListener;
+import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libsimprints.Constants;
 
 import java.util.UUID;
@@ -42,8 +44,7 @@ import static com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN;
 
 @SuppressWarnings("deprecation")
 @SuppressLint("HardwareIds")
-public class LaunchActivity extends AppCompatActivity
-        implements Scanner.ScannerListener, DatabaseEventListener {
+public class LaunchActivity extends AppCompatActivity implements DatabaseEventListener {
 
     public boolean waitingForConfirmation;
     public AppState appState;
@@ -51,6 +52,7 @@ public class LaunchActivity extends AppCompatActivity
     private PositionTracker positionTracker;
     private LaunchProcess launchProcess;
     private boolean launchOutOfFocus;
+    private ButtonListener scannerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +81,13 @@ public class LaunchActivity extends AppCompatActivity
 
         //Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
+
+        scannerButton = new ButtonListener() {
+            @Override
+            public void onClick() {
+                finishLaunch();
+            }
+        };
 
         //Validate the callout
         validateCalloutAndLaunch(getIntent());
@@ -109,10 +118,7 @@ public class LaunchActivity extends AppCompatActivity
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (waitingForConfirmation) {
-            waitingForConfirmation = false;
-            analytics.setScannerMac(appState.getMacAddress());
-            startActivityForResult(new Intent(LaunchActivity.this, MainActivity.class),
-                    MAIN_ACTIVITY_REQUEST);
+            finishLaunch();
             return true;
         } else {
             return super.onTouchEvent(event);
@@ -173,12 +179,23 @@ public class LaunchActivity extends AppCompatActivity
                         launchOutOfFocus = false;
 
                         if (appState.getScanner() != null) {
-                            appState.getScanner().destroy();
-                            appState.setScanner(null);
-                        }
+                            appState.getScanner().disconnect(new ResultListener() {
+                                @Override
+                                public void onSuccess() {
+                                    appState.setScanner(null);
+                                    launchProcess = new LaunchProcess(LaunchActivity.this);
+                                    launchProcess.launch();
+                                }
 
-                        launchProcess = new LaunchProcess(this);
-                        launchProcess.launch();
+                                @Override
+                                public void onFailure(SCANNER_ERROR scanner_error) {
+                                    appState.setScanner(null);
+                                    launchProcess = new LaunchProcess(LaunchActivity.this);
+                                    launchProcess.launch();
+                                }
+                            });
+
+                        }
                         break;
 
                     default:
@@ -209,11 +226,19 @@ public class LaunchActivity extends AppCompatActivity
         positionTracker.finish();
 
         if (appState.getScanner() != null) {
-            appState.getScanner().destroy();
+            appState.getScanner().disconnect(new ResultListener() {
+                @Override
+                public void onSuccess() {
+                    appState.destroy();
+                }
+
+                @Override
+                public void onFailure(SCANNER_ERROR scanner_error) {
+                    appState.destroy();
+                }
+            });
             appState.setScanner(null);
         }
-
-        appState.destroy();
 
         super.onDestroy();
     }
@@ -265,68 +290,23 @@ public class LaunchActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onScannerEvent(com.simprints.libscanner.EVENT event) {
-        switch (event) {
-            case CONNECTION_SUCCESS:
-            case CONNECTION_ALREADY_CONNECTED:
-                launchProcess.btConnection = true;
-                launchProcess.updateScanner();
-                break;
+    public void finishLaunch() {
+        appState.getScanner().unregisterButtonListener(scannerButton);
+        waitingForConfirmation = false;
+        analytics.setScannerMac(appState.getMacAddress());
+        startActivityForResult(new Intent(LaunchActivity.this, MainActivity.class),
+                MAIN_ACTIVITY_REQUEST);
+    }
 
-            case CONNECTION_BLUETOOTH_DISABLED:
-                launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
-                break;
-            case CONNECTION_SCANNER_UNBONDED:
-                launchAlert(ALERT_TYPE.NOT_PAIRED);
-                break;
-            case CONNECTION_SCANNER_UNREACHABLE:
-                launchAlert(ALERT_TYPE.DISCONNECTED);
-                break;
+    public void setButton() {
+        scannerButton = new ButtonListener() {
+            @Override
+            public void onClick() {
+                finishLaunch();
+            }
+        };
 
-            case DISCONNECTION_IO_ERROR:
-            case SET_SENSOR_CONFIG_FAILURE:
-            case PAIR_FAILURE:
-            case UN20_SHUTDOWN_INVALID_STATE:
-            case UN20_SHUTDOWN_FAILURE:
-            case EXTRACT_CRASH_LOG_FAILURE:
-            case SET_HARDWARE_CONFIG_INVALID_STATE:
-            case SET_HARDWARE_CONFIG_INVALID_CONFIG:
-            case SET_HARDWARE_CONFIG_FAILURE:
-            case NOT_CONNECTED:
-            case NO_RESPONSE:
-            case SEND_REQUEST_IO_ERROR:
-            case CONNECTION_IO_ERROR:
-            case CONNECTION_BAD_SCANNER_FEATURE:
-            case UN20_WAKEUP_FAILURE:
-            case UN20_CANNOT_CHECK_STATE:
-            case SET_UI_FAILURE:
-            case UPDATE_SENSOR_INFO_FAILURE:
-            case SCANNER_BUSY:
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                break;
-
-            case UN20_WAKEUP_SUCCESS:
-            case UN20_WAKEUP_INVALID_STATE:
-                appState.getScanner().setUI(true, null, (short) -1);
-                break;
-
-            case SET_UI_SUCCESS:
-                appState.getScanner().updateSensorInfo();
-                break;
-
-            case UPDATE_SENSOR_INFO_SUCCESS:
-                launchProcess.un20WakeUp = true;
-                launchProcess.updateScanner();
-                break;
-
-            case TRIGGER_PRESSED:
-                if (waitingForConfirmation) {
-                    startActivityForResult(new Intent(LaunchActivity.this, MainActivity.class),
-                            MAIN_ACTIVITY_REQUEST);
-                }
-                break;
-        }
+        appState.getScanner().registerButtonListener(scannerButton);
     }
 
     private void validateCalloutAndLaunch(Intent intent) {

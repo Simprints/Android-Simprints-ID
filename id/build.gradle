@@ -63,14 +63,14 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics-ndk:1.1.4@aar') {
         transitive = true;
     }
-    compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.android.support:design:25.1.1'
-    compile 'com.android.support:support-v4:25.1.1'
+    compile 'com.android.support:appcompat-v7:25.2.0'
+    compile 'com.android.support:design:25.2.0'
+    compile 'com.android.support:support-v4:25.2.0'
     compile 'com.google.android.gms:play-services-location:10.2.0'
     compile 'com.google.android.gms:play-services-gcm:10.2.0'
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.volley:volley:1.0.0'
-    compile 'com.simprints:libscanner:0.0.60'
+    compile 'com.simprints:libscanner:0.1.2'
     compile 'com.simprints:libdata:1.1.10'
     compile 'com.simprints:libcommon:1.0.46'
     compile 'com.simprints:libmatcher:1.0.15'
