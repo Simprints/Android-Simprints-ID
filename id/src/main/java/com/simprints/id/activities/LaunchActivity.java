@@ -41,6 +41,7 @@ import static com.simprints.id.tools.InternalConstants.MAIN_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.RESOLUTION_REQUEST;
 import static com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN;
+import static com.simprints.id.tools.Vibrate.vibrate;
 
 @SuppressWarnings("deprecation")
 @SuppressLint("HardwareIds")
@@ -85,7 +86,8 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
         scannerButton = new ButtonListener() {
             @Override
             public void onClick() {
-                finishLaunch();
+                if (!launchOutOfFocus)
+                    finishLaunch();
             }
         };
 
@@ -298,15 +300,11 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
                 MAIN_ACTIVITY_REQUEST);
     }
 
-    public void setButton() {
-        scannerButton = new ButtonListener() {
-            @Override
-            public void onClick() {
-                finishLaunch();
-            }
-        };
-
+    public void readyToContinue() {
+        waitingForConfirmation = true;
+        appState.setHardwareVersion(appState.getScanner().getUcVersion());
         appState.getScanner().registerButtonListener(scannerButton);
+        vibrate(this, 100);
     }
 
     private void validateCalloutAndLaunch(Intent intent) {
