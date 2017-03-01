@@ -11,4 +11,5 @@
     <color name="simprints_green">#FF00CC00</color>
     <color name="simprints_red">#FFCC0000</color>
     <color name="simprints_separator">#FFC0C0C0</color>
+    <color name="simprints_main_bg">#FFEEEEEE</color>
 </resources>
