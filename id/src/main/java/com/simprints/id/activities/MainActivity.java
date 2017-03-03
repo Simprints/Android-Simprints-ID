@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements
     private final static int PRIVACY_ACTIVITY_REQUEST_CODE = 3;
     private final static int ABOUT_ACTIVITY_REQUEST_CODE = 4;
 
+    private boolean buttonContinue = false;
+
     private final static ScanConfig DEFAULT_CONFIG;
 
     private SharedPref sharedPref;
@@ -112,9 +114,9 @@ public class MainActivity extends AppCompatActivity implements
     private ViewPagerCustom viewPager;
     private FingerPageAdapter pageAdapter;
     private TimeoutBar timeoutBar;
-    private Status previousStatus;
 
     private Registration registrationResult;
+    private Status previousStatus;
 
     private MenuItem continueItem;
     private MenuItem syncItem;
@@ -137,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements
         fingers = new Finger[NB_OF_FINGERS];
         activeFingers = new ArrayList<>();
         currentActiveFingerNo = 0;
-
         previousStatus = Status.NOT_COLLECTED;
 
         indicators = new ArrayList<>();
@@ -229,7 +230,10 @@ public class MainActivity extends AppCompatActivity implements
         scannerButton = new ButtonListener() {
             @Override
             public void onClick() {
-                toggleContinuousCapture();
+                if (buttonContinue)
+                    onActionForward();
+                else if (activeFingers.get(currentActiveFingerNo).getStatus() != Status.GOOD_SCAN)
+                    toggleContinuousCapture();
             }
         };
         appState.getScanner().registerButtonListener(scannerButton);
@@ -255,6 +259,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void toggleContinuousCapture() {
+        Finger finger = activeFingers.get(currentActiveFingerNo);
+
         switch (activeFingers.get(currentActiveFingerNo).getStatus()) {
             case GOOD_SCAN:
                 activeFingers.get(currentActiveFingerNo).setStatus(Status.RESCAN_GOOD_SCAN);
@@ -263,6 +269,11 @@ public class MainActivity extends AppCompatActivity implements
             case RESCAN_GOOD_SCAN:
             case BAD_SCAN:
             case NOT_COLLECTED:
+                previousStatus = finger.getStatus();
+                finger.setStatus(Status.COLLECTING);
+                refreshDisplay();
+                scanButton.setEnabled(true);
+                refreshDisplay();
                 startContinuousCapture();
                 break;
             case COLLECTING:
@@ -342,6 +353,8 @@ public class MainActivity extends AppCompatActivity implements
             fragment.updateTextAccordingToStatus();
         }
 
+        buttonContinue = false;
+
         if (continueItem != null) {
             if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
                 continueItem.setIcon(R.drawable.ic_menu_forward_grey);
@@ -351,6 +364,7 @@ public class MainActivity extends AppCompatActivity implements
                     continueItem.setIcon(R.drawable.ic_menu_forward_grey);
                 } else if (nbCollected > 0 && promptContinue) {
                     continueItem.setIcon(R.drawable.ic_menu_forward_green);
+                    buttonContinue = true;
                 } else if (nbCollected > 0) {
                     continueItem.setIcon(R.drawable.ic_menu_forward_white);
                 }
@@ -658,6 +672,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (appState.getScanner() != null) {
+            appState.getScanner().unregisterButtonListener(scannerButton);
+        }
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
@@ -708,97 +730,28 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void startContinuousCapture() {
-        scanButton.setEnabled(false);
         timeoutBar.startTimeoutBar();
-        unregisterScannerButton();
 
         appState.getScanner().startContinuousCapture(sharedPref.getQualityThresholdInt(),
-                sharedPref.getTimeoutInt(), new ResultListener() {
+                sharedPref.getTimeoutInt() * 1000, new ResultListener() {
                     @Override
                     public void onSuccess() {
-                        Finger finger = activeFingers.get(currentActiveFingerNo);
-                        int quality = appState.getScanner().getImageQuality();
-
-                        if (finger.getTemplate() == null || finger.getTemplate().getQualityScore() < quality) {
-                            try {
-                                activeFingers
-                                        .get(currentActiveFingerNo)
-                                        .setTemplate(
-                                                new Fingerprint(
-                                                        finger.getId(),
-                                                        appState.getScanner().getTemplate()));
-                            } catch (IllegalArgumentException ex) {
-                                FirebaseCrash.report(ex);
-                                resetUIFromError();
-                                return;
-                            }
-                        }
-
-                        int qualityScore1 = sharedPref.getQualityThresholdInt();
-
-                        if (quality >= qualityScore1) {
-                            activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
-                            nudgeMode();
-                        } else {
-                            activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
-                        }
-
-                        Vibrate.vibrate(MainActivity.this, 100);
-                        refreshDisplay();
-
-                        registerScannerButton();
+                        timeoutBar.stopTimeoutBar();
+                        captureSuccess();
                     }
 
                     @Override
                     public void onFailure(final SCANNER_ERROR scanner_error) {
-                        switch (scanner_error) {
-                            case BUSY:
-                                resetUIFromError();
-                                break;
-                            case INVALID_STATE:
-                            case IO_ERROR:
-                            case NO_RESPONSE:
-                            case UNEXPECTED:
-                            case SCANNER_UNREACHABLE:
-                            case UN20_FAILURE:
-                            case UN20_LOW_VOLTAGE:
-                            case UN20_SDK_ERROR:
-                                finishWithUnexpectedError();
-                                break;
-                            case UN20_INVALID_STATE:
-                                startUn20();
-                                break;
-                            case OUTDATED_SCANNER_INFO:
-                                appState.getScanner().getHardwareVersion();
-                                resetUIFromError();
-                                break;
-                            case NOT_CAPTURING:
-                                break;
-                            case INTERRUPTED:
-                                refreshDisplay();
-                                break;
-                            case TIMEOUT:
-                                refreshDisplay();
-                                break;
-                        }
-                        registerScannerButton();
+                        if (scanner_error == SCANNER_ERROR.TIMEOUT)
+                            forceCapture();
+                        else
+                            handleError(scanner_error);
                     }
                 });
     }
 
     private void stopContinuousCapture() {
-        appState.getScanner().stopContinuousCapture(new ResultListener() {
-            @Override
-            public void onSuccess() {
-                scanButton.setEnabled(false);
-                timeoutBar.cancelTimeoutBar();
-            }
-
-            @Override
-            public void onFailure(SCANNER_ERROR scanner_error) {
-
-            }
-        });
+        appState.getScanner().stopContinuousCapture();
     }
 
     private void startUn20() {
@@ -819,12 +772,120 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-    private void registerScannerButton() {
-        appState.getScanner().registerButtonListener(scannerButton);
+    private void forceCapture() {
+        appState.getScanner().forceCapture(sharedPref.getQualityThresholdInt(), new ResultListener() {
+                    @Override
+                    public void onSuccess() {
+                        captureSuccess();
+                    }
+
+                    @Override
+                    public void onFailure(SCANNER_ERROR scanner_error) {
+                        handleError(scanner_error);
+                    }
+                }
+        );
     }
 
-    private void unregisterScannerButton() {
-        appState.getScanner().unregisterButtonListener(scannerButton);
+    private void captureSuccess() {
+        Finger finger = activeFingers.get(currentActiveFingerNo);
+        int quality = appState.getScanner().getImageQuality();
+
+        if (finger.getTemplate() == null || finger.getTemplate().getQualityScore() < quality) {
+            try {
+                activeFingers
+                        .get(currentActiveFingerNo)
+                        .setTemplate(
+                                new Fingerprint(
+                                        finger.getId(),
+                                        appState.getScanner().getTemplate()));
+            } catch (IllegalArgumentException ex) {
+                FirebaseCrash.report(ex);
+                resetUIFromError();
+                return;
+            }
+        }
+
+        int qualityScore1 = sharedPref.getQualityThresholdInt();
+
+        if (quality >= qualityScore1) {
+            activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
+            nudgeMode();
+        } else {
+            activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
+        }
+
+        Vibrate.vibrate(MainActivity.this, 100);
+        refreshDisplay();
+    }
+
+    private void handleError(SCANNER_ERROR scanner_error) {
+        Finger finger = activeFingers.get(currentActiveFingerNo);
+
+        switch (scanner_error) {
+            case BUSY:
+            case INTERRUPTED:
+            case TIMEOUT:
+                finger.setStatus(previousStatus);
+                timeoutBar.cancelTimeoutBar();
+                refreshDisplay();
+                break;
+
+            case UN20_INVALID_STATE:
+                startUn20();
+                break;
+
+            case OUTDATED_SCANNER_INFO:
+                appState.getScanner().updateSensorInfo(new ResultListener() {
+                    @Override
+                    public void onSuccess() {
+                        resetUIFromError();
+                    }
+
+                    @Override
+                    public void onFailure(SCANNER_ERROR scanner_error) {
+                        handleError(scanner_error);
+                    }
+                });
+                break;
+
+            case INVALID_STATE:
+            case SCANNER_UNREACHABLE:
+                reconnect();
+                break;
+
+            case IO_ERROR:
+            case NO_RESPONSE:
+            case UNEXPECTED:
+            case BLUETOOTH_DISABLED:
+            case BLUETOOTH_NOT_SUPPORTED:
+            case SCANNER_UNBONDED:
+            case UN20_FAILURE:
+            case UN20_LOW_VOLTAGE:
+            case UN20_SDK_ERROR:
+                finishWithUnexpectedError();
+        }
+    }
+
+    private void reconnect() {
+        un20WakeupDialog.show();
+
+        if (appState.getScanner() != null) {
+            appState.getScanner().connect(new ResultListener() {
+                @Override
+                public void onSuccess() {
+                    un20WakeupDialog.cancel();
+                    resetUIFromError();
+                }
+
+                @Override
+                public void onFailure(SCANNER_ERROR scanner_error) {
+                    finishWithUnexpectedError();
+                }
+            });
+        } else {
+            finishWithUnexpectedError();
+        }
     }
 
 }
