@@ -5,7 +5,8 @@ import android.os.Bundle;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crash.FirebaseCrash;
-import com.simprints.id.activities.ALERT_TYPE;
+import com.simprints.id.model.ALERT_TYPE;
+import com.simprints.id.model.Callout;
 
 import static com.google.firebase.analytics.FirebaseAnalytics.Event;
 import static com.google.firebase.analytics.FirebaseAnalytics.Param;
@@ -56,7 +57,7 @@ public class Analytics {
         firebaseAnalytics.logEvent("alert", bundle);
     }
 
-    public void setLogin(AppState.Callout callout) {
+    public void setLogin(Callout callout) {
         Bundle bundle = new Bundle();
         bundle.putString(Param.VALUE, String.valueOf(callout.name()));
         firebaseAnalytics.logEvent(Event.LOGIN, bundle);

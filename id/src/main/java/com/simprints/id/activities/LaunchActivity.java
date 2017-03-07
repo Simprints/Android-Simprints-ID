@@ -10,26 +10,21 @@ import android.view.MotionEvent;
 import com.crashlytics.android.Crashlytics;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
+import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
-import com.simprints.id.tools.SharedPref;
 import com.simprints.id.tools.launch.LaunchProcess;
 import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.Event;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.ResultListener;
 import com.simprints.libscanner.SCANNER_ERROR;
-import com.simprints.libsimprints.Constants;
-
-import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
 
-import static android.provider.Settings.Secure;
-import static com.simprints.id.tools.AppState.Callout;
 import static com.simprints.id.tools.AppState.getInstance;
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.ALERT_TYPE_EXTRA;
@@ -63,24 +58,31 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
         setContentView(R.layout.activity_launch);
         Fabric.with(this, new Crashlytics());
 
-        //initialize remote config
+        // Initialize remote config
         RemoteConfig.init();
 
-        analytics = Analytics.getInstance(getApplicationContext());
+        // Parse/verify callout, initialize app state
         appState = getInstance();
+        ALERT_TYPE alert = appState.init(getIntent(), getApplicationContext());
+        if (alert != null) {
+            launchAlert(alert);
+            return;
+        }
 
-        String deviceID = Secure.getString(getApplicationContext().getContentResolver(),
-                Secure.ANDROID_ID);
-        appState.setDeviceId(deviceID);
+
+        // Initialize analytics
+        analytics = Analytics.getInstance(getApplicationContext());
         analytics.setDeviceId(appState.getDeviceId());
+        analytics.setUser(appState.getUserId(), appState.getApiKey());
+        analytics.setLogin(appState.getCallout());
 
-        //Set position tracker
+        // Initialize position tracker
         positionTracker = new PositionTracker(this);
         positionTracker.start();
 
         waitingForConfirmation = false;
 
-        //Start the background sync service in case it has failed for some reason
+        // Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
 
         scannerButton = new ButtonListener() {
@@ -91,8 +93,8 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
             }
         };
 
-        //Validate the callout
-        validateCalloutAndLaunch(getIntent());
+        launchProcess = new LaunchProcess(LaunchActivity.this);
+        launchProcess.launch();
     }
 
     public void finishWith(final int resultCode, final Intent resultData) {
@@ -225,7 +227,8 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
             appState.getData().destroy();
         }
 
-        positionTracker.finish();
+        if (positionTracker != null)
+            positionTracker.finish();
 
         if (appState.getScanner() != null) {
             appState.getScanner().disconnect(new ResultListener() {
@@ -305,81 +308,5 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
         appState.setHardwareVersion(appState.getScanner().getUcVersion());
         appState.getScanner().registerButtonListener(scannerButton);
         vibrate(this, 100);
-    }
-
-    private void validateCalloutAndLaunch(Intent intent) {
-
-        // Check bundle
-        Bundle extras = intent.getExtras();
-        if (extras == null || extras.isEmpty()) {
-            launchAlert(ALERT_TYPE.MISSING_API_KEY);
-            return;
-        }
-
-        // Check action
-        switch (intent.getAction()) {
-            case Constants.SIMPRINTS_IDENTIFY_INTENT:
-                appState.setCallout(Callout.IDENTIFY);
-                break;
-            case Constants.SIMPRINTS_REGISTER_INTENT:
-                appState.setCallout(Callout.REGISTER);
-                appState.setGuid(UUID.randomUUID().toString());
-                break;
-            case Constants.SIMPRINTS_UPDATE_INTENT:
-                String updateId = extras.getString(Constants.SIMPRINTS_UPDATE_GUID);
-                if (updateId == null || updateId.isEmpty()) {
-                    launchAlert(ALERT_TYPE.MISSING_UPDATE_GUID);
-                    return;
-                }
-                appState.setGuid(updateId);
-                appState.setCallout(Callout.UPDATE);
-                break;
-            case Constants.SIMPRINTS_VERIFY_INTENT:
-                String verifyId = extras.getString(Constants.SIMPRINTS_VERIFY_GUID);
-                if (verifyId == null || verifyId.isEmpty()) {
-                    launchAlert(ALERT_TYPE.MISSING_VERIFY_GUID);
-                    return;
-                }
-                appState.setGuid(verifyId);
-                appState.setCallout(Callout.VERIFY);
-                break;
-            default:
-                finishWith(Constants.SIMPRINTS_INVALID_INTENT_ACTION, null);
-                return;
-        }
-        analytics.setLogin(appState.getCallout());
-
-        // Check apiKey
-        String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
-        if (apiKey == null || apiKey.isEmpty()) {
-            launchAlert(ALERT_TYPE.MISSING_API_KEY);
-            return;
-        }
-        appState.setApiKey(apiKey);
-        appState.setAppKey(apiKey.substring(0, 8));
-        new SharedPref(getApplicationContext()).setAppKeyString(appState.getAppKey());
-
-        // Check userId
-        String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
-        if (userId == null || userId.isEmpty()) {
-            launchAlert(ALERT_TYPE.MISSING_USER_ID);
-            return;
-        }
-        appState.setUserId(userId);
-        analytics.setUser(appState.getUserId(), appState.getApiKey());
-
-        // Check moduleId
-        String moduleId = extras.getString(Constants.SIMPRINTS_MODULE_ID);
-        if (moduleId == null || moduleId.isEmpty()) {
-            launchAlert(ALERT_TYPE.MISSING_MODULE_ID);
-            return;
-        }
-
-        // Sets calling package
-        appState.setCallingPackage(null);
-        appState.setCallingPackage(extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE));
-
-        launchProcess = new LaunchProcess(LaunchActivity.this);
-        launchProcess.launch();
     }
 }

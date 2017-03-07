@@ -1,17 +1,27 @@
 package com.simprints.id.tools;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.simprints.id.model.ALERT_TYPE;
+import com.simprints.id.model.Callout;
 import com.simprints.libcommon.RefusalForm;
 import com.simprints.libcommon.Session;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libscanner.Scanner;
+import com.simprints.libsimprints.Constants;
+import com.simprints.libsimprints.Metadata;
 
 import java.util.Calendar;
+import java.util.UUID;
 
 
-@SuppressWarnings("unused")
+@SuppressWarnings("ConstantConditions")
 public class AppState {
 
     private static AppState singleton;
@@ -45,8 +55,70 @@ public class AppState {
         session.setStartTime(c.getTime());
     }
 
-    public void setCallout(Callout callout) {
-        this.callout = callout;
+    @SuppressLint("HardwareIds")
+    public ALERT_TYPE init(Intent intent, Context appContext) {
+        // Open bundle
+        Bundle extras = intent.getExtras();
+        if (extras == null || extras.isEmpty())
+            return ALERT_TYPE.MISSING_API_KEY;
+
+        String action = intent.getAction();
+        if (action == null || action.isEmpty())
+            return ALERT_TYPE.INVALID_INTENT_ACTION;
+        callout = Callout.fromAction(action);
+
+        // Read all bundle fields
+        String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
+        String updateId = extras.getString(Constants.SIMPRINTS_UPDATE_GUID);
+        String verifyId = extras.getString(Constants.SIMPRINTS_VERIFY_GUID);
+        String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
+        String moduleId = extras.getString(Constants.SIMPRINTS_MODULE_ID);
+        String metadataString = extras.getString(Constants.SIMPRINTS_METADATA);
+        callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
+
+        // Check parameters
+        if (apiKey == null || apiKey.isEmpty())
+            return ALERT_TYPE.MISSING_API_KEY;
+
+        if (userId == null || userId.isEmpty())
+            return ALERT_TYPE.MISSING_USER_ID;
+
+        if (moduleId == null || moduleId.isEmpty())
+            return ALERT_TYPE.MISSING_MODULE_ID;
+
+        if (callout == Callout.UPDATE && (updateId == null || updateId.isEmpty()))
+            return ALERT_TYPE.MISSING_UPDATE_GUID;
+
+        if (callout == Callout.VERIFY && (verifyId == null || verifyId.isEmpty()))
+            return ALERT_TYPE.MISSING_VERIFY_GUID;
+
+        Metadata metadata = null;
+        if (metadataString != null && !metadataString.isEmpty())
+            try {
+                metadata = new Metadata(metadataString);
+            } catch (Metadata.InvalidMetadataException e) {
+                return ALERT_TYPE.INVALID_METADATA;
+            }
+
+        // Set attributes accordingly
+        session.setApiKey(apiKey);
+        appKey = apiKey.substring(0, 8);
+        new SharedPref(appContext).setAppKeyString(appKey);
+        session.setUserId(userId);
+        session.setModuleId(moduleId);
+        session.setDeviceId(Settings.Secure.getString(appContext.getContentResolver(), Settings.Secure.ANDROID_ID));
+
+        if (callout == Callout.UPDATE)
+            session.setPersonGuid(updateId);
+        if (callout == Callout.VERIFY)
+            session.setPersonGuid(verifyId);
+        if (callout == Callout.REGISTER)
+            session.setPersonGuid(UUID.randomUUID().toString());
+
+        session.setMetadata(metadata);
+
+
+        return null;
     }
 
     public Callout getCallout() {
@@ -57,32 +129,20 @@ public class AppState {
         return session.getApiKey();
     }
 
-    public void setApiKey(String apiKey) {
-        session.setApiKey(apiKey);
-    }
-
     public String getDeviceId() {
         return session.getDeviceId();
-    }
-
-    public void setDeviceId(String deviceId) {
-        session.setDeviceId(deviceId);
     }
 
     public String getUserId() {
         return session.getUserId();
     }
 
-    public void setUserId(String userId) {
-        session.setUserId(userId);
+    public String getModuleId() {
+        return session.getModuleId();
     }
 
     public String getGuid() {
         return session.getPersonGuid();
-    }
-
-    public void setGuid(String guid) {
-        session.setPersonGuid(guid);
     }
 
     public Scanner getScanner() {
@@ -109,28 +169,20 @@ public class AppState {
         this.data = data;
     }
 
-    public GoogleApiClient getGoogleApiClient() {
+    GoogleApiClient getGoogleApiClient() {
         return googleApiClient;
     }
 
-    public void setGoogleApiClient(GoogleApiClient googleApiClient) {
+    void setGoogleApiClient(GoogleApiClient googleApiClient) {
         this.googleApiClient = googleApiClient;
     }
 
-    public void setLatitude(String latitude) {
+    void setLatitude(String latitude) {
         session.setLatitude(latitude);
     }
 
-    public String getLatitude() {
-        return session.getLatitude();
-    }
-
-    public void setLongitude(String longitude) {
+    void setLongitude(String longitude) {
         session.setLongitude(longitude);
-    }
-
-    public String getLongitude() {
-        return session.getLongitude();
     }
 
     public Session getReadyToSendSession() {
@@ -163,16 +215,8 @@ public class AppState {
         this.connected = connected;
     }
 
-    public void setCallingPackage(String callingPackage) {
-        this.callingPackage = callingPackage;
-    }
-
     public String getCallingPackage() {
         return this.callingPackage;
-    }
-
-    public void setAppKey(String appKey) {
-        this.appKey = appKey;
     }
 
     public String getAppKey() {
@@ -192,10 +236,4 @@ public class AppState {
         singleton = null;
     }
 
-    public enum Callout {
-        REGISTER,
-        IDENTIFY,
-        UPDATE,
-        VERIFY
-    }
 }
