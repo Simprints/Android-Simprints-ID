@@ -31,6 +31,8 @@ import com.google.firebase.crash.FirebaseCrash;
 import com.simprints.id.R;
 import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.fragments.FingerFragment;
+import com.simprints.id.model.ALERT_TYPE;
+import com.simprints.id.model.Callout;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.tools.AppState;
@@ -483,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements
             Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show();
         } else {
             Person person = new Person(appState.getGuid(), fingerprints);
-            if (appState.getCallout() == AppState.Callout.REGISTER || appState.getCallout() == AppState.Callout.UPDATE) {
+            if (appState.getCallout() == Callout.REGISTER || appState.getCallout() == Callout.UPDATE) {
                 appState.getData().savePerson(person);
 
                 registrationResult = new Registration(appState.getGuid());

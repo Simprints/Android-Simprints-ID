@@ -5,9 +5,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.simprints.id.R;
-import com.simprints.id.activities.ALERT_TYPE;
+import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.activities.LaunchActivity;
 import com.simprints.id.tools.AppState;
+import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libdata.DatabaseContext;
@@ -145,25 +146,24 @@ public class LaunchProcess {
     }
 
     private void updateScanner() {
-        if (!btConnection) {
-            // Initializes the session Scanner object if necessary
-            if (launchActivity.appState.getScanner() == null) {
-                List<String> pairedScanners = ScannerUtils.getPairedScanners();
-                if (pairedScanners.size() == 0) {
-                    launchActivity.launchAlert(ALERT_TYPE.NOT_PAIRED);
-                    return;
-                }
-                if (pairedScanners.size() > 1) {
-                    launchActivity.launchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS);
-                    return;
-                }
-                String macAddress = pairedScanners.get(0);
-                appState.setMacAddress(macAddress);
+        // Initializes the session Scanner object if necessary
+        if (launchActivity.appState.getScanner() == null) {
+            List<String> pairedScanners = ScannerUtils.getPairedScanners();
+            if (pairedScanners.size() == 0) {
+                launchActivity.launchAlert(ALERT_TYPE.NOT_PAIRED);
+                return;
             }
-
+            if (pairedScanners.size() > 1) {
+                launchActivity.launchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS);
+                return;
+            }
+            String macAddress = pairedScanners.get(0);
+            appState.setMacAddress(macAddress);
             launchActivity.appState.setScanner(new Scanner(appState.getMacAddress()));
+        }
 
-            // Initiate scanner connection
+        // Initiate scanner connection
+        if (!launchActivity.appState.getScanner().isConnected()) {
             launchActivity.appState.getScanner().connect(new ResultListener() {
                 @Override
                 public void onSuccess() {
@@ -173,6 +173,7 @@ public class LaunchProcess {
 
                 @Override
                 public void onFailure(SCANNER_ERROR scanner_error) {
+                    boolean test = appState.getScanner().isConnected();
                     switch (scanner_error) {
                         case INVALID_STATE:
                             btConnection = true;
@@ -180,13 +181,16 @@ public class LaunchProcess {
                             break;
                         case BLUETOOTH_DISABLED:
                             launchActivity.launchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED);
-                            return;
+                            break;
                         case BLUETOOTH_NOT_SUPPORTED:
                             launchActivity.launchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED);
-                            return;
+                            break;
                         case SCANNER_UNBONDED:
                             launchActivity.launchAlert(ALERT_TYPE.NOT_PAIRED);
                             break;
+
+                        case BUSY:
+                        case IO_ERROR:
                         default:
                             launchActivity.launchAlert(ALERT_TYPE.DISCONNECTED);
                     }
@@ -195,7 +199,7 @@ public class LaunchProcess {
             return;
         }
 
-        launch();
+        launch(); // Update progress bar
 
         if (!resetUI) {
             appState.getScanner().resetUI(new ResultListener() {
@@ -209,18 +213,18 @@ public class LaunchProcess {
                 public void onFailure(SCANNER_ERROR scanner_error) {
                     switch (scanner_error) {
                         case BUSY:
+                        case INVALID_STATE:
                             updateScanner();
                             break;
                         default:
-                            resetUI = true;
-                            updateScanner();
+                            launchActivity.launchAlert(ALERT_TYPE.DISCONNECTED);
                     }
                 }
             });
             return;
         }
 
-        launch();
+        launch(); // Update progress bar
 
         if (!un20WakeUp) {
             appState.getScanner().un20Wakeup(new ResultListener() {
@@ -233,12 +237,12 @@ public class LaunchProcess {
                 @Override
                 public void onFailure(final SCANNER_ERROR scanner_error) {
                     switch (scanner_error) {
+                        case BUSY:
                         case INVALID_STATE:
-                            if (appState.getScanner().isConnected()) {
-                                un20WakeUp = true;
-                                launch();
-                                return;
-                            }
+                            updateScanner();
+                            break;
+                        case UN20_LOW_VOLTAGE:
+                            launchActivity.launchAlert(ALERT_TYPE.LOW_BATTERY);
                         default:
                             launchActivity.launchAlert(ALERT_TYPE.DISCONNECTED);
                     }

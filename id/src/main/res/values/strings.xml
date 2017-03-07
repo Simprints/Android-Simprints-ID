@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Id</string>
 
     <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.6</string>
@@ -78,12 +78,12 @@
     </string>
 
     <!--Launch strings-->
-    <string name="launch_checking_permissions">Checking permissions...</string>
-    <string name="launch_loading_database">Loading database...</string>
-    <string name="launch_checking_api_key">Checking API key...</string>
-    <string name="launch_cc_resolve">Resolving database with CommCare...</string>
-    <string name="launch_bt_connect">Connecting to Vero...</string>
-    <string name="launch_wake_un20">Waking up UN20...</string>
+    <string name="launch_checking_permissions">Checking permissions…</string>
+    <string name="launch_loading_database">Loading database…</string>
+    <string name="launch_checking_api_key">Checking API key…</string>
+    <string name="launch_cc_resolve">Resolving database with CommCare…</string>
+    <string name="launch_bt_connect">Connecting to Vero…</string>
+    <string name="launch_wake_un20">Waking up UN20…</string>
 
     <!--Main app-->
     <string name="scan_label">SCAN</string>
@@ -92,6 +92,8 @@
     <string name="missing_apikey_message">A configuration error has occurred (missing API key), please contact your system administrator</string>
     <string name="missing_calling_package_message">A configuration error has occurred (missing calling package) please contact your system administrator</string>
     <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
+    <string name="invalid_intentAction_message">A configuration error has occurred (invalid intent action), please contact your system administrator</string>
+    <string name="invalid_metadata_message">A configuration error has occurred (invalid metadata), please contact your system administrator</string>
     <string name="missing_userId_message">A configuration error has occurred (no user ID), please contact your system administrator</string>
     <string name="missing_moduleId_message">A configuration error has occurred (no module ID), please contact your system administrator</string>
     <string name="missing_updateId_message">A configuration error has occurred (no update GUID), please contact your system administrator</string>
@@ -108,7 +110,7 @@
     <string name="disconnected_message">The scanner is unreachable, please make sure it is powered on and close to the phone</string>
     <string name="close">CLOSE</string>
     <string name="title_activity_main" translatable="false">MainActivity</string>
-    <string name="cancel_button">CANCEL</string>
+    <string name="cancel_button" tools:ignore="ButtonCase">CANCEL</string>
     <string name="try_again_label">Try Again</string>
     <string name="settings_label">Phone settings</string>
     <string name="rescan_label">Re-scan</string>
@@ -120,7 +122,7 @@
     <string name="good_scan_direction">Swipe left to next finger</string>
     <string name="poor_scan_direction">Please re-scan</string>
     <string name="please_scan">Please scan</string>
-    <string name="scanning">Scanning...</string>
+    <string name="scanning">Scanning…</string>
     <string name="last_scan_message">Press arrow to continue</string>
     <string name="empty" translatable="false" />
     <string name="unforeseen_error_message">Sorry, an unforeseen error occurred, press close to continue</string>
@@ -133,7 +135,7 @@
     <string name="network_failure_message">Network failure, please make sure you are connected to the internet</string>
     <string name="please_wait">Please wait while we proceed to identification</string>
     <string name="finger_image_description" translatable="false">Hands with arrow pointing to a finger</string>
-    <string name="coming_soon">Coming soon...</string>
+    <string name="coming_soon">Coming soon…</string>
     <string name="confirm_consent">Tap here to confirm consent</string>
     <string name="nudge_mode_checkbox_name">Nudge Mode</string>
     <string name="healthworker_consent_checkbox">I agree to Simprints using this data in these ways.</string>
@@ -165,10 +167,10 @@
     <string name="alert_api_key_verify_failed_body">"We could not verify your API key, please make sure you are connected to the internet and try again"</string>
     <string name="main_error_graphic" translatable="false">main error graphic</string>
     <string name="sync_data">Sync Data</string>
-    <string name="syncing">Syncing...</string>
+    <string name="syncing">Syncing…</string>
     <string name="not_signed_in">Not Signed In</string>
     <string name="offline">Offline</string>
-    <string name="updating_database">Updating project database...</string>
+    <string name="updating_database">Updating project database…</string>
     <string name="vibrate">Vibrate</string>
     <string name="scanner_not_here">Scanner not here</string>
     <string name="scanner_not_working">Scanner not working</string>
@@ -176,7 +178,7 @@
     <string name="beneficiary_was_physically_unable">Beneficiary was physically unable to give fingerprints (e.g. too painful, missing fingers)</string>
     <string name="beneficiary_refused">Beneficiary refused</string>
     <string name="other">Other</string>
-    <string name="hint_other_reason">More info...</string>
+    <string name="hint_other_reason">More info…</string>
     <string name="button_scan_prints">Scan Fingerprints</string>
     <string name="button_submit">Submit</string>
     <string name="why_did_you_skip_fingerprinting">Why did you skip fingerprinting?</string>
@@ -184,4 +186,6 @@
     <string name="privacy_label">Privacy</string>
     <string name="update_title">Update</string>
     <string name="verify_title">Verify</string>
+    <string name="low_battery_title">LOW BATTERY</string>
+    <string name="low_battery_message">Scanner battery low, please charge your scanner</string>
 </resources>

@@ -1,7 +1,6 @@
 package com.simprints.id.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,10 +12,9 @@ import android.widget.TextView;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
 import com.simprints.id.R;
+import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.InternalConstants;
-import com.simprints.libsimprints.Constants;
 
 public class AlertActivity extends AppCompatActivity {
 
@@ -70,41 +68,7 @@ public class AlertActivity extends AppCompatActivity {
             alertLeftButtonTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
-                    switch (alertType) {
-
-                        case UNEXPECTED_ERROR:
-                        case BLUETOOTH_NOT_ENABLED:
-                        case NOT_PAIRED:
-                        case MULTIPLE_PAIRED_SCANNERS:
-                        case DISCONNECTED:
-                        case UNVERIFIED_API_KEY:
-                            analytics.setAlert(alertType, true);
-                            setResult(InternalConstants.RESULT_TRY_AGAIN);
-                            finish();
-                            return;
-
-                        case MISSING_API_KEY:
-                            setResult(Constants.SIMPRINTS_MISSING_API_KEY);
-                            break;
-                        case MISSING_USER_ID:
-                            setResult(Constants.SIMPRINTS_MISSING_USER_ID);
-                            break;
-                        case MISSING_MODULE_ID:
-                            setResult(Constants.SIMPRINTS_MISSING_MODULE_ID);
-                            break;
-                        case MISSING_UPDATE_GUID:
-                            setResult(Constants.SIMPRINTS_MISSING_UPDATE_GUID);
-                            break;
-                        case INVALID_API_KEY:
-                            setResult(Constants.SIMPRINTS_INVALID_API_KEY);
-                            break;
-                        case BLUETOOTH_NOT_SUPPORTED:
-                        default:
-                            setResult(RESULT_CANCELED);
-                            break;
-                    }
-
+                    setResult(alertType.getResultCode());
                     analytics.setAlert(alertType, false);
                     finish();
                 }
