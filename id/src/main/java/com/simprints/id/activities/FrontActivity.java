@@ -57,7 +57,7 @@ public class FrontActivity extends AppCompatActivity implements DatabaseEventLis
 
         new SyncSetup(getApplicationContext()).initialize();
 
-        PermissionManager.requestPermissions(FrontActivity.this);
+        PermissionManager.requestAllPermissions(FrontActivity.this);
 
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
