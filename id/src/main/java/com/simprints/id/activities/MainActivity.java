@@ -296,17 +296,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onPageSelected(int position) {
                 currentActiveFingerNo = position;
                 refreshDisplay();
-                appState.getScanner().resetUI(new ResultListener() {
-                    @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onFailure(SCANNER_ERROR scanner_error) {
-
-                    }
-                });
+                appState.getScanner().resetUI(null);
             }
 
             @Override
@@ -384,6 +374,8 @@ public class MainActivity extends AppCompatActivity implements
             public void onSuccess() {
                 refreshDisplay();
                 scanButton.setEnabled(true);
+                un20WakeupDialog.cancel();
+
             }
 
             @Override
@@ -392,16 +384,19 @@ public class MainActivity extends AppCompatActivity implements
                     case BUSY:
                         resetUIFromError();
                         break;
+                    case INVALID_STATE:
+                        reconnect();
+                        break;
                     default:
-                        finishWithUnexpectedError();
+                        finishWith(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
         });
     }
 
-    private void finishWithUnexpectedError() {
+    private void finishWith(ALERT_TYPE alertType) {
         Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra("alertType", ALERT_TYPE.UNEXPECTED_ERROR);
+        intent.putExtra("alertType", alertType);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
@@ -769,7 +764,17 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onFailure(SCANNER_ERROR scanner_error) {
-                finishWithUnexpectedError();
+                // Handling an error here becomes quite complicated, it's better
+                // to just display an error screen and let the user close & reopen simprints id
+                switch (scanner_error) {
+                    case UN20_LOW_VOLTAGE:
+                        finishWith(ALERT_TYPE.LOW_BATTERY);
+                        break;
+                    case BUSY:
+                    case INVALID_STATE:
+                    default:
+                        finishWith(ALERT_TYPE.DISCONNECTED);
+                }
             }
         });
     }
@@ -865,7 +870,7 @@ public class MainActivity extends AppCompatActivity implements
             case UN20_FAILURE:
             case UN20_LOW_VOLTAGE:
             case UN20_SDK_ERROR:
-                finishWithUnexpectedError();
+                finishWith(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
 
@@ -876,17 +881,16 @@ public class MainActivity extends AppCompatActivity implements
             appState.getScanner().connect(new ResultListener() {
                 @Override
                 public void onSuccess() {
-                    un20WakeupDialog.cancel();
                     resetUIFromError();
                 }
 
                 @Override
                 public void onFailure(SCANNER_ERROR scanner_error) {
-                    finishWithUnexpectedError();
+                    finishWith(ALERT_TYPE.DISCONNECTED);
                 }
             });
         } else {
-            finishWithUnexpectedError();
+            finishWith(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
 

@@ -73,7 +73,7 @@ public enum ALERT_TYPE {
 
     LOW_BATTERY(R.string.low_battery_title, R.string.low_battery_message,
             R.drawable.scanner_error_icon, R.drawable.low_battery_icon, R.string.close, R.string.empty,
-            false, R.color.simprints_blue, Constants.SIMPRINTS_MISSING_UPDATE_GUID),
+            true, R.color.simprints_blue, Constants.SIMPRINTS_MISSING_UPDATE_GUID),
 
     //Unexpected errors
     UNEXPECTED_ERROR(R.string.error_occurred_title, R.string.unforeseen_error_message,
@@ -146,9 +146,5 @@ public enum ALERT_TYPE {
 
     public int getResultCode() {
         return resultCode;
-    }
-
-    public void setAlertHintDrawableId(int alertHintDrawableId) {
-        this.alertHintDrawableId = alertHintDrawableId;
     }
 }

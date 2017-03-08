@@ -37,6 +37,7 @@ public class AppState {
     private DatabaseContext data;
     private Session session;
     private GoogleApiClient googleApiClient;
+    private Analytics analytics;
     private boolean signedIn;
     private boolean connected;
     private String callingPackage;
@@ -46,10 +47,11 @@ public class AppState {
 
     private AppState() {
         scanner = null;
-        refusalForm = null;
         data = null;
         session = new Session();
         googleApiClient = null;
+        analytics = null;
+        refusalForm = null;
         callout = null;
         Calendar c = Calendar.getInstance();
         session.setStartTime(c.getTime());
@@ -57,6 +59,7 @@ public class AppState {
 
     @SuppressLint("HardwareIds")
     public ALERT_TYPE init(Intent intent, Context appContext) {
+        analytics = Analytics.getInstance(appContext);
         // Open bundle
         Bundle extras = intent.getExtras();
         if (extras == null || extras.isEmpty())
@@ -66,6 +69,7 @@ public class AppState {
         if (action == null || action.isEmpty())
             return ALERT_TYPE.INVALID_INTENT_ACTION;
         callout = Callout.fromAction(action);
+        analytics.setLogin(callout);
 
         // Read all bundle fields
         String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
@@ -106,7 +110,7 @@ public class AppState {
         new SharedPref(appContext).setAppKeyString(appKey);
         session.setUserId(userId);
         session.setModuleId(moduleId);
-        session.setDeviceId(Settings.Secure.getString(appContext.getContentResolver(), Settings.Secure.ANDROID_ID));
+        analytics.setUser(userId, apiKey);
 
         if (callout == Callout.UPDATE)
             session.setPersonGuid(updateId);
@@ -117,6 +121,10 @@ public class AppState {
 
         session.setMetadata(metadata);
 
+        // Set other attributes
+        String deviceId = Settings.Secure.getString(appContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+        session.setDeviceId(deviceId);
+        analytics.setDeviceId(deviceId);
 
         return null;
     }
@@ -137,10 +145,6 @@ public class AppState {
         return session.getUserId();
     }
 
-    public String getModuleId() {
-        return session.getModuleId();
-    }
-
     public String getGuid() {
         return session.getPersonGuid();
     }
@@ -159,6 +163,7 @@ public class AppState {
 
     public void setMacAddress(String macAddress) {
         session.setMacAddress(macAddress);
+        analytics.setScannerMac(macAddress);
     }
 
     public DatabaseContext getData() {

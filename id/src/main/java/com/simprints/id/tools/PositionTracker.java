@@ -105,7 +105,7 @@ public class PositionTracker implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d(activity, "onConnected");
+        Log.d(activity, "PositionTracker.onConnected");
         if (requestPermission()) {
             getLastLocation();
             startLocationUpdates();
@@ -119,7 +119,7 @@ public class PositionTracker implements
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d(activity, String.format(Locale.UK,
-                "onConnectionFailed : %s", connectionResult.toString()));
+                "PositionTracker.onConnectionFailed : %s", connectionResult.toString()));
 
         switch (connectionResult.getErrorCode()) {
             case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
@@ -142,17 +142,17 @@ public class PositionTracker implements
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     InternalConstants.LOCATION_PERMISSION_REQUEST
             );
-            Log.d(activity, "requestionPermission() -> false");
+            Log.d(activity, "PositionTracker.requestionPermission() -> false");
             return false;
         } else {
-            Log.d(activity, "requestionPermission() -> true");
+            Log.d(activity, "PositionTracker.requestionPermission() -> true");
             return true;
         }
 
     }
 
     private void getLastLocation() {
-        Log.d(activity, "getLastLocation()");
+        Log.d(activity, "PositionTracker.getLastLocation()");
 
         int locationPermission = ContextCompat.checkSelfPermission(
                 activity, Manifest.permission.ACCESS_FINE_LOCATION
@@ -190,12 +190,12 @@ public class PositionTracker implements
                     switch (status.getStatusCode()) {
 
                         case LocationSettingsStatusCodes.SUCCESS:
-                            Log.d(activity, "startLocationUpdates() -> SUCCESS");
+                            Log.d(activity, "PositionTracker.startLocationUpdates() -> SUCCESS");
                             requestLocationUpdates();
                             break;
 
                         case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            Log.d(activity, "startLocationUpdates() -> RESOLUTION");
+                            Log.d(activity, "PositionTracker.startLocationUpdates() -> RESOLUTION");
                             try {
                                 status.startResolutionForResult(
                                         activity, InternalConstants.RESOLUTION_REQUEST
@@ -205,7 +205,7 @@ public class PositionTracker implements
                             break;
 
                         default:
-                            Log.d(activity, "startLocationUpdates() -> FAILURE");
+                            Log.d(activity, "PositionTracker.startLocationUpdates() -> FAILURE");
                     }
                 }
             });
@@ -213,7 +213,7 @@ public class PositionTracker implements
     }
 
     private void requestLocationUpdates() {
-        Log.d(activity, "requestLocationUpdates()");
+        Log.d(activity, "PositionTracker.requestLocationUpdates()");
         int locationPermission = ContextCompat.checkSelfPermission(
                 activity,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -234,7 +234,7 @@ public class PositionTracker implements
         if (location != null) {
             appState.setLatitude(String.valueOf(location.getLatitude()));
             appState.setLongitude(String.valueOf(location.getLongitude()));
-            Log.d(activity, String.format(Locale.UK, "onLocationChanged(%f %f)",
+            Log.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
                     location.getLatitude(), location.getLongitude()));
         }
     }
