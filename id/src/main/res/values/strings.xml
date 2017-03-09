@@ -84,6 +84,7 @@
     <string name="launch_cc_resolve">Resolving database with CommCare…</string>
     <string name="launch_bt_connect">Connecting to Vero…</string>
     <string name="launch_wake_un20">Waking up UN20…</string>
+    <string name="launch_setup">Setting up Vero…</string>
 
     <!--Main app-->
     <string name="scan_label">SCAN</string>
