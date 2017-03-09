@@ -15,7 +15,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -30,13 +29,14 @@ import android.widget.Toast;
 import com.google.firebase.crash.FirebaseCrash;
 import com.simprints.id.R;
 import com.simprints.id.adapters.FingerPageAdapter;
+import com.simprints.id.controllers.Setup;
+import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.Dialogs;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.RemoteConfig;
@@ -66,6 +66,8 @@ import java.util.Locale;
 
 import static com.simprints.id.model.Finger.NB_OF_FINGERS;
 import static com.simprints.id.model.Finger.Status;
+import static com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST;
+import static com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
@@ -104,6 +106,8 @@ public class MainActivity extends AppCompatActivity implements
     private ButtonListener scannerButton;
 
     private AppState appState;
+
+    private Setup setup = Setup.getInstance();
 
     private Handler handler;
 
@@ -147,11 +151,10 @@ public class MainActivity extends AppCompatActivity implements
         scanButton = (Button) findViewById(R.id.scan_button);
         viewPager = (ViewPagerCustom) findViewById(R.id.view_pager);
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
-        un20WakeupDialog = Dialogs.getUn20Dialog(this);
+        un20WakeupDialog = initUn20Dialog();
         registrationResult = null;
         sharedPref = new SharedPref(getApplicationContext());
-        timeoutBar = new TimeoutBar(getApplicationContext(),
-                (ProgressBar) findViewById(R.id.pb_timeout));
+        timeoutBar = new TimeoutBar(getApplicationContext(), (ProgressBar) findViewById(R.id.pb_timeout));
 
         initActiveFingers();
         initBarAndDrawer();
@@ -172,6 +175,21 @@ public class MainActivity extends AppCompatActivity implements
 
         activeFingers.get(activeFingers.size() - 1).setLastFinger(true);
         Arrays.sort(fingers);
+    }
+
+    private ProgressDialog initUn20Dialog() {
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setIndeterminate(true);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setMessage("Re-Connecting...");
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                setResult(RESULT_CANCELED);
+                finish();
+            }
+        });
+        return dialog;
     }
 
     private void initBarAndDrawer() {
@@ -375,7 +393,6 @@ public class MainActivity extends AppCompatActivity implements
                 refreshDisplay();
                 scanButton.setEnabled(true);
                 un20WakeupDialog.cancel();
-
             }
 
             @Override
@@ -388,13 +405,17 @@ public class MainActivity extends AppCompatActivity implements
                         reconnect();
                         break;
                     default:
-                        finishWith(ALERT_TYPE.UNEXPECTED_ERROR);
+                        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
         });
     }
 
-    private void finishWith(ALERT_TYPE alertType) {
+
+    /**
+     * Start alert activity
+     */
+    private void launchAlert(ALERT_TYPE alertType) {
         Intent intent = new Intent(this, AlertActivity.class);
         intent.putExtra("alertType", alertType);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
@@ -421,6 +442,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onDataEvent(Event event) {
         Log.d(this, String.format(Locale.UK, "onDataEvent %s %s", event.name(), event.details()));
+
+        setup.onDataEvent(event);
+
         switch (event) {
             case SYNC_INTERRUPTED:
                 if (syncItem == null)
@@ -508,8 +532,11 @@ public class MainActivity extends AppCompatActivity implements
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
+            toggleContinuousCapture();
         } else {
-            super.onBackPressed();
+            setup.stop();
+            startActivityForResult(new Intent(this, RefusalActivity.class), REFUSAL_ACTIVITY_REQUEST);
         }
     }
 
@@ -661,6 +688,13 @@ public class MainActivity extends AppCompatActivity implements
             case ABOUT_ACTIVITY_REQUEST_CODE:
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
+            case ALERT_ACTIVITY_REQUEST_CODE:
+            case REFUSAL_ACTIVITY_REQUEST:
+                if (resultCode != RESULT_TRY_AGAIN) {
+                    setResult(resultCode, data);
+                    finish();
+                }
+                break;
             default:
                 setResult(resultCode, data);
                 finish();
@@ -673,21 +707,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onDestroy();
         if (appState.getScanner() != null) {
             appState.getScanner().unregisterButtonListener(scannerButton);
-        }
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
-                toggleContinuousCapture();
-            } else {
-                setResult(RESULT_CANCELED);
-                finish();
-            }
-            return true;
-        } else {
-            return super.onKeyDown(keyCode, event);
         }
     }
 
@@ -751,33 +770,6 @@ public class MainActivity extends AppCompatActivity implements
         appState.getScanner().stopContinuousCapture();
     }
 
-    private void startUn20() {
-        timeoutBar.cancelTimeoutBar();
-        un20WakeupDialog.show();
-
-        appState.getScanner().un20Wakeup(new ResultListener() {
-            @Override
-            public void onSuccess() {
-                resetUIFromError();
-                un20WakeupDialog.cancel();
-            }
-
-            @Override
-            public void onFailure(SCANNER_ERROR scanner_error) {
-                // Handling an error here becomes quite complicated, it's better
-                // to just display an error screen and let the user close & reopen simprints id
-                switch (scanner_error) {
-                    case UN20_LOW_VOLTAGE:
-                        finishWith(ALERT_TYPE.LOW_BATTERY);
-                        break;
-                    case BUSY:
-                    case INVALID_STATE:
-                    default:
-                        finishWith(ALERT_TYPE.DISCONNECTED);
-                }
-            }
-        });
-    }
 
     private void forceCapture() {
         appState.getScanner().forceCapture(sharedPref.getQualityThresholdInt(), new ResultListener() {
@@ -839,7 +831,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case UN20_INVALID_STATE:
-                startUn20();
+                reconnect();
                 break;
 
             case OUTDATED_SCANNER_INFO:
@@ -870,28 +862,41 @@ public class MainActivity extends AppCompatActivity implements
             case UN20_FAILURE:
             case UN20_LOW_VOLTAGE:
             case UN20_SDK_ERROR:
-                finishWith(ALERT_TYPE.UNEXPECTED_ERROR);
+                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
 
     private void reconnect() {
+        SetupCallback setupCallback = new SetupCallback () {
+            @Override
+            public void onSuccess() {
+                Log.d(MainActivity.this, "reconnect.onSuccess()");
+                un20WakeupDialog.dismiss();
+                activeFingers.get(currentActiveFingerNo).setStatus(previousStatus);
+                timeoutBar.cancelTimeoutBar();
+                refreshDisplay();
+            }
+
+            @Override
+            public void onProgress(int progress, int detailsId) {
+                Log.d(MainActivity.this, "reconnect.onProgress()");
+            }
+
+            @Override
+            public void onError(int resultCode, Intent resultData) {
+                Log.d(MainActivity.this, "reconnect.onError()");
+                launchAlert(ALERT_TYPE.DISCONNECTED);
+            }
+
+            @Override
+            public void onAlert(@NonNull ALERT_TYPE alertType) {
+                Log.d(MainActivity.this, "reconnect.onAlert()");
+                launchAlert(alertType);
+            }
+        };
+
         un20WakeupDialog.show();
-
-        if (appState.getScanner() != null) {
-            appState.getScanner().connect(new ResultListener() {
-                @Override
-                public void onSuccess() {
-                    resetUIFromError();
-                }
-
-                @Override
-                public void onFailure(SCANNER_ERROR scanner_error) {
-                    finishWith(ALERT_TYPE.DISCONNECTED);
-                }
-            });
-        } else {
-            finishWith(ALERT_TYPE.UNEXPECTED_ERROR);
-        }
+        setup.start(this, this, setupCallback);
     }
 
 }

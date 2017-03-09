@@ -6,13 +6,18 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
+import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
+import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.id.controllers.Setup;
@@ -53,6 +58,10 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
         }
     };
 
+    // Setup callback
+    private Setup setup = Setup.getInstance();
+    private SetupCallback setupCallback;
+
     // True iff the user confirmed consent
     private boolean consentConfirmed = false;
 
@@ -63,7 +72,6 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
     private boolean launchOutOfFocus = false;
 
 
-    private Setup setup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,13 +98,22 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
         // Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
 
-        // Start the launch process
-        setup = new Setup(LaunchActivity.this, new Runnable() {
+        final ProgressBar launchProgress = (ProgressBar) findViewById(R.id.pb_launch_progress);
+        final TextView loadingInfoTextView = (TextView) findViewById(R.id.tv_loadingInfo);
+        final TextView confirmConsentTextView = (TextView) findViewById(R.id.confirm_consent_text_view);
+
+        confirmConsentTextView.setVisibility(View.INVISIBLE);
+        loadingInfoTextView.setVisibility(View.VISIBLE);
+
+        setupCallback = new SetupCallback () {
             @Override
-            public void run() {
+            public void onSuccess() {
                 // If it is the first time the launch process finishes, wait for consent confirmation
                 // Else, go directly to the main activity
                 if (!consentConfirmed) {
+                    launchProgress.setProgress(100);
+                    confirmConsentTextView.setVisibility(View.VISIBLE);
+                    loadingInfoTextView.setVisibility(View.INVISIBLE);
                     waitingForConfirmation = true;
                     appState.getScanner().registerButtonListener(scannerButton);
                     vibrate(LaunchActivity.this, 100);
@@ -104,37 +121,48 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
                     finishLaunch();
                 }
             }
-        });
-        setup.start();
+
+            @Override
+            public void onProgress(int progress, int detailsId) {
+                Log.d(LaunchActivity.this, "onprogress");
+                launchProgress.setProgress(progress);
+                loadingInfoTextView.setText(detailsId);
+            }
+
+            @Override
+            public void onError(int resultCode, Intent resultData) {
+                finishWith(resultCode, resultData);
+            }
+
+            @Override
+            public void onAlert(@NonNull ALERT_TYPE alertType) {
+                launchAlert(alertType);
+            }
+        };
+
+
+        // Start the launch process
+        setup.start(this, this, setupCallback);
     }
 
     /**
      * Start alert activity
      */
-    public void launchAlert(ALERT_TYPE alertType) {
+    private void launchAlert(ALERT_TYPE alertType) {
         if (launchOutOfFocus)
             return;
 
         launchOutOfFocus = true;
-        setup.pause();
+        setup.stop();
         Intent intent = new Intent(this, AlertActivity.class);
         intent.putExtra(ALERT_TYPE_EXTRA, alertType);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST);
     }
 
     /**
-     * Start refusal form activity
-     */
-    public void launchRefusal() {
-        launchOutOfFocus = true;
-        setup.pause();
-        startActivityForResult(new Intent(this, RefusalActivity.class), REFUSAL_ACTIVITY_REQUEST);
-    }
-
-    /**
      * Close Simprints ID
      */
-    public void finishWith(final int resultCode, final Intent resultData) {
+    private void finishWith(final int resultCode, final Intent resultData) {
         waitingForConfirmation = false;
         setResult(resultCode, resultData);
         finish();
@@ -143,7 +171,7 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
 
     private void tryAgain() {
         launchOutOfFocus = false;
-        setup.resume();
+        setup.start(this, this, setupCallback);
     }
 
     @Override
@@ -174,15 +202,15 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
                 break;
             case MAIN_ACTIVITY_REQUEST:
                 switch (resultCode) {
-                    case RESULT_CANCELED:
-                        launchRefusal();
-                        break;
-                    case RESULT_OK:
-                        finishWith(resultCode, data);
-                        break;
                     case RESULT_TRY_AGAIN:
                         tryAgain();
                         break;
+
+                    case RESULT_CANCELED:
+                    case RESULT_OK:
+                        finishWith(resultCode, data);
+                        break;
+
                 }
                 break;
             case ALERT_ACTIVITY_REQUEST:
@@ -204,7 +232,9 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
 
     @Override
     public void onBackPressed() {
-        launchRefusal();
+        launchOutOfFocus = true;
+        setup.stop();
+        startActivityForResult(new Intent(this, RefusalActivity.class), REFUSAL_ACTIVITY_REQUEST);
     }
 
     @Override
@@ -240,9 +270,7 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
 
     @Override
     public void onDataEvent(final Event event) {
-        if (setup != null) {
-            setup.onDataEvent(event);
-        }
+        setup.onDataEvent(event);
 
         switch (event) {
             case CONNECTED:
