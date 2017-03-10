@@ -124,7 +124,7 @@ public class LaunchProcess {
 
     public void updateData() {
         if (!apiKey) {
-            appState.getData().signIn();
+            appState.getData().signIn(BuildConfig.DEBUG);
             return;
         }
 

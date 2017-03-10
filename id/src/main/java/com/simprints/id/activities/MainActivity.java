@@ -28,6 +28,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
 import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.fragments.FingerFragment;
@@ -557,7 +558,7 @@ public class MainActivity extends AppCompatActivity implements
             case CONNECTED:
                 appState.setConnected(true);
                 if (!appState.getSignedIn())
-                    appState.getData().signIn();
+                    appState.getData().signIn(BuildConfig.DEBUG);
                 updateSyncStatus();
                 break;
             case DISCONNECTED:
