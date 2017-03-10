@@ -421,6 +421,12 @@ public class MainActivity extends AppCompatActivity implements
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
+    @Override
+    public void startActivityForResult(Intent intent, int requestCode) {
+        appState.getScanner().unregisterButtonListener(scannerButton);
+        super.startActivityForResult(intent, requestCode);
+    }
+
     private void nudgeMode() {
         boolean nudge = sharedPref.getNudgeModeBool();
 
@@ -686,11 +692,15 @@ public class MainActivity extends AppCompatActivity implements
             case SETTINGS_ACTIVITY_REQUEST_CODE:
             case PRIVACY_ACTIVITY_REQUEST_CODE:
             case ABOUT_ACTIVITY_REQUEST_CODE:
+                appState.getScanner().registerButtonListener(scannerButton);
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
-            case ALERT_ACTIVITY_REQUEST_CODE:
+
             case REFUSAL_ACTIVITY_REQUEST:
-                if (resultCode != RESULT_TRY_AGAIN) {
+            case ALERT_ACTIVITY_REQUEST_CODE:
+                if (resultCode == RESULT_TRY_AGAIN) {
+                    reconnect();
+                } else {
                     setResult(resultCode, data);
                     finish();
                 }
@@ -786,6 +796,12 @@ public class MainActivity extends AppCompatActivity implements
         );
     }
 
+    private void cancelCaptureUI() {
+        activeFingers.get(currentActiveFingerNo).setStatus(previousStatus);
+        timeoutBar.cancelTimeoutBar();
+        refreshDisplay();
+    }
+
     private void captureSuccess() {
         Finger finger = activeFingers.get(currentActiveFingerNo);
         int quality = appState.getScanner().getImageQuality();
@@ -819,22 +835,15 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void handleError(SCANNER_ERROR scanner_error) {
-        Finger finger = activeFingers.get(currentActiveFingerNo);
-
         switch (scanner_error) {
             case BUSY:
             case INTERRUPTED:
             case TIMEOUT:
-                finger.setStatus(previousStatus);
-                timeoutBar.cancelTimeoutBar();
-                refreshDisplay();
-                break;
-
-            case UN20_INVALID_STATE:
-                reconnect();
+                cancelCaptureUI();
                 break;
 
             case OUTDATED_SCANNER_INFO:
+                cancelCaptureUI();
                 appState.getScanner().updateSensorInfo(new ResultListener() {
                     @Override
                     public void onSuccess() {
@@ -850,6 +859,8 @@ public class MainActivity extends AppCompatActivity implements
 
             case INVALID_STATE:
             case SCANNER_UNREACHABLE:
+            case UN20_INVALID_STATE:
+                cancelCaptureUI();
                 reconnect();
                 break;
 
@@ -867,14 +878,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void reconnect() {
+        appState.getScanner().unregisterButtonListener(scannerButton);
+
         SetupCallback setupCallback = new SetupCallback () {
             @Override
             public void onSuccess() {
                 Log.d(MainActivity.this, "reconnect.onSuccess()");
                 un20WakeupDialog.dismiss();
-                activeFingers.get(currentActiveFingerNo).setStatus(previousStatus);
-                timeoutBar.cancelTimeoutBar();
-                refreshDisplay();
+                appState.getScanner().registerButtonListener(scannerButton);
             }
 
             @Override
@@ -885,12 +896,14 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onError(int resultCode, Intent resultData) {
                 Log.d(MainActivity.this, "reconnect.onError()");
+                un20WakeupDialog.dismiss();
                 launchAlert(ALERT_TYPE.DISCONNECTED);
             }
 
             @Override
             public void onAlert(@NonNull ALERT_TYPE alertType) {
                 Log.d(MainActivity.this, "reconnect.onAlert()");
+                un20WakeupDialog.dismiss();
                 launchAlert(alertType);
             }
         };

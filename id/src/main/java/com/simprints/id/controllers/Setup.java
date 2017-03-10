@@ -79,6 +79,11 @@ public class Setup {
         goOn();
     }
 
+    public void destroy() {
+        activity = null;
+        singleton = null;
+    }
+
 
     private void goOn() {
         if (this.paused)

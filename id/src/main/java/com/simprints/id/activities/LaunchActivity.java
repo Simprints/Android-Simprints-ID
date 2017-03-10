@@ -265,6 +265,8 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
             appState.setScanner(null);
         }
 
+        setup.destroy();
+
         super.onDestroy();
     }
 
