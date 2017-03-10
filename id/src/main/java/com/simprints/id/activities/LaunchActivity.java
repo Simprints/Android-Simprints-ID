@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+import com.simprints.id.BuildConfig;
 import com.simprints.id.LaunchProcess;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
@@ -311,7 +312,7 @@ public class LaunchActivity extends AppCompatActivity
             case CONNECTED:
                 appState.setConnected(true);
                 if (!appState.getSignedIn())
-                    appState.getData().signIn();
+                    appState.getData().signIn(BuildConfig.DEBUG);
                 break;
             case DISCONNECTED:
                 appState.setConnected(false);
