@@ -1,5 +1,6 @@
 package com.simprints.id.activities;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -662,8 +663,9 @@ public class MainActivity extends AppCompatActivity implements
                         refreshDisplay();
                     }
                 });
-
-        builder.create().show();
+        if (!this.isFinishing()) {
+            builder.create().show();
+        }
     }
 
     public void autoAdd() {
@@ -908,7 +910,10 @@ public class MainActivity extends AppCompatActivity implements
             }
         };
 
-        un20WakeupDialog.show();
+        if (!this.isFinishing()) {
+            un20WakeupDialog.show();
+        }
+
         setup.start(this, this, setupCallback);
     }
 
