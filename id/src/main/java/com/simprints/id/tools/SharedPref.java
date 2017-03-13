@@ -149,7 +149,7 @@ public class SharedPref {
      * Sync group
      */
     public Constants.GROUP getSyncGroup() {
-        int syncGroupInt = sharedPref.getInt(sync_group, 0);
+        int syncGroupInt = sharedPref.getInt(sync_group, 1);
         return Constants.GROUP.values()[syncGroupInt];
     }
 
@@ -163,7 +163,7 @@ public class SharedPref {
      * Match group
      */
     public Constants.GROUP getMatchGroup() {
-        int matchGroupInt = sharedPref.getInt(match_group, 0);
+        int matchGroupInt = sharedPref.getInt(match_group, 1);
         return Constants.GROUP.values()[matchGroupInt];
     }
 
