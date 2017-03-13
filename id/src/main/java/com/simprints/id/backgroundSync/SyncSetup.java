@@ -44,7 +44,9 @@ public class SyncSetup {
             if (availability.isUserResolvableError(resultCode)) {
                 // Show dialog to resolve the error if the calling context is an activity.
                 if (context instanceof Activity) {
-                    availability.getErrorDialog((Activity) context, resultCode, RC_PLAY_SERVICES).show();
+                    if (!((Activity) context).isFinishing()) {
+                        availability.getErrorDialog((Activity) context, resultCode, RC_PLAY_SERVICES).show();
+                    }
                 }
                 return false;
             } else {
