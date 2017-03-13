@@ -18,6 +18,7 @@ import android.widget.ToggleButton;
 import com.simprints.id.R;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.SharedPref;
+import com.simprints.libdata.tools.Constants;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private SharedPref sharedPref;
@@ -158,6 +159,32 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             }
         });
 
+        //Set the sync group radio buttons
+        Constants.GROUP syncGroup = sharedPref.getSyncGroup();
+        switch (syncGroup) {
+            case GLOBAL:
+                ((RadioButton) findViewById(R.id.rb_globalSyncGroup)).setChecked(true);
+                break;
+            case USER:
+                ((RadioButton) findViewById(R.id.rb_userSyncGroup)).setChecked(true);
+                break;
+        }
+
+        //Set the match group radio buttons
+        Constants.GROUP matchGroup = sharedPref.getSyncGroup();
+        switch (matchGroup) {
+            case GLOBAL:
+                ((RadioButton) findViewById(R.id.rb_globalMatchGroup)).setChecked(true);
+                break;
+            case USER:
+                ((RadioButton) findViewById(R.id.rb_userMatchGroup)).setChecked(true);
+                break;
+            case MODULE:
+                ((RadioButton) findViewById(R.id.rb_moduleMatchGroup)).setChecked(true);
+                break;
+        }
+
+        //Set the matcher radio buttons
         int matcher = sharedPref.getMatcherTypeInt();
         if (matcher == 0) {
             ((RadioButton) findViewById(R.id.radio_simAfis)).setChecked(true);
@@ -231,7 +258,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
     }
 
-    public void onRadioButtonClicked(View view) {
+    public void onAfisSelectionClicked(View view) {
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
 
@@ -244,6 +271,44 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             case R.id.radio_sourceAfis:
                 if (checked)
                     sharedPref.setMatcherTypeInt(1);
+                break;
+        }
+    }
+
+    public void onSyncSelectionClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch (view.getId()) {
+            case R.id.rb_userSyncGroup:
+                if (checked)
+                    sharedPref.setSyncGroup(Constants.GROUP.USER);
+                break;
+            case R.id.rb_globalSyncGroup:
+                if (checked)
+                    sharedPref.setSyncGroup(Constants.GROUP.GLOBAL);
+                break;
+        }
+    }
+
+    public void onMatchSelectionClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch (view.getId()) {
+            case R.id.rb_userMatchGroup:
+                if (checked)
+                    sharedPref.setMatchGroup(Constants.GROUP.USER);
+                break;
+            case R.id.rb_moduleMatchGroup:
+                if (checked)
+                    sharedPref.setMatchGroup(Constants.GROUP.MODULE);
+                break;
+            case R.id.rb_globalMatchGroup:
+                if (checked)
+                    sharedPref.setMatchGroup(Constants.GROUP.GLOBAL);
                 break;
         }
     }

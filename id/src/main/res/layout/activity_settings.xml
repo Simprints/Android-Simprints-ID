@@ -187,6 +187,86 @@
                 android:layout_margin="15dp"
                 android:background="#3F000000" />
 
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sync Settings:"
+                android:textSize="20sp" />
+
+            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rb_userSyncGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginRight="15dp"
+                    android:onClick="onSyncSelectionClicked"
+                    android:text="User" />
+
+                <RadioButton
+                    android:id="@+id/rb_globalSyncGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="onSyncSelectionClicked"
+                    android:text="Project" />
+
+            </RadioGroup>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="15dp"
+                android:background="#3F000000" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Search Settings:"
+                android:textSize="20sp" />
+
+            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rb_userMatchGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginRight="15dp"
+                    android:onClick="onMatchSelectionClicked"
+                    android:text="User" />
+
+                <RadioButton
+                    android:id="@+id/rb_moduleMatchGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="onMatchSelectionClicked"
+                    android:text="Module" />
+
+                <RadioButton
+                    android:id="@+id/rb_globalMatchGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="onMatchSelectionClicked"
+                    android:text="Project" />
+
+            </RadioGroup>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="15dp"
+                android:background="#3F000000" />
+
             <TableRow>
 
                 <Spinner
@@ -223,14 +303,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="15dp"
                     android:layout_marginRight="15dp"
-                    android:onClick="onRadioButtonClicked"
+                    android:onClick="onAfisSelectionClicked"
                     android:text="@string/sourceafis" />
 
                 <RadioButton
                     android:id="@+id/radio_simAfis"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:onClick="onRadioButtonClicked"
+                    android:onClick="onAfisSelectionClicked"
                     android:text="@string/simafis_beta" />
 
             </RadioGroup>
