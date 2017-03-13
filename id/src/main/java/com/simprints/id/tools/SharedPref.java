@@ -3,6 +3,8 @@ package com.simprints.id.tools;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.simprints.libdata.tools.Constants;
+
 
 public class SharedPref {
     private SharedPreferences sharedPref;
@@ -18,6 +20,8 @@ public class SharedPref {
     private static final String timeout_int = "TimeoutInt";
     private static final String app_key = "AppKey";
     private static final String vibrate_bool = "VibrateOn";
+    private static final String sync_group = "SyncGroup";
+    private static final String match_group = "MatchGroup";
 
     public SharedPref(Context context) {
         sharedPref = context.getSharedPreferences(preference_file_key,
@@ -138,6 +142,34 @@ public class SharedPref {
     public void setAppKeyString(String appKey) {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(app_key, appKey);
+        editor.apply();
+    }
+
+    /**
+     * Sync group
+     */
+    public Constants.GROUP getSyncGroup() {
+        int syncGroupInt = sharedPref.getInt(sync_group, 0);
+        return Constants.GROUP.values()[syncGroupInt];
+    }
+
+    public void setSyncGroup(Constants.GROUP syncGroup) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(sync_group, syncGroup.ordinal());
+        editor.apply();
+    }
+
+    /**
+     * Match group
+     */
+    public Constants.GROUP getMatchGroup() {
+        int matchGroupInt = sharedPref.getInt(match_group, 0);
+        return Constants.GROUP.values()[matchGroupInt];
+    }
+
+    public void setMatchGroup(Constants.GROUP matchGroup) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(match_group, matchGroup.ordinal());
         editor.apply();
     }
 

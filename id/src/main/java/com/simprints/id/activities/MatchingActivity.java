@@ -15,8 +15,8 @@ import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.SharedPref;
 import com.simprints.libcommon.Person;
-import com.simprints.libdata.DatabaseEventListener;
-import com.simprints.libdata.Event;
+import com.simprints.libdata.DATA_ERROR;
+import com.simprints.libdata.ResultListener;
 import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
 import com.simprints.libmatcher.Progress;
@@ -24,6 +24,7 @@ import com.simprints.libmatcher.sourceafis.MatcherEventListener;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.Identification;
 import com.simprints.libsimprints.Tier;
+import com.simprints.libdata.tools.Constants.GROUP;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-public class MatchingActivity extends AppCompatActivity implements DatabaseEventListener, MatcherEventListener {
+public class MatchingActivity extends AppCompatActivity implements MatcherEventListener {
 
     private AppState appState;
     private Person probe;
@@ -48,7 +49,6 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
         setContentView(R.layout.activity_matching);
 
         appState = AppState.getInstance();
-        appState.getData().setListener(this);
 
         progressBar = (ProgressBar) findViewById(R.id.pb_identification);
         int progressBarColor = ContextCompat.getColor(this, R.color.simprints_blue);
@@ -60,13 +60,11 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
         Bundle extras = getIntent().getExtras();
         probe = extras.getParcelable("Person");
 
-        appState.getData().loadPeople(candidates);
-    }
+        final GROUP matchGroup = new SharedPref(getApplicationContext()).getMatchGroup();
 
-    @Override
-    public void onDataEvent(Event event) {
-        switch (event) {
-            case LOAD_PEOPLE_FINISHED:
+        appState.getData().loadPeople(candidates, matchGroup, new ResultListener() {
+            @Override
+            public void onSuccess() {
                 Log.d(MatchingActivity.this, String.format(Locale.UK,
                         "Successfully loaded %d candidates", candidates.size()));
 
@@ -93,8 +91,13 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
                         matcher.start();
                     }
                 }).start();
-                break;
-        }
+            }
+
+            @Override
+            public void onFailure(DATA_ERROR data_error) {
+                throw new RuntimeException();
+            }
+        });
     }
 
     private Tier computeTier(float score) {
@@ -143,7 +146,7 @@ public class MatchingActivity extends AppCompatActivity implements DatabaseEvent
                 }
 
                 if (appState.getData() != null && topCandidates.size() > 0) {
-                    appState.getData().saveIdentification(probe, topCandidates);
+                    appState.getData().saveIdentification(probe, topCandidates, appState.getSessionId());
                 }
 
                 // finish

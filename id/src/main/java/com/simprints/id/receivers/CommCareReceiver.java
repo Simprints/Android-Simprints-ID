@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
 
+import com.simprints.id.tools.AppState;
 import com.simprints.libdata.DatabaseContext;
 
 public class CommCareReceiver extends BroadcastReceiver {
