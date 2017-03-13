@@ -201,6 +201,7 @@ public class Setup {
     // STEP 3
     private void validateApiKey(@NonNull final Activity activity) {
         onProgress(20, R.string.launch_checking_api_key);
+        
         appState.getData().signIn(true, new com.simprints.libdata.ResultListener() {
             @Override
             public void onSuccess() {
