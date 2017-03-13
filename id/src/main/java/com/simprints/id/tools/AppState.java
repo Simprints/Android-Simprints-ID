@@ -84,6 +84,9 @@ public class AppState {
         if (apiKey == null || apiKey.isEmpty())
             return ALERT_TYPE.MISSING_API_KEY;
 
+        if (apiKey.length() < 8)
+            return ALERT_TYPE.INVALID_API_KEY;
+
         if (userId == null || userId.isEmpty())
             return ALERT_TYPE.MISSING_USER_ID;
 

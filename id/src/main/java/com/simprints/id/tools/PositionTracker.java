@@ -123,10 +123,12 @@ public class PositionTracker implements
 
         switch (connectionResult.getErrorCode()) {
             case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
-                GoogleApiAvailability.getInstance().getErrorDialog(
-                        activity,
-                        connectionResult.getErrorCode(),
-                        InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST).show();
+                if (!activity.isFinishing()) {
+                    GoogleApiAvailability.getInstance().getErrorDialog(
+                            activity,
+                            connectionResult.getErrorCode(),
+                            InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST).show();
+                }
         }
     }
 

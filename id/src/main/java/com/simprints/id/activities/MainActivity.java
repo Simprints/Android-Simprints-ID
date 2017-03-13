@@ -48,10 +48,9 @@ import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
 import com.simprints.libcommon.ScanConfig;
-import com.simprints.libdata.AuthListener;
-import com.simprints.libdata.ConnectionListener;
-import com.simprints.libdata.DATA_ERROR;
+import com.simprints.libdata.DatabaseEventListener;
 import com.simprints.libdata.DatabaseSync;
+import com.simprints.libdata.Event;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.ResultListener;
 import com.simprints.libscanner.SCANNER_ERROR;
@@ -63,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import static com.simprints.id.model.Finger.NB_OF_FINGERS;
 import static com.simprints.id.model.Finger.Status;
@@ -70,8 +70,8 @@ import static com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN;
 
 public class MainActivity extends AppCompatActivity implements
-        NavigationView.OnNavigationItemSelectedListener
-{
+        NavigationView.OnNavigationItemSelectedListener,
+        DatabaseEventListener {
 
     private final static long AUTO_SWIPE_DELAY = 500;
     private final static int FAST_SWIPE_SPEED = 100;
@@ -138,28 +138,7 @@ public class MainActivity extends AppCompatActivity implements
         navView.setItemIconTintList(null);
 
         appState = AppState.getInstance();
-        appState.getData().registerConnectionListener(new ConnectionListener() {
-            @Override
-            public void onConnection() {
-                updateSyncStatus();
-            }
-
-            @Override
-            public void onDisconnection() {
-                updateSyncStatus();
-            }
-        });
-        appState.getData().registerAuthListener(new AuthListener() {
-            @Override
-            public void onSignIn() {
-                updateSyncStatus();
-            }
-
-            @Override
-            public void onSignOut() {
-                updateSyncStatus();
-            }
-        });
+        appState.getData().setListener(this);
 
         handler = new Handler();
 
@@ -466,6 +445,50 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
+    @Override
+    public void onDataEvent(Event event) {
+        Log.d(this, String.format(Locale.UK, "onDataEvent %s %s", event.name(), event.details()));
+
+        setup.onDataEvent(event);
+
+        switch (event) {
+            case SYNC_INTERRUPTED:
+                if (syncItem == null)
+                    return;
+
+                syncItem.setEnabled(true);
+                syncItem.setTitle("Syncing Failed");
+                syncItem.setIcon(R.drawable.ic_menu_sync_failed);
+                break;
+            case SYNC_SUCCESS:
+                if (syncItem == null)
+                    return;
+
+                syncItem.setEnabled(true);
+                syncItem.setTitle("Sync Complete");
+                syncItem.setIcon(R.drawable.ic_menu_sync_success);
+                break;
+            case CONNECTED:
+                appState.setConnected(true);
+                if (!appState.getSignedIn())
+                    appState.getData().signIn();
+                updateSyncStatus();
+                break;
+            case DISCONNECTED:
+                appState.setConnected(false);
+                updateSyncStatus();
+                break;
+            case SIGNED_IN:
+                appState.setSignedIn(true);
+                updateSyncStatus();
+                break;
+            case SIGNED_OUT:
+                appState.setSignedIn(false);
+                updateSyncStatus();
+                break;
+        }
+    }
+
     protected void onActionForward() {
         // Gathers the fingerprints in a list
         activeFingers.get(currentActiveFingerNo);
@@ -639,8 +662,9 @@ public class MainActivity extends AppCompatActivity implements
                         refreshDisplay();
                     }
                 });
-
-        builder.create().show();
+        if (!this.isFinishing()) {
+            builder.create().show();
+        }
     }
 
     public void autoAdd() {
@@ -723,29 +747,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void backgroundSync() {
-        final com.simprints.libdata.tools.Constants.GROUP syncGroup = new SharedPref(getApplicationContext()).getSyncGroup();
-
-        DatabaseSync.sync(getApplicationContext(), appState.getAppKey(), new com.simprints.libdata.ResultListener() {
-            @Override
-            public void onSuccess() {
-                if (syncItem == null)
-                    return;
-
-                syncItem.setEnabled(true);
-                syncItem.setTitle("Sync Complete");
-                syncItem.setIcon(R.drawable.ic_menu_sync_success);
-            }
-
-            @Override
-            public void onFailure(DATA_ERROR data_error) {
-                if (syncItem == null)
-                    return;
-
-                syncItem.setEnabled(true);
-                syncItem.setTitle("Syncing Failed");
-                syncItem.setIcon(R.drawable.ic_menu_sync_failed);
-            }
-        }, syncGroup, appState.getUserId());
+        DatabaseSync.sync(getApplicationContext(), appState.getAppKey(), this, appState.getUserId());
 
         if (syncItem != null) {
             syncItem.setEnabled(false);
@@ -907,8 +909,11 @@ public class MainActivity extends AppCompatActivity implements
             }
         };
 
-        un20WakeupDialog.show();
-        setup.start(this, setupCallback);
+        if (!this.isFinishing()) {
+            un20WakeupDialog.show();
+        }
+
+        setup.start(this, this, setupCallback);
     }
 
 }
