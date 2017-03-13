@@ -189,4 +189,8 @@
     <string name="verify_title">Verify</string>
     <string name="low_battery_title">LOW BATTERY</string>
     <string name="low_battery_message">Scanner battery low, please charge your scanner</string>
+    <string name="database_information">Database Information</string>
+    <string name="user_count">User Count:</string>
+    <string name="module_count">Module Count:</string>
+    <string name="project_count">Project Count:</string>
 </resources>

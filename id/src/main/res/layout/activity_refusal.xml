@@ -58,7 +58,7 @@
             android:id="@+id/rb_unableToGive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onRadioButtonClicked"
+            android:onClick="onRefusalSelectionClicked"
             android:text="@string/beneficiary_was_physically_unable"
             android:textColor="@color/simprints_white"
             android:textSize="20sp" />
@@ -67,7 +67,7 @@
             android:id="@+id/rb_refused"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onRadioButtonClicked"
+            android:onClick="onRefusalSelectionClicked"
             android:text="@string/beneficiary_refused"
             android:textColor="@color/simprints_white"
             android:textSize="20sp" />
@@ -76,7 +76,7 @@
             android:id="@+id/rb_other"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="onRadioButtonClicked"
+            android:onClick="onRefusalSelectionClicked"
             android:text="@string/other"
             android:textColor="@color/simprints_white"
             android:textSize="20sp" />

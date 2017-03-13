@@ -106,15 +106,14 @@ public class Setup {
         }
 
         // Step 4: resolve commcare database. Optional, and only has to be done once.
-        if (!ccDbResolved) {
-            this.resolveCcDb(activity);
-            return;
-        }
+//        if (!ccDbResolved) {
+//            this.resolveCcDb(activity);
+//            return;
+//        }
 
         // Step 5: initialize scanner object.
         if (appState.getScanner() == null) {
             this.initScanner();
-            return;
         }
 
         // Step 6: connect with scanner. Must be done everytime the scanner is not connected
@@ -201,7 +200,7 @@ public class Setup {
     // STEP 3
     private void validateApiKey(@NonNull final Activity activity) {
         onProgress(20, R.string.launch_checking_api_key);
-        
+
         appState.getData().signIn(true, new com.simprints.libdata.ResultListener() {
             @Override
             public void onSuccess() {
@@ -301,6 +300,7 @@ public class Setup {
 
                     case BUSY:
                     case IO_ERROR:
+
                     default:
                         onAlert(ALERT_TYPE.DISCONNECTED);
                 }
