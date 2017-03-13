@@ -145,6 +145,10 @@ public class AppState {
         return session.getUserId();
     }
 
+    public String getModuleId() {
+        return session.getModuleId();
+    }
+
     public String getGuid() {
         return session.getPersonGuid();
     }
@@ -235,6 +239,10 @@ public class AppState {
     @Nullable
     public RefusalForm getRefusalForm() {
         return this.refusalForm;
+    }
+
+    public String getSessionId() {
+        return this.session.getSessionId();
     }
 
     public void destroy() {

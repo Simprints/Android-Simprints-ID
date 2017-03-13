@@ -21,8 +21,8 @@ import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.id.controllers.Setup;
-import com.simprints.libdata.DatabaseEventListener;
-import com.simprints.libdata.Event;
+import com.simprints.libcommon.RefusalForm;
+import com.simprints.libcommon.Session;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.ResultListener;
 import com.simprints.libscanner.SCANNER_ERROR;
@@ -40,7 +40,7 @@ import static com.simprints.id.tools.Vibrate.vibrate;
 
 @SuppressWarnings("deprecation")
 @SuppressLint("HardwareIds")
-public class LaunchActivity extends AppCompatActivity implements DatabaseEventListener {
+public class LaunchActivity extends AppCompatActivity {
 
     // Application state (singleton containing scanner, database context, analytics, ...)
     private AppState appState = AppState.getInstance();
@@ -142,7 +142,7 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
 
 
         // Start the launch process
-        setup.start(this, this, setupCallback);
+        setup.start(this, setupCallback);
     }
 
     /**
@@ -171,7 +171,7 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
 
     private void tryAgain() {
         launchOutOfFocus = false;
-        setup.start(this, this, setupCallback);
+        setup.start(this, setupCallback);
     }
 
     @Override
@@ -189,7 +189,7 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
             positionTracker.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (setup != null)
-            setup.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            setup.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
     }
 
     @Override
@@ -239,11 +239,16 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
 
     @Override
     public void onDestroy() {
-        if (appState.getData() != null && appState.getReadyToSendSession() != null) {
-            if (appState.getRefusalForm() != null)
-                appState.getData().saveSession(appState.getReadyToSendSession(), appState.getRefusalForm());
-            else
-                appState.getData().saveSession(appState.getReadyToSendSession());
+        Session session = appState.getReadyToSendSession();
+        if (appState.getData() != null && session != null) {
+            // Save session to firebase
+            appState.getData().saveSession(session);
+
+            // Save refusal form to firebase
+            RefusalForm refusalForm = appState.getRefusalForm();
+            if (refusalForm != null)
+                appState.getData().saveRefusalForm(refusalForm, session.getSessionId());
+
             appState.getData().destroy();
         }
 
@@ -268,28 +273,6 @@ public class LaunchActivity extends AppCompatActivity implements DatabaseEventLi
         setup.destroy();
 
         super.onDestroy();
-    }
-
-    @Override
-    public void onDataEvent(final Event event) {
-        setup.onDataEvent(event);
-
-        switch (event) {
-            case CONNECTED:
-                appState.setConnected(true);
-                if (!appState.getSignedIn())
-                    appState.getData().signIn();
-                break;
-            case DISCONNECTED:
-                appState.setConnected(false);
-                break;
-            case SIGNED_IN:
-                appState.setSignedIn(true);
-                break;
-            case SIGNED_OUT:
-                appState.setSignedIn(false);
-                break;
-        }
     }
 
     public void finishLaunch() {

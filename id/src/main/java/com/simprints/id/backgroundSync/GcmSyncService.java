@@ -10,11 +10,12 @@ import com.google.android.gms.gcm.TaskParams;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.id.tools.SharedPref;
-import com.simprints.libdata.DatabaseEventListener;
+import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DatabaseSync;
-import com.simprints.libdata.Event;
+import com.simprints.libdata.ResultListener;
+import com.simprints.libdata.tools.Constants;
 
-public class GcmSyncService extends GcmTaskService implements DatabaseEventListener {
+public class GcmSyncService extends GcmTaskService {
     private String deviceId;
 
     @Override
@@ -36,24 +37,22 @@ public class GcmSyncService extends GcmTaskService implements DatabaseEventListe
         if (appKey == null || appKey.isEmpty())
             return GcmNetworkManager.RESULT_FAILURE;
 
-        DatabaseSync.sync(getApplicationContext(), appKey, this, null);
+        Constants.GROUP syncGroup = new SharedPref(getApplicationContext()).getSyncGroup();
 
-        return GcmNetworkManager.RESULT_SUCCESS;
-    }
-
-    @Override
-    public void onDataEvent(Event event) {
-        switch (event) {
-
-            case SYNC_INTERRUPTED:
-                Log.d("BACKGROUND SYNC", "SYNC_INTERRUPTED");
-                Analytics.getInstance(getApplicationContext()).setBackgroundSync(false, deviceId);
-                break;
-            case SYNC_SUCCESS:
+        DatabaseSync.sync(getApplicationContext(), appKey, new ResultListener() {
+            @Override
+            public void onSuccess() {
                 Log.d("BACKGROUND SYNC", "SYNC_SUCCESS");
                 Analytics.getInstance(getApplicationContext()).setBackgroundSync(true, deviceId);
-                break;
+            }
 
-        }
+            @Override
+            public void onFailure(DATA_ERROR data_error) {
+                Log.d("BACKGROUND SYNC", "SYNC_INTERRUPTED");
+                Analytics.getInstance(getApplicationContext()).setBackgroundSync(false, deviceId);
+            }
+        }, syncGroup, null);
+
+        return GcmNetworkManager.RESULT_SUCCESS;
     }
 }
