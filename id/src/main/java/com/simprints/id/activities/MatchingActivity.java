@@ -145,7 +145,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                             scores.get(idx[i]).intValue(), computeTier(scores.get(idx[i]))));
                 }
 
-                if (appState.getData() != null && topCandidates.size() > 0) {
+                if (appState.getData() != null) {
                     appState.getData().saveIdentification(probe, topCandidates, appState.getSessionId());
                 }
 

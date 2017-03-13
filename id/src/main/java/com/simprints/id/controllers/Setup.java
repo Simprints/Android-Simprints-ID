@@ -12,7 +12,6 @@ import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
-import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libdata.AuthListener;
 import com.simprints.libdata.ConnectionListener;
 import com.simprints.libdata.DATA_ERROR;
@@ -25,7 +24,6 @@ import com.simprints.libscanner.ScannerUtils;
 import java.util.List;
 
 import static android.app.Activity.RESULT_CANCELED;
-import static com.simprints.id.tools.InternalConstants.COMMCARE_PACKAGE;
 
 public class Setup {
 
@@ -49,20 +47,10 @@ public class Setup {
     // True iff the api key was validated successfully
     private boolean apiKeyValidated = false;
 
-    // True iff calling package is commcare AND commcare db resolution on loading is enable
-    // AND commcare's database was resolved successfully
-    private boolean ccDbResolved = false;
-
     // True iff the UI of the scanner was reset since the last connection (enabling trigger button)
     private boolean uiResetSinceConnection = false;
 
     private volatile Boolean paused = false;
-
-
-    private Setup() {
-        ccDbResolved = !RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_CCDBR_ON_LOADING) ||
-                !COMMCARE_PACKAGE.equalsIgnoreCase(appState.getCallingPackage());
-    }
 
     public void stop() {
         paused = true;
@@ -227,24 +215,6 @@ public class Setup {
                     default:
                         throw new RuntimeException();
                 }
-            }
-        });
-    }
-
-    // STEP 4
-    private void resolveCcDb(@NonNull final Activity activity) {
-        callback.onProgress(30, R.string.launch_cc_resolve);
-        appState.getData().resolveCommCare(activity.getContentResolver(), new com.simprints.libdata.ResultListener() {
-            @Override
-            public void onSuccess() {
-                ccDbResolved = true;
-                Log.d("Setup", "CC database resolved.");
-                goOn(activity);
-            }
-
-            @Override
-            public void onFailure(DATA_ERROR data_error) {
-                throw new RuntimeException();
             }
         });
     }
