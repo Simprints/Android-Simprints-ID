@@ -27,6 +27,6 @@ public class CommCareReceiver extends BroadcastReceiver {
         String androidId = Settings.Secure.getString(context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
-        DatabaseContext.updateIdentification(caseId, androidId);
+        DatabaseContext.updateIdentification(caseId, androidId, "");
     }
 }
