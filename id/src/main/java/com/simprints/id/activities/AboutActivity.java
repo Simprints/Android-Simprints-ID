@@ -2,7 +2,6 @@ package com.simprints.id.activities;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,14 +9,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
-import com.simprints.libdata.DatabaseContext;
+import com.simprints.libdata.tools.Constants;
 
 public class AboutActivity extends AppCompatActivity {
+    private AppState appState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +33,8 @@ public class AboutActivity extends AppCompatActivity {
             actionBar.show();
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        appState = AppState.getInstance();
 
         PackageInfo pInfo;
         String version = "";
@@ -55,19 +56,23 @@ public class AboutActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         ((TextView) findViewById(R.id.firmwareVersionTextView)).setText(
                 String.valueOf(firmwareVersion));
+    }
 
-        if (BuildConfig.DEBUG) {
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... voids) {
-//                    DatabaseContext.fakeSQLDb(getApplicationContext(),
-//                            AppState.getInstance().getApiKey(), 100);
-                    return null;
-                }
-            }.execute();
-        }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ((TextView) findViewById(R.id.tv_userDbCount))
+                .setText((Long.toString(appState.getData()
+                        .getPeopleCount(Constants.GROUP.USER))));
+        ((TextView) findViewById(R.id.tv_moduleDbCount))
+                .setText((Long.toString(appState.getData()
+                        .getPeopleCount(Constants.GROUP.MODULE))));
+        ((TextView) findViewById(R.id.tv_globalDbCount))
+                .setText((Long.toString(appState.getData()
+                        .getPeopleCount(Constants.GROUP.GLOBAL))));
     }
 
     @Override

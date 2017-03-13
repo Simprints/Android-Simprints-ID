@@ -92,7 +92,7 @@ public class RefusalActivity extends AppCompatActivity {
         });
     }
 
-    public void onRadioButtonClicked(View view) {
+    public void onRefusalSelectionClicked(View view) {
         boolean checked = ((RadioButton) view).isChecked();
 
         if (checked) {
