@@ -53,6 +53,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
         sharedPref = new SharedPref(getApplicationContext());
 
+        //Set language spinner
         Spinner spinner = (Spinner) findViewById(R.id.language_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.language_array, android.R.layout.simple_spinner_item);
@@ -61,26 +62,29 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         spinner.setOnItemSelectedListener(this);
         spinner.setSelection(sharedPref.getLanguagePositionInt());
 
+        //Set nudge mode
         boolean nudgeMode = sharedPref.getNudgeModeBool();
         nudgeToggleButton = (ToggleButton) findViewById(R.id.nudgeToggleButton);
         nudgeToggleButton.setChecked(nudgeMode);
         nudgeToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                saveNudgeMode();
+                sharedPref.setNudgeModeBool(nudgeToggleButton.isChecked());
             }
         });
 
+        //Set vibrate mode
         boolean vibrate = sharedPref.getVibrateBool();
         vibrateToggleButton = (ToggleButton) findViewById(R.id.vibrateToggleButton);
         vibrateToggleButton.setChecked(vibrate);
         vibrateToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                saveVibrateMode();
+                sharedPref.setVibrateBool(vibrateToggleButton.isChecked());
             }
         });
 
+        //Set the quality score threshold
         ((TextView) findViewById(R.id.minQualityTextView)).setText(String.valueOf(MIN_QUALITY));
         ((TextView) findViewById(R.id.maxQualityTextView)).setText(String.valueOf(MAX_QUALITY));
         final TextView qualityThresholdTextView = (TextView) findViewById(R.id.qualityTextView);
@@ -93,7 +97,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         qualitySeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                saveQualityThreshold();
+                sharedPref.setQualityThresholdInt(qualitySeekBar.getProgress() + MIN_QUALITY);
                 qualityThresholdTextView.setText(String.format(
                         getString(R.string.quality_threshold_value), progress + MIN_QUALITY));
             }
@@ -107,6 +111,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             }
         });
 
+        //Set the return # of IDs
         ((TextView) findViewById(R.id.minNbOfIdsTextView)).setText(String.valueOf(MIN_NB_OF_IDS));
         ((TextView) findViewById(R.id.maxNbOfIdsTextView)).setText(String.valueOf(MAX_NB_OF_IDS));
         final TextView nbOfIdsTextView = (TextView) findViewById(R.id.nbOfIdsTextView);
@@ -119,7 +124,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         nbOfIdsSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                saveNbOfIds();
+                sharedPref.setReturnIdCountInt(nbOfIdsSeekBar.getProgress() + MIN_NB_OF_IDS);
                 nbOfIdsTextView.setText(String.format(
                         getString(R.string.nb_of_ids_value), progress + MIN_NB_OF_IDS));
             }
@@ -133,6 +138,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             }
         });
 
+        //Set the timeout slider
         ((TextView) findViewById(R.id.tv_minTimeout)).setText(String.valueOf(MIN_TIMEOUT));
         ((TextView) findViewById(R.id.tv_maxTimeout)).setText(String.valueOf(MAX_TIMEOUT));
         final TextView tv_timeout = (TextView) findViewById(R.id.tv_timeout);
@@ -145,7 +151,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         timeoutSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                saveTimeout();
+                sharedPref.setTimeoutInt(timeoutSeekBar.getProgress() + MIN_TIMEOUT);
                 tv_timeout.setText(String.format(
                         getString(R.string.timeout_value), progress + MIN_TIMEOUT));
             }
@@ -203,34 +209,6 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void saveQualityThreshold() {
-        sharedPref.setQualityThresholdInt(qualitySeekBar.getProgress() + MIN_QUALITY);
-    }
-
-
-    private void saveNbOfIds() {
-        sharedPref.setReturnIdCountInt(nbOfIdsSeekBar.getProgress() + MIN_NB_OF_IDS);
-    }
-
-    private void saveTimeout() {
-        sharedPref.setTimeoutInt(timeoutSeekBar.getProgress() + MIN_TIMEOUT);
-    }
-
-    private void saveNudgeMode() {
-        sharedPref.setNudgeModeBool(nudgeToggleButton.isChecked());
-    }
-
-    private void saveVibrateMode() {
-        sharedPref.setVibrateBool(vibrateToggleButton.isChecked());
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        saveQualityThreshold();
-        saveNbOfIds();
     }
 
     @Override
