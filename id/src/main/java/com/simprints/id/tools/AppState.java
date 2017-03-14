@@ -41,7 +41,6 @@ public class AppState {
     private boolean signedIn;
     private boolean connected;
     private String callingPackage;
-    private String appKey;
     private RefusalForm refusalForm;
     private Callout callout;
 
@@ -108,9 +107,9 @@ public class AppState {
             }
 
         // Set attributes accordingly
+        new SharedPref(appContext).setAppKeyString(apiKey.substring(0, 8));
+        new SharedPref(appContext).setLastUserIdString(userId);
         session.setApiKey(apiKey);
-        appKey = apiKey.substring(0, 8);
-        new SharedPref(appContext).setAppKeyString(appKey);
         session.setUserId(userId);
         session.setModuleId(moduleId);
         analytics.setUser(userId, apiKey);
@@ -229,10 +228,6 @@ public class AppState {
 
     public String getCallingPackage() {
         return this.callingPackage;
-    }
-
-    public String getAppKey() {
-        return this.appKey;
     }
 
     public void setRefusalForm(RefusalForm refusalForm) {
