@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Id</string>
 
-    <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.6</string>
+    <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.8</string>
 
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>

@@ -68,10 +68,11 @@ import static com.simprints.id.model.Finger.NB_OF_FINGERS;
 import static com.simprints.id.model.Finger.Status;
 import static com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN;
+import static com.simprints.libdata.tools.Constants.GROUP;
 
 public class MainActivity extends AppCompatActivity implements
-        NavigationView.OnNavigationItemSelectedListener
-{
+        NavigationView.OnNavigationItemSelectedListener {
+    private com.simprints.libdata.ResultListener dataResultListener;
 
     private final static long AUTO_SWIPE_DELAY = 500;
     private final static int FAST_SWIPE_SPEED = 100;
@@ -724,9 +725,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void backgroundSync() {
-        final com.simprints.libdata.tools.Constants.GROUP syncGroup = new SharedPref(getApplicationContext()).getSyncGroup();
+        final GROUP syncGroup = new SharedPref(getApplicationContext()).getSyncGroup();
 
-        DatabaseSync.sync(getApplicationContext(), appState.getAppKey(), new com.simprints.libdata.ResultListener() {
+
+        dataResultListener = new com.simprints.libdata.ResultListener() {
             @Override
             public void onSuccess() {
                 if (syncItem == null)
@@ -739,19 +741,39 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                if (syncItem == null)
-                    return;
+                switch (data_error) {
+                    case SYNC_INTERRUPTED:
+                        if (syncItem == null)
+                            return;
 
-                syncItem.setEnabled(true);
-                syncItem.setTitle("Syncing Failed");
-                syncItem.setIcon(R.drawable.ic_menu_sync_failed);
+                        syncItem.setEnabled(true);
+                        syncItem.setTitle("Syncing Failed");
+                        syncItem.setIcon(R.drawable.ic_menu_sync_failed);
+                        break;
+                    default:
+                        throw new RuntimeException();
+                }
             }
-        }, syncGroup, appState.getUserId());
+        };
 
         if (syncItem != null) {
             syncItem.setEnabled(false);
             syncItem.setTitle("Syncing...");
             syncItem.setIcon(R.drawable.ic_menu_syncing);
+        }
+
+        switch (syncGroup) {
+            case GLOBAL:
+                new DatabaseSync(getApplicationContext(),
+                        sharedPref.getAppKeyString(),
+                        dataResultListener).sync();
+                break;
+            case USER:
+                new DatabaseSync(getApplicationContext(),
+                        sharedPref.getAppKeyString(),
+                        dataResultListener,
+                        sharedPref.getLastUserIdString()).sync();
+                break;
         }
     }
 
@@ -880,7 +902,7 @@ public class MainActivity extends AppCompatActivity implements
     private void reconnect() {
         appState.getScanner().unregisterButtonListener(scannerButton);
 
-        SetupCallback setupCallback = new SetupCallback () {
+        SetupCallback setupCallback = new SetupCallback() {
             @Override
             public void onSuccess() {
                 Log.d(MainActivity.this, "reconnect.onSuccess()");

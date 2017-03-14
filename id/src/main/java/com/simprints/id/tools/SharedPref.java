@@ -19,13 +19,13 @@ public class SharedPref {
     private static final String matcher_type = "MatcherType";
     private static final String timeout_int = "TimeoutInt";
     private static final String app_key = "AppKey";
+    private static final String last_user_id = "LastUserId";
     private static final String vibrate_bool = "VibrateOn";
     private static final String sync_group = "SyncGroup";
     private static final String match_group = "MatchGroup";
 
     public SharedPref(Context context) {
-        sharedPref = context.getSharedPreferences(preference_file_key,
-                Context.MODE_PRIVATE);
+        sharedPref = context.getSharedPreferences(preference_file_key, Context.MODE_PRIVATE);
     }
 
     /**
@@ -183,6 +183,19 @@ public class SharedPref {
     public void setVibrateBool(Boolean vibrateBool) {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean(vibrate_bool, vibrateBool);
+        editor.apply();
+    }
+
+    /**
+     * User ID. ID of the last user
+     */
+    public String getLastUserIdString() {
+        return sharedPref.getString(last_user_id, "");
+    }
+
+    public void setLastUserIdString(String userId) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(last_user_id, userId);
         editor.apply();
     }
 }

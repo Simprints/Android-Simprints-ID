@@ -29,6 +29,7 @@ public class FrontActivity extends AppCompatActivity {
     private ImageView syncStatus;
     private Button syncButton;
     private SharedPref sharedPref;
+    private ResultListener dataListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,33 +61,47 @@ public class FrontActivity extends AppCompatActivity {
 
         PermissionManager.requestAllPermissions(FrontActivity.this);
 
-        final Constants.GROUP syncGroup = new SharedPref(getApplicationContext()).getSyncGroup();
+        dataListener = new ResultListener() {
+            @Override
+            public void onSuccess() {
+                syncButton.setEnabled(true);
+                syncButton.setText(R.string.sync_data);
+                syncStatus.setImageResource(R.drawable.ic_menu_sync_success);
+            }
+
+            @Override
+            public void onFailure(DATA_ERROR data_error) {
+                switch (data_error) {
+                    case SYNC_INTERRUPTED:
+                        syncButton.setEnabled(true);
+                        syncButton.setText(R.string.sync_data);
+                        syncStatus.setImageResource(R.drawable.ic_menu_sync_failed);
+                        break;
+                    default:
+                        throw new RuntimeException();
+                }
+            }
+        };
+
+        final Constants.GROUP syncGroup = sharedPref.getSyncGroup();
 
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatabaseSync.sync(getApplicationContext(), sharedPref.getAppKeyString(),
-                        new ResultListener() {
-                            @Override
-                            public void onSuccess() {
-                                syncButton.setEnabled(true);
-                                syncButton.setText(R.string.sync_data);
-                                syncStatus.setImageResource(R.drawable.ic_menu_sync_success);
-                            }
+                switch (syncGroup) {
+                    case GLOBAL:
+                        new DatabaseSync(getApplicationContext(),
+                                sharedPref.getAppKeyString(),
+                                dataListener).sync();
+                        break;
+                    case USER:
+                        new DatabaseSync(getApplicationContext(),
+                                sharedPref.getAppKeyString(),
+                                dataListener,
+                                sharedPref.getLastUserIdString()).sync();
+                        break;
+                }
 
-                            @Override
-                            public void onFailure(DATA_ERROR error) {
-                                switch (error) {
-                                    case SYNC_INTERRUPTED:
-                                        syncButton.setEnabled(true);
-                                        syncButton.setText(R.string.sync_data);
-                                        syncStatus.setImageResource(R.drawable.ic_menu_sync_failed);
-                                        break;
-                                    default:
-                                        throw new RuntimeException();
-                                }
-                            }
-                        }, syncGroup, null);
                 syncButton.setEnabled(false);
                 syncButton.setText(R.string.syncing);
                 syncStatus.setImageResource(R.drawable.ic_menu_syncing);
