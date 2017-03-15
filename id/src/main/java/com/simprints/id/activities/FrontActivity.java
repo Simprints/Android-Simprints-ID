@@ -1,5 +1,6 @@
 package com.simprints.id.activities;
 
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
+import com.simprints.id.services.SyncService;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PermissionManager;
@@ -19,9 +21,7 @@ import com.simprints.id.tools.RemoteConfig;
 import com.simprints.id.tools.SharedPref;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DatabaseContext;
-import com.simprints.libdata.DatabaseSync;
 import com.simprints.libdata.ResultListener;
-import com.simprints.libdata.tools.Constants;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -83,25 +83,14 @@ public class FrontActivity extends AppCompatActivity {
             }
         };
 
-        final Constants.GROUP syncGroup = sharedPref.getSyncGroup();
+        bindService(new Intent(FrontActivity.this, SyncService.class),
+                SyncService.buildListener(dataListener),
+                BIND_AUTO_CREATE);
 
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                switch (syncGroup) {
-                    case GLOBAL:
-                        new DatabaseSync(getApplicationContext(),
-                                sharedPref.getAppKeyString(),
-                                dataListener).sync();
-                        break;
-                    case USER:
-                        new DatabaseSync(getApplicationContext(),
-                                sharedPref.getAppKeyString(),
-                                dataListener,
-                                sharedPref.getLastUserIdString()).sync();
-                        break;
-                }
-
+                startService(new Intent(FrontActivity.this, SyncService.class));
                 syncButton.setEnabled(false);
                 syncButton.setText(R.string.syncing);
                 syncStatus.setImageResource(R.drawable.ic_menu_syncing);
