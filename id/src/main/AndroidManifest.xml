@@ -115,6 +115,8 @@
             </intent-filter>
         </receiver>
 
+        <service android:name=".services.SyncService" />
+
         <service
             android:name=".backgroundSync.GcmSyncService"
             android:exported="true"

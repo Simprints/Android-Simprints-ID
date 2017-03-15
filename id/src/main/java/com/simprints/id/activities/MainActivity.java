@@ -36,6 +36,7 @@ import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
+import com.simprints.id.services.SyncService;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
@@ -51,7 +52,6 @@ import com.simprints.libcommon.ScanConfig;
 import com.simprints.libdata.AuthListener;
 import com.simprints.libdata.ConnectionListener;
 import com.simprints.libdata.DATA_ERROR;
-import com.simprints.libdata.DatabaseSync;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.ResultListener;
 import com.simprints.libscanner.SCANNER_ERROR;
@@ -68,11 +68,9 @@ import static com.simprints.id.model.Finger.NB_OF_FINGERS;
 import static com.simprints.id.model.Finger.Status;
 import static com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN;
-import static com.simprints.libdata.tools.Constants.GROUP;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener {
-    private com.simprints.libdata.ResultListener dataResultListener;
 
     private final static long AUTO_SWIPE_DELAY = 500;
     private final static int FAST_SWIPE_SPEED = 100;
@@ -177,6 +175,9 @@ public class MainActivity extends AppCompatActivity implements
         registrationResult = null;
         sharedPref = new SharedPref(getApplicationContext());
         timeoutBar = new TimeoutBar(getApplicationContext(), (ProgressBar) findViewById(R.id.pb_timeout));
+
+
+        bindService(new Intent(this, SyncService.class), SyncService.buildListener(syncListener), BIND_AUTO_CREATE);
 
         initActiveFingers();
         initBarAndDrawer();
@@ -724,56 +725,42 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    private com.simprints.libdata.ResultListener syncListener = new com.simprints.libdata.ResultListener() {
+        @Override
+        public void onSuccess() {
+            if (syncItem == null)
+                return;
+
+            syncItem.setEnabled(true);
+            syncItem.setTitle("Sync Complete");
+            syncItem.setIcon(R.drawable.ic_menu_sync_success);
+        }
+
+        @Override
+        public void onFailure(DATA_ERROR data_error) {
+            switch (data_error) {
+                case SYNC_INTERRUPTED:
+                    if (syncItem == null)
+                        return;
+
+                    syncItem.setEnabled(true);
+                    syncItem.setTitle("Syncing Failed");
+                    syncItem.setIcon(R.drawable.ic_menu_sync_failed);
+                    break;
+                default:
+                    throw new RuntimeException();
+            }
+        }
+    };
+
     private void backgroundSync() {
-        final GROUP syncGroup = new SharedPref(getApplicationContext()).getSyncGroup();
-
-
-        dataResultListener = new com.simprints.libdata.ResultListener() {
-            @Override
-            public void onSuccess() {
-                if (syncItem == null)
-                    return;
-
-                syncItem.setEnabled(true);
-                syncItem.setTitle("Sync Complete");
-                syncItem.setIcon(R.drawable.ic_menu_sync_success);
-            }
-
-            @Override
-            public void onFailure(DATA_ERROR data_error) {
-                switch (data_error) {
-                    case SYNC_INTERRUPTED:
-                        if (syncItem == null)
-                            return;
-
-                        syncItem.setEnabled(true);
-                        syncItem.setTitle("Syncing Failed");
-                        syncItem.setIcon(R.drawable.ic_menu_sync_failed);
-                        break;
-                    default:
-                        throw new RuntimeException();
-                }
-            }
-        };
+        Intent intent = new Intent(this, SyncService.class);
+        startService(intent);
 
         if (syncItem != null) {
             syncItem.setEnabled(false);
             syncItem.setTitle("Syncing...");
             syncItem.setIcon(R.drawable.ic_menu_syncing);
-        }
-
-        switch (syncGroup) {
-            case GLOBAL:
-                new DatabaseSync(getApplicationContext(),
-                        sharedPref.getAppKeyString(),
-                        dataResultListener).sync();
-                break;
-            case USER:
-                new DatabaseSync(getApplicationContext(),
-                        sharedPref.getAppKeyString(),
-                        dataResultListener,
-                        sharedPref.getLastUserIdString()).sync();
-                break;
         }
     }
 
