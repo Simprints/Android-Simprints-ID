@@ -102,9 +102,8 @@ public class FrontActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (!DatabaseContext.isSignedIn(sharedPref.getAppKeyString())) {
-            syncButton.setEnabled(false);
             syncButton.setText(R.string.not_signed_in);
-            syncStatus.setImageResource(R.drawable.ic_menu_sync_failed);
+            syncStatus.setImageResource(R.drawable.ic_menu_sync_off);
         }
     }
 }

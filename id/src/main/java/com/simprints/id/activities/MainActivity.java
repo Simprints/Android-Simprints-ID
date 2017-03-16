@@ -137,28 +137,6 @@ public class MainActivity extends AppCompatActivity implements
         navView.setItemIconTintList(null);
 
         appState = AppState.getInstance();
-        appState.getData().registerConnectionListener(new ConnectionListener() {
-            @Override
-            public void onConnection() {
-                updateSyncStatus();
-            }
-
-            @Override
-            public void onDisconnection() {
-                updateSyncStatus();
-            }
-        });
-        appState.getData().registerAuthListener(new AuthListener() {
-            @Override
-            public void onSignIn() {
-                updateSyncStatus();
-            }
-
-            @Override
-            public void onSignOut() {
-                updateSyncStatus();
-            }
-        });
 
         handler = new Handler();
 
@@ -176,7 +154,6 @@ public class MainActivity extends AppCompatActivity implements
         sharedPref = new SharedPref(getApplicationContext());
         timeoutBar = new TimeoutBar(getApplicationContext(), (ProgressBar) findViewById(R.id.pb_timeout));
 
-
         bindService(new Intent(this, SyncService.class), SyncService.buildListener(syncListener), BIND_AUTO_CREATE);
 
         initActiveFingers();
@@ -185,6 +162,42 @@ public class MainActivity extends AppCompatActivity implements
         initScanButton();
         initViewPager();
         refreshDisplay();
+        initConnectionListener();
+        initAuthInListener();
+    }
+
+    private void initConnectionListener() {
+        appState.getData().registerConnectionListener(new ConnectionListener() {
+            @Override
+            public void onConnection() {
+                syncItem.setEnabled(true);
+                syncItem.setTitle("Sync");
+                syncItem.setIcon(R.drawable.ic_menu_sync_ready);
+            }
+
+            @Override
+            public void onDisconnection() {
+                syncItem.setEnabled(false);
+                syncItem.setTitle("Offline");
+                syncItem.setIcon(R.drawable.ic_menu_sync_off);
+            }
+        });
+    }
+
+    private void initAuthInListener() {
+        appState.getData().registerAuthListener(new AuthListener() {
+            @Override
+            public void onSignIn() {
+
+            }
+
+            @Override
+            public void onSignOut() {
+                syncItem.setEnabled(false);
+                syncItem.setTitle("Signed Out");
+                syncItem.setIcon(R.drawable.ic_menu_sync_off);
+            }
+        });
     }
 
     private void initActiveFingers() {
@@ -227,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         syncItem = navigationView.getMenu().findItem(R.id.nav_sync);
+
         navigationView.setNavigationItemSelectedListener(this);
 
         ActionBar actionBar = getSupportActionBar();
@@ -706,23 +720,8 @@ public class MainActivity extends AppCompatActivity implements
         super.onResume();
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
-        updateSyncStatus();
-    }
-
-    private void updateSyncStatus() {
-        if (!appState.isConnected()) {
-            syncItem.setEnabled(false);
-            syncItem.setTitle("Offline");
-            syncItem.setIcon(R.drawable.ic_menu_sync_off);
-        } else if (!appState.getSignedIn()) {
-            syncItem.setEnabled(false);
-            syncItem.setTitle("Signed Out");
-            syncItem.setIcon(R.drawable.ic_menu_sync_off);
-        } else if (appState.getSignedIn()) {
-            syncItem.setEnabled(true);
-            syncItem.setTitle("Sync");
+        if (syncItem != null && appState.getData().isConnected())
             syncItem.setIcon(R.drawable.ic_menu_sync_ready);
-        }
     }
 
     private com.simprints.libdata.ResultListener syncListener = new com.simprints.libdata.ResultListener() {

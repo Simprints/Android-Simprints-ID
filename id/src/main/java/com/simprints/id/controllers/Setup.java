@@ -147,7 +147,6 @@ public class Setup {
         dbContext.registerConnectionListener(new ConnectionListener() {
             @Override
             public void onConnection() {
-                appState.setConnected(true);
                 if (!appState.getSignedIn()) {
                     apiKeyValidated = false;
                     goOn(activity);
@@ -156,7 +155,6 @@ public class Setup {
 
             @Override
             public void onDisconnection() {
-                appState.setConnected(false);
             }
         });
 

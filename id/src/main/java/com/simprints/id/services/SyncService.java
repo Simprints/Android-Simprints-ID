@@ -51,7 +51,7 @@ public class SyncService extends Service {
             @Override
             public void onSuccess() {
                 for (ResultListener callback : resultListeners)
-                    callback.onSuccess();
+                     callback.onSuccess();
                 syncStarted = false;
             }
 
