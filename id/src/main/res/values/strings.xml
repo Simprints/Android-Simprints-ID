@@ -183,6 +183,7 @@
     <string name="button_scan_prints">Scan Fingerprints</string>
     <string name="button_submit">Submit</string>
     <string name="why_did_you_skip_fingerprinting">Why did you skip fingerprinting?</string>
+    <string name="resolve_db" translatable="false">Resolve DB</string>
     <string name="refusal_label">Refusal Form</string>
     <string name="privacy_label">Privacy</string>
     <string name="update_title">Update</string>

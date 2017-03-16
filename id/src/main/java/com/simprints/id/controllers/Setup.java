@@ -15,8 +15,9 @@ import com.simprints.id.tools.PermissionManager;
 import com.simprints.libdata.AuthListener;
 import com.simprints.libdata.ConnectionListener;
 import com.simprints.libdata.DATA_ERROR;
+import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.DatabaseContext;
-import com.simprints.libscanner.ResultListener;
+import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerUtils;
@@ -93,30 +94,24 @@ public class Setup {
             return;
         }
 
-        // Step 4: resolve commcare database. Optional, and only has to be done once.
-//        if (!ccDbResolved) {
-//            this.resolveCcDb(activity);
-//            return;
-//        }
-
-        // Step 5: initialize scanner object.
+        // Step 4: initialize scanner object.
         if (appState.getScanner() == null) {
             this.initScanner();
         }
 
-        // Step 6: connect with scanner. Must be done everytime the scanner is not connected
+        // Step 5: connect with scanner. Must be done everytime the scanner is not connected
         if (!appState.getScanner().isConnected()) {
             this.connectToScanner(activity);
             return;
         }
 
-        // Step 7: reset the UI. This is necessary for the trigger button to work.
+        // Step 6: reset the UI. This is necessary for the trigger button to work.
         if (!uiResetSinceConnection) {
             this.resetUi(activity);
             return;
         }
 
-        // Step 8: turn on the un20 if needed.
+        // Step 7: turn on the un20 if needed.
         this.wakeUpUn20(activity);
     }
 
@@ -158,7 +153,7 @@ public class Setup {
             }
         });
 
-        dbContext.initDatabase(new com.simprints.libdata.ResultListener() {
+        dbContext.initDatabase(new DataCallback() {
             @Override
             public void onSuccess() {
                 Log.d("Setup", "Database context initialized.");
@@ -187,7 +182,7 @@ public class Setup {
     private void validateApiKey(@NonNull final Activity activity) {
         onProgress(20, R.string.launch_checking_api_key);
 
-        appState.getData().signIn(true, new com.simprints.libdata.ResultListener() {
+        appState.getData().signIn(false, new DataCallback() {
             @Override
             public void onSuccess() {
                 if (!apiKeyValidated) {
@@ -217,7 +212,7 @@ public class Setup {
         });
     }
 
-    // STEP 5
+    // STEP 4
     private void initScanner() {
         callback.onProgress(40, R.string.launch_bt_connect);
         List<String> pairedScanners = ScannerUtils.getPairedScanners();
@@ -236,11 +231,11 @@ public class Setup {
         Log.d("Setup", "Scanner initialized.");
     }
 
-    // STEP 6
+    // STEP 5
     private void connectToScanner(@NonNull final Activity activity) {
         callback.onProgress(50, R.string.launch_bt_connect);
 
-        appState.getScanner().connect(new ResultListener() {
+        appState.getScanner().connect(new ScannerCallback() {
             @Override
             public void onSuccess() {
                 Log.d("Setup", "Connected to Vero.");
@@ -276,11 +271,11 @@ public class Setup {
         });
     }
 
-    // STEP 7
+    // STEP 6
     private void resetUi(@NonNull final Activity activity) {
         callback.onProgress(60, R.string.launch_setup);
 
-        appState.getScanner().resetUI(new ResultListener() {
+        appState.getScanner().resetUI(new ScannerCallback() {
             @Override
             public void onSuccess() {
                 Log.d("Setup", "UI reset.");
@@ -302,10 +297,10 @@ public class Setup {
         });
     }
 
-    // STEP 8
+    // STEP 7
     private void wakeUpUn20(@NonNull final Activity activity) {
         callback.onProgress(80, R.string.launch_wake_un20);
-        appState.getScanner().un20Wakeup(new ResultListener() {
+        appState.getScanner().un20Wakeup(new ScannerCallback() {
             @Override
             public void onSuccess() {
                 Log.d("Setup", "UN20 ready.");

@@ -24,7 +24,7 @@ import com.simprints.id.controllers.Setup;
 import com.simprints.libcommon.RefusalForm;
 import com.simprints.libcommon.Session;
 import com.simprints.libscanner.ButtonListener;
-import com.simprints.libscanner.ResultListener;
+import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.SCANNER_ERROR;
 
 import io.fabric.sdk.android.Fabric;
@@ -256,7 +256,7 @@ public class LaunchActivity extends AppCompatActivity {
             positionTracker.finish();
 
         if (appState.getScanner() != null) {
-            appState.getScanner().disconnect(new ResultListener() {
+            appState.getScanner().disconnect(new ScannerCallback() {
                 @Override
                 public void onSuccess() {
                     appState.destroy();

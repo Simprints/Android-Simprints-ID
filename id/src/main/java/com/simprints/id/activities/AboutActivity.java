@@ -15,7 +15,10 @@ import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
 import com.simprints.libdata.tools.Constants;
 
+
 public class AboutActivity extends AppCompatActivity {
+
+//    private ProgressDialog ccResolverDialog;
     private AppState appState;
 
     @Override
@@ -25,7 +28,7 @@ public class AboutActivity extends AppCompatActivity {
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_about);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_about);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_about);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -49,7 +52,7 @@ public class AboutActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.libSimprintsVersionTextView))
                 .setText(InternalConstants.LIBSIMPRINTS_VERSION);
 
-        AppState appState = AppState.getInstance();
+        final AppState appState = AppState.getInstance();
         short firmwareVersion = 0;
         try {
             firmwareVersion = appState.getHardwareVersion();
@@ -59,6 +62,30 @@ public class AboutActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.firmwareVersionTextView)).setText(
                 String.valueOf(firmwareVersion));
+
+//        ccResolverDialog = new ProgressDialog(this);
+//        ccResolverDialog.setIndeterminate(true);
+//        ccResolverDialog.setCanceledOnTouchOutside(false);
+//        ccResolverDialog.setMessage("Resolving Database...");
+//
+//        findViewById(R.id.bt_resolveCc).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                ccResolverDialog.show();
+//                appState.getData().resolveCommCare(getApplicationContext().getContentResolver(),
+//                        new ResultListener() {
+//                            @Override
+//                            public void onSuccess() {
+//                                ccResolverDialog.cancel();
+//                            }
+//
+//                            @Override
+//                            public void onFailure(DATA_ERROR data_error) {
+//                                ccResolverDialog.cancel();
+//                            }
+//                        });
+//            }
+//        });
     }
 
     @Override

@@ -177,7 +177,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         }
 
         //Set the match group radio buttons
-        Constants.GROUP matchGroup = sharedPref.getSyncGroup();
+        Constants.GROUP matchGroup = sharedPref.getMatchGroup();
         switch (matchGroup) {
             case GLOBAL:
                 ((RadioButton) findViewById(R.id.rb_globalMatchGroup)).setChecked(true);
