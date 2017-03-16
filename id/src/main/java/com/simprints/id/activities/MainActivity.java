@@ -754,8 +754,7 @@ public class MainActivity extends AppCompatActivity implements
     };
 
     private void backgroundSync() {
-        Intent intent = new Intent(this, SyncService.class);
-        startService(intent);
+        startService(new Intent(this, SyncService.class));
 
         if (syncItem != null) {
             syncItem.setEnabled(false);

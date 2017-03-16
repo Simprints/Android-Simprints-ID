@@ -12,35 +12,35 @@ public enum ALERT_TYPE {
 
     INVALID_API_KEY(R.string.configuration_error_title, R.string.invalid_apikey_message,
             R.drawable.error_icon, R.drawable.error_hint_key, R.string.close, R.string.empty,
-            false, R.color.simprints_red, Constants.SIMPRINTS_INVALID_API_KEY),
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_API_KEY),
 
     INVALID_INTENT_ACTION(R.string.configuration_error_title, R.string.invalid_intentAction_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
-            false, R.color.simprints_red, Constants.SIMPRINTS_INVALID_METADATA),
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_METADATA),
 
     INVALID_METADATA(R.string.configuration_error_title, R.string.invalid_metadata_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
-            false, R.color.simprints_red, Constants.SIMPRINTS_INVALID_INTENT_ACTION),
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_INTENT_ACTION),
 
     MISSING_API_KEY(R.string.configuration_error_title, R.string.missing_apikey_message,
             R.drawable.error_icon, R.drawable.error_hint_key, R.string.close, R.string.empty,
-            false, R.color.simprints_red, Constants.SIMPRINTS_MISSING_API_KEY),
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_API_KEY),
 
     MISSING_USER_ID(R.string.configuration_error_title, R.string.missing_userId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
-            false, R.color.simprints_red, Constants.SIMPRINTS_MISSING_USER_ID),
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_USER_ID),
 
     MISSING_MODULE_ID(R.string.configuration_error_title, R.string.missing_moduleId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
-            false, R.color.simprints_red, Constants.SIMPRINTS_MISSING_MODULE_ID),
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_MODULE_ID),
 
     MISSING_UPDATE_GUID(R.string.configuration_error_title, R.string.missing_updateId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
-            false, R.color.simprints_red, Constants.SIMPRINTS_MISSING_UPDATE_GUID),
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_UPDATE_GUID),
 
     MISSING_VERIFY_GUID(R.string.configuration_error_title, R.string.missing_verifyId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
-            false, R.color.simprints_red, Constants.SIMPRINTS_MISSING_VERIFY_GUID),
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_VERIFY_GUID),
 
     // Verification errors
 
@@ -52,7 +52,7 @@ public enum ALERT_TYPE {
 
     BLUETOOTH_NOT_SUPPORTED(R.string.bluetooth_error_title, R.string.bluetooth_not_supported_message,
             R.drawable.bt_error_icon, R.drawable.bt_not_enabled, R.string.try_again_label, R.string.settings_label,
-            false, R.color.simprints_red, RESULT_CANCELED),
+            false, R.color.simprints_alert_orange, RESULT_CANCELED),
 
     BLUETOOTH_NOT_ENABLED(R.string.bluetooth_error_title, R.string.bluetooth_not_enabled_message,
             R.drawable.bt_error_icon, R.drawable.bt_not_enabled, R.string.try_again_label, R.string.settings_label,
@@ -67,6 +67,7 @@ public enum ALERT_TYPE {
             true, R.color.simprints_blue, InternalConstants.RESULT_TRY_AGAIN),
 
     // Scanner errors
+
     DISCONNECTED(R.string.disconnected_title, R.string.disconnected_message,
             R.drawable.scanner_error_icon, -1, R.string.try_again_label, R.string.settings_label,
             true, R.color.simprints_blue, InternalConstants.RESULT_TRY_AGAIN),
@@ -76,6 +77,7 @@ public enum ALERT_TYPE {
             true, R.color.simprints_blue, Constants.SIMPRINTS_MISSING_UPDATE_GUID),
 
     //Unexpected errors
+
     UNEXPECTED_ERROR(R.string.error_occurred_title, R.string.unforeseen_error_message,
             R.drawable.error_icon, -1, R.string.try_again_label, R.string.close,
             true, R.color.simprints_blue, InternalConstants.RESULT_TRY_AGAIN);

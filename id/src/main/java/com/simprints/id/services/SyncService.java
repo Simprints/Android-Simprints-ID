@@ -68,25 +68,26 @@ public class SyncService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (syncStarted)
             return START_NOT_STICKY;
-
         syncStarted = true;
+
+        //Get and check data in case background sync fires before someone logs in
         SharedPref sharedPref = new SharedPref(getApplicationContext());
+        String appKey = sharedPref.getAppKeyString();
+        String userId = sharedPref.getLastUserIdString();
+        if (appKey == null || appKey.isEmpty())
+            return START_NOT_STICKY;
+        if (userId == null || userId.isEmpty())
+            return START_NOT_STICKY;
 
         switch (sharedPref.getSyncGroup()) {
             case GLOBAL:
-                new DatabaseSync(getApplicationContext(),
-                        sharedPref.getAppKeyString(),
-                        dataResultListener).sync();
+                new DatabaseSync(getApplicationContext(), appKey, dataResultListener).sync();
                 break;
             case USER:
-                new DatabaseSync(getApplicationContext(),
-                        sharedPref.getAppKeyString(),
-                        dataResultListener,
-                        sharedPref.getLastUserIdString()).sync();
+                new DatabaseSync(getApplicationContext(), appKey, dataResultListener, userId).sync();
                 break;
         }
 
-        // If we get killed, after returning from here, restart
         return START_NOT_STICKY;
     }
 
