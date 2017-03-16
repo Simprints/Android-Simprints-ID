@@ -13,15 +13,18 @@ import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DatabaseSync;
 import com.simprints.libdata.ResultListener;
 
+import java.util.ArrayList;
+
 public class SyncService extends Service {
     private final IBinder binder = new SyncBinder();
     private ResultListener dataResultListener;
-    private ResultListener callback;
     private boolean syncStarted = false;
+    private ArrayList<ResultListener> resultListeners;
 
     private class SyncBinder extends Binder {
         void setListener(ResultListener resultListener) {
-            SyncService.this.callback = resultListener;
+            if (!SyncService.this.resultListeners.contains(resultListener))
+                SyncService.this.resultListeners.add(resultListener);
         }
     }
 
@@ -43,17 +46,18 @@ public class SyncService extends Service {
 
     @Override
     public void onCreate() {
+        resultListeners = new ArrayList<>();
         dataResultListener = new com.simprints.libdata.ResultListener() {
             @Override
             public void onSuccess() {
-                if (callback != null)
+                for (ResultListener callback : resultListeners)
                     callback.onSuccess();
                 syncStarted = false;
             }
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                if (callback != null)
+                for (ResultListener callback : resultListeners)
                     callback.onFailure(data_error);
                 syncStarted = false;
             }
