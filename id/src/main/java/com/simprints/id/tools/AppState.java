@@ -39,7 +39,6 @@ public class AppState {
     private GoogleApiClient googleApiClient;
     private Analytics analytics;
     private boolean signedIn;
-    private boolean connected;
     private String callingPackage;
     private RefusalForm refusalForm;
     private Callout callout;
@@ -216,14 +215,6 @@ public class AppState {
 
     public void setSignedIn(boolean signedIn) {
         this.signedIn = signedIn;
-    }
-
-    public boolean isConnected() {
-        return this.connected;
-    }
-
-    public void setConnected(boolean connected) {
-        this.connected = connected;
     }
 
     public String getCallingPackage() {
