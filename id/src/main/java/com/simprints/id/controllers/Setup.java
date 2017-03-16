@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
@@ -182,7 +183,7 @@ public class Setup {
     private void validateApiKey(@NonNull final Activity activity) {
         onProgress(20, R.string.launch_checking_api_key);
 
-        appState.getData().signIn(true, new DataCallback() {
+        appState.getData().signIn(BuildConfig.DEBUG, new DataCallback() {
             @Override
             public void onSuccess() {
                 if (!apiKeyValidated) {

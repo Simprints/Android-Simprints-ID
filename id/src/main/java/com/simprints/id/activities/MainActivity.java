@@ -3,6 +3,7 @@ package com.simprints.id.activities;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -129,6 +130,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private ProgressDialog un20WakeupDialog;
 
+    private ServiceConnection syncService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,7 +158,8 @@ public class MainActivity extends AppCompatActivity implements
         sharedPref = new SharedPref(getApplicationContext());
         timeoutBar = new TimeoutBar(getApplicationContext(), (ProgressBar) findViewById(R.id.pb_timeout));
 
-        bindService(new Intent(this, SyncService.class), SyncService.buildListener(syncListener), BIND_AUTO_CREATE);
+        syncService = SyncService.buildListener(syncListener);
+        bindService(new Intent(this, SyncService.class), syncService, BIND_AUTO_CREATE);
 
         initActiveFingers();
         initBarAndDrawer();
@@ -714,6 +718,7 @@ public class MainActivity extends AppCompatActivity implements
         if (appState.getScanner() != null) {
             appState.getScanner().unregisterButtonListener(scannerButton);
         }
+        unbindService(syncService);
     }
 
     @SuppressWarnings("deprecation")

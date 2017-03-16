@@ -1,6 +1,7 @@
 package com.simprints.id.activities;
 
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ public class FrontActivity extends AppCompatActivity {
     private Button syncButton;
     private SharedPref sharedPref;
     private DataCallback dataCallback;
+    private ServiceConnection syncService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,9 +85,8 @@ public class FrontActivity extends AppCompatActivity {
             }
         };
 
-        bindService(new Intent(FrontActivity.this, SyncService.class),
-                SyncService.buildListener(dataCallback),
-                BIND_AUTO_CREATE);
+        syncService = SyncService.buildListener(dataCallback);
+        bindService(new Intent(FrontActivity.this, SyncService.class), syncService, BIND_AUTO_CREATE);
 
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,5 +106,11 @@ public class FrontActivity extends AppCompatActivity {
             syncButton.setText(R.string.not_signed_in);
             syncStatus.setImageResource(R.drawable.ic_menu_sync_off);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(syncService);
     }
 }
