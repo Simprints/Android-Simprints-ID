@@ -11,24 +11,24 @@ import android.support.annotation.Nullable;
 import com.simprints.id.tools.SharedPref;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DatabaseSync;
-import com.simprints.libdata.ResultListener;
+import com.simprints.libdata.DataCallback;
 
 import java.util.ArrayList;
 
 public class SyncService extends Service {
     private final IBinder binder = new SyncBinder();
-    private ResultListener dataResultListener;
+    private DataCallback dataCallback;
     private boolean syncStarted = false;
-    private ArrayList<ResultListener> resultListeners;
+    private ArrayList<DataCallback> resultListeners;
 
     private class SyncBinder extends Binder {
-        void setListener(ResultListener resultListener) {
+        void setListener(DataCallback resultListener) {
             if (!SyncService.this.resultListeners.contains(resultListener))
                 SyncService.this.resultListeners.add(resultListener);
         }
     }
 
-    public static ServiceConnection buildListener(@Nullable final ResultListener resultListener) {
+    public static ServiceConnection buildListener(@Nullable final DataCallback resultListener) {
         return new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
@@ -47,17 +47,17 @@ public class SyncService extends Service {
     @Override
     public void onCreate() {
         resultListeners = new ArrayList<>();
-        dataResultListener = new com.simprints.libdata.ResultListener() {
+        dataCallback = new com.simprints.libdata.DataCallback() {
             @Override
             public void onSuccess() {
-                for (ResultListener callback : resultListeners)
+                for (DataCallback callback : resultListeners)
                      callback.onSuccess();
                 syncStarted = false;
             }
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                for (ResultListener callback : resultListeners)
+                for (DataCallback callback : resultListeners)
                     callback.onFailure(data_error);
                 syncStarted = false;
             }
@@ -81,10 +81,10 @@ public class SyncService extends Service {
 
         switch (sharedPref.getSyncGroup()) {
             case GLOBAL:
-                new DatabaseSync(getApplicationContext(), appKey, dataResultListener).sync();
+                new DatabaseSync(getApplicationContext(), appKey, dataCallback).sync();
                 break;
             case USER:
-                new DatabaseSync(getApplicationContext(), appKey, dataResultListener, userId).sync();
+                new DatabaseSync(getApplicationContext(), appKey, dataCallback, userId).sync();
                 break;
         }
 

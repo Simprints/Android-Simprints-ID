@@ -20,8 +20,8 @@ import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.id.tools.SharedPref;
 import com.simprints.libdata.DATA_ERROR;
+import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.DatabaseContext;
-import com.simprints.libdata.ResultListener;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -29,7 +29,7 @@ public class FrontActivity extends AppCompatActivity {
     private ImageView syncStatus;
     private Button syncButton;
     private SharedPref sharedPref;
-    private ResultListener dataListener;
+    private DataCallback dataCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +61,7 @@ public class FrontActivity extends AppCompatActivity {
 
         PermissionManager.requestAllPermissions(FrontActivity.this);
 
-        dataListener = new ResultListener() {
+        dataCallback = new DataCallback() {
             @Override
             public void onSuccess() {
                 syncButton.setEnabled(true);
@@ -84,7 +84,7 @@ public class FrontActivity extends AppCompatActivity {
         };
 
         bindService(new Intent(FrontActivity.this, SyncService.class),
-                SyncService.buildListener(dataListener),
+                SyncService.buildListener(dataCallback),
                 BIND_AUTO_CREATE);
 
         syncButton.setOnClickListener(new View.OnClickListener() {

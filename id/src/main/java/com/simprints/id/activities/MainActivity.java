@@ -52,9 +52,10 @@ import com.simprints.libcommon.ScanConfig;
 import com.simprints.libdata.AuthListener;
 import com.simprints.libdata.ConnectionListener;
 import com.simprints.libdata.DATA_ERROR;
+import com.simprints.libdata.DataCallback;
 import com.simprints.libscanner.ButtonListener;
-import com.simprints.libscanner.ResultListener;
 import com.simprints.libscanner.SCANNER_ERROR;
+import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.FingerIdentifier;
 import com.simprints.libsimprints.Registration;
@@ -424,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements
         activeFingers.get(currentActiveFingerNo).setStatus(Status.NOT_COLLECTED);
         activeFingers.get(currentActiveFingerNo).setTemplate(null);
 
-        appState.getScanner().resetUI(new ResultListener() {
+        appState.getScanner().resetUI(new ScannerCallback() {
             @Override
             public void onSuccess() {
                 refreshDisplay();
@@ -511,7 +512,8 @@ public class MainActivity extends AppCompatActivity implements
                     if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES))
                         registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
                     else
-                        registrationResult.setTemplate(fp.getFingerId(), new byte[1]);
+                        registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
+//                        registrationResult.setTemplate(fp.getFingerId(), new byte[1]);
                 }
 
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
@@ -724,8 +726,7 @@ public class MainActivity extends AppCompatActivity implements
             syncItem.setIcon(R.drawable.ic_menu_sync_ready);
     }
 
-    private com.simprints.libdata.ResultListener syncListener = new com.simprints.libdata.ResultListener() {
-        @Override
+    DataCallback syncListener = new DataCallback() {
         public void onSuccess() {
             if (syncItem == null)
                 return;
@@ -766,7 +767,7 @@ public class MainActivity extends AppCompatActivity implements
         timeoutBar.startTimeoutBar();
 
         appState.getScanner().startContinuousCapture(sharedPref.getQualityThresholdInt(),
-                sharedPref.getTimeoutInt() * 1000, new ResultListener() {
+                sharedPref.getTimeoutInt() * 1000, new ScannerCallback() {
                     @Override
                     public void onSuccess() {
                         timeoutBar.stopTimeoutBar();
@@ -789,7 +790,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private void forceCapture() {
-        appState.getScanner().forceCapture(sharedPref.getQualityThresholdInt(), new ResultListener() {
+        appState.getScanner().forceCapture(sharedPref.getQualityThresholdInt(), new ScannerCallback() {
                     @Override
                     public void onSuccess() {
                         captureSuccess();
@@ -851,7 +852,7 @@ public class MainActivity extends AppCompatActivity implements
 
             case OUTDATED_SCANNER_INFO:
                 cancelCaptureUI();
-                appState.getScanner().updateSensorInfo(new ResultListener() {
+                appState.getScanner().updateSensorInfo(new ScannerCallback() {
                     @Override
                     public void onSuccess() {
                         resetUIFromError();

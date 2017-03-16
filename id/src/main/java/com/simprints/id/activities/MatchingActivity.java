@@ -16,7 +16,7 @@ import com.simprints.id.tools.Log;
 import com.simprints.id.tools.SharedPref;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DATA_ERROR;
-import com.simprints.libdata.ResultListener;
+import com.simprints.libdata.DataCallback;
 import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
 import com.simprints.libmatcher.Progress;
@@ -62,7 +62,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
         final GROUP matchGroup = new SharedPref(getApplicationContext()).getMatchGroup();
 
-        appState.getData().loadPeople(candidates, matchGroup, new ResultListener() {
+        appState.getData().loadPeople(candidates, matchGroup, new DataCallback() {
             @Override
             public void onSuccess() {
                 Log.d(MatchingActivity.this, String.format(Locale.UK,
