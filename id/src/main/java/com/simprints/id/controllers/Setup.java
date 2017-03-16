@@ -182,7 +182,7 @@ public class Setup {
     private void validateApiKey(@NonNull final Activity activity) {
         onProgress(20, R.string.launch_checking_api_key);
 
-        appState.getData().signIn(false, new DataCallback() {
+        appState.getData().signIn(true, new DataCallback() {
             @Override
             public void onSuccess() {
                 if (!apiKeyValidated) {
