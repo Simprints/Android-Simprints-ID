@@ -184,14 +184,14 @@
     <string name="button_submit">Submit</string>
     <string name="why_did_you_skip_fingerprinting">Why did you skip fingerprinting?</string>
     <string name="resolve_db" translatable="false">Resolve DB</string>
-    <string name="refusal_label">Refusal Form</string>
-    <string name="privacy_label">Privacy</string>
+    <string name="refusal_label" translatable="false">Refusal Form</string>
+    <string name="privacy_label" translatable="false">Privacy</string>
     <string name="update_title">Update</string>
     <string name="verify_title">Verify</string>
     <string name="low_battery_title">LOW BATTERY</string>
     <string name="low_battery_message">Scanner battery low, please charge your scanner</string>
-    <string name="database_information">Database Information</string>
-    <string name="user_count">User Count:</string>
-    <string name="module_count">Module Count:</string>
-    <string name="project_count">Project Count:</string>
+    <string name="database_information" translatable="false">Database Information</string>
+    <string name="user_count" translatable="false">User Count:</string>
+    <string name="module_count" translatable="false">Module Count:</string>
+    <string name="project_count" translatable="false">Project Count:</string>
 </resources>
