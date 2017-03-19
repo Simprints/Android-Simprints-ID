@@ -84,6 +84,7 @@ public class SyncService extends Service {
         }
 
         switch (sharedPref.getSyncGroup()) {
+            case MODULE:
             case GLOBAL:
                 new DatabaseSync(getApplicationContext(), appKey, dataCallback).sync();
                 break;
