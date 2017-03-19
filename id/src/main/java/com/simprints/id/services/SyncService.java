@@ -10,8 +10,8 @@ import android.support.annotation.Nullable;
 
 import com.simprints.id.tools.SharedPref;
 import com.simprints.libdata.DATA_ERROR;
-import com.simprints.libdata.DatabaseSync;
 import com.simprints.libdata.DataCallback;
+import com.simprints.libdata.DatabaseSync;
 
 import java.util.ArrayList;
 
@@ -51,7 +51,7 @@ public class SyncService extends Service {
             @Override
             public void onSuccess() {
                 for (DataCallback callback : resultListeners)
-                     callback.onSuccess();
+                    callback.onSuccess();
                 syncStarted = false;
             }
 
@@ -74,10 +74,14 @@ public class SyncService extends Service {
         SharedPref sharedPref = new SharedPref(getApplicationContext());
         String appKey = sharedPref.getAppKeyString();
         String userId = sharedPref.getLastUserIdString();
-        if (appKey == null || appKey.isEmpty())
+        if (appKey == null || appKey.isEmpty()) {
+            dataCallback.onFailure(DATA_ERROR.SYNC_INTERRUPTED);
             return START_NOT_STICKY;
-        if (userId == null || userId.isEmpty())
+        }
+        if (userId == null || userId.isEmpty()) {
+            dataCallback.onFailure(DATA_ERROR.SYNC_INTERRUPTED);
             return START_NOT_STICKY;
+        }
 
         switch (sharedPref.getSyncGroup()) {
             case GLOBAL:
