@@ -434,7 +434,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onSuccess() {
                 refreshDisplay();
                 scanButton.setEnabled(true);
-                un20WakeupDialog.cancel();
+                un20WakeupDialog.dismiss();
             }
 
             @Override
@@ -877,6 +877,10 @@ public class MainActivity extends AppCompatActivity implements
                 reconnect();
                 break;
 
+            case UN20_SDK_ERROR:
+                resetUIFromError();
+                break;
+
             case IO_ERROR:
             case NO_RESPONSE:
             case UNEXPECTED:
@@ -885,7 +889,7 @@ public class MainActivity extends AppCompatActivity implements
             case SCANNER_UNBONDED:
             case UN20_FAILURE:
             case UN20_LOW_VOLTAGE:
-            case UN20_SDK_ERROR:
+                cancelCaptureUI();
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
