@@ -8,7 +8,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 40
+        versionCode 41
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -71,7 +71,7 @@ dependencies {
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.simprints:libscanner:1.1.1'
-    compile 'com.simprints:libdata:1.1.15'
+    compile 'com.simprints:libdata:1.1.20'
     compile 'com.simprints:libcommon:1.0.48'
     compile 'com.simprints:libmatcher:1.0.15'
     compile 'com.simprints:LibSimprints:1.0.9'
