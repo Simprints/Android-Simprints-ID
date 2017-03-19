@@ -18,9 +18,9 @@ import com.simprints.libdata.ConnectionListener;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.DatabaseContext;
-import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
+import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.ScannerUtils;
 
 import java.util.List;
@@ -97,7 +97,8 @@ public class Setup {
 
         // Step 4: initialize scanner object.
         if (appState.getScanner() == null) {
-            this.initScanner();
+            this.initScanner(activity);
+            return;
         }
 
         // Step 5: connect with scanner. Must be done everytime the scanner is not connected
@@ -214,7 +215,7 @@ public class Setup {
     }
 
     // STEP 4
-    private void initScanner() {
+    private void initScanner(@NonNull final Activity activity) {
         callback.onProgress(40, R.string.launch_bt_connect);
         List<String> pairedScanners = ScannerUtils.getPairedScanners();
         if (pairedScanners.size() == 0) {
@@ -229,6 +230,7 @@ public class Setup {
         appState.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
 
+        goOn(activity);
         Log.d("Setup", "Scanner initialized.");
     }
 
