@@ -3,7 +3,6 @@ package com.simprints.id.activities;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -37,7 +36,7 @@ import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
-import com.simprints.id.services.SyncService;
+import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
@@ -130,8 +129,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private ProgressDialog un20WakeupDialog;
 
-    private ServiceConnection syncService;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,9 +154,6 @@ public class MainActivity extends AppCompatActivity implements
         registrationResult = null;
         sharedPref = new SharedPref(getApplicationContext());
         timeoutBar = new TimeoutBar(getApplicationContext(), (ProgressBar) findViewById(R.id.pb_timeout));
-
-        syncService = SyncService.buildListener(syncListener);
-        bindService(new Intent(this, SyncService.class), syncService, BIND_AUTO_CREATE);
 
         initActiveFingers();
         initBarAndDrawer();
@@ -718,7 +712,7 @@ public class MainActivity extends AppCompatActivity implements
         if (appState.getScanner() != null) {
             appState.getScanner().unregisterButtonListener(scannerButton);
         }
-        unbindService(syncService);
+        SyncService.getInstance().stopListening(syncListener);
     }
 
     @SuppressWarnings("deprecation")
@@ -759,13 +753,14 @@ public class MainActivity extends AppCompatActivity implements
     };
 
     private void backgroundSync() {
-        startService(new Intent(this, SyncService.class));
-
         if (syncItem != null) {
             syncItem.setEnabled(false);
             syncItem.setTitle("Syncing...");
             syncItem.setIcon(R.drawable.ic_menu_syncing);
         }
+
+        if (!SyncService.getInstance().startAndListen(getApplicationContext(), syncListener))
+            throw new RuntimeException();
     }
 
     private void startContinuousCapture() {

@@ -1,7 +1,5 @@
 package com.simprints.id.activities;
 
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -13,25 +11,20 @@ import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.simprints.id.R;
-import com.simprints.id.backgroundSync.SyncSetup;
-import com.simprints.id.services.SyncService;
+import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.RemoteConfig;
-import com.simprints.id.tools.SharedPref;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
-import com.simprints.libdata.DatabaseContext;
 
 import io.fabric.sdk.android.Fabric;
 
 public class FrontActivity extends AppCompatActivity {
     private ImageView syncStatus;
     private Button syncButton;
-    private SharedPref sharedPref;
     private DataCallback dataCallback;
-    private ServiceConnection syncService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +35,6 @@ public class FrontActivity extends AppCompatActivity {
         setContentView(R.layout.activity_front);
         Analytics.getInstance(getApplicationContext());
         RemoteConfig.init();
-        sharedPref = new SharedPref(getApplicationContext());
 
         syncStatus = (ImageView) findViewById(R.id.iv_sync);
         syncButton = (Button) findViewById(R.id.bt_sync);
@@ -58,8 +50,6 @@ public class FrontActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.versionTextView)).setText(String.format("Simprints ID: %s", version));
         ((TextView) findViewById(R.id.libSimprintsTextView)).setText(R.string.front_libSimprints_version);
-
-        new SyncSetup(getApplicationContext()).initialize();
 
         PermissionManager.requestAllPermissions(FrontActivity.this);
 
@@ -85,32 +75,23 @@ public class FrontActivity extends AppCompatActivity {
             }
         };
 
-        syncService = SyncService.buildListener(dataCallback);
-        bindService(new Intent(FrontActivity.this, SyncService.class), syncService, BIND_AUTO_CREATE);
-
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startService(new Intent(FrontActivity.this, SyncService.class));
                 syncButton.setEnabled(false);
                 syncButton.setText(R.string.syncing);
                 syncStatus.setImageResource(R.drawable.ic_menu_syncing);
+                if (!SyncService.getInstance().startAndListen(getApplicationContext(), dataCallback)) {
+                    syncButton.setText(R.string.not_signed_in);
+                    syncStatus.setImageResource(R.drawable.ic_menu_sync_off);
+                }
             }
         });
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (!DatabaseContext.isSignedIn(sharedPref.getAppKeyString())) {
-            syncButton.setText(R.string.not_signed_in);
-            syncStatus.setImageResource(R.drawable.ic_menu_sync_off);
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(syncService);
+        SyncService.getInstance().stopListening(dataCallback);
     }
 }

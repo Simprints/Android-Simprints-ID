@@ -24,9 +24,8 @@ public class SyncSetup {
 
             Task task = new PeriodicTask.Builder()
                     .setService(GcmSyncService.class)
-                    //.setPeriod(60 * 60 * 5) // 5 hours
-                    //.setFlex(60 * 60 * 4) // 4 hours
-                    .setPeriod(60)
+                    .setPeriod(60 * 60 * 5) // 5 hours
+                    .setFlex(60 * 60) // 1 hours
                     .setPersisted(true)
                     .setRequiredNetwork(Task.NETWORK_STATE_CONNECTED)
                     .setTag("periodic_task")
