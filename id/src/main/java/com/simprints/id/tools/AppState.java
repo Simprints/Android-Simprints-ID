@@ -113,14 +113,20 @@ public class AppState {
         session.setModuleId(moduleId);
         analytics.setUser(userId, apiKey);
 
-        if (callout == Callout.UPDATE)
-            session.setPersonGuid(updateId);
-        if (callout == Callout.VERIFY)
-            session.setPersonGuid(verifyId);
-        if (callout == Callout.REGISTER)
-            session.setPersonGuid(UUID.randomUUID().toString());
 
-        session.setMetadata(metadata);
+        if (callout == Callout.UPDATE) {
+            session.setPersonGuid(updateId);
+        }
+        if (callout == Callout.VERIFY) {
+            session.setPersonGuid(verifyId);
+            session.setEnrol(false);
+        }
+        if (callout == Callout.REGISTER) {
+            session.setPersonGuid(UUID.randomUUID().toString());
+            session.setEnrol(true);
+        }
+
+            session.setMetadata(metadata);
 
         // Set other attributes
         String deviceId = Settings.Secure.getString(appContext.getContentResolver(), Settings.Secure.ANDROID_ID);
