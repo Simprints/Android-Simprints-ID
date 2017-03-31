@@ -111,6 +111,7 @@ public class AppState {
         session.setApiKey(apiKey);
         session.setUserId(userId);
         session.setModuleId(moduleId);
+        session.setSessionId(UUID.randomUUID().toString());
         analytics.setUser(userId, apiKey);
 
 
