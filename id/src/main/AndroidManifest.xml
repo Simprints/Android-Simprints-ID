@@ -109,12 +109,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <receiver android:name=".receivers.CommCareReceiver">
-            <intent-filter>
-                <action android:name="org.commcare.dalvik.api.action.case.selected" />
-            </intent-filter>
-        </receiver>
-
         <service
             android:name=".backgroundSync.GcmSyncService"
             android:exported="true"
