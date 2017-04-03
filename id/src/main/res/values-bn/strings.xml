@@ -145,5 +145,15 @@
     <string name="menu_continue">চালয়িে যান</string>
     <string name="settings_select_language">ভাষা নর্বিাচন করুন</string>
     <string name="missing_calling_package_message">একটি কনফগিারশেন ত্রুটি ঘটছেে (কলং প্যাকজে অনুপস্থতি), আপনার সস্টিমে অ্যাডমনিস্ট্রিটেররে সাথে  যোগাযোগ করুন</string>
+    <string name="launch_setup">सेट अप Vero</string>
+    <string name="low_battery_title">ব্যাটারীর চার্জ কম</string>
+    <string name="update_title">হালনাগাদ</string>
+    <string name="verify_title">যাচাই করুন</string>
+    <string name="low_battery_message">" स्क्यानर ब्याट्री कम, कृपया आफ्नो स्क्यानर चार्ज"</string>
+    <string name="invalid_intentAction_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid intent action)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="invalid_metadata_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid metadata)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="missing_moduleId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no module ID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="missing_updateId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no update GUID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="missing_verifyId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no verify GUID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
 
 </resources>
