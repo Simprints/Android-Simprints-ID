@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
+import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
@@ -20,12 +21,11 @@ import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
-import com.simprints.id.controllers.Setup;
 import com.simprints.libcommon.RefusalForm;
 import com.simprints.libcommon.Session;
 import com.simprints.libscanner.ButtonListener;
-import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.SCANNER_ERROR;
+import com.simprints.libscanner.ScannerCallback;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -72,7 +72,6 @@ public class LaunchActivity extends AppCompatActivity {
     private boolean launchOutOfFocus = false;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,7 +104,7 @@ public class LaunchActivity extends AppCompatActivity {
         confirmConsentTextView.setVisibility(View.INVISIBLE);
         loadingInfoTextView.setVisibility(View.VISIBLE);
 
-        setupCallback = new SetupCallback () {
+        setupCallback = new SetupCallback() {
             @Override
             public void onSuccess() {
                 // If it is the first time the launch process finishes, wait for consent confirmation

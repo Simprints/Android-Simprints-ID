@@ -8,7 +8,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 37
+        versionCode 43
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -24,11 +24,11 @@ android {
     productFlavors {
         development {
             applicationId 'com.simprints.id.development'
-            versionName '0.1.1'
+            versionName '0.1.2'
         }
         production {
             applicationId 'com.simprints.id'
-            versionName '1.1.1'
+            versionName '1.1.2'
         }
     }
 }
@@ -71,10 +71,10 @@ dependencies {
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.simprints:libscanner:1.1.1'
-    compile 'com.simprints:libdata:0.1.59'
+    compile 'com.simprints:libdata:1.1.20'
     compile 'com.simprints:libcommon:1.0.48'
     compile 'com.simprints:libmatcher:1.0.15'
-    compile 'com.simprints:LibSimprints:0.0.10'
+    compile 'com.simprints:LibSimprints:1.0.9'
     compile 'com.google.firebase:firebase-core:10.2.0'
     compile 'com.google.firebase:firebase-crash:10.2.0'
     compile 'com.google.firebase:firebase-database:10.2.0'
