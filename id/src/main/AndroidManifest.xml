@@ -124,6 +124,9 @@
             </intent-filter>
         </service>
 
+        <service android:name=".services.GuidSelectionService"
+            android:exported="true"/>
+
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value=".activities.MainActivity" />
