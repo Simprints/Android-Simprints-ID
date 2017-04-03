@@ -230,8 +230,8 @@ public class Setup {
         appState.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
 
-        goOn(activity);
         Log.d("Setup", "Scanner initialized.");
+        goOn(activity);
     }
 
     // STEP 5
