@@ -18,9 +18,9 @@ import com.simprints.libdata.ConnectionListener;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.DatabaseContext;
-import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
+import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.ScannerUtils;
 
 import java.util.List;
@@ -230,6 +230,7 @@ public class Setup {
         appState.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
 
+        goOn(activity);
         Log.d("Setup", "Scanner initialized.");
         goOn(activity);
     }

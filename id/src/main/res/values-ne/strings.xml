@@ -146,4 +146,14 @@
     <string name="menu_continue">लोड हुँदै</string>
     <string name="missing_calling_package_message">कन्फिगरेसन त्रुटि फेला परेको छ (कलिङ प्याकेज छुटेको), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="settings_select_language">भाषा चयन गर्नुहोस्</string>
+    <string name="launch_setup">ঠিককরা Vero</string>
+    <string name="low_battery_title">कम ब्याट्री</string>
+    <string name="update_title">अपडेट</string>
+    <string name="verify_title">प्रमाणित</string>
+    <string name="low_battery_message">स्क्यानर ब्याट्री कम, कृपया आफ्नो स्क्यानर चार्ज</string>
+    <string name="invalid_intentAction_message">कन्फिगरेसन त्रुटि फेला परेको छ (invalid intent action), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
+    <string name="invalid_metadata_message">कन्फिगरेसन त्रुटि फेला परेको छ (invalid metadata), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
+    <string name="missing_moduleId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no module ID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
+    <string name="missing_updateId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no update GUID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
+    <string name="missing_verifyId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no verify GUID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
 </resources>
