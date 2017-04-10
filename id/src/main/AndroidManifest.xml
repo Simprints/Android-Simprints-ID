@@ -119,7 +119,11 @@
         </service>
 
         <service android:name=".services.GuidSelectionService"
-            android:exported="true"/>
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.simprints.id.CONFIRM_IDENTITY"/>
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
