@@ -118,7 +118,7 @@
             </intent-filter>
         </service>
 
-        <service android:name=".services.GuidSelectionService"
+        <service android:name="com.simprints.id.services.GuidSelectionService"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.simprints.id.CONFIRM_IDENTITY"/>
