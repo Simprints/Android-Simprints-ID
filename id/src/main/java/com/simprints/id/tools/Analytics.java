@@ -69,4 +69,15 @@ public class Analytics {
         bundle.putString("device_id", deviceId);
         firebaseAnalytics.logEvent("background_sync", bundle);
     }
+
+    public void logGuidSelectionService(String apiKey, String selectedGuid, String androidId,
+                                        String sessionId, boolean callbackSent) {
+        Bundle bundle = new Bundle();
+        bundle.putString("api_key", apiKey);
+        bundle.putString("selected_guid", selectedGuid);
+        bundle.putString("android_id", androidId);
+        bundle.putString("session_id", sessionId);
+        bundle.putBoolean("callback_sent", callbackSent);
+        firebaseAnalytics.logEvent("guid_selection_service", bundle);
+    }
 }
