@@ -5,11 +5,13 @@ apply plugin: 'com.google.firebase.firebase-crash'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
+
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 43
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+        versionName '1.1.3'
     }
     buildTypes {
         debug {
@@ -19,16 +21,6 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-    productFlavors {
-        development {
-            applicationId 'com.simprints.id.development'
-            versionName '0.1.2'
-        }
-        production {
-            applicationId 'com.simprints.id'
-            versionName '1.1.2'
         }
     }
 }
