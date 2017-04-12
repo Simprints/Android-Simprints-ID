@@ -152,6 +152,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 // finish
                 Intent resultData = new Intent(Constants.SIMPRINTS_IDENTIFY_INTENT);
                 resultData.putExtra(Constants.SIMPRINTS_IDENTIFICATIONS, topCandidates);
+                resultData.putExtra(Constants.SIMPRINTS_SESSION_ID, appState.getSessionId());
                 setResult(RESULT_OK, resultData);
                 finish();
                 break;
