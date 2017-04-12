@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 
+import com.simprints.id.tools.Analytics;
+
 import static com.simprints.libdata.DatabaseContext.updateIdentification;
 import static com.simprints.libsimprints.Constants.*;
 
@@ -24,7 +26,19 @@ public class GuidSelectionService extends IntentService {
             String androidId = Settings.Secure.getString(this.getContentResolver(),
                     Settings.Secure.ANDROID_ID);
 
-            updateIdentification(apiKey, selectedGuid, androidId, sessionId);
+            if (selectedGuid == null) {
+                selectedGuid = "null";
+            }
+
+            boolean callbackSent;
+            if (apiKey == null || androidId == null || sessionId == null) {
+                callbackSent = false;
+            } else {
+                updateIdentification(apiKey, selectedGuid, androidId, sessionId);
+                callbackSent = true;
+            }
+            Analytics.getInstance(this).logGuidSelectionService(
+                    apiKey, selectedGuid, androidId, sessionId, callbackSent);
         }
     }
 }
