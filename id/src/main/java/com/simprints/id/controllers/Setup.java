@@ -10,9 +10,11 @@ import android.util.Log;
 import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
 import com.simprints.id.model.ALERT_TYPE;
+import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
+import com.simprints.libcommon.Person;
 import com.simprints.libdata.AuthListener;
 import com.simprints.libdata.ConnectionListener;
 import com.simprints.libdata.DATA_ERROR;
@@ -23,6 +25,7 @@ import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.ScannerUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.app.Activity.RESULT_CANCELED;
@@ -48,6 +51,9 @@ public class Setup {
 
     // True iff the api key was validated successfully
     private boolean apiKeyValidated = false;
+
+    // True iff it is not a verify intent || or the GUID in the verify intent was found
+    private boolean guidExists = false;
 
     // True iff the UI of the scanner was reset since the last connection (enabling trigger button)
     private boolean uiResetSinceConnection = false;
@@ -107,13 +113,21 @@ public class Setup {
             return;
         }
 
-        // Step 6: reset the UI. This is necessary for the trigger button to work.
+        // Step 6: check if it's a verify intent. If it is, check if the person is in the database.
+        // If they are, check if connected to the internet.
+        if (!guidExists) {
+            this.checkIfVerifyAndGuidExists(activity);
+            return;
+        }
+
+
+        // Step 7: reset the UI. This is necessary for the trigger button to work.
         if (!uiResetSinceConnection) {
             this.resetUi(activity);
             return;
         }
 
-        // Step 7: turn on the un20 if needed.
+        // Step 8: turn on the un20 if needed.
         this.wakeUpUn20(activity);
     }
 
@@ -275,8 +289,46 @@ public class Setup {
     }
 
     // STEP 6
+    private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
+        if (appState.getCallout() == Callout.VERIFY) {
+            guidExists = true;
+            goOn(activity);
+        }
+
+        callback.onProgress(60, R.string.launch_checking_person_in_db);
+
+        List<Person> loadedPerson = new ArrayList<>();
+        String guid = appState.getGuid();
+        appState.getData().loadPerson(loadedPerson, guid, new DataCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d("Setup", "GUID found.");
+                guidExists = true;
+                goOn(activity);
+            }
+
+            @Override
+            public void onFailure(DATA_ERROR data_error) {
+                switch (data_error) {
+                    case NOT_FOUND:
+                        if (appState.getData().isConnected()) {
+                            // We've synced with the online db and they're not in the db
+                            onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
+                        } else {
+                            // We're offline but might find the person if we sync
+                            onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
+                        }
+                        break;
+                    default:
+                        throw new RuntimeException(); // SHOULDN'T HAPPEN
+                }
+            }
+        });
+    }
+
+    // STEP 7
     private void resetUi(@NonNull final Activity activity) {
-        callback.onProgress(60, R.string.launch_setup);
+        callback.onProgress(70, R.string.launch_setup);
 
         appState.getScanner().resetUI(new ScannerCallback() {
             @Override
@@ -300,9 +352,9 @@ public class Setup {
         });
     }
 
-    // STEP 7
+    // STEP 8
     private void wakeUpUn20(@NonNull final Activity activity) {
-        callback.onProgress(80, R.string.launch_wake_un20);
+        callback.onProgress(85, R.string.launch_wake_un20);
         appState.getScanner().un20Wakeup(new ScannerCallback() {
             @Override
             public void onSuccess() {

@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.simprints.id.R;
+import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
@@ -60,44 +61,69 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         Bundle extras = getIntent().getExtras();
         probe = extras.getParcelable("Person");
 
-        final GROUP matchGroup = new SharedPref(getApplicationContext()).getMatchGroup();
+        Callout callout = appState.getCallout();
 
-        appState.getData().loadPeople(candidates, matchGroup, new DataCallback() {
-            @Override
-            public void onSuccess() {
-                Log.d(MatchingActivity.this, String.format(Locale.UK,
-                        "Successfully loaded %d candidates", candidates.size()));
+        // Do different things depending on the callout
+        switch (callout) {
+            case IDENTIFY:
+                final GROUP matchGroup = new SharedPref(getApplicationContext()).getMatchGroup();
 
-                int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
+                appState.getData().loadPeople(candidates, matchGroup, new DataCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(MatchingActivity.this, String.format(Locale.UK,
+                                "Successfully loaded %d candidates", candidates.size()));
 
-                final LibMatcher.MATCHER_TYPE matcher_type;
+                        int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
 
-                switch (matcherType) {
-                    case 0:
-                        matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
-                        break;
-                    case 1:
-                        matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS;
-                        break;
-                    default:
-                        matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
-                }
+                        final LibMatcher.MATCHER_TYPE matcher_type;
 
-                // Start lengthy operation in a background thread
-                new Thread(new Runnable() {
-                    public void run() {
-                        LibMatcher matcher = new LibMatcher(probe, candidates,
-                                matcher_type, scores, MatchingActivity.this, 1);
-                        matcher.start();
+                        switch (matcherType) {
+                            case 0:
+                                matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
+                                break;
+                            case 1:
+                                matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS;
+                                break;
+                            default:
+                                matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
+                        }
+
+                        // Start lengthy operation in a background thread
+                        new Thread(new Runnable() {
+                            public void run() {
+                                LibMatcher matcher = new LibMatcher(probe, candidates,
+                                        matcher_type, scores, MatchingActivity.this, 1);
+                                matcher.start();
+                            }
+                        }).start();
                     }
-                }).start();
-            }
 
-            @Override
-            public void onFailure(DATA_ERROR data_error) {
-                throw new RuntimeException();
-            }
-        });
+                    @Override
+                    public void onFailure(DATA_ERROR data_error) {
+                        throw new RuntimeException();
+                    }
+                });
+                break;
+            case VERIFY:
+                final String guid = appState.getGuid();
+
+                appState.getData().loadPerson(candidates, guid, new DataCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(MatchingActivity.this, "Successfully loaded candidate");
+
+
+                    }
+
+                    @Override
+                    public void onFailure(DATA_ERROR data_error) {
+                        throw new RuntimeException();
+                    }
+                });
+        }
+
+
     }
 
     private Tier computeTier(float score) {
