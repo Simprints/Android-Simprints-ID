@@ -52,11 +52,11 @@ public enum ALERT_TYPE {
 
     GUID_NOT_FOUND_ONLINE(R.string.verify_guid_not_found_title, R.string.verify_guid_not_found_online_message,
             R.drawable.error_icon, -1, R.string.close, R.string.empty,
-            true, R.color.simprints_alert_orange, Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE),
+            true, R.color.simprints_grey, Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE),
 
     GUID_NOT_FOUND_OFFLINE(R.string.verify_guid_not_found_title, R.string.verify_guid_not_found_offline_message,
             R.drawable.error_icon, R.drawable.error_hint_wifi, R.string.try_again_label, R.string.settings_label,
-            true, R.color.simprints_alert_orange, Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_OFFLINE),
+            true, R.color.simprints_grey, Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_OFFLINE),
 
     // Bluetooth errors
 

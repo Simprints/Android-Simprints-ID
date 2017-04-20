@@ -83,7 +83,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                                 matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
                                 break;
                             case 1:
-                                matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS;
+                                matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS_IDENTIFY;
                                 break;
                             default:
                                 matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
@@ -113,6 +113,29 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                     public void onSuccess() {
                         Log.d(MatchingActivity.this, "Successfully loaded candidate");
 
+                        int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
+
+                        final LibMatcher.MATCHER_TYPE matcher_type;
+
+                        switch (matcherType) {
+                            case 0:
+                                matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY;
+                                break;
+                            case 1:
+                                matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS_VERIFY;
+                                break;
+                            default:
+                                matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY;
+                        }
+
+                        // Start lengthy operation in a background thread
+                        new Thread(new Runnable() {
+                            public void run() {
+                                LibMatcher matcher = new LibMatcher(probe, candidates,
+                                        matcher_type, scores, MatchingActivity.this, 1);
+                                matcher.start();
+                            }
+                        }).start();
 
                     }
 
