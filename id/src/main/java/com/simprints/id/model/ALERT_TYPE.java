@@ -45,7 +45,7 @@ public enum ALERT_TYPE {
     // Verification errors
 
     UNVERIFIED_API_KEY(R.string.alert_api_key_verify_failed, R.string.alert_api_key_verify_failed_body,
-            R.drawable.error_icon, R.drawable.error_hint_wifi, R.string.try_again_label, R.string.close,
+            R.drawable.error_icon, R.drawable.error_hint_wifi, R.string.try_again_label, R.string.settings_label,
             true, R.color.simprints_grey, InternalConstants.RESULT_TRY_AGAIN),
 
     // Data errors
