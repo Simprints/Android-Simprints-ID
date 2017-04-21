@@ -20,6 +20,7 @@ import com.simprints.libdata.ConnectionListener;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.DatabaseContext;
+import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
@@ -298,7 +299,7 @@ public class Setup {
         callback.onProgress(60, R.string.launch_checking_person_in_db);
 
         List<Person> loadedPerson = new ArrayList<>();
-        String guid = appState.getGuid();
+        final String guid = appState.getGuid();
         appState.getData().loadPerson(loadedPerson, guid, new DataCallback() {
             @Override
             public void onSuccess() {
@@ -311,11 +312,18 @@ public class Setup {
             public void onFailure(DATA_ERROR data_error) {
                 switch (data_error) {
                     case NOT_FOUND:
+                        Person probe = new Person(guid);
                         if (appState.getData().isConnected()) {
                             // We've synced with the online db and they're not in the db
+                            appState.getData().saveVerification(probe, null,
+                                    appState.getSessionId(),
+                                    VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE);
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
                         } else {
                             // We're offline but might find the person if we sync
+                            appState.getData().saveVerification(probe, null,
+                                    appState.getSessionId(),
+                                    VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE);
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
                         }
                         break;
