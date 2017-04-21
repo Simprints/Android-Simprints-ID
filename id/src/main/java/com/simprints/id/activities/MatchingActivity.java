@@ -146,6 +146,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         throw new RuntimeException();
                     }
                 });
+                break;
         }
 
 
@@ -210,6 +211,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         resultData.putExtra(Constants.SIMPRINTS_IDENTIFICATIONS, topCandidates);
                         resultData.putExtra(Constants.SIMPRINTS_SESSION_ID, appState.getSessionId());
                         setResult(RESULT_OK, resultData);
+                        break;
                     }
                     case VERIFY: {
                         Verification verification;
@@ -237,6 +239,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         resultData.putExtra(Constants.SIMPRINTS_VERIFICATIONS, verification);
                         resultData.putExtra(Constants.SIMPRINTS_SESSION_ID, appState.getSessionId());
                         setResult(resultCode, resultData);
+                        break;
                     }
                 }
                 finish();
