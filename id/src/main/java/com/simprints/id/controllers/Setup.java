@@ -291,9 +291,10 @@ public class Setup {
 
     // STEP 6
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
-        if (appState.getCallout() == Callout.VERIFY) {
+        if (appState.getCallout() != Callout.VERIFY) {
             guidExists = true;
             goOn(activity);
+            return;
         }
 
         callback.onProgress(60, R.string.launch_checking_person_in_db);
