@@ -86,9 +86,16 @@ public class AlertActivity extends AppCompatActivity {
                         case NOT_PAIRED:
                         case MULTIPLE_PAIRED_SCANNERS:
                         case DISCONNECTED:
-                            Intent intent = new Intent();
-                            intent.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
-                            startActivity(intent);
+                            Intent intent1 = new Intent();
+                            intent1.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+                            startActivity(intent1);
+                            break;
+
+                        case GUID_NOT_FOUND_OFFLINE:
+                        case UNVERIFIED_API_KEY:
+                            Intent intent2 = new Intent();
+                            intent2.setAction(android.provider.Settings.ACTION_WIFI_SETTINGS);
+                            startActivity(intent2);
                             break;
 
                         default:
