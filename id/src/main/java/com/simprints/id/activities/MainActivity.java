@@ -727,6 +727,7 @@ public class MainActivity extends AppCompatActivity implements
 
     DataCallback syncListener = new DataCallback() {
         public void onSuccess() {
+            android.util.Log.d("sync", "onSuccess");
             if (syncItem == null)
                 return;
 
@@ -737,6 +738,7 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         public void onFailure(DATA_ERROR data_error) {
+            android.util.Log.d("sync", "onFailure");
             switch (data_error) {
                 case SYNC_INTERRUPTED:
                     if (syncItem == null)
