@@ -126,7 +126,7 @@ public class Setup {
     // STEP 2
     private void initDbContext(@NonNull final Activity activity) {
         onProgress(10, R.string.updating_database);
-        DatabaseContext dbContext = new DatabaseContext(appState.getApiKey(), appState.getUserId(), appState.getModuleId(), appState.getDeviceId(), activity);
+        DatabaseContext dbContext = new DatabaseContext(appState.getApiKey(), appState.getUserId(), appState.getModuleId(), appState.getDeviceId(), activity, BuildConfig.DEBUG);
         appState.setData(dbContext);
 
         dbContext.registerAuthListener(new AuthListener() {
@@ -184,7 +184,7 @@ public class Setup {
     private void validateApiKey(@NonNull final Activity activity) {
         onProgress(20, R.string.launch_checking_api_key);
 
-        appState.getData().signIn(BuildConfig.DEBUG, new DataCallback() {
+        appState.getData().signIn(new DataCallback() {
             @Override
             public void onSuccess() {
                 if (!apiKeyValidated) {
