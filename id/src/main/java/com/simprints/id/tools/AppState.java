@@ -5,19 +5,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.libcommon.RefusalForm;
-import com.simprints.libcommon.Session;
 import com.simprints.libdata.DatabaseContext;
+import com.simprints.libdata.models.firebase.fb_Session;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.Metadata;
 
-import java.util.Calendar;
 import java.util.UUID;
 
 
@@ -33,52 +33,78 @@ public class AppState {
         return singleton;
     }
 
-    private Scanner scanner;
-    private DatabaseContext data;
-    private Session session;
-    private GoogleApiClient googleApiClient;
-    private Analytics analytics;
-    private boolean signedIn;
-    private String callingPackage;
-    private RefusalForm refusalForm;
-    private Callout callout;
+    // Callout parameters
+    private Callout callout = null;
+    private String apiKey = null;
+    private String updateId = null;
+    private String verifyId = null;
+    private String userId = null;
+    private String moduleId = null;
+    private String metadataString = null;
+    private Metadata metadata = null;
+    private String callingPackage = null;
+    private String personGuid = null;
 
-    private AppState() {
-        scanner = null;
-        data = null;
-        session = new Session();
-        googleApiClient = null;
-        analytics = null;
-        refusalForm = null;
-        callout = null;
-        Calendar c = Calendar.getInstance();
-        session.setStartTime(c.getTime());
-    }
+    // Other attributes
+    private String deviceId = null;
+    private String macAddress = null;
+    private String scannerId = null;
+    private short hardwareVersion = -1;
+    private String latitude = null;
+    private String longitude = null;
+
+    // Handles on scanner, database, firebase analytics, google api, etc.
+    private Scanner scanner = null;
+    private DatabaseContext data = null;
+    private fb_Session session = null;
+    private GoogleApiClient googleApiClient = null;
+    private Analytics analytics = null;
+    private boolean signedIn = false;
+    private RefusalForm refusalForm = null;
+
 
     @SuppressLint("HardwareIds")
-    public ALERT_TYPE init(Intent intent, Context appContext) {
-        analytics = Analytics.getInstance(appContext);
-        // Open bundle
+    public ALERT_TYPE init(@NonNull Intent intent, @NonNull Context appContext) {
+
+        // Reads intent parameters
+        callout = Callout.fromAction(intent.getAction());
         Bundle extras = intent.getExtras();
-        if (extras == null || extras.isEmpty())
-            return ALERT_TYPE.MISSING_API_KEY;
+        if (extras != null) {
+            apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
+            updateId = extras.getString(Constants.SIMPRINTS_UPDATE_GUID);
+            verifyId = extras.getString(Constants.SIMPRINTS_VERIFY_GUID);
+            userId = extras.getString(Constants.SIMPRINTS_USER_ID);
+            moduleId = extras.getString(Constants.SIMPRINTS_MODULE_ID);
+            metadataString = extras.getString(Constants.SIMPRINTS_METADATA);
+            callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
+        }
+        if (callout != null) {
+            switch (callout) {
+                case UPDATE:
+                    personGuid = updateId;
+                    break;
+                case VERIFY:
+                    personGuid = verifyId;
+                    break;
+                case REGISTER:
+                    personGuid = UUID.randomUUID().toString();
+                    break;
+                default:
+                    break;
+            }
+        }
 
-        String action = intent.getAction();
-        if (action == null || action.isEmpty())
-            return ALERT_TYPE.INVALID_INTENT_ACTION;
-        callout = Callout.fromAction(action);
-        analytics.setLogin(callout);
+        // Read other local attributes
+        deviceId = Settings.Secure.getString(appContext.getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        // Read all bundle fields
-        String apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
-        String updateId = extras.getString(Constants.SIMPRINTS_UPDATE_GUID);
-        String verifyId = extras.getString(Constants.SIMPRINTS_VERIFY_GUID);
-        String userId = extras.getString(Constants.SIMPRINTS_USER_ID);
-        String moduleId = extras.getString(Constants.SIMPRINTS_MODULE_ID);
-        String metadataString = extras.getString(Constants.SIMPRINTS_METADATA);
-        callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
+        // Save attributes to firebase session, whether they are valid or not
+        session = new fb_Session(Callout.toString(callout), apiKey, moduleId, userId, personGuid,
+                metadataString, deviceId, callingPackage);
 
         // Check parameters
+        if (callout == null)
+            return ALERT_TYPE.INVALID_INTENT_ACTION;
+
         if (apiKey == null || apiKey.isEmpty())
             return ALERT_TYPE.MISSING_API_KEY;
 
@@ -97,7 +123,7 @@ public class AppState {
         if (callout == Callout.VERIFY && (verifyId == null || verifyId.isEmpty()))
             return ALERT_TYPE.MISSING_VERIFY_GUID;
 
-        Metadata metadata = null;
+        metadata = null;
         if (metadataString != null && !metadataString.isEmpty())
             try {
                 metadata = new Metadata(metadataString);
@@ -105,140 +131,135 @@ public class AppState {
                 return ALERT_TYPE.INVALID_METADATA;
             }
 
-        // Set attributes accordingly
+        // Save some attributes in shared preferences
         new SharedPref(appContext).setAppKeyString(apiKey.substring(0, 8));
         new SharedPref(appContext).setLastUserIdString(userId);
-        session.setApiKey(apiKey);
-        session.setUserId(userId);
-        session.setModuleId(moduleId);
-        session.setSessionId(UUID.randomUUID().toString());
-        analytics.setUser(userId, apiKey);
 
-
-        if (callout == Callout.UPDATE) {
-            session.setPersonGuid(updateId);
-        }
-        if (callout == Callout.VERIFY) {
-            session.setPersonGuid(verifyId);
-            session.setEnrol(false);
-        }
-        if (callout == Callout.REGISTER) {
-            session.setPersonGuid(UUID.randomUUID().toString());
-            session.setEnrol(true);
-        }
-
-            session.setMetadata(metadata);
-
-        // Set other attributes
-        String deviceId = Settings.Secure.getString(appContext.getContentResolver(), Settings.Secure.ANDROID_ID);
-        session.setDeviceId(deviceId);
-        analytics.setDeviceId(deviceId);
+        // Save some attributes to analytics
+        analytics = Analytics.getInstance(appContext);
+        analytics.setUserProperties(apiKey, moduleId, userId, deviceId);
+        analytics.logLogin();
 
         return null;
-    }
-
-    public Callout getCallout() {
-        return this.callout;
-    }
-
-    public String getApiKey() {
-        return session.getApiKey();
-    }
-
-    public String getDeviceId() {
-        return session.getDeviceId();
-    }
-
-    public String getUserId() {
-        return session.getUserId();
-    }
-
-    public String getModuleId() {
-        return session.getModuleId();
-    }
-
-    public String getGuid() {
-        return session.getPersonGuid();
-    }
-
-    public Scanner getScanner() {
-        return scanner;
     }
 
     public void setScanner(Scanner scanner) {
         this.scanner = scanner;
     }
 
-    public String getMacAddress() {
-        return session.getMacAddress();
+    public void setMacAddress(@NonNull String macAddress) {
+        this.macAddress = macAddress;
+        session.saveMacAddress(macAddress);
+        analytics.setScannerMac();
     }
 
-    public void setMacAddress(String macAddress) {
-        session.setMacAddress(macAddress);
-        analytics.setScannerMac(macAddress);
+    public void setHardwareVersion(short hardwareVersion) {
+        this.hardwareVersion = hardwareVersion;
+        session.saveHardwareVersion(hardwareVersion);
     }
 
-    public DatabaseContext getData() {
-        return data;
+    public void setScannerId(@NonNull String scannerId) {
+        this.scannerId = scannerId;
+        session.saveScannerId(scannerId);
+    }
+
+    public void setPosition(@NonNull String latitude, @NonNull String longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        session.savePosition(latitude, longitude);
+    }
+
+    public void logLoadEnd() {
+        session.logLoadEndTime();
+    }
+
+    public void logMainStart() {
+        session.logMainStartTime();
+    }
+
+    public void logMatchStart() {
+        session.logMatchStartTime();
+    }
+
+    public void logSessionEnd() {
+        session.logSessionEndTime();
     }
 
     public void setData(DatabaseContext data) {
         this.data = data;
     }
 
-    GoogleApiClient getGoogleApiClient() {
-        return googleApiClient;
-    }
-
     void setGoogleApiClient(GoogleApiClient googleApiClient) {
         this.googleApiClient = googleApiClient;
-    }
-
-    void setLatitude(String latitude) {
-        session.setLatitude(latitude);
-    }
-
-    void setLongitude(String longitude) {
-        session.setLongitude(longitude);
-    }
-
-    public Session getReadyToSendSession() {
-        Calendar c = Calendar.getInstance();
-        session.setEndTime(c.getTime());
-        return session;
-    }
-
-    public void setHardwareVersion(short hardwareVersion) {
-        session.setHardwareVersion(hardwareVersion);
-    }
-
-    public short getHardwareVersion() {
-        return session.getHardwareVersion();
-    }
-
-    public boolean getSignedIn() {
-        return this.signedIn;
     }
 
     public void setSignedIn(boolean signedIn) {
         this.signedIn = signedIn;
     }
 
-    public String getCallingPackage() {
-        return this.callingPackage;
-    }
-
     public void setRefusalForm(RefusalForm refusalForm) {
         this.refusalForm = refusalForm;
     }
 
+    public Callout getCallout() {
+        return callout;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getModuleId() {
+        return moduleId;
+    }
+
+    public String getGuid() {
+        return personGuid;
+    }
+
+    public String getMacAddress() {
+        return macAddress;
+    }
+
+    public short getHardwareVersion() {
+        return hardwareVersion;
+    }
+
+    public Scanner getScanner() {
+        return scanner;
+    }
+
+    public boolean getSignedIn() {
+        return signedIn;
+    }
+
+    public String getCallingPackage() {
+        return callingPackage;
+    }
+
+    public DatabaseContext getData() {
+        return data;
+    }
+
+    GoogleApiClient getGoogleApiClient() {
+        return googleApiClient;
+    }
+
     @Nullable
     public RefusalForm getRefusalForm() {
-        return this.refusalForm;
+        return refusalForm;
     }
 
     public String getSessionId() {
-        return this.session.getSessionId();
+        return session.sessionId;
     }
 
     public void destroy() {

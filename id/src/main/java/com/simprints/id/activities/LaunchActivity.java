@@ -22,7 +22,6 @@ import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libcommon.RefusalForm;
-import com.simprints.libcommon.Session;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.ScannerCallback;
@@ -107,6 +106,7 @@ public class LaunchActivity extends AppCompatActivity {
         setupCallback = new SetupCallback() {
             @Override
             public void onSuccess() {
+                appState.logLoadEnd();
                 // If it is the first time the launch process finishes, wait for consent confirmation
                 // Else, go directly to the main activity
                 if (!consentConfirmed) {
@@ -238,15 +238,12 @@ public class LaunchActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        Session session = appState.getReadyToSendSession();
-        if (appState.getData() != null && session != null) {
-            // Save session to firebase
-            appState.getData().saveSession(session);
-
+        appState.logSessionEnd();
+        if (appState.getData() != null) {
             // Save refusal form to firebase
             RefusalForm refusalForm = appState.getRefusalForm();
             if (refusalForm != null)
-                appState.getData().saveRefusalForm(refusalForm, session.getSessionId());
+                appState.getData().saveRefusalForm(refusalForm, appState.getSessionId());
 
             appState.getData().destroy();
         }
