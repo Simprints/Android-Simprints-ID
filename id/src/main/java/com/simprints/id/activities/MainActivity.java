@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements
         navView.setItemIconTintList(null);
 
         appState = AppState.getInstance();
+        appState.logMainStart();
 
         handler = new Handler();
 
