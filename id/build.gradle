@@ -4,14 +4,14 @@ apply plugin: 'com.google.firebase.firebase-crash'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 44
+        versionCode 46
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
-        versionName '1.2.0'
+        versionName '1.2.2'
     }
     buildTypes {
         debug {
@@ -59,20 +59,20 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.google.android.gms:play-services-location:10.2.1'
-    compile 'com.google.android.gms:play-services-gcm:10.2.1'
+    compile 'com.google.android.gms:play-services-location:10.2.4'
+    compile 'com.google.android.gms:play-services-gcm:10.2.4'
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.volley:volley:1.0.0'
-    compile 'com.simprints:libscanner:1.1.2'
-    compile 'com.simprints:libdata:0.1.74'
+    compile 'com.simprints:libscanner:1.1.
+    compile 'com.simprints:libdata:1.1.25'
     compile 'com.simprints:libcommon:1.0.48'
-    compile 'com.simprints:libmatcher:0.0.64'
-    compile 'com.simprints:LibSimprints:0.0.19'
-    compile 'com.google.firebase:firebase-core:10.2.1'
-    compile 'com.google.firebase:firebase-crash:10.2.1'
-    compile 'com.google.firebase:firebase-database:10.2.1'
-    compile 'com.google.firebase:firebase-auth:10.2.1'
-    compile 'com.google.firebase:firebase-config:10.2.1'
+    compile 'com.simprints:libmatcher:1.0.18'
+    compile 'com.simprints:LibSimprints:1.0.10'
+    compile 'com.google.firebase:firebase-core:10.2.0'
+    compile 'com.google.firebase:firebase-crash:10.2.0'
+    compile 'com.google.firebase:firebase-database:10.2.0'
+    compile 'com.google.firebase:firebase-auth:10.2.0'
+    compile 'com.google.firebase:firebase-config:10.2.0'
     testCompile 'junit:junit:4.12'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
