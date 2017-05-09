@@ -166,8 +166,8 @@ public class PositionTracker implements
             Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     appState.getGoogleApiClient());
             if (lastLocation != null) {
-                appState.setLatitude(String.valueOf(lastLocation.getLatitude()));
-                appState.setLongitude(String.valueOf(lastLocation.getLongitude()));
+                appState.setPosition(String.valueOf(lastLocation.getLatitude()),
+                        String.valueOf(lastLocation.getLongitude()));
             }
             Log.d(activity, String.format(Locale.UK, "Last location: %s", lastLocation));
         }
@@ -234,8 +234,8 @@ public class PositionTracker implements
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            appState.setLatitude(String.valueOf(location.getLatitude()));
-            appState.setLongitude(String.valueOf(location.getLongitude()));
+            appState.setPosition(String.valueOf(location.getLatitude()),
+                    String.valueOf(location.getLongitude()));
             Log.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
                     location.getLatitude(), location.getLongitude()));
         }

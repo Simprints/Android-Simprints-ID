@@ -69,7 +69,7 @@ public class AlertActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     setResult(alertType.getResultCode());
-                    analytics.setAlert(alertType, false);
+                    analytics.logAlert(alertType, false);
                     finish();
                 }
             });
@@ -100,7 +100,7 @@ public class AlertActivity extends AppCompatActivity {
 
                         default:
                             setResult(RESULT_CANCELED);
-                            analytics.setAlert(alertType, false);
+                            analytics.logAlert(alertType, false);
                             finish();
                             break;
                     }
