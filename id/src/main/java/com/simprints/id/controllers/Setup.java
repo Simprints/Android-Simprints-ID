@@ -258,6 +258,7 @@ public class Setup {
             public void onSuccess() {
                 Log.d("Setup", "Connected to Vero.");
                 uiResetSinceConnection = false;
+                appState.setScannerId(appState.getScanner().getScannerId());
                 goOn(activity);
             }
 

@@ -52,6 +52,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         setContentView(R.layout.activity_matching);
 
         appState = AppState.getInstance();
+        appState.logMatchStart();
 
         progressBar = (ProgressBar) findViewById(R.id.pb_identification);
         int progressBarColor = ContextCompat.getColor(this, R.color.simprints_blue);
