@@ -3,6 +3,7 @@ package com.simprints.id.backgroundSync;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.simprints.id.tools.SharedPref;
 import com.simprints.libdata.DATA_ERROR;
@@ -38,7 +39,9 @@ public class SyncService implements DataCallback {
         SharedPref sharedPref = new SharedPref(appContext);
         String appKey = sharedPref.getAppKeyString();
         String userId = sharedPref.getLastUserIdString();
+        Log.d("sync", "startAndListen()");
         if (appKey == null || appKey.isEmpty() || userId == null || userId.isEmpty()) {
+            Log.d("sync", "first if");
             return false;
         }
 
@@ -49,9 +52,11 @@ public class SyncService implements DataCallback {
             syncInProgress = true;
             switch (sharedPref.getSyncGroup()) {
                 case GLOBAL:
+                    Log.d("sync", "calling global sync");
                     new DatabaseSync(appContext, appKey, this).sync();
                     break;
                 case USER:
+                    Log.d("sync", "calling user sync");
                     new DatabaseSync(appContext, appKey, this, userId).sync();
                     break;
             }
