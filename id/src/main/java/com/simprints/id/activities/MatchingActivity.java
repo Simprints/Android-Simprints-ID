@@ -221,7 +221,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                         if (candidates.size() > 0 && scores.size() > 0) {
                             int score = scores.get(0).intValue();
-                            verification = new Verification(score, computeTier(score));
+                            verification = new Verification(score, computeTier(score), appState.getGuid());
                             guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_FOUND;
                             resultCode = RESULT_OK;
                         } else {
