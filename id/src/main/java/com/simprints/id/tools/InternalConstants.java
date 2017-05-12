@@ -19,5 +19,5 @@ public class InternalConstants {
 
     //Version numbers
     public final static int DATABASE_VERSION_NUMBER = 4;
-    public final static String LIBSIMPRINTS_VERSION = "1.0.5";
+    public final static String LIBSIMPRINTS_VERSION = "1.0.10";
 }
