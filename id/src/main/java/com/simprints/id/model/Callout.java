@@ -22,8 +22,16 @@ public enum Callout {
             actionCalloutMapping.put(callout.action, callout);
     }
 
+    @NonNull
+    public static String toString(@Nullable Callout callout) {
+        if (callout == null)
+            return "";
+        else
+            return callout.toString();
+    }
+
     @Nullable
-    public static Callout fromAction(@NonNull String action) {
+    public static Callout fromAction(@Nullable String action) {
         return actionCalloutMapping.get(action);
     }
 
