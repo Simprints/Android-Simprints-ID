@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Id</string>
 
-    <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.10</string>
+    <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.11</string>
 
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
@@ -87,7 +87,7 @@
     <string name="launch_bt_connect">Connecting to Vero…</string>
     <string name="launch_wake_un20">Waking up UN20…</string>
     <string name="launch_setup">Setting up Vero…</string>
-    <string name="launch_checking_person_in_db">Checking person is in database…</string>
+    <string name="launch_checking_person_in_db" translatable="false">Checking person is in database…</string>
 
     <!--Main app-->
     <string name="scan_label">SCAN</string>
@@ -102,9 +102,9 @@
     <string name="missing_moduleId_message">A configuration error has occurred (no module ID), please contact your system administrator</string>
     <string name="missing_updateId_message">A configuration error has occurred (no update GUID), please contact your system administrator</string>
     <string name="missing_verifyId_message">A configuration error has occurred (no verify GUID), please contact your system administrator</string>
-    <string name="verify_guid_not_found_title">Person Not Found</string>
-    <string name="verify_guid_not_found_online_message">The person selected for verification is not in the database</string>
-    <string name="verify_guid_not_found_offline_message">Person not found, please make sure you are connected to the internet and try again"</string>
+    <string name="verify_guid_not_found_title" translatable="false">Person Not Found</string>
+    <string name="verify_guid_not_found_online_message" translatable="false">The person selected for verification is not in the database</string>
+    <string name="verify_guid_not_found_offline_message" translatable="false">Person not found, please make sure you are connected to the internet and try again</string>
     <string name="bluetooth_not_supported_title" translatable="false">BLUETOOTH NOT SUPPORTED</string>
     <string name="bluetooth_not_supported_message" translatable="false">Bluetooth not supported on this device, please contact your system administrator</string>
     <string name="bluetooth_not_enabled_title" translatable="false">BLUETOOTH NOT ENABLED</string>
