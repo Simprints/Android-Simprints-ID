@@ -20,9 +20,6 @@ public class TimeoutBar {
     }
 
     public void startTimeoutBar() {
-        if (AppState.getInstance().getHardwareVersion() <= 4)
-            return;
-
         final int[] i = {0, new SharedPref(context).getTimeoutInt() * 1000};
         progressBar.setProgress(i[0]);
         countDownTimer = new CountDownTimer(i[1], i[1] / 100) {

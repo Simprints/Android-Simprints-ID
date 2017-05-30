@@ -807,6 +807,15 @@ public class MainActivity extends AppCompatActivity implements
         );
     }
 
+    /**
+     * For hardware version <=4, set bad scan if force capture isn't possible
+     */
+    private void forceCaptureNotPossible() {
+        activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
+        Vibrate.vibrate(MainActivity.this, 100);
+        refreshDisplay();
+    }
+
     private void cancelCaptureUI() {
         activeFingers.get(currentActiveFingerNo).setStatus(previousStatus);
         timeoutBar.cancelTimeoutBar();
@@ -876,7 +885,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case UN20_SDK_ERROR:
-                resetUIFromError();
+                forceCaptureNotPossible();
                 break;
 
             case IO_ERROR:
