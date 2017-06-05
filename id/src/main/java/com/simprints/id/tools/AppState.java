@@ -3,6 +3,8 @@ package com.simprints.id.tools;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -43,6 +45,7 @@ public class AppState {
     private String metadataString = null;
     private Metadata metadata = null;
     private String callingPackage = null;
+    private String appVersion = null;
     private String personGuid = null;
 
     // Other attributes
@@ -96,10 +99,17 @@ public class AppState {
 
         // Read other local attributes
         deviceId = Settings.Secure.getString(appContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+        PackageInfo pInfo;
+        try {
+            pInfo = appContext.getPackageManager().getPackageInfo(appContext.getPackageName(), 0);
+            appVersion = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
 
         // Save attributes to firebase session, whether they are valid or not
         session = new fb_Session(Callout.toString(callout), apiKey, moduleId, userId, personGuid,
-                metadataString, deviceId, callingPackage);
+                metadataString, deviceId, callingPackage, appVersion);
 
         // Check parameters
         if (callout == null)
@@ -243,6 +253,10 @@ public class AppState {
 
     public String getCallingPackage() {
         return callingPackage;
+    }
+
+    public String getAppVersion() {
+        return appVersion;
     }
 
     public DatabaseContext getData() {
