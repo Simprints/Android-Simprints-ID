@@ -43,7 +43,7 @@
         Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other community health workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to patients.
     </string>
     <string name="scan">স্ক্যান</string>
-    <string name="scanning">স্ক্যানিং...</string>
+    <string name="scanning">স্ক্যানিং…</string>
     <string name="scan_label">স্ক্যান</string>
     <string name="rescan_label">পুনঃস্ক্যান</string>
     <string name="rescan_label_question">পুনঃস্ক্যান?</string>
@@ -95,7 +95,7 @@
     <string name="ok">ঠিক আছে</string>
     <string name="cancel">বন্ধ করুন</string>
     <string name="please_wait">সনাক্তকরণ করার সময় অনুগ্রহ করে অপেক্ষা করুন</string>
-    <string name="coming_soon">শীঘ্রই আসছে...</string>
+    <string name="coming_soon">শীঘ্রই আসছে…</string>
     <string name="confirm_consent">সম্মতি নিশ্চিত করতে এখানে ট্যাপ করুন</string>
     <string name="nudge_mode_checkbox_name">Nudge মোড</string>
     <string name="healthworker_consent_checkbox">এই তথ্য এই উপায়ে ব্যবহার করার জন্য আমি Simprints এর সাথে সম্মত</string>
@@ -113,18 +113,18 @@
     <string name="menu_header">Simprints ID</string>
     <string name="menu_subheader">Every person counts!</string>
     <string name="nav_sync">সিঙ্ক</string>
-    <string name="launch_wake_un20">UN20 নিদ্রাভঙ্গ আপ...</string>
-    <string name="launch_loading_database">ডাটাবেস লোড হচ্ছে...</string>
-    <string name="launch_checking_permissions">অনুমতি পরীক্ষা করা হচ্ছে...</string>
-    <string name="launch_checking_api_key">API কী পরীক্ষা করা হচ্ছে...</string>
-    <string name="launch_cc_resolve">CommCare সঙ্গে ডাটাবেস স্থির করা হচ্ছে...</string>
-    <string name="launch_bt_connect">Vero সংযুক্ত হচ্ছে...</string>
+    <string name="launch_wake_un20">UN20 নিদ্রাভঙ্গ আপ…</string>
+    <string name="launch_loading_database">ডাটাবেস লোড হচ্ছে…</string>
+    <string name="launch_checking_permissions">অনুমতি পরীক্ষা করা হচ্ছে…</string>
+    <string name="launch_checking_api_key">API কী পরীক্ষা করা হচ্ছে…</string>
+    <string name="launch_cc_resolve">CommCare সঙ্গে ডাটাবেস স্থির করা হচ্ছে…</string>
+    <string name="launch_bt_connect">Vero সংযুক্ত হচ্ছে…</string>
     <string name="alert_api_key_verify_failed">API কী যাচাই করতে ব্যর্থ</string>
     <string name="alert_api_key_verify_failed_body">\"আমরা আপনার API কী যাচাই করতে পারিনি, দয়া করে নিশ্চিত করুন যে আপনি ইন্টারনেটের সাথে সংযুক্ত করা হয় এবং আবার চেষ্টা করুন\"</string>
     <string name="beneficiary_refused">সুবিধাভোগী প্রত্যাখ্যান করেছেন</string>
     <string name="beneficiary_was_physically_unable">সুবিধাভোগী আঙুলের ছাপ দিতে শারীরিকভাবে অক্ষম ছিলেন (যেমন, অত্যন্ত ব্যথাময় ছিল, হাত ছিল না)</string>
     <string name="other">অন্যান্য</string>
-    <string name="hint_other_reason">আরো তথ্য...</string>
+    <string name="hint_other_reason">আরো তথ্য…</string>
     <string name="button_scan_prints">আঙুলের ছাপ স্ক্যান করুন</string>
     <string name="button_submit">জমা দিন</string>
     <string name="unable_to_capture_a_good_scan">একটি ভালো স্ক্যান ক্যাপচার করতে অক্ষম</string>
@@ -140,8 +140,8 @@
     <string name="not_signed_in">সাইন ইন করনেনি</string>
     <string name="offline">অফলাইন</string>
     <string name="sync_data">সঙ্কি ডাটা</string>
-    <string name="updating_database">সিঙ্ক করা হচ্ছেপ্রজক্টে ডাটাবসে আপডটে করা হচ্ছ...</string>
-    <string name="syncing">সিঙ্ক করা হচ্ছে...</string>
+    <string name="updating_database">সিঙ্ক করা হচ্ছেপ্রজক্টে ডাটাবসে আপডটে করা হচ্ছ…</string>
+    <string name="syncing">সিঙ্ক করা হচ্ছে…</string>
     <string name="menu_continue">চালয়িে যান</string>
     <string name="settings_select_language">ভাষা নর্বিাচন করুন</string>
     <string name="missing_calling_package_message">একটি কনফগিারশেন ত্রুটি ঘটছেে (কলং প্যাকজে অনুপস্থতি), আপনার সস্টিমে অ্যাডমনিস্ট্রিটেররে সাথে  যোগাযোগ করুন</string>
