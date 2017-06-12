@@ -23,6 +23,9 @@
     <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
     <!-- Version Names -->
     <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.11</string>
+    <!-- App Titles -->
+    <string name="simprints_label" translatable="false">Simprints</string>
+    <string name="libsimprints_label" translatable="false">LibSimprints</string>
     <!-- Content Descriptions -->
     <string name="launch_background_description" translatable="false">Simprint\'s logo as background image</string>
     <!-- Sync Button Text -->
@@ -164,6 +167,11 @@
     <string name="nb_of_ids_value">Returned Identifications: %1$d</string>
     <string name="timeout_empty">Timeout (Seconds):</string>
     <string name="timeout_value">Timeout (Seconds): %1$d</string>
+    <string name="sync_settings_label">Sync Settings</string>
+    <string name="search_settings_label">Search Settings</string>
+    <string name="user_label">User</string>
+    <string name="module_label">Module</string>
+    <string name="project_label">Project</string>
     <string name="sourceafis" translatable="false">SourceAFIS</string>
     <string name="simafis_beta" translatable="false">SimAFIS (Beta)</string>
 

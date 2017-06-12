@@ -27,7 +27,7 @@
         android:layout_marginBottom="45dp"
         android:layout_marginLeft="60dp"
         android:layout_marginStart="60dp"
-        android:text="LibSimprints"
+        android:text="@string/libsimprints_label"
         android:textColor="@color/simprints_white"
         android:textSize="20sp" />
 
@@ -39,7 +39,7 @@
         android:layout_alignLeft="@+id/libSimprintsTextView"
         android:layout_alignStart="@+id/libSimprintsTextView"
         android:layout_marginBottom="15dp"
-        android:text="Simprints"
+        android:text="@string/simprints_label"
         android:textColor="@color/simprints_white"
         android:textSize="20sp" />
 

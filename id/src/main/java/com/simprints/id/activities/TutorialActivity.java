@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.simprints.id.R;
-import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.Language;
 
 public class TutorialActivity extends AppCompatActivity {
