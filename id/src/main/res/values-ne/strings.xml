@@ -150,6 +150,11 @@
     <string name="nb_of_ids_value">पहिचान गरिएकाहरु: %1$d</string>
     <string name="timeout_empty">समय समाप्ति (सेकेण्ड):</string>
     <string name="timeout_value">समय समाप्ति (सेकेण्ड): %1$d</string>
+    <string name="sync_settings_label">Sync Settings</string>
+    <string name="search_settings_label">Search Settings</string>
+    <string name="user_label">User</string>
+    <string name="module_label">Module</string>
+    <string name="project_label">Project</string>
 
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->

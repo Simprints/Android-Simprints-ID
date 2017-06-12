@@ -149,6 +149,11 @@
     <string name="nb_of_ids_value">ফিরে এসে সনাক্তকরণ: %1$d</string>
     <string name="timeout_empty">সময়সীমা (সকেন্দে):</string>
     <string name="timeout_value">সময়সীমা (সকেন্দে): %1$d</string>
+    <string name="sync_settings_label">Sync Settings</string>
+    <string name="search_settings_label">Search Settings</string>
+    <string name="user_label">User</string>
+    <string name="module_label">Module</string>
+    <string name="project_label">Project</string>
 
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
