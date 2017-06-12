@@ -1,8 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Id</string>
+
+
+    <!-- AndroidManifest : activity titles throughout the app -->
+    <!-- Activity Titles -->
+    <string name="register_title">নিয়োগ</string>
+    <string name="identify_title">সনাক্ত করুন</string>
+    <string name="update_title">হালনাগাদ</string>
+    <string name="verify_title">যাচাই করুন</string>
+    <string name="help_title">সাহায্য</string>
+    <string name="settings_title">সেটিংস</string>
+    <string name="about_title">সম্বন্ধে</string>
+    <string name="alert_title">Alert</string>
+    <string name="tutorial_title">Tutorial</string>
+    <string name="refusal_label">Refusal Form</string>
+    <string name="privacy_label">Privacy</string>
+
+
+    <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
+    <!-- Sync Button Text -->
+    <string name="sync_data">সঙ্কি ডাটা</string>
+    <string name="syncing">সিঙ্ক করা হচ্ছে…</string>
+    <string name="not_signed_in">সাইন ইন করনেনি</string>
+
+
+    <!-- SetupActivity : the loading screen -->
+    <!-- Consent Text -->
     <string name="short_consent">আমি আপনার আঙুলের ছাপ এবং অবস্থান ব্যবহার করতে চাই যেন সিমপ্রিন্টস আপনার স্বাস্থ্য তথ্য সমূহ খুঁজে পায়। যদি আপনি এতে রাজী থাকেন অথবা আপনার কোন প্রশ্ন থেকে থাকে তবে আমাকে জানান অন্যথায় আপনার বামহাতের তর্জনী সেন্সরে সমানভাবে রাখুন"</string>
-     <string name="long_consent">
+    <string name="confirm_consent">সম্মতি নিশ্চিত করতে এখানে ট্যাপ করুন</string>
+    <!-- Loading Messages-->
+    <string name="loading">লোড হচ্ছে</string>
+    <string name="updating_database">সিঙ্ক করা হচ্ছেপ্রজক্টে ডাটাবসে আপডটে করা হচ্ছ…</string>
+    <string name="launch_checking_permissions">অনুমতি পরীক্ষা করা হচ্ছে…</string>
+    <string name="launch_checking_api_key">API কী পরীক্ষা করা হচ্ছে…</string>
+    <string name="launch_bt_connect">Vero সংযুক্ত হচ্ছে…</string>
+    <string name="launch_wake_un20">UN20 নিদ্রাভঙ্গ আপ…</string>
+    <string name="launch_setup">सेट अप Vero</string>
+    <string name="launch_checking_person_in_db">Checking person is in database…</string>
+
+
+    <!-- MainActivity : screen where the scanning happens -->
+    <!-- Screen Text -->
+    <string name="good_scan_direction">দয়া করে পরবর্তী আঙুল স্ক্যান করুন</string>
+    <string name="last_scan_message">চালিয়ে যেতে তীর চিহ্নটি টিপুন</string>
+    <string name="please_scan">অনুগ্রহ করে স্ক্যান করুন</string>
+    <string name="poor_scan_direction">পুনরায় স্ক্যান</string>
+    <string name="scanning">স্ক্যানিং…</string>
+    <string name="good_scan_message">ভাল ছবি</string>
+    <string name="poor_scan_message">খারাপ ছবি</string>
+    <!-- Button Labels -->
+    <string name="rescan_label">পুনঃস্ক্যান</string>
+    <string name="rescan_label_question">পুনঃস্ক্যান?</string>
+    <string name="scan_label">স্ক্যান</string>
+    <string name="cancel_button">বন্ধ করুন</string>
+    <string name="ok">ঠিক আছে</string>
+    <string name="scan">স্ক্যান</string>
+
+
+    <!-- activity_main_drawer.xml : menu that comes out from the top left of the MainActivity -->
+    <!-- Menu Titles -->
+    <string name="action_settings">সেটিংস</string>
+    <string name="menu_header">Simprints ID</string>
+    <string name="menu_subheader">Every person counts!</string>
+    <!-- Menu Labels -->
+    <string name="fingerprints_menu">আঙ্গুলের ছাপ</string>
+    <string name="help_menu">সাহায্য</string>
+    <string name="about_menu">সম্বন্ধে</string>
+    <string name="help_and_support_menu">সাহায্য এবং সহযোগিতা</string>
+    <string name="configuration_menu">কনফিগারেশন</string>
+    <string name="nav_add_finger">আঙুল যোগ করুন</string>
+    <string name="nav_select_finger">আঙুল নির্বাচন</string>
+    <string name="nav_settings">সেটিংস</string>
+    <string name="nav_sync">সিঙ্ক</string>
+    <string name="privacy_and_consent"><![CDATA[গোপনীয়তা এবং কনসেন্ট]]></string>
+    <!-- Toast Messages -->
+    <string name="coming_soon">শীঘ্রই আসছে…</string>
+    <!-- Finger Names -->
+    <string name="l_5_finger_name">বাম ৫ম আঙুল</string>
+    <string name="l_4_finger_name">বাম ৪র্থ আঙুল</string>
+    <string name="l_3_finger_name">বাম ৩য় আঙুল</string>
+    <string name="l_2_finger_name">বাম তর্জনী</string>
+    <string name="l_1_finger_name">বাম বুড়ো আঙুল</string>
+    <string name="r_1_finger_name">ডান বুড়ো আঙুল</string>
+    <string name="r_2_finger_name">ডান তর্জনী</string>
+    <string name="r_3_finger_name">ডান ৩য় আঙুল</string>
+    <string name="r_4_finger_name">ডান ৪র্থ আঙুল</string>
+    <string name="r_5_finger_name">ডান ৫ম আঙুল</string>
+
+
+    <!-- MatchingActivity : the waiting screen after an identification -->
+    <!-- Screen Text -->
+    <string name="please_wait">সনাক্তকরণ করার সময় অনুগ্রহ করে অপেক্ষা করুন</string>
+
+
+    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- Error Message Titles -->
+    <string name="bluetooth_error_title">Bluetooth ত্রুটি</string>
+    <string name="configuration_error_title">কনফিগারেশন ত্রুটি</string>
+    <string name="disconnected_title">স্ক্যানার পাওয়া যায়নি</string>
+    <string name="verify_guid_not_found_title">PERSON NOT FOUND</string>
+    <string name="error_occurred_title">ত্রুটি ঘটেছে</string>
+    <string name="low_battery_title">ব্যাটারীর চার্জ কম</string>
+    <string name="alert_api_key_verify_failed">API কী যাচাই করতে ব্যর্থ</string>
+    <!-- Error Message Text -->
+    <string name="missing_apikey_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ API Key), আপনার সিস্টেম অ্যাডমিনস্ট্রেটরের সঙ্গে যোগাযোগ করুন</string>
+    <string name="invalid_apikey_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ API Key), আপনার সিস্টেম অ্যাডমিনস্ট্রেটরের সঙ্গে যোগাযোগ করুন</string>
+    <string name="invalid_intentAction_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid intent action)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="invalid_metadata_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid metadata)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="missing_userId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (ইউজার আইডি নই)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="missing_moduleId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no module ID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="missing_updateId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no update GUID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="missing_verifyId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no verify GUID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="verify_guid_not_found_online_message">The person selected for verification is not in the database</string>
+    <string name="verify_guid_not_found_offline_message">Person not found, please make sure you are connected to the internet and try again</string>
+    <string name="bluetooth_not_supported_message">Bluetooth not supported on this device, please contact your system administrator</string>
+    <string name="bluetooth_not_enabled_message">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
+    <string name="unbonded_scanner_message">স্ক্যানার  যুক্ত করা নেই, নিশ্চিত করুন এটা সেটিংসে যুক্ত  করা এবং আবার চেষ্টা করুন</string>
+    <string name="multiple_scanners_found_message">এর মধ্যে একটি স্ক্যানার ফোনের সাথে জোড়া করুন, দয়া করে অপ্রয়োজনীয় স্ক্যানার জোড়া বাতিল করুন।</string>
+    <string name="disconnected_message">স্ক্যানারটি পাওয়া যাচ্ছে না, দয়া করে নিশ্চিত করুন যে  এটি চালু এবং ফোনেরি</string>
+    <string name="low_battery_message">" स्क्यानर ब्याट्री कम, कृपया आफ्नो स्क्यानर चार्ज"</string>
+    <string name="unforeseen_error_message">স্ক্যানার পাওয়া যাচ্ছেনা, দয়া করে নিশ্চিন হন এর পাওয়ার চালু আছে কিনা এবং ফোন বন্ধ আছে কিনা।</string>
+    <string name="alert_api_key_verify_failed_body">\"আমরা আপনার API কী যাচাই করতে পারিনি, দয়া করে নিশ্চিত করুন যে আপনি ইন্টারনেটের সাথে সংযুক্ত করা হয় এবং আবার চেষ্টা করুন\"</string>
+    <!-- Button Labels For Error Messages -->
+    <string name="close">বন্ধ করা</string>
+    <string name="try_again_label">আবার চেষ্টা করা</string>
+    <string name="settings_label">ফোন সেটিংস</string>
+
+
+    <!-- AboutActivity : the screen that shows project statistics and version numbers -->
+    <!-- Screen Text -->
+    <string name="database_information">Database Information</string>
+    <string name="user_count">User Count:</string>
+    <string name="module_count">Module Count:</string>
+    <string name="project_count">Project Count:</string>
+    <string name="about_app_version">App Version:</string>
+    <string name="about_libsimprints_version">LibSimprints Version:</string>
+    <string name="about_scanner_version">Scanner Version:</string>
+
+
+    <!-- SettingsActivity : the detailed settings screen -->
+    <!-- Setting Labels -->
+    <string name="settings_select_language">ভাষা নর্বিাচন করুন</string>
+    <string name="nudge_mode_checkbox_name">Nudge মোড</string>
+    <string name="vibrate">কাম্পান</string>
+    <string name="quality_threshold_empty">কোয়ালিটি থ্রেশহোল্ড:</string>
+    <string name="quality_threshold_value">কোয়ালিটি থ্রেশহোল্ড: %1$d</string>
+    <string name="nb_of_ids_empty">ফিরে এসে সনাক্তকরণ:</string>
+    <string name="nb_of_ids_value">ফিরে এসে সনাক্তকরণ: %1$d</string>
+    <string name="timeout_empty">সময়সীমা (সকেন্দে):</string>
+    <string name="timeout_value">সময়সীমা (সকেন্দে): %1$d</string>
+
+
+    <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
+    <!-- Screen Text -->
+    <string name="why_did_you_skip_fingerprinting">আপনি কেন আঙুলের ছাপ দেয়া এড়িয়ে গেছেন?</string>
+    <!-- Button Labels -->
+    <string name="button_submit">জমা দিন</string>
+    <string name="button_scan_prints">আঙুলের ছাপ স্ক্যান করুন</string>
+    <!-- Refusal Selection Points -->
+    <string name="scanner_not_here">এখানে স্ক্যানার নেই</string>
+    <string name="scanner_not_working">স্ক্যানার কাজ করছে না</string>
+    <string name="unable_to_capture_a_good_scan">একটি ভালো স্ক্যান ক্যাপচার করতে অক্ষম</string>
+    <string name="beneficiary_was_physically_unable">সুবিধাভোগী আঙুলের ছাপ দিতে শারীরিকভাবে অক্ষম ছিলেন (যেমন, অত্যন্ত ব্যথাময় ছিল, হাত ছিল না)</string>
+    <string name="beneficiary_refused">সুবিধাভোগী প্রত্যাখ্যান করেছেন</string>
+    <string name="other">অন্যান্য</string>
+    <!-- Text Prompt -->
+    <string name="hint_other_reason">আরো তথ্য…</string>
+
+
+    <!-- PrivacyActivity : the screen where the user can find the long consent form -->
+    <!-- Long Consent -->
+    <string name="healthworker_consent_checkbox">এই তথ্য এই উপায়ে ব্যবহার করার জন্য আমি Simprints এর সাথে সম্মত</string>
+    <string name="long_consent">
         <b><u>গোপনীয়তা এবং কনসেন্ট</u></b>\n\n
         আপনি যদি আপনার আঙুল স্ক্যানারে রাখেন তবে তা আপনার আঙুলের ছাপ সংগ্রহ করবে এটি আরো আপনার সম্ভাব্য অবস্থান, যেখানে ছাপ গ্রহন করা হয়েছে এবং সময় ও তারিখও নথিবদ্ধ করবে \n \n
         একটি বৃটিশ বেসরকারী প্রতিষ্ঠান সিমপ্রিন্টস টেকনোলজি লিমিটেড আপনার এ তথ্য গুলো যাচাই করবে \n\n
@@ -42,118 +211,6 @@
         <b><u>Health Worker Consent</u></b>\n\n
         Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other community health workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to patients.
     </string>
-    <string name="scan">স্ক্যান</string>
-    <string name="scanning">স্ক্যানিং…</string>
-    <string name="scan_label">স্ক্যান</string>
-    <string name="rescan_label">পুনঃস্ক্যান</string>
-    <string name="rescan_label_question">পুনঃস্ক্যান?</string>
-    <string name="register_title">নিয়োগ</string>
-    <string name="please_scan">অনুগ্রহ করে স্ক্যান করুন</string>
-    <string name="r_2_finger_name">ডান তর্জনী</string>
-    <string name="l_2_finger_name">বাম তর্জনী</string>
-    <string name="l_1_finger_name">বাম বুড়ো আঙুল</string>
-    <string name="r_1_finger_name">ডান বুড়ো আঙুল</string>
-    <string name="good_scan_message">ভাল ছবি</string>
-    <string name="poor_scan_message">খারাপ ছবি</string>
-    <string name="good_scan_direction">দয়া করে পরবর্তী আঙুল স্ক্যান করুন</string>
-    <string name="r_3_finger_name">ডান ৩য় আঙুল</string>
-    <string name="r_4_finger_name">ডান ৪র্থ আঙুল</string>
-    <string name="r_5_finger_name">ডান ৫ম আঙুল</string>
-    <string name="l_3_finger_name">বাম ৩য় আঙুল</string>
-    <string name="l_4_finger_name">বাম ৪র্থ আঙুল</string>
-    <string name="l_5_finger_name">বাম ৫ম আঙুল</string>
-    <string name="action_settings">সেটিংস</string>
-    <string name="nav_settings">সেটিংস</string>
-    <string name="settings_title">সেটিংস</string>
-    <string name="close">বন্ধ করা</string>
-    <string name="try_again_label">আবার চেষ্টা করা</string>
-    <string name="settings_label">ফোন সেটিংস</string>
-    <string name="disconnected_title">স্ক্যানার পাওয়া যায়নি</string>
-    <string name="disconnected_message">স্ক্যানারটি পাওয়া যাচ্ছে না, দয়া করে নিশ্চিত করুন যে  এটি চালু এবং ফোনেরি</string>
-    <string name="configuration_error_title">কনফিগারেশন ত্রুটি</string>
-    <string name="invalid_apikey_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ API Key), আপনার সিস্টেম অ্যাডমিনস্ট্রেটরের সঙ্গে যোগাযোগ করুন</string>
-    <string name="missing_apikey_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ API Key), আপনার সিস্টেম অ্যাডমিনস্ট্রেটরের সঙ্গে যোগাযোগ করুন</string>
-    <string name="bluetooth_error_title">Bluetooth ত্রুটি</string>
-    <string name="unbonded_scanner_message">স্ক্যানার  যুক্ত করা নেই, নিশ্চিত করুন এটা সেটিংসে যুক্ত  করা এবং আবার চেষ্টা করুন</string>
 
-    <string name="help_title">সাহায্য</string>
-    <string name="about_title">সম্বন্ধে</string>
-    <string name="fingerprints_menu">আঙ্গুলের ছাপ</string>
-    <string name="help_menu">সাহায্য</string>
-    <string name="about_menu">সম্বন্ধে</string>
-    <string name="help_and_support_menu">সাহায্য এবং সহযোগিতা</string>
-    <string name="configuration_menu">কনফিগারেশন</string>
-    <string name="identify_title">সনাক্ত করুন</string>
-
-    <!--Main app-->
-    <string name="multiple_scanners_found_message">এর মধ্যে একটি স্ক্যানার ফোনের সাথে জোড়া করুন, দয়া করে অপ্রয়োজনীয় স্ক্যানার জোড়া বাতিল করুন।</string>
-    <string name="cancel_button">বন্ধ করুন</string>
-    <string name="error_occurred_title">ত্রুটি ঘটেছে</string>
-    <string name="poor_scan_direction">পুনরায় স্ক্যান</string>
-    <string name="last_scan_message">চালিয়ে যেতে তীর চিহ্নটি টিপুন</string>
-    <string name="unforeseen_error_message">স্ক্যানার পাওয়া যাচ্ছেনা, দয়া করে নিশ্চিন হন এর পাওয়ার চালু আছে কিনা এবং ফোন বন্ধ আছে কিনা।</string>
-    <string name="ok">ঠিক আছে</string>
-    <string name="cancel">বন্ধ করুন</string>
-    <string name="please_wait">সনাক্তকরণ করার সময় অনুগ্রহ করে অপেক্ষা করুন</string>
-    <string name="coming_soon">শীঘ্রই আসছে…</string>
-    <string name="confirm_consent">সম্মতি নিশ্চিত করতে এখানে ট্যাপ করুন</string>
-    <string name="nudge_mode_checkbox_name">Nudge মোড</string>
-    <string name="healthworker_consent_checkbox">এই তথ্য এই উপায়ে ব্যবহার করার জন্য আমি Simprints এর সাথে সম্মত</string>
-    <string name="privacy_and_consent"><![CDATA[গোপনীয়তা এবং কনসেন্ট]]></string>
-    <string name="quality_threshold_text_view">কোয়ালিটি থ্রেশহোল্ড:</string>
-    <string name="nav_add_finger">আঙুল যোগ করুন</string>
-    <string name="nav_select_finger">আঙুল নির্বাচন</string>
-    <string name="quality_threshold_empty">কোয়ালিটি থ্রেশহোল্ড:</string>
-    <string name="quality_threshold_value">কোয়ালিটি থ্রেশহোল্ড: %1$d</string>
-    <string name="nb_of_ids_empty">ফিরে এসে সনাক্তকরণ:</string>
-    <string name="nb_of_ids_value">ফিরে এসে সনাক্তকরণ: %1$d</string>
-    <string name="about_app_version">App Version:</string>
-    <string name="about_libsimprints_version">LibSimprints Version:</string>
-    <string name="about_scanner_version">Scanner Version:</string>
-    <string name="menu_header">Simprints ID</string>
-    <string name="menu_subheader">Every person counts!</string>
-    <string name="nav_sync">সিঙ্ক</string>
-    <string name="launch_wake_un20">UN20 নিদ্রাভঙ্গ আপ…</string>
-    <string name="launch_loading_database">ডাটাবেস লোড হচ্ছে…</string>
-    <string name="launch_checking_permissions">অনুমতি পরীক্ষা করা হচ্ছে…</string>
-    <string name="launch_checking_api_key">API কী পরীক্ষা করা হচ্ছে…</string>
-    <string name="launch_cc_resolve">CommCare সঙ্গে ডাটাবেস স্থির করা হচ্ছে…</string>
-    <string name="launch_bt_connect">Vero সংযুক্ত হচ্ছে…</string>
-    <string name="alert_api_key_verify_failed">API কী যাচাই করতে ব্যর্থ</string>
-    <string name="alert_api_key_verify_failed_body">\"আমরা আপনার API কী যাচাই করতে পারিনি, দয়া করে নিশ্চিত করুন যে আপনি ইন্টারনেটের সাথে সংযুক্ত করা হয় এবং আবার চেষ্টা করুন\"</string>
-    <string name="beneficiary_refused">সুবিধাভোগী প্রত্যাখ্যান করেছেন</string>
-    <string name="beneficiary_was_physically_unable">সুবিধাভোগী আঙুলের ছাপ দিতে শারীরিকভাবে অক্ষম ছিলেন (যেমন, অত্যন্ত ব্যথাময় ছিল, হাত ছিল না)</string>
-    <string name="other">অন্যান্য</string>
-    <string name="hint_other_reason">আরো তথ্য…</string>
-    <string name="button_scan_prints">আঙুলের ছাপ স্ক্যান করুন</string>
-    <string name="button_submit">জমা দিন</string>
-    <string name="unable_to_capture_a_good_scan">একটি ভালো স্ক্যান ক্যাপচার করতে অক্ষম</string>
-    <string name="scanner_not_working">স্ক্যানার কাজ করছে না</string>
-    <string name="scanner_not_here">এখানে স্ক্যানার নেই</string>
-    <string name="why_did_you_skip_fingerprinting">আপনি কেন আঙুলের ছাপ দেয়া এড়িয়ে গেছেন?</string>
-    <string name="vibrate">কাম্পান</string>
-    <string name="missing_userId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (ইউজার আইডি নই)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
-    <string name="timeout_empty">সময়সীমা (সকেন্দে):</string>
-    <string name="timeout_value">সময়সীমা (সকেন্দে): %1$d</string>
-    <string name="loading">লোড হচ্ছে</string>
-    <string name="network_failure_message">নটেওর্য়াক র্ব্যথতা, দয়া করে নশ্চিতি করুন যে আপনি ইন্টারনটে এর সাথে সংযুক্ত</string>
-    <string name="not_signed_in">সাইন ইন করনেনি</string>
-    <string name="offline">অফলাইন</string>
-    <string name="sync_data">সঙ্কি ডাটা</string>
-    <string name="updating_database">সিঙ্ক করা হচ্ছেপ্রজক্টে ডাটাবসে আপডটে করা হচ্ছ…</string>
-    <string name="syncing">সিঙ্ক করা হচ্ছে…</string>
-    <string name="menu_continue">চালয়িে যান</string>
-    <string name="settings_select_language">ভাষা নর্বিাচন করুন</string>
-    <string name="missing_calling_package_message">একটি কনফগিারশেন ত্রুটি ঘটছেে (কলং প্যাকজে অনুপস্থতি), আপনার সস্টিমে অ্যাডমনিস্ট্রিটেররে সাথে  যোগাযোগ করুন</string>
-    <string name="launch_setup">सेट अप Vero</string>
-    <string name="low_battery_title">ব্যাটারীর চার্জ কম</string>
-    <string name="update_title">হালনাগাদ</string>
-    <string name="verify_title">যাচাই করুন</string>
-    <string name="low_battery_message">" स्क्यानर ब्याट्री कम, कृपया आफ्नो स्क्यानर चार्ज"</string>
-    <string name="invalid_intentAction_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid intent action)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
-    <string name="invalid_metadata_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid metadata)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
-    <string name="missing_moduleId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no module ID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
-    <string name="missing_updateId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no update GUID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
-    <string name="missing_verifyId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no verify GUID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
 
 </resources>
