@@ -114,18 +114,18 @@
         \n
     </string>
     <string name="nav_sync">Sync</string>
-    <string name="launch_bt_connect">Vero जडान...</string>
-    <string name="launch_cc_resolve">"CommCare संग डेटाबेस समाधान गर्दै... "</string>
-    <string name="launch_checking_api_key">"एपीआई प्रमुख जाँच गर्दै... "</string>
-    <string name="launch_checking_permissions">"अनुमति जाँच गर्दै... "</string>
-    <string name="launch_loading_database">"डेटाबेस लोड... "</string>
-    <string name="launch_wake_un20">" UN20 उठ्दै..."</string>
+    <string name="launch_bt_connect">Vero जडान…</string>
+    <string name="launch_cc_resolve">"CommCare संग डेटाबेस समाधान गर्दै… "</string>
+    <string name="launch_checking_api_key">"एपीआई प्रमुख जाँच गर्दै… "</string>
+    <string name="launch_checking_permissions">"अनुमति जाँच गर्दै… "</string>
+    <string name="launch_loading_database">"डेटाबेस लोड… "</string>
+    <string name="launch_wake_un20">" UN20 उठ्दै…"</string>
     <string name="alert_api_key_verify_failed">एपीआई प्रमुख प्रमाणित गर्न असफल</string>
     <string name="alert_api_key_verify_failed_body">\"हामी तपाईंको एपीआई प्रमुख प्रमाणित गर्न सक्दैन, कृपया पक्का इन्टरनेट जडान गर्दै छन् र फेरि प्रयास गर्नुहोस्\"</string>
     <string name="beneficiary_was_physically_unable">उत्तराधिकारी औँठाछापहरू उपलब्ध गराउन शारीरिक रूपमा असक्षम हुनुहुन्थ्यो (जस्तै, एकदमै कष्टकर, हातका अंगहरू नभएको)</string>
     <string name="beneficiary_refused">लाभार्थीले अस्वीकार गर्नुभयो</string>
     <string name="other">अन्य</string>
-    <string name="hint_other_reason">थप जानकारी...</string>
+    <string name="hint_other_reason">थप जानकारी…</string>
     <string name="button_scan_prints">औँठाछापहरू स्क्यान गर्नुहोस्</string>
     <string name="button_submit">पेश गर्नुहोस्</string>
     <string name="unable_to_capture_a_good_scan">राम्रो स्क्यान क्याप्चर गर्न असक्षम भयो</string>
@@ -141,8 +141,8 @@
     <string name="not_signed_in">साइन इन भएको छैन</string>
     <string name="offline">अफलाइन</string>
     <string name="sync_data">डेटा समक्रमण गर्नुहोस्</string>
-    <string name="syncing">समक्रमण हुँदै...</string>
-    <string name="updating_database">परियोजना डाटाबेस अद्यावधिक गर्दै.....</string>
+    <string name="syncing">समक्रमण हुँदै…</string>
+    <string name="updating_database">परियोजना डाटाबेस अद्यावधिक गर्दै…</string>
     <string name="menu_continue">लोड हुँदै</string>
     <string name="missing_calling_package_message">कन्फिगरेसन त्रुटि फेला परेको छ (कलिङ प्याकेज छुटेको), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="settings_select_language">भाषा चयन गर्नुहोस्</string>
