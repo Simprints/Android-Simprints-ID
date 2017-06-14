@@ -171,14 +171,14 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onConnection() {
                 syncItem.setEnabled(true);
-                syncItem.setTitle("Sync");
+                syncItem.setTitle(R.string.nav_sync);
                 syncItem.setIcon(R.drawable.ic_menu_sync_ready);
             }
 
             @Override
             public void onDisconnection() {
                 syncItem.setEnabled(false);
-                syncItem.setTitle("Offline");
+                syncItem.setTitle(R.string.nav_offline);
                 syncItem.setIcon(R.drawable.ic_menu_sync_off);
             }
         });
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onSignOut() {
                 syncItem.setEnabled(false);
-                syncItem.setTitle("Signed Out");
+                syncItem.setTitle(R.string.not_signed_in);
                 syncItem.setIcon(R.drawable.ic_menu_sync_off);
             }
         });
@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
         dialog.setCanceledOnTouchOutside(false);
-        dialog.setMessage("Re-Connecting...");
+        dialog.setMessage(getString(R.string.reconnecting_message));
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
@@ -733,7 +733,7 @@ public class MainActivity extends AppCompatActivity implements
                 return;
 
             syncItem.setEnabled(true);
-            syncItem.setTitle("Sync Complete");
+            syncItem.setTitle(R.string.nav_sync_complete);
             syncItem.setIcon(R.drawable.ic_menu_sync_success);
         }
 
@@ -746,7 +746,7 @@ public class MainActivity extends AppCompatActivity implements
                         return;
 
                     syncItem.setEnabled(true);
-                    syncItem.setTitle("Syncing Failed");
+                    syncItem.setTitle(R.string.nav_sync_failed);
                     syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                     break;
                 default:
@@ -758,7 +758,7 @@ public class MainActivity extends AppCompatActivity implements
     private void backgroundSync() {
         if (syncItem != null) {
             syncItem.setEnabled(false);
-            syncItem.setTitle("Syncing...");
+            syncItem.setTitle(R.string.syncing);
             syncItem.setIcon(R.drawable.ic_menu_syncing);
         }
 

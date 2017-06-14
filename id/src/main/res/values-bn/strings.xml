@@ -48,6 +48,7 @@
     <string name="scanning">স্ক্যানিং…</string>
     <string name="good_scan_message">ভাল ছবি</string>
     <string name="poor_scan_message">খারাপ ছবি</string>
+    <string name="reconnecting_message">পুনঃসংযোগ</string>
     <!-- Button Labels -->
     <string name="rescan_label">পুনঃস্ক্যান</string>
     <string name="rescan_label_question">পুনঃস্ক্যান?</string>
@@ -72,6 +73,9 @@
     <string name="nav_select_finger">আঙুল নির্বাচন</string>
     <string name="nav_settings">সেটিংস</string>
     <string name="nav_sync">সিঙ্ক</string>
+    <string name="nav_offline">অফলাইন</string>
+    <string name="nav_sync_complete">সিঙ্ক সম্পন্ন</string>
+    <string name="nav_sync_failed">সিঙ্ক ব্যর্থ</string>
     <string name="privacy_and_consent"><![CDATA[গোপনীয়তা এবং কনসেন্ট]]></string>
     <!-- Toast Messages -->
     <string name="coming_soon">শীঘ্রই আসছে…</string>
