@@ -13,12 +13,12 @@ import android.support.annotation.Nullable;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
-import com.simprints.libcommon.RefusalForm;
 import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.models.firebase.fb_Session;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.Metadata;
+import com.simprints.libsimprints.RefusalForm;
 
 import java.util.UUID;
 
