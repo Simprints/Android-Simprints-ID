@@ -58,6 +58,7 @@
     <string name="scanning">Scanning…</string>
     <string name="good_scan_message">Good Scan</string>
     <string name="poor_scan_message">Poor Scan</string>
+    <string name="reconnecting_message">Reconnecting…</string>
     <!-- Button Labels -->
     <string name="rescan_label">Re-scan</string>
     <string name="rescan_label_question">Re-scan?</string>
@@ -86,6 +87,9 @@
     <string name="nav_select_finger">Select Finger</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_sync">Sync</string>
+    <string name="nav_offline">Offline</string>
+    <string name="nav_sync_complete">Sync Complete</string>
+    <string name="nav_sync_failed">Sync Failed</string>
     <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
     <!-- Toast Messages -->
     <string name="coming_soon">Coming soon…</string>

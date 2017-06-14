@@ -48,6 +48,7 @@
     <string name="scanning">स्क्यान हुँदै छ </string>
     <string name="good_scan_message">स्क्यान राम्रो भयो </string>
     <string name="poor_scan_message">स्क्यान राम्रो भएन </string>
+    <string name="reconnecting_message">पुन: जडान</string>
     <!-- Button Labels -->
     <string name="rescan_label">फेरी स्क्यान गर्नुहोस </string>
     <string name="rescan_label_question">फेरी स्क्यान गर्नुहोस?</string>
@@ -72,6 +73,9 @@
     <string name="nav_select_finger">औंला छान्नुहोस्</string>
     <string name="nav_settings">सेटिंगहरु</string>
     <string name="nav_sync">समक्रमण</string>
+    <string name="nav_sync_failed">समक्रमण असफल</string>
+    <string name="nav_sync_complete">समक्रमण  पूरा</string>
+    <string name="nav_offline">अफलाइन</string>
     <string name="privacy_and_consent"><![CDATA[गोपनियता तथा स्वीकृति]]></string>
     <!-- Toast Messages -->
     <string name="coming_soon">छिट्टै आउंदै छ </string>
@@ -221,6 +225,6 @@
         लागि डाटा प्रयोग गर।ेकोमा म सहमत छु ।   \n
         \n
     </string>
-    
+
 
 </resources>
