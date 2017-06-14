@@ -11,10 +11,10 @@
     <string name="help_title">सहयोग </string>
     <string name="settings_title">सेटिंगहरु</string>
     <string name="about_title">एप्सको बारेमा</string>
-    <string name="alert_title">Alert</string>
-    <string name="tutorial_title">Tutorial</string>
-    <string name="refusal_label">Refusal Form</string>
-    <string name="privacy_label">Privacy</string>
+    <string name="alert_title">अलर्ट</string>
+    <string name="tutorial_title">पाठ</string>
+    <string name="refusal_label">असहमति फारम</string>
+    <string name="privacy_label">गोपनीयता</string>
 
 
     <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
@@ -36,7 +36,7 @@
     <string name="launch_bt_connect">Vero जडान…</string>
     <string name="launch_wake_un20">" UN20 उठ्दै…"</string>
     <string name="launch_setup">ঠিককরা Vero</string>
-    <string name="launch_checking_person_in_db">Checking person is in database…</string>
+    <string name="launch_checking_person_in_db">डेटाबेसमा व्यक्तिको खोजी गर्दै …</string>
 
 
     <!-- MainActivity : screen where the scanning happens -->
@@ -65,13 +65,13 @@
     <!-- Menu Labels -->
     <string name="fingerprints_menu">औंलाको छापहरु </string>
     <string name="help_menu">सहयोग </string>
-    <string name="about_menu">About</string>
+    <string name="about_menu">"एप्लिकेसनको बारेमा "</string>
     <string name="help_and_support_menu">सहयोग र समर्थन </string>
     <string name="configuration_menu">कन्फिगरेसन </string>
     <string name="nav_add_finger">अर्को औंला थप्नुहोस </string>
     <string name="nav_select_finger">औंला छान्नुहोस्</string>
     <string name="nav_settings">सेटिंगहरु</string>
-    <string name="nav_sync">Sync</string>
+    <string name="nav_sync">समक्रमण</string>
     <string name="privacy_and_consent"><![CDATA[गोपनियता तथा स्वीकृति]]></string>
     <!-- Toast Messages -->
     <string name="coming_soon">छिट्टै आउंदै छ </string>
@@ -98,7 +98,7 @@
     <string name="bluetooth_error_title">ब्लुटुथमा गल्ती देखियो  </string>
     <string name="configuration_error_title">कन्फिगरेसनमा गल्ती</string>
     <string name="disconnected_title">स्क्यानर भेटिएन </string>
-    <string name="verify_guid_not_found_title">PERSON NOT FOUND</string>
+    <string name="verify_guid_not_found_title">व्यक्ति भेटीएन</string>
     <string name="error_occurred_title">गल्ती भयो</string>
     <string name="low_battery_title">कम ब्याट्री</string>
     <string name="alert_api_key_verify_failed">एपीआई प्रमुख प्रमाणित गर्न असफल</string>
@@ -111,10 +111,10 @@
     <string name="missing_moduleId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no module ID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="missing_updateId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no update GUID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="missing_verifyId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no verify GUID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="verify_guid_not_found_online_message">The person selected for verification is not in the database</string>
-    <string name="verify_guid_not_found_offline_message">Person not found, please make sure you are connected to the internet and try again</string>
-    <string name="bluetooth_not_supported_message">Bluetooth not supported on this device, please contact your system administrator</string>
-    <string name="bluetooth_not_enabled_message">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
+    <string name="verify_guid_not_found_online_message">प्रमाणिकरणका लागि छानिएको व्यक्ति डेटाबेसमा छैन</string>
+    <string name="verify_guid_not_found_offline_message">व्यक्ति भेटीएन;  कृपया इन्टरनेटमा कनेक्ट गरि पुन प्रयास गर्नुहोस</string>
+    <string name="bluetooth_not_supported_message">एस उपकरणमा ब्लुटुथ छैन; कृपया आफ्नो सिस्टम प्रशासकलाई खबर गर्नुहोस</string>
+    <string name="bluetooth_not_enabled_message">ब्लुटुथ स्विच अन छैन; कृपया सेटिङमा गई ब्लुटुथ अन गरि पुन प्रयास गर्नुहोस</string>
     <string name="unbonded_scanner_message">स्क्यानर र फोन जोडिएका छैनन् | सेटिंगमा गएर स्क्यानरलाइ ब्लुटुथबाट फोनसंग जोड्नुहोस र एकपल्ट फेरी प्रयास गर्नुहोस </string>
     <string name="multiple_scanners_found_message">एउटा भन्दा बढी स्क्यानर फोनसंग   जोडिएको छ, कृपया यौटा स्क्यानर हटाउनुहोस</string>
     <string name="disconnected_message">स्क्यानरसंग सम्पर्क हुन सकेन, अन गर्नुहोस र फोनको नजिक राख्नुहोस </string>
@@ -130,10 +130,10 @@
 
     <!-- AboutActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
-    <string name="database_information">Database Information</string>
-    <string name="user_count">User Count:</string>
-    <string name="module_count">Module Count:</string>
-    <string name="project_count">Project Count:</string>
+    <string name="database_information">"डेटाबेस सम्बन्धि जानकारी "</string>
+    <string name="user_count">प्रयोगकर्ता संख्या</string>
+    <string name="module_count">मोड्युल संख्या</string>
+    <string name="project_count">परियोजना संख्या</string>
     <string name="about_app_version">एप्स संस्करण</string>
     <string name="about_libsimprints_version">LibSimprints संस्करण</string>
     <string name="about_scanner_version">सिम्प्रिन्ट्स संस्करण</string>
@@ -150,11 +150,11 @@
     <string name="nb_of_ids_value">पहिचान गरिएकाहरु: %1$d</string>
     <string name="timeout_empty">समय समाप्ति (सेकेण्ड):</string>
     <string name="timeout_value">समय समाप्ति (सेकेण्ड): %1$d</string>
-    <string name="sync_settings_label">Sync Settings</string>
-    <string name="search_settings_label">Search Settings</string>
-    <string name="user_label">User</string>
-    <string name="module_label">Module</string>
-    <string name="project_label">Project</string>
+    <string name="sync_settings_label">समक्रमण सेटिङहरू</string>
+    <string name="search_settings_label">"खोजको सेटिंगहरु "</string>
+    <string name="user_label">प्रयोगकर्ता</string>
+    <string name="module_label">मोड्युल</string>
+    <string name="project_label">परियोजना</string>
 
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->

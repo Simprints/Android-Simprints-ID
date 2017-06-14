@@ -11,10 +11,10 @@
     <string name="help_title">সাহায্য</string>
     <string name="settings_title">সেটিংস</string>
     <string name="about_title">সম্বন্ধে</string>
-    <string name="alert_title">Alert</string>
-    <string name="tutorial_title">Tutorial</string>
-    <string name="refusal_label">Refusal Form</string>
-    <string name="privacy_label">Privacy</string>
+    <string name="alert_title">অ্যালার্ট</string>
+    <string name="tutorial_title">টিউটোরিয়াল</string>
+    <string name="refusal_label">প্রত্যাখ্যান ফর্ম</string>
+    <string name="privacy_label">গোপনীয়তা</string>
 
 
     <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
@@ -36,7 +36,7 @@
     <string name="launch_bt_connect">Vero সংযুক্ত হচ্ছে…</string>
     <string name="launch_wake_un20">UN20 নিদ্রাভঙ্গ আপ…</string>
     <string name="launch_setup">सेट अप Vero</string>
-    <string name="launch_checking_person_in_db">Checking person is in database…</string>
+    <string name="launch_checking_person_in_db">চেক করা ব্যক্তি ডাটাবেসে আছে…</string>
 
 
     <!-- MainActivity : screen where the scanning happens -->
@@ -61,7 +61,7 @@
     <!-- Menu Titles -->
     <string name="action_settings">সেটিংস</string>
     <string name="menu_header">Simprints ID</string>
-    <string name="menu_subheader">Every person counts!</string>
+    <string name="menu_subheader">প্রত্যেক ব্যক্তিই গুরুত্বপূর্ণ!</string>
     <!-- Menu Labels -->
     <string name="fingerprints_menu">আঙ্গুলের ছাপ</string>
     <string name="help_menu">সাহায্য</string>
@@ -98,7 +98,7 @@
     <string name="bluetooth_error_title">Bluetooth ত্রুটি</string>
     <string name="configuration_error_title">কনফিগারেশন ত্রুটি</string>
     <string name="disconnected_title">স্ক্যানার পাওয়া যায়নি</string>
-    <string name="verify_guid_not_found_title">PERSON NOT FOUND</string>
+    <string name="verify_guid_not_found_title">ব্যক্তি খুঁজে পাওয়া যায়নি</string>
     <string name="error_occurred_title">ত্রুটি ঘটেছে</string>
     <string name="low_battery_title">ব্যাটারীর চার্জ কম</string>
     <string name="alert_api_key_verify_failed">API কী যাচাই করতে ব্যর্থ</string>
@@ -111,10 +111,10 @@
     <string name="missing_moduleId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no module ID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
     <string name="missing_updateId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no update GUID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
     <string name="missing_verifyId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no verify GUID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
-    <string name="verify_guid_not_found_online_message">The person selected for verification is not in the database</string>
-    <string name="verify_guid_not_found_offline_message">Person not found, please make sure you are connected to the internet and try again</string>
-    <string name="bluetooth_not_supported_message">Bluetooth not supported on this device, please contact your system administrator</string>
-    <string name="bluetooth_not_enabled_message">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
+    <string name="verify_guid_not_found_online_message">যাচাইয়ের জন্য নির্বাচিত ব্যক্তি ডাটাবেসে নেই</string>
+    <string name="verify_guid_not_found_offline_message">ব্যক্তি খুঁজে পাওয়া যায়নি, দয়া করে নিশ্চিত করুন যে আপনি ইন্টারনেটে সংযুক্ত আছেন এবং আবার চেষ্টা করুন</string>
+    <string name="bluetooth_not_supported_message">Bluetooth এই ডিভাইসের জন্য উপযোগী নয়, অনুগ্রহ করে আপনার সিসটেম অ্যাডমিনিস্ট্রেটর এর সাথে যোগাযোগ করুন</string>
+    <string name="bluetooth_not_enabled_message">Bluetooth সক্রিয় করা নেই, এটি সেটিংস এ সক্রিয় হয়েছে কিনা তা নিশ্চিত করুন এবং আবার চেষ্টা করুন</string>
     <string name="unbonded_scanner_message">স্ক্যানার  যুক্ত করা নেই, নিশ্চিত করুন এটা সেটিংসে যুক্ত  করা এবং আবার চেষ্টা করুন</string>
     <string name="multiple_scanners_found_message">এর মধ্যে একটি স্ক্যানার ফোনের সাথে জোড়া করুন, দয়া করে অপ্রয়োজনীয় স্ক্যানার জোড়া বাতিল করুন।</string>
     <string name="disconnected_message">স্ক্যানারটি পাওয়া যাচ্ছে না, দয়া করে নিশ্চিত করুন যে  এটি চালু এবং ফোনেরি</string>
@@ -129,13 +129,13 @@
 
     <!-- AboutActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
-    <string name="database_information">Database Information</string>
-    <string name="user_count">User Count:</string>
-    <string name="module_count">Module Count:</string>
-    <string name="project_count">Project Count:</string>
-    <string name="about_app_version">App Version:</string>
-    <string name="about_libsimprints_version">LibSimprints Version:</string>
-    <string name="about_scanner_version">Scanner Version:</string>
+    <string name="database_information">ডাটাবেস তথ্য</string>
+    <string name="user_count">ব্যবহারকারি সংখ্যা:</string>
+    <string name="module_count">মডিউল সংখ্যা:</string>
+    <string name="project_count">প্রকল্প সংখ্যা:</string>
+    <string name="about_app_version">অ্যাপ সংস্করণ:</string>
+    <string name="about_libsimprints_version">LibSimprints সংস্করণ:</string>
+    <string name="about_scanner_version">স্ক্যানার সংস্করণ:</string>
 
 
     <!-- SettingsActivity : the detailed settings screen -->
@@ -149,11 +149,11 @@
     <string name="nb_of_ids_value">ফিরে এসে সনাক্তকরণ: %1$d</string>
     <string name="timeout_empty">সময়সীমা (সকেন্দে):</string>
     <string name="timeout_value">সময়সীমা (সকেন্দে): %1$d</string>
-    <string name="sync_settings_label">Sync Settings</string>
-    <string name="search_settings_label">Search Settings</string>
-    <string name="user_label">User</string>
-    <string name="module_label">Module</string>
-    <string name="project_label">Project</string>
+    <string name="sync_settings_label">সিঙ্ক সেটিংস</string>
+    <string name="search_settings_label">অনুসন্ধান সেটিংস</string>
+    <string name="user_label">ব্যবহারকারি</string>
+    <string name="module_label">মডিউল</string>
+    <string name="project_label">প্রকল্প</string>
 
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
