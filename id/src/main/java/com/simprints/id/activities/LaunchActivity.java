@@ -21,10 +21,10 @@ import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
-import com.simprints.libcommon.RefusalForm;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.ScannerCallback;
+import com.simprints.libsimprints.RefusalForm;
 
 import io.fabric.sdk.android.Fabric;
 
