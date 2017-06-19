@@ -766,9 +766,10 @@ public class MainActivity extends AppCompatActivity implements
             syncItem.setIcon(R.drawable.ic_menu_syncing);
         }
 
-        if (!SyncService.getInstance().startAndListen(getApplicationContext(), syncListener))
+        if (!SyncService.getInstance().startAndListen(getApplicationContext(), syncListener)) {
             FirebaseCrash.report(new Exception("Error in MainActivity.backgroundSync()"));
             launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+        }
     }
 
     private void startContinuousCapture() {
