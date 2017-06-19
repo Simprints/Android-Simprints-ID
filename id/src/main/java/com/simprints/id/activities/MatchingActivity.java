@@ -164,11 +164,11 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     private Tier computeTier(float score) {
         if (score < 20) {
             return Tier.TIER_5;
-        } else if (score < 40) {
+        } else if (score < 35) {
             return Tier.TIER_4;
-        } else if (score < 60) {
+        } else if (score < 50) {
             return Tier.TIER_3;
-        } else if (score < 80) {
+        } else if (score < 75) {
             return Tier.TIER_2;
         } else {
             return Tier.TIER_1;
