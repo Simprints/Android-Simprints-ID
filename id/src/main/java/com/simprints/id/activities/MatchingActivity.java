@@ -10,7 +10,9 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.simprints.id.R;
+import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
@@ -37,6 +39,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class MatchingActivity extends AppCompatActivity implements MatcherEventListener {
+
+    private final static int ALERT_ACTIVITY_REQUEST_CODE = 0;
 
     private AppState appState;
     private Person probe;
@@ -106,7 +110,8 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                     @Override
                     public void onFailure(DATA_ERROR data_error) {
-                        throw new RuntimeException();
+                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onCreate()case:IDENTIFY"));
+                        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                     }
                 });
                 break;
@@ -146,7 +151,8 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                     @Override
                     public void onFailure(DATA_ERROR data_error) {
-                        throw new RuntimeException();
+                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onCreate()case:VERIFY"));
+                        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                     }
                 });
                 break;
@@ -259,5 +265,14 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 progressBar.setProgress(progress.getProgress());
             }
         });
+    }
+
+    /**
+     * Start alert activity
+     */
+    private void launchAlert(ALERT_TYPE alertType) {
+        Intent intent = new Intent(this, AlertActivity.class);
+        intent.putExtra("alertType", alertType);
+        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 }

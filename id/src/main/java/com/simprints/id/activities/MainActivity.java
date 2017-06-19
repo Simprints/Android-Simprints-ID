@@ -492,9 +492,10 @@ public class MainActivity extends AppCompatActivity implements
         int nbRequiredFingerprints = 0;
 
         for (Finger finger : activeFingers) {
-            if (finger.getStatus() == Status.GOOD_SCAN ||
+            if ((finger.getStatus() == Status.GOOD_SCAN ||
                     finger.getStatus() == Status.BAD_SCAN ||
-                    finger.getStatus() == Status.RESCAN_GOOD_SCAN) {
+                    finger.getStatus() == Status.RESCAN_GOOD_SCAN) &&
+                    finger.getTemplate() != null) {
                 fingerprints.add(new Fingerprint(finger.getId(), finger.getTemplate().getTemplateBytes()));
 
                 nbRequiredFingerprints++;
@@ -752,7 +753,8 @@ public class MainActivity extends AppCompatActivity implements
                     syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                     break;
                 default:
-                    throw new RuntimeException();
+                    FirebaseCrash.report(new Exception("Unknown error returned in onFailure MainActivity.syncListener()"));
+                    launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         }
     };
@@ -765,7 +767,8 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         if (!SyncService.getInstance().startAndListen(getApplicationContext(), syncListener))
-            throw new RuntimeException();
+            FirebaseCrash.report(new Exception("Error in MainActivity.backgroundSync()"));
+            launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
     }
 
     private void startContinuousCapture() {
