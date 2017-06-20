@@ -90,7 +90,7 @@ public enum ALERT_TYPE {
 
     UNEXPECTED_ERROR(R.string.error_occurred_title, R.string.unforeseen_error_message,
             R.drawable.error_icon, -1, R.string.try_again_label, R.string.close,
-            true, R.color.simprints_blue, InternalConstants.RESULT_TRY_AGAIN);
+            true, R.color.simprints_red, InternalConstants.RESULT_TRY_AGAIN);
 
     private int alertTitleId;
     private int alertMessageId;

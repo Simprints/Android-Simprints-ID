@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -133,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         navView.setItemIconTintList(null);
@@ -171,14 +173,14 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onConnection() {
                 syncItem.setEnabled(true);
-                syncItem.setTitle("Sync");
+                syncItem.setTitle(R.string.nav_sync);
                 syncItem.setIcon(R.drawable.ic_menu_sync_ready);
             }
 
             @Override
             public void onDisconnection() {
                 syncItem.setEnabled(false);
-                syncItem.setTitle("Offline");
+                syncItem.setTitle(R.string.nav_offline);
                 syncItem.setIcon(R.drawable.ic_menu_sync_off);
             }
         });
@@ -194,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onSignOut() {
                 syncItem.setEnabled(false);
-                syncItem.setTitle("Signed Out");
+                syncItem.setTitle(R.string.not_signed_in);
                 syncItem.setIcon(R.drawable.ic_menu_sync_off);
             }
         });
@@ -217,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements
         ProgressDialog dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
         dialog.setCanceledOnTouchOutside(false);
-        dialog.setMessage("Re-Connecting...");
+        dialog.setMessage(getString(R.string.reconnecting_message));
         dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
@@ -490,9 +492,10 @@ public class MainActivity extends AppCompatActivity implements
         int nbRequiredFingerprints = 0;
 
         for (Finger finger : activeFingers) {
-            if (finger.getStatus() == Status.GOOD_SCAN ||
+            if ((finger.getStatus() == Status.GOOD_SCAN ||
                     finger.getStatus() == Status.BAD_SCAN ||
-                    finger.getStatus() == Status.RESCAN_GOOD_SCAN) {
+                    finger.getStatus() == Status.RESCAN_GOOD_SCAN) &&
+                    finger.getTemplate() != null) {
                 fingerprints.add(new Fingerprint(finger.getId(), finger.getTemplate().getTemplateBytes()));
 
                 nbRequiredFingerprints++;
@@ -733,7 +736,7 @@ public class MainActivity extends AppCompatActivity implements
                 return;
 
             syncItem.setEnabled(true);
-            syncItem.setTitle("Sync Complete");
+            syncItem.setTitle(R.string.nav_sync_complete);
             syncItem.setIcon(R.drawable.ic_menu_sync_success);
         }
 
@@ -746,11 +749,12 @@ public class MainActivity extends AppCompatActivity implements
                         return;
 
                     syncItem.setEnabled(true);
-                    syncItem.setTitle("Syncing Failed");
+                    syncItem.setTitle(R.string.nav_sync_failed);
                     syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                     break;
                 default:
-                    throw new RuntimeException();
+                    FirebaseCrash.report(new Exception("Unknown error returned in onFailure MainActivity.syncListener()"));
+                    launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         }
     };
@@ -758,12 +762,14 @@ public class MainActivity extends AppCompatActivity implements
     private void backgroundSync() {
         if (syncItem != null) {
             syncItem.setEnabled(false);
-            syncItem.setTitle("Syncing...");
+            syncItem.setTitle(R.string.syncing);
             syncItem.setIcon(R.drawable.ic_menu_syncing);
         }
 
-        if (!SyncService.getInstance().startAndListen(getApplicationContext(), syncListener))
-            throw new RuntimeException();
+        if (!SyncService.getInstance().startAndListen(getApplicationContext(), syncListener)) {
+            FirebaseCrash.report(new Exception("Error in MainActivity.backgroundSync()"));
+            launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+        }
     }
 
     private void startContinuousCapture() {

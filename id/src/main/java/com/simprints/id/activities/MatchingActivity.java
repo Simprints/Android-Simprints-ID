@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.simprints.id.R;
+import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
@@ -37,6 +40,8 @@ import java.util.Locale;
 
 public class MatchingActivity extends AppCompatActivity implements MatcherEventListener {
 
+    private final static int ALERT_ACTIVITY_REQUEST_CODE = 0;
+
     private AppState appState;
     private Person probe;
     private List<Person> candidates = new ArrayList<>();
@@ -50,6 +55,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_matching);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         appState = AppState.getInstance();
         appState.logMatchStart();
@@ -104,7 +110,8 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                     @Override
                     public void onFailure(DATA_ERROR data_error) {
-                        throw new RuntimeException();
+                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onCreate()case:IDENTIFY"));
+                        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                     }
                 });
                 break;
@@ -144,7 +151,8 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                     @Override
                     public void onFailure(DATA_ERROR data_error) {
-                        throw new RuntimeException();
+                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onCreate()case:VERIFY"));
+                        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                     }
                 });
                 break;
@@ -156,11 +164,11 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     private Tier computeTier(float score) {
         if (score < 20) {
             return Tier.TIER_5;
-        } else if (score < 40) {
+        } else if (score < 35) {
             return Tier.TIER_4;
-        } else if (score < 60) {
+        } else if (score < 50) {
             return Tier.TIER_3;
-        } else if (score < 80) {
+        } else if (score < 75) {
             return Tier.TIER_2;
         } else {
             return Tier.TIER_1;
@@ -257,5 +265,14 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 progressBar.setProgress(progress.getProgress());
             }
         });
+    }
+
+    /**
+     * Start alert activity
+     */
+    private void launchAlert(ALERT_TYPE alertType) {
+        Intent intent = new Intent(this, AlertActivity.class);
+        intent.putExtra("alertType", alertType);
+        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 }

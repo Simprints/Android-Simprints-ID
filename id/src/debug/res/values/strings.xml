@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Id DEBUG</string>
+
+
+    <!-- AndroidManifest : activity titles throughout the app -->
+    <!-- App Name -->
+    <string name="app_name" translatable="false">Id DEBUG</string>
+    <!-- Activity Titles -->
     <string name="title_activity_front" translatable="false">Simprints ID DEBUG</string>
+
+
+    <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
+    <!-- App Titles -->
+    <string name="simprints_label" translatable="false">Simprints DEBUG</string>
+
+
 </resources>

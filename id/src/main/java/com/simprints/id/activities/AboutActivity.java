@@ -1,12 +1,12 @@
 package com.simprints.id.activities;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.simprints.id.R;
@@ -27,6 +27,7 @@ public class AboutActivity extends AppCompatActivity {
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_about);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_about);
         setSupportActionBar(toolbar);
@@ -39,14 +40,11 @@ public class AboutActivity extends AppCompatActivity {
 
         appState = AppState.getInstance();
 
-        PackageInfo pInfo;
         String version = "";
-        try {
-            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            version = pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+        if (appState.getAppVersion() != null) {
+            version = appState.getAppVersion();
         }
+
         ((TextView) findViewById(R.id.appVersionTextView)).setText(version);
 
         ((TextView) findViewById(R.id.libSimprintsVersionTextView))
