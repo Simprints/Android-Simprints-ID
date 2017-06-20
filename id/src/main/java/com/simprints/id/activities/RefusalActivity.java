@@ -1,11 +1,13 @@
 package com.simprints.id.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,25 +17,22 @@ import android.widget.TextView;
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
-import com.simprints.libcommon.RefusalForm;
-
-import static com.simprints.libcommon.RefusalForm.Reason;
-import static com.simprints.libcommon.RefusalForm.Reason.OTHER;
-import static com.simprints.libcommon.RefusalForm.Reason.REFUSED;
-import static com.simprints.libcommon.RefusalForm.Reason.SCANNER_NOT_HERE;
-import static com.simprints.libcommon.RefusalForm.Reason.SCANNER_NOT_WORKING;
-import static com.simprints.libcommon.RefusalForm.Reason.UNABLE_TO_CAPTURE_GOOD_SCAN;
-import static com.simprints.libcommon.RefusalForm.Reason.UNABLE_TO_GIVE_PRINTS;
+import com.simprints.libdata.models.enums.REFUSAL_FORM_REASON;
+import com.simprints.libsimprints.Constants;
+import com.simprints.libsimprints.RefusalForm;
 
 public class RefusalActivity extends AppCompatActivity {
+
     private Button submit;
-    private Reason reason;
+    private REFUSAL_FORM_REASON reason;
     private EditText otherText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_refusal);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         submit = (Button) findViewById(R.id.bt_submit_refusal_form);
         otherText = (EditText) findViewById(R.id.et_other_refusal_text);
 
@@ -42,13 +41,17 @@ public class RefusalActivity extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RefusalForm refusalForm = new RefusalForm();
-                refusalForm.setReason(reason);
-                refusalForm.setOtherText(otherText.getText().toString());
-                AppState.getInstance().setRefusalForm(refusalForm);
+
+                Intent resultData = new Intent();
+
+                if (reason != null) {
+                    RefusalForm refusalForm = new RefusalForm(reason.toString(), otherText.getText().toString());
+                    AppState.getInstance().setRefusalForm(refusalForm);
+                    resultData.putExtra(Constants.SIMPRINTS_REFUSAL_FORM, refusalForm);
+                }
 
                 //We are really bailing out of Simprints ID so the result is 'cancelled'
-                setResult(RESULT_CANCELED);
+                setResult(RESULT_CANCELED, resultData);
                 finish();
             }
         });
@@ -110,27 +113,27 @@ public class RefusalActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.rb_scannerNotHere:
                 if (checked)
-                    reason = SCANNER_NOT_HERE;
+                    reason = REFUSAL_FORM_REASON.SCANNER_NOT_HERE;
                 break;
             case R.id.rb_scannerNotWorking:
                 if (checked)
-                    reason = SCANNER_NOT_WORKING;
+                    reason = REFUSAL_FORM_REASON.SCANNER_NOT_WORKING;
                 break;
             case R.id.rb_unableToCapture:
                 if (checked)
-                    reason = UNABLE_TO_CAPTURE_GOOD_SCAN;
+                    reason = REFUSAL_FORM_REASON.UNABLE_TO_CAPTURE_GOOD_SCAN;
                 break;
             case R.id.rb_unableToGive:
                 if (checked)
-                    reason = UNABLE_TO_GIVE_PRINTS;
+                    reason = REFUSAL_FORM_REASON.UNABLE_TO_GIVE_PRINTS;
                 break;
             case R.id.rb_refused:
                 if (checked)
-                    reason = REFUSED;
+                    reason = REFUSAL_FORM_REASON.REFUSED;
                 break;
             case R.id.rb_other:
                 if (checked)
-                    reason = OTHER;
+                    reason = REFUSAL_FORM_REASON.OTHER;
                 break;
         }
     }

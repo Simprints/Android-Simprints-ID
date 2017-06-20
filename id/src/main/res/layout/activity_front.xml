@@ -12,7 +12,7 @@
         android:layout_alignTop="@+id/versionTextView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="43dp"
-        android:text="LibSimprints"
+        android:text="@string/libsimprints_label"
         android:textColor="@color/simprints_white"
         android:textSize="20sp" />
 
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="Simprints"
+        android:text="@string/simprints_label"
         android:textColor="@color/simprints_white"
         android:textSize="20sp" />
 

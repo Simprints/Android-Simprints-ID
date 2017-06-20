@@ -191,7 +191,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sync Settings:"
+                android:text="@string/sync_settings_label"
                 android:textSize="20sp" />
 
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
@@ -207,14 +207,14 @@
                     android:layout_marginEnd="15dp"
                     android:layout_marginRight="15dp"
                     android:onClick="onSyncSelectionClicked"
-                    android:text="User" />
+                    android:text="@string/user_label" />
 
                 <RadioButton
                     android:id="@+id/rb_globalSyncGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="onSyncSelectionClicked"
-                    android:text="Project" />
+                    android:text="@string/project_label" />
 
             </RadioGroup>
 
@@ -227,7 +227,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Search Settings:"
+                android:text="@string/search_settings_label"
                 android:textSize="20sp" />
 
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
@@ -243,21 +243,21 @@
                     android:layout_marginEnd="15dp"
                     android:layout_marginRight="15dp"
                     android:onClick="onMatchSelectionClicked"
-                    android:text="User" />
+                    android:text="@string/user_label" />
 
                 <RadioButton
                     android:id="@+id/rb_moduleMatchGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="onMatchSelectionClicked"
-                    android:text="Module" />
+                    android:text="@string/module_label" />
 
                 <RadioButton
                     android:id="@+id/rb_globalMatchGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="onMatchSelectionClicked"
-                    android:text="Project" />
+                    android:text="@string/project_label" />
 
             </RadioGroup>
 

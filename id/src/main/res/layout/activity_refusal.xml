@@ -91,6 +91,7 @@
         android:background="@color/simprints_white"
         android:enabled="false"
         android:gravity="top|start"
+        android:maxLength="2000"
         android:hint="@string/hint_other_reason"
         android:imeOptions="actionDone"
         android:inputType="textMultiLine" />

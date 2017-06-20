@@ -1,30 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Id</string>
 
+
+    <!-- AndroidManifest : activity titles throughout the app -->
+    <!-- App Name -->
+    <string name="app_name" translatable="false">Id</string>
+    <!-- Activity Titles -->
+    <string name="title_activity_front" translatable="false">Simprints ID</string>
+    <string name="register_title">Enrollment</string>
+    <string name="identify_title">Identify</string>
+    <string name="update_title">Update</string>
+    <string name="verify_title">Verify</string>
+    <string name="help_title">Help</string>
+    <string name="settings_title">Settings</string>
+    <string name="about_title">About</string>
+    <string name="alert_title">Alert</string>
+    <string name="tutorial_title">Tutorial</string>
+    <string name="refusal_label">Refusal Form</string>
+    <string name="privacy_label">Privacy</string>
+
+
+    <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
+    <!-- Version Names -->
     <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.11</string>
+    <!-- App Titles -->
+    <string name="simprints_label" translatable="false">Simprints</string>
+    <string name="libsimprints_label" translatable="false">LibSimprints</string>
+    <!-- Content Descriptions -->
+    <string name="launch_background_description" translatable="false">Simprint\'s logo as background image</string>
+    <!-- Sync Button Text -->
+    <string name="sync_data">Sync Data</string>
+    <string name="syncing">Syncing…</string>
+    <string name="not_signed_in">Not Signed In</string>
 
+
+    <!-- SetupActivity : the loading screen -->
+    <!-- Consent Text -->
+    <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your health records. If that’s not OK or you have any questions let me know, otherwise please place your left thumb flat on the sensor.</string>
+    <string name="confirm_consent">Tap here to confirm consent</string>
+    <!-- Loading Messages-->
+    <string name="loading">Loading</string>
+    <string name="updating_database">Updating project database…</string>
+    <string name="launch_checking_permissions">Checking permissions…</string>
+    <string name="launch_checking_api_key">Checking API key…</string>
+    <string name="launch_bt_connect">Connecting to Vero…</string>
+    <string name="launch_wake_un20">Waking up UN20…</string>
+    <string name="launch_setup">Setting up Vero…</string>
+    <string name="launch_checking_person_in_db">Checking person is in database…</string>
+
+
+    <!-- MainActivity : screen where the scanning happens -->
+    <!-- Screen Text -->
+    <string name="good_scan_direction">Swipe left to next finger</string>
+    <string name="last_scan_message">Press arrow to continue</string>
+    <string name="please_scan">Please scan</string>
+    <string name="poor_scan_direction">Please re-scan</string>
+    <string name="scanning">Scanning…</string>
+    <string name="good_scan_message">Good Scan</string>
+    <string name="poor_scan_message">Poor Scan</string>
+    <string name="reconnecting_message">Reconnecting…</string>
+    <!-- Button Labels -->
+    <string name="rescan_label">Re-scan</string>
+    <string name="rescan_label_question">Re-scan?</string>
+    <string name="scan_label">SCAN</string>
+    <string name="cancel_button" tools:ignore="ButtonCase">CANCEL</string>
+    <string name="ok">OK</string>
+    <string name="scan">SCAN</string>
+    <!-- Content Descriptions -->
+    <string name="finger_image_description" translatable="false">Hands with arrow pointing to a finger</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
 
-    <string name="help_title">Help</string>
-    <string name="settings_title">Settings</string>
-    <string name="tutorial_title" translatable="false">Tutorial</string>
-    <string name="troubleshoot_title" translatable="false">Troubleshoot</string>
-    <string name="about_title">About</string>
+    <!-- activity_main_drawer.xml : menu that comes out from the top left of the MainActivity -->
+    <!-- Menu Titles -->
+    <string name="action_settings">Settings</string>
+    <string name="menu_header">Simprints ID</string>
+    <string name="menu_subheader">Every person counts!</string>
+    <!-- Menu Labels -->
     <string name="fingerprints_menu">Fingerprints</string>
     <string name="help_menu">Help</string>
     <string name="about_menu">About</string>
     <string name="help_and_support_menu">Help and Support</string>
     <string name="configuration_menu">Configuration</string>
-    <string name="consent_title" translatable="false">Consent</string>
-    <string name="alert_title" translatable="false">Alert</string>
-    <string name="register_title">Enrollment</string>
-    <string name="identify_title">Identify</string>
-    <string name="update_title">Update</string>
-    <string name="verify_title">Verify</string>
-
+    <string name="nav_add_finger">Add Finger</string>
+    <string name="nav_select_finger">Select Finger</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_sync">Sync</string>
+    <string name="nav_offline">Offline</string>
+    <string name="nav_sync_complete">Sync Complete</string>
+    <string name="nav_sync_failed">Sync Failed</string>
+    <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
+    <!-- Toast Messages -->
+    <string name="coming_soon">Coming soon…</string>
+    <!-- Finger Names -->
     <string name="l_5_finger_name">LEFT FIFTH FINGER</string>
     <string name="l_4_finger_name">LEFT FOURTH FINGER</string>
     <string name="l_3_finger_name">LEFT THIRD FINGER</string>
@@ -36,8 +105,101 @@
     <string name="r_4_finger_name">RIGHT FOURTH FINGER</string>
     <string name="r_5_finger_name">RIGHT FIFTH FINGER</string>
 
-    <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your health records. If that’s not OK or you have any questions let me know, otherwise please place your left thumb flat on the sensor.</string>
 
+    <!-- MatchingActivity : the waiting screen after an identification -->
+    <!-- Screen Text -->
+    <string name="please_wait">Please wait while we proceed to identification</string>
+
+
+    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- Error Message Titles -->
+    <string name="bluetooth_error_title">BLUETOOTH ERROR</string>
+    <string name="configuration_error_title">CONFIGURATION ERROR</string>
+    <string name="disconnected_title">SCANNER NOT FOUND</string>
+    <string name="verify_guid_not_found_title">PERSON NOT FOUND</string>
+    <string name="error_occurred_title">ERROR OCCURRED</string>
+    <string name="low_battery_title">LOW BATTERY</string>
+    <string name="alert_api_key_verify_failed">Failed to verify API key</string>
+    <!-- Error Message Text -->
+    <string name="missing_apikey_message">A configuration error has occurred (missing API key), please contact your system administrator</string>
+    <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
+    <string name="invalid_intentAction_message">A configuration error has occurred (invalid intent action), please contact your system administrator</string>
+    <string name="invalid_metadata_message">A configuration error has occurred (invalid metadata), please contact your system administrator</string>
+    <string name="missing_userId_message">A configuration error has occurred (no user ID), please contact your system administrator</string>
+    <string name="missing_moduleId_message">A configuration error has occurred (no module ID), please contact your system administrator</string>
+    <string name="missing_updateId_message">A configuration error has occurred (no update GUID), please contact your system administrator</string>
+    <string name="missing_verifyId_message">A configuration error has occurred (no verify GUID), please contact your system administrator</string>
+    <string name="verify_guid_not_found_online_message">The person selected for verification is not in the database</string>
+    <string name="verify_guid_not_found_offline_message">Person not found, please make sure you are connected to the internet and try again</string>
+    <string name="bluetooth_not_supported_message">Bluetooth not supported on this device, please contact your system administrator</string>
+    <string name="bluetooth_not_enabled_message">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
+    <string name="unbonded_scanner_message">Scanner not paired, please make sure it is paired in settings and try again</string>
+    <string name="multiple_scanners_found_message">More than one scanner is paired to the phone, please unpair un-needed scanners</string>
+    <string name="disconnected_message">The scanner is unreachable, please make sure it is powered on and close to the phone</string>
+    <string name="low_battery_message">Scanner battery low, please charge your scanner</string>
+    <string name="unforeseen_error_message">Sorry, an unforeseen error occurred, press close to continue</string>
+    <string name="alert_api_key_verify_failed_body">"We could not verify your API key, please make sure you are connected to the internet and try again"</string>
+    <!-- Button Labels For Error Messages -->
+    <string name="close">CLOSE</string>
+    <string name="try_again_label">Try Again</string>
+    <string name="settings_label">Phone settings</string>
+    <!-- Content Descriptions -->
+    <string name="main_error_graphic" translatable="false">main error graphic</string>
+
+
+    <!-- AboutActivity : the screen that shows project statistics and version numbers -->
+    <!-- Screen Text -->
+    <string name="database_information">Database Information</string>
+    <string name="user_count">User Count:</string>
+    <string name="module_count">Module Count:</string>
+    <string name="project_count">Project Count:</string>
+    <string name="about_app_version">App Version:</string>
+    <string name="about_libsimprints_version">LibSimprints Version:</string>
+    <string name="about_scanner_version">Scanner Version:</string>
+    <!-- Button Labels -->
+    <string name="resolve_db" translatable="false">Resolve DB</string>
+
+
+    <!-- SettingsActivity : the detailed settings screen -->
+    <!-- Setting Labels -->
+    <string name="settings_select_language">Select Language</string>
+    <string name="nudge_mode_checkbox_name">Nudge Mode</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="quality_threshold_empty">Quality Threshold:</string>
+    <string name="quality_threshold_value">Quality Threshold: %1$d</string>
+    <string name="nb_of_ids_empty">Returned Identifications:</string>
+    <string name="nb_of_ids_value">Returned Identifications: %1$d</string>
+    <string name="timeout_empty">Timeout (Seconds):</string>
+    <string name="timeout_value">Timeout (Seconds): %1$d</string>
+    <string name="sync_settings_label">Sync Settings</string>
+    <string name="search_settings_label">Search Settings</string>
+    <string name="user_label">User</string>
+    <string name="module_label">Module</string>
+    <string name="project_label">Project</string>
+    <string name="sourceafis" translatable="false">SourceAFIS</string>
+    <string name="simafis_beta" translatable="false">SimAFIS (Beta)</string>
+
+
+    <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
+    <!-- Screen Text -->
+    <string name="why_did_you_skip_fingerprinting">Why did you skip fingerprinting?</string>
+    <!-- Button Labels -->
+    <string name="button_submit">Submit</string>
+    <string name="button_scan_prints">Scan Fingerprints</string>
+    <!-- Refusal Selection Points -->
+    <string name="scanner_not_here">Scanner not here</string>
+    <string name="scanner_not_working">Scanner not working</string>
+    <string name="unable_to_capture_a_good_scan">Unable to capture a \'good scan\'</string>
+    <string name="beneficiary_was_physically_unable">Beneficiary was physically unable to give fingerprints (e.g. too painful, missing fingers)</string>
+    <string name="beneficiary_refused">Beneficiary refused</string>
+    <string name="other">Other</string>
+    <!-- Text Prompt -->
+    <string name="hint_other_reason">More info…</string>
+
+
+    <!-- PrivacyActivity : the screen where the user can find the long consent form -->
+    <!-- Long Consent -->
+    <string name="healthworker_consent_checkbox">I agree to Simprints using this data in these ways.</string>
     <string name="long_consent">
         <b><u>Privacy and Consent</u></b>\n\n
         If you put your finger on the scanner, it will record information about your fingerprint. It will also record the approximate location where this scan took place, and the time and date of the scan. \n \n
@@ -79,123 +241,10 @@
         Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other community health workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to patients.
     </string>
 
-    <!--Launch strings-->
-    <string name="launch_checking_permissions">Checking permissions…</string>
-    <string name="launch_loading_database">Loading database…</string>
-    <string name="launch_checking_api_key">Checking API key…</string>
-    <string name="launch_cc_resolve">Resolving database with CommCare…</string>
-    <string name="launch_bt_connect">Connecting to Vero…</string>
-    <string name="launch_wake_un20">Waking up UN20…</string>
-    <string name="launch_setup">Setting up Vero…</string>
-    <string name="launch_checking_person_in_db" translatable="false">Checking person is in database…</string>
 
-    <!--Main app-->
-    <string name="scan_label">SCAN</string>
-    <string name="bluetooth_error_title">BLUETOOTH ERROR</string>
-    <string name="configuration_error_title">CONFIGURATION ERROR</string>
-    <string name="missing_apikey_message">A configuration error has occurred (missing API key), please contact your system administrator</string>
-    <string name="missing_calling_package_message">A configuration error has occurred (missing calling package) please contact your system administrator</string>
-    <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
-    <string name="invalid_intentAction_message">A configuration error has occurred (invalid intent action), please contact your system administrator</string>
-    <string name="invalid_metadata_message">A configuration error has occurred (invalid metadata), please contact your system administrator</string>
-    <string name="missing_userId_message">A configuration error has occurred (no user ID), please contact your system administrator</string>
-    <string name="missing_moduleId_message">A configuration error has occurred (no module ID), please contact your system administrator</string>
-    <string name="missing_updateId_message">A configuration error has occurred (no update GUID), please contact your system administrator</string>
-    <string name="missing_verifyId_message">A configuration error has occurred (no verify GUID), please contact your system administrator</string>
-    <string name="verify_guid_not_found_title" translatable="false">Person Not Found</string>
-    <string name="verify_guid_not_found_online_message" translatable="false">The person selected for verification is not in the database</string>
-    <string name="verify_guid_not_found_offline_message" translatable="false">Person not found, please make sure you are connected to the internet and try again</string>
-    <string name="bluetooth_not_supported_title" translatable="false">BLUETOOTH NOT SUPPORTED</string>
-    <string name="bluetooth_not_supported_message" translatable="false">Bluetooth not supported on this device, please contact your system administrator</string>
-    <string name="bluetooth_not_enabled_title" translatable="false">BLUETOOTH NOT ENABLED</string>
-    <string name="bluetooth_not_enabled_message" translatable="false">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
-    <string name="unbonded_scanner_title" translatable="false">SCANNER NOT PAIRED</string>
-    <string name="unbonded_scanner_message">Scanner not paired, please make sure it is paired in settings and try again</string>
-    <string name="multiple_scanners_found_title" translatable="false">MULTIPLE PAIRED SCANNERS</string>
-    <string name="multiple_scanners_found_message">More than one scanner is paired to the phone, please unpair un-needed scanners</string>
-    <string name="disconnected_title">SCANNER NOT FOUND</string>
-    <string name="disconnected_message">The scanner is unreachable, please make sure it is powered on and close to the phone</string>
-    <string name="close">CLOSE</string>
-    <string name="title_activity_main" translatable="false">MainActivity</string>
-    <string name="cancel_button" tools:ignore="ButtonCase">CANCEL</string>
-    <string name="try_again_label">Try Again</string>
-    <string name="settings_label">Phone settings</string>
-    <string name="rescan_label">Re-scan</string>
-    <string name="rescan_label_question">Re-scan?</string>
-    <string name="reconnect_label" translatable="false">Re-connect</string>
-    <string name="error_occurred_title">ERROR OCCURRED</string>
-    <string name="good_scan_message">Good Scan</string>
-    <string name="poor_scan_message">Poor Scan</string>
-    <string name="good_scan_direction">Swipe left to next finger</string>
-    <string name="poor_scan_direction">Please re-scan</string>
-    <string name="please_scan">Please scan</string>
-    <string name="scanning">Scanning…</string>
-    <string name="last_scan_message">Press arrow to continue</string>
+    <!-- Miscellaneous -->
+    <!-- The Empty String -->
     <string name="empty" translatable="false" />
-    <string name="unforeseen_error_message">Sorry, an unforeseen error occurred, press close to continue</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
-    <string name="scan">SCAN</string>
-    <string name="launch_background_description" translatable="false">Simprint\'s logo as background image</string>
-    <string name="loading">Loading</string>
-    <string name="network_failure_title" translatable="false">NETWORK FAILURE</string>
-    <string name="network_failure_message">Network failure, please make sure you are connected to the internet</string>
-    <string name="please_wait">Please wait while we proceed to identification</string>
-    <string name="finger_image_description" translatable="false">Hands with arrow pointing to a finger</string>
-    <string name="coming_soon">Coming soon…</string>
-    <string name="confirm_consent">Tap here to confirm consent</string>
-    <string name="nudge_mode_checkbox_name">Nudge Mode</string>
-    <string name="healthworker_consent_checkbox">I agree to Simprints using this data in these ways.</string>
-    <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
-    <string name="quality_threshold_text_view">Quality Threshold</string>
-    <string name="menu_continue">Continue</string>
-    <string name="nav_add_finger">Add Finger</string>
-    <string name="nav_select_finger">Select Finger</string>
-    <string name="nav_settings">Settings</string>
-    <string name="quality_threshold_empty">Quality Threshold:</string>
-    <string name="quality_threshold_value">Quality Threshold: %1$d</string>
-    <string name="nb_of_ids_empty">Returned Identifications:</string>
-    <string name="nb_of_ids_value">Returned Identifications: %1$d</string>
-    <string name="timeout_empty">Timeout (Seconds):</string>
-    <string name="timeout_value">Timeout (Seconds): %1$d</string>
-    <string name="about_app_version">App Version:</string>
-    <string name="about_libsimprints_version">LibSimprints Version:</string>
-    <string name="about_scanner_version">Scanner Version:</string>
-    <string name="menu_header">Simprints ID</string>
-    <string name="menu_subheader">Every person counts!</string>
-    <string name="nav_sync">Sync</string>
-    <string name="settings_select_language">Select Language</string>
-    <string name="title_activity_front" translatable="false">Simprints ID</string>
-    <string name="simprintsVersionText" translatable="false">"Simprints: "</string>
-    <string name="front_simprints_version" translatable="false">Simprints: </string>
-    <string name="sourceafis" translatable="false">SourceAFIS</string>
-    <string name="simafis_beta" translatable="false">SimAFIS (Beta)</string>
-    <string name="alert_api_key_verify_failed">Failed to verify API key</string>
-    <string name="alert_api_key_verify_failed_body">"We could not verify your API key, please make sure you are connected to the internet and try again"</string>
-    <string name="main_error_graphic" translatable="false">main error graphic</string>
-    <string name="sync_data">Sync Data</string>
-    <string name="syncing">Syncing…</string>
-    <string name="not_signed_in">Not Signed In</string>
-    <string name="offline">Offline</string>
-    <string name="updating_database">Updating project database…</string>
-    <string name="vibrate">Vibrate</string>
-    <string name="scanner_not_here">Scanner not here</string>
-    <string name="scanner_not_working">Scanner not working</string>
-    <string name="unable_to_capture_a_good_scan">Unable to capture a \'good scan\'</string>
-    <string name="beneficiary_was_physically_unable">Beneficiary was physically unable to give fingerprints (e.g. too painful, missing fingers)</string>
-    <string name="beneficiary_refused">Beneficiary refused</string>
-    <string name="other">Other</string>
-    <string name="hint_other_reason">More info…</string>
-    <string name="button_scan_prints">Scan Fingerprints</string>
-    <string name="button_submit">Submit</string>
-    <string name="why_did_you_skip_fingerprinting">Why did you skip fingerprinting?</string>
-    <string name="resolve_db" translatable="false">Resolve DB</string>
-    <string name="refusal_label" translatable="false">Refusal Form</string>
-    <string name="privacy_label" translatable="false">Privacy</string>
-    <string name="low_battery_title">LOW BATTERY</string>
-    <string name="low_battery_message">Scanner battery low, please charge your scanner</string>
-    <string name="database_information" translatable="false">Database Information</string>
-    <string name="user_count" translatable="false">User Count:</string>
-    <string name="module_count" translatable="false">Module Count:</string>
-    <string name="project_count" translatable="false">Project Count:</string>
+
+
 </resources>

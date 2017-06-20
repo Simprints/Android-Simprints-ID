@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
 import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
 import com.simprints.id.model.ALERT_TYPE;
@@ -108,7 +109,7 @@ public class Setup {
             return;
         }
 
-        // Step 5: connect with scanner. Must be done everytime the scanner is not connected
+        // Step 5: connect with scanner. Must be done every time the scanner is not connected
         if (!appState.getScanner().isConnected()) {
             this.connectToScanner(activity);
             return;
@@ -189,7 +190,8 @@ public class Setup {
                         goOn(activity);
                         break;
                     default:
-                        throw new RuntimeException();
+                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure Setup.initDbContext()"));
+                        onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
         });
@@ -223,7 +225,8 @@ public class Setup {
                         callback.onAlert(ALERT_TYPE.INVALID_API_KEY);
                         break;
                     default:
-                        throw new RuntimeException();
+                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure Setup.validateApiKey()"));
+                        onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
         });
@@ -256,10 +259,15 @@ public class Setup {
         appState.getScanner().connect(new ScannerCallback() {
             @Override
             public void onSuccess() {
-                Log.d("Setup", "Connected to Vero.");
-                uiResetSinceConnection = false;
-                appState.setScannerId(appState.getScanner().getScannerId());
-                goOn(activity);
+                if (appState != null && appState.getScanner() != null) {
+                    Log.d("Setup", "Connected to Vero.");
+                    uiResetSinceConnection = false;
+                    appState.setScannerId(appState.getScanner().getScannerId());
+                    goOn(activity);
+                } else {
+                    FirebaseCrash.report(new Exception("Null values in onSuccess Setup.connectToScanner()"));
+                    onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                }
             }
 
             @Override
@@ -330,7 +338,8 @@ public class Setup {
                         }
                         break;
                     default:
-                        throw new RuntimeException(); // SHOULDN'T HAPPEN
+                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure Setup.checkIfVerifyAndGuidExists()"));
+                        onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
         });
@@ -368,9 +377,14 @@ public class Setup {
         appState.getScanner().un20Wakeup(new ScannerCallback() {
             @Override
             public void onSuccess() {
-                Log.d("Setup", "UN20 ready.");
-                appState.setHardwareVersion(appState.getScanner().getUcVersion());
-                Setup.this.onSuccess();
+                if (appState != null && appState.getScanner() != null) {
+                    Log.d("Setup", "UN20 ready.");
+                    appState.setHardwareVersion(appState.getScanner().getUcVersion());
+                    Setup.this.onSuccess();
+                } else {
+                    FirebaseCrash.report(new Exception("Null values in onSuccess Setup.wakeUpUn20()"));
+                    onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                }
             }
 
             @Override

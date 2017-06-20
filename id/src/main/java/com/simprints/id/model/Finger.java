@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 
 import com.simprints.id.R;
 import com.simprints.libcommon.Fingerprint;
-import com.simprints.libmatcher.sourceafis.templates.Template;
 import com.simprints.libsimprints.FingerIdentifier;
 
 
