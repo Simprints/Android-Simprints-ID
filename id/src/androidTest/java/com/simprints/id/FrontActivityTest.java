@@ -3,6 +3,7 @@ package com.simprints.id;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.view.WindowManager;
 
 import com.simprints.id.activities.FrontActivity;
 
@@ -28,7 +29,17 @@ public class FrontActivityTest {
 
 
     @Before
-    public void setUp() {}
+    public void setUp() {
+        final FrontActivity activity = frontActivityActivityTestRule.getActivity();
+        Runnable wakeUpDevice = new Runnable() {
+            public void run() {
+                activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+        };
+        activity.runOnUiThread(wakeUpDevice);
+    }
 
 
     /**
