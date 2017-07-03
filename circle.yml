@@ -20,19 +20,16 @@ dependencies:
 
 test:
     pre:
-        # start the emulator
-        - emulator -avd circleci-android22 -no-window -gpu off:
+        # start a fresh emulator
+        - emulator -avd circleci-android22 -no-window -gpu off -wipe-data:
             background: true
             parallel: true
         # wait for it to have booted
         - circle-android wait-for-boot
     override:
-        # build the apk
-        - ./gradlew assembleDebug
-        # install the apk
-        - adb install id/build/outputs/apk/id-debug.apk
-        # run tests  against the emulator.
+        # build & install the apk, and run tests against the emulator.
         - ./gradlew connectedAndroidTest
+    post:
         # copy the build outputs to artifacts
         - cp -r id/build/outputs $CIRCLE_ARTIFACTS
         # copy the test results to the test results directory.
