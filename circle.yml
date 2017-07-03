@@ -21,7 +21,7 @@ dependencies:
 test:
     pre:
         # start the emulator
-        - emulator -avd circleci-android25 -no-window:
+        - emulator -avd circleci-android22 -no-window -gpu off:
             background: true
             parallel: true
         # wait for it to have booted
