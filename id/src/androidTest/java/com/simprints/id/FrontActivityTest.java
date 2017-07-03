@@ -19,6 +19,7 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.anyOf;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -49,9 +50,9 @@ public class FrontActivityTest {
     public void checkSyncButton() {
         onView(withId(R.id.bt_sync))
                 .check(matches(isClickable()))
-                .check(matches(withText(R.string.sync_data)))
+                .check(matches(anyOf(withText(R.string.sync_data), withText(R.string.not_signed_in))))
                 .perform(click())
-                .check(matches(withText(R.string.sync_data)));
+                .check(matches(anyOf(withText(R.string.sync_data), withText(R.string.not_signed_in))));
     }
 
     @After
