@@ -30,7 +30,7 @@ test:
         # build the apk
         - ./gradlew assembleDebug
         # install the apk
-        - adb install ./id/id-debug.apk
+        - adb install id/id-debug.apk
         # run tests  against the emulator.
         - ./gradlew connectedAndroidTest
         # copy the build outputs to artifacts
