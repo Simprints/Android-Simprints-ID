@@ -42,36 +42,66 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
     private final static int ALERT_ACTIVITY_REQUEST_CODE = 0;
 
+    private MatchingView matchingView;
+
     private AppState appState;
     private Person probe;
     private List<Person> candidates = new ArrayList<>();
     private List<Float> scores = new ArrayList<>();
-    private ProgressBar progressBar;
     private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
-        setContentView(R.layout.activity_matching);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        initViews();
 
         appState = AppState.getInstance();
         appState.logMatchStart();
 
-        progressBar = (ProgressBar) findViewById(R.id.pb_identification);
-        int progressBarColor = ContextCompat.getColor(this, R.color.simprints_blue);
-        progressBar.getIndeterminateDrawable().setColorFilter(
-                progressBarColor, PorterDuff.Mode.SRC_IN);
-        progressBar.getProgressDrawable().setColorFilter(
-                progressBarColor, PorterDuff.Mode.SRC_IN);
-
         Bundle extras = getIntent().getExtras();
         probe = extras.getParcelable("Person");
 
-        Callout callout = appState.getCallout();
+        onMatcherStart(appState.getCallout());
+    }
 
+    private void initViews() {
+        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
+                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+        setContentView(R.layout.activity_matching);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        matchingView = new MatchingView();
+    }
+
+    private class MatchingView {
+
+        private ProgressBar progressBar;
+
+        MatchingView() {
+            progressBar = initProgressBar();
+        }
+
+        private ProgressBar initProgressBar() {
+            ProgressBar progressBar = (ProgressBar) findViewById(R.id.pb_identification);
+            int progressBarColor = ContextCompat.getColor(MatchingActivity.this, R.color.simprints_blue);
+            progressBar.getIndeterminateDrawable().setColorFilter(
+                    progressBarColor, PorterDuff.Mode.SRC_IN);
+            progressBar.getProgressDrawable().setColorFilter(
+                    progressBarColor, PorterDuff.Mode.SRC_IN);
+            return progressBar;
+        }
+
+        void setProgress(int progress) {
+            progressBar.setProgress(progress);
+        }
+    }
+
+    private void launchAlert(ALERT_TYPE alertType) {
+        Intent intent = new Intent(this, AlertActivity.class);
+        intent.putExtra("alertType", alertType);
+        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
+    }
+
+    private void onMatcherStart(Callout callout) {
         // Do different things depending on the callout
         switch (callout) {
             case IDENTIFY:
@@ -156,22 +186,6 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                     }
                 });
                 break;
-        }
-
-
-    }
-
-    private Tier computeTier(float score) {
-        if (score < 20) {
-            return Tier.TIER_5;
-        } else if (score < 35) {
-            return Tier.TIER_4;
-        } else if (score < 50) {
-            return Tier.TIER_3;
-        } else if (score < 75) {
-            return Tier.TIER_2;
-        } else {
-            return Tier.TIER_1;
         }
     }
 
@@ -262,17 +276,22 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         handler.post(new Runnable() {
             @Override
             public void run() {
-                progressBar.setProgress(progress.getProgress());
+                matchingView.setProgress(progress.getProgress());
             }
         });
     }
 
-    /**
-     * Start alert activity
-     */
-    private void launchAlert(ALERT_TYPE alertType) {
-        Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra("alertType", alertType);
-        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
+    private Tier computeTier(float score) {
+        if (score < 20) {
+            return Tier.TIER_5;
+        } else if (score < 35) {
+            return Tier.TIER_4;
+        } else if (score < 50) {
+            return Tier.TIER_3;
+        } else if (score < 75) {
+            return Tier.TIER_2;
+        } else {
+            return Tier.TIER_1;
+        }
     }
 }

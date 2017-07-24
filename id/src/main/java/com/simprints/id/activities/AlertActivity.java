@@ -41,9 +41,9 @@ public class AlertActivity extends AppCompatActivity {
 
         if (alertType.mustBeLogged()) {
             Answers.getInstance().logCustom(new CustomEvent("Alert Triggered")
-                    .putCustomAttribute("Alert Type", alertType.name())
-                    .putCustomAttribute("API Key", appState.getApiKey())
-                    .putCustomAttribute("MAC Address", appState.getMacAddress()));
+                    .putCustomAttribute("Alert Type", alertType.name() != null ? alertType.name() : "null")
+                    .putCustomAttribute("API Key", appState.getApiKey() != null ? appState.getApiKey() : "null")
+                    .putCustomAttribute("MAC Address", appState.getMacAddress() != null ? appState.getMacAddress() : "null"));
         }
 
         int color = ResourcesCompat.getColor(getResources(), alertType.getBackgroundColor(), null);
