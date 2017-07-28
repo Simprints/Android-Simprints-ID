@@ -18,28 +18,28 @@ public class FormatResult {
     final static private String confidenceKey = "confidence";
     final static private String tierKey = "tier";
 
-    final static private String ODK_FORMAT_V01 = "ODKv01";  //ToDo Move to libCommon
-    final static private String OdkSepV01 = " ";
+    final static private String ODK_RESULT_FORMAT_V01 = "ODKv01";  // TODO Move to LibSimprints
+    final static private String ODK_RESULT_FORMAT_SEPARATOR_V01 = " ";  // TODO Move to LibSimprints
 
     private interface attributeGetter {
         // called this apply so it has a similar signature to function in Java 8
         String apply(Identification identification );
     }
 
-    static private String constructSring(ArrayList<Identification> identifications, attributeGetter function){
+    static private String constructString(ArrayList<Identification> identifications, attributeGetter function){
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < identifications.size(); i++) {
             Identification id = identifications.get(i);
             sb.append(function.apply(id));
             if( i < identifications.size() - 1){
-                sb.append(OdkSepV01);
+                sb.append(ODK_RESULT_FORMAT_SEPARATOR_V01);
             }
         }
         return sb.toString();
     }
 
     static private boolean isODK( ){
-        return ODK_FORMAT_V01.equalsIgnoreCase(AppState.getInstance().getResultFormat());
+        return ODK_RESULT_FORMAT_V01.equalsIgnoreCase(AppState.getInstance().getResultFormat());
     }
 
     static public void put(Intent intent, Registration registration){
@@ -69,19 +69,19 @@ public class FormatResult {
 
         if( isODK()) {
             // a bit inefficient to run through the array x times but there will be <= 20 objects in there
-            String guids = constructSring(identifications, new attributeGetter() {
+            String guids = constructString(identifications, new attributeGetter() {
                 @Override
                 public String apply(Identification identification) {
                     return identification.getGuid();
                 }
             });
-            String confidences = constructSring(identifications, new attributeGetter() {
+            String confidences = constructString(identifications, new attributeGetter() {
                 @Override
                 public String apply(Identification identification) {
                     return Float.toString(identification.getConfidence());
                 }
             });
-            String tiers = constructSring(identifications, new attributeGetter() {
+            String tiers = constructString(identifications, new attributeGetter() {
                 @Override
                 public String apply(Identification identification) {
                     return identification.getTier().toString();
