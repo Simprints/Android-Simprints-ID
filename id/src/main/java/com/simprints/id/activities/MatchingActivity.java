@@ -17,6 +17,7 @@ import com.simprints.id.R;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
+import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.ResourceHelper;
@@ -352,8 +353,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                         Intent resultData;
                         resultData = new Intent(Constants.SIMPRINTS_IDENTIFY_INTENT);
-                        resultData.putExtra(Constants.SIMPRINTS_IDENTIFICATIONS, topCandidates);
-                        resultData.putExtra(Constants.SIMPRINTS_SESSION_ID, appState.getSessionId());
+                        FormatResult.put( resultData, topCandidates);
                         setResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                                 tier1Matches, tier2Matches, tier3Matches);
@@ -382,8 +382,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         // finish
                         Intent resultData;
                         resultData = new Intent(Constants.SIMPRINTS_VERIFY_INTENT);
-                        resultData.putExtra(Constants.SIMPRINTS_VERIFICATION, verification);
-                        resultData.putExtra(Constants.SIMPRINTS_SESSION_ID, appState.getSessionId());
+                        FormatResult.put(resultData, verification);
                         setResult(resultCode, resultData);
                         finish();
                         break;
