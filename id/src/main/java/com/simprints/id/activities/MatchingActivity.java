@@ -164,7 +164,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 resultText2.setVisibility(View.VISIBLE);
                 resultText2.setText(getStringPlural(MatchingActivity.this, R.string.tier2_matches_quantity_key, tier2Matches, tier2Matches));
             }
-            if (tier1Matches < 1 && tier2Matches < 1) {
+            if ((tier1Matches < 1 && tier2Matches < 1) || tier3Matches > 1) {
                 resultText3.setVisibility(View.VISIBLE);
                 resultText3.setText(getStringPlural(MatchingActivity.this, R.string.tier3_matches_quantity_key, tier3Matches, tier3Matches));
             }
