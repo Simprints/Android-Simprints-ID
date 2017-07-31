@@ -19,6 +19,7 @@ import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
+import com.simprints.id.tools.ResourceHelper;
 import com.simprints.id.tools.SharedPref;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DATA_ERROR;
@@ -39,6 +40,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import static com.simprints.id.tools.ResourceHelper.getStringPlural;
 import static com.simprints.id.tools.TierHelper.computeTier;
 
 public class MatchingActivity extends AppCompatActivity implements MatcherEventListener {
@@ -140,7 +142,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         }
 
         void setIdentificationProgressMatchingStart(int matchSize) {
-            progressText1.setText(getResources().getQuantityString(R.plurals.loaded_candidates, matchSize, matchSize));
+            progressText1.setText(getStringPlural(MatchingActivity.this, R.string.loaded_candidates_quantity_key, matchSize, matchSize));
             progressText2.setText(R.string.matching_fingerprints);
             setProgress(50);
         }
@@ -150,20 +152,20 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
             setProgress(90);
         }
 
-        void setIdentificationProgressFinished(int returnSize, int veryGoodMatches, int goodMatches, int matches) {
-            progressText2.setText(getResources().getQuantityString(R.plurals.returned_results, (short) 1, 1));
+        void setIdentificationProgressFinished(int returnSize, int tier1Matches, int tier2Matches, int tier3Matches) {
+            progressText2.setText(getStringPlural(MatchingActivity.this, R.string.returned_results_quantity_key, returnSize, returnSize));
 
-            if (veryGoodMatches > 0) {
+            if (tier1Matches > 0) {
                 resultText1.setVisibility(View.VISIBLE);
-                resultText1.setText(getResources().getQuantityString(R.plurals.very_good_match, 1, 1));
+                resultText1.setText(getStringPlural(MatchingActivity.this, R.string.tier1_matches_quantity_key, tier1Matches, tier1Matches));
             }
-            if (goodMatches > 0) {
+            if (tier2Matches > 0) {
                 resultText2.setVisibility(View.VISIBLE);
-                resultText2.setText(getResources().getQuantityString(R.plurals.good_match, 1, 1));
+                resultText2.setText(getStringPlural(MatchingActivity.this, R.string.tier2_matches_quantity_key, tier2Matches, tier2Matches));
             }
-            if (veryGoodMatches < 1 && goodMatches < 1) {
+            if (tier1Matches < 1 && tier2Matches < 1) {
                 resultText3.setVisibility(View.VISIBLE);
-                resultText3.setText(getResources().getQuantityString(R.plurals.match, 1, 1));
+                resultText3.setText(getStringPlural(MatchingActivity.this, R.string.tier3_matches_quantity_key, tier3Matches, tier3Matches));
             }
             setProgress(100);
 
@@ -331,19 +333,19 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         }
 
                         // finish
-                        int veryGoodMatches = 0;
-                        int goodMatches = 0;
-                        int matches = 0;
+                        int tier1Matches = 0;
+                        int tier2Matches = 0;
+                        int tier3Matches = 0;
                         for (Identification identification : topCandidates) {
                             switch (identification.getTier()) {
                                 case TIER_1:
-                                    veryGoodMatches++;
+                                    tier1Matches++;
                                     break;
                                 case TIER_2:
-                                    goodMatches++;
+                                    tier2Matches++;
                                     break;
                                 case TIER_3:
-                                    matches++;
+                                    tier3Matches++;
                                     break;
                             }
                         }
@@ -354,7 +356,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         resultData.putExtra(Constants.SIMPRINTS_SESSION_ID, appState.getSessionId());
                         setResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
-                                veryGoodMatches, goodMatches, matches);
+                                tier1Matches, tier2Matches, tier3Matches);
                         break;
                     }
                     case VERIFY: {
