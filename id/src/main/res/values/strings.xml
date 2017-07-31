@@ -109,6 +109,10 @@
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
     <string name="please_wait">Please wait while we proceed to identification</string>
+    <!-- Loading text -->
+    <string name="loading_candidates">Loading candidates…</string>
+    <string name="matching_fingerprints">Matching fingerprints…</string>
+    <string name="returning_results">Returning results…</string>
 
 
     <!-- AlertActivity : the Simprints ID error message screen -->
