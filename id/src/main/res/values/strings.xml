@@ -111,22 +111,23 @@
     <string name="please_wait">Please wait while we proceed to identification</string>
     <!-- Loading text -->
     <string name="loading_candidates">Loading candidates…</string>
-    <string name="loaded_candidates_quantity_key" translatable="false">loaded_candidates_</string>
+    <string name="loaded_candidates_quantity_key" translatable="false">loaded_candidates</string>
     <string name="loaded_candidates_one">Loaded %d candidate.</string>
     <string name="loaded_candidates_other">Loaded %d candidates.</string>
     <string name="matching_fingerprints">Matching fingerprints…</string>
     <string name="returning_results">Returning results…</string>
-    <string name="returned_results_quantity_key" translatable="false">returned_results_</string>
+    <string name="returned_results_quantity_key" translatable="false">returned_results</string>
     <string name="returned_results_one">Returned %d result.</string>
     <string name="returned_results_other">Returned %d results.</string>
-    <string name="tier1_matches_quantity_key" translatable="false">very_good_matches_</string>
+    <string name="tier1_matches_quantity_key" translatable="false">tier1_matches</string>
     <string name="tier1_matches_zero">No very good matches</string>
     <string name="tier1_matches_one">%d very good match</string>
     <string name="tier1_matches_other">%d very good matches</string>
-    <string name="tier2_matches_quantity_key" translatable="false">good_matches_</string>
+    <string name="tier2_matches_quantity_key" translatable="false">tier2_matches</string>
     <string name="tier2_matches_zero">No good matches</string>
     <string name="tier2_matches_one">%d good match</string>
-    <string name="tier3_matches_quantity_key" translatable="false">matches_</string>
+    <string name="tier2_matches_other">%d good matches</string>
+    <string name="tier3_matches_quantity_key" translatable="false">tier3_matches</string>
     <string name="tier3_matches_zero">No matches</string>
     <string name="tier3_matches_one">%d match</string>
     <string name="tier3_matches_other">%d matches</string>

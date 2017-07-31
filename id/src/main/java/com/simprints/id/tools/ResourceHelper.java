@@ -77,13 +77,13 @@ public class ResourceHelper {
         Resources res = context.getResources();
 
         try {
-            String targetStringResourceName = res.getString(stringQuantityKey) + intToQuantity(quantity).toString();
+            String targetStringResourceName = res.getString(stringQuantityKey) + "_" + intToQuantity(quantity).toString();
             int targetStringResourceId = res.getIdentifier(targetStringResourceName, "string", context.getPackageName());
             return res.getString(targetStringResourceId, values);
 
         } catch (Resources.NotFoundException e) {
             // If we can't find the resource, try instead to find the "other" version
-            String targetStringResourceName = res.getString(stringQuantityKey) + QUANTITY.OTHER.toString();
+            String targetStringResourceName = res.getString(stringQuantityKey) + "_" + QUANTITY.OTHER.toString();
             int targetStringResourceId = res.getIdentifier(targetStringResourceName, "string", context.getPackageName());
             return res.getString(targetStringResourceId, values);
         }
