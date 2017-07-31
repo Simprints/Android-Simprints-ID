@@ -46,6 +46,7 @@ import com.simprints.id.tools.SharedPref;
 import com.simprints.id.tools.TimeoutBar;
 import com.simprints.id.tools.Vibrate;
 import com.simprints.id.tools.ViewPagerCustom;
+import com.simprints.id.tools.FormatResult;
 import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
@@ -519,7 +520,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
-                resultData.putExtra(Constants.SIMPRINTS_REGISTRATION, registrationResult);
+                FormatResult.put( resultData, registrationResult);
                 setResult(RESULT_OK, resultData);
                 finish();
             } else {
