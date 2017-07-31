@@ -1,13 +1,15 @@
 package com.simprints.id.activities;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
+import android.os.HandlerThread;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.crash.FirebaseCrash;
@@ -28,7 +30,6 @@ import com.simprints.libmatcher.Progress;
 import com.simprints.libmatcher.sourceafis.MatcherEventListener;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.Identification;
-import com.simprints.libsimprints.Tier;
 import com.simprints.libdata.tools.Constants.GROUP;
 import com.simprints.libsimprints.Verification;
 
@@ -37,6 +38,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+
+import static com.simprints.id.tools.TierHelper.computeTier;
 
 public class MatchingActivity extends AppCompatActivity implements MatcherEventListener {
 
@@ -49,6 +52,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     private List<Person> candidates = new ArrayList<>();
     private List<Float> scores = new ArrayList<>();
     private Handler handler = new Handler();
+    private OnMatchStartHandlerThread onMatchStartHandlerThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +65,29 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         Bundle extras = getIntent().getExtras();
         probe = extras.getParcelable("Person");
 
-        onMatcherStart(appState.getCallout());
+        switch (appState.getCallout()) {
+            case IDENTIFY:
+                final Runnable onMatchStartRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        onIdentifyStart();
+                    }
+                };
+
+                onMatchStartHandlerThread = new OnMatchStartHandlerThread("onMatchStartHandlerThread");
+                onMatchStartHandlerThread.start();
+                onMatchStartHandlerThread.prepareHandler();
+                onMatchStartHandlerThread.postTask(onMatchStartRunnable);
+                matchingView.setIdentificationProgressLoadingStart();
+                break;
+            case VERIFY:
+                matchingView.setVerificationProgress();
+                onVerifyStart();
+                break;
+            default:
+                FirebaseCrash.report(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
+                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+        }
     }
 
     private void initViews() {
@@ -75,24 +101,84 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     private class MatchingView {
 
         private ProgressBar progressBar;
+        private TextView progressText1;
+        private TextView progressText2;
+        private TextView resultText1;
+        private TextView resultText2;
+        private TextView resultText3;
 
         MatchingView() {
-            progressBar = initProgressBar();
+            initProgressBar();
+            initProgressTextViews();
         }
 
-        private ProgressBar initProgressBar() {
-            ProgressBar progressBar = (ProgressBar) findViewById(R.id.pb_identification);
-            int progressBarColor = ContextCompat.getColor(MatchingActivity.this, R.color.simprints_blue);
-            progressBar.getIndeterminateDrawable().setColorFilter(
-                    progressBarColor, PorterDuff.Mode.SRC_IN);
-            progressBar.getProgressDrawable().setColorFilter(
-                    progressBarColor, PorterDuff.Mode.SRC_IN);
-            return progressBar;
+        private void initProgressBar() {
+            progressBar = (ProgressBar) findViewById(R.id.pb_identification);
+        }
+
+        private void initProgressTextViews() {
+            progressText1 = (TextView) findViewById(R.id.tv_matchingProgressStatus1);
+            progressText2 = (TextView) findViewById(R.id.tv_matchingProgressStatus2);
+            resultText1 = (TextView) findViewById(R.id.tv_matchingResultStatus1);
+            resultText2 = (TextView) findViewById(R.id.tv_matchingResultStatus2);
+            resultText3 = (TextView) findViewById(R.id.tv_matchingResultStatus3);
         }
 
         void setProgress(int progress) {
-            progressBar.setProgress(progress);
+            ObjectAnimator.ofInt(progressBar, "progress", progressBar.getProgress(), progress)
+                    .setDuration(progress * 10)
+                    .start();
         }
+
+        void setVerificationProgress() {
+            setProgress(100);
+        }
+
+        void setIdentificationProgressLoadingStart() {
+            progressText1.setText(R.string.loading_candidates);
+            setProgress(25);
+        }
+
+        void setIdentificationProgressMatchingStart(int matchSize) {
+            progressText1.setText(getResources().getQuantityString(R.plurals.loaded_candidates, matchSize, matchSize));
+            progressText2.setText(R.string.matching_fingerprints);
+            setProgress(50);
+        }
+
+        void setIdentificationProgressReturningStart() {
+            progressText2.setText(R.string.returning_results);
+            setProgress(90);
+        }
+
+        void setIdentificationProgressFinished(int returnSize, int veryGoodMatches, int goodMatches, int matches) {
+            progressText2.setText(getResources().getQuantityString(R.plurals.returned_results, (short) 1, 1));
+
+            if (veryGoodMatches > 0) {
+                resultText1.setVisibility(View.VISIBLE);
+                resultText1.setText(getResources().getQuantityString(R.plurals.very_good_match, 1, 1));
+            }
+            if (goodMatches > 0) {
+                resultText2.setVisibility(View.VISIBLE);
+                resultText2.setText(getResources().getQuantityString(R.plurals.good_match, 1, 1));
+            }
+            if (veryGoodMatches < 1 && goodMatches < 1) {
+                resultText3.setVisibility(View.VISIBLE);
+                resultText3.setText(getResources().getQuantityString(R.plurals.match, 1, 1));
+            }
+            setProgress(100);
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    finish();
+                }
+            }, 3000);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void launchAlert(ALERT_TYPE alertType) {
@@ -101,92 +187,106 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
-    private void onMatcherStart(Callout callout) {
-        // Do different things depending on the callout
-        switch (callout) {
-            case IDENTIFY:
-                final GROUP matchGroup = new SharedPref(getApplicationContext()).getMatchGroup();
+    private class OnMatchStartHandlerThread extends HandlerThread {
 
-                appState.getData().loadPeople(candidates, matchGroup, new DataCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Log.d(MatchingActivity.this, String.format(Locale.UK,
-                                "Successfully loaded %d candidates", candidates.size()));
+        Handler handler;
 
-                        int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
-
-                        final LibMatcher.MATCHER_TYPE matcher_type;
-
-                        switch (matcherType) {
-                            case 0:
-                                matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
-                                break;
-                            case 1:
-                                matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS_IDENTIFY;
-                                break;
-                            default:
-                                matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
-                        }
-
-                        // Start lengthy operation in a background thread
-                        new Thread(new Runnable() {
-                            public void run() {
-                                LibMatcher matcher = new LibMatcher(probe, candidates,
-                                        matcher_type, scores, MatchingActivity.this, 1);
-                                matcher.start();
-                            }
-                        }).start();
-                    }
-
-                    @Override
-                    public void onFailure(DATA_ERROR data_error) {
-                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onCreate()case:IDENTIFY"));
-                        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                    }
-                });
-                break;
-            case VERIFY:
-                final String guid = appState.getGuid();
-
-                appState.getData().loadPerson(candidates, guid, new DataCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Log.d(MatchingActivity.this, "Successfully loaded candidate");
-
-                        int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
-
-                        final LibMatcher.MATCHER_TYPE matcher_type;
-
-                        switch (matcherType) {
-                            case 0:
-                                matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY;
-                                break;
-                            case 1:
-                                matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS_VERIFY;
-                                break;
-                            default:
-                                matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY;
-                        }
-
-                        // Start lengthy operation in a background thread
-                        new Thread(new Runnable() {
-                            public void run() {
-                                LibMatcher matcher = new LibMatcher(probe, candidates,
-                                        matcher_type, scores, MatchingActivity.this, 1);
-                                matcher.start();
-                            }
-                        }).start();
-
-                    }
-
-                    @Override
-                    public void onFailure(DATA_ERROR data_error) {
-                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onCreate()case:VERIFY"));
-                        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                    }
-                });
-                break;
+        OnMatchStartHandlerThread(String name) {
+            super(name);
         }
+
+        void postTask(Runnable task) {
+            handler.post(task);
+        }
+
+        void prepareHandler() {
+            handler = new Handler(getLooper());
+        }
+    }
+
+    private void onIdentifyStart() {
+        final GROUP matchGroup = new SharedPref(getApplicationContext()).getMatchGroup();
+
+        appState.getData().loadPeople(candidates, matchGroup, new DataCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d(MatchingActivity.this, String.format(Locale.UK,
+                        "Successfully loaded %d candidates", candidates.size()));
+                matchingView.setIdentificationProgressMatchingStart(candidates.size());
+
+                int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
+
+                final LibMatcher.MATCHER_TYPE matcher_type;
+
+                switch (matcherType) {
+                    case 0:
+                        matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
+                        break;
+                    case 1:
+                        matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS_IDENTIFY;
+                        break;
+                    default:
+                        matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY;
+                }
+
+                // Start lengthy operation in a background thread
+                new Thread(new Runnable() {
+                    public void run() {
+                        LibMatcher matcher = new LibMatcher(probe, candidates,
+                                matcher_type, scores, MatchingActivity.this, 1);
+                        matcher.start();
+                    }
+                }).start();
+            }
+
+            @Override
+            public void onFailure(DATA_ERROR data_error) {
+                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onMatcherStart()case:IDENTIFY"));
+                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+            }
+        });
+    }
+
+    private void onVerifyStart() {
+        final String guid = appState.getGuid();
+
+        appState.getData().loadPerson(candidates, guid, new DataCallback() {
+            @Override
+            public void onSuccess() {
+                Log.d(MatchingActivity.this, "Successfully loaded candidate");
+
+                int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
+
+                final LibMatcher.MATCHER_TYPE matcher_type;
+
+                switch (matcherType) {
+                    case 0:
+                        matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY;
+                        break;
+                    case 1:
+                        matcher_type = LibMatcher.MATCHER_TYPE.SOURCEAFIS_VERIFY;
+                        break;
+                    default:
+                        matcher_type = LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY;
+                }
+
+                // Start lengthy operation in a background thread
+                new Thread(new Runnable() {
+                    public void run() {
+                        LibMatcher matcher = new LibMatcher(probe, candidates,
+                                matcher_type, scores, MatchingActivity.this, 1);
+                        matcher.start();
+                    }
+                }).start();
+
+            }
+
+            @Override
+            public void onFailure(DATA_ERROR data_error) {
+                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onCreate()case:VERIFY"));
+                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+            }
+        });
     }
 
     @Override
@@ -200,6 +300,8 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 Callout callout = appState.getCallout();
                 switch (callout) {
                     case IDENTIFY: {
+                        onMatchStartHandlerThread.quit();
+                        matchingView.setIdentificationProgressReturningStart();
                         int nbOfResults = new SharedPref(getApplicationContext()).getReturnIdCountInt();
 
                         ArrayList<Identification> topCandidates = new ArrayList<>();
@@ -229,11 +331,30 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         }
 
                         // finish
+                        int veryGoodMatches = 0;
+                        int goodMatches = 0;
+                        int matches = 0;
+                        for (Identification identification : topCandidates) {
+                            switch (identification.getTier()) {
+                                case TIER_1:
+                                    veryGoodMatches++;
+                                    break;
+                                case TIER_2:
+                                    goodMatches++;
+                                    break;
+                                case TIER_3:
+                                    matches++;
+                                    break;
+                            }
+                        }
+
                         Intent resultData;
                         resultData = new Intent(Constants.SIMPRINTS_IDENTIFY_INTENT);
                         resultData.putExtra(Constants.SIMPRINTS_IDENTIFICATIONS, topCandidates);
                         resultData.putExtra(Constants.SIMPRINTS_SESSION_ID, appState.getSessionId());
                         setResult(RESULT_OK, resultData);
+                        matchingView.setIdentificationProgressFinished(topCandidates.size(),
+                                veryGoodMatches, goodMatches, matches);
                         break;
                     }
                     case VERIFY: {
@@ -262,10 +383,10 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         resultData.putExtra(Constants.SIMPRINTS_VERIFICATION, verification);
                         resultData.putExtra(Constants.SIMPRINTS_SESSION_ID, appState.getSessionId());
                         setResult(resultCode, resultData);
+                        finish();
                         break;
                     }
                 }
-                finish();
                 break;
             }
         }
@@ -279,19 +400,5 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 matchingView.setProgress(progress.getProgress());
             }
         });
-    }
-
-    private Tier computeTier(float score) {
-        if (score < 20) {
-            return Tier.TIER_5;
-        } else if (score < 35) {
-            return Tier.TIER_4;
-        } else if (score < 50) {
-            return Tier.TIER_3;
-        } else if (score < 75) {
-            return Tier.TIER_2;
-        } else {
-            return Tier.TIER_1;
-        }
     }
 }
