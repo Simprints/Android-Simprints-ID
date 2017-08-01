@@ -392,6 +392,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         }
     }
 
+    // TODO Remove or fix this
     @Override
     public void onMatcherProgress(final Progress progress) {
         handler.post(new Runnable() {

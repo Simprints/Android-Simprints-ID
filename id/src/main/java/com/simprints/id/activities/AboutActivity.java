@@ -2,8 +2,8 @@ package com.simprints.id.activities;
 
 
 import android.app.ProgressDialog;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,28 +18,31 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.ViewHelper;
+import com.simprints.libdata.DATA_ERROR;
+import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.tools.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class AboutActivity extends AppCompatActivity {
 
     private StatisticsView statisticsView;
     private RecoveryView recoveryView;
 
+    private AppState appState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initViews();
 
-        AppState appState = AppState.getInstance();
+        appState = AppState.getInstance();
 
         statisticsView.setVersionData(
-                appState.getAppVersion() != null? appState.getAppVersion() : "null",
+                appState.getAppVersion() != null ? appState.getAppVersion() : "null",
                 InternalConstants.LIBSIMPRINTS_VERSION,
-                appState.getHardwareVersion() > -1? String.valueOf(appState.getHardwareVersion()) : "null");
+                appState.getHardwareVersion() > -1 ? String.valueOf(appState.getHardwareVersion()) : "null");
 
         statisticsView.setDbCountData(
                 Long.toString(appState.getData().getPeopleCount(Constants.GROUP.USER)),
@@ -173,11 +176,17 @@ public class AboutActivity extends AppCompatActivity {
 
     private void recoverDb() {
         recoveryView.setStartRecovering();
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
+
+        appState.getData().recoverRealmDb("db-7.json", Constants.GROUP.GLOBAL, new DataCallback() {
+            @Override
+            public void onSuccess() {
                 recoveryView.setFinishRecovering();
             }
-        }, 3000);
+
+            @Override
+            public void onFailure(DATA_ERROR data_error) {
+                recoveryView.setFinishRecovering();
+            }
+        });
     }
 }
