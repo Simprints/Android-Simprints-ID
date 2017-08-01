@@ -20,7 +20,6 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
-import com.simprints.id.tools.ResourceHelper;
 import com.simprints.id.tools.SharedPref;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DATA_ERROR;
@@ -244,7 +243,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onMatcherStart()case:IDENTIFY"));
+                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
@@ -286,7 +285,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onCreate()case:VERIFY"));
+                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onVerifyStart()"));
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });

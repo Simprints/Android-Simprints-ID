@@ -1,103 +1,163 @@
 package com.simprints.id.activities;
 
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
+import com.simprints.id.tools.ViewHelper;
 import com.simprints.libdata.tools.Constants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class AboutActivity extends AppCompatActivity {
 
-//    private ProgressDialog ccResolverDialog;
-    private AppState appState;
+    private StatisticsView statisticsView;
+    private RecoveryView recoveryView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initViews();
+
+        AppState appState = AppState.getInstance();
+
+        statisticsView.setVersionData(
+                appState.getAppVersion() != null? appState.getAppVersion() : "null",
+                InternalConstants.LIBSIMPRINTS_VERSION,
+                appState.getHardwareVersion() > -1? String.valueOf(appState.getHardwareVersion()) : "null");
+
+        statisticsView.setDbCountData(
+                Long.toString(appState.getData().getPeopleCount(Constants.GROUP.USER)),
+                Long.toString(appState.getData().getPeopleCount(Constants.GROUP.MODULE)),
+                Long.toString(appState.getData().getPeopleCount(Constants.GROUP.GLOBAL)));
+
+        recoveryView.registerRecoverDbListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recoverDb();
+            }
+        });
+    }
+
+    private void initViews() {
         getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
                 getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_about);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_about);
-        setSupportActionBar(toolbar);
-
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.show();
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-
-        appState = AppState.getInstance();
-
-        String version = "";
-        if (appState.getAppVersion() != null) {
-            version = appState.getAppVersion();
-        }
-
-        ((TextView) findViewById(R.id.appVersionTextView)).setText(version);
-
-        ((TextView) findViewById(R.id.libSimprintsVersionTextView))
-                .setText(InternalConstants.LIBSIMPRINTS_VERSION);
-
-        final AppState appState = AppState.getInstance();
-        short firmwareVersion = 0;
-        try {
-            firmwareVersion = appState.getHardwareVersion();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        ((TextView) findViewById(R.id.firmwareVersionTextView)).setText(
-                String.valueOf(firmwareVersion));
-
-//        ccResolverDialog = new ProgressDialog(this);
-//        ccResolverDialog.setIndeterminate(true);
-//        ccResolverDialog.setCanceledOnTouchOutside(false);
-//        ccResolverDialog.setMessage("Resolving Database...");
-//
-//        findViewById(R.id.bt_resolveCc).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                ccResolverDialog.show();
-//                appState.getData().resolveCommCare(getApplicationContext().getContentResolver(),
-//                        new ResultListener() {
-//                            @Override
-//                            public void onSuccess() {
-//                                ccResolverDialog.cancel();
-//                            }
-//
-//                            @Override
-//                            public void onFailure(DATA_ERROR data_error) {
-//                                ccResolverDialog.cancel();
-//                            }
-//                        });
-//            }
-//        });
+        new MasterView();
+        statisticsView = new StatisticsView();
+        recoveryView = new RecoveryView();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        ((TextView) findViewById(R.id.tv_userDbCount))
-                .setText((Long.toString(appState.getData()
-                        .getPeopleCount(Constants.GROUP.USER))));
-        ((TextView) findViewById(R.id.tv_moduleDbCount))
-                .setText((Long.toString(appState.getData()
-                        .getPeopleCount(Constants.GROUP.MODULE))));
-        ((TextView) findViewById(R.id.tv_globalDbCount))
-                .setText((Long.toString(appState.getData()
-                        .getPeopleCount(Constants.GROUP.GLOBAL))));
+    private class MasterView {
+
+        MasterView() {
+            initToolbar();
+            initActionBar();
+        }
+
+        private void initToolbar() {
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_about);
+            setSupportActionBar(toolbar);
+        }
+
+        private void initActionBar() {
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.show();
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
+        }
+    }
+
+    private class StatisticsView {
+
+        TextView tv_appVersion;
+        TextView tv_libsimprintsVersion;
+        TextView tv_scannerVersion;
+
+        TextView tv_userDbCount;
+        TextView tv_moduleDbCount;
+        TextView tv_globalDbCount;
+
+        StatisticsView() {
+            initTextViews();
+        }
+
+        private void initTextViews() {
+            tv_appVersion = (TextView) findViewById(R.id.tv_appVersion);
+            tv_libsimprintsVersion = (TextView) findViewById(R.id.tv_libsimprintsVersion);
+            tv_scannerVersion = (TextView) findViewById(R.id.tv_scannerVersion);
+
+            tv_userDbCount = (TextView) findViewById(R.id.tv_userDbCount);
+            tv_moduleDbCount = (TextView) findViewById(R.id.tv_moduleDbCount);
+            tv_globalDbCount = (TextView) findViewById(R.id.tv_globalDbCount);
+        }
+
+        void setVersionData(String appVersion, String libsimprintsVersion, String scannerVersion) {
+            tv_appVersion.setText(appVersion);
+            tv_libsimprintsVersion.setText(libsimprintsVersion);
+            tv_scannerVersion.setText(scannerVersion);
+        }
+
+        void setDbCountData(String userCount, String moduleCount, String globalCount) {
+            tv_userDbCount.setText(userCount);
+            tv_moduleDbCount.setText(moduleCount);
+            tv_globalDbCount.setText(globalCount);
+        }
+    }
+
+    private class RecoveryView {
+
+        private Button recoverDbButton;
+        private List<View.OnClickListener> recoverDbButtonListeners;
+        private ProgressDialog recoveryDialog;
+
+        RecoveryView() {
+            initRecoverDbButton();
+            initRecoverDialog();
+        }
+
+        private void initRecoverDbButton() {
+            recoverDbButton = (Button) findViewById(R.id.bt_recoverDb);
+            recoverDbButtonListeners = new ArrayList<>();
+            ViewHelper.registerOnClickButtonListeners(recoverDbButton, recoverDbButtonListeners);
+        }
+
+        private void initRecoverDialog() {
+            recoveryDialog = new ProgressDialog(AboutActivity.this);
+            recoveryDialog.setIndeterminate(true);
+            recoveryDialog.setCanceledOnTouchOutside(false);
+        }
+
+        void registerRecoverDbListener(View.OnClickListener onClickListener) {
+            recoverDbButtonListeners.add(onClickListener);
+        }
+
+        void setStartRecovering() {
+            recoveryDialog.setMessage("Resolving Database...");
+            recoveryDialog.show();
+        }
+
+        void setFinishRecovering() {
+            recoveryDialog.cancel();
+        }
     }
 
     @Override
@@ -109,5 +169,15 @@ public class AboutActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void recoverDb() {
+        recoveryView.setStartRecovering();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                recoveryView.setFinishRecovering();
+            }
+        }, 3000);
     }
 }
