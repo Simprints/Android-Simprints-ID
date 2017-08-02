@@ -35,7 +35,7 @@
             android:text="@string/about_app_version" />
 
         <TextView
-            android:id="@+id/appVersionTextView"
+            android:id="@+id/tv_appVersion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -57,7 +57,7 @@
             android:text="@string/about_libsimprints_version" />
 
         <TextView
-            android:id="@+id/libSimprintsVersionTextView"
+            android:id="@+id/tv_libsimprintsVersion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -79,7 +79,7 @@
             android:text="@string/about_scanner_version" />
 
         <TextView
-            android:id="@+id/firmwareVersionTextView"
+            android:id="@+id/tv_scannerVersion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -162,9 +162,10 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/bt_resolveCc"
+        android:id="@+id/bt_recoverDb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/resolve_db" />
+        android:padding="10dp"
+        android:text="@string/recover_db" />
 
 </LinearLayout>

@@ -179,7 +179,13 @@
     <string name="about_libsimprints_version">LibSimprints Version:</string>
     <string name="about_scanner_version">Scanner Version:</string>
     <!-- Button Labels -->
-    <string name="resolve_db" translatable="false">Resolve DB</string>
+    <string name="recover_db" translatable="false">Recover DB</string>
+    <!-- Recovery dialogs -->
+    <string name="recovering_db">Recovering Database… \nThis may take a while.</string>
+    <string name="error">Error</string>
+    <string name="error_recovery_message">An error occurred while uploading the recovery file.</string>
+    <string name="success_recovery_message">Recovery file uploaded successfully.</string>
+    <string name="dismiss">Dismiss</string>
 
 
     <!-- SettingsActivity : the detailed settings screen -->
