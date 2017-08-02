@@ -1,9 +1,12 @@
 package com.simprints.id.activities;
 
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.net.Uri;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +16,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
@@ -27,10 +31,13 @@ import java.util.List;
 
 public class AboutActivity extends AppCompatActivity {
 
+    private static boolean recoveryRunning = false;
+
     private StatisticsView statisticsView;
     private RecoveryView recoveryView;
 
     private AppState appState;
+    private RecoverDbHandlerThread recoverDbHandlerThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +56,29 @@ public class AboutActivity extends AppCompatActivity {
                 Long.toString(appState.getData().getPeopleCount(Constants.GROUP.MODULE)),
                 Long.toString(appState.getData().getPeopleCount(Constants.GROUP.GLOBAL)));
 
+        if (recoveryRunning) recoveryView.setRecoverDbUnavailable();
+        else recoveryView.setRecoverDbAvailable();
+
+        final Runnable recoverDbRunnable = new Runnable() {
+            @Override
+            public void run() {
+                recoverDb();
+            }
+        };
+
         recoveryView.registerRecoverDbListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recoverDb();
+                recoveryRunning = true;
+                recoveryView.setRecoverDbUnavailable();
+                recoveryView.setStartRecovering();
+                recoverDbHandlerThread = new RecoverDbHandlerThread("recoverDbHandlerThread");
+                recoverDbHandlerThread.start();
+                recoverDbHandlerThread.prepareHandler();
+                recoverDbHandlerThread.postTask(recoverDbRunnable);
             }
         });
+
     }
 
     private void initViews() {
@@ -131,10 +155,12 @@ public class AboutActivity extends AppCompatActivity {
         private Button recoverDbButton;
         private List<View.OnClickListener> recoverDbButtonListeners;
         private ProgressDialog recoveryDialog;
+        private AlertDialog errorDialog;
+        private AlertDialog successDialog;
 
         RecoveryView() {
             initRecoverDbButton();
-            initRecoverDialog();
+            initDialogs();
         }
 
         private void initRecoverDbButton() {
@@ -143,23 +169,57 @@ public class AboutActivity extends AppCompatActivity {
             ViewHelper.registerOnClickButtonListeners(recoverDbButton, recoverDbButtonListeners);
         }
 
-        private void initRecoverDialog() {
+        private void initDialogs() {
             recoveryDialog = new ProgressDialog(AboutActivity.this);
             recoveryDialog.setIndeterminate(true);
             recoveryDialog.setCanceledOnTouchOutside(false);
+
+            errorDialog = new AlertDialog.Builder(AboutActivity.this)
+                    .setTitle(getString(R.string.error))
+                    .setMessage(getString(R.string.error_recovery_message))
+                    .setNegativeButton(R.string.dismiss, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).create();
+
+            successDialog = new AlertDialog.Builder(AboutActivity.this)
+                    .setMessage(getString(R.string.success_recovery_message))
+                    .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).create();
         }
 
         void registerRecoverDbListener(View.OnClickListener onClickListener) {
             recoverDbButtonListeners.add(onClickListener);
         }
 
+        void setRecoverDbAvailable() {
+            recoverDbButton.setEnabled(true);
+        }
+
+        void setRecoverDbUnavailable() {
+            recoverDbButton.setEnabled(false);
+        }
+
         void setStartRecovering() {
-            recoveryDialog.setMessage("Resolving Database...");
+            recoveryDialog.setMessage(getString(R.string.recovering_db));
             recoveryDialog.show();
         }
 
-        void setFinishRecovering() {
+        void setSuccessRecovering() {
             recoveryDialog.cancel();
+            successDialog.show();
+        }
+
+        void setErrorRecovering(String errorMessage) {
+            recoveryDialog.cancel();
+            if (errorMessage != null) errorDialog.setMessage(errorMessage);
+            errorDialog.show();
         }
     }
 
@@ -175,18 +235,52 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     private void recoverDb() {
-        recoveryView.setStartRecovering();
-
-        appState.getData().recoverRealmDb("db-7.json", Constants.GROUP.GLOBAL, new DataCallback() {
+        String androidId = appState.getDeviceId() != null? appState.getDeviceId() : "no-device-id";
+        appState.getData().recoverRealmDb(androidId + "_" + Long.toString(System.currentTimeMillis()) + ".json",
+                androidId,
+                Constants.GROUP.GLOBAL,
+                BuildConfig.DEBUG,
+                new DataCallback() {
             @Override
             public void onSuccess() {
-                recoveryView.setFinishRecovering();
+                recoverDbHandlerThread.quit();
+                recoveryRunning = false;
+                try {
+                    recoveryView.setSuccessRecovering();
+                    recoveryView.setRecoverDbAvailable();
+                } catch (WindowManager.BadTokenException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                recoveryView.setFinishRecovering();
+                recoverDbHandlerThread.quit();
+                recoveryRunning = false;
+                try {
+                    recoveryView.setErrorRecovering(data_error.details());
+                    recoveryView.setRecoverDbAvailable();
+                } catch (WindowManager.BadTokenException e) {
+                    e.printStackTrace();
+                }
             }
         });
+    }
+
+    private class RecoverDbHandlerThread extends HandlerThread {
+
+        Handler handler;
+
+        RecoverDbHandlerThread(String name) {
+            super(name);
+        }
+
+        void postTask(Runnable task) {
+            handler.post(task);
+        }
+
+        void prepareHandler() {
+            handler = new Handler(getLooper());
+        }
     }
 }
