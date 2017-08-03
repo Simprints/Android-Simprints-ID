@@ -83,7 +83,7 @@ public class AppState {
             moduleId = extras.getString(Constants.SIMPRINTS_MODULE_ID);
             metadataString = extras.getString(Constants.SIMPRINTS_METADATA);
             callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
-            resultFormat = extras.getString("resultFormat");    // TODO Move to LibSimprints
+            resultFormat = extras.getString(Constants.SIMPRINTS_RESULT_FORMAT);
         }
         if (callout != null) {
             switch (callout) {
