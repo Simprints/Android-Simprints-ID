@@ -325,13 +325,13 @@ public class Setup {
                         Person probe = new Person(guid);
                         if (appState.getData().isConnected()) {
                             // We've synced with the online db and they're not in the db
-                            appState.getData().saveVerification(probe, null,
+                            appState.getData().saveVerification(probe, guid, null,
                                     appState.getSessionId(),
                                     VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE);
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
                         } else {
                             // We're offline but might find the person if we sync
-                            appState.getData().saveVerification(probe, null,
+                            appState.getData().saveVerification(probe, guid, null,
                                     appState.getSessionId(),
                                     VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE);
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);

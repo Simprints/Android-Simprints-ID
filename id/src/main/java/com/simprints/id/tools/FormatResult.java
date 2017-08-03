@@ -9,10 +9,6 @@ import com.simprints.libsimprints.Verification;
 
 import java.util.ArrayList;
 
-/**
- * Created by james on 21/07/2017.
- */
-
 public class FormatResult {
     final static private String guidKey = "guid";
     final static private String confidenceKey = "confidence";
