@@ -14,9 +14,6 @@ public class FormatResult {
     final static private String confidenceKey = "confidence";
     final static private String tierKey = "tier";
 
-    final static private String ODK_RESULT_FORMAT_V01 = "ODKv01";  // TODO Move to LibSimprints
-    final static private String ODK_RESULT_FORMAT_SEPARATOR_V01 = " ";  // TODO Move to LibSimprints
-
     private interface attributeGetter {
         // called this apply so it has a similar signature to function in Java 8
         String apply(Identification identification );
@@ -28,14 +25,14 @@ public class FormatResult {
             Identification id = identifications.get(i);
             sb.append(function.apply(id));
             if( i < identifications.size() - 1){
-                sb.append(ODK_RESULT_FORMAT_SEPARATOR_V01);
+                sb.append(Constants.SIMPRINTS_ODK_RESULT_FORMAT_V01_SEPARATOR);
             }
         }
         return sb.toString();
     }
 
     static private boolean isODK( ){
-        return ODK_RESULT_FORMAT_V01.equalsIgnoreCase(AppState.getInstance().getResultFormat());
+        return Constants.SIMPRINTS_ODK_RESULT_FORMAT_V01.equalsIgnoreCase(AppState.getInstance().getResultFormat());
     }
 
     static public void put(Intent intent, Registration registration){
