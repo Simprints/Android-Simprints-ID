@@ -56,6 +56,7 @@ public class Analytics {
         bundle.putString("api_key", appState.getApiKey());
         bundle.putString("module_id", appState.getModuleId());
         bundle.putString("user_id", appState.getUserId());
+        bundle.putString("scanner_id", appState.getDeviceId() != null? appState.getDeviceId() : "null");
         firebaseAnalytics.logEvent("alert", bundle);
     }
 

@@ -329,7 +329,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         }
 
                         if (appState.getData() != null) {
-                            appState.getData().saveIdentification(probe, topCandidates, appState.getSessionId());
+                            appState.getData().saveIdentification(probe, candidates.size(), topCandidates, appState.getSessionId());
                         }
 
                         // finish
@@ -375,7 +375,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         }
 
                         if (appState.getData() != null) {
-                            appState.getData().saveVerification(probe, verification, appState.getSessionId(), guidExistsResult);
+                            appState.getData().saveVerification(probe, appState.getGuid(), verification, appState.getSessionId(), guidExistsResult);
                         }
 
                         // finish

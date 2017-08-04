@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
@@ -51,6 +52,7 @@ public class AppState {
 
     // Other attributes
     private String deviceId = null;
+    private String phoneModel = null;
     private String macAddress = null;
     private String scannerId = null;
     private short hardwareVersion = -1;
@@ -81,7 +83,7 @@ public class AppState {
             moduleId = extras.getString(Constants.SIMPRINTS_MODULE_ID);
             metadataString = extras.getString(Constants.SIMPRINTS_METADATA);
             callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
-            resultFormat = extras.getString("resultFormat");    // TODO Move to LibSimprints
+            resultFormat = extras.getString(Constants.SIMPRINTS_RESULT_FORMAT);
         }
         if (callout != null) {
             switch (callout) {
@@ -109,9 +111,17 @@ public class AppState {
             e.printStackTrace();
         }
 
+        try {
+            phoneModel = Build.MANUFACTURER
+                    + " " + Build.MODEL + " " + Build.VERSION.RELEASE
+                    + " " + Build.VERSION_CODES.class.getFields()[Build.VERSION.SDK_INT].getName();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+
         // Save attributes to firebase session, whether they are valid or not
         session = new fb_Session(Callout.toString(callout), apiKey, moduleId, userId, personGuid,
-                metadataString, deviceId, callingPackage, appVersion);
+                metadataString, deviceId, callingPackage, appVersion, phoneModel);
 
         // Check parameters
         if (callout == null)
