@@ -22,7 +22,7 @@
 
     <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
     <!-- Version Names -->
-    <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.11</string>
+    <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.12</string>
     <!-- App Titles -->
     <string name="simprints_label" translatable="false">Simprints</string>
     <string name="libsimprints_label" translatable="false">LibSimprints</string>
@@ -181,7 +181,7 @@
     <!-- Button Labels -->
     <string name="recover_db" translatable="false">Recover DB</string>
     <!-- Recovery dialogs -->
-    <string name="recovering_db">Recovering Database… \nThis may take a while.</string>
+    <string name="recovering_db">Recovering Database… \nThis will take a moment.</string>
     <string name="error">Error</string>
     <string name="error_recovery_message">An error occurred while uploading the recovery file.</string>
     <string name="success_recovery_message">Recovery file uploaded successfully.</string>
