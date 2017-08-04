@@ -22,7 +22,7 @@
 
     <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
     <!-- Version Names -->
-    <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.11</string>
+    <string name="front_libSimprints_version" translatable="false">LibSimprints: 1.0.12</string>
     <!-- App Titles -->
     <string name="simprints_label" translatable="false">Simprints</string>
     <string name="libsimprints_label" translatable="false">LibSimprints</string>
