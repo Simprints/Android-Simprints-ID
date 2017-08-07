@@ -3,9 +3,12 @@ package com.simprints.id;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.IdlingResource;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.text.format.DateUtils;
 import android.view.WindowManager;
 
 import com.simprints.id.activities.LaunchActivity;
@@ -20,6 +23,7 @@ import org.junit.runner.RunWith;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayingAtLeast;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 @RunWith(AndroidJUnit4.class)
@@ -28,6 +32,7 @@ public class IdentifyHappyPathTest {
     private static final String apiKey = "1b22a8e0-6e86-4d8b-92f7-905bd38ac1d5";
     private static final String userId = "1b22a8e0-6e86-4d8b-92f7-905bd38ac1d5";
     private static final String moduleId = "0";
+    private static IdlingResource idlingResource;
 
     @Rule
     public ActivityTestRule<LaunchActivity> launchActivityActivityTestRule = new ActivityTestRule<LaunchActivity>(LaunchActivity.class) {
@@ -46,6 +51,7 @@ public class IdentifyHappyPathTest {
 
     @Before
     public void setUp() {
+        idlingResource = new ElapsedTimeIdlingResource(DateUtils.SECOND_IN_MILLIS * 1);
         final LaunchActivity activity = launchActivityActivityTestRule.getActivity();
         Runnable wakeUpDevice = new Runnable() {
             public void run() {
@@ -55,6 +61,9 @@ public class IdentifyHappyPathTest {
             }
         };
         activity.runOnUiThread(wakeUpDevice);
+
+        // ...and wait
+        Espresso.registerIdlingResources(idlingResource);
     }
 
 
@@ -68,5 +77,7 @@ public class IdentifyHappyPathTest {
     }
 
     @After
-    public void cleanUp() {}
+    public void cleanUp() {
+        Espresso.unregisterIdlingResources(idlingResource);
+    }
 }
