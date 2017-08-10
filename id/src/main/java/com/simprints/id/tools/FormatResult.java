@@ -47,8 +47,8 @@ public class FormatResult {
     static public void put(Intent intent, Verification verification){
         if( isODK() ){
             intent.putExtra(guidKey, verification.getGuid());
-            intent.putExtra(confidenceKey, verification.getConfidence());
-            intent.putExtra(tierKey, verification.getTier());
+            intent.putExtra(confidenceKey, Float.toString(verification.getConfidence()));
+            intent.putExtra(tierKey, verification.getTier().toString());
         }
         else {
             intent.putExtra(Constants.SIMPRINTS_VERIFICATION, verification);
