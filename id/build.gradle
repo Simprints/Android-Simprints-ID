@@ -45,6 +45,7 @@ buildscript {
 
 repositories {
     mavenCentral()
+    maven { url "https://maven.google.com" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url 'https://maven.fabric.io/public' }
 }
@@ -60,9 +61,9 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics-ndk:1.1.4@aar') {
         transitive = true;
     }
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:appcompat-v7:25.4.0'
+    compile 'com.android.support:design:25.4.0'
+    compile 'com.android.support:support-v4:25.4.0'
     compile 'com.google.android.gms:play-services-location:10.2.4'
     compile 'com.google.android.gms:play-services-gcm:10.2.4'
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
@@ -79,7 +80,10 @@ dependencies {
     compile 'com.google.firebase:firebase-auth:10.2.4'
     compile 'com.google.firebase:firebase-config:10.2.4'
     testCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
+//    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
+//        exclude group: 'com.android.support', module: 'support-annotations'
+//    }
+    androidTestCompile('com.schibsted.spain:barista:1.7.0') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
 }
