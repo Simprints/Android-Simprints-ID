@@ -1,16 +1,15 @@
-package com.simprints.id;
+package com.simprints.id.happypath;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.Espresso;
-import android.support.test.espresso.IdlingResource;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.text.format.DateUtils;
 import android.view.WindowManager;
 
+import com.simprints.id.R;
 import com.simprints.id.activities.LaunchActivity;
 import com.simprints.libsimprints.Constants;
 
@@ -20,18 +19,22 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.TimeUnit;
+
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static com.schibsted.spain.barista.BaristaSleepActions.sleep;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class HappyPathEnrolTest {
+public class HappyPathIdentifyTest {
     private static final String apiKey = "1b22a8e0-6e86-4d8b-92f7-905bd38ac1d5";
     private static final String userId = "1b22a8e0-6e86-4d8b-92f7-905bd38ac1d5";
     private static final String moduleId = "0";
-    private static IdlingResource idlingResource;
 
     @Rule
     public ActivityTestRule<LaunchActivity> launchActivityActivityTestRule = new ActivityTestRule<LaunchActivity>(LaunchActivity.class) {
@@ -50,7 +53,6 @@ public class HappyPathEnrolTest {
 
     @Before
     public void setUp() {
-        idlingResource = new ElapsedTimeIdlingResource(DateUtils.SECOND_IN_MILLIS * 5);
         final LaunchActivity activity = launchActivityActivityTestRule.getActivity();
         Runnable wakeUpDevice = new Runnable() {
             public void run() {
@@ -61,22 +63,50 @@ public class HappyPathEnrolTest {
         };
         activity.runOnUiThread(wakeUpDevice);
 
-        // ...and wait
-        Espresso.registerIdlingResources(idlingResource);
     }
 
 
     /**
-     * LaunchActivity behaves
+     * SetupActivity:
+     * Wait for setup activity to finish loading. Once it has, click through to the next.
+     *
+     * MainActivity:
+     * Click scan. Wait for a good print. Click scan again. Wait for another good print.
+     * Click through.
      */
     @Test
-    public void setupActivityBehaves() {
-        onView(withText(R.string.short_consent))
+    public void successfulEnrol() {
+
+        onView(ViewMatchers.withText(R.string.short_consent))
                 .check(matches(isDisplayed()));
+
+        sleep(10, TimeUnit.SECONDS);
+
+        onView(withText(R.string.confirm_consent))
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        sleep(2, TimeUnit.SECONDS);
+
+        onView(withText(R.string.scan))
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        sleep(8, TimeUnit.SECONDS);
+
+        onView(withText(R.string.scan))
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        sleep(8, TimeUnit.SECONDS);
+
+        onView(withId(R.id.action_forward))
+                .check(matches(isDisplayed()))
+                .perform(click());
+
+        sleep(10);
     }
 
     @After
-    public void cleanUp() {
-        Espresso.unregisterIdlingResources(idlingResource);
-    }
+    public void cleanUp() {}
 }

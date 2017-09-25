@@ -13,9 +13,10 @@ commands = {
     'devices query': 'adb devices -l',
     'bluetooth on': 'adb -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.ON',
     'bluetooth off': 'adb -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.OFF',
-    'bluetooth pair': 'adb -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.PAIR -e '
-                      '"com.simprints.testutilities.bluetooth.extra.MAC_ADDRESS" "{1}"',
-    'bluetooth unpair': 'adb -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.UNPAIR -e '
+    'bluetooth pair': 'adb -s {0} shell am startservice --user 0 -a com.simprints.testutilities.bluetooth.action.PAIR '
+                      '-e "com.simprints.testutilities.bluetooth.extra.MAC_ADDRESS" "{1}"',
+    'bluetooth unpair': 'adb -s {0} shell am startservice --user 0 -a '
+                        'com.simprints.testutilities.bluetooth.action.UNPAIR -e '
                         '"com.simprints.testutilities.bluetooth.extra.MAC_ADDRESS" "{1}"',
     'wifi on': 'adb -s {0} shell am startservice -a com.simprints.testutilities.wifi.action.ON',
     'wifi off': 'adb -s {0} shell am startservice -a com.simprints.testutilities.wifi.action.OFF',
@@ -23,7 +24,7 @@ commands = {
     'run example tests': 'adb -s {0} shell am instrument -w com.simprints.testutilities.test/android.support.test'
                          '.runner.AndroidJUnitRunner ',
     'run tests': 'adb -s {0} shell am instrument -w '
-                 '-e class com.simprints.id.HappyPathEnrolTest'
+                 '-e class com.simprints.id.happypath.HappyPathEnrolTest'
                  ' com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner '
 }
 
@@ -231,7 +232,9 @@ class Run:
         for deviceStr in devicesStrs:
             # The 0th element is the device Id
             # The 3rd element is the model name, the first 6 characters are 'model:'
-            devices.append(Device(deviceStr[0], deviceStr[3][6:]))
+            for deviceStrSection in deviceStr:
+                if deviceStrSection[0:6] == 'model:':
+                    devices.append(Device(deviceStr[0], deviceStrSection[6:]))
         return devices
 
     def bluetoothOn(self, device: Device):
@@ -286,16 +289,14 @@ class Run:
 def main():
     run = Run('instrumented_test')
     run.log("Hello world!")
-    run.assembleTestApk()
+    # run.assembleTestApk()
     devices = run.devicesQuery()
     for device in devices:
         run.updateLogFormat(LogState.device(device))
-        run.log('Preparing device for instrumented test...')
-        # run.wifiOn(device)
-        # run.bluetoothOn(device)
-        run.bluetoothPair(device, scanners['SP443761'])
-        run.installTestApk(device)
+        # run.installTestApk(device)
+        # run.bluetoothPair(device, scanners['SP443761'])
         run.runTests(device)
+        # run.bluetoothUnpair(device, scanners['SP443761'])
     run.updateLogFormat(LogState.default())
     run.log('TEST END')
 
