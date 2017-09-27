@@ -4,9 +4,11 @@ import subprocess
 import time
 import queue
 import threading
-import logging
 
 import datetime
+from logging import Formatter, Logger, getLogger, DEBUG, StreamHandler, FileHandler, INFO, WARN, ERROR, CRITICAL
+
+from typing import List
 
 commands = {
     'assemble test apk': 'gradlew.bat assembleAndroidTest',
@@ -30,11 +32,11 @@ commands = {
 
 
 class Scanner:
-    def __init__(self, scannerId, macAddress, hardwareVersion, description=''):
-        self.scannerId = scannerId
-        self.macAddress = macAddress
-        self.hardwareVersion = hardwareVersion
-        self.description = description
+    def __init__(self, scanner_id: str, mac_address: str, hardware_version: int, description: str = ''):
+        self.scanner_id: str = scanner_id
+        self.mac_address: str = mac_address
+        self.hardware_version: int = hardware_version
+        self.description: str = description
 
 
 scanners = {
@@ -46,17 +48,17 @@ scanners = {
 
 
 class Device:
-    def __init__(self, deviceId, model):
-        self.deviceId = deviceId
-        self.model = model
-        self.isBluetoothOn = None
-        self.isWifiOn = None
-        self.bluetoothPairedList = []
+    def __init__(self, device_id: str, model: str):
+        self.device_id: str = device_id
+        self.model: str = model
+        self.is_bluetooth_on: bool = None
+        self.is_wifi_on: bool = None
+        self.bluetooth_paired_list: List[Scanner] = []
 
 
 class LogState:
     """
-    These methods return a logState to be passed to Run.updateLogFormat()
+    These methods return a LogState to be passed to Run.updateLogFormat()
     They represent different beginning strings for each of the log coressponding to what state the program is in
     Here are the states and when they should be used:
 
@@ -81,7 +83,7 @@ class LogState:
         fmt = '[%(asctime)s] :{0} %(message)s'.format(extra)
         datefmt = '%Y/%m/%d %H:%M:%S'
 
-        return logging.Formatter(fmt=fmt, datefmt=datefmt)
+        return Formatter(fmt=fmt, datefmt=datefmt)
 
     @staticmethod
     def device(device: Device, extra=''):
@@ -89,111 +91,98 @@ class LogState:
 
     @staticmethod
     def test(device: Device):
-        W = '?'
-        if device.isWifiOn is True:
-            W = '1'
-        if device.isWifiOn is False:
-            W = '0'
+        bool_to_char = {None: '?', True: '1', False: '0'}
+        w = bool_to_char[device.is_wifi_on]
+        b = bool_to_char[device.is_bluetooth_on]
 
-        B = '?'
-        if device.isWifiOn is True:
-            B = '1'
-        if device.isWifiOn is False:
-            B = '0'
+        paired_count = len(device.bluetooth_paired_list)
+        p = str(paired_count) if 0 <= paired_count <= 9 else '+'
 
-        p = len(device.bluetoothPairedList)
-        P = '?'
-        if 0 <= p <= 9:
-            P = str(p)
-        elif p > 9:
-            P = '+'
+        if paired_count == 0:
+            s = 'NONE    '
+        elif paired_count == 1:
+            s = device.bluetooth_paired_list[0].scanner_id
+        else:
+            s = 'MULTIPLE'
 
-        S = 'UNKNOWN '
-        if p == 1:
-            S = device.bluetoothPairedList[0].scannerId
-        if p > 1:
-            S = 'MULTIPLE'
-        if p == 0:
-            S = 'NONE    '
-
-        return LogState.device(device, ' W{0:1s}-B{1:1s}-P{2:1s}-{3:8s} :'.format(W, B, P, S))
+        return LogState.device(device, ' W{0:1s}-B{1:1s}-P{2:1s}-{3:8s} :'.format(w, b, p, s))
 
 
 class Run:
 
-    logDirName = 'testing/logs'
+    LOG_DIR_NAME = 'testing/logs'
 
-    if not os.path.exists(logDirName):
-        os.makedirs(logDirName)
+    if not os.path.exists(LOG_DIR_NAME):
+        os.makedirs(LOG_DIR_NAME)
 
-    def __init__(self, loggerName, logFileName=None, logCommands=True):
+    def __init__(self, logger_name, log_file_name=None, log_commands=True):
 
-        if logFileName is None:
-            logFileName = loggerName + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        if log_file_name is None:
+            log_file_name = logger_name + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
-        self.logger = logging.getLogger(loggerName)
-        self.logger.setLevel(logging.DEBUG)
+        self.logger: Logger = getLogger(logger_name)
+        self.logger.setLevel(DEBUG)
 
-        self.consoleHandler = logging.StreamHandler(sys.stdout)
-        self.fileHandler = logging.FileHandler(Run.logDirName + '/' + logFileName + '.log', mode='w')
+        self.console_handler: StreamHandler = StreamHandler(sys.stdout)
+        self.file_handler: FileHandler = FileHandler(Run.LOG_DIR_NAME + '/' + log_file_name + '.log', mode='w')
 
-        self.logger.addHandler(self.consoleHandler)
-        self.logger.addHandler(self.fileHandler)
+        self.logger.addHandler(self.console_handler)
+        self.logger.addHandler(self.file_handler)
 
-        self.updateLogFormat(LogState.default())
+        self.update_log_format(LogState.default())
 
-        self.logCommands = logCommands
+        self.log_commands = log_commands
 
     @staticmethod
-    def reformatProcessOutput(output: bytes):
+    def reformat_process_output(output: bytes):
         #  The output onto the command line contains a lot of \r and \n characters which add a lot of blank spaces
         return output.decode('utf-8').replace(u'\r\r\n', '').replace(u'\r\n', '')
 
-    def updateLogFormat(self, logState: logging.Formatter):
-        self.consoleHandler.setFormatter(logState)
-        self.fileHandler.setFormatter(logState)
+    def update_log_format(self, log_state: Formatter):
+        self.console_handler.setFormatter(log_state)
+        self.file_handler.setFormatter(log_state)
 
-    def log(self, line: str, flag=logging.INFO):
-        if flag is logging.DEBUG:
+    def log(self, line: str, flag=INFO):
+        if flag is DEBUG:
             self.logger.debug(line)
-        elif flag is logging.INFO:
+        elif flag is INFO:
             self.logger.info(line)
-        elif flag is logging.WARN:
+        elif flag is WARN:
             self.logger.warning(line)
-        elif flag is logging.ERROR:
+        elif flag is ERROR:
             self.logger.error(line)
-        elif flag is logging.CRITICAL:
+        elif flag is CRITICAL:
             self.logger.critical(line)
         else:
             self.logger.info(line)
 
-    def runAndLog(self, command):
-        if self.logCommands:
-            self.log('>>> ' + command, logging.DEBUG)
+    def run_and_log(self, command):
+        if self.log_commands:
+            self.log('>>> ' + command, DEBUG)
         lines = []
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1)
 
-        def enqueueOutput(out, thisQueue: queue.Queue):
+        def enqueue_output(out, this_queue: queue.Queue):
             for thisLine in iter(out.readline, b''):
-                thisQueue.put(thisLine)
+                this_queue.put(thisLine)
             out.close()
-            thisQueue.put(None)
+            this_queue.put(None)
 
-        messageQueue = queue.Queue()
-        thread = threading.Thread(target=enqueueOutput, args=(process.stdout, messageQueue))
+        message_queue = queue.Queue()
+        thread = threading.Thread(target=enqueue_output, args=(process.stdout, message_queue))
         thread.daemon = True
         thread.start()
 
         while True:
-            while not messageQueue.empty():
-                line = messageQueue.get()
-                messageQueue.task_done()
+            while not message_queue.empty():
+                line = message_queue.get()
+                message_queue.task_done()
                 if line is None:
                     return lines
-                formattedLine = self.reformatProcessOutput(line)
+                formatted_line = self.reformat_process_output(line)
 
-                lines.append(formattedLine)
-                self.log(formattedLine, logging.INFO)
+                lines.append(formatted_line)
+                self.log(formatted_line, INFO)
 
     ##############
     #  Command methods
@@ -211,25 +200,25 @@ class Run:
     #
     ##############
 
-    def assembleTestApk(self):
-        self.updateLogFormat(LogState.default())
-        self.runAndLog(commands['assemble test apk'])
+    def assemble_test_apk(self):
+        self.update_log_format(LogState.default())
+        self.run_and_log(commands['assemble test apk'])
 
-    def devicesQuery(self):
-        self.updateLogFormat(LogState.default())
-        lines = self.runAndLog(commands['devices query'])
+    def devices_query(self):
+        self.update_log_format(LogState.default())
+        lines = self.run_and_log(commands['devices query'])
 
         # The first line is "List of devices attached". The last line is blank. Lines in between contain a device.
         # If ADB isn't started, the adb daemon starting log has '*'s
-        relevantLines = []
+        relevant_lines = []
         for line in lines[1:-1]:
             if line[0] != '*':
-                relevantLines.append(line)
-        devicesStrs = []
-        for line in relevantLines:
-            devicesStrs.append(line.split())
+                relevant_lines.append(line)
+        devices_strs = []
+        for line in relevant_lines:
+            devices_strs.append(line.split())
         devices = []
-        for deviceStr in devicesStrs:
+        for deviceStr in devices_strs:
             # The 0th element is the device Id
             # The 3rd element is the model name, the first 6 characters are 'model:'
             for deviceStrSection in deviceStr:
@@ -237,67 +226,67 @@ class Run:
                     devices.append(Device(deviceStr[0], deviceStrSection[6:]))
         return devices
 
-    def bluetoothOn(self, device: Device):
-        self.updateLogFormat(LogState.device(device))
-        self.runAndLog(commands['bluetooth on'].format(device.deviceId))
+    def bluetooth_on(self, device: Device):
+        self.update_log_format(LogState.device(device))
+        self.run_and_log(commands['bluetooth on'].format(device.device_id))
         time.sleep(5)
-        device.isBluetoothOn = True
+        device.is_bluetooth_on = True
 
-    def bluetoothOff(self, device: Device):
-        self.updateLogFormat(LogState.device(device))
-        self.runAndLog(commands['bluetooth off'].format(device.deviceId))
+    def bluetooth_off(self, device: Device):
+        self.update_log_format(LogState.device(device))
+        self.run_and_log(commands['bluetooth off'].format(device.device_id))
         time.sleep(5)
-        device.isBluetoothOn = False
+        device.is_bluetooth_on = False
 
-    def bluetoothPair(self, device: Device, scanner: Scanner):
-        self.updateLogFormat(LogState.device(device))
-        self.runAndLog(commands['bluetooth pair'].format(device.deviceId, scanner.macAddress))
+    def bluetooth_pair(self, device: Device, scanner: Scanner):
+        self.update_log_format(LogState.device(device))
+        self.run_and_log(commands['bluetooth pair'].format(device.device_id, scanner.mac_address))
         time.sleep(10)
-        device.bluetoothPairedList.append(scanner)
+        device.bluetooth_paired_list.append(scanner)
 
-    def bluetoothUnpair(self, device: Device, scanner: Scanner):
-        self.updateLogFormat(LogState.device(device))
-        self.runAndLog(commands['bluetooth unpair'].format(device.deviceId, scanner.macAddress))
+    def bluetooth_unpair(self, device: Device, scanner: Scanner):
+        self.update_log_format(LogState.device(device))
+        self.run_and_log(commands['bluetooth unpair'].format(device.device_id, scanner.mac_address))
         time.sleep(5)
-        device.bluetoothPairedList.remove(scanner)
+        device.bluetooth_paired_list.remove(scanner)
 
-    def wifiOn(self, device: Device):
-        self.updateLogFormat(LogState.device(device))
-        self.runAndLog(commands['wifi on'].format(device.deviceId))
+    def wifi_on(self, device: Device):
+        self.update_log_format(LogState.device(device))
+        self.run_and_log(commands['wifi on'].format(device.device_id))
         time.sleep(10)
-        device.isWifiOn = True
+        device.is_wifi_on = True
 
-    def wifiOff(self, device: Device):
-        self.updateLogFormat(LogState.device(device))
-        self.runAndLog(commands['wifi off'].format(device.deviceId))
+    def wifi_off(self, device: Device):
+        self.update_log_format(LogState.device(device))
+        self.run_and_log(commands['wifi off'].format(device.device_id))
         time.sleep(5)
-        device.isWifiOn = False
+        device.is_wifi_on = False
 
-    def installTestApk(self, device: Device):
-        self.updateLogFormat(LogState.device(device))
-        self.runAndLog(commands['install test apk'].format(device.deviceId))
+    def install_test_apk(self, device: Device):
+        self.update_log_format(LogState.device(device))
+        self.run_and_log(commands['install test apk'].format(device.device_id))
 
-    def runExampleTests(self, device: Device):
-        self.updateLogFormat(LogState.test(device))
-        self.runAndLog(commands['run example tests'].format(device.deviceId))
+    def run_example_tests(self, device: Device):
+        self.update_log_format(LogState.test(device))
+        self.run_and_log(commands['run example tests'].format(device.device_id))
 
-    def runTests(self, device: Device):
-        self.updateLogFormat(LogState.device(device))
-        self.runAndLog(commands['run tests'].format(device.deviceId))
+    def run_tests(self, device: Device):
+        self.update_log_format(LogState.device(device))
+        self.run_and_log(commands['run tests'].format(device.device_id))
 
 
 def main():
     run = Run('instrumented_test')
     run.log("Hello world!")
     # run.assembleTestApk()
-    devices = run.devicesQuery()
+    devices = run.devices_query()
     for device in devices:
-        run.updateLogFormat(LogState.device(device))
-        # run.installTestApk(device)
-        # run.bluetoothPair(device, scanners['SP443761'])
-        run.runTests(device)
-        # run.bluetoothUnpair(device, scanners['SP443761'])
-    run.updateLogFormat(LogState.default())
+        run.update_log_format(LogState.device(device))
+        # run.install_test_apk(device)
+        # run.bluetooth_pair(device, scanners['SP443761'])
+        run.run_tests(device)
+        # run.bluetooth_unpair(device, scanners['SP443761'])
+    run.update_log_format(LogState.default())
     run.log('TEST END')
 
 
