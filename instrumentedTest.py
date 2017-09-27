@@ -1,17 +1,18 @@
-import sys
-import os
-import subprocess
-import time
-import queue
-import threading
-
 import datetime
-from logging import Formatter, Logger, getLogger, DEBUG, StreamHandler, FileHandler, INFO, WARN, ERROR, CRITICAL
+import os
+import platform
+import queue
+import subprocess
+import sys
+import threading
+import time
 
+from logging import Formatter, Logger, getLogger, DEBUG, StreamHandler, FileHandler, INFO, WARN, ERROR, CRITICAL
 from typing import List
 
 commands = {
-    'assemble test apk': 'gradlew.bat assembleAndroidTest',
+    'assemble test apk': ('gradlew.bat assembleAndroidTest' if platform.system() == 'Windows'
+                          else './gradlew assembleAndroidTest'),
     'devices query': 'adb devices -l',
     'bluetooth on': 'adb -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.ON',
     'bluetooth off': 'adb -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.OFF',
@@ -160,7 +161,10 @@ class Run:
         if self.log_commands:
             self.log('>>> ' + command, DEBUG)
         lines = []
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1)
+        if platform.system() == 'Windows':
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1)
+        else:
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, shell=True)
 
         def enqueue_output(out, this_queue: queue.Queue):
             for thisLine in iter(out.readline, b''):
@@ -275,17 +279,17 @@ class Run:
         self.run_and_log(commands['run tests'].format(device.device_id))
 
 
-def main():
+def main(scannerId: str = 'SP443761'):
     run = Run('instrumented_test')
     run.log("Hello world!")
-    # run.assembleTestApk()
+    run.assemble_test_apk()
     devices = run.devices_query()
     for device in devices:
         run.update_log_format(LogState.device(device))
-        # run.install_test_apk(device)
-        # run.bluetooth_pair(device, scanners['SP443761'])
+        run.install_test_apk(device)
+        run.bluetooth_pair(device, scanners[scannerId])
         run.run_tests(device)
-        # run.bluetooth_unpair(device, scanners['SP443761'])
+        run.bluetooth_unpair(device, scanners[scannerId])
     run.update_log_format(LogState.default())
     run.log('TEST END')
 
