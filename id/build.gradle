@@ -30,6 +30,7 @@ android {
         endToEndTesting {
             initWith debug
             versionNameSuffix 't-'
+            testCoverageEnabled true
         }
     }
     testBuildType "endToEndTesting"
@@ -85,9 +86,6 @@ dependencies {
     compile 'com.google.firebase:firebase-auth:10.2.4'
     compile 'com.google.firebase:firebase-config:10.2.4'
     testCompile 'junit:junit:4.12'
-//    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2', {
-//        exclude group: 'com.android.support', module: 'support-annotations'
-//    }
     androidTestCompile('com.schibsted.spain:barista:1.7.0') {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
@@ -101,3 +99,8 @@ crashlytics {
 
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'realm-android'
+
+apply plugin: 'jacoco'
+jacoco {
+    toolVersion = '0.7.5.201505241946'
+}

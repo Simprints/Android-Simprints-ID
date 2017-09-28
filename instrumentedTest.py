@@ -10,9 +10,12 @@ import time
 from logging import Formatter, Logger, getLogger, DEBUG, StreamHandler, FileHandler, INFO, WARN, ERROR, CRITICAL
 from typing import List
 
+GRADLEW_PATH = 'gradlew.bat' if platform.system() == 'Windows' else './gradlew'
+
 commands = {
-    'assemble test apk': ('gradlew.bat assembleAndroidTest' if platform.system() == 'Windows'
-                          else './gradlew assembleAndroidTest'),
+    'clean builds': (GRADLEW_PATH + ' clean'),
+    'assemble endToEndTesting apk': (GRADLEW_PATH + ' assembleEndToEndTesting'),
+    'assemble endToEndTesting test apk': (GRADLEW_PATH + ' assembleEndToEndTestingAndroidTest'),
     'devices query': 'adb devices -l',
     'bluetooth on': 'adb -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.ON',
     'bluetooth off': 'adb -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.OFF',
@@ -23,12 +26,19 @@ commands = {
                         '"com.simprints.testutilities.bluetooth.extra.MAC_ADDRESS" "{1}"',
     'wifi on': 'adb -s {0} shell am startservice -a com.simprints.testutilities.wifi.action.ON',
     'wifi off': 'adb -s {0} shell am startservice -a com.simprints.testutilities.wifi.action.OFF',
-    'install test apk': 'adb -s {0} install -t -d -r id/build/outputs/apk/id-debug-androidTest.apk',
+    'install endToEndTesting apk': 'adb -s {0} install -t -d -r '
+                                   'id/build/outputs/apk/id-endToEndTesting.apk',
+    'install endToEndTesting test apk': 'adb -s {0} install -t -d -r '
+                                        'id/build/outputs/apk/id-endToEndTesting-androidTest.apk',
     'run example tests': 'adb -s {0} shell am instrument -w com.simprints.testutilities.test/android.support.test'
                          '.runner.AndroidJUnitRunner ',
-    'run tests': 'adb -s {0} shell am instrument -w '
-                 '-e class com.simprints.id.happypath.HappyPathEnrolTest'
-                 ' com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner '
+    'run tests': 'adb -s {0} shell am instrument -w -e coverage true '
+                 '-e class com.simprints.id.happypath.HappyPathEnrolTest '
+                 'com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner ',
+    'acquire coverage file': 'adb -d shell "run-as com.simprints.id cat '
+                             '/data/user/0/com.simprints.id/files/coverage.ec" > coverage.ec',
+    'parse coverage file': 'java -jar JacocoReportParser.jar -p . -f coverage.ec -c '
+                           './id/build/intermediates/classes -s ./id/src/main/java'
 }
 
 
@@ -110,7 +120,6 @@ class LogState:
 
 
 class Run:
-
     LOG_DIR_NAME = 'testing/logs'
 
     if not os.path.exists(LOG_DIR_NAME):
@@ -137,7 +146,7 @@ class Run:
     @staticmethod
     def reformat_process_output(output: bytes):
         #  The output onto the command line contains a lot of \r and \n characters which add a lot of blank spaces
-        return output.decode('utf-8').replace(u'\r\r\n', '').replace(u'\r\n', '')
+        return output.decode('utf-8').replace(u'\r\r\n', '').replace(u'\r\n', '').replace(u'\n', '')
 
     def update_log_format(self, log_state: Formatter):
         self.console_handler.setFormatter(log_state)
@@ -204,9 +213,17 @@ class Run:
     #
     ##############
 
+    def clean_builds(self):
+        self.update_log_format(LogState.default())
+        self.run_and_log(commands['clean builds'])
+
+    def assemble_apk(self):
+        self.update_log_format(LogState.default())
+        self.run_and_log(commands['assemble endToEndTesting apk'])
+
     def assemble_test_apk(self):
         self.update_log_format(LogState.default())
-        self.run_and_log(commands['assemble test apk'])
+        self.run_and_log(commands['assemble endToEndTesting test apk'])
 
     def devices_query(self):
         self.update_log_format(LogState.default())
@@ -266,9 +283,13 @@ class Run:
         time.sleep(5)
         device.is_wifi_on = False
 
+    def install_apk(self, device: Device):
+        self.update_log_format(LogState.device(device))
+        self.run_and_log(commands['install endToEndTesting apk'].format(device.device_id))
+
     def install_test_apk(self, device: Device):
         self.update_log_format(LogState.device(device))
-        self.run_and_log(commands['install test apk'].format(device.device_id))
+        self.run_and_log(commands['install endToEndTesting test apk'].format(device.device_id))
 
     def run_example_tests(self, device: Device):
         self.update_log_format(LogState.test(device))
@@ -279,17 +300,23 @@ class Run:
         self.run_and_log(commands['run tests'].format(device.device_id))
 
 
-def main(scannerId: str = 'SP443761'):
+def main(scanner_id: str = 'SP443761'):
     run = Run('instrumented_test')
     run.log("Hello world!")
-    run.assemble_test_apk()
+
+    # run.clean_builds()
+    # run.assemble_apk()
+    # run.assemble_test_apk()
+
     devices = run.devices_query()
+
     for device in devices:
         run.update_log_format(LogState.device(device))
-        run.install_test_apk(device)
-        run.bluetooth_pair(device, scanners[scannerId])
+        # run.install_apk(device)
+        # run.install_test_apk(device)
+        # run.bluetooth_pair(device, scanners[scanner_id])
         run.run_tests(device)
-        run.bluetooth_unpair(device, scanners[scannerId])
+        # run.bluetooth_unpair(device, scanners[scanner_id])
     run.update_log_format(LogState.default())
     run.log('TEST END')
 
