@@ -72,7 +72,7 @@ class Device:
 class LogState:
     """
     These methods return a LogState to be passed to Run.updateLogFormat()
-    They represent different beginning strings for each of the log coressponding to what state the program is in
+    They represent different beginning strings for each of the logs corresponding to what state the program is in.
     Here are the states and when they should be used:
 
     default()
@@ -153,9 +153,11 @@ class Run:
         #  The output onto the command line contains a lot of \r and \n characters which add a lot of blank spaces
         return output.decode('utf-8').replace(u'\r\r\n', '').replace(u'\r\n', '').replace(u'\n', '')
 
-    def update_log_format(self, log_state: Formatter):
+    def update_log_format(self, log_state: Formatter, extra_file_handler: FileHandler = None):
         self.console_handler.setFormatter(log_state)
         self.file_handler.setFormatter(log_state)
+        if extra_file_handler is not None:
+            extra_file_handler.setFormatter(log_state)
 
     def log(self, line: str, flag=INFO):
         if flag is DEBUG:
@@ -207,14 +209,14 @@ class Run:
     #
     #  Template:
     #
-    #  commandMethodName(self, ...):
-    #      self.updateLogFormat(LogSate.appropriateLogState())
-    #      lines = self.runAndLog(command['theCommand'].format(the, command, arguments))
+    #  command_method_name(self, ...):
+    #      self.update_log_format(LogSate.appropriate_log_state())
+    #      lines = self.run_and_log(command['the_command'].format(the, command, arguments))
     #
-    #      processedLines = processTheRawOutputtedLines(lines)
-    #      updateStateOrLogsIfNecessary(processedLines)
+    #      processed_lines = process_the_raw_outputted_lines(lines)
+    #      update_state_or_logs_if_necessary(processed_lines)
     #
-    #      return nothingOrSomeInformationIfNecessary
+    #      return nothing_or_some_information_if_necessary
     #
     ##############
 
@@ -235,7 +237,7 @@ class Run:
         lines = self.run_and_log(commands['devices query'])
 
         # The first line is "List of devices attached". The last line is blank. Lines in between contain a device.
-        # If ADB isn't started, the adb daemon starting log has '*'s
+        # If the ADB daemon isn't started or is invalid, there is some preamble that can be ignored.
         relevant_lines = []
         for line in lines[1:-1]:
             if line[0] != '*':
@@ -297,8 +299,6 @@ class Run:
         self.run_and_log(commands['install endToEndTesting test apk'].format(device.device_id))
 
     def run_test(self, device: Device, test_id: str):
-        self.update_log_format(LogState.device(device))
-
         test_dir_name = self.log_dir_name + '/' + test_id
 
         if not os.path.exists(test_dir_name):
@@ -307,6 +307,7 @@ class Run:
         test_file_handler: FileHandler = FileHandler(test_dir_name + '/' + test_id + '.log', mode='w')
 
         self.logger.addHandler(test_file_handler)
+        self.update_log_format(LogState.device(device), test_file_handler)
 
         self.run_and_log(commands['run test'].format(device.device_id, tests[test_id]))
         self.run_and_log(commands['acquire coverage file'].format(device.device_id, test_dir_name))
@@ -338,7 +339,7 @@ def main(scanner_id: str = 'SP443761'):
     run.log('TEST END')
 
     end_time = time.perf_counter()
-    run.log('Total elapsed time: {0}'.format(end_time - start_time))
+    run.log('Total time elapsed: {0}'.format(end_time - start_time))
 
 
 if __name__ == "__main__":
