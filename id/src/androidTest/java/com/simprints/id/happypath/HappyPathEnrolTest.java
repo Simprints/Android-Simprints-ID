@@ -2,6 +2,7 @@ package com.simprints.id.happypath;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.filters.LargeTest;
@@ -24,16 +25,18 @@ import java.util.concurrent.TimeUnit;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isClickable;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static com.schibsted.spain.barista.BaristaSleepActions.sleep;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class HappyPathEnrolTest {
-    private static final String apiKey = "1b22a8e0-6e86-4d8b-92f7-905bd38ac1d5";
-    private static final String userId = "1b22a8e0-6e86-4d8b-92f7-905bd38ac1d5";
-    private static final String moduleId = "0";
+    private static final String apiKey = "00000000-0000-0000-0000-000000000000";
+    private static final String userId = "the_lone_user";
+    private static final String moduleId = "the_one_and_only_module";
 
     @Rule
     public ActivityTestRule<LaunchActivity> launchActivityActivityTestRule = new ActivityTestRule<LaunchActivity>(LaunchActivity.class) {
@@ -98,6 +101,13 @@ public class HappyPathEnrolTest {
                 .perform(click());
 
         sleep(8, TimeUnit.SECONDS);
+
+        onView(withId(R.id.action_forward))
+                .check(matches(isClickable()))
+                .perform(click());
+
+        SystemClock.sleep(5000);
+        // Check that a patient was indeed saved to the database
     }
 
     @After
