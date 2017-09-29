@@ -12,6 +12,11 @@ from typing import List
 
 GRADLEW_PATH = 'gradlew.bat' if platform.system() == 'Windows' else './gradlew'
 
+tests = {
+    'happy_path_enrol': 'com.simprints.id.happypath.HappyPathEnrolTest',
+    'happy_path_identify': 'com.simprints.id.happypath.HappyPathIdentifyTest'
+}
+
 commands = {
     'clean builds': (GRADLEW_PATH + ' clean'),
     'assemble endToEndTesting apk': (GRADLEW_PATH + ' assembleEndToEndTesting'),
@@ -30,15 +35,12 @@ commands = {
                                    'id/build/outputs/apk/id-endToEndTesting.apk',
     'install endToEndTesting test apk': 'adb -s {0} install -t -d -r '
                                         'id/build/outputs/apk/id-endToEndTesting-androidTest.apk',
-    'run example tests': 'adb -s {0} shell am instrument -w com.simprints.testutilities.test/android.support.test'
-                         '.runner.AndroidJUnitRunner ',
-    'run tests': 'adb -s {0} shell am instrument -w -e coverage true '
-                 '-e class com.simprints.id.happypath.HappyPathEnrolTest '
-                 'com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner ',
-    'acquire coverage file': 'adb -d shell "run-as com.simprints.id cat '
-                             '/data/user/0/com.simprints.id/files/coverage.ec" > coverage.ec',
-    'parse coverage file': 'java -jar JacocoReportParser.jar -p . -f coverage.ec -c '
-                           './id/build/intermediates/classes -s ./id/src/main/java'
+    'run test': 'adb -s {0} shell am instrument -w -e coverage true '
+                '-e class {1} com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner ',
+    'acquire coverage file': 'adb -d -s {0} shell "run-as com.simprints.id cat '
+                             '/data/user/0/com.simprints.id/files/coverage.ec" > {1}/coverage.ec',
+    'parse coverage file': 'java -jar ./testing/JacocoReportParser.jar -p . -f ./{0}/coverage.ec -c '
+                           './id/build/intermediates/classes -s ./id/src/main/java -r ./{0}/coverage_report'
 }
 
 
@@ -120,21 +122,24 @@ class LogState:
 
 
 class Run:
-    LOG_DIR_NAME = 'testing/logs'
+    LOG_DIR_BASE_NAME = 'testing/logs'
 
-    if not os.path.exists(LOG_DIR_NAME):
-        os.makedirs(LOG_DIR_NAME)
+    if not os.path.exists(LOG_DIR_BASE_NAME):
+        os.makedirs(LOG_DIR_BASE_NAME)
 
-    def __init__(self, logger_name, log_file_name=None, log_commands=True):
+    def __init__(self, logger_name, log_commands=True):
 
-        if log_file_name is None:
-            log_file_name = logger_name + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        self.log_dir_name = Run.LOG_DIR_BASE_NAME + '/'\
+                            + logger_name + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
+        if not os.path.exists(self.log_dir_name):
+            os.makedirs(self.log_dir_name)
 
         self.logger: Logger = getLogger(logger_name)
         self.logger.setLevel(DEBUG)
 
         self.console_handler: StreamHandler = StreamHandler(sys.stdout)
-        self.file_handler: FileHandler = FileHandler(Run.LOG_DIR_NAME + '/' + log_file_name + '.log', mode='w')
+        self.file_handler: FileHandler = FileHandler(self.log_dir_name + '/' + logger_name + '.log', mode='w')
 
         self.logger.addHandler(self.console_handler)
         self.logger.addHandler(self.file_handler)
@@ -291,34 +296,49 @@ class Run:
         self.update_log_format(LogState.device(device))
         self.run_and_log(commands['install endToEndTesting test apk'].format(device.device_id))
 
-    def run_example_tests(self, device: Device):
-        self.update_log_format(LogState.test(device))
-        self.run_and_log(commands['run example tests'].format(device.device_id))
-
-    def run_tests(self, device: Device):
+    def run_test(self, device: Device, test_id: str):
         self.update_log_format(LogState.device(device))
-        self.run_and_log(commands['run tests'].format(device.device_id))
+
+        test_dir_name = self.log_dir_name + '/' + test_id
+
+        if not os.path.exists(test_dir_name):
+            os.makedirs(test_dir_name)
+
+        test_file_handler: FileHandler = FileHandler(test_dir_name + '/' + test_id + '.log', mode='w')
+
+        self.logger.addHandler(test_file_handler)
+
+        self.run_and_log(commands['run test'].format(device.device_id, tests[test_id]))
+        self.run_and_log(commands['acquire coverage file'].format(device.device_id, test_dir_name))
+        self.run_and_log(commands['parse coverage file'].format(test_dir_name))
+
+        self.logger.removeHandler(test_file_handler)
 
 
 def main(scanner_id: str = 'SP443761'):
+    start_time = time.perf_counter()
     run = Run('instrumented_test')
     run.log("Hello world!")
 
-    # run.clean_builds()
-    # run.assemble_apk()
-    # run.assemble_test_apk()
+    run.clean_builds()
+    run.assemble_apk()
+    run.assemble_test_apk()
 
     devices = run.devices_query()
 
     for device in devices:
         run.update_log_format(LogState.device(device))
-        # run.install_apk(device)
-        # run.install_test_apk(device)
+        run.install_apk(device)
+        run.install_test_apk(device)
         # run.bluetooth_pair(device, scanners[scanner_id])
-        run.run_tests(device)
+        run.run_test(device, 'happy_path_enrol')
+        run.run_test(device, 'happy_path_identify')
         # run.bluetooth_unpair(device, scanners[scanner_id])
     run.update_log_format(LogState.default())
     run.log('TEST END')
+
+    end_time = time.perf_counter()
+    run.log('Total elapsed time: {0}'.format(end_time - start_time))
 
 
 if __name__ == "__main__":
