@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.google.firebase.crash.FirebaseCrash;
 import com.simprints.id.R;
 import com.simprints.id.adapters.FingerPageAdapter;
+import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.fragments.FingerFragment;
@@ -37,8 +38,8 @@ import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
-import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.tools.AppState;
+import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.RemoteConfig;
@@ -46,7 +47,6 @@ import com.simprints.id.tools.SharedPref;
 import com.simprints.id.tools.TimeoutBar;
 import com.simprints.id.tools.Vibrate;
 import com.simprints.id.tools.ViewPagerCustom;
-import com.simprints.id.tools.FormatResult;
 import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
@@ -87,23 +87,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private boolean buttonContinue = false;
 
-    private final static ScanConfig DEFAULT_CONFIG;
+    private static ScanConfig DEFAULT_CONFIG;
 
     private SharedPref sharedPref;
-
-    static {
-        DEFAULT_CONFIG = new ScanConfig();
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0);
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_INDEX_FINGER, FingerConfig.REQUIRED, 1);
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_3RD_FINGER, FingerConfig.OPTIONAL, 4);
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_4TH_FINGER, FingerConfig.OPTIONAL, 5);
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_5TH_FINGER, FingerConfig.OPTIONAL, 6);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_5TH_FINGER, FingerConfig.OPTIONAL, 7);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_4TH_FINGER, FingerConfig.OPTIONAL, 8);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_3RD_FINGER, FingerConfig.OPTIONAL, 9);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_THUMB, FingerConfig.OPTIONAL, 2);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_INDEX_FINGER, FingerConfig.OPTIONAL, 3);
-    }
 
     private ButtonListener scannerButton;
 
@@ -159,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements
         sharedPref = new SharedPref(getApplicationContext());
         timeoutBar = new TimeoutBar(getApplicationContext(), (ProgressBar) findViewById(R.id.pb_timeout));
 
+        setFingerStatus();
         initActiveFingers();
         initBarAndDrawer();
         initIndicators();
@@ -167,6 +154,24 @@ public class MainActivity extends AppCompatActivity implements
         refreshDisplay();
         initConnectionListener();
         initAuthInListener();
+    }
+
+    private void setFingerStatus() {
+        DEFAULT_CONFIG = new ScanConfig();
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_INDEX_FINGER, FingerConfig.REQUIRED, 1);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_3RD_FINGER, FingerConfig.OPTIONAL, 4);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_4TH_FINGER, FingerConfig.OPTIONAL, 5);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_5TH_FINGER, FingerConfig.OPTIONAL, 6);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_5TH_FINGER, FingerConfig.OPTIONAL, 7);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_4TH_FINGER, FingerConfig.OPTIONAL, 8);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_3RD_FINGER, FingerConfig.OPTIONAL, 9);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_THUMB, FingerConfig.OPTIONAL, 2);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_INDEX_FINGER, FingerConfig.OPTIONAL, 3);
+
+        // We set the two defaults in the config for the first reset.
+        sharedPref.setFingerStatus(FingerIdentifier.LEFT_THUMB, true);
+        sharedPref.setFingerStatus(FingerIdentifier.LEFT_INDEX_FINGER, true);
     }
 
     private void initConnectionListener() {
@@ -206,7 +211,10 @@ public class MainActivity extends AppCompatActivity implements
     private void initActiveFingers() {
         for (int i = 0; i < NB_OF_FINGERS; i++) {
             FingerIdentifier id = FingerIdentifier.values()[i];
-            fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, false, DEFAULT_CONFIG.getPriority(id));
+            if (sharedPref.getFingerStatusPersist())
+                fingers[i] = new Finger(id, sharedPref.getFingerStatus(id), false, DEFAULT_CONFIG.getPriority(id));
+            else
+                fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, false, DEFAULT_CONFIG.getPriority(id));
             if (fingers[i].isActive()) {
                 activeFingers.add(fingers[i]);
             }
@@ -520,7 +528,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
-                FormatResult.put( resultData, registrationResult);
+                FormatResult.put(resultData, registrationResult);
                 setResult(RESULT_OK, resultData);
                 finish();
             } else {
@@ -604,17 +612,25 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void addFinger() {
-        final boolean[] checked = new boolean[fingers.length];
-        String[] labels = new String[fingers.length];
+        final boolean[] checked = new boolean[fingers.length + 1];
+        String[] labels = new String[fingers.length + 1];
         for (int i = 0; i < fingers.length; i++) {
             checked[i] = fingers[i].isActive();
             labels[i] = getString(FingerRes.get(fingers[i]).getNameId());
         }
+        labels[fingers.length] = "Persist Settings?";
+        checked[fingers.length] = sharedPref.getFingerStatusPersist();
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle("Add Finger(s)")
                 .setMultiChoiceItems(labels, checked, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, boolean isChecked) {
+                        if (i == fingers.length) {
+                            checked[i] = isChecked;
+                            sharedPref.setFingerStatusPersist(isChecked);
+                            return;
+                        }
+
                         Finger finger = fingers[i];
                         switch (DEFAULT_CONFIG.get(finger.getId())) {
                             case DO_NOT_COLLECT:
@@ -640,9 +656,13 @@ public class MainActivity extends AppCompatActivity implements
                         for (Finger finger : fingers) {
                             if (finger.isActive() && !activeFingers.contains(finger)) {
                                 activeFingers.add(finger);
+                                if (sharedPref.getFingerStatusPersist())
+                                    sharedPref.setFingerStatus(finger.getId(), true);
                             }
                             if (!finger.isActive() && activeFingers.contains(finger)) {
                                 activeFingers.remove(finger);
+                                if (sharedPref.getFingerStatusPersist())
+                                    sharedPref.setFingerStatus(finger.getId(), false);
                             }
                         }
                         Collections.sort(activeFingers);
