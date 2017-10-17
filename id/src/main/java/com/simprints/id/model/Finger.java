@@ -29,14 +29,24 @@ public class Finger implements Parcelable, Comparable<Finger>{
     private Fingerprint template;
     private boolean lastFinger;
     private int priority;
+    private int order;
 
-    public Finger(@NonNull FingerIdentifier id, boolean isActive, boolean isLastFinger, int priority) {
+    /**
+     * Constructor for the Finger class
+     * @param id            The ISO number of the finger (0-9)
+     * @param isActive      Whether the finger is the current finger
+     * @param isLastFinger  Whether the finger is the last finger in the workflow
+     * @param priority      The order in which fingers get auto-added (based on research) (0-9)
+     * @param order         The order in which fingers appear in the list and the workflow (0-9)
+     */
+    public Finger(@NonNull FingerIdentifier id, boolean isActive, boolean isLastFinger, int priority, int order) {
         this.id = id;
         this.isActive = isActive;
         this.status = Status.NOT_COLLECTED;
         this.template = null;
         this.lastFinger = isLastFinger;
         this.priority = priority;
+        this.order = order;
     }
 
 
@@ -110,7 +120,7 @@ public class Finger implements Parcelable, Comparable<Finger>{
 
     @Override
     public int compareTo(@NonNull Finger other) {
-        return this.priority - other.priority;
+        return this.order - other.order;
     }
 
     public boolean isLastFinger() {
@@ -123,6 +133,10 @@ public class Finger implements Parcelable, Comparable<Finger>{
 
     public int getPriority() {
         return priority;
+    }
+
+    public int getOrder() {
+        return order;
     }
 
     public enum Status {

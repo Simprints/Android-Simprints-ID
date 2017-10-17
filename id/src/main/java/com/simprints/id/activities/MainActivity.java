@@ -158,16 +158,17 @@ public class MainActivity extends AppCompatActivity implements
 
     private void setFingerStatus() {
         DEFAULT_CONFIG = new ScanConfig();
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0);
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_INDEX_FINGER, FingerConfig.REQUIRED, 1);
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_3RD_FINGER, FingerConfig.OPTIONAL, 4);
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_4TH_FINGER, FingerConfig.OPTIONAL, 5);
-        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_5TH_FINGER, FingerConfig.OPTIONAL, 6);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_5TH_FINGER, FingerConfig.OPTIONAL, 7);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_4TH_FINGER, FingerConfig.OPTIONAL, 8);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_3RD_FINGER, FingerConfig.OPTIONAL, 9);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_THUMB, FingerConfig.OPTIONAL, 2);
-        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_INDEX_FINGER, FingerConfig.OPTIONAL, 3);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_THUMB          , FingerConfig.REQUIRED, 0, 0);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_INDEX_FINGER   , FingerConfig.REQUIRED, 1, 1);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_3RD_FINGER     , FingerConfig.OPTIONAL, 4, 2);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_4TH_FINGER     , FingerConfig.OPTIONAL, 5, 3);
+        DEFAULT_CONFIG.set(FingerIdentifier.LEFT_5TH_FINGER     , FingerConfig.OPTIONAL, 6, 4);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_THUMB         , FingerConfig.OPTIONAL, 2, 5);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_INDEX_FINGER  , FingerConfig.OPTIONAL, 3, 6);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_3RD_FINGER    , FingerConfig.OPTIONAL, 7, 7);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_4TH_FINGER    , FingerConfig.OPTIONAL, 8, 8);
+        DEFAULT_CONFIG.set(FingerIdentifier.RIGHT_5TH_FINGER    , FingerConfig.OPTIONAL, 9, 9);
+
 
         // We set the two defaults in the config for the first reset.
         sharedPref.setFingerStatus(FingerIdentifier.LEFT_THUMB, true);
@@ -212,14 +213,14 @@ public class MainActivity extends AppCompatActivity implements
         for (int i = 0; i < NB_OF_FINGERS; i++) {
             FingerIdentifier id = FingerIdentifier.values()[i];
             if (sharedPref.getFingerStatusPersist())
-                fingers[i] = new Finger(id, sharedPref.getFingerStatus(id), false, DEFAULT_CONFIG.getPriority(id));
+                fingers[i] = new Finger(id, sharedPref.getFingerStatus(id), false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
             else
-                fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, false, DEFAULT_CONFIG.getPriority(id));
+                fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
             if (fingers[i].isActive()) {
                 activeFingers.add(fingers[i]);
             }
         }
-
+        Collections.sort(activeFingers);
         activeFingers.get(activeFingers.size() - 1).setLastFinger(true);
         Arrays.sort(fingers);
     }
@@ -688,7 +689,14 @@ public class MainActivity extends AppCompatActivity implements
     public void autoAdd() {
         activeFingers.get(activeFingers.size() - 1).setLastFinger(false);
 
+        // Construct a list of fingers sorted by priority
+        Finger[] fingersSortedByPriority = new Finger[NB_OF_FINGERS];
         for (Finger finger : fingers) {
+            fingersSortedByPriority[finger.getPriority()] = finger;
+        }
+
+        // Auto-add the next finger sorted by the "priority" field
+        for (Finger finger : fingersSortedByPriority) {
             if (DEFAULT_CONFIG.get(finger.getId()) != FingerConfig.DO_NOT_COLLECT && !activeFingers.contains(finger)) {
                 activeFingers.add(finger);
                 finger.setActive(true);
