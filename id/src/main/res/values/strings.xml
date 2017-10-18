@@ -119,18 +119,18 @@
     <string name="returned_results_quantity_key" translatable="false">returned_results</string>
     <string name="returned_results_one">Returned %d result.</string>
     <string name="returned_results_other">Returned %d results.</string>
-    <string name="tier1_matches_quantity_key" translatable="false">tier1_matches</string>
-    <string name="tier1_matches_zero">No very good matches</string>
-    <string name="tier1_matches_one">%d very good match</string>
-    <string name="tier1_matches_other">%d very good matches</string>
-    <string name="tier2_matches_quantity_key" translatable="false">tier2_matches</string>
-    <string name="tier2_matches_zero">No good matches</string>
-    <string name="tier2_matches_one">%d good match</string>
-    <string name="tier2_matches_other">%d good matches</string>
+    <string name="tier1or2_matches_quantity_key" translatable="false">tier1or2_matches</string>
+    <string name="tier1or2_matches_zero">No very good matches</string>
+    <string name="tier1or2_matches_one">%d very good match</string>
+    <string name="tier1or2_matches_other">%d very good matches</string>
     <string name="tier3_matches_quantity_key" translatable="false">tier3_matches</string>
-    <string name="tier3_matches_zero">No matches</string>
-    <string name="tier3_matches_one">%d match</string>
-    <string name="tier3_matches_other">%d matches</string>
+    <string name="tier3_matches_zero">No good matches</string>
+    <string name="tier3_matches_one">%d good match</string>
+    <string name="tier3_matches_other">%d good matches</string>
+    <string name="tier4_matches_quantity_key" translatable="false">tier4_matches</string>
+    <string name="tier4_matches_zero">No matches</string>
+    <string name="tier4_matches_one">%d match</string>
+    <string name="tier4_matches_other">%d matches</string>
 
 
     <!-- AlertActivity : the Simprints ID error message screen -->
