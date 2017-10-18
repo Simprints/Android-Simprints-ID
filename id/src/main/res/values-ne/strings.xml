@@ -180,7 +180,7 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-    <string name="healthworker_consent_checkbox">सिम्प्रिन्ट्सलाई यो डाटा प्रयोग गर्न मेरो स्वीकृति छ   </string>
+    <string name="developmentworker_consent_checkbox">सिम्प्रिन्ट्सलाई यो डाटा प्रयोग गर्न मेरो स्वीकृति छ   </string>
     <string name="long_consent">
         \n
         तपाईँले यस स्क्यानरमा औँला राख्नुभयो भने यसले तपाईँको औँठाछापका साथै यो रेकर्ड गरेको स्थान, मिति र समयको जानकारी राख्छ ।   \n
