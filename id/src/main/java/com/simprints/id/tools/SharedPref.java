@@ -25,6 +25,7 @@ public class SharedPref {
     private static final String sync_group = "SyncGroup";
     private static final String match_group = "MatchGroup";
     private static final String persist_finger = "PersistFingerStatus";
+    private static final String matching_end_wait_time = "MatchingEndWaitTime";
 
     public SharedPref(Context context) {
         sharedPref = context.getSharedPreferences(preference_file_key, Context.MODE_PRIVATE);
@@ -240,6 +241,16 @@ public class SharedPref {
     public void setFingerStatus(FingerIdentifier fingerIdentifier, Boolean show) {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean(fingerIdentifier.toString(), show);
+        editor.apply();
+    }
+
+    public int getMatchingEndWaitTime() {
+        return sharedPref.getInt(matching_end_wait_time, 1);
+    }
+
+    public void setMatchingEndWaitTime(int matchingEndWaitTime) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(matching_end_wait_time, matchingEndWaitTime);
         editor.apply();
     }
 }

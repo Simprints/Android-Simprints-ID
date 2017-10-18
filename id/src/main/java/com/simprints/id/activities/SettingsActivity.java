@@ -30,11 +30,14 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     private final static int MAX_NB_OF_IDS = 20;
     private final static int MIN_TIMEOUT = 1;
     private final static int MAX_TIMEOUT = 10;
+    private final static int MIN_ID_WAIT_TIME = 0;
+    private final static int MAX_ID_WAIT_TIME = 10;
     ToggleButton nudgeToggleButton;
     ToggleButton vibrateToggleButton;
     SeekBar qualitySeekBar;
     SeekBar nbOfIdsSeekBar;
     SeekBar timeoutSeekBar;
+    SeekBar idWaitTimeSeekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,6 +167,35 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+
+        //Set the id wait time slider
+        ((TextView) findViewById(R.id.tv_min_id_wait_time)).setText(String.valueOf(MIN_ID_WAIT_TIME));
+        ((TextView) findViewById(R.id.tv_max_id_wait_time)).setText(String.valueOf(MAX_ID_WAIT_TIME));
+        final TextView tv_idWaitTime = (TextView) findViewById(R.id.tv_id_wait_time);
+        final int idWaitTime = sharedPref.getMatchingEndWaitTime() - MIN_ID_WAIT_TIME;
+        idWaitTimeSeekBar = (SeekBar) findViewById(R.id.sb_id_wait_time);
+        idWaitTimeSeekBar.setMax(MAX_ID_WAIT_TIME - MIN_ID_WAIT_TIME);
+        idWaitTimeSeekBar.setProgress(idWaitTime);
+        tv_idWaitTime.setText(String.format(
+                getString(R.string.id_wait_time_value), idWaitTime + MIN_ID_WAIT_TIME));
+        idWaitTimeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                sharedPref.setMatchingEndWaitTime(idWaitTimeSeekBar.getProgress() + MIN_ID_WAIT_TIME);
+                tv_idWaitTime.setText(String.format(
+                        getString(R.string.id_wait_time_value), progress + MIN_ID_WAIT_TIME));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
 

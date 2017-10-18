@@ -1,6 +1,7 @@
 package com.simprints.id.activities;
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -174,7 +175,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 public void run() {
                     finish();
                 }
-            }, 3000);
+            }, new SharedPref(getApplicationContext()).getMatchingEndWaitTime() * 1000);
         }
     }
 
