@@ -197,8 +197,10 @@
     <string name="quality_threshold_value">Quality Threshold: %1$d</string>
     <string name="nb_of_ids_empty">Returned Identifications:</string>
     <string name="nb_of_ids_value">Returned Identifications: %1$d</string>
-    <string name="timeout_empty">Timeout (Seconds):</string>
-    <string name="timeout_value">Timeout (Seconds): %1$d</string>
+    <string name="timeout_empty">Scanning Timeout (Seconds):</string>
+    <string name="timeout_value">Scanning Timeout (Seconds): %1$d</string>
+    <string name="id_wait_time_empty">Wait Time on Identification Screen:</string>
+    <string name="id_wait_time_value">Wait Time on Identification Screen: %1$d</string>
     <string name="sync_settings_label">Sync Settings</string>
     <string name="search_settings_label">Search Settings</string>
     <string name="user_label">User</string>
