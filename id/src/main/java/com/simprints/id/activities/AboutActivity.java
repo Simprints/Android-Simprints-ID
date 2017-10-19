@@ -16,7 +16,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
@@ -239,7 +238,6 @@ public class AboutActivity extends AppCompatActivity {
         appState.getData().recoverRealmDb(androidId + "_" + Long.toString(System.currentTimeMillis()) + ".json",
                 androidId,
                 Constants.GROUP.GLOBAL,
-                BuildConfig.DEBUG,
                 new DataCallback() {
             @Override
             public void onSuccess() {
