@@ -142,7 +142,7 @@ public class Setup {
     // STEP 2
     private void initDbContext(@NonNull final Activity activity) {
         onProgress(10, R.string.updating_database);
-        DatabaseContext dbContext = new DatabaseContext(appState.getApiKey(), appState.getUserId(), appState.getModuleId(), appState.getDeviceId(), activity, BuildConfig.DEBUG);
+        DatabaseContext dbContext = new DatabaseContext(appState.getApiKey(), appState.getUserId(), appState.getModuleId(), appState.getDeviceId(), activity, BuildConfig.FIREBASE_PROJECT);
         appState.setData(dbContext);
 
         dbContext.registerAuthListener(new AuthListener() {
