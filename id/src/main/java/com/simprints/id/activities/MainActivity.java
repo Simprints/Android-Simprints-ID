@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.simprints.id.R;
+import com.simprints.id.activities.matching.MatchingActivity;
 import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.controllers.Setup;
