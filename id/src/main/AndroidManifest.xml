@@ -72,7 +72,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.MatchingActivity"
+            android:name=".activities.matching.MatchingActivity"
             android:label="Matching"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
