@@ -52,7 +52,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.FrontActivity"
+            android:name=".activities.front.FrontActivity"
             android:label="@string/title_activity_front"
             android:launchMode="standard">
             <intent-filter>
