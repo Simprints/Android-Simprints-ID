@@ -91,6 +91,7 @@
     <string name="nav_sync_complete">Sync Complete</string>
     <string name="nav_sync_failed">Sync Failed</string>
     <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
+    <string name="persistence_label">Remember these settings next time</string>
     <!-- Toast Messages -->
     <string name="coming_soon">Coming soon…</string>
     <!-- Finger Names -->

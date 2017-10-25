@@ -619,7 +619,7 @@ public class MainActivity extends AppCompatActivity implements
             checked[i] = fingers[i].isActive();
             labels[i] = getString(FingerRes.get(fingers[i]).getNameId());
         }
-        labels[fingers.length] = "Persist Settings?";
+        labels[fingers.length] = getString(R.string.persistence_label);
         checked[fingers.length] = sharedPref.getFingerStatusPersist();
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle("Add Finger(s)")
