@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+
+    <!-- AndroidManifest : activity titles throughout the app -->
+    <!-- Activity Titles -->
+    <string name="register_title">شاملیدل</string>
+    <string name="identify_title">مشخص کول</string>
+    <string name="update_title">تجدیدول (اپدیټ)</string>
+    <string name="verify_title">پیدا کول</string>
+    <string name="help_title">مرسته</string>
+    <string name="settings_title">تنظیمات</string>
+    <string name="about_title">د برنامې په اړه</string>
+    <string name="alert_title">پاملرنه</string>
+    <string name="tutorial_title">ځانګړي تمرین</string>
+    <string name="refusal_label">د انکار فورم</string>
+    <string name="privacy_label">محرمیت</string>
+
+
+    <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
+    <!-- Sync Button Text -->
+    <string name="sync_data">د معلوماتو همګامول</string>
+    <string name="syncing">همګامول</string>
+    <string name="not_signed_in">سیسټم کې دننه شوی نه یاست</string>
+
+
+    <!-- SetupActivity : the loading screen -->
+    <!-- Consent Text -->
+    <string name="short_consent">سمپرنټ (Simprints) وکولې شو څو ستاسو معلومات پیدا کړي. که چیرې دغه معلومات غلط دی او یا تاسو یې په اړه پوښتنه لرئ نو ما ته ووایاست، له هغه پرته، د خپل کیڼ لاس غټه ګوته په هوار ډول په سنسور کېږدئ</string>
+    <string name="confirm_consent">د رضایت لپاره دلته کلیک وکړئ</string>
+    <!-- Loading Messages-->
+    <string name="loading">د آماده کیدو پر حال</string>
+    <string name="updating_database">ډیټابیس د تجدید یا اپدیټ په حال کی ده…</string>
+    <string name="launch_checking_permissions">د چک کولو اجازه</string>
+    <string name="launch_checking_api_key">د ...... د چک کولو په حال</string>
+    <string name="launch_bt_connect">له Veroسره د اړیکې په حال کې</string>
+    <string name="launch_wake_un20">د .... برابرول</string>
+    <string name="launch_setup">د .... آماده کول</string>
+    <string name="launch_checking_person_in_db">د دی چک کول چې کس په دیټابیس کې شامل دی</string>
+
+
+    <!-- MainActivity : screen where the scanning happens -->
+    <!-- Screen Text -->
+    <string name="good_scan_direction">د بلي ګوتې لپاره چپ خواته پر صفحې ګوته راکیکاږئ</string>
+    <string name="last_scan_message">د دوام لپاره د تیر پر علامه ګوته راکیکاږئ</string>
+    <string name="please_scan">په مهربانۍ سره سکن یې کړئ</string>
+    <string name="poor_scan_direction">په مهربانۍ سره بیا سکن کړئ</string>
+    <string name="scanning">د سکن کولو په حال کې …</string>
+    <string name="good_scan_message">ښه سکن</string>
+    <string name="poor_scan_message">ضعیفه سکن</string>
+    <string name="reconnecting_message">بیا ځلې نښلیدل</string>
+    <!-- Button Labels -->
+    <string name="rescan_label">بیا ځلې سکن</string>
+    <string name="rescan_label_question">بیا ځلې سکن یعنی څه؟</string>
+    <string name="scan_label">سکن</string>
+    <string name="cancel_button" tools:ignore="ButtonCase">لغو کول</string>
+    <string name="ok">اوکی</string>
+    <string name="scan">سکن</string>
+    <!-- Content Descriptions -->
+
+
+    <!-- activity_main_drawer.xml : menu that comes out from the top left of the MainActivity -->
+    <!-- Menu Titles -->
+    <string name="action_settings">تنظیمات</string>
+    <string name="menu_header">Simprints آی دی دستگاه</string>
+    <string name="menu_subheader">Every person counts!</string>
+    <!-- Menu Labels -->
+    <string name="fingerprints_menu">د ګوتې نښان</string>
+    <string name="help_menu">مرسته</string>
+    <string name="about_menu">معلومات</string>
+    <string name="help_and_support_menu">مرسته او ملاتړ</string>
+    <string name="configuration_menu">تنظیمات</string>
+    <string name="nav_add_finger">ګوته اضافه کړئ</string>
+    <string name="nav_select_finger">ګوته انتخاب کړئ</string>
+    <string name="nav_settings">تنظیمات</string>
+    <string name="nav_sync">همګامه کېدل</string>
+    <string name="nav_offline">آفلاین</string>
+    <string name="nav_sync_complete">همګامول یا تنظیمول تکمیل شو</string>
+    <string name="nav_sync_failed">همګامول ناکامه شو</string>
+    <string name="privacy_and_consent">محرمیت او رضایت</string>
+    <string name="persistence_label">دغه تنظیمات مو د بل وخت لپاره په یاد وي</string>
+    <!-- Toast Messages -->
+    <string name="coming_soon">ډیر ژر…</string>
+    <!-- Finger Names -->
+    <string name="l_5_finger_name">د چپ لاس پنځمه ګوته</string>
+    <string name="l_4_finger_name">د چپ لاس څلورمه ګوته</string>
+    <string name="l_3_finger_name">د چپ لاس دریمه ګوته</string>
+    <string name="l_2_finger_name">د چپ لاس د شهادت ګوته</string>
+    <string name="l_1_finger_name">چپ لاس غټه ګوته</string>
+    <string name="r_1_finger_name">د ښی لاس غټه ګوته</string>
+    <string name="r_2_finger_name">د ښې لاس د شهادت ګوته</string>
+    <string name="r_3_finger_name">د ښې لاس دریمه ګوته</string>
+    <string name="r_4_finger_name">د ښې لاس څلورمه ګوته</string>
+    <string name="r_5_finger_name">د ښې لاس پنځمه ګوته</string>
+
+
+    <!-- MatchingActivity : the waiting screen after an identification -->
+    <!-- Screen Text -->
+    <string name="please_wait">صبر وکړئ څو مو تشخیص ته ادامه ورکړو</string>
+    <!-- Loading text -->
+    <string name="loading_candidates">د ګډونوالو د آماده کولو په حال</string>
+    <string name="loaded_candidates_one">%d ..... فیصده کسان د آماده کیدو پر حال</string>
+    <string name="loaded_candidates_other">%d .... کسان آمده شوی دی</string>
+    <string name="matching_fingerprints">د ګوتو د نښانو د مطابقت په حال کی</string>
+    <string name="returning_results">پایله د لاسته راتلو په حال کی</string>
+    <string name="returned_results_one">d% فیصده پایله لاسته راغله</string>
+    <string name="returned_results_other">d% فیصده پایله لاسته راغله</string>
+    <string name="tier1or2_matches_zero">دومره ښه مطابقت نه</string>
+    <string name="tier1or2_matches_one">d% فیصده ډیر ښه مطابقت</string>
+    <string name="tier1or2_matches_other">d% ډیر ښه مطابقت</string>
+    <string name="tier3_matches_zero">ښه مطابقت نه</string>
+    <string name="tier3_matches_one">d% ښه مطابقت</string>
+    <string name="tier3_matches_other">d% ښه مطابقتونه</string>
+    <string name="tier4_matches_zero">ورته والی یا مطابقت نلری</string>
+    <string name="tier4_matches_one">d% مطابقت لری</string>
+    <string name="tier4_matches_other">d% سره ورته دي</string>
+
+
+    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- Error Message Titles -->
+    <string name="bluetooth_error_title">په بلوتوت کې تیروتنه</string>
+    <string name="configuration_error_title">به تنظماتو کې تیروتنه</string>
+    <string name="disconnected_title">سکینر ونه موندل شو</string>
+    <string name="verify_guid_not_found_title">کس پیدا نشو</string>
+    <string name="error_occurred_title">تیروتنه رامنځته شوه</string>
+    <string name="low_battery_title">د بطرۍ چارج لږ دی</string>
+    <string name="alert_api_key_verify_failed">د API Key پیژندنه ناکامه شوه</string>
+    <!-- Error Message Text -->
+    <string name="missing_apikey_message">د missing API key په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="invalid_apikey_message">د (invalid API Key)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="invalid_intentAction_message">د (invalid Intent Action)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="invalid_metadata_message">د (invalid metadata)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="missing_userId_message">د no user ID په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="missing_moduleId_message">د no module ID په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="missing_updateId_message">د no update GUID په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="missing_verifyId_message">د no verify GUID په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="verify_guid_not_found_online_message">هغه کس چي د تشخیص لپاره انتخاب شوی په ډیټابیس کې شتون نلری</string>
+    <string name="verify_guid_not_found_offline_message">کس پیدا نشو، په مهربانۍ سره ځان ډاډه کړئ چې انټرنټ سره وصل یاست او بیا له سر نه کوښښ وکړئ</string>
+    <string name="bluetooth_not_supported_message">په دغه دستګاه کې بلوتوت کار نه ورکوي، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="bluetooth_not_enabled_message">بلوتوت فعاله نه ده، په مهربانۍ سره ځان ډاده کړئ چې بلوتوت په تنظیماتو کې فعال شوي دی او بیا کوښښ وکړئ.</string>
+    <string name="unbonded_scanner_message">دغه سکینر د لاسرسۍ وړ نه ده. په مهربانۍ سره ځان ډاډه کړئ چې سکینر لږیدلې او موبایل ته نژدې ایښودل شوی دی</string>
+    <string name="multiple_scanners_found_message">له یوه څخه ډیر سکینر له موبایل سره وصل شوی، په مهربانۍ سره د هغه سکینر ارتباط چې تاسو ورته اړتیا نه لرئ له موبایل سره قطع کړئ.</string>
+    <string name="disconnected_message">دغه سکینر د لاسرسۍ وړ نه ده. په مهربانۍ سره ځان ډاډه کړئ چې سکینر لږیدلې او موبایل ته نژدې ایښودل شوی دی</string>
+    <string name="low_battery_message">د سکینر بطري په ختمیدو ده. په مهربانۍ سره د خپل سکینر بطري چارج کړئ.</string>
+    <string name="unforeseen_error_message">بښنه غواړو، غیر مترقبه تیروتنه ترسره شوی، د دوام لپاره پروګرام بند کړئ</string>
+    <string name="alert_api_key_verify_failed_body">مونږ ونشو کړې څو ستاسو .... وپیژنو، په مهربانۍ سره ځان ډاډه کړئ چې له انټرنټ سره وصل یاست او وروسته بیا کوښښ وکړئ.</string>
+    <!-- Button Labels For Error Messages -->
+    <string name="close">بندول</string>
+    <string name="try_again_label">په مهربانۍ سره بیا کوښښ وکړئ</string>
+    <string name="settings_label">د ټیلفون تنظیمات</string>
+
+
+    <!-- AboutActivity : the screen that shows project statistics and version numbers -->
+    <!-- Screen Text -->
+    <string name="database_information">د ډیټابیس په اړه معلومات</string>
+    <string name="user_count">د ګټه اخیستونکو شمیر:</string>
+    <string name="module_count">د مادیول شمیره :</string>
+    <string name="project_count">د پروژو شمیر :</string>
+    <string name="about_app_version">د اپلیکيشن نسخه :</string>
+    <string name="about_libsimprints_version">د ګوتې د نښان اخستلو د ماشین مودل :</string>
+    <string name="about_scanner_version">د سکینر نسخه یا ډول :</string>
+    <!-- Button Labels -->
+    <!-- Recovery dialogs -->
+    <string name="recovering_db">د معلوماتو بیا لاسته راوړل.... لږ څه وخت نیسې</string>
+    <string name="error">تیروتنه</string>
+    <string name="error_recovery_message">د ریکوري شوي فایل په رالیږلو کې ستونزه</string>
+    <string name="success_recovery_message">د دوباره لټون فایل په بریالیتوب سره اپلوډ شو</string>
+    <string name="dismiss">راوتل</string>
+
+
+    <!-- SettingsActivity : the detailed settings screen -->
+    <!-- Setting Labels -->
+    <string name="settings_select_language">د ژبې انتخاب</string>
+    <string name="nudge_mode_checkbox_name">Nudge Mode</string>
+    <string name="vibrate">لرزه کول</string>
+    <string name="quality_threshold_empty">د کیفیت کچه:</string>
+    <string name="quality_threshold_value">د کیفیت کچه: %1$d</string>
+    <string name="nb_of_ids_empty">د راغوښتل شویو معلوماتو تشخیص :</string>
+    <string name="nb_of_ids_value">د راغوښتل شویو معلوماتو تشخیص:%1$d</string>
+    <string name="timeout_empty">وخت پوره شو (په سانیو):</string>
+    <string name="timeout_value">وخت پوره شو (په سانیو): %d</string>
+    <string name="sync_settings_label">د همګامولو تنظیمات</string>
+    <string name="search_settings_label">د تنظیماتو د پیدا کولو په حال کی</string>
+    <string name="user_label">ګټه اخیستونکی</string>
+    <string name="module_label">مادیول</string>
+    <string name="project_label">پروژه</string>
+
+
+    <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
+    <!-- Screen Text -->
+    <string name="why_did_you_skip_fingerprinting">د گوتي د نښان ورکولو څخه مو ولې ډډه وکړه؟</string>
+    <!-- Button Labels -->
+    <string name="button_submit">سپارل</string>
+    <string name="button_scan_prints">اوکی</string>
+    <!-- Refusal Selection Points -->
+    <string name="scanner_not_here">سکنر شتون نلری</string>
+    <string name="scanner_not_working">سکنر کار نه ورکوي</string>
+    <string name="unable_to_capture_a_good_scan">نشي کولي څو ښه سکن واخلي</string>
+    <string name="beneficiary_was_physically_unable">ګټه اخیستونکی له فزیکي پلوه نشو کولی څو د خپلې ګوټې نښان راکړي (د بیلګې په توګه: د درد احساس یې کاوه او یا یې ګوټې نه وې)</string>
+    <string name="beneficiary_refused">ګټه اخیستونکی انکار وکړ</string>
+    <string name="other">نور</string>
+    <!-- Text Prompt -->
+    <string name="hint_other_reason">لا ډير معلومات</string>
+
+
+    <!-- PrivacyActivity : the screen where the user can find the long consent form -->
+    <!-- Long Consent -->
+    <string name="long_consent">
+        <b><u>Privacy and Consent</u></b>\n\n
+        If you put your finger on the scanner, it will record information about your fingerprint. It will also record the approximate location where this scan took place, and the time and date of the scan. \n \n
+        All this information of yours will be stored by Simprints Technology Limited, which is a British NGO. \n\n
+        Simprints will use your information to help identify you in the future, and match you to your records. \n\n
+        Simprints may also use your information to improve the accuracy of its service, and may share it with other experts for this purpose. \n\n
+        Simprints may also use your information to apply a better understanding of service delivery in your location. \n\n
+        In the future, Simprints may also use your information to help other partner development organisations to identify you, and may share your information with those organisations for that purpose. \n\n
+        Simprints expects that its work here will last three years. Simprints will keep your information for the duration of its work here, and for 2 years after that work has finished. Simprints will then delete your information. \n\n
+        Simprints will not store any fingerprint images. \n\n
+        Simprints will not give any information that it holds on you to any state, unless required to do so by law. \n\n
+        You do not have to agree to give Simprints any information to receive services. But if you do not then development organisations may find it harder to find your records in the future.\n\n
+        If you have previously been happy for Simprints to store and use your information, but you have changed your mind and you do not want this to continue, then please speak to me. \n\n
+
+        <b><u>Frequently asked Questions</u></b> \n\n
+        <b>I am no longer happy for Simprints to keep and use my information. What should I do?</b>\n\n
+        You are free to ask Simprints to delete your information at any time. To do so, you will have to give your fingerprints to the development worker one last time, so that Simprints can identify you. Once you have done that, Simprints will delete all the information it has that relates to you.\n\n
+        You should, however, bear in mind that if Simprints deletes your information then development organisations may find it harder to find your records.\n\n
+        <b>Who are Simprints?</b>\n\n
+        Simprints Technology Limited is a British NGO that is helping development organisations to match beneficiaries like you to their records.\n\n
+        <b>What information will Simprints store about me?</b>\n\n
+        Simprints will store information about your scanned fingerprints. It will also store the approximate location where any scan takes place, together with the time and date of any such scan.\n\n
+        Simprints will not store any other identifying information about you, such as your name or date of birth. Simprints will not store any of your personal records. Simprints will not store any images of your fingerprints.\n\n
+        <b>What will Simprints do with my information?</b>\n\n
+        Simprints will use your information to help development organisations identify you in the future, and match you to your records.\n\n
+        Simprints may also use your information to improve the accuracy of its service, and may share it with other experts for this purpose.\n\n
+        Simprints may also use your information to apply a better understanding of service delivery in your location.\n\n
+        In the future, Simprints may also use your information to help other partner development organisations to identify you, and may share this information with those organisations for that purpose.\n\n
+        <b>How long will Simprints keep my information for?</b>\n\n
+        Simprints expects that its work here will last for three years. Simprints will keep your information for the duration of its work here, and for 2 years after that work has finished. Simprints will then delete your information.\n\n
+        <b>Will Simprints store any fingerprint images?</b>\n\n
+        Simprints will not store any fingerprint images.\n\n
+        <b>Will Simprints give my information to the Government?</b>\n\n
+        Simprints will not give any information that it holds on you to the Government, unless required to do so by law.\n\n
+        <b>Do I have to agree to my fingerprints being taken?</b>\n\n
+        You do not have to agree to give Simprints any information to receive services. But if you do not then development organisations may find it harder to find your records in the future. \n\n
+
+        <b><u>Development Worker Consent</u></b>\n\n
+        Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
+    </string>
+    <string name="developmentworker_consent_checkbox">له دیټا څخه د SimPrints په توګه کار اخیستنې په اړه رضایت لرم</string>
+
+
+</resources>
