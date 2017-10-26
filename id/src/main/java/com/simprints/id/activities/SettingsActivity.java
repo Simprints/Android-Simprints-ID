@@ -262,6 +262,13 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
                 sharedPref.setLanguageString("bn");
                 sharedPref.setLanguagePositionInt(2);
                 break;
+            case 3:
+                sharedPref.setLanguageString("ps");
+                sharedPref.setLanguagePositionInt(3);
+                break;
+            case 4:
+                sharedPref.setLanguageString("fa-rAF");
+                sharedPref.setLanguagePositionInt(4);
         }
     }
 

@@ -104,21 +104,21 @@
     <string name="please_wait">صبر کنید تا ما به شناسایی ادامه دهیم</string>
     <!-- Loading text -->
     <string name="loading_candidates">در حال آماده سازی اشتراک کنندگان</string>
-    <string name="loaded_candidates_one">%d فرد یا اشتراک کننده آماده است</string>
-    <string name="loaded_candidates_other">%d افراد یا اشتراک کنندگان آماده شدند</string>
+    <string name="loaded_candidates_one"> فرد یا اشتراک کننده آماده است %d</string>
+    <string name="loaded_candidates_other"> افراد یا اشتراک کنندگان آماده شدند %d</string>
     <string name="matching_fingerprints">در حال مطابقت نشان انگشتان</string>
     <string name="returning_results">نتیجه در حال بدست آمدن</string>
-    <string name="returned_results_one">d% نتیجه بدست آمد</string>
-    <string name="returned_results_other">d% نتیجه بدست آمد</string>
+    <string name="returned_results_one"> نتیجه بدست آمد %d</string>
+    <string name="returned_results_other"> نتیجه بدست آمد %d</string>
     <string name="tier1or2_matches_zero">آنقدر مطابقت خوب نه</string>
-    <string name="tier1or2_matches_one">d% فیصد بسیار خوب مطابقت داشت</string>
-    <string name="tier1or2_matches_other">d% مطابقت بسیار خوب</string>
+    <string name="tier1or2_matches_one"> فیصد بسیار خوب مطابقت داشت %d</string>
+    <string name="tier1or2_matches_other"> مطابقت بسیار خوب %d</string>
     <string name="tier3_matches_zero">مطابقت خوب نه</string>
-    <string name="tier3_matches_one">d% مطابقت خوب</string>
-    <string name="tier3_matches_other">d% مطابقت های خوب</string>
+    <string name="tier3_matches_one"> مطابقت خوب %d</string>
+    <string name="tier3_matches_other"> مطابقت های خوب %d</string>
     <string name="tier4_matches_zero">مطابقت ندارد</string>
-    <string name="tier4_matches_one">d% مطابقت دارد</string>
-    <string name="tier4_matches_other">d% در مطابقت است</string>
+    <string name="tier4_matches_one"> مطابقت دارد %d</string>
+    <string name="tier4_matches_other"> در مطابقت است %d</string>
 
 
     <!-- AlertActivity : the Simprints ID error message screen -->
