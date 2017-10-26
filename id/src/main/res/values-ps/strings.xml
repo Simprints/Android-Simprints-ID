@@ -99,21 +99,21 @@
     <string name="please_wait">صبر وکړئ څو مو تشخیص ته ادامه ورکړو</string>
     <!-- Loading text -->
     <string name="loading_candidates">د ګډونوالو د آماده کولو په حال</string>
-    <string name="loaded_candidates_one">%d ..... فیصده کسان د آماده کیدو پر حال</string>
-    <string name="loaded_candidates_other">%d .... کسان آمده شوی دی</string>
+    <string name="loaded_candidates_one"> ..... فیصده کسان د آماده کیدو پر حال %d</string>
+    <string name="loaded_candidates_other">.... کسان آمده شوی دی %d</string>
     <string name="matching_fingerprints">د ګوتو د نښانو د مطابقت په حال کی</string>
     <string name="returning_results">پایله د لاسته راتلو په حال کی</string>
-    <string name="returned_results_one">d% فیصده پایله لاسته راغله</string>
-    <string name="returned_results_other">d% فیصده پایله لاسته راغله</string>
+    <string name="returned_results_one"> فیصده پایله لاسته راغله %d</string>
+    <string name="returned_results_other"> فیصده پایله لاسته راغله %d</string>
     <string name="tier1or2_matches_zero">دومره ښه مطابقت نه</string>
-    <string name="tier1or2_matches_one">d% فیصده ډیر ښه مطابقت</string>
-    <string name="tier1or2_matches_other">d% ډیر ښه مطابقت</string>
+    <string name="tier1or2_matches_one"> فیصده ډیر ښه مطابقت %d</string>
+    <string name="tier1or2_matches_other">ډیر ښه مطابقت %d</string>
     <string name="tier3_matches_zero">ښه مطابقت نه</string>
-    <string name="tier3_matches_one">d% ښه مطابقت</string>
-    <string name="tier3_matches_other">d% ښه مطابقتونه</string>
+    <string name="tier3_matches_one"> ښه مطابقت %d</string>
+    <string name="tier3_matches_other"> ښه مطابقتونه %d</string>
     <string name="tier4_matches_zero">ورته والی یا مطابقت نلری</string>
-    <string name="tier4_matches_one">d% مطابقت لری</string>
-    <string name="tier4_matches_other">d% سره ورته دي</string>
+    <string name="tier4_matches_one"> مطابقت لری %d</string>
+    <string name="tier4_matches_other">سره ورته دي %d</string>
 
 
     <!-- AlertActivity : the Simprints ID error message screen -->

@@ -3,6 +3,7 @@ package com.simprints.id.activities;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements
     private final static int ABOUT_ACTIVITY_REQUEST_CODE = 4;
 
     private boolean buttonContinue = false;
+
+    private boolean rightToLeft = false;
 
     private static ScanConfig DEFAULT_CONFIG;
 
@@ -352,6 +355,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initViewPager() {
+        // If the layout is from right to left, we need to reverse the scrolling direction
+        rightToLeft = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 &&
+                getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+
         viewPager.setAdapter(pageAdapter);
         viewPager.setOffscreenPageLimit(1);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -377,6 +384,10 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
         viewPager.setCurrentItem(currentActiveFingerNo);
+
+        if (rightToLeft) {
+            viewPager.setRotationY(180);
+        }
     }
 
     private void refreshDisplay() {
@@ -409,6 +420,9 @@ public class MainActivity extends AppCompatActivity implements
 
         FingerFragment fragment = pageAdapter.getFragment(currentActiveFingerNo);
         if (fragment != null) {
+            if (rightToLeft && fragment.getView() != null) {
+                fragment.getView().setRotationY(180);
+            }
             fragment.updateTextAccordingToStatus();
         }
 
