@@ -26,7 +26,7 @@
 
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
-    <string name="short_consent">सिम्प्रिन्ट्सले तपाइँको औंलाको छापबाट तपाइँको सहि पहिचान गर्दछ र यसबाट हामीलाई तपाइंको जानकारी भेटाउन सजिलो हुन्छ  | यसमा तपाइँलाइ अफ्ठ्यारो लाग्छ भने मलाई भन्न सक्नुहुन्छ | लाग्दैन भने कृपया आफ्नो देब्रे बुढी औंला यो स्क्यानरमा राख्नुहोस |</string>
+    <string name="short_consent">सिम्प्रिन्ट्सले तपाइँको औंलाको छाप र स्थानबाट तपाइँको सहि पहिचान गर्दछ र यसबाट हामीलाई तपाइंको जानकारी भेटाउन सजिलो हुन्छ | यसमा तपाइँलाइ अफ्ठ्यारो लाग्छ भने मलाई भन्न सक्नुहुन्छ | लाग्दैन भने कृपया आफ्नो देब्रे बुढी औंला यो स्क्यानरमा राख्नुहोस |</string>
     <string name="confirm_consent">आफ्नो सहमति जनाउन यहाँ थिच्नुहोस</string>
     <!-- Loading Messages-->
     <string name="loading">लोड हुँदै</string>
@@ -77,6 +77,7 @@
     <string name="nav_sync_complete">समक्रमण  पूरा</string>
     <string name="nav_offline">अफलाइन</string>
     <string name="privacy_and_consent"><![CDATA[गोपनियता तथा स्वीकृति]]></string>
+    <string name="persistence_label">"यी सेटिङ्हरू अर्को पालीको लागि याद रहोस "</string>
     <!-- Toast Messages -->
     <string name="coming_soon">छिट्टै आउंदै छ </string>
     <!-- Finger Names -->
@@ -95,6 +96,23 @@
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
     <string name="please_wait">एकैछिन पर्खनुहोस, हामी पहिचान गर्दैछौं </string>
+    <!-- Loading Text -->
+    <string name="loaded_candidates_one">%d व्यक्ति लोड भयो</string>
+    <string name="loaded_candidates_other">"%d व्यक्तिहरु लोड भयो "</string>
+    <string name="loading_candidates">व्यक्तिहरु लोड गर्दै …</string>
+    <string name="matching_fingerprints">औठाछापहरू मिलाई रहेको अवस्था…</string>
+    <string name="returned_results_one">"%d परिणाम फिर्ता गरियो "</string>
+    <string name="returned_results_other">"%d परिणामहरु फिर्ता गरियो "</string>
+    <string name="returning_results">परिणामहरु फिर्ता गर्दै</string>
+    <string name="tier1or2_matches_one">"%d धेरै राम्ररी मिल्ने व्यक्ति भेटिए "</string>
+    <string name="tier1or2_matches_other">%d धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिए</string>
+    <string name="tier1or2_matches_zero">"कुनै धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिएन "</string>
+    <string name="tier3_matches_one">%d धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिए</string>
+    <string name="tier3_matches_other">"कुनै धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिएन "</string>
+    <string name="tier3_matches_zero">%d राम्ररी मिल्ने व्यक्ति भेटिए</string>
+    <string name="tier4_matches_one">%d राम्ररी मिल्ने व्यक्तिहरु भेटिए</string>
+    <string name="tier4_matches_other">"कुनै राम्ररी मिल्ने व्यक्तिहरु भेटिएन "</string>
+    <string name="tier4_matches_zero">"%d मिल्ने व्यक्ति भेटिए "</string>
 
 
     <!-- AlertActivity : the Simprints ID error message screen -->
@@ -129,7 +147,6 @@
     <string name="close">बन्द गर्नुहोस</string>
     <string name="try_again_label">फेरी प्रयास गर्नुहोस </string>
     <string name="settings_label">फोनको सेटिंगहरु </string>
-    <!-- Content Descriptions -->
 
 
     <!-- AboutActivity : the screen that shows project statistics and version numbers -->
@@ -141,6 +158,12 @@
     <string name="about_app_version">एप्स संस्करण</string>
     <string name="about_libsimprints_version">LibSimprints संस्करण</string>
     <string name="about_scanner_version">सिम्प्रिन्ट्स संस्करण</string>
+    <!-- Recovery dialogs -->
+    <string name="recovering_db">"डाटाबेस पुनःप्राप्त गर्दै… यसलाई केहि समय लग्नेछ "</string>
+    <string name="error">गल्ती भयो</string>
+    <string name="error_recovery_message">रिकभरी फाइल अपलोड गर्दा त्रुटि भयो</string>
+    <string name="success_recovery_message">रिकभरी फाइल सफलतापूर्वक अपलोड गरियो</string>
+    <string name="dismiss">खारेज गर्नुहोस्</string>
 
 
     <!-- SettingsActivity : the detailed settings screen -->
@@ -180,7 +203,7 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-    <string name="healthworker_consent_checkbox">सिम्प्रिन्ट्सलाई यो डाटा प्रयोग गर्न मेरो स्वीकृति छ   </string>
+    <string name="developmentworker_consent_checkbox">"सिम्प्रिन्ट्सलाई यो डाटा प्रयोग गर्न मेरो स्वीकृति छ   "</string>
     <string name="long_consent">
         \n
         तपाईँले यस स्क्यानरमा औँला राख्नुभयो भने यसले तपाईँको औँठाछापका साथै यो रेकर्ड गरेको स्थान, मिति र समयको जानकारी राख्छ ।   \n
