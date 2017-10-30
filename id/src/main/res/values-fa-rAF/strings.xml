@@ -254,9 +254,4 @@
     </string>
 
 
-    <!-- Miscellaneous -->
-    <!-- The Empty String -->
-    <string name="empty" translatable="false" />
-
-
 </resources>

@@ -205,6 +205,7 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
+    <string name="developmentworker_consent_checkbox">له دیټا څخه د SimPrints په توګه کار اخیستنې په اړه رضایت لرم</string>
     <string name="long_consent">
         <b><u>Privacy and Consent</u></b>\n\n
         If you put your finger on the scanner, it will record information about your fingerprint. It will also record the approximate location where this scan took place, and the time and date of the scan. \n \n
@@ -245,7 +246,6 @@
         <b><u>Development Worker Consent</u></b>\n\n
         Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
     </string>
-    <string name="developmentworker_consent_checkbox">له دیټا څخه د SimPrints په توګه کار اخیستنې په اړه رضایت لرم</string>
 
 
 </resources>

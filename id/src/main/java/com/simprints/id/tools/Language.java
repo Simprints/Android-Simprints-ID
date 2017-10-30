@@ -12,6 +12,10 @@ public class Language {
 
         Locale locale;
 
+        /*
+         * Languages are usually two characters, except if they also contain a region.
+         * If they contain a region they follow the format [language]-r[REGION] e.g. fa-rAF
+         */
         if (languageToLoad.contains("-r") && languageToLoad.length() > 2) {
 
             int indexOfFlag = -1;

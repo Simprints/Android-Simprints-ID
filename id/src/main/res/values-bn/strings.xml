@@ -179,8 +179,8 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
+    <string name="developmentworker_consent_checkbox">এই তথ্য এই উপায়ে ব্যবহার করার জন্য আমি Simprints এর সাথে সম্মত</string>
     <string name="long_consent">
-        <string name="developmentworker_consent_checkbox">এই তথ্য এই উপায়ে ব্যবহার করার জন্য আমি Simprints এর সাথে সম্মত</string>
         <b><u>গোপনীয়তা এবং কনসেন্ট</u></b>\n\n
         আপনি যদি আপনার আঙুল স্ক্যানারে রাখেন তবে তা আপনার আঙুলের ছাপ সংগ্রহ করবে এটি আরো আপনার সম্ভাব্য অবস্থান, যেখানে ছাপ গ্রহন করা হয়েছে এবং সময় ও তারিখও নথিবদ্ধ করবে \n \n
         একটি বৃটিশ বেসরকারী প্রতিষ্ঠান সিমপ্রিন্টস টেকনোলজি লিমিটেড আপনার এ তথ্য গুলো যাচাই করবে \n\n
