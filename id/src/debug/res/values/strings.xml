@@ -4,7 +4,7 @@
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- App Name -->
-    <string name="app_name" translatable="false">Id DEBUG</string>
+    <string name="app_name" translatable="false">Simprints ID DEBUG</string>
     <!-- Activity Titles -->
     <string name="title_activity_front" translatable="false">Simprints ID DEBUG</string>
 

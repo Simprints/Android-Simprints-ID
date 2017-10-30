@@ -152,20 +152,20 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
             setProgress(90);
         }
 
-        void setIdentificationProgressFinished(int returnSize, int tier1Matches, int tier2Matches, int tier3Matches) {
+        void setIdentificationProgressFinished(int returnSize, int tier1Or2Matches, int tier3Matches, int tier4Matches) {
             progressText2.setText(getStringPlural(MatchingActivity.this, R.string.returned_results_quantity_key, returnSize, returnSize));
 
-            if (tier1Matches > 0) {
+            if (tier1Or2Matches > 0) {
                 resultText1.setVisibility(View.VISIBLE);
-                resultText1.setText(getStringPlural(MatchingActivity.this, R.string.tier1_matches_quantity_key, tier1Matches, tier1Matches));
+                resultText1.setText(getStringPlural(MatchingActivity.this, R.string.tier1or2_matches_quantity_key, tier1Or2Matches, tier1Or2Matches));
             }
-            if (tier2Matches > 0) {
+            if (tier3Matches > 0) {
                 resultText2.setVisibility(View.VISIBLE);
-                resultText2.setText(getStringPlural(MatchingActivity.this, R.string.tier2_matches_quantity_key, tier2Matches, tier2Matches));
+                resultText2.setText(getStringPlural(MatchingActivity.this, R.string.tier3_matches_quantity_key, tier3Matches, tier3Matches));
             }
-            if ((tier1Matches < 1 && tier2Matches < 1) || tier3Matches > 1) {
+            if ((tier1Or2Matches < 1 && tier3Matches < 1) || tier4Matches > 1) {
                 resultText3.setVisibility(View.VISIBLE);
-                resultText3.setText(getStringPlural(MatchingActivity.this, R.string.tier3_matches_quantity_key, tier3Matches, tier3Matches));
+                resultText3.setText(getStringPlural(MatchingActivity.this, R.string.tier4_matches_quantity_key, tier4Matches, tier4Matches));
             }
             setProgress(100);
 
@@ -174,7 +174,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 public void run() {
                     finish();
                 }
-            }, 3000);
+            }, new SharedPref(getApplicationContext()).getMatchingEndWaitTime() * 1000);
         }
     }
 
@@ -333,19 +333,20 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         }
 
                         // finish
-                        int tier1Matches = 0;
-                        int tier2Matches = 0;
+                        int tier1Or2Matches = 0;
                         int tier3Matches = 0;
+                        int tier4Matches = 0;
                         for (Identification identification : topCandidates) {
                             switch (identification.getTier()) {
                                 case TIER_1:
-                                    tier1Matches++;
-                                    break;
                                 case TIER_2:
-                                    tier2Matches++;
+                                    tier1Or2Matches++;
                                     break;
                                 case TIER_3:
                                     tier3Matches++;
+                                    break;
+                                case TIER_4:
+                                    tier4Matches++;
                                     break;
                             }
                         }
@@ -355,7 +356,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         FormatResult.put( resultData, topCandidates);
                         setResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
-                                tier1Matches, tier2Matches, tier3Matches);
+                                tier1Or2Matches, tier3Matches, tier4Matches);
                         break;
                     }
                     case VERIFY: {

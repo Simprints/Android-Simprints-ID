@@ -45,7 +45,7 @@
                 android:onClick="onCheckBoxClicked"
                 android:padding="10dp"
                 android:paddingBottom="20dp"
-                android:text="@string/healthworker_consent_checkbox" />
+                android:text="@string/developmentworker_consent_checkbox" />
 
         </LinearLayout>
 
