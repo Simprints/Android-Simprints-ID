@@ -1,4 +1,5 @@
-package com.simprints.id.happypath;
+package com.simprints.id.testbucket01;
+
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,8 +9,10 @@ import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 import android.view.WindowManager;
 
+import com.simprints.id.FirstUseTest;
 import com.simprints.id.R;
 import com.simprints.id.activities.LaunchActivity;
 import com.simprints.libsimprints.Constants;
@@ -33,7 +36,7 @@ import static com.schibsted.spain.barista.BaristaSleepActions.sleep;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class HappyPathEnrolTest {
+public class SampleTest01 extends FirstUseTest {
     private static final String apiKey = "00000000-0000-0000-0000-000000000000";
     private static final String userId = "the_lone_user";
     private static final String moduleId = "the_one_and_only_module";
@@ -53,8 +56,11 @@ public class HappyPathEnrolTest {
     };
 
 
+    @Override
     @Before
     public void setUp() {
+        super.setUp();
+        Log.d("EndToEndTests", "testbucket01.SampleTest01.suiteSetUp()");
         final LaunchActivity activity = launchActivityActivityTestRule.getActivity();
         Runnable wakeUpDevice = new Runnable() {
             public void run() {
@@ -64,7 +70,6 @@ public class HappyPathEnrolTest {
             }
         };
         activity.runOnUiThread(wakeUpDevice);
-
     }
 
 
@@ -78,6 +83,7 @@ public class HappyPathEnrolTest {
      */
     @Test
     public void successfulEnrol() {
+        Log.d("EndToEndTests", "testbucket01.SampleTest01 actual test");
 
         onView(ViewMatchers.withText(R.string.short_consent))
                 .check(matches(isDisplayed()));
@@ -110,6 +116,10 @@ public class HappyPathEnrolTest {
         // Check that a patient was indeed saved to the database
     }
 
+    @Override
     @After
-    public void cleanUp() {}
+    public void tearDown() {
+        super.tearDown();
+        Log.d("EndToEndTests", "testbucket01.SampleTest01.suiteTearDown()");
+    }
 }
