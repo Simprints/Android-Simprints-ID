@@ -187,6 +187,43 @@
                 android:layout_margin="15dp"
                 android:background="#3F000000" />
 
+            <TextView
+                android:id="@+id/tv_id_wait_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/id_wait_time_empty"
+                android:textSize="20sp" />
+
+            <TableRow>
+
+                <TextView
+                    android:id="@+id/tv_min_id_wait_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center" />
+
+                <SeekBar
+                    android:id="@+id/sb_id_wait_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3" />
+
+                <TextView
+                    android:id="@+id/tv_max_id_wait_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center" />
+
+            </TableRow>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="15dp"
+                android:background="#3F000000" />
+
 
             <TextView
                 android:layout_width="wrap_content"

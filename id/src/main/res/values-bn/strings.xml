@@ -179,7 +179,7 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-    <string name="healthworker_consent_checkbox">এই তথ্য এই উপায়ে ব্যবহার করার জন্য আমি Simprints এর সাথে সম্মত</string>
+    <string name="developmentworker_consent_checkbox">এই তথ্য এই উপায়ে ব্যবহার করার জন্য আমি Simprints এর সাথে সম্মত</string>
     <string name="long_consent">
         <b><u>গোপনীয়তা এবং কনসেন্ট</u></b>\n\n
         আপনি যদি আপনার আঙুল স্ক্যানারে রাখেন তবে তা আপনার আঙুলের ছাপ সংগ্রহ করবে এটি আরো আপনার সম্ভাব্য অবস্থান, যেখানে ছাপ গ্রহন করা হয়েছে এবং সময় ও তারিখও নথিবদ্ধ করবে \n \n
@@ -217,8 +217,8 @@
         <b>আঙুলের ছাপ দেয়ার ব্যাপারে আমি কি বাধ্য?</b>\n\n
         স্বাস্থ্য সেবা পাওয়ার জন্য সিমপ্রিন্টকে  কোন তথ্য দেয়ার ব্যাপারে আপনার বাধ্য হতে হবে না। কিন্তু আপনি যদি রাজী না হন তবে হয়তো আপনার স্বাস্থ্য তথ্যসমূহ খুঁজে পেতে সেবা প্রদান কারী প্রতিষ্ঠানের সমস্যা হতেও পারে \n\n
 
-        <b><u>Health Worker Consent</u></b>\n\n
-        Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other community health workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to patients.
+        <b><u>Development Worker Consent</u></b>\n\n
+        Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
     </string>
 
 
