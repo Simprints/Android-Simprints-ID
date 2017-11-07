@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.simprints.libdata.tools.Constants;
+import com.simprints.libsimprints.FingerIdentifier;
 
 
 public class SharedPref {
@@ -23,6 +24,8 @@ public class SharedPref {
     private static final String vibrate_bool = "VibrateOn";
     private static final String sync_group = "SyncGroup";
     private static final String match_group = "MatchGroup";
+    private static final String persist_finger = "PersistFingerStatus";
+    private static final String matching_end_wait_time = "MatchingEndWaitTime";
 
     public SharedPref(Context context) {
         sharedPref = context.getSharedPreferences(preference_file_key, Context.MODE_PRIVATE);
@@ -196,6 +199,58 @@ public class SharedPref {
     public void setLastUserIdString(String userId) {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(last_user_id, userId);
+        editor.apply();
+    }
+
+    /**
+     * Check if the finger status is persisted
+     *
+     * @return Is finger status persisted? Default is False
+     */
+    public boolean getFingerStatusPersist() {
+        return sharedPref.getBoolean(persist_finger, false);
+    }
+
+    /**
+     * Set if the finger status should be persisted
+     *
+     * @param fingerStatusPersist True = persist status, False = don't persist status
+     */
+    public void setFingerStatusPersist(Boolean fingerStatusPersist) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(persist_finger, fingerStatusPersist);
+        editor.apply();
+    }
+
+    /**
+     * Gets the status of a specific finger.
+     *
+     * @param fingerIdentifier The finger status to retrieve
+     * @return FingerConfig
+     */
+    public Boolean getFingerStatus(FingerIdentifier fingerIdentifier) {
+        return sharedPref.getBoolean(fingerIdentifier.toString(), false);
+    }
+
+    /**
+     * Set the status of a specific finger
+     *
+     * @param fingerIdentifier selected finger
+     * @param show             True = show, False = don't show
+     */
+    public void setFingerStatus(FingerIdentifier fingerIdentifier, Boolean show) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(fingerIdentifier.toString(), show);
+        editor.apply();
+    }
+
+    public int getMatchingEndWaitTime() {
+        return sharedPref.getInt(matching_end_wait_time, 1);
+    }
+
+    public void setMatchingEndWaitTime(int matchingEndWaitTime) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(matching_end_wait_time, matchingEndWaitTime);
         editor.apply();
     }
 }
