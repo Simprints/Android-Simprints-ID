@@ -9,9 +9,9 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 54
+        versionCode 55
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
-        versionName '2017.4.0'
+        versionName '2017.4.1'
     }
     buildTypes {
         debug {
