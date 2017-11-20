@@ -2,6 +2,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- This language is Afghan Farsi - more commonly known as Dari -->
+    <!-- Note: this file was added as pre- Android 7.0 was not correctly finding the fa-rAF language
+        This should always be an exact copy of the fa-rAF strings file
+        If actually wanting Iranian Farsi, then additional workarounds will be required -->
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- App Name -->

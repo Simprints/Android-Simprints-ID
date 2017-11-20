@@ -205,46 +205,62 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-    <string name="developmentworker_consent_checkbox">له دیټا څخه د SimPrints په توګه کار اخیستنې په اړه رضایت لرم</string>
+    <string name="developmentworker_consent_checkbox">له دیټا څخه د Simprints په توګه کار اخیستنې په اړه رضایت لرم</string>
     <string name="long_consent">
-        <b><u>Privacy and Consent</u></b>\n\n
-        If you put your finger on the scanner, it will record information about your fingerprint. It will also record the approximate location where this scan took place, and the time and date of the scan. \n \n
-        All this information of yours will be stored by Simprints Technology Limited, which is a British NGO. \n\n
-        Simprints will use your information to help identify you in the future, and match you to your records. \n\n
-        Simprints may also use your information to improve the accuracy of its service, and may share it with other experts for this purpose. \n\n
-        Simprints may also use your information to apply a better understanding of service delivery in your location. \n\n
-        In the future, Simprints may also use your information to help other partner development organisations to identify you, and may share your information with those organisations for that purpose. \n\n
-        Simprints expects that its work here will last three years. Simprints will keep your information for the duration of its work here, and for 2 years after that work has finished. Simprints will then delete your information. \n\n
-        Simprints will not store any fingerprint images. \n\n
-        Simprints will not give any information that it holds on you to any state, unless required to do so by law. \n\n
-        You do not have to agree to give Simprints any information to receive services. But if you do not then development organisations may find it harder to find your records in the future.\n\n
-        If you have previously been happy for Simprints to store and use your information, but you have changed your mind and you do not want this to continue, then please speak to me. \n\n
+        <b><u>د رضایت بیانیه: </u></b>\n\n
+کله چې پر سکینر باندې خپلې ګوتې ایږدئ نو ستاسو د ګوتې په اړه معلومات به ثبت کړي. دغه سکینر به د هغه ځاې تقریبي موقعیت چې ستاسو ګوتې په کې سکین شوي او همدارنګه د سکین کولو وخت او نیټه هم ثبت کړي. ستاسو ټول دغه معلومات د سمپرنټس ټکنالوژۍ له لارې چې یوه انګلیسي این جی او ده، ساتل کیږي.
 
-        <b><u>Frequently asked Questions</u></b> \n\n
-        <b>I am no longer happy for Simprints to keep and use my information. What should I do?</b>\n\n
-        You are free to ask Simprints to delete your information at any time. To do so, you will have to give your fingerprints to the development worker one last time, so that Simprints can identify you. Once you have done that, Simprints will delete all the information it has that relates to you.\n\n
-        You should, however, bear in mind that if Simprints deletes your information then development organisations may find it harder to find your records.\n\n
-        <b>Who are Simprints?</b>\n\n
-        Simprints Technology Limited is a British NGO that is helping development organisations to match beneficiaries like you to their records.\n\n
-        <b>What information will Simprints store about me?</b>\n\n
-        Simprints will store information about your scanned fingerprints. It will also store the approximate location where any scan takes place, together with the time and date of any such scan.\n\n
-        Simprints will not store any other identifying information about you, such as your name or date of birth. Simprints will not store any of your personal records. Simprints will not store any images of your fingerprints.\n\n
-        <b>What will Simprints do with my information?</b>\n\n
-        Simprints will use your information to help development organisations identify you in the future, and match you to your records.\n\n
-        Simprints may also use your information to improve the accuracy of its service, and may share it with other experts for this purpose.\n\n
-        Simprints may also use your information to apply a better understanding of service delivery in your location.\n\n
-        In the future, Simprints may also use your information to help other partner development organisations to identify you, and may share this information with those organisations for that purpose.\n\n
-        <b>How long will Simprints keep my information for?</b>\n\n
-        Simprints expects that its work here will last for three years. Simprints will keep your information for the duration of its work here, and for 2 years after that work has finished. Simprints will then delete your information.\n\n
-        <b>Will Simprints store any fingerprint images?</b>\n\n
-        Simprints will not store any fingerprint images.\n\n
-        <b>Will Simprints give my information to the Government?</b>\n\n
-        Simprints will not give any information that it holds on you to the Government, unless required to do so by law.\n\n
-        <b>Do I have to agree to my fingerprints being taken?</b>\n\n
-        You do not have to agree to give Simprints any information to receive services. But if you do not then development organisations may find it harder to find your records in the future. \n\n
+سمپرنټس د دغه معلوماتو څخه په راتلونکی کې ستاسو د پیدا کولو او پیژندلو کې ګټه واخلي او له موجوده معلوماتو سره به تاسې مقایسه کړي.
 
-        <b><u>Development Worker Consent</u></b>\n\n
-        Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
+همدارنګه سمپرنټس به له دغو معلوماتو څخه د خپلو خدماتو د دقیقوالې د پراختیا په برخه کې ګټه واخلي او له متخصصینو سره به یې شریک کړي.
+
+همدارنګه، کیداې سمپرنټس له دغو معلوماتو څخه ستاسو په سیمه کې د خدمتونو د وړاندې کولو په برخه کې د غوره خبرتیا په برخه کې ګټه واخلي.
+
+همدارنګه په راتلونکې کې کیداې شي سمپرنټس د دغو معلوماتو له مخې ستاسو د پيژندې په برخه کې د پرمختیایي سازمانونو سره مرسته وکړي او ستاسو د پیژندنې په موخه دغه معلوماتو له هغوې سره شریک کړي.
+
+سمپرنټس هیله مند دی چې د هغوې کار به د یو کال په اوږدو کې پاې ته ورسیږي. سمپرنټس به ستاسو معلومات د دغه کال او د دوو نورو کلونو لپاره وساتي او وروسته به ستاسو معلومات له منځه ویسي.
+
+سمپرنټس به د ګوتو د نښان هیځ انځور له ځان سره ونه ساتي.
+
+سمپرنټس به ستاسو معلومات په هیڅ وجه له نورو سره شریک نکړي، پرته له دې چې د قانون له مخې ترې غوښتنه وشي.
+
+کیداې شي تاسو د سمپرنټس لپاره د هر ډول معلوماتو د ورکولو سره موافقه ونکړئ، خو که داسې وکړئ، نو د پرمختیایي سازمانونو لپاره دا په ستونزمنه شي څو په راتلونکې کې تاسې پیدا کړي.
+
+که چیرې پخوا تاسې خوشحاله وی څو سمپرنټس ستاسو معلومات ترلاسه کړي او ترې ګټه واخلي خو اوس ستاسو نظر تغیر کړی او نه غواړی چې دغه کار ادامه ولري نو په مهربانۍ سره په اړه یې له مونږ سره وغږیږئ.
+\n\n
+        <b><u>د پوښتنو او ځوابونو بیانیه – حقوقي پوښتنې</u></b> \n\n
+        <b>له دی وروسته زه نه غواړم څو سمپرنټس زما په اړه معلومات زخیره کړړي او ترې ګټه واخلي. په دې اړه باید څه وکړم؟ </b>\n\n
+        له دی وروسته زه نه غواړم څو سمپرنټس زما په اړه معلومات زخیره کړړي او ترې ګټه واخلي. په دې اړه باید څه وکړم؟ تاسو هر وخت چې وغواړئ کولې شی له سمپرنټس څخه غوښتنه وکړئ څو ستاسو معلومات له منځه ویسي. د دی کار لپاره اړتیا ده څو تاسو د خپلې ګوتې نښې د وروستي ځل لپاره د سمپرنټس کارکوونکی ته ورکړئ. کله مو چې دا کال وکړل نو سمپرنټس ستاسو اړوند معلومات له منځه ویسي.
+
+په یاد ولرئ، که چیرې سمپرنټس ستاسو معلومات له منځه ویسي نو پرمختیایي سازمانونو ته به ستونزمنه شي څو په راتلونکی کې ستاسو په اړه معلومات پیدا کړی.
+\n\n
+        <b>سمپرنټس څوک دي؟ </b>\n\n
+        د سمپرنټس ټکنالوژي یو انګلیسي ان جی او ده چې له پرمختیایي سازمانونو سره مرسته کوي څو تاسو په شان ګټه اخیستونکي د خپلو شته معلوماتو سره مقایسه کړي. \n\n
+        <b>سمپرنټس زما په اړه کوم معلومات زخیره کوي؟</b>\n\n
+        سمپرنټس به ستاسو د ګوتو د نښان په اړه معلومات زخیره کړي. همدارنګه هغه ځاې چې په کې د ګوتو نښان اخیستل شوي وي او د سکن کولو وخت او نیټه هم زخیره کوي.
+
+سمپرنټس ستاسو د پيژندګوي په اړه نور معلومات لکه نوم، د زیږیدلو نیټه نه زخیره کوي. سمپرنټس ستاسو هیڅ ډول شخصي معلومات نه زخیره کوي. سمپرنټس ستاسو د ګوتو د نښان هیڅ انځور نه زخیره کوي.
+\n\n
+        <b>سمپرنټس به زما په اړه له معلوماتو سره څه وکړي؟ </b>\n\n
+سمپرنټس په راتلونکې کې ستاسو له معلوماتو څخه د پرمختیایي سازمانونو لخوا ستاسو د پیدا کولو او همدارنګه هغوې سره له شته معلوماتو سره ستاسو د معلوماتو د پرتله کولو په موخه ګټه اخلي.
+
+همدارنګه سمپرنیټس به د خپلو خدماتونو د دقیقوالي په موخه له دغو معلوماتو څخه ګټه واخلي او هغه به له متخصصینو سره شریک کړي.
+
+همدارنګه، کیداې شي سمپرنټس له دغو معلوماتو څخه ستاسو په سیمه کې د خدمتونو د وړاندې کولو په اړه د لا ښه پوهاوې په برخه کې ګټه واخلي.
+
+په راتلونکی، کیداې شي سمپرنټس د دغو معلوماتو له لارې د پرمختیایي سازمانونو لخوا ستاسو د پیژندګلوي په برخه کې له هغوې سره مرسته وکړي او ستاسو د پيژندګلوي لپاره به خپل شته معلومات له هغوې سره شریک کړي.
+\n\n
+        <b>سمپرنټس دغه معلومات د څومره وخت لپاره ساتي؟ </b>\n\n
+        سمپرنټس هیله مند دی چې د هغوې کار به په یو کال کې تکمیل شي. سمپرنټس به ستاسو معلومات د همدې مودې لپاره او همدارنګه د دوو نورو کلونو لپاره وساتي او وروسته به ستاسو دغه معلومات له منځه ويسي.\n\n
+        <b>آیا سمپرنټس د ګوتو د نښان انځورونه زخیره کوي؟ </b>\n\n
+        سمپرنټس به د ګوتو د نښان انځورونه ثبت نه کړي. \n\n
+        <b>آیا سمپرنټس به دغه معلومات له دولت سره شریک کړي؟ </b>\n\n
+        سمپرنټس به په هیڅ صورت ستاسو معلومات له دولت سره شریک نه کړي، پرته له دې چې د قانون له مخې ترې غوښتنه وشي.\n\n
+        <b>ایا زه باید له دې سره چې زما د ګوتې نښان واخیستل شي، موافقت وکړم؟ </b>\n\n
+        تاسو د خدمتونو د ترلاسه کولو په موخه کیداې شي سمپرنټس ته د هر ډول معلوماتو له ورکولو سره مخالفت وکړئ، خو که داسې وکړئ، نو د پرمختیایي سازمانونو لپاره په دا ستونزمنه شي څو په راتلونکې کې تاسې پیدا کړي.\n\n
+
+        <b><u>د کارکوونکو رضایت:</u></b>\n\n
+        سمپرنټس ټکنالوژي به د سمپرنټس اپلیکیشن څخه ستاسو ګټه اخیستنه واروزي څو وکولې شي په دغه اپلیکیشن کې پرمختیا راولي. همدارنګه سمپرنټس هغه ځاې چې په هغه کې د ګوتو نښان اخلې زخیره کوي. د دې تر څنګ هغه وخت چې په هغه کې د ګوتې نښان اخیستل کيږي هم زخیره کوي څو وکولې شي د ګټه اخیستونکو د رضایت په موخه خپلو خدمتونو ته پرمختیا ورکړی.
     </string>
 
 
