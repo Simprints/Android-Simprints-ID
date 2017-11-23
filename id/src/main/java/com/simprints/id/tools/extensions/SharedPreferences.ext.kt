@@ -4,10 +4,10 @@ import android.content.SharedPreferences
 
 inline fun <reified T: Enum<T>> SharedPreferences.getEnum(key: String, defValue: Enum<T>): Enum<T> {
     val ordinal = getInt(key, -1)
-    if (enumValues<T>().indices.contains(ordinal)) {
-        return enumValues<T>()[ordinal]
+    return if (enumValues<T>().indices.contains(ordinal)) {
+        enumValues<T>()[ordinal]
     } else {
-        return defValue
+        defValue
     }
 }
 

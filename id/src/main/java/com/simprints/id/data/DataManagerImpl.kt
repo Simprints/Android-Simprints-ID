@@ -34,7 +34,7 @@ class DataManagerImpl(private val context: Context,
 
 
     // Session state
-    override var callout: Callout? = preferencesManager.callout
+    override var callout: Callout = preferencesManager.callout
 
     // Settings
 
