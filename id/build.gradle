@@ -12,7 +12,7 @@ android {
         targetSdkVersion 26
         versionCode 54
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
-        versionName '2017.4.0'
+        versionName '2017.4.1'
     }
     buildTypes {
         debug {
