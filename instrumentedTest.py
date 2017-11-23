@@ -10,35 +10,36 @@ import time
 from logging import Formatter, Logger, getLogger, DEBUG, StreamHandler, FileHandler, INFO, WARN, ERROR, CRITICAL
 from typing import List
 
+ADB = 'adb' if platform.system() == 'Windows' else './testing/adb'
 GRADLEW_PATH = 'gradlew.bat' if platform.system() == 'Windows' else './gradlew'
 
 tests = {
-    'happy_path_enrol': 'com.simprints.id.happypath.HappyPathEnrolTest',
-    'happy_path_identify': 'com.simprints.id.happypath.HappyPathIdentifyTest'
+    'bucket_01': 'com.simprints.id.bucket01.Bucket01Suite',
 }
 
 commands = {
-    'clean builds': (GRADLEW_PATH + ' clean'),
-    'assemble endToEndTesting apk': (GRADLEW_PATH + ' assembleEndToEndTesting'),
-    'assemble endToEndTesting test apk': (GRADLEW_PATH + ' assembleEndToEndTestingAndroidTest'),
-    'devices query': 'adb devices -l',
-    'bluetooth on': 'adb -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.ON',
-    'bluetooth off': 'adb -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.OFF',
-    'bluetooth pair': 'adb -s {0} shell am startservice --user 0 -a com.simprints.testutilities.bluetooth.action.PAIR '
-                      '-e "com.simprints.testutilities.bluetooth.extra.MAC_ADDRESS" "{1}"',
-    'bluetooth unpair': 'adb -s {0} shell am startservice --user 0 -a '
-                        'com.simprints.testutilities.bluetooth.action.UNPAIR -e '
-                        '"com.simprints.testutilities.bluetooth.extra.MAC_ADDRESS" "{1}"',
-    'wifi on': 'adb -s {0} shell am startservice -a com.simprints.testutilities.wifi.action.ON',
-    'wifi off': 'adb -s {0} shell am startservice -a com.simprints.testutilities.wifi.action.OFF',
-    'install endToEndTesting apk': 'adb -s {0} install -t -d -r '
-                                   'id/build/outputs/apk/id-endToEndTesting.apk',
-    'install endToEndTesting test apk': 'adb -s {0} install -t -d -r '
-                                        'id/build/outputs/apk/id-endToEndTesting-androidTest.apk',
-    'run test': 'adb -s {0} shell am instrument -w -e coverage true '
-                '-e class {1} com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner ',
-    'acquire coverage file': 'adb -d -s {0} shell "run-as com.simprints.id cat '
-                             '/data/user/0/com.simprints.id/files/coverage.ec" > {1}/coverage.ec',
+    'clean builds': (GRADLEW_PATH + ' :id:clean'),
+    'assemble endToEndTesting apk': (GRADLEW_PATH + ' :id:assembleEndToEndTesting'),
+    'assemble endToEndTesting test apk': (GRADLEW_PATH + ' :id:assembleEndToEndTestingAndroidTest'),
+    'devices query': ADB + ' devices -l',
+    'bluetooth on': ADB + ' -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.ON',
+    'bluetooth off': ADB + ' -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.OFF',
+    'bluetooth pair': ADB + ' -s {0} shell am startservice --user 0 -a '
+                            'com.simprints.testutilities.bluetooth.action.PAIR '
+                            '-e "com.simprints.testutilities.bluetooth.extra.MAC_ADDRESS" "{1}"',
+    'bluetooth unpair': ADB + ' -s {0} shell am startservice --user 0 -a '
+                              'com.simprints.testutilities.bluetooth.action.UNPAIR -e '
+                              '"com.simprints.testutilities.bluetooth.extra.MAC_ADDRESS" "{1}"',
+    'wifi on': ADB + ' -s {0} shell am startservice -a com.simprints.testutilities.wifi.action.ON',
+    'wifi off': ADB + ' -s {0} shell am startservice -a com.simprints.testutilities.wifi.action.OFF',
+    'install endToEndTesting apk': ADB + ' -s {0} install -t -d -r '
+                                         'id/build/outputs/apk/endToEndTesting/id-endToEndTesting.apk',
+    'install endToEndTesting test apk': ADB + ' -s {0} install -t -d -r '
+                                              'id/build/outputs/apk/androidTest/endToEndTesting/id-endToEndTesting-androidTest.apk',
+    'run test': ADB + ' -s {0} shell am instrument -w -e emma true -e coverage true '
+                      '-e class {1} com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner ',
+    'acquire coverage file': ADB + ' -d -s {0} shell "run-as com.simprints.id cat '
+                                   '/data/user/0/com.simprints.id/files/coverage.ec" > {1}/coverage.ec',
     'parse coverage file': 'java -jar ./testing/JacocoReportParser.jar -p . -f ./{0}/coverage.ec -c '
                            './id/build/intermediates/classes -s ./id/src/main/java -r ./{0}/coverage_report'
 }
@@ -129,7 +130,7 @@ class Run:
 
     def __init__(self, logger_name, log_commands=True):
 
-        self.log_dir_name = Run.LOG_DIR_BASE_NAME + '/'\
+        self.log_dir_name = Run.LOG_DIR_BASE_NAME + '/' \
                             + logger_name + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
         if not os.path.exists(self.log_dir_name):
@@ -237,7 +238,7 @@ class Run:
         lines = self.run_and_log(commands['devices query'])
 
         # The first line is "List of devices attached". The last line is blank. Lines in between contain a device.
-        # If the ADB daemon isn't started or is invalid, there is some preamble that can be ignored.
+        # If the ADB daemon isn't started or is invalid, there is some preamble that cane ignored.
         relevant_lines = []
         for line in lines[1:-1]:
             if line[0] != '*':
@@ -299,7 +300,7 @@ class Run:
         self.run_and_log(commands['install endToEndTesting test apk'].format(device.device_id))
 
     def run_test(self, device: Device, test_id: str):
-        test_dir_name = self.log_dir_name + '/' + test_id
+        test_dir_name = self.log_dir_name + '/' + device.model + '/' + test_id
 
         if not os.path.exists(test_dir_name):
             os.makedirs(test_dir_name)
@@ -316,7 +317,7 @@ class Run:
         self.logger.removeHandler(test_file_handler)
 
 
-def main(scanner_id: str = 'SP443761'):
+def main():
     start_time = time.perf_counter()
     run = Run('instrumented_test')
     run.log("Hello world!")
@@ -331,10 +332,7 @@ def main(scanner_id: str = 'SP443761'):
         run.update_log_format(LogState.device(device))
         run.install_apk(device)
         run.install_test_apk(device)
-        # run.bluetooth_pair(device, scanners[scanner_id])
-        run.run_test(device, 'happy_path_enrol')
-        run.run_test(device, 'happy_path_identify')
-        # run.bluetooth_unpair(device, scanners[scanner_id])
+        run.run_test(device, 'bucket_01')
     run.update_log_format(LogState.default())
     run.log('TEST END')
 
