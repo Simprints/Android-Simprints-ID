@@ -16,8 +16,10 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.simprints.id.Application;
 import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.Language;
@@ -36,6 +38,7 @@ public class AboutActivity extends AppCompatActivity {
     private StatisticsView statisticsView;
     private RecoveryView recoveryView;
 
+    DataManager dataManager;
     private AppState appState;
     private RecoverDbHandlerThread recoverDbHandlerThread;
 
@@ -44,7 +47,9 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         initViews();
 
-        appState = AppState.getInstance();
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+        appState = app.getAppState();
 
         statisticsView.setVersionData(
                 appState.getAppVersion() != null ? appState.getAppVersion() : "null",

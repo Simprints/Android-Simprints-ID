@@ -29,11 +29,13 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
@@ -96,10 +98,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private ButtonListener scannerButton;
 
-    private AppState appState;
-
-    private Setup setup = Setup.getInstance();
-
     private Handler handler;
 
     private Finger[] fingers = new Finger[NB_OF_FINGERS];
@@ -120,6 +118,15 @@ public class MainActivity extends AppCompatActivity implements
 
     private ProgressDialog un20WakeupDialog;
 
+
+    private DataManager dataManager;
+
+    // Singletons
+    private AppState appState;
+    private Setup setup;
+    private SyncService syncService;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,7 +136,11 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
         navView.setItemIconTintList(null);
 
-        appState = AppState.getInstance();
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+        appState = app.getAppState();
+        setup = app.getSetup();
+        syncService = app.getSyncService();
         appState.logMainStart();
 
         handler = new Handler();
@@ -262,7 +273,8 @@ public class MainActivity extends AppCompatActivity implements
         //noinspection ConstantConditions
         actionBar.show();
 
-        switch (appState.getCallout()) {
+        // TODO: Make that NPE safe. Note that reading/writing the callout through the data manager did not produce this, but simply made it apparent where it was hidden.
+        switch (dataManager.getCallout()) {
             case REGISTER:
                 actionBar.setTitle(R.string.register_title);
                 break;
@@ -530,7 +542,7 @@ public class MainActivity extends AppCompatActivity implements
             Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show();
         } else {
             Person person = new Person(appState.getGuid(), fingerprints);
-            if (appState.getCallout() == Callout.REGISTER || appState.getCallout() == Callout.UPDATE) {
+            if (dataManager.getCallout() == Callout.REGISTER || dataManager.getCallout() == Callout.UPDATE) {
                 appState.getData().savePerson(person);
 
                 registrationResult = new Registration(appState.getGuid());
@@ -543,7 +555,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
-                FormatResult.put(resultData, registrationResult);
+                FormatResult.put(resultData, registrationResult, appState);
                 setResult(RESULT_OK, resultData);
                 finish();
             } else {
@@ -759,7 +771,7 @@ public class MainActivity extends AppCompatActivity implements
         if (appState.getScanner() != null) {
             appState.getScanner().unregisterButtonListener(scannerButton);
         }
-        SyncService.getInstance().stopListening(syncListener);
+        syncService.stopListening(syncListener);
     }
 
     @SuppressWarnings("deprecation")
@@ -809,7 +821,7 @@ public class MainActivity extends AppCompatActivity implements
             syncItem.setIcon(R.drawable.ic_menu_syncing);
         }
 
-        if (!SyncService.getInstance().startAndListen(getApplicationContext(), syncListener)) {
+        if (!syncService.startAndListen(getApplicationContext(), syncListener)) {
             FirebaseCrash.report(new Exception("Error in MainActivity.backgroundSync()"));
             launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }

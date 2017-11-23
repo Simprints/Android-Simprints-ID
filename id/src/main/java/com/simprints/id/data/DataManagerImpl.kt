@@ -7,6 +7,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.model.Callout
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libdata.tools.Constants
@@ -31,6 +32,12 @@ class DataManagerImpl(private val context: Context,
     override val appVersionName: String
         get() = context.packageVersionName
 
+
+    // Session state
+    override var callout: Callout? = preferencesManager.callout
+
+    // Settings
+
     override var nudgeMode: Boolean = preferencesManager.nudgeMode
     override var consent: Boolean = preferencesManager.consent
     override var qualityThreshold: Int = preferencesManager.qualityThreshold
@@ -48,4 +55,5 @@ class DataManagerImpl(private val context: Context,
     override var fingerStatusPersist: Boolean = preferencesManager.fingerStatusPersist
     override fun getFingerStatus(fingerIdentifier: FingerIdentifier): Boolean = preferencesManager.getFingerStatus(fingerIdentifier)
     override fun setFingerStatus(fingerIdentifier: FingerIdentifier, show: Boolean) = preferencesManager.setFingerStatus(fingerIdentifier, show)
+
 }

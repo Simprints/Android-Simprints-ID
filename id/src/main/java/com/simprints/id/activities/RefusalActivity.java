@@ -14,7 +14,9 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.simprints.id.Application;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.libdata.models.enums.REFUSAL_FORM_REASON;
@@ -26,12 +28,18 @@ public class RefusalActivity extends AppCompatActivity {
     private Button submit;
     private REFUSAL_FORM_REASON reason;
     private EditText otherText;
+    private DataManager dataManager;
+    private AppState appState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_refusal);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+        appState = app.getAppState();
 
         submit = (Button) findViewById(R.id.bt_submit_refusal_form);
         otherText = (EditText) findViewById(R.id.et_other_refusal_text);
@@ -46,7 +54,7 @@ public class RefusalActivity extends AppCompatActivity {
 
                 if (reason != null) {
                     RefusalForm refusalForm = new RefusalForm(reason.toString(), otherText.getText().toString());
-                    AppState.getInstance().setRefusalForm(refusalForm);
+                    appState.setRefusalForm(refusalForm);
                     resultData.putExtra(Constants.SIMPRINTS_REFUSAL_FORM, refusalForm);
                 }
 

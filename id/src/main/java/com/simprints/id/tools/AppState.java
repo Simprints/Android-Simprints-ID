@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.libdata.DatabaseContext;
@@ -29,15 +30,20 @@ public class AppState {
 
     private static AppState singleton;
 
-    public synchronized static AppState getInstance() {
+    public synchronized static AppState getInstance(DataManager dataManager) {
         if (singleton == null) {
-            singleton = new AppState();
+            singleton = new AppState(dataManager);
         }
         return singleton;
     }
 
+    public AppState(DataManager dataManager) {
+        this.dataManager = dataManager;
+    }
+
+    private DataManager dataManager;
+
     // Callout parameters
-    private Callout callout = null;
     private String apiKey = null;
     private String updateId = null;
     private String verifyId = null;
@@ -64,7 +70,6 @@ public class AppState {
     private DatabaseContext data = null;
     private fb_Session session = null;
     private GoogleApiClient googleApiClient = null;
-    private Analytics analytics = null;
     private boolean signedIn = false;
     private RefusalForm refusalForm = null;
 
@@ -73,7 +78,8 @@ public class AppState {
     public ALERT_TYPE init(@NonNull Intent intent, @NonNull Context appContext) {
 
         // Reads intent parameters
-        callout = Callout.fromAction(intent.getAction());
+        Callout callout = Callout.fromAction(intent.getAction());
+        dataManager.setCallout(callout);
         Bundle extras = intent.getExtras();
         if (extras != null) {
             apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
@@ -157,11 +163,6 @@ public class AppState {
         new SharedPref(appContext).setAppKeyString(apiKey.substring(0, 8));
         new SharedPref(appContext).setLastUserIdString(userId);
 
-        // Save some attributes to analytics
-        analytics = Analytics.getInstance(appContext);
-        analytics.setUserProperties(apiKey, moduleId, userId, deviceId);
-        analytics.logLogin();
-
         return null;
     }
 
@@ -172,7 +173,6 @@ public class AppState {
     public void setMacAddress(@NonNull String macAddress) {
         this.macAddress = macAddress;
         session.saveMacAddress(macAddress);
-        analytics.setScannerMac();
     }
 
     public void setHardwareVersion(short hardwareVersion) {
@@ -221,10 +221,6 @@ public class AppState {
 
     public void setRefusalForm(RefusalForm refusalForm) {
         this.refusalForm = refusalForm;
-    }
-
-    public Callout getCallout() {
-        return callout;
     }
 
     public String getApiKey() {

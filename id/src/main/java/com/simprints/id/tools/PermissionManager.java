@@ -14,8 +14,7 @@ import java.util.List;
 public class PermissionManager {
 
     @NonNull
-    private static List<String> requiredPermissions() {
-        AppState appState = AppState.getInstance();
+    private static List<String> requiredPermissions(AppState appState) {
         List<String> requiredPermissions = new ArrayList<>();
 
         requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -26,19 +25,19 @@ public class PermissionManager {
         return requiredPermissions;
     }
 
-    public static boolean checkAllPermissions(@NonNull Activity activity) {
+    public static boolean checkAllPermissions(@NonNull Activity activity, AppState appState) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            for (String permission : requiredPermissions())
+            for (String permission : requiredPermissions(appState))
                 if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED)
                     return false;
 
         return true;
     }
 
-    public static void requestAllPermissions(@NonNull Activity activity) {
+    public static void requestAllPermissions(@NonNull Activity activity, AppState appState) {
         ActivityCompat.requestPermissions(
                 activity,
-                requiredPermissions().toArray(new String[0]),
+                requiredPermissions(appState).toArray(new String[0]),
                 InternalConstants.ALL_PERMISSIONS_REQUEST
         );
     }
