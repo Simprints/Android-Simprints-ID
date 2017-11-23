@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'io.fabric'
 apply plugin: 'com.google.firebase.firebase-crash'
 
@@ -10,7 +11,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 54
+        versionCode 55
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
         versionName '2017.4.1'
     }
@@ -18,7 +19,7 @@ android {
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            versionNameSuffix 'd-'
+            versionNameSuffix '-dev'
             buildConfigField("String", "FIREBASE_PROJECT", "\"simprints-dev\"")
         }
         release {
@@ -32,7 +33,7 @@ android {
         }
         endToEndTesting {
             initWith debug
-            versionNameSuffix 't-'
+            versionNameSuffix '-test'
             buildConfigField("String", "FIREBASE_PROJECT", "\"simprints-testing\"")
             testCoverageEnabled true
         }
@@ -44,6 +45,7 @@ buildscript {
     repositories {
         jcenter()
         mavenCentral()
+        google()
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
@@ -100,7 +102,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
-
+    androidTestCompile 'com.simprints:cerberus-library:2017.4.0'
     androidTestCompile 'com.simprints:remote-admin-client:2017.4.0-dev-3'
     androidTestCompile 'com.squareup.okhttp:okhttp:2.7.5'
     androidTestCompile 'com.google.code.gson:gson:2.8.1'

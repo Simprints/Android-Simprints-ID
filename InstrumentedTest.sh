@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-python instrumentedTest.py
+python3 instrumentedTest.py
