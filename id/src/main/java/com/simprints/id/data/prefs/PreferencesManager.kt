@@ -12,7 +12,7 @@ import com.simprints.libsimprints.FingerIdentifier
 interface PreferencesManager {
 
     // Session state
-    var callout: Callout?
+    var callout: Callout
 
     // Settings
     var nudgeMode: Boolean

@@ -71,7 +71,6 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         Bundle extras = getIntent().getExtras();
         probe = extras.getParcelable("Person");
 
-        // TODO: Make that NPE safe. Note that reading/writing the callout through the data manager did not produce this, but simply made it apparent where it was hidden.
         switch (dataManager.getCallout()) {
             case IDENTIFY:
                 final Runnable onMatchStartRunnable = new Runnable() {
@@ -304,7 +303,6 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 break;
             }
             case MATCH_COMPLETED: {
-                // TODO: Make that NPE safe. Note that reading/writing the callout through the data manager did not produce this, but simply made it apparent where it was hidden.
                 switch (dataManager.getCallout()) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();

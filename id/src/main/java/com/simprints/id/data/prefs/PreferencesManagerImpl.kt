@@ -18,7 +18,7 @@ class PreferencesManagerImpl(context: Context, preferenceFileName: String = PREF
 
         // Session state
         private val CALLOUT_KEY = "Callout"
-        private val CALLOUT_DEFAULT = null
+        private val CALLOUT_DEFAULT = Callout.NULL
 
         // Settings
 
@@ -70,7 +70,7 @@ class PreferencesManagerImpl(context: Context, preferenceFileName: String = PREF
 
     private val prefs: SharedPreferences = context.getSharedPreferences(preferenceFileName, Context.MODE_PRIVATE)
 
-    inner class Preference<T>(private val name: String, private val default: T) {
+    inner class Preference<T: Any?>(private val name: String, private val default: T) {
 
         @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
         operator fun getValue(thisRef: Any?, property: KProperty<*>): T =
@@ -83,7 +83,7 @@ class PreferencesManagerImpl(context: Context, preferenceFileName: String = PREF
                         is Float -> prefs.getFloat(name, default)
                         is Constants.GROUP -> prefs.getEnum(name, default)
                         is Callout -> prefs.getEnum(name, default)
-                        else -> throw IllegalArgumentException("This type can be saved into Preferences")
+                        else -> throw IllegalArgumentException("This type can't be saved into Preferences")
                     } as T
                 }
 
@@ -105,7 +105,7 @@ class PreferencesManagerImpl(context: Context, preferenceFileName: String = PREF
     }
 
     // Callout of the current session
-    override var callout: Callout? by Preference(CALLOUT_KEY, CALLOUT_DEFAULT)
+    override var callout: Callout by Preference(CALLOUT_KEY, CALLOUT_DEFAULT)
 
     // Should the UI automatically slide forward?
     override var nudgeMode: Boolean by Preference(NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)

@@ -273,7 +273,6 @@ public class MainActivity extends AppCompatActivity implements
         //noinspection ConstantConditions
         actionBar.show();
 
-        // TODO: Make that NPE safe. Note that reading/writing the callout through the data manager did not produce this, but simply made it apparent where it was hidden.
         switch (dataManager.getCallout()) {
             case REGISTER:
                 actionBar.setTitle(R.string.register_title);
@@ -287,6 +286,8 @@ public class MainActivity extends AppCompatActivity implements
             case VERIFY:
                 actionBar.setTitle(R.string.verify_title);
                 break;
+            default:
+                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
 
