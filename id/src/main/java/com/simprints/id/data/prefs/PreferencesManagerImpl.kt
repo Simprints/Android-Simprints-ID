@@ -3,6 +3,7 @@ package com.simprints.id.data.prefs
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import com.simprints.id.model.Callout
 import com.simprints.id.tools.extensions.getEnum
 import com.simprints.id.tools.extensions.putEnum
 import com.simprints.libdata.tools.Constants
@@ -14,6 +15,12 @@ class PreferencesManagerImpl(context: Context, preferenceFileName: String = PREF
     companion object {
 
         private val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
+
+        // Session state
+        private val CALLOUT_KEY = "Callout"
+        private val CALLOUT_DEFAULT = null
+
+        // Settings
 
         private val NUDGE_MODE_KEY = "NudgeModeBool"
         private val NUDGE_MODE_DEFAULT = true
@@ -75,6 +82,7 @@ class PreferencesManagerImpl(context: Context, preferenceFileName: String = PREF
                         is Boolean -> prefs.getBoolean(name, default)
                         is Float -> prefs.getFloat(name, default)
                         is Constants.GROUP -> prefs.getEnum(name, default)
+                        is Callout -> prefs.getEnum(name, default)
                         else -> throw IllegalArgumentException("This type can be saved into Preferences")
                     } as T
                 }
@@ -89,12 +97,15 @@ class PreferencesManagerImpl(context: Context, preferenceFileName: String = PREF
                     is Boolean -> putBoolean(name, value)
                     is Float -> putFloat(name, value)
                     is Constants.GROUP -> putEnum(name, value)
+                    is Callout -> putEnum(name, value)
                     else -> throw IllegalArgumentException("This type can't be saved into Preferences")
                 }.apply()
             }
         }
     }
 
+    // Callout of the current session
+    override var callout: Callout? by Preference(CALLOUT_KEY, CALLOUT_DEFAULT)
 
     // Should the UI automatically slide forward?
     override var nudgeMode: Boolean by Preference(NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)

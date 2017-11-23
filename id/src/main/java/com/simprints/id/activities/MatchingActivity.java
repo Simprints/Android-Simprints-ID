@@ -13,9 +13,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.crash.FirebaseCrash;
+import com.simprints.id.Application;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Language;
@@ -25,13 +26,13 @@ import com.simprints.libcommon.Person;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT;
+import com.simprints.libdata.tools.Constants.GROUP;
 import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
 import com.simprints.libmatcher.Progress;
 import com.simprints.libmatcher.sourceafis.MatcherEventListener;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.Identification;
-import com.simprints.libdata.tools.Constants.GROUP;
 import com.simprints.libsimprints.Verification;
 
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
     private MatchingView matchingView;
 
+    private DataManager dataManager;
     private AppState appState;
     private Person probe;
     private List<Person> candidates = new ArrayList<>();
@@ -61,13 +63,16 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         super.onCreate(savedInstanceState);
         initViews();
 
-        appState = AppState.getInstance();
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+        appState = app.getAppState();
         appState.logMatchStart();
 
         Bundle extras = getIntent().getExtras();
         probe = extras.getParcelable("Person");
 
-        switch (appState.getCallout()) {
+        // TODO: Make that NPE safe. Note that reading/writing the callout through the data manager did not produce this, but simply made it apparent where it was hidden.
+        switch (dataManager.getCallout()) {
             case IDENTIFY:
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
@@ -299,8 +304,8 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 break;
             }
             case MATCH_COMPLETED: {
-                Callout callout = appState.getCallout();
-                switch (callout) {
+                // TODO: Make that NPE safe. Note that reading/writing the callout through the data manager did not produce this, but simply made it apparent where it was hidden.
+                switch (dataManager.getCallout()) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();
                         matchingView.setIdentificationProgressReturningStart();
@@ -353,7 +358,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                         Intent resultData;
                         resultData = new Intent(Constants.SIMPRINTS_IDENTIFY_INTENT);
-                        FormatResult.put( resultData, topCandidates);
+                        FormatResult.put( resultData, topCandidates, appState);
                         setResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                                 tier1Or2Matches, tier3Matches, tier4Matches);
@@ -382,7 +387,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         // finish
                         Intent resultData;
                         resultData = new Intent(Constants.SIMPRINTS_VERIFY_INTENT);
-                        FormatResult.put(resultData, verification);
+                        FormatResult.put(resultData, verification, appState);
                         setResult(resultCode, resultData);
                         finish();
                         break;

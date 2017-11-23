@@ -10,8 +10,10 @@ import android.util.Log;
 import com.google.firebase.crash.FirebaseCrash;
 import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
+import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
@@ -36,17 +38,21 @@ public class Setup {
 
     private static Setup singleton;
 
-    public synchronized static Setup getInstance() {
+    public synchronized static Setup getInstance(DataManager dataManager, AppState appState, Analytics analytics) {
         if (singleton == null) {
-            singleton = new Setup();
+            singleton = new Setup(dataManager, appState, analytics);
         }
         return singleton;
     }
 
+    private Setup(DataManager dataManager, AppState appState, Analytics analytics) {
+        this.dataManager = dataManager;
+        this.appState = appState;
+        this.analytics = analytics;
+    }
+
+
     private SetupCallback callback;
-
-    private AppState appState = AppState.getInstance();
-
 
     // True iff the database context was initialized
     private boolean databaseInitialized = false;
@@ -61,6 +67,15 @@ public class Setup {
     private boolean uiResetSinceConnection = false;
 
     private volatile Boolean paused = false;
+
+
+    private DataManager dataManager;
+
+    // Singletons
+    private AppState appState;
+    private Analytics analytics;
+
+
 
     public void stop() {
         paused = true;
@@ -82,7 +97,7 @@ public class Setup {
             return;
 
         // Step 1: check permissions. These can be revoked, so it has to be done every time
-        boolean permissionsReady = PermissionManager.checkAllPermissions(activity);
+        boolean permissionsReady = PermissionManager.checkAllPermissions(activity, appState);
         if (!permissionsReady) {
             this.requestPermissions(activity);
             return;
@@ -136,7 +151,7 @@ public class Setup {
     // STEP 1
     private void requestPermissions(@NonNull Activity activity) {
         onProgress(0, R.string.launch_checking_permissions);
-        PermissionManager.requestAllPermissions(activity);
+        PermissionManager.requestAllPermissions(activity, appState);
     }
 
     // STEP 2
@@ -247,6 +262,7 @@ public class Setup {
         String macAddress = pairedScanners.get(0);
         appState.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
+        analytics.setScannerMac();
 
         Log.d("Setup", "Scanner initialized.");
         goOn(activity);
@@ -300,7 +316,7 @@ public class Setup {
 
     // STEP 6
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
-        if (appState.getCallout() != Callout.VERIFY) {
+        if (dataManager.getCallout() != Callout.VERIFY) {
             guidExists = true;
             goOn(activity);
             return;

@@ -12,16 +12,23 @@ import android.widget.TextView;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.CustomEvent;
+import com.simprints.id.Application;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 
 public class AlertActivity extends AppCompatActivity {
 
+    DataManager dataManager;
+    ALERT_TYPE alertType;
+
+    // Singletons
     AppState appState;
     Analytics analytics;
-    ALERT_TYPE alertType;
+    Answers answers;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +36,11 @@ public class AlertActivity extends AppCompatActivity {
         setContentView(R.layout.activity_alert);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        appState = AppState.getInstance();
-        analytics = Analytics.getInstance(getApplicationContext());
-
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+        appState = app.getAppState();
+        analytics = app.getAnalytics();
+        answers = app.getAnswers();
 
         Bundle extras = getIntent().getExtras();
         assert extras != null;
@@ -40,7 +49,7 @@ public class AlertActivity extends AppCompatActivity {
         this.alertType = alertType;
 
         if (alertType.mustBeLogged()) {
-            Answers.getInstance().logCustom(new CustomEvent("Alert Triggered")
+            answers.logCustom(new CustomEvent("Alert Triggered")
                     .putCustomAttribute("Alert Type", alertType.name() != null ? alertType.name() : "null")
                     .putCustomAttribute("API Key", appState.getApiKey() != null ? appState.getApiKey() : "null")
                     .putCustomAttribute("MAC Address", appState.getMacAddress() != null ? appState.getMacAddress() : "null"));

@@ -1,5 +1,6 @@
 package com.simprints.id.data.prefs
 
+import com.simprints.id.model.Callout
 import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.FingerIdentifier
 
@@ -10,6 +11,10 @@ import com.simprints.libsimprints.FingerIdentifier
  */
 interface PreferencesManager {
 
+    // Session state
+    var callout: Callout?
+
+    // Settings
     var nudgeMode: Boolean
     var consent: Boolean
     var qualityThreshold: Int

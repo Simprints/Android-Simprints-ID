@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.crash.FirebaseCrash;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 
 import static com.google.firebase.analytics.FirebaseAnalytics.Event;
@@ -14,21 +15,23 @@ public class Analytics {
 
     private static Analytics singleton;
 
-    public synchronized static Analytics getInstance(Context context) {
+    public synchronized static Analytics getInstance(Context context, DataManager dataManager, AppState appState) {
         if (singleton == null) {
-            singleton = new Analytics(context);
+            singleton = new Analytics(context, dataManager, appState);
         }
         return singleton;
     }
 
     private FirebaseAnalytics firebaseAnalytics;
     private AppState appState;
+    private DataManager dataManager;
 
-    private Analytics(Context context) {
+    private Analytics(Context context, DataManager dataManager, AppState appState) {
         firebaseAnalytics = FirebaseAnalytics.getInstance(context);
         firebaseAnalytics.setAnalyticsCollectionEnabled(true);
         firebaseAnalytics.setMinimumSessionDuration(0);
-        appState = AppState.getInstance();
+        this.dataManager = dataManager;
+        this.appState = appState;
     }
 
     public FirebaseAnalytics getFirebaseAnalytics() {
@@ -62,7 +65,7 @@ public class Analytics {
 
     public void logLogin() {
         Bundle bundle = new Bundle();
-        bundle.putString("callout", appState.getCallout().name());
+        bundle.putString("callout", dataManager.getCallout().name());
         firebaseAnalytics.logEvent(Event.LOGIN, bundle);
     }
 

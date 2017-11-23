@@ -31,12 +31,12 @@ public class FormatResult {
         return sb.toString();
     }
 
-    static private boolean isODK( ){
-        return Constants.SIMPRINTS_ODK_RESULT_FORMAT_V01.equalsIgnoreCase(AppState.getInstance().getResultFormat());
+    static private boolean isODK(AppState appState){
+        return Constants.SIMPRINTS_ODK_RESULT_FORMAT_V01.equalsIgnoreCase(appState.getResultFormat());
     }
 
-    static public void put(Intent intent, Registration registration){
-        if( isODK() ){
+    static public void put(Intent intent, Registration registration, AppState appState){
+        if( isODK(appState) ){
             intent.putExtra(guidKey, registration.getGuid());
         }
         else {
@@ -44,8 +44,8 @@ public class FormatResult {
         }
     }
 
-    static public void put(Intent intent, Verification verification){
-        if( isODK() ){
+    static public void put(Intent intent, Verification verification, AppState appState){
+        if( isODK(appState) ){
             intent.putExtra(guidKey, verification.getGuid());
             intent.putExtra(confidenceKey, Float.toString(verification.getConfidence()));
             intent.putExtra(tierKey, verification.getTier().toString());
@@ -55,12 +55,12 @@ public class FormatResult {
         }
     }
 
-    static public void put(Intent intent, ArrayList<Identification> identifications){
+    static public void put(Intent intent, ArrayList<Identification> identifications, AppState appState){
 
 
-        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, AppState.getInstance().getSessionId());
+        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, appState.getSessionId());
 
-        if( isODK()) {
+        if( isODK(appState)) {
             // a bit inefficient to run through the array x times but there will be <= 20 objects in there
             String guids = constructString(identifications, new attributeGetter() {
                 @Override
