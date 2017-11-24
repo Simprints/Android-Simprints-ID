@@ -8,12 +8,11 @@ import threading
 import time
 
 from logging import Formatter, Logger, getLogger, DEBUG, StreamHandler, FileHandler, INFO, WARN, ERROR, CRITICAL
-from typing import List
 
 ADB = 'adb' if platform.system() == 'Windows' else './testing/adb'
 GRADLEW_PATH = 'gradlew.bat' if platform.system() == 'Windows' else './gradlew'
 
-tests = {
+buckets = {
     'bucket_01': 'com.simprints.id.bucket01.Bucket01Suite',
 }
 
@@ -22,26 +21,13 @@ commands = {
     'assemble endToEndTesting apk': (GRADLEW_PATH + ' :id:assembleEndToEndTesting'),
     'assemble endToEndTesting test apk': (GRADLEW_PATH + ' :id:assembleEndToEndTestingAndroidTest'),
     'devices query': ADB + ' devices -l',
-    'bluetooth on': ADB + ' -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.ON',
-    'bluetooth off': ADB + ' -s {0} shell am startservice -a com.simprints.testutilities.bluetooth.action.OFF',
-    'bluetooth pair': ADB + ' -s {0} shell am startservice --user 0 -a '
-                            'com.simprints.testutilities.bluetooth.action.PAIR '
-                            '-e "com.simprints.testutilities.bluetooth.extra.MAC_ADDRESS" "{1}"',
-    'bluetooth unpair': ADB + ' -s {0} shell am startservice --user 0 -a '
-                              'com.simprints.testutilities.bluetooth.action.UNPAIR -e '
-                              '"com.simprints.testutilities.bluetooth.extra.MAC_ADDRESS" "{1}"',
-    'wifi on': ADB + ' -s {0} shell am startservice -a com.simprints.testutilities.wifi.action.ON',
-    'wifi off': ADB + ' -s {0} shell am startservice -a com.simprints.testutilities.wifi.action.OFF',
     'install endToEndTesting apk': ADB + ' -s {0} install -t -d -r '
                                          'id/build/outputs/apk/endToEndTesting/id-endToEndTesting.apk',
     'install endToEndTesting test apk': ADB + ' -s {0} install -t -d -r '
-                                              'id/build/outputs/apk/androidTest/endToEndTesting/id-endToEndTesting-androidTest.apk',
-    'run test': ADB + ' -s {0} shell am instrument -w -e emma true -e coverage true '
-                      '-e class {1} com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner ',
-    'acquire coverage file': ADB + ' -d -s {0} shell "run-as com.simprints.id cat '
-                                   '/data/user/0/com.simprints.id/files/coverage.ec" > {1}/coverage.ec',
-    'parse coverage file': 'java -jar ./testing/JacocoReportParser.jar -p . -f ./{0}/coverage.ec -c '
-                           './id/build/intermediates/classes -s ./id/src/main/java -r ./{0}/coverage_report'
+                                              'id/build/outputs/apk/androidTest/endToEndTesting/id-endToEndTesting'
+                                              '-androidTest.apk',
+    'run test': ADB + ' -s {0} shell am instrument -w '
+                      '-e class {1} com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner '
 }
 
 
@@ -65,9 +51,6 @@ class Device:
     def __init__(self, device_id: str, model: str):
         self.device_id: str = device_id
         self.model: str = model
-        self.is_bluetooth_on: bool = None
-        self.is_wifi_on: bool = None
-        self.bluetooth_paired_list: List[Scanner] = []
 
 
 class LogState:
@@ -104,22 +87,8 @@ class LogState:
         return LogState.default(' {0:12s} :{1}'.format(device.model, extra))
 
     @staticmethod
-    def test(device: Device):
-        bool_to_char = {None: '?', True: '1', False: '0'}
-        w = bool_to_char[device.is_wifi_on]
-        b = bool_to_char[device.is_bluetooth_on]
-
-        paired_count = len(device.bluetooth_paired_list)
-        p = str(paired_count) if 0 <= paired_count <= 9 else '+'
-
-        if paired_count == 0:
-            s = 'NONE    '
-        elif paired_count == 1:
-            s = device.bluetooth_paired_list[0].scanner_id
-        else:
-            s = 'MULTIPLE'
-
-        return LogState.device(device, ' W{0:1s}-B{1:1s}-P{2:1s}-{3:8s} :'.format(w, b, p, s))
+    def test(device: Device, bucket: str):
+        return LogState.device(device, ' {0:9s} :'.format(bucket))
 
 
 class Run:
@@ -255,42 +224,6 @@ class Run:
                     devices.append(Device(deviceStr[0], deviceStrSection[6:]))
         return devices
 
-    def bluetooth_on(self, device: Device):
-        self.update_log_format(LogState.device(device))
-        self.run_and_log(commands['bluetooth on'].format(device.device_id))
-        time.sleep(5)
-        device.is_bluetooth_on = True
-
-    def bluetooth_off(self, device: Device):
-        self.update_log_format(LogState.device(device))
-        self.run_and_log(commands['bluetooth off'].format(device.device_id))
-        time.sleep(5)
-        device.is_bluetooth_on = False
-
-    def bluetooth_pair(self, device: Device, scanner: Scanner):
-        self.update_log_format(LogState.device(device))
-        self.run_and_log(commands['bluetooth pair'].format(device.device_id, scanner.mac_address))
-        time.sleep(10)
-        device.bluetooth_paired_list.append(scanner)
-
-    def bluetooth_unpair(self, device: Device, scanner: Scanner):
-        self.update_log_format(LogState.device(device))
-        self.run_and_log(commands['bluetooth unpair'].format(device.device_id, scanner.mac_address))
-        time.sleep(5)
-        device.bluetooth_paired_list.remove(scanner)
-
-    def wifi_on(self, device: Device):
-        self.update_log_format(LogState.device(device))
-        self.run_and_log(commands['wifi on'].format(device.device_id))
-        time.sleep(10)
-        device.is_wifi_on = True
-
-    def wifi_off(self, device: Device):
-        self.update_log_format(LogState.device(device))
-        self.run_and_log(commands['wifi off'].format(device.device_id))
-        time.sleep(5)
-        device.is_wifi_on = False
-
     def install_apk(self, device: Device):
         self.update_log_format(LogState.device(device))
         self.run_and_log(commands['install endToEndTesting apk'].format(device.device_id))
@@ -308,11 +241,9 @@ class Run:
         test_file_handler: FileHandler = FileHandler(test_dir_name + '/' + test_id + '.log', mode='w')
 
         self.logger.addHandler(test_file_handler)
-        self.update_log_format(LogState.device(device), test_file_handler)
+        self.update_log_format(LogState.test(device, test_id), test_file_handler)
 
-        self.run_and_log(commands['run test'].format(device.device_id, tests[test_id]))
-        self.run_and_log(commands['acquire coverage file'].format(device.device_id, test_dir_name))
-        self.run_and_log(commands['parse coverage file'].format(test_dir_name))
+        self.run_and_log(commands['run test'].format(device.device_id, buckets[test_id]))
 
         self.logger.removeHandler(test_file_handler)
 

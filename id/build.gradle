@@ -102,7 +102,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
-    androidTestCompile 'com.simprints:cerberus-library:2017.4.0'
+    androidTestCompile 'com.simprints:cerberus-library:2017.4.1-dev-2'
     androidTestCompile 'com.simprints:remote-admin-client:2017.4.0-dev-3'
     androidTestCompile 'com.squareup.okhttp:okhttp:2.7.5'
     androidTestCompile 'com.google.code.gson:gson:2.8.1'
@@ -119,8 +119,3 @@ crashlytics {
 
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'realm-android'
-
-apply plugin: 'jacoco'
-jacoco {
-    toolVersion = '0.7.5.201505241946'
-}
