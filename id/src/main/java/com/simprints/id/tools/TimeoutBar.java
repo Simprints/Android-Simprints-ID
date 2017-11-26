@@ -13,14 +13,16 @@ public class TimeoutBar {
     private Context context;
     private CountDownTimer countDownTimer;
     private ProgressBar progressBar;
+    private int timeoutMs;
 
-    public TimeoutBar(Context context, ProgressBar progressBar) {
+    public TimeoutBar(Context context, ProgressBar progressBar, int timeoutMs) {
         this.context = context;
         this.progressBar = progressBar;
+        this.timeoutMs = timeoutMs;
     }
 
     public void startTimeoutBar() {
-        final int[] i = {0, new SharedPref(context).getTimeoutInt() * 1000};
+        final int[] i = {0, timeoutMs};
         progressBar.setProgress(i[0]);
         countDownTimer = new CountDownTimer(i[1], i[1] / 100) {
             @Override

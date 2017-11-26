@@ -160,8 +160,8 @@ public class AppState {
             }
 
         // Save some attributes in shared preferences
-        new SharedPref(appContext).setAppKeyString(apiKey.substring(0, 8));
-        new SharedPref(appContext).setLastUserIdString(userId);
+        dataManager.setAppKey(apiKey.substring(0, 8));
+        dataManager.setLastUserId(userId);
 
         return null;
     }

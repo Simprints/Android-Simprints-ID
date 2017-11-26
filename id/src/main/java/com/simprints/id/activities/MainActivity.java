@@ -46,7 +46,6 @@ import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.RemoteConfig;
-import com.simprints.id.tools.SharedPref;
 import com.simprints.id.tools.TimeoutBar;
 import com.simprints.id.tools.Vibrate;
 import com.simprints.id.tools.ViewPagerCustom;
@@ -94,8 +93,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private static ScanConfig DEFAULT_CONFIG;
 
-    private SharedPref sharedPref;
-
     private ButtonListener scannerButton;
 
     private Handler handler;
@@ -130,17 +127,19 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
-        navView.setItemIconTintList(null);
 
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
         appState = app.getAppState();
         setup = app.getSetup();
         syncService = app.getSyncService();
+
+        setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        navView.setItemIconTintList(null);
+
         appState.logMainStart();
 
         handler = new Handler();
@@ -156,8 +155,9 @@ public class MainActivity extends AppCompatActivity implements
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
         un20WakeupDialog = initUn20Dialog();
         registrationResult = null;
-        sharedPref = new SharedPref(getApplicationContext());
-        timeoutBar = new TimeoutBar(getApplicationContext(), (ProgressBar) findViewById(R.id.pb_timeout));
+        timeoutBar = new TimeoutBar(getApplicationContext(),
+                (ProgressBar) findViewById(R.id.pb_timeout),
+                dataManager.getTimeoutS() * 1000);
 
         setFingerStatus();
         initActiveFingers();
@@ -185,8 +185,8 @@ public class MainActivity extends AppCompatActivity implements
 
 
         // We set the two defaults in the config for the first reset.
-        sharedPref.setFingerStatus(FingerIdentifier.LEFT_THUMB, true);
-        sharedPref.setFingerStatus(FingerIdentifier.LEFT_INDEX_FINGER, true);
+        dataManager.setFingerStatus(FingerIdentifier.LEFT_THUMB, true);
+        dataManager.setFingerStatus(FingerIdentifier.LEFT_INDEX_FINGER, true);
     }
 
     private void initConnectionListener() {
@@ -226,8 +226,8 @@ public class MainActivity extends AppCompatActivity implements
     private void initActiveFingers() {
         for (int i = 0; i < NB_OF_FINGERS; i++) {
             FingerIdentifier id = FingerIdentifier.values()[i];
-            if (sharedPref.getFingerStatusPersist())
-                fingers[i] = new Finger(id, sharedPref.getFingerStatus(id), false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
+            if (dataManager.getFingerStatusPersist())
+                fingers[i] = new Finger(id, dataManager.getFingerStatus(id), false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
             else
                 fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
             if (fingers[i].isActive()) {
@@ -504,7 +504,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void nudgeMode() {
-        boolean nudge = sharedPref.getNudgeModeBool();
+        boolean nudge = dataManager.getNudgeMode();
 
         if (nudge) {
             handler.postDelayed(new Runnable() {
@@ -647,7 +647,7 @@ public class MainActivity extends AppCompatActivity implements
             labels[i] = getString(FingerRes.get(fingers[i]).getNameId());
         }
         labels[fingers.length] = getString(R.string.persistence_label);
-        checked[fingers.length] = sharedPref.getFingerStatusPersist();
+        checked[fingers.length] = dataManager.getFingerStatusPersist();
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle("Add Finger(s)")
                 .setMultiChoiceItems(labels, checked, new DialogInterface.OnMultiChoiceClickListener() {
@@ -655,7 +655,7 @@ public class MainActivity extends AppCompatActivity implements
                     public void onClick(DialogInterface dialogInterface, int i, boolean isChecked) {
                         if (i == fingers.length) {
                             checked[i] = isChecked;
-                            sharedPref.setFingerStatusPersist(isChecked);
+                            dataManager.setFingerStatusPersist(isChecked);
                             return;
                         }
 
@@ -684,13 +684,13 @@ public class MainActivity extends AppCompatActivity implements
                         for (Finger finger : fingers) {
                             if (finger.isActive() && !activeFingers.contains(finger)) {
                                 activeFingers.add(finger);
-                                if (sharedPref.getFingerStatusPersist())
-                                    sharedPref.setFingerStatus(finger.getId(), true);
+                                if (dataManager.getFingerStatusPersist())
+                                    dataManager.setFingerStatus(finger.getId(), true);
                             }
                             if (!finger.isActive() && activeFingers.contains(finger)) {
                                 activeFingers.remove(finger);
-                                if (sharedPref.getFingerStatusPersist())
-                                    sharedPref.setFingerStatus(finger.getId(), false);
+                                if (dataManager.getFingerStatusPersist())
+                                    dataManager.setFingerStatus(finger.getId(), false);
                             }
                         }
                         Collections.sort(activeFingers);
@@ -779,8 +779,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onResume() {
         super.onResume();
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
         if (syncItem != null && appState.getData().isConnected())
             syncItem.setIcon(R.drawable.ic_menu_sync_ready);
     }
@@ -831,8 +832,8 @@ public class MainActivity extends AppCompatActivity implements
     private void startContinuousCapture() {
         timeoutBar.startTimeoutBar();
 
-        appState.getScanner().startContinuousCapture(sharedPref.getQualityThresholdInt(),
-                sharedPref.getTimeoutInt() * 1000, new ScannerCallback() {
+        appState.getScanner().startContinuousCapture(dataManager.getQualityThreshold(),
+                dataManager.getTimeoutS() * 1000, new ScannerCallback() {
                     @Override
                     public void onSuccess() {
                         timeoutBar.stopTimeoutBar();
@@ -855,7 +856,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private void forceCapture() {
-        appState.getScanner().forceCapture(sharedPref.getQualityThresholdInt(), new ScannerCallback() {
+        appState.getScanner().forceCapture(dataManager.getQualityThreshold(), new ScannerCallback() {
                     @Override
                     public void onSuccess() {
                         captureSuccess();
@@ -874,7 +875,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void forceCaptureNotPossible() {
         activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
-        Vibrate.vibrate(MainActivity.this, 100);
+        Vibrate.vibrate(MainActivity.this, dataManager.getVibrateMode(), 100);
         refreshDisplay();
     }
 
@@ -903,7 +904,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-        int qualityScore1 = sharedPref.getQualityThresholdInt();
+        int qualityScore1 = dataManager.getQualityThreshold();
 
         if (quality >= qualityScore1) {
             activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
@@ -912,7 +913,7 @@ public class MainActivity extends AppCompatActivity implements
             activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
         }
 
-        Vibrate.vibrate(MainActivity.this, 100);
+        Vibrate.vibrate(MainActivity.this, dataManager.getVibrateMode(), 100);
         refreshDisplay();
     }
 
