@@ -45,11 +45,12 @@ public class AboutActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initViews();
 
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
         appState = app.getAppState();
+
+        initViews();
 
         statisticsView.setVersionData(
                 appState.getAppVersion() != null ? appState.getAppVersion() : "null",
@@ -87,8 +88,9 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_about);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

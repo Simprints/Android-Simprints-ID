@@ -42,5 +42,5 @@ class Application: AndroidApplication() {
     val analytics: Analytics by lazy { Analytics.getInstance(this, dataManager, appState) }
     val setup: Setup by lazy { Setup.getInstance(dataManager, appState, analytics) }
     val answers: Answers by lazy { Answers.getInstance() }
-    val syncService: SyncService by lazy { SyncService.getInstance() }
+    val syncService: SyncService by lazy { SyncService.getInstance(dataManager) }
 }

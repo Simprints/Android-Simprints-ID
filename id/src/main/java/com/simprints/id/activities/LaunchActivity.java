@@ -81,19 +81,21 @@ public class LaunchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
-        setContentView(R.layout.activity_launch);
-        Fabric.with(this, new Crashlytics());
-
-        // Keep screen from going to sleep
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
         appState = app.getAppState();
         setup = app.getSetup();
         analytics = app.getAnalytics();
+
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
+        setContentView(R.layout.activity_launch);
+        Fabric.with(this, new Crashlytics());
+
+        // Keep screen from going to sleep
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Initialize remote config
         RemoteConfig.init();
@@ -135,7 +137,7 @@ public class LaunchActivity extends AppCompatActivity {
                     loadingInfoTextView.setVisibility(View.INVISIBLE);
                     waitingForConfirmation = true;
                     appState.getScanner().registerButtonListener(scannerButton);
-                    vibrate(LaunchActivity.this, 100);
+                    vibrate(LaunchActivity.this, dataManager.getVibrateMode(), 100);
                 } else {
                     finishLaunch();
                 }

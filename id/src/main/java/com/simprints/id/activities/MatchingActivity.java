@@ -21,7 +21,6 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
-import com.simprints.id.tools.SharedPref;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
@@ -50,23 +49,28 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
     private MatchingView matchingView;
 
-    private DataManager dataManager;
-    private AppState appState;
     private Person probe;
     private List<Person> candidates = new ArrayList<>();
     private List<Float> scores = new ArrayList<>();
     private Handler handler = new Handler();
     private OnMatchStartHandlerThread onMatchStartHandlerThread;
 
+    private DataManager dataManager;
+    private AppState appState;
+
+    // Singletons
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initViews();
 
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
         appState = app.getAppState();
         appState.logMatchStart();
+
+        initViews();
+
 
         Bundle extras = getIntent().getExtras();
         probe = extras.getParcelable("Person");
@@ -97,8 +101,9 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     }
 
     private void initViews() {
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_matching);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         matchingView = new MatchingView();
@@ -178,7 +183,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 public void run() {
                     finish();
                 }
-            }, new SharedPref(getApplicationContext()).getMatchingEndWaitTime() * 1000);
+            }, dataManager.getMatchingEndWaitTimeS() * 1000);
         }
     }
 
@@ -211,7 +216,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     }
 
     private void onIdentifyStart() {
-        final GROUP matchGroup = new SharedPref(getApplicationContext()).getMatchGroup();
+        final GROUP matchGroup = dataManager.getMatchGroup();
 
         appState.getData().loadPeople(candidates, matchGroup, new DataCallback() {
             @Override
@@ -220,7 +225,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
-                int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
+                int matcherType = dataManager.getMatcherType();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -261,7 +266,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
             public void onSuccess() {
                 Log.d(MatchingActivity.this, "Successfully loaded candidate");
 
-                int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
+                int matcherType = dataManager.getMatcherType();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -307,7 +312,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();
                         matchingView.setIdentificationProgressReturningStart();
-                        int nbOfResults = new SharedPref(getApplicationContext()).getReturnIdCountInt();
+                        int nbOfResults = dataManager.getReturnIdCount();
 
                         ArrayList<Identification> topCandidates = new ArrayList<>();
 

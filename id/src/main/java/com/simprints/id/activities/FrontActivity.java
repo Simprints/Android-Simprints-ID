@@ -37,15 +37,18 @@ public class FrontActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
-        setContentView(R.layout.activity_front);
 
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
         syncService = app.getSyncService();
         appState = app.getAppState();
+
+        Fabric.with(this, new Crashlytics());
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
+        setContentView(R.layout.activity_front);
+
         // TODO: is that necessary?
         app.getAnalytics();
 
