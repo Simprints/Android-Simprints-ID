@@ -259,7 +259,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     }
 
     private void onVerifyStart() {
-        final String guid = appState.getGuid();
+        final String guid = dataManager.getPatientId();
 
         appState.getData().loadPerson(candidates, guid, new DataCallback() {
             @Override
@@ -361,7 +361,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                         Intent resultData;
                         resultData = new Intent(Constants.SIMPRINTS_IDENTIFY_INTENT);
-                        FormatResult.put( resultData, topCandidates, appState);
+                        FormatResult.put(resultData, topCandidates, appState, dataManager.getResultFormat());
                         setResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                                 tier1Or2Matches, tier3Matches, tier4Matches);
@@ -374,7 +374,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                         if (candidates.size() > 0 && scores.size() > 0) {
                             int score = scores.get(0).intValue();
-                            verification = new Verification(score, computeTier(score), appState.getGuid());
+                            verification = new Verification(score, computeTier(score), dataManager.getPatientId());
                             guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_FOUND;
                             resultCode = RESULT_OK;
                         } else {
@@ -384,13 +384,13 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         }
 
                         if (appState.getData() != null) {
-                            appState.getData().saveVerification(probe, appState.getGuid(), verification, appState.getSessionId(), guidExistsResult);
+                            appState.getData().saveVerification(probe, dataManager.getPatientId(), verification, appState.getSessionId(), guidExistsResult);
                         }
 
                         // finish
                         Intent resultData;
                         resultData = new Intent(Constants.SIMPRINTS_VERIFY_INTENT);
-                        FormatResult.put(resultData, verification, appState);
+                        FormatResult.put(resultData, verification, dataManager.getResultFormat());
                         setResult(resultCode, resultData);
                         finish();
                         break;

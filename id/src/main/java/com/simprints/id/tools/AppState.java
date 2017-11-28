@@ -1,13 +1,8 @@
 package com.simprints.id.tools;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -43,22 +38,7 @@ public class AppState {
 
     private DataManager dataManager;
 
-    // Callout parameters
-    private String apiKey = null;
-    private String updateId = null;
-    private String verifyId = null;
-    private String userId = null;
-    private String moduleId = null;
-    private String metadataString = null;
-    private String resultFormat = null;
-    private Metadata metadata = null;
-    private String callingPackage = null;
-    private String appVersion = null;
-    private String personGuid = null;
-
     // Other attributes
-    private String deviceId = null;
-    private String phoneModel = null;
     private String macAddress = null;
     private String scannerId = null;
     private short hardwareVersion = -1;
@@ -75,93 +55,100 @@ public class AppState {
 
 
     @SuppressLint("HardwareIds")
-    public ALERT_TYPE init(@NonNull Intent intent, @NonNull Context appContext) {
+    public ALERT_TYPE init(@NonNull Intent intent) {
+
+        Callout callout = Callout.NULL;
+        String apiKey = "";
+        String moduleId = "";
+        String userId = "";
+        String updateId = "";
+        String verifyId = "";
+        String patientId = "";
+        String callingPackage = "";
+        String metadata = "";
+        String resultFormat = "";
 
         // Reads intent parameters
-        Callout callout = Callout.fromAction(intent.getAction());
-        dataManager.setCallout(callout);
+        if (intent.getAction() != null) {
+            callout = Callout.fromAction(intent.getAction());
+        }
+
         Bundle extras = intent.getExtras();
         if (extras != null) {
-            apiKey = extras.getString(Constants.SIMPRINTS_API_KEY);
-            updateId = extras.getString(Constants.SIMPRINTS_UPDATE_GUID);
-            verifyId = extras.getString(Constants.SIMPRINTS_VERIFY_GUID);
-            userId = extras.getString(Constants.SIMPRINTS_USER_ID);
-            moduleId = extras.getString(Constants.SIMPRINTS_MODULE_ID);
-            metadataString = extras.getString(Constants.SIMPRINTS_METADATA);
-            callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE);
-            resultFormat = extras.getString(Constants.SIMPRINTS_RESULT_FORMAT);
+            apiKey = extras.getString(Constants.SIMPRINTS_API_KEY, "");
+            updateId = extras.getString(Constants.SIMPRINTS_UPDATE_GUID, "");
+            verifyId = extras.getString(Constants.SIMPRINTS_VERIFY_GUID, "");
+            userId = extras.getString(Constants.SIMPRINTS_USER_ID, "");
+            moduleId = extras.getString(Constants.SIMPRINTS_MODULE_ID, "");
+            metadata = extras.getString(Constants.SIMPRINTS_METADATA, "");
+            callingPackage = extras.getString(Constants.SIMPRINTS_CALLING_PACKAGE, "");
+            resultFormat = extras.getString(Constants.SIMPRINTS_RESULT_FORMAT, "");
         }
-        if (callout != null) {
-            switch (callout) {
-                case UPDATE:
-                    personGuid = updateId;
-                    break;
-                case VERIFY:
-                    personGuid = verifyId;
-                    break;
-                case REGISTER:
-                    personGuid = UUID.randomUUID().toString();
-                    break;
-                default:
-                    break;
-            }
+        switch (callout) {
+            case UPDATE:
+                patientId = updateId;
+                break;
+            case VERIFY:
+                patientId = verifyId;
+                break;
+            case REGISTER:
+                patientId = UUID.randomUUID().toString();
+                break;
+            default:
+                break;
         }
 
-        // Read other local attributes
-        deviceId = Settings.Secure.getString(appContext.getContentResolver(), Settings.Secure.ANDROID_ID);
-        PackageInfo pInfo;
-        try {
-            pInfo = appContext.getPackageManager().getPackageInfo(appContext.getPackageName(), 0);
-            appVersion = pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            phoneModel = Build.MANUFACTURER
-                    + " " + Build.MODEL + " " + Build.VERSION.RELEASE
-                    + " " + Build.VERSION_CODES.class.getFields()[Build.VERSION.SDK_INT].getName();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        }
+        // Save session parameters
+        dataManager.setCallout(callout);
+        dataManager.setApiKey(apiKey);
+        dataManager.setModuleId(moduleId);
+        dataManager.setUserId(userId);
+        dataManager.setPatientId(patientId);
+        dataManager.setAppKey(apiKey.substring(0, 8));
+        dataManager.setCallingPackage(callingPackage);
+        dataManager.setMetadata(metadata);
+        dataManager.setResultFormat(resultFormat);
 
         // Save attributes to firebase session, whether they are valid or not
-        session = new fb_Session(Callout.toString(callout), apiKey, moduleId, userId, personGuid,
-                metadataString, deviceId, callingPackage, appVersion, phoneModel);
+        session = new fb_Session(Callout.toString(callout),
+                apiKey,
+                moduleId,
+                userId,
+                patientId,
+                metadata,
+                dataManager.getDeviceId(),
+                callingPackage,
+                dataManager.getAppVersionName(),
+                dataManager.getDeviceModel() + " " + dataManager.getAndroidSdkVersion());
 
         // Check parameters
-        if (callout == null)
+        if (callout == Callout.NULL)
             return ALERT_TYPE.INVALID_INTENT_ACTION;
 
-        if (apiKey == null || apiKey.isEmpty())
+        if (apiKey.isEmpty())
             return ALERT_TYPE.MISSING_API_KEY;
 
         if (apiKey.length() < 8)
             return ALERT_TYPE.INVALID_API_KEY;
 
-        if (userId == null || userId.isEmpty())
+        if (userId.isEmpty())
             return ALERT_TYPE.MISSING_USER_ID;
 
-        if (moduleId == null || moduleId.isEmpty())
+        if (moduleId.isEmpty())
             return ALERT_TYPE.MISSING_MODULE_ID;
 
-        if (callout == Callout.UPDATE && (updateId == null || updateId.isEmpty()))
+        if (callout == Callout.UPDATE && updateId.isEmpty())
             return ALERT_TYPE.MISSING_UPDATE_GUID;
 
-        if (callout == Callout.VERIFY && (verifyId == null || verifyId.isEmpty()))
+        if (callout == Callout.VERIFY && verifyId.isEmpty())
             return ALERT_TYPE.MISSING_VERIFY_GUID;
 
-        metadata = null;
-        if (metadataString != null && !metadataString.isEmpty())
+        if (!metadata.isEmpty())
             try {
-                metadata = new Metadata(metadataString);
+                new Metadata(metadata);
             } catch (Metadata.InvalidMetadataException e) {
                 return ALERT_TYPE.INVALID_METADATA;
             }
-
-        // Save some attributes in shared preferences
-        dataManager.setAppKey(apiKey.substring(0, 8));
-        dataManager.setLastUserId(userId);
 
         return null;
     }
@@ -223,26 +210,6 @@ public class AppState {
         this.refusalForm = refusalForm;
     }
 
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getModuleId() {
-        return moduleId;
-    }
-
-    public String getGuid() {
-        return personGuid;
-    }
-
     public String getMacAddress() {
         return macAddress;
     }
@@ -257,16 +224,6 @@ public class AppState {
 
     public boolean getSignedIn() {
         return signedIn;
-    }
-
-    public String getCallingPackage() {
-        return callingPackage;
-    }
-
-    public String getResultFormat() { return resultFormat; }
-
-    public String getAppVersion() {
-        return appVersion;
     }
 
     public DatabaseContext getData() {

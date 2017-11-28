@@ -39,7 +39,7 @@ public class SyncService implements DataCallback {
      */
     public synchronized boolean startAndListen(@NonNull Context appContext, @Nullable DataCallback dataCallback) {
         String appKey = dataManager.getAppKey();
-        String userId = dataManager.getLastUserId();
+        String userId = dataManager.getUserId();
         Log.d("sync", "startAndListen()");
         if (appKey.isEmpty() || userId.isEmpty()) {
             Log.d("sync", "first if");

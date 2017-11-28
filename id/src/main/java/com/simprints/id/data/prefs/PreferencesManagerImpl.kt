@@ -2,23 +2,47 @@ package com.simprints.id.data.prefs
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
+import com.google.gson.Gson
 import com.simprints.id.model.Callout
-import com.simprints.id.tools.extensions.getEnum
-import com.simprints.id.tools.extensions.putEnum
+import com.simprints.id.tools.delegates.Preference
+import com.simprints.id.tools.delegations.sharedPreferences.ExtSharedPreferences
 import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.FingerIdentifier
+import timber.log.Timber
 import kotlin.reflect.KProperty
 
-class PreferencesManagerImpl(context: Context, preferenceFileName: String = PREF_FILE_NAME): PreferencesManager {
+class PreferencesManagerImpl(private val prefs: ExtSharedPreferences,
+                             private val gson: Gson): PreferencesManager {
 
     companion object {
 
-        private val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
+        val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
+        val PREF_MODE = Context.MODE_PRIVATE
 
         // Session state
+        private val API_KEY_KEY = "ApiKey"
+        private val API_KEY_DEFAULT = ""
+
         private val CALLOUT_KEY = "Callout"
         private val CALLOUT_DEFAULT = Callout.NULL
+
+        private val MODULE_ID_KEY = "ModuleId"
+        private val MODULE_ID_DEFAULT = ""
+
+        private val USER_ID_KEY = "UserId"
+        private val USER_ID_DEFAULT = ""
+
+        private val PATIENT_ID_KEY = "PatientId"
+        private val PATIENT_ID_DEFAULT = ""
+
+        private val CALLING_PACKAGE_KEY = "CallingPackage"
+        private val CALLING_PACKAGE_DEFAULT = ""
+
+        private val METADATA_KEY = "Metadata"
+        private val METADATA_DEFAULT = ""
+
+        private val RESULT_FORMAT_KEY = "ResultFormat"
+        private val RESULT_FORMAT_DEFAULT = ""
 
         // Settings
 
@@ -61,96 +85,116 @@ class PreferencesManagerImpl(context: Context, preferenceFileName: String = PREF
         private val MATCHING_END_WAIT_TIME_KEY = "MatchingEndWaitTime"
         private val MATCHING_END_WAIT_TIME_DEFAULT = 1
 
-        private val LAST_USER_ID_KEY = "LastUserId"
-        private val LAST_USER_ID_DEFAULT = ""
-
         private val PERSIST_FINGER_KEY = "PersistFingerStatus"
         private val PERSIST_FINGER_DEFAULT = false
+
+        private val FINGER_STATUS_KEY = "FingerStatus"
+        private val FINGER_STATUS_DEFAULT = FingerIdentifier.values().map({ Pair(it, false)}).toMap()
     }
 
-    private val prefs: SharedPreferences = context.getSharedPreferences(preferenceFileName, Context.MODE_PRIVATE)
 
-    inner class Preference<T: Any?>(private val name: String, private val default: T) {
+    inner class MapPreference<K: Any, V: Any>(private val name: String, private val default: Map<K, V>) {
 
-        @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
-        operator fun getValue(thisRef: Any?, property: KProperty<*>): T =
-                with(prefs) {
-                    when (default) {
-                        is Long -> prefs.getLong(name, default)
-                        is String -> prefs.getString(name, default)
-                        is Int -> prefs.getInt(name, default)
-                        is Boolean -> prefs.getBoolean(name, default)
-                        is Float -> prefs.getFloat(name, default)
-                        is Constants.GROUP -> prefs.getEnum(name, default)
-                        is Callout -> prefs.getEnum(name, default)
-                        else -> throw IllegalArgumentException("This type can't be saved into Preferences")
-                    } as T
+        private var initialized: Boolean = false
+        private lateinit var field: Map<K, V>
+
+        @Suppress("UNCHECKED_CAST")
+        @Synchronized
+        operator fun getValue(thisRef: Any?, property: KProperty<*>): Map<K, V> {
+            Timber.d("get map ${property.name}")
+            if (!initialized) {
+                field = if (prefs.contains(name)) {
+                    val string = prefs.getString(name, "")
+                    Timber.d("Read $string")
+                    gson.fromJson(string, Map::class.java) as Map<K, V>
+                } else {
+                    Timber.d("Pref did not contain, returning default")
+                    default
                 }
+                initialized = true
+            }
+            return field
+        }
 
         @SuppressLint("CommitPrefEdits")
-        operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-            with(prefs.edit()) {
-                when (value) {
-                    is Long -> putLong(name, value)
-                    is String -> putString(name, value)
-                    is Int -> putInt(name, value)
-                    is Boolean -> putBoolean(name, value)
-                    is Float -> putFloat(name, value)
-                    is Constants.GROUP -> putEnum(name, value)
-                    is Callout -> putEnum(name, value)
-                    else -> throw IllegalArgumentException("This type can't be saved into Preferences")
-                }.apply()
-            }
+        @Synchronized
+        operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Map<K, V>) {
+            Timber.d("set map ${property.name}")
+            field = value
+            val string = gson.toJson(value)
+            prefs.edit().putString(name, gson.toJson(value)).apply()
+            Timber.d("Wrote $string")
         }
     }
 
+
+    // API key of the current sessions
+    override var apiKey: String by Preference(prefs, API_KEY_KEY, API_KEY_DEFAULT)
+
     // Callout of the current session
-    override var callout: Callout by Preference(CALLOUT_KEY, CALLOUT_DEFAULT)
+    override var callout: Callout by Preference(prefs, CALLOUT_KEY, CALLOUT_DEFAULT)
+
+    // Module ID of the current session
+    override var moduleId: String by Preference(prefs, MODULE_ID_KEY, MODULE_ID_DEFAULT)
+
+    // User ID of the current session
+    override var userId: String by Preference(prefs, USER_ID_KEY, USER_ID_DEFAULT)
+
+    // Patient ID of the current session
+    override var patientId: String by Preference(prefs, PATIENT_ID_KEY, PATIENT_ID_DEFAULT)
+
+    // Calling package of the current session
+    override var callingPackage: String by Preference(prefs, CALLING_PACKAGE_KEY, CALLING_PACKAGE_DEFAULT)
+
+    // Metadata of the current session
+    override var metadata: String by Preference(prefs, METADATA_KEY, METADATA_DEFAULT)
+
+    // Result format of the current session
+    override var resultFormat: String by Preference(prefs, RESULT_FORMAT_KEY, RESULT_FORMAT_DEFAULT)
 
     // Should the UI automatically slide forward?
-    override var nudgeMode: Boolean by Preference(NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)
+    override var nudgeMode: Boolean by Preference(prefs, NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)
 
     // Has the CHW given consent to use Simprints ID?
-    override var consent: Boolean by Preference(CONSENT_KEY, CONSENT_DEFAULT)
+    override var consent: Boolean by Preference(prefs, CONSENT_KEY, CONSENT_DEFAULT)
 
     // Threshold that determines the UI feedback for a given fingerprint quality
-    override var qualityThreshold: Int by Preference(QUALITY_THRESHOLD_KEY, QUALITY_THRESHOLD_DEFAULT)
+    override var qualityThreshold: Int by Preference(prefs, QUALITY_THRESHOLD_KEY, QUALITY_THRESHOLD_DEFAULT)
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
-    override var returnIdCount: Int by Preference(NB_IDS_KEY, NB_IDS_DEFAULT)
+    override var returnIdCount: Int by Preference(prefs, NB_IDS_KEY, NB_IDS_DEFAULT)
 
     // Selected language
-    override var language: String by Preference(LANGUAGE_KEY, LANGUAGE_DEFAULT)
+    override var language: String by Preference(prefs, LANGUAGE_KEY, LANGUAGE_DEFAULT)
 
     // Active language position to be displayed in the list
-    override var languagePosition: Int by Preference(LANGUAGE_POSITION_KEY, LANGUAGE_POSITION_DEFAULT)
+    override var languagePosition: Int by Preference(prefs, LANGUAGE_POSITION_KEY, LANGUAGE_POSITION_DEFAULT)
 
     // Matcher type
-    override var matcherType: Int by Preference(MATCHER_TYPE_KEY, MATCHER_TYPE_DEFAULT)
+    override var matcherType: Int by Preference(prefs, MATCHER_TYPE_KEY, MATCHER_TYPE_DEFAULT)
 
     // Timeout seconds
-    override var timeoutS: Int by Preference(TIMEOUT_KEY, TIMEOUT_DEFAULT)
+    override var timeoutS: Int by Preference(prefs, TIMEOUT_KEY, TIMEOUT_DEFAULT)
 
     // App Key
-    override var appKey: String by Preference(APP_KEY_KEY, APP_KEY_DEFAULT)
+    override var appKey: String by Preference(prefs, APP_KEY_KEY, APP_KEY_DEFAULT)
 
     // Sync group. Default is user
-    override var syncGroup: Constants.GROUP by Preference(SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT)
+    override var syncGroup: Constants.GROUP by Preference(prefs, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT)
 
     // Match group. Default is user
-    override var matchGroup: Constants.GROUP by Preference(MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT)
+    override var matchGroup: Constants.GROUP by Preference(prefs, MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT)
 
     // Is the vibrate on
-    override var vibrateMode: Boolean by Preference(VIBRATE_KEY, VIBRATE_DEFAULT)
+    override var vibrateMode: Boolean by Preference(prefs, VIBRATE_KEY, VIBRATE_DEFAULT)
 
     // TODO: document that
-    override var matchingEndWaitTimeS: Int by Preference(MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
-
-    // ID of the last user
-    override var lastUserId: String by Preference(LAST_USER_ID_KEY, LAST_USER_ID_DEFAULT)
+    override var matchingEndWaitTimeS: Int by Preference(prefs, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
 
     // True if the fingers status should be persisted, false else
-    override var fingerStatusPersist: Boolean by Preference(PERSIST_FINGER_KEY, PERSIST_FINGER_DEFAULT)
+    override var fingerStatusPersist: Boolean by Preference(prefs, PERSIST_FINGER_KEY, PERSIST_FINGER_DEFAULT)
+
+    private var fingerStatus: Map<FingerIdentifier, Boolean> by MapPreference(FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT)
 
     /**
      * Get the status of a specific finger.
@@ -158,8 +202,10 @@ class PreferencesManagerImpl(context: Context, preferenceFileName: String = PREF
      * @param fingerIdentifier The finger status to retrieve
      * @return FingerConfig
      */
-    override fun getFingerStatus(fingerIdentifier: FingerIdentifier): Boolean =
-            prefs.getBoolean(fingerIdentifier.toString(), false)
+    override fun getFingerStatus(fingerIdentifier: FingerIdentifier): Boolean {
+        return fingerStatus[fingerIdentifier] ?: throw Error("Missing finger status")
+    }
+
 
     /**
      * Set the status of a specific finger
@@ -167,6 +213,7 @@ class PreferencesManagerImpl(context: Context, preferenceFileName: String = PREF
      * @param fingerIdentifier selected finger
      * @param show             True = show, False = don't show
      */
-    override fun setFingerStatus(fingerIdentifier: FingerIdentifier, show: Boolean) =
-            prefs.edit().putBoolean(fingerIdentifier.toString(), show).apply()
+    override fun setFingerStatus(fingerIdentifier: FingerIdentifier, show: Boolean) {
+        fingerStatus = fingerStatus.toMutableMap().apply { put(fingerIdentifier, show) }
+    }
 }

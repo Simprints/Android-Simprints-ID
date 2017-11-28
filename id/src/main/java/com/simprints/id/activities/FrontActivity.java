@@ -69,7 +69,7 @@ public class FrontActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.versionTextView)).setText(String.format("Simprints ID: %s", version));
         ((TextView) findViewById(R.id.libSimprintsTextView)).setText(R.string.front_libSimprints_version);
 
-        PermissionManager.requestAllPermissions(FrontActivity.this, appState);
+        PermissionManager.requestAllPermissions(FrontActivity.this, dataManager.getCallingPackage());
 
         dataCallback = new DataCallback() {
             @Override

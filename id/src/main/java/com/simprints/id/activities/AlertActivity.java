@@ -51,7 +51,7 @@ public class AlertActivity extends AppCompatActivity {
         if (alertType.mustBeLogged()) {
             answers.logCustom(new CustomEvent("Alert Triggered")
                     .putCustomAttribute("Alert Type", alertType.name() != null ? alertType.name() : "null")
-                    .putCustomAttribute("API Key", appState.getApiKey() != null ? appState.getApiKey() : "null")
+                    .putCustomAttribute("API Key", dataManager.getApiKey())
                     .putCustomAttribute("MAC Address", appState.getMacAddress() != null ? appState.getMacAddress() : "null"));
         }
 
