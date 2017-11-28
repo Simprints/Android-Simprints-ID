@@ -101,13 +101,13 @@ public class LaunchActivity extends AppCompatActivity {
         RemoteConfig.init();
 
         // Parse/verify callout, initialize app state
-        ALERT_TYPE alert = appState.init(getIntent(), getApplicationContext());
+        ALERT_TYPE alert = appState.init(getIntent());
         if (alert != null) {
             launchAlert(alert);
             return;
         }
         // Save some attributes to analytics
-        analytics.setUserProperties(appState.getApiKey(), appState.getModuleId(), appState.getUserId(), appState.getDeviceId());
+        analytics.setUserProperties();
         analytics.logLogin();
 
 

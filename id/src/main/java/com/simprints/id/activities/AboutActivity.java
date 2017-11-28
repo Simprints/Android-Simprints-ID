@@ -53,7 +53,7 @@ public class AboutActivity extends AppCompatActivity {
         initViews();
 
         statisticsView.setVersionData(
-                appState.getAppVersion() != null ? appState.getAppVersion() : "null",
+                dataManager.getAppVersionName(),
                 InternalConstants.LIBSIMPRINTS_VERSION,
                 appState.getHardwareVersion() > -1 ? String.valueOf(appState.getHardwareVersion()) : "null");
 
@@ -242,7 +242,7 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     private void recoverDb() {
-        String androidId = appState.getDeviceId() != null? appState.getDeviceId() : "no-device-id";
+        String androidId = dataManager.getDeviceId();
         appState.getData().recoverRealmDb(androidId + "_" + Long.toString(System.currentTimeMillis()) + ".json",
                 androidId,
                 Constants.GROUP.GLOBAL,

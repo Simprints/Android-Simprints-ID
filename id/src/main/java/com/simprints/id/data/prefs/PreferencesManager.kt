@@ -12,7 +12,14 @@ import com.simprints.libsimprints.FingerIdentifier
 interface PreferencesManager {
 
     // Session state
+    var apiKey: String
     var callout: Callout
+    var moduleId: String
+    var userId: String
+    var patientId: String
+    var callingPackage: String
+    var metadata: String
+    var resultFormat: String
 
     // Settings
     var nudgeMode: Boolean
@@ -27,9 +34,9 @@ interface PreferencesManager {
     var syncGroup: Constants.GROUP
     var matchGroup: Constants.GROUP
     var vibrateMode: Boolean
-    var lastUserId: String
     var matchingEndWaitTimeS: Int
     var fingerStatusPersist: Boolean
+
     fun getFingerStatus(fingerIdentifier: FingerIdentifier): Boolean
     fun setFingerStatus(fingerIdentifier: FingerIdentifier, show: Boolean)
 

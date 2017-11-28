@@ -38,12 +38,12 @@ public class Analytics {
         return firebaseAnalytics;
     }
 
-    public void setUserProperties(String apiKey, String moduleId, String userId, String deviceId) {
-        firebaseAnalytics.setUserId(appState.getUserId());
-        firebaseAnalytics.setUserProperty("api_key", appState.getApiKey());
-        firebaseAnalytics.setUserProperty("module_id", appState.getModuleId());
-        firebaseAnalytics.setUserProperty("user_id", appState.getUserId());
-        firebaseAnalytics.setUserProperty("device_id", appState.getDeviceId());
+    public void setUserProperties() {
+        firebaseAnalytics.setUserId(dataManager.getUserId());
+        firebaseAnalytics.setUserProperty("api_key", dataManager.getApiKey());
+        firebaseAnalytics.setUserProperty("module_id", dataManager.getModuleId());
+        firebaseAnalytics.setUserProperty("user_id", dataManager.getUserId());
+        firebaseAnalytics.setUserProperty("device_id", dataManager.getDeviceId());
     }
 
     public void setScannerMac() {
@@ -56,10 +56,11 @@ public class Analytics {
         Bundle bundle = new Bundle();
         bundle.putString("alert_name", alertType.name());
         bundle.putBoolean("retry", retry);
-        bundle.putString("api_key", appState.getApiKey());
-        bundle.putString("module_id", appState.getModuleId());
-        bundle.putString("user_id", appState.getUserId());
-        bundle.putString("scanner_id", appState.getDeviceId() != null? appState.getDeviceId() : "null");
+        bundle.putString("api_key", dataManager.getApiKey());
+        bundle.putString("module_id", dataManager.getModuleId());
+        bundle.putString("user_id", dataManager.getUserId());
+        // TODO: this looks weird, scanner_id != device_id
+        bundle.putString("scanner_id", dataManager.getDeviceId());
         firebaseAnalytics.logEvent("alert", bundle);
     }
 

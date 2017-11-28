@@ -97,7 +97,7 @@ public class Setup {
             return;
 
         // Step 1: check permissions. These can be revoked, so it has to be done every time
-        boolean permissionsReady = PermissionManager.checkAllPermissions(activity, appState);
+        boolean permissionsReady = PermissionManager.checkAllPermissions(activity, dataManager.getCallingPackage());
         if (!permissionsReady) {
             this.requestPermissions(activity);
             return;
@@ -151,13 +151,13 @@ public class Setup {
     // STEP 1
     private void requestPermissions(@NonNull Activity activity) {
         onProgress(0, R.string.launch_checking_permissions);
-        PermissionManager.requestAllPermissions(activity, appState);
+        PermissionManager.requestAllPermissions(activity, dataManager.getCallingPackage());
     }
 
     // STEP 2
     private void initDbContext(@NonNull final Activity activity) {
         onProgress(10, R.string.updating_database);
-        DatabaseContext dbContext = new DatabaseContext(appState.getApiKey(), appState.getUserId(), appState.getModuleId(), appState.getDeviceId(), activity, BuildConfig.DEBUG);
+        DatabaseContext dbContext = new DatabaseContext(dataManager.getApiKey(), dataManager.getUserId(), dataManager.getModuleId(), dataManager.getDeviceId(), activity, BuildConfig.DEBUG);
         appState.setData(dbContext);
 
         dbContext.registerAuthListener(new AuthListener() {
@@ -325,7 +325,7 @@ public class Setup {
         callback.onProgress(60, R.string.launch_checking_person_in_db);
 
         List<Person> loadedPerson = new ArrayList<>();
-        final String guid = appState.getGuid();
+        final String guid = dataManager.getPatientId();
         appState.getData().loadPerson(loadedPerson, guid, new DataCallback() {
             @Override
             public void onSuccess() {
@@ -390,6 +390,7 @@ public class Setup {
     // STEP 8
     private void wakeUpUn20(@NonNull final Activity activity) {
         callback.onProgress(85, R.string.launch_wake_un20);
+
         appState.getScanner().un20Wakeup(new ScannerCallback() {
             @Override
             public void onSuccess() {

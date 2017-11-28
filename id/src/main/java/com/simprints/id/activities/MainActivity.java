@@ -542,11 +542,11 @@ public class MainActivity extends AppCompatActivity implements
         if (nbRequiredFingerprints < 1) {
             Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show();
         } else {
-            Person person = new Person(appState.getGuid(), fingerprints);
+            Person person = new Person(dataManager.getPatientId(), fingerprints);
             if (dataManager.getCallout() == Callout.REGISTER || dataManager.getCallout() == Callout.UPDATE) {
                 appState.getData().savePerson(person);
 
-                registrationResult = new Registration(appState.getGuid());
+                registrationResult = new Registration(dataManager.getPatientId());
                 for (Fingerprint fp : fingerprints) {
                     if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES))
                         registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
@@ -556,7 +556,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
-                FormatResult.put(resultData, registrationResult, appState);
+                FormatResult.put(resultData, registrationResult, dataManager.getResultFormat());
                 setResult(RESULT_OK, resultData);
                 finish();
             } else {
