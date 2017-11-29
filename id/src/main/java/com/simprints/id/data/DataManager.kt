@@ -6,6 +6,9 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
 
+/**
+ * @author: Etienne Thiery (etienne@simprints.com)
+ */
 interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, ApiManager, AnalyticsManager {
 
     val androidSdkVersion: Int
