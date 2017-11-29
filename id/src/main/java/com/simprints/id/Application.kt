@@ -18,10 +18,15 @@ import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.network.ApiManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.tools.Analytics
 import com.simprints.id.tools.AppState
-import com.simprints.id.tools.delegations.sharedPreferences.ExtSharedPreferences
-import com.simprints.id.tools.delegations.sharedPreferences.ExtSharedPreferencesImpl
+import com.simprints.id.tools.serializers.BooleanSerializer
+import com.simprints.id.tools.serializers.FingerIdentifierSerializer
+import com.simprints.id.tools.serializers.MapSerializer
+import com.simprints.id.tools.serializers.Serializer
+import com.simprints.libsimprints.FingerIdentifier
 import timber.log.Timber
 import android.app.Application as AndroidApplication
 
@@ -30,9 +35,15 @@ class Application: AndroidApplication() {
     // TODO: dependency injection with Dagger 2!
 
     private val gson: Gson by lazy { Gson() }
+    private val booleanSerializer: Serializer<Boolean> by lazy { BooleanSerializer() }
+    private val fingerIdentifierSerializer: Serializer<FingerIdentifier>
+            by lazy { FingerIdentifierSerializer() }
+    private val fingerIdentifierToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>
+            by lazy { MapSerializer(fingerIdentifierSerializer, booleanSerializer, gson) }
+
     private val basePrefs: SharedPreferences by lazy { this.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)}
-    private val prefs: ExtSharedPreferences by lazy { ExtSharedPreferencesImpl(basePrefs) }
-    private val preferencesManager: PreferencesManager by lazy { PreferencesManagerImpl(prefs, gson) }
+    private val prefs: ImprovedSharedPreferences by lazy { ImprovedSharedPreferencesImpl(basePrefs) }
+    private val preferencesManager: PreferencesManager by lazy { PreferencesManagerImpl(prefs, fingerIdentifierToBooleanSerializer) }
     private val localDbManager: LocalDbManager by lazy { RealmDbManager(this) }
     private val remoteDbManager: RemoteDbManager by lazy { FirebaseRtdbManager(this) }
     private val apiManager: ApiManager by lazy { ApiManagerImpl(this) }
