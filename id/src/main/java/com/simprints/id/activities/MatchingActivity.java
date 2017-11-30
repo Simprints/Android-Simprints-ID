@@ -12,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
@@ -95,7 +94,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 onVerifyStart();
                 break;
             default:
-                Crashlytics.logException(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
+                dataManager.logException(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -252,7 +251,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                Crashlytics.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
+                dataManager.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
@@ -294,7 +293,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                Crashlytics.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onVerifyStart()"));
+                dataManager.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onVerifyStart()"));
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
