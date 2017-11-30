@@ -28,7 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.adapters.FingerPageAdapter;
@@ -69,6 +69,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import timber.log.Timber;
 
 import static com.simprints.id.model.Finger.NB_OF_FINGERS;
 import static com.simprints.id.model.Finger.Status;
@@ -803,7 +805,7 @@ public class MainActivity extends AppCompatActivity implements
 
     DataCallback syncListener = new DataCallback() {
         public void onSuccess() {
-            android.util.Log.d("sync", "onSuccess");
+            Timber.d("sync: onSuccess");
             if (syncItem == null)
                 return;
 
@@ -814,7 +816,7 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         public void onFailure(DATA_ERROR data_error) {
-            android.util.Log.d("sync", "onFailure");
+            Timber.d("sync: onFailure");
             switch (data_error) {
                 case SYNC_INTERRUPTED:
                     if (syncItem == null)
@@ -825,7 +827,7 @@ public class MainActivity extends AppCompatActivity implements
                     syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                     break;
                 default:
-                    FirebaseCrash.report(new Exception("Unknown error returned in onFailure MainActivity.syncListener()"));
+                    Crashlytics.logException(new Exception("Unknown error returned in onFailure MainActivity.syncListener()"));
                     launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         }
@@ -839,7 +841,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         if (!syncService.startAndListen(getApplicationContext(), syncListener)) {
-            FirebaseCrash.report(new Exception("Error in MainActivity.backgroundSync()"));
+            Crashlytics.logException(new Exception("Error in MainActivity.backgroundSync()"));
             launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -913,7 +915,7 @@ public class MainActivity extends AppCompatActivity implements
                                         finger.getId(),
                                         appState.getScanner().getTemplate()));
             } catch (IllegalArgumentException ex) {
-                FirebaseCrash.report(ex);
+                Crashlytics.logException(ex);
                 resetUIFromError();
                 return;
             }

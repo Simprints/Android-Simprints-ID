@@ -3,8 +3,8 @@ package com.simprints.id.tools;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.crash.FirebaseCrash;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 
@@ -51,7 +51,7 @@ public class Analytics {
     }
 
     public void logAlert(ALERT_TYPE alertType, boolean retry) {
-        FirebaseCrash.log(alertType.name());
+        Crashlytics.log(alertType.name());
 
         Bundle bundle = new Bundle();
         bundle.putString("alert_name", alertType.name());

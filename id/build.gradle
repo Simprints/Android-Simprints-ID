@@ -85,11 +85,15 @@ dependencies {
     // Databases
     implementation 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     implementation "com.google.firebase:firebase-core:$google_version"
-    implementation "com.google.firebase:firebase-crash:$google_version"
     implementation "com.google.firebase:firebase-database:$google_version"
     implementation "com.google.firebase:firebase-storage:$google_version"
     implementation "com.google.firebase:firebase-auth:$google_version"
     implementation "com.google.firebase:firebase-config:$google_version"
+
+    // Analytics
+    implementation ('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
+        transitive = true
+    }
 
     // Network
     implementation 'com.android.volley:volley:1.0.0'

@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
 import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
@@ -198,7 +198,7 @@ public class Setup {
                         goOn(activity);
                         break;
                     default:
-                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure Setup.initDbContext()"));
+                        Crashlytics.logException(new Exception("Unknown error returned in onFailure Setup.initDbContext()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -233,7 +233,7 @@ public class Setup {
                         callback.onAlert(ALERT_TYPE.INVALID_API_KEY);
                         break;
                     default:
-                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure Setup.validateApiKey()"));
+                        Crashlytics.logException(new Exception("Unknown error returned in onFailure Setup.validateApiKey()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -274,7 +274,7 @@ public class Setup {
                     appState.setScannerId(appState.getScanner().getScannerId());
                     goOn(activity);
                 } else {
-                    FirebaseCrash.report(new Exception("Null values in onSuccess Setup.connectToScanner()"));
+                    Crashlytics.logException(new Exception("Null values in onSuccess Setup.connectToScanner()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -347,7 +347,7 @@ public class Setup {
                         }
                         break;
                     default:
-                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure Setup.checkIfVerifyAndGuidExists()"));
+                        Crashlytics.logException(new Exception("Unknown error returned in onFailure Setup.checkIfVerifyAndGuidExists()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -392,7 +392,7 @@ public class Setup {
                     appState.setHardwareVersion(appState.getScanner().getUcVersion());
                     Setup.this.onSuccess();
                 } else {
-                    FirebaseCrash.report(new Exception("Null values in onSuccess Setup.wakeUpUn20()"));
+                    Crashlytics.logException(new Exception("Null values in onSuccess Setup.wakeUpUn20()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
