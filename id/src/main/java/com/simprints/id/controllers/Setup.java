@@ -32,6 +32,8 @@ import com.simprints.libscanner.ScannerUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 import static android.app.Activity.RESULT_CANCELED;
 
 public class Setup {
@@ -54,9 +56,6 @@ public class Setup {
 
     private SetupCallback callback;
 
-    // True iff the database context was initialized
-    private boolean databaseInitialized = false;
-
     // True iff the api key was validated successfully
     private boolean apiKeyValidated = false;
 
@@ -67,7 +66,6 @@ public class Setup {
     private boolean uiResetSinceConnection = false;
 
     private volatile Boolean paused = false;
-
 
     private DataManager dataManager;
 
@@ -104,7 +102,7 @@ public class Setup {
         }
 
         // Step 2: initialize database context + port db from aa to realm if needed . Only has to be done once.
-        if (!databaseInitialized) {
+        if (appState.getData() == null) {
             this.initDbContext(activity);
             return;
         }
@@ -157,8 +155,7 @@ public class Setup {
     // STEP 2
     private void initDbContext(@NonNull final Activity activity) {
         onProgress(10, R.string.updating_database);
-        DatabaseContext dbContext = new DatabaseContext(dataManager.getApiKey(), dataManager.getUserId(), dataManager.getModuleId(), dataManager.getDeviceId(), activity, BuildConfig.DEBUG);
-        appState.setData(dbContext);
+        final DatabaseContext dbContext = new DatabaseContext(dataManager.getApiKey(), dataManager.getUserId(), dataManager.getModuleId(), dataManager.getDeviceId(), activity, BuildConfig.DEBUG);
 
         dbContext.registerAuthListener(new AuthListener() {
             @Override
@@ -176,7 +173,7 @@ public class Setup {
             @Override
             public void onConnection() {
                 if (!appState.getSignedIn()) {
-                    apiKeyValidated = false;
+                    appState.setData(null);
                     goOn(activity);
                 }
             }
@@ -189,8 +186,8 @@ public class Setup {
         dbContext.initDatabase(new DataCallback() {
             @Override
             public void onSuccess() {
-                Log.d("Setup", "Database context initialized.");
-                databaseInitialized = true;
+                Timber.d("Setup: Database context initialized.");
+                appState.setData(dbContext);
                 goOn(activity);
             }
 
@@ -198,10 +195,7 @@ public class Setup {
             public void onFailure(DATA_ERROR error) {
                 switch (error) {
                     case DATABASE_INIT_RESTART:
-                        if (appState.getData() != null) {
-                            appState.getData().destroy();
-                            appState.setData(null);
-                        }
+                        dbContext.destroy();
                         goOn(activity);
                         break;
                     default:
@@ -221,7 +215,7 @@ public class Setup {
             public void onSuccess() {
                 if (!apiKeyValidated) {
                     apiKeyValidated = true;
-                    Log.d("Setup", "Api key validated.");
+                    Timber.d("Setup: Api key validated.");
                     goOn(activity);
                 }
             }
@@ -264,7 +258,7 @@ public class Setup {
         appState.setScanner(new Scanner(macAddress));
         analytics.setScannerMac();
 
-        Log.d("Setup", "Scanner initialized.");
+        Timber.d("Setup: Scanner initialized.");
         goOn(activity);
     }
 
@@ -276,7 +270,7 @@ public class Setup {
             @Override
             public void onSuccess() {
                 if (appState != null && appState.getScanner() != null) {
-                    Log.d("Setup", "Connected to Vero.");
+                    Timber.d("Setup: Connected to Vero.");
                     uiResetSinceConnection = false;
                     appState.setScannerId(appState.getScanner().getScannerId());
                     goOn(activity);
@@ -290,7 +284,7 @@ public class Setup {
             public void onFailure(SCANNER_ERROR scanner_error) {
                 switch (scanner_error) {
                     case INVALID_STATE: // Already connected, considered as a success
-                        Log.d("Setup", "Connected to Vero.");
+                        Timber.d("Setup: Connected to Vero.");
                         uiResetSinceConnection = false;
                         goOn(activity);
                         break;
@@ -329,7 +323,7 @@ public class Setup {
         appState.getData().loadPerson(loadedPerson, guid, new DataCallback() {
             @Override
             public void onSuccess() {
-                Log.d("Setup", "GUID found.");
+                Timber.d("Setup: GUID found.");
                 guidExists = true;
                 goOn(activity);
             }
@@ -368,7 +362,7 @@ public class Setup {
         appState.getScanner().resetUI(new ScannerCallback() {
             @Override
             public void onSuccess() {
-                Log.d("Setup", "UI reset.");
+                Timber.d("Setup: UI reset.");
                 uiResetSinceConnection = true;
                 goOn(activity);
             }
@@ -395,7 +389,7 @@ public class Setup {
             @Override
             public void onSuccess() {
                 if (appState != null && appState.getScanner() != null) {
-                    Log.d("Setup", "UN20 ready.");
+                    Timber.d("Setup: UN20 ready.");
                     appState.setHardwareVersion(appState.getScanner().getUcVersion());
                     Setup.this.onSuccess();
                 } else {
@@ -433,7 +427,7 @@ public class Setup {
                     return;
                 }
             }
-            Log.d("Setup", "Permissions granted.");
+            Timber.d("Setup: Permissions granted.");
             goOn(activity);
         }
     }
