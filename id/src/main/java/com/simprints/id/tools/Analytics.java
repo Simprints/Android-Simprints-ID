@@ -3,10 +3,8 @@ package com.simprints.id.tools;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.model.ALERT_TYPE;
 
 import static com.google.firebase.analytics.FirebaseAnalytics.Event;
 
@@ -50,19 +48,6 @@ public class Analytics {
         firebaseAnalytics.setUserProperty("scanner_id", appState.getMacAddress());
     }
 
-    public void logAlert(ALERT_TYPE alertType, boolean retry) {
-        Crashlytics.log(alertType.name());
-
-        Bundle bundle = new Bundle();
-        bundle.putString("alert_name", alertType.name());
-        bundle.putBoolean("retry", retry);
-        bundle.putString("api_key", dataManager.getApiKey());
-        bundle.putString("module_id", dataManager.getModuleId());
-        bundle.putString("user_id", dataManager.getUserId());
-        // TODO: this looks weird, scanner_id != device_id
-        bundle.putString("scanner_id", dataManager.getDeviceId());
-        firebaseAnalytics.logEvent("alert", bundle);
-    }
 
     public void logLogin() {
         Bundle bundle = new Bundle();

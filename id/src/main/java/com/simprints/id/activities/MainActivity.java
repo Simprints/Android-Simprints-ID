@@ -28,7 +28,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.adapters.FingerPageAdapter;
@@ -827,7 +826,7 @@ public class MainActivity extends AppCompatActivity implements
                     syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                     break;
                 default:
-                    Crashlytics.logException(new Exception("Unknown error returned in onFailure MainActivity.syncListener()"));
+                    dataManager.logException(new Exception("Unknown error returned in onFailure MainActivity.syncListener()"));
                     launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         }
@@ -841,7 +840,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         if (!syncService.startAndListen(getApplicationContext(), syncListener)) {
-            Crashlytics.logException(new Exception("Error in MainActivity.backgroundSync()"));
+            dataManager.logException(new Exception("Error in MainActivity.backgroundSync()"));
             launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -915,7 +914,7 @@ public class MainActivity extends AppCompatActivity implements
                                         finger.getId(),
                                         appState.getScanner().getTemplate()));
             } catch (IllegalArgumentException ex) {
-                Crashlytics.logException(ex);
+                dataManager.logException(ex);
                 resetUIFromError();
                 return;
             }

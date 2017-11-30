@@ -64,7 +64,7 @@ public class AlertActivity extends AppCompatActivity {
 
         ((ImageView) findViewById(R.id.graphic)).setImageResource(alertType.getAlertMainDrawableId());
 
-        ImageView alertHint = (ImageView) findViewById(R.id.hintGraphic);
+        ImageView alertHint = findViewById(R.id.hintGraphic);
         if (alertType.getAlertHintDrawableId() != -1) {
             alertHint.setImageResource(alertType.getAlertHintDrawableId());
         } else {
@@ -73,20 +73,20 @@ public class AlertActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.message)).setText(alertType.getAlertMessageId());
 
-        TextView alertLeftButtonTextView = (TextView) findViewById(R.id.left_button);
+        TextView alertLeftButtonTextView = findViewById(R.id.left_button);
         if (alertType.isLeftButtonActive()) {
             alertLeftButtonTextView.setText(alertType.getAlertLeftButtonTextId());
             alertLeftButtonTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     setResult(alertType.getResultCode());
-                    analytics.logAlert(alertType, false);
+                    dataManager.logAlert(alertType);
                     finish();
                 }
             });
         }
 
-        TextView alertRightButtonTextView = (TextView) findViewById(R.id.right_button);
+        TextView alertRightButtonTextView = findViewById(R.id.right_button);
         if (alertType.isRightButtonActive()) {
             alertRightButtonTextView.setText(alertType.getAlertRightButtonTextId());
             alertRightButtonTextView.setOnClickListener(new View.OnClickListener() {
@@ -111,7 +111,7 @@ public class AlertActivity extends AppCompatActivity {
 
                         default:
                             setResult(RESULT_CANCELED);
-                            analytics.logAlert(alertType, false);
+                            dataManager.logAlert(alertType);
                             finish();
                             break;
                     }

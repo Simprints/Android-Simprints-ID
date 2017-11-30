@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncService;
@@ -20,8 +19,6 @@ import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
-
-import io.fabric.sdk.android.Fabric;
 
 public class FrontActivity extends AppCompatActivity {
     private ImageView syncStatus;
@@ -43,19 +40,15 @@ public class FrontActivity extends AppCompatActivity {
         syncService = app.getSyncService();
         appState = app.getAppState();
 
-        Fabric.with(this, new Crashlytics());
         getBaseContext().getResources().updateConfiguration(
                 Language.selectLanguage(dataManager.getLanguage()),
                 getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_front);
 
-        // TODO: is that necessary?
-        app.getAnalytics();
-
         RemoteConfig.init();
 
-        syncStatus = (ImageView) findViewById(R.id.iv_sync);
-        syncButton = (Button) findViewById(R.id.bt_sync);
+        syncStatus = findViewById(R.id.iv_sync);
+        syncButton = findViewById(R.id.bt_sync);
 
         PackageInfo pInfo;
         String version = "";

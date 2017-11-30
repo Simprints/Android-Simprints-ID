@@ -11,7 +11,6 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
@@ -29,8 +28,6 @@ import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libsimprints.RefusalForm;
-
-import io.fabric.sdk.android.Fabric;
 
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.ALERT_TYPE_EXTRA;
@@ -92,7 +89,6 @@ public class LaunchActivity extends AppCompatActivity {
                 Language.selectLanguage(dataManager.getLanguage()),
                 getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_launch);
-        Fabric.with(this, new Crashlytics());
 
         // Keep screen from going to sleep
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
