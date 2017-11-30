@@ -7,11 +7,11 @@ import org.junit.Test
 /**
  * @author: Etienne Thiery (etienne@simprints.com)
  */
-class FingerIdentifierSerializerTest {
+class EnumSerializerTest {
 
     @Test
     fun testConsistentSerialization() {
-        val serializer = FingerIdentifierSerializer()
+        val serializer = EnumSerializer(FingerIdentifier::class.java)
         for (fingerId in FingerIdentifier.values())
         Assert.assertEquals(fingerId, serializer.deserialize(serializer.serialize(fingerId)))
     }

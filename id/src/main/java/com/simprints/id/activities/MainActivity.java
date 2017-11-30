@@ -68,6 +68,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static com.simprints.id.model.Finger.NB_OF_FINGERS;
 import static com.simprints.id.model.Finger.Status;
@@ -137,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navView = findViewById(R.id.nav_view);
         navView.setItemIconTintList(null);
 
         appState.logMainStart();
@@ -150,8 +151,8 @@ public class MainActivity extends AppCompatActivity implements
         previousStatus = Status.NOT_COLLECTED;
 
         indicators = new ArrayList<>();
-        scanButton = (Button) findViewById(R.id.scan_button);
-        viewPager = (ViewPagerCustom) findViewById(R.id.view_pager);
+        scanButton = findViewById(R.id.scan_button);
+        viewPager = findViewById(R.id.view_pager);
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
         un20WakeupDialog = initUn20Dialog();
         registrationResult = null;
@@ -185,8 +186,10 @@ public class MainActivity extends AppCompatActivity implements
 
 
         // We set the two defaults in the config for the first reset.
-        dataManager.setFingerStatus(FingerIdentifier.LEFT_THUMB, true);
-        dataManager.setFingerStatus(FingerIdentifier.LEFT_INDEX_FINGER, true);
+        Map<FingerIdentifier, Boolean> fingerStatus = dataManager.getFingerStatus();
+        fingerStatus.put(FingerIdentifier.LEFT_THUMB, true);
+        fingerStatus.put(FingerIdentifier.LEFT_INDEX_FINGER, true);
+        dataManager.setFingerStatus(fingerStatus);
     }
 
     private void initConnectionListener() {
@@ -224,12 +227,21 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initActiveFingers() {
-        for (int i = 0; i < NB_OF_FINGERS; i++) {
-            FingerIdentifier id = FingerIdentifier.values()[i];
-            if (dataManager.getFingerStatusPersist())
-                fingers[i] = new Finger(id, dataManager.getFingerStatus(id), false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
-            else
+        FingerIdentifier[] fingerIdentifiers = FingerIdentifier.values();
+        if (dataManager.getFingerStatusPersist()) {
+            Map<FingerIdentifier, Boolean> fingerStatus = dataManager.getFingerStatus();
+            for (int i = 0; i < NB_OF_FINGERS; i++) {
+                FingerIdentifier id = fingerIdentifiers[i];
+                fingers[i] = new Finger(id, fingerStatus.get(id), false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
+            }
+        } else {
+            for (int i = 0; i < NB_OF_FINGERS; i++) {
+                FingerIdentifier id = fingerIdentifiers[i];
                 fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
+            }
+        }
+
+        for (int i = 0; i < NB_OF_FINGERS; i++) {
             if (fingers[i].isActive()) {
                 activeFingers.add(fingers[i]);
             }
@@ -255,16 +267,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initBarAndDrawer() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         syncItem = navigationView.getMenu().findItem(R.id.nav_sync);
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -292,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initIndicators() {
-        LinearLayout indicatorLayout = (LinearLayout) findViewById(R.id.indicator_layout);
+        LinearLayout indicatorLayout = findViewById(R.id.indicator_layout);
         indicatorLayout.removeAllViewsInLayout();
         indicators.clear();
         for (int i = 0; i < activeFingers.size(); i++) {
@@ -569,7 +581,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
@@ -634,7 +646,7 @@ public class MainActivity extends AppCompatActivity implements
                         SETTINGS_ACTIVITY_REQUEST_CODE);
                 break;
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -681,18 +693,21 @@ public class MainActivity extends AppCompatActivity implements
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Finger currentActiveFinger = activeFingers.get(currentActiveFingerNo);
                         activeFingers.get(activeFingers.size() - 1).setLastFinger(false);
+                        Map<FingerIdentifier, Boolean> fingerStatus = dataManager.getFingerStatus();
+
                         for (Finger finger : fingers) {
                             if (finger.isActive() && !activeFingers.contains(finger)) {
                                 activeFingers.add(finger);
                                 if (dataManager.getFingerStatusPersist())
-                                    dataManager.setFingerStatus(finger.getId(), true);
+                                    fingerStatus.put(finger.getId(), true);
                             }
                             if (!finger.isActive() && activeFingers.contains(finger)) {
                                 activeFingers.remove(finger);
                                 if (dataManager.getFingerStatusPersist())
-                                    dataManager.setFingerStatus(finger.getId(), false);
+                                    fingerStatus.put(finger.getId(), false);
                             }
                         }
+                        dataManager.setFingerStatus(fingerStatus);
                         Collections.sort(activeFingers);
 
                         if (currentActiveFinger.isActive()) {

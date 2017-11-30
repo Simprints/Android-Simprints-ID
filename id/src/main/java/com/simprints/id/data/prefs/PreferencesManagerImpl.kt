@@ -13,7 +13,9 @@ import com.simprints.libsimprints.FingerIdentifier
  * @author: Etienne Thiery (etienne@simprints.com)
  */
 class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
-                             fingerIdentifierToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>): PreferencesManager {
+                             fingerIdentifierToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
+                             calloutSerializer: Serializer<Callout>,
+                             groupSerializer: Serializer<Constants.GROUP>): PreferencesManager {
 
     companion object {
 
@@ -90,7 +92,9 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private val PERSIST_FINGER_DEFAULT = false
 
         private val FINGER_STATUS_KEY = "FingerStatus"
-        private val FINGER_STATUS_DEFAULT =  mapOf<FingerIdentifier, Boolean>()
+        private val FINGER_STATUS_DEFAULT =  FingerIdentifier.values()
+                .map { Pair(it, false) }
+                .toMap()
     }
 
 
@@ -98,7 +102,7 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var apiKey: String by PrimitivePreference(prefs, API_KEY_KEY, API_KEY_DEFAULT)
 
     // Callout of the current session
-    override var callout: Callout by PrimitivePreference(prefs, CALLOUT_KEY, CALLOUT_DEFAULT)
+    override var callout: Callout by ComplexPreference(prefs, CALLOUT_KEY, CALLOUT_DEFAULT, calloutSerializer)
 
     // Module ID of the current session
     override var moduleId: String by PrimitivePreference(prefs, MODULE_ID_KEY, MODULE_ID_DEFAULT)
@@ -146,10 +150,10 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var appKey: String by PrimitivePreference(prefs, APP_KEY_KEY, APP_KEY_DEFAULT)
 
     // Sync group. Default is user
-    override var syncGroup: Constants.GROUP by PrimitivePreference(prefs, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT)
+    override var syncGroup: Constants.GROUP by ComplexPreference(prefs, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
 
     // Match group. Default is user
-    override var matchGroup: Constants.GROUP by PrimitivePreference(prefs, MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT)
+    override var matchGroup: Constants.GROUP by ComplexPreference(prefs, MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT, groupSerializer)
 
     // Is the vibrate on
     override var vibrateMode: Boolean by PrimitivePreference(prefs, VIBRATE_KEY, VIBRATE_DEFAULT)
@@ -160,31 +164,7 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // True if the fingers status should be persisted, false else
     override var fingerStatusPersist: Boolean by PrimitivePreference(prefs, PERSIST_FINGER_KEY, PERSIST_FINGER_DEFAULT)
 
-    private var fingerStatus: Map<FingerIdentifier, Boolean>
+    override var fingerStatus: Map<FingerIdentifier, Boolean>
             by ComplexPreference(prefs, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdentifierToBooleanSerializer)
 
-    /**
-     * Get the status of a specific finger.
-     *
-     * @param fingerIdentifier The finger status to retrieve
-     * @return FingerConfig
-     */
-    override fun getFingerStatus(fingerIdentifier: FingerIdentifier): Boolean {
-        synchronized(fingerStatus) {
-            return fingerStatus[fingerIdentifier] ?: throw Error("Missing finger status")
-        }
-    }
-
-    /**
-     * Set the status of a specific finger
-     *
-     * @param fingerIdentifier selected finger
-     * @param show             True = show, False = don't show
-     */
-    override fun setFingerStatus(fingerIdentifier: FingerIdentifier, show: Boolean) {
-        synchronized(fingerStatus) {
-            this.fingerStatus = fingerStatus.toMutableMap()
-                    .apply { put(fingerIdentifier, show) }
-        }
-    }
 }
