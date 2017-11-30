@@ -118,9 +118,9 @@ public class LaunchActivity extends AppCompatActivity {
         // Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
 
-        final ProgressBar launchProgress = (ProgressBar) findViewById(R.id.pb_launch_progress);
-        final TextView loadingInfoTextView = (TextView) findViewById(R.id.tv_loadingInfo);
-        final TextView confirmConsentTextView = (TextView) findViewById(R.id.confirm_consent_text_view);
+        final ProgressBar launchProgress = findViewById(R.id.pb_launch_progress);
+        final TextView loadingInfoTextView = findViewById(R.id.tv_loadingInfo);
+        final TextView confirmConsentTextView = findViewById(R.id.confirm_consent_text_view);
 
         confirmConsentTextView.setVisibility(View.INVISIBLE);
         loadingInfoTextView.setVisibility(View.VISIBLE);
@@ -268,6 +268,7 @@ public class LaunchActivity extends AppCompatActivity {
                 appState.getData().saveRefusalForm(refusalForm, appState.getSessionId());
 
             appState.getData().destroy();
+            appState.setData(null);
         }
 
         if (positionTracker != null)
