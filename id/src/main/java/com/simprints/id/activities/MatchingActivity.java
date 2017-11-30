@@ -12,7 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
@@ -95,7 +95,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 onVerifyStart();
                 break;
             default:
-                FirebaseCrash.report(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
+                Crashlytics.logException(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -124,15 +124,15 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         }
 
         private void initProgressBar() {
-            progressBar = (ProgressBar) findViewById(R.id.pb_identification);
+            progressBar = findViewById(R.id.pb_identification);
         }
 
         private void initProgressTextViews() {
-            progressText1 = (TextView) findViewById(R.id.tv_matchingProgressStatus1);
-            progressText2 = (TextView) findViewById(R.id.tv_matchingProgressStatus2);
-            resultText1 = (TextView) findViewById(R.id.tv_matchingResultStatus1);
-            resultText2 = (TextView) findViewById(R.id.tv_matchingResultStatus2);
-            resultText3 = (TextView) findViewById(R.id.tv_matchingResultStatus3);
+            progressText1 = findViewById(R.id.tv_matchingProgressStatus1);
+            progressText2 = findViewById(R.id.tv_matchingProgressStatus2);
+            resultText1 = findViewById(R.id.tv_matchingResultStatus1);
+            resultText2 = findViewById(R.id.tv_matchingResultStatus2);
+            resultText3 = findViewById(R.id.tv_matchingResultStatus3);
         }
 
         void setProgress(int progress) {
@@ -252,7 +252,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
+                Crashlytics.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
@@ -294,7 +294,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onVerifyStart()"));
+                Crashlytics.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onVerifyStart()"));
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
