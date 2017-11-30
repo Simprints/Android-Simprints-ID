@@ -2,6 +2,7 @@ package com.simprints.id.tools;
 
 import android.content.Intent;
 
+import com.simprints.id.data.DataManager;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.Identification;
 import com.simprints.libsimprints.Registration;
@@ -55,12 +56,12 @@ public class FormatResult {
         }
     }
 
-    static public void put(Intent intent, ArrayList<Identification> identifications, AppState appState, String resultFormat){
+    static public void put(Intent intent, ArrayList<Identification> identifications, DataManager dataManager){
 
 
-        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, appState.getSessionId());
+        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, dataManager.getSessionId());
 
-        if( isODK(resultFormat)) {
+        if( isODK(dataManager.getResultFormat())) {
             // a bit inefficient to run through the array x times but there will be <= 20 objects in there
             String guids = constructString(identifications, new attributeGetter() {
                 @Override

@@ -22,7 +22,7 @@ class DataManagerImpl(private val context: Context,
                       private val analyticsManager: AnalyticsManager)
     : DataManager,
         PreferencesManager by preferencesManager,
-        AnalyticsManager by analyticsManager{
+        AnalyticsManager by analyticsManager {
 
     override val androidSdkVersion: Int
         get() = Build.VERSION.SDK_INT
@@ -39,4 +39,19 @@ class DataManagerImpl(private val context: Context,
     override fun logAlert(alertType: ALERT_TYPE) {
         analyticsManager.logAlert(alertType.name, apiKey, moduleId, userId, deviceId)
     }
+
+    override fun logUserProperties() {
+        analyticsManager.logUserProperties(userId, apiKey, moduleId, deviceId)
+    }
+
+    override fun logLogin() {
+        analyticsManager.logLogin(callout)
+    }
+
+    override fun logGuidSelectionService(selectedGuid: String, callbackSent: Boolean) {
+        analyticsManager.logGuidSelectionService(selectedGuid, callbackSent, apiKey, deviceId,
+                sessionId)
+    }
+
+
 }

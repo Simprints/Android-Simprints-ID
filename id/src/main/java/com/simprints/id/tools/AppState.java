@@ -98,17 +98,6 @@ public class AppState {
                 break;
         }
 
-        // Save session parameters
-        dataManager.setCallout(callout);
-        dataManager.setApiKey(apiKey);
-        dataManager.setModuleId(moduleId);
-        dataManager.setUserId(userId);
-        dataManager.setPatientId(patientId);
-        dataManager.setAppKey(apiKey.substring(0, 8));
-        dataManager.setCallingPackage(callingPackage);
-        dataManager.setMetadata(metadata);
-        dataManager.setResultFormat(resultFormat);
-
         // Save attributes to firebase session, whether they are valid or not
         session = new fb_Session(Callout.toString(callout),
                 apiKey,
@@ -120,6 +109,18 @@ public class AppState {
                 callingPackage,
                 dataManager.getAppVersionName(),
                 dataManager.getDeviceModel() + " " + dataManager.getAndroidSdkVersion());
+
+        // Save session parameters
+        dataManager.setCallout(callout);
+        dataManager.setApiKey(apiKey);
+        dataManager.setModuleId(moduleId);
+        dataManager.setUserId(userId);
+        dataManager.setPatientId(patientId);
+        dataManager.setAppKey(apiKey.substring(0, 8));
+        dataManager.setCallingPackage(callingPackage);
+        dataManager.setMetadata(metadata);
+        dataManager.setResultFormat(resultFormat);
+        dataManager.setSessionId(session.sessionId);
 
         // Check parameters
         if (callout == Callout.NULL)
@@ -216,6 +217,10 @@ public class AppState {
 
     public short getHardwareVersion() {
         return hardwareVersion;
+    }
+
+    public String getScannerId() {
+        return scannerId;
     }
 
     public Scanner getScanner() {

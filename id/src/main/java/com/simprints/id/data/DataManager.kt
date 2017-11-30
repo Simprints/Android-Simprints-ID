@@ -19,4 +19,10 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
 
     fun logAlert(alertType: ALERT_TYPE)
 
+    fun logUserProperties()
+
+    fun logLogin()
+
+    fun logGuidSelectionService(selectedGuid: String, callbackSent: Boolean)
+
 }

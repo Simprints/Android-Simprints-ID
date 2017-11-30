@@ -47,6 +47,9 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private val RESULT_FORMAT_KEY = "ResultFormat"
         private val RESULT_FORMAT_DEFAULT = ""
 
+        private val SESSION_ID_KEY = "SessionId"
+        private val SESSION_ID_DEFAULT = ""
+
         // Settings
 
         private val NUDGE_MODE_KEY = "NudgeModeBool"
@@ -121,6 +124,8 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Result format of the current session
     override var resultFormat: String by PrimitivePreference(prefs, RESULT_FORMAT_KEY, RESULT_FORMAT_DEFAULT)
+
+    override var sessionId: String by PrimitivePreference(prefs, SESSION_ID_KEY, SESSION_ID_DEFAULT)
 
     // Should the UI automatically slide forward?
     override var nudgeMode: Boolean by PrimitivePreference(prefs, NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)

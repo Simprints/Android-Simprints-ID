@@ -22,6 +22,7 @@ interface PreferencesManager {
     var callingPackage: String
     var metadata: String
     var resultFormat: String
+    var sessionId: String
 
     // Settings
     var nudgeMode: Boolean

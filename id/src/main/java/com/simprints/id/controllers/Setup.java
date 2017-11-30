@@ -11,7 +11,6 @@ import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
-import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
@@ -38,17 +37,16 @@ public class Setup {
 
     private static Setup singleton;
 
-    public synchronized static Setup getInstance(DataManager dataManager, AppState appState, Analytics analytics) {
+    public synchronized static Setup getInstance(DataManager dataManager, AppState appState) {
         if (singleton == null) {
-            singleton = new Setup(dataManager, appState, analytics);
+            singleton = new Setup(dataManager, appState);
         }
         return singleton;
     }
 
-    private Setup(DataManager dataManager, AppState appState, Analytics analytics) {
+    private Setup(DataManager dataManager, AppState appState) {
         this.dataManager = dataManager;
         this.appState = appState;
-        this.analytics = analytics;
     }
 
 
@@ -69,9 +67,6 @@ public class Setup {
 
     // Singletons
     private AppState appState;
-    private Analytics analytics;
-
-
 
     public void stop() {
         paused = true;
@@ -254,7 +249,6 @@ public class Setup {
         String macAddress = pairedScanners.get(0);
         appState.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
-        analytics.setScannerMac();
 
         Timber.d("Setup: Scanner initialized.");
         goOn(activity);
@@ -271,6 +265,7 @@ public class Setup {
                     Timber.d("Setup: Connected to Vero.");
                     uiResetSinceConnection = false;
                     appState.setScannerId(appState.getScanner().getScannerId());
+                    dataManager.logScannerProperties(appState.getMacAddress(), appState.getScannerId());
                     goOn(activity);
                 } else {
                     dataManager.logException(new Exception("Null values in onSuccess Setup.connectToScanner()"));
@@ -334,13 +329,13 @@ public class Setup {
                         if (appState.getData().isConnected()) {
                             // We've synced with the online db and they're not in the db
                             appState.getData().saveVerification(probe, guid, null,
-                                    appState.getSessionId(),
+                                    dataManager.getSessionId(),
                                     VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE);
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
                         } else {
                             // We're offline but might find the person if we sync
                             appState.getData().saveVerification(probe, guid, null,
-                                    appState.getSessionId(),
+                                    dataManager.getSessionId(),
                                     VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE);
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
                         }
