@@ -336,7 +336,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         }
 
                         if (appState.getData() != null) {
-                            appState.getData().saveIdentification(probe, candidates.size(), topCandidates, appState.getSessionId());
+                            appState.getData().saveIdentification(probe, candidates.size(), topCandidates, dataManager.getSessionId());
                         }
 
                         // finish
@@ -360,7 +360,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                         Intent resultData;
                         resultData = new Intent(Constants.SIMPRINTS_IDENTIFY_INTENT);
-                        FormatResult.put(resultData, topCandidates, appState, dataManager.getResultFormat());
+                        FormatResult.put(resultData, topCandidates, dataManager);
                         setResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                                 tier1Or2Matches, tier3Matches, tier4Matches);
@@ -383,7 +383,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         }
 
                         if (appState.getData() != null) {
-                            appState.getData().saveVerification(probe, dataManager.getPatientId(), verification, appState.getSessionId(), guidExistsResult);
+                            appState.getData().saveVerification(probe, dataManager.getPatientId(), verification, dataManager.getSessionId(), guidExistsResult);
                         }
 
                         // finish

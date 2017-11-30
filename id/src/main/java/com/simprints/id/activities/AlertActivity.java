@@ -10,13 +10,10 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 
 public class AlertActivity extends AppCompatActivity {
@@ -26,8 +23,6 @@ public class AlertActivity extends AppCompatActivity {
 
     // Singletons
     AppState appState;
-    Analytics analytics;
-    Answers answers;
 
 
     @Override
@@ -39,8 +34,6 @@ public class AlertActivity extends AppCompatActivity {
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
         appState = app.getAppState();
-        analytics = app.getAnalytics();
-        answers = app.getAnswers();
 
         Bundle extras = getIntent().getExtras();
         assert extras != null;
@@ -48,12 +41,7 @@ public class AlertActivity extends AppCompatActivity {
         assert alertType != null;
         this.alertType = alertType;
 
-        if (alertType.mustBeLogged()) {
-            answers.logCustom(new CustomEvent("Alert Triggered")
-                    .putCustomAttribute("Alert Type", alertType.name() != null ? alertType.name() : "null")
-                    .putCustomAttribute("API Key", dataManager.getApiKey())
-                    .putCustomAttribute("MAC Address", appState.getMacAddress() != null ? appState.getMacAddress() : "null"));
-        }
+        dataManager.logAlert(alertType);
 
         int color = ResourcesCompat.getColor(getResources(), alertType.getBackgroundColor(), null);
         findViewById(R.id.alertLayout).setBackgroundColor(color);
@@ -80,7 +68,6 @@ public class AlertActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     setResult(alertType.getResultCode());
-                    dataManager.logAlert(alertType);
                     finish();
                 }
             });
@@ -111,7 +98,6 @@ public class AlertActivity extends AppCompatActivity {
 
                         default:
                             setResult(RESULT_CANCELED);
-                            dataManager.logAlert(alertType);
                             finish();
                             break;
                     }

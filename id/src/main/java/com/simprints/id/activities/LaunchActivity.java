@@ -18,7 +18,6 @@ import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
@@ -72,7 +71,6 @@ public class LaunchActivity extends AppCompatActivity {
     private DataManager dataManager;
     // Singletons
     private AppState appState;
-    private Analytics analytics;
     private Setup setup;
 
     @Override
@@ -83,7 +81,6 @@ public class LaunchActivity extends AppCompatActivity {
         dataManager = app.getDataManager();
         appState = app.getAppState();
         setup = app.getSetup();
-        analytics = app.getAnalytics();
 
         getBaseContext().getResources().updateConfiguration(
                 Language.selectLanguage(dataManager.getLanguage()),
@@ -102,9 +99,9 @@ public class LaunchActivity extends AppCompatActivity {
             launchAlert(alert);
             return;
         }
-        // Save some attributes to analytics
-        analytics.setUserProperties();
-        analytics.logLogin();
+        // Log some attributes to analytics
+        dataManager.logUserProperties();
+        dataManager.logLogin();
 
 
         // Initialize position tracker
@@ -261,7 +258,7 @@ public class LaunchActivity extends AppCompatActivity {
             // Save refusal form to firebase
             RefusalForm refusalForm = appState.getRefusalForm();
             if (refusalForm != null)
-                appState.getData().saveRefusalForm(refusalForm, appState.getSessionId());
+                appState.getData().saveRefusalForm(refusalForm, dataManager.getSessionId());
 
             appState.getData().destroy();
             appState.setData(null);
