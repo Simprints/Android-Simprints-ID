@@ -38,8 +38,6 @@ interface PreferencesManager {
     var vibrateMode: Boolean
     var matchingEndWaitTimeS: Int
     var fingerStatusPersist: Boolean
-
-    fun getFingerStatus(fingerIdentifier: FingerIdentifier): Boolean
-    fun setFingerStatus(fingerIdentifier: FingerIdentifier, show: Boolean)
+    var fingerStatus: Map<FingerIdentifier, Boolean>
 
 }

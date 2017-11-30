@@ -14,7 +14,7 @@ import kotlin.reflect.KProperty
  * @author etienne@simprints.com
  */
 class ComplexPreference<T:Any> (prefs: ImprovedSharedPreferences,
-                                key: String,
+                                private val key: String,
                                 defValue: T,
                                 private val serializer: Serializer<T>) {
 
@@ -22,12 +22,12 @@ class ComplexPreference<T:Any> (prefs: ImprovedSharedPreferences,
     private var serializedValue by PrimitivePreference(prefs, key, serializedDefValue)
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        Timber.d("ComplexPreference.getValue ${property.name}")
+        Timber.d("ComplexPreference.getValue $key")
         return serializer.deserialize(serializedValue)
     }
 
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        Timber.d("ComplexPreference.setValue ${property.name}")
+        Timber.d("ComplexPreference.setValue $key")
         serializedValue = serializer.serialize(value)
     }
 }

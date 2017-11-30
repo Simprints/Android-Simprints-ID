@@ -26,22 +26,26 @@ class PrimitivePreference<T: Any>(private val preferences: ImprovedSharedPrefere
     init {
         when (defValue) {
             is Boolean, is Float, is Int, is Long, is String -> {}
-            else -> throw InvalidParameterException("Only Boolean, Float, Int, Long and String types are supported")
+            else -> throw InvalidParameterException("${defValue::class.java.simpleName} is not a primitive type. Use ComplexPreference instead.")
         }
     }
 
-    private var value: T by lazyVar { preferences.getAny(key, defValue) }
+    private var value: T by lazyVar {
+        Timber.d("PrimitivePreference read $key from Shared Preferences")
+        preferences.getAny(key, defValue)
+    }
 
     @Synchronized
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        Timber.d("PrimitivePreference.getValue ${property.name}")
+        Timber.d("PrimitivePreference.getValue $key")
         return value
     }
 
     @Synchronized
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        Timber.d("PrimitivePreference.setValue ${property.name}")
+        Timber.d("PrimitivePreference.setValue $key")
         this.value = value
+        Timber.d("PrimitivePreference write $key to Shared Preferences")
         preferences.edit().putAny(key, value).apply()
     }
 }
