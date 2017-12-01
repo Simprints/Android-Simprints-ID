@@ -4,18 +4,15 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
-import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.models.firebase.fb_Session;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.Metadata;
-import com.simprints.libsimprints.RefusalForm;
 
 import java.util.UUID;
 
@@ -42,17 +39,11 @@ public class AppState {
     private String macAddress = null;
     private String scannerId = null;
     private short hardwareVersion = -1;
-    private String latitude = null;
-    private String longitude = null;
 
     // Handles on scanner, database, firebase analytics, google api, etc.
     private Scanner scanner = null;
-    private DatabaseContext data = null;
     private fb_Session session = null;
     private GoogleApiClient googleApiClient = null;
-    private boolean signedIn = false;
-    private RefusalForm refusalForm = null;
-
 
     @SuppressLint("HardwareIds")
     public ALERT_TYPE init(@NonNull Intent intent) {
@@ -174,8 +165,6 @@ public class AppState {
     }
 
     public void setPosition(@NonNull String latitude, @NonNull String longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
         session.savePosition(latitude, longitude);
     }
 
@@ -195,20 +184,8 @@ public class AppState {
         session.logSessionEndTime();
     }
 
-    public void setData(DatabaseContext data) {
-        this.data = data;
-    }
-
     void setGoogleApiClient(GoogleApiClient googleApiClient) {
         this.googleApiClient = googleApiClient;
-    }
-
-    public void setSignedIn(boolean signedIn) {
-        this.signedIn = signedIn;
-    }
-
-    public void setRefusalForm(RefusalForm refusalForm) {
-        this.refusalForm = refusalForm;
     }
 
     public String getMacAddress() {
@@ -227,25 +204,8 @@ public class AppState {
         return scanner;
     }
 
-    public boolean getSignedIn() {
-        return signedIn;
-    }
-
-    public DatabaseContext getData() {
-        return data;
-    }
-
     GoogleApiClient getGoogleApiClient() {
         return googleApiClient;
-    }
-
-    @Nullable
-    public RefusalForm getRefusalForm() {
-        return refusalForm;
-    }
-
-    public String getSessionId() {
-        return session.sessionId;
     }
 
     public void destroy() {

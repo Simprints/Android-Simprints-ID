@@ -58,6 +58,7 @@ import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
+import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.FingerIdentifier;
@@ -95,7 +96,15 @@ public class MainActivity extends AppCompatActivity implements
 
     private static ScanConfig DEFAULT_CONFIG;
 
-    private ButtonListener scannerButton;
+    private final ButtonListener scannerButtonListener = new ButtonListener() {
+        @Override
+        public void onClick() {
+            if (buttonContinue)
+                onActionForward();
+            else if (activeFingers.get(currentActiveFingerNo).getStatus() != Status.GOOD_SCAN)
+                toggleContinuousCapture();
+        }
+    };
 
     private Handler handler;
 
@@ -117,6 +126,35 @@ public class MainActivity extends AppCompatActivity implements
 
     private ProgressDialog un20WakeupDialog;
 
+    private AuthListener authListener = new AuthListener() {
+        @Override
+        public void onSignIn() {
+
+        }
+
+        @Override
+        public void onSignOut() {
+            syncItem.setEnabled(false);
+            syncItem.setTitle(R.string.not_signed_in);
+            syncItem.setIcon(R.drawable.ic_menu_sync_off);
+        }
+    };
+
+    private ConnectionListener connectionListener = new ConnectionListener() {
+        @Override
+        public void onConnection() {
+            syncItem.setEnabled(true);
+            syncItem.setTitle(R.string.nav_sync);
+            syncItem.setIcon(R.drawable.ic_menu_sync_ready);
+        }
+
+        @Override
+        public void onDisconnection() {
+            syncItem.setEnabled(false);
+            syncItem.setTitle(R.string.nav_offline);
+            syncItem.setIcon(R.drawable.ic_menu_sync_off);
+        }
+    };
 
     private DataManager dataManager;
 
@@ -168,8 +206,25 @@ public class MainActivity extends AppCompatActivity implements
         initScanButton();
         initViewPager();
         refreshDisplay();
-        initConnectionListener();
-        initAuthInListener();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        appState.getScanner().registerButtonListener(scannerButtonListener);
+        dataManager.registerAuthListener(authListener);
+        dataManager.registerConnectionListener(connectionListener);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onResume() {
+        super.onResume();
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
+        if (syncItem != null && dataManager.isConnected())
+            syncItem.setIcon(R.drawable.ic_menu_sync_ready);
     }
 
     private void setFingerStatus() {
@@ -191,40 +246,6 @@ public class MainActivity extends AppCompatActivity implements
         fingerStatus.put(FingerIdentifier.LEFT_THUMB, true);
         fingerStatus.put(FingerIdentifier.LEFT_INDEX_FINGER, true);
         dataManager.setFingerStatus(fingerStatus);
-    }
-
-    private void initConnectionListener() {
-        appState.getData().registerConnectionListener(new ConnectionListener() {
-            @Override
-            public void onConnection() {
-                syncItem.setEnabled(true);
-                syncItem.setTitle(R.string.nav_sync);
-                syncItem.setIcon(R.drawable.ic_menu_sync_ready);
-            }
-
-            @Override
-            public void onDisconnection() {
-                syncItem.setEnabled(false);
-                syncItem.setTitle(R.string.nav_offline);
-                syncItem.setIcon(R.drawable.ic_menu_sync_off);
-            }
-        });
-    }
-
-    private void initAuthInListener() {
-        appState.getData().registerAuthListener(new AuthListener() {
-            @Override
-            public void onSignIn() {
-
-            }
-
-            @Override
-            public void onSignOut() {
-                syncItem.setEnabled(false);
-                syncItem.setTitle(R.string.not_signed_in);
-                syncItem.setIcon(R.drawable.ic_menu_sync_off);
-            }
-        });
     }
 
     private void initActiveFingers() {
@@ -325,24 +346,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initScanButton() {
-        scannerButton = new ButtonListener() {
-            @Override
-            public void onClick() {
-                if (buttonContinue)
-                    onActionForward();
-                else if (activeFingers.get(currentActiveFingerNo).getStatus() != Status.GOOD_SCAN)
-                    toggleContinuousCapture();
-            }
-        };
-        appState.getScanner().registerButtonListener(scannerButton);
-
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 toggleContinuousCapture();
             }
         });
-
         scanButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -512,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
-        appState.getScanner().unregisterButtonListener(scannerButton);
+        appState.getScanner().unregisterButtonListener(scannerButtonListener);
         super.startActivityForResult(intent, requestCode);
     }
 
@@ -557,7 +566,7 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             Person person = new Person(dataManager.getPatientId(), fingerprints);
             if (dataManager.getCallout() == Callout.REGISTER || dataManager.getCallout() == Callout.UPDATE) {
-                appState.getData().savePerson(person);
+                dataManager.savePerson(person);
 
                 registrationResult = new Registration(dataManager.getPatientId());
                 for (Fingerprint fp : fingerprints) {
@@ -762,7 +771,7 @@ public class MainActivity extends AppCompatActivity implements
             case SETTINGS_ACTIVITY_REQUEST_CODE:
             case PRIVACY_ACTIVITY_REQUEST_CODE:
             case ABOUT_ACTIVITY_REQUEST_CODE:
-                appState.getScanner().registerButtonListener(scannerButton);
+                appState.getScanner().registerButtonListener(scannerButtonListener);
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
 
@@ -783,23 +792,15 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (appState.getScanner() != null) {
-            appState.getScanner().unregisterButtonListener(scannerButton);
+    protected void onStop() {
+        super.onStop();
+        Scanner scanner = appState.getScanner();
+        if (scanner != null) {
+            scanner.unregisterButtonListener(scannerButtonListener);
         }
+        dataManager.unregisterAuthListener(authListener);
+        dataManager.unregisterConnectionListener(connectionListener);
         syncService.stopListening(syncListener);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onResume() {
-        super.onResume();
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
-        if (syncItem != null && appState.getData().isConnected())
-            syncItem.setIcon(R.drawable.ic_menu_sync_ready);
     }
 
     DataCallback syncListener = new DataCallback() {
@@ -981,14 +982,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void reconnect() {
-        appState.getScanner().unregisterButtonListener(scannerButton);
+        appState.getScanner().unregisterButtonListener(scannerButtonListener);
 
         SetupCallback setupCallback = new SetupCallback() {
             @Override
             public void onSuccess() {
                 Log.d(MainActivity.this, "reconnect.onSuccess()");
                 un20WakeupDialog.dismiss();
-                appState.getScanner().registerButtonListener(scannerButton);
+                appState.getScanner().registerButtonListener(scannerButtonListener);
             }
 
             @Override

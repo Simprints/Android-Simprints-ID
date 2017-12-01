@@ -217,7 +217,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     private void onIdentifyStart() {
         final GROUP matchGroup = dataManager.getMatchGroup();
 
-        appState.getData().loadPeople(candidates, matchGroup, new DataCallback() {
+        dataManager.loadPeople(candidates, matchGroup, new DataCallback() {
             @Override
             public void onSuccess() {
                 Log.d(MatchingActivity.this, String.format(Locale.UK,
@@ -260,7 +260,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     private void onVerifyStart() {
         final String guid = dataManager.getPatientId();
 
-        appState.getData().loadPerson(candidates, guid, new DataCallback() {
+        dataManager.loadPerson(candidates, guid, new DataCallback() {
             @Override
             public void onSuccess() {
                 Log.d(MatchingActivity.this, "Successfully loaded candidate");
@@ -335,9 +335,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                                     scores.get(idx[i]).intValue(), computeTier(scores.get(idx[i]))));
                         }
 
-                        if (appState.getData() != null) {
-                            appState.getData().saveIdentification(probe, candidates.size(), topCandidates, dataManager.getSessionId());
-                        }
+                        dataManager.saveIdentification(probe, candidates.size(), topCandidates);
 
                         // finish
                         int tier1Or2Matches = 0;
@@ -382,9 +380,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                             resultCode = Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
                         }
 
-                        if (appState.getData() != null) {
-                            appState.getData().saveVerification(probe, dataManager.getPatientId(), verification, dataManager.getSessionId(), guidExistsResult);
-                        }
+                        dataManager.saveVerification(probe, verification, guidExistsResult);
 
                         // finish
                         Intent resultData;

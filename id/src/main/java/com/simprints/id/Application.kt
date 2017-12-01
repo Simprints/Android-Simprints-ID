@@ -57,9 +57,9 @@ class Application: AndroidApplication() {
             by lazy { PreferencesManagerImpl(prefs, fingerIdentifierToBooleanSerializer,
                     calloutSerializer, groupSerializer) }
     private val localDbManager: LocalDbManager
-            by lazy { RealmDbManager(this) }
-    private val remoteDbManager: RemoteDbManager by lazy { FirebaseRtdbManager(this) }
-    private val apiManager: ApiManager by lazy { ApiManagerImpl(this) }
+            by lazy { RealmDbManager() }
+    private val remoteDbManager: RemoteDbManager by lazy { FirebaseRtdbManager() }
+    private val apiManager: ApiManager by lazy { ApiManagerImpl() }
     private val fabric: Fabric by lazy {
         Fabric.Builder(this).kits(Crashlytics()).debuggable(BuildConfig.DEBUG).build()
     }

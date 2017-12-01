@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
@@ -15,11 +14,8 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.libcommon.Person;
-import com.simprints.libdata.AuthListener;
-import com.simprints.libdata.ConnectionListener;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
-import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
@@ -95,7 +91,7 @@ public class Setup {
         }
 
         // Step 2: initialize database context + port db from aa to realm if needed . Only has to be done once.
-        if (appState.getData() == null) {
+        if (!dataManager.isInitialized()) {
             this.initDbContext(activity);
             return;
         }
@@ -148,39 +144,10 @@ public class Setup {
     // STEP 2
     private void initDbContext(@NonNull final Activity activity) {
         onProgress(10, R.string.updating_database);
-        final DatabaseContext dbContext = new DatabaseContext(dataManager.getApiKey(), dataManager.getUserId(), dataManager.getModuleId(), dataManager.getDeviceId(), activity, BuildConfig.DEBUG);
-
-        dbContext.registerAuthListener(new AuthListener() {
-            @Override
-            public void onSignIn() {
-                appState.setSignedIn(true);
-            }
-
-            @Override
-            public void onSignOut() {
-                appState.setSignedIn(false);
-            }
-        });
-
-        dbContext.registerConnectionListener(new ConnectionListener() {
-            @Override
-            public void onConnection() {
-                if (!appState.getSignedIn()) {
-                    appState.setData(null);
-                    goOn(activity);
-                }
-            }
-
-            @Override
-            public void onDisconnection() {
-            }
-        });
-
-        dbContext.initDatabase(new DataCallback() {
+        dataManager.initialize(new DataCallback() {
             @Override
             public void onSuccess() {
                 Timber.d("Setup: Database context initialized.");
-                appState.setData(dbContext);
                 goOn(activity);
             }
 
@@ -188,7 +155,6 @@ public class Setup {
             public void onFailure(DATA_ERROR error) {
                 switch (error) {
                     case DATABASE_INIT_RESTART:
-                        dbContext.destroy();
                         goOn(activity);
                         break;
                     default:
@@ -203,7 +169,7 @@ public class Setup {
     private void validateApiKey(@NonNull final Activity activity) {
         onProgress(20, R.string.launch_checking_api_key);
 
-        appState.getData().signIn(new DataCallback() {
+        dataManager.signIn(new DataCallback() {
             @Override
             public void onSuccess() {
                 if (!apiKeyValidated) {
@@ -313,7 +279,7 @@ public class Setup {
 
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = dataManager.getPatientId();
-        appState.getData().loadPerson(loadedPerson, guid, new DataCallback() {
+        dataManager.loadPerson(loadedPerson, guid, new DataCallback() {
             @Override
             public void onSuccess() {
                 Timber.d("Setup: GUID found.");
@@ -326,16 +292,14 @@ public class Setup {
                 switch (data_error) {
                     case NOT_FOUND:
                         Person probe = new Person(guid);
-                        if (appState.getData().isConnected()) {
+                        if (dataManager.isConnected()) {
                             // We've synced with the online db and they're not in the db
-                            appState.getData().saveVerification(probe, guid, null,
-                                    dataManager.getSessionId(),
+                            dataManager.saveVerification(probe, null,
                                     VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE);
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
                         } else {
                             // We're offline but might find the person if we sync
-                            appState.getData().saveVerification(probe, guid, null,
-                                    dataManager.getSessionId(),
+                            dataManager.saveVerification(probe,null,
                                     VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE);
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
                         }
