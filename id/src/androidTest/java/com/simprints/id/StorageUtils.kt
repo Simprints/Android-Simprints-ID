@@ -1,17 +1,9 @@
 package com.simprints.id
 
 import android.content.Context
-
 import com.simprints.cerberuslibrary.RealmUtility
-import com.simprints.remoteadminclient.Configuration
-import com.simprints.remoteadminclient.api.DefaultApi
-import com.simprints.remoteadminclient.auth.ApiKeyAuth
-import com.squareup.okhttp.OkHttpClient
-
-import java.io.File
-import java.util.concurrent.TimeUnit
-
 import io.realm.RealmConfiguration
+import java.io.File
 
 object StorageUtils {
 
@@ -22,11 +14,9 @@ object StorageUtils {
         val applicationDirectory = File(cacheDirectory.parent)
         if (applicationDirectory.exists()) {
             val fileNames = applicationDirectory.list() ?: return
-            for (fileName in fileNames) {
-                if (fileName != "lib") {
-                    deleteFile(File(applicationDirectory, fileName))
-                }
-            }
+            fileNames
+                    .filter { it != "lib" }
+                    .forEach { deleteFile(File(applicationDirectory, it)) }
         }
     }
 
