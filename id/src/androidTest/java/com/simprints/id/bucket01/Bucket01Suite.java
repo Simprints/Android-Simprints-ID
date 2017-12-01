@@ -12,9 +12,13 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import java.util.concurrent.TimeUnit;
+
+import static com.schibsted.spain.barista.BaristaSleepActions.sleep;
+
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        HappyWorkflow.class
+        HappyWorkflowAllMainFeatures.class
 })
 public class Bucket01Suite {
 
@@ -36,6 +40,8 @@ public class Bucket01Suite {
         bluetoothUtility.setBluetoothPairingStateSync(macAddress, true);
         Log.d("EndToEndTests", "Bucket01Suite.suiteSetUp(): ensuring wifi is connected");
         wifiUtility.setWifiNetworkSync(networkSsid, networkPassword);
+        Log.d("EndToEndTests", "Bucket01Suite.suiteSetUp(): ensuring internet is connected");
+        wifiUtility.waitForInternetStateSync(true);
     }
 
     @AfterClass

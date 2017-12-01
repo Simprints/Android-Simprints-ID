@@ -11,8 +11,10 @@ import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 import android.view.WindowManager;
 
+import com.google.gson.JsonObject;
 import com.simprints.id.FirstUseTest;
 import com.simprints.id.R;
+import com.simprints.id.RemoteAdminUtils;
 import com.simprints.id.activities.LaunchActivity;
 import com.simprints.libdata.models.realm.RealmConfig;
 import com.simprints.libsimprints.Constants;
@@ -20,6 +22,8 @@ import com.simprints.libsimprints.Identification;
 import com.simprints.libsimprints.Registration;
 import com.simprints.libsimprints.Tier;
 import com.simprints.libsimprints.Verification;
+import com.simprints.remoteadminclient.ApiException;
+import com.simprints.remoteadminclient.api.DefaultApi;
 
 import org.junit.After;
 import org.junit.Before;
@@ -43,11 +47,12 @@ import static com.schibsted.spain.barista.BaristaSleepActions.sleep;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class HappyWorkflow extends FirstUseTest {
+public class HappyWorkflowAllMainFeatures extends FirstUseTest {
     private static final String apiKey = "00000000-0000-0000-0000-000000000000";
     private static final String userId = "the_lone_user";
     private static final String moduleId = "the_one_and_only_module";
@@ -65,10 +70,11 @@ public class HappyWorkflow extends FirstUseTest {
             new ActivityTestRule<>(LaunchActivity.class, false, false);
 
     @Before
-    public void setUp() {
-        Log.d("EndToEndTests", "bucket01.HappyWorkflow.setUp()");
+    public void setUp() throws ApiException {
+        Log.d("EndToEndTests", "bucket01.HappyWorkflowAllMainFeatures.setUp()");
         Realm.init(getInstrumentation().getTargetContext());
         super.setRealmConfiguration(RealmConfig.get(apiKey));
+        super.setApiKey(apiKey);
         super.setUp();
     }
 
@@ -100,9 +106,9 @@ public class HappyWorkflow extends FirstUseTest {
      * Go through the full verify workflow.
      */
     @Test
-    public void happyWorkflow() {
-        Log.d("EndToEndTests", "bucket01.HappyWorkflow.happyWorkflow");
-        Log.d("EndToEndTests", "bucket01.HappyWorkflow.happyWorkflow enrol patient start");
+    public void happyWorkflowAllMainFeatures() {
+        Log.d("EndToEndTests", "bucket01.HappyWorkflowAllMainFeatures.happyWorkflowAllMainFeatures");
+        Log.d("EndToEndTests", "bucket01.HappyWorkflowAllMainFeatures.happyWorkflowAllMainFeatures enrol patient start");
 
         Intent registerIntent = createLaunchActivityIntent(Constants.SIMPRINTS_REGISTER_INTENT);
         launchActivityActivityTestRuleEnrol.launchActivity(registerIntent);
@@ -144,12 +150,25 @@ public class HappyWorkflow extends FirstUseTest {
         String guid = registration.getGuid();
         assertNotNull(guid);
 
-        Log.d("EndToEndTests", "bucket01.HappyWorkflow.happyWorkflow enrol patient end");
+        Log.d("EndToEndTests", "bucket01.HappyWorkflowAllMainFeatures.happyWorkflowAllMainFeatures enrol patient end");
 
-        // TODO: Check that a patient was indeed saved to the database
         SystemClock.sleep(2000);
 
-        Log.d("EndToEndTests", "bucket01.HappyWorkflow.happyWorkflow identify patient start");
+        DefaultApi apiInstance = RemoteAdminUtils.INSTANCE.getConfiguredApiInstance();
+        try {
+            // Check to see if the patient made it to the database
+            JsonObject patientsJson = RemoteAdminUtils.getPatientsNode(apiInstance, apiKey);
+            assertNotNull(patientsJson);
+            assertEquals(1, patientsJson.size());
+            assertTrue(patientsJson.has(guid));
+
+        } catch (ApiException e) {
+            assertNull("ApiException", e);
+        }
+
+        SystemClock.sleep(2000);
+
+        Log.d("EndToEndTests", "bucket01.HappyWorkflowAllMainFeatures.happyWorkflowAllMainFeatures identify patient start");
 
         Intent identifyIntent = createLaunchActivityIntent(Constants.SIMPRINTS_IDENTIFY_INTENT);
         launchActivityActivityTestRuleIdentify.launchActivity(identifyIntent);
@@ -195,11 +214,11 @@ public class HappyWorkflow extends FirstUseTest {
         assertTrue(identifications.get(0).getConfidence() > 0);
         assertNotEquals(Tier.TIER_5, identifications.get(0).getTier());
 
-        Log.d("EndToEndTests", "bucket01.HappyWorkflow.happyWorkflow identify patient end");
+        Log.d("EndToEndTests", "bucket01.HappyWorkflowAllMainFeatures.happyWorkflowAllMainFeatures identify patient end");
 
         SystemClock.sleep(2000);
 
-        Log.d("EndToEndTests", "bucket01.HappyWorkflow.happyWorkflow verify patient start");
+        Log.d("EndToEndTests", "bucket01.HappyWorkflowAllMainFeatures.happyWorkflowAllMainFeatures verify patient start");
 
         Intent verifyIntent = createLaunchActivityIntent(Constants.SIMPRINTS_VERIFY_INTENT);
         verifyIntent.putExtra(Constants.SIMPRINTS_VERIFY_GUID, guid);
@@ -243,7 +262,7 @@ public class HappyWorkflow extends FirstUseTest {
         assertTrue(verification.getConfidence() > 0);
         assertNotEquals(Tier.TIER_5, verification.getTier());
 
-        Log.d("EndToEndTests", "bucket01.HappyWorkflow.happyWorkflow verify patient end");
+        Log.d("EndToEndTests", "bucket01.HappyWorkflowAllMainFeatures.happyWorkflowAllMainFeatures verify patient end");
 
         SystemClock.sleep(2000);
     }
@@ -251,6 +270,6 @@ public class HappyWorkflow extends FirstUseTest {
     @After
     public void tearDown() {
         super.tearDown();
-        Log.d("EndToEndTests", "bucket01.HappyWorkflow.tearDown()");
+        Log.d("EndToEndTests", "bucket01.HappyWorkflowAllMainFeatures.tearDown()");
     }
 }

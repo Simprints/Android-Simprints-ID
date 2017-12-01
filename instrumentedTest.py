@@ -9,23 +9,30 @@ import time
 
 from logging import Formatter, Logger, getLogger, DEBUG, StreamHandler, FileHandler, INFO, WARN, ERROR, CRITICAL
 
+# Use the custom version of adb that configures devices by their usb port rather than serial number
 ADB = 'adb' if platform.system() == 'Windows' else './testing/adb'
 GRADLEW_PATH = 'gradlew.bat' if platform.system() == 'Windows' else './gradlew'
+CERBERUS_DIR_PATH = '../Android-Cerberus/'
 
 buckets = {
     'bucket_01': 'com.simprints.id.bucket01.Bucket01Suite',
 }
 
 commands = {
-    'clean builds': (GRADLEW_PATH + ' :id:clean'),
-    'assemble endToEndTesting apk': (GRADLEW_PATH + ' :id:assembleEndToEndTesting'),
-    'assemble endToEndTesting test apk': (GRADLEW_PATH + ' :id:assembleEndToEndTestingAndroidTest'),
+    'clean cerberus build': 'cd ' + CERBERUS_DIR_PATH + ';' + GRADLEW_PATH + ' :cerberus-app:clean',
+    'clean simprints id build': GRADLEW_PATH + ' :id:clean',
+    'assemble cerberus debug apk': 'cd ' + CERBERUS_DIR_PATH + ';' + GRADLEW_PATH + ' :cerberus-app:assembleDebug',
+    'assemble simprints id endToEndTesting apk': (GRADLEW_PATH + ' :id:assembleEndToEndTesting'),
+    'assemble simprints id endToEndTesting test apk': (GRADLEW_PATH + ' :id:assembleEndToEndTestingAndroidTest'),
     'devices query': ADB + ' devices -l',
-    'install endToEndTesting apk': ADB + ' -s {0} install -t -d -r '
-                                         'id/build/outputs/apk/endToEndTesting/id-endToEndTesting.apk',
-    'install endToEndTesting test apk': ADB + ' -s {0} install -t -d -r '
-                                              'id/build/outputs/apk/androidTest/endToEndTesting/id-endToEndTesting'
-                                              '-androidTest.apk',
+    'install cerberus debug apk': ADB + ' -s {0} install -t -d -r ' + CERBERUS_DIR_PATH + 'cerberus-app/build/outputs'
+                                                                                          '/apk/debug/cerberus-app'
+                                                                                          '-debug.apk',
+    'install simprints id endToEndTesting apk': ADB + ' -s {0} install -t -d -r '
+                                                      'id/build/outputs/apk/endToEndTesting/id-endToEndTesting.apk',
+    'install simprints id endToEndTesting test apk': ADB + ' -s {0} install -t -d -r '
+                                                           'id/build/outputs/apk/androidTest/endToEndTesting/id'
+                                                           '-endToEndTesting-androidTest.apk',
     'run test': ADB + ' -s {0} shell am instrument -w '
                       '-e class {1} com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner '
 }
@@ -190,20 +197,31 @@ class Run:
     #
     ##############
 
-    def clean_builds(self):
-        self.update_log_format(LogState.default())
-        self.run_and_log(commands['clean builds'])
+    def clean_cerberus_build(self):
+        self.run_and_log(commands['clean cerberus build'])
 
-    def assemble_apk(self):
-        self.update_log_format(LogState.default())
-        self.run_and_log(commands['assemble endToEndTesting apk'])
+    def clean_simprints_id_build(self):
+        self.run_and_log(commands['clean simprints id build'])
 
-    def assemble_test_apk(self):
-        self.update_log_format(LogState.default())
-        self.run_and_log(commands['assemble endToEndTesting test apk'])
+    def assemble_cerberus_apk(self):
+        self.run_and_log(commands['assemble cerberus debug apk'])
+
+    def assemble_simprints_id_apk(self):
+        self.run_and_log(commands['assemble simprints id endToEndTesting apk'])
+
+    def assemble_simprints_id_test_apk(self):
+        self.run_and_log(commands['assemble simprints id endToEndTesting test apk'])
+
+    def install_cerberus_apk(self, device: Device):
+        self.run_and_log(commands['install cerberus debug apk'].format(device.device_id))
+
+    def install_apk(self, device: Device):
+        self.run_and_log(commands['install simprints id endToEndTesting apk'].format(device.device_id))
+
+    def install_test_apk(self, device: Device):
+        self.run_and_log(commands['install simprints id endToEndTesting test apk'].format(device.device_id))
 
     def devices_query(self):
-        self.update_log_format(LogState.default())
         lines = self.run_and_log(commands['devices query'])
 
         # The first line is "List of devices attached". The last line is blank. Lines in between contain a device.
@@ -224,14 +242,6 @@ class Run:
                     devices.append(Device(deviceStr[0], deviceStrSection[6:]))
         return devices
 
-    def install_apk(self, device: Device):
-        self.update_log_format(LogState.device(device))
-        self.run_and_log(commands['install endToEndTesting apk'].format(device.device_id))
-
-    def install_test_apk(self, device: Device):
-        self.update_log_format(LogState.device(device))
-        self.run_and_log(commands['install endToEndTesting test apk'].format(device.device_id))
-
     def run_test(self, device: Device, test_id: str):
         test_dir_name = self.log_dir_name + '/' + device.model + '/' + test_id
 
@@ -250,20 +260,29 @@ class Run:
 
 def main():
     start_time = time.perf_counter()
+
     run = Run('instrumented_test')
+    run.update_log_format(LogState.default())
     run.log("Hello world!")
 
-    run.clean_builds()
-    run.assemble_apk()
-    run.assemble_test_apk()
+    run.clean_cerberus_build()
+    run.assemble_cerberus_apk()
+
+    run.clean_simprints_id_build()
+    run.assemble_simprints_id_apk()
+    run.assemble_simprints_id_test_apk()
 
     devices = run.devices_query()
 
     for device in devices:
         run.update_log_format(LogState.device(device))
+
+        run.install_cerberus_apk(device)
         run.install_apk(device)
         run.install_test_apk(device)
+
         run.run_test(device, 'bucket_01')
+
     run.update_log_format(LogState.default())
     run.log('TEST END')
 
