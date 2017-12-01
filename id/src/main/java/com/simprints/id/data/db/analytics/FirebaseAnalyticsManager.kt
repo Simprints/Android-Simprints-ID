@@ -15,11 +15,6 @@ import timber.log.Timber
 
 class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics): AnalyticsManager {
 
-    override fun logException(throwable: Throwable?) {
-        Timber.d("FirebaseAnalyticsManager.logException(throwable=$throwable)")
-        Crashlytics.logException(throwable)
-    }
-
     private fun logAlertToCrashlytics(alertName: String) {
         Timber.d("FirebaseAnalyticsManager.logAlertToCrashlytics(alertName=$alertName)")
         Crashlytics.log(alertName)
@@ -43,6 +38,19 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         Timber.d("FirebaseAnalyticsManager.logAlert(alertName=$alertName, ...)")
         logAlertToCrashlytics(alertName)
         logAlertToFirebaseAnalytics(alertName, apiKey, moduleId, userId, deviceId)
+    }
+
+    override fun logException(throwable: Throwable?) {
+        Timber.d("FirebaseAnalyticsManager.logException(throwable=$throwable)")
+        Crashlytics.logException(throwable)
+    }
+
+    override fun logNonFatalException(description: String) {
+        Timber.d("FirebaseAnalyticsManager.logNonFatalException(description=$description")
+        Crashlytics.log(description)
+        val bundle = Bundle()
+        bundle.putString("description", description)
+        firebaseAnalytics.logEvent("non_fatal_exception", bundle)
     }
 
     override fun logUserProperties(userId: String, apiKey: String, moduleId: String, deviceId: String) {
@@ -78,5 +86,24 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         firebaseAnalytics.logEvent("guid_selection_service", bundle)
     }
 
+    override fun logConnectionStateChange(connected: Boolean, apiKey: String,
+                                                  androidId: String, sessionId: String) {
+        Timber.d("FirebaseAnalyticsManager.logConnectionStateChange(connected=$connected)")
+        val bundle = Bundle()
+        bundle.putString("api_key", apiKey)
+        bundle.putString("android_id", androidId)
+        bundle.putString("session_id", sessionId)
+        bundle.putBoolean("connected", connected)
+        firebaseAnalytics.logEvent("connection_state_change", bundle)
+    }
 
+    override fun logAuthStateChange(authenticated: Boolean, apiKey: String, androidId: String, sessionId: String) {
+        Timber.d("FirebaseAnalyticsManager.logAuthStateChange(authenticated=$authenticated)")
+        val bundle = Bundle()
+        bundle.putString("api_key", apiKey)
+        bundle.putString("android_id", androidId)
+        bundle.putString("session_id", sessionId)
+        bundle.putBoolean("authenticated", authenticated)
+        firebaseAnalytics.logEvent("auth_state_change", bundle)
+    }
 }

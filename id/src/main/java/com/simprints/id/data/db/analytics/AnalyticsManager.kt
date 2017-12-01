@@ -9,6 +9,8 @@ interface AnalyticsManager {
     fun logAlert(alertName: String, apiKey: String, moduleId: String, userId: String,
                  deviceId: String)
 
+    fun logNonFatalException(description: String)
+
     fun logUserProperties(userId: String, apiKey: String, moduleId: String, deviceId: String)
 
     fun logScannerProperties(macAddress: String, scannerId: String)
@@ -17,5 +19,12 @@ interface AnalyticsManager {
 
     fun logGuidSelectionService(selectedGuid: String, callbackSent: Boolean,
                                 apiKey: String, androidId: String, sessionId: String)
+
+    fun logConnectionStateChange(connected: Boolean, apiKey: String,
+                                 androidId: String, sessionId: String)
+
+    fun logAuthStateChange(authenticated: Boolean, apiKey: String,
+                           androidId: String, sessionId: String)
+
 }
 

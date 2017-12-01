@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.libdata.models.enums.REFUSAL_FORM_REASON;
 import com.simprints.libsimprints.Constants;
@@ -29,7 +28,6 @@ public class RefusalActivity extends AppCompatActivity {
     private REFUSAL_FORM_REASON reason;
     private EditText otherText;
     private DataManager dataManager;
-    private AppState appState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +37,9 @@ public class RefusalActivity extends AppCompatActivity {
 
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
-        appState = app.getAppState();
 
-        submit = (Button) findViewById(R.id.bt_submit_refusal_form);
-        otherText = (EditText) findViewById(R.id.et_other_refusal_text);
+        submit = findViewById(R.id.bt_submit_refusal_form);
+        otherText = findViewById(R.id.et_other_refusal_text);
 
         otherText.clearFocus();
 
@@ -54,7 +51,7 @@ public class RefusalActivity extends AppCompatActivity {
 
                 if (reason != null) {
                     RefusalForm refusalForm = new RefusalForm(reason.toString(), otherText.getText().toString());
-                    appState.setRefusalForm(refusalForm);
+                    dataManager.saveRefusalForm(refusalForm);
                     resultData.putExtra(Constants.SIMPRINTS_REFUSAL_FORM, refusalForm);
                 }
 

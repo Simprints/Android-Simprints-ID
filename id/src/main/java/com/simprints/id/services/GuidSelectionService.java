@@ -9,7 +9,6 @@ import com.simprints.id.Application;
 import com.simprints.id.data.DataManager;
 import com.simprints.libsimprints.Constants;
 
-import static com.simprints.libdata.DatabaseContext.updateIdentification;
 import static com.simprints.libsimprints.Constants.SIMPRINTS_SELECTED_GUID;
 import static com.simprints.libsimprints.Constants.SIMPRINTS_SESSION_ID;
 
@@ -48,8 +47,7 @@ public class GuidSelectionService extends IntentService {
         boolean isValidSelection = hasValidApiKeyExtra(intent) && hasValidSessionIdExtra(intent);
         String selectedGuid = getSelectedGuidExtra(intent);
         if (isValidSelection) {
-            updateIdentification(dataManager.getApiKey(), selectedGuid, dataManager.getDeviceId(),
-                    dataManager.getSessionId());
+            dataManager.updateIdentification(selectedGuid);
         }
         dataManager.logGuidSelectionService(selectedGuid, isValidSelection);
     }

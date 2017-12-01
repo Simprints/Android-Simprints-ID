@@ -26,7 +26,6 @@ import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.ScannerCallback;
-import com.simprints.libsimprints.RefusalForm;
 
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.ALERT_TYPE_EXTRA;
@@ -173,16 +172,6 @@ public class LaunchActivity extends AppCompatActivity {
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST);
     }
 
-    /**
-     * Close Simprints ID
-     */
-    private void finishWith(final int resultCode, final Intent resultData) {
-        waitingForConfirmation = false;
-        setResult(resultCode, resultData);
-        finish();
-    }
-
-
     private void tryAgain() {
         launchOutOfFocus = false;
         setup.start(this, setupCallback);
@@ -251,17 +240,20 @@ public class LaunchActivity extends AppCompatActivity {
         startActivityForResult(new Intent(this, RefusalActivity.class), REFUSAL_ACTIVITY_REQUEST);
     }
 
-    @Override
-    public void onDestroy() {
-        appState.logSessionEnd();
-        if (appState.getData() != null) {
-            // Save refusal form to firebase
-            RefusalForm refusalForm = appState.getRefusalForm();
-            if (refusalForm != null)
-                appState.getData().saveRefusalForm(refusalForm, dataManager.getSessionId());
+    /**
+     * Close Simprints ID
+     */
+    private void finishWith(final int resultCode, final Intent resultData) {
+        waitingForConfirmation = false;
+        setResult(resultCode, resultData);
+        finish();
+    }
 
-            appState.getData().destroy();
-            appState.setData(null);
+    @Override
+    protected void onDestroy() {
+        appState.logSessionEnd();
+        if (dataManager.isInitialized()) {
+            dataManager.finish();
         }
 
         if (positionTracker != null)
@@ -283,7 +275,6 @@ public class LaunchActivity extends AppCompatActivity {
         }
 
         setup.destroy();
-
         super.onDestroy();
     }
 

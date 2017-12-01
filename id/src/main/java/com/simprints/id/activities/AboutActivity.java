@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.simprints.id.Application;
-import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.AppState;
@@ -58,9 +57,9 @@ public class AboutActivity extends AppCompatActivity {
                 appState.getHardwareVersion() > -1 ? String.valueOf(appState.getHardwareVersion()) : "null");
 
         statisticsView.setDbCountData(
-                Long.toString(appState.getData().getPeopleCount(Constants.GROUP.USER)),
-                Long.toString(appState.getData().getPeopleCount(Constants.GROUP.MODULE)),
-                Long.toString(appState.getData().getPeopleCount(Constants.GROUP.GLOBAL)));
+                Long.toString(dataManager.getPeopleCount(Constants.GROUP.USER)),
+                Long.toString(dataManager.getPeopleCount(Constants.GROUP.MODULE)),
+                Long.toString(dataManager.getPeopleCount(Constants.GROUP.GLOBAL)));
 
         if (recoveryRunning) recoveryView.setRecoverDbUnavailable();
         else recoveryView.setRecoverDbAvailable();
@@ -107,7 +106,7 @@ public class AboutActivity extends AppCompatActivity {
         }
 
         private void initToolbar() {
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_about);
+            Toolbar toolbar = findViewById(R.id.toolbar_about);
             setSupportActionBar(toolbar);
         }
 
@@ -135,13 +134,13 @@ public class AboutActivity extends AppCompatActivity {
         }
 
         private void initTextViews() {
-            tv_appVersion = (TextView) findViewById(R.id.tv_appVersion);
-            tv_libsimprintsVersion = (TextView) findViewById(R.id.tv_libsimprintsVersion);
-            tv_scannerVersion = (TextView) findViewById(R.id.tv_scannerVersion);
+            tv_appVersion = findViewById(R.id.tv_appVersion);
+            tv_libsimprintsVersion = findViewById(R.id.tv_libsimprintsVersion);
+            tv_scannerVersion = findViewById(R.id.tv_scannerVersion);
 
-            tv_userDbCount = (TextView) findViewById(R.id.tv_userDbCount);
-            tv_moduleDbCount = (TextView) findViewById(R.id.tv_moduleDbCount);
-            tv_globalDbCount = (TextView) findViewById(R.id.tv_globalDbCount);
+            tv_userDbCount = findViewById(R.id.tv_userDbCount);
+            tv_moduleDbCount = findViewById(R.id.tv_moduleDbCount);
+            tv_globalDbCount = findViewById(R.id.tv_globalDbCount);
         }
 
         void setVersionData(String appVersion, String libsimprintsVersion, String scannerVersion) {
@@ -171,7 +170,7 @@ public class AboutActivity extends AppCompatActivity {
         }
 
         private void initRecoverDbButton() {
-            recoverDbButton = (Button) findViewById(R.id.bt_recoverDb);
+            recoverDbButton = findViewById(R.id.bt_recoverDb);
             recoverDbButtonListeners = new ArrayList<>();
             ViewHelper.registerOnClickButtonListeners(recoverDbButton, recoverDbButtonListeners);
         }
@@ -242,36 +241,33 @@ public class AboutActivity extends AppCompatActivity {
     }
 
     private void recoverDb() {
-        String androidId = dataManager.getDeviceId();
-        appState.getData().recoverRealmDb(androidId + "_" + Long.toString(System.currentTimeMillis()) + ".json",
-                androidId,
-                Constants.GROUP.GLOBAL,
-                BuildConfig.DEBUG,
+        dataManager.recoverRealmDb(Constants.GROUP.GLOBAL,
                 new DataCallback() {
-            @Override
-            public void onSuccess() {
-                recoverDbHandlerThread.quit();
-                recoveryRunning = false;
-                try {
-                    recoveryView.setSuccessRecovering();
-                    recoveryView.setRecoverDbAvailable();
-                } catch (WindowManager.BadTokenException e) {
-                    e.printStackTrace();
-                }
-            }
+                    @Override
+                    public void onSuccess() {
+                        recoverDbHandlerThread.quit();
+                        recoveryRunning = false;
+                        try {
+                            recoveryView.setSuccessRecovering();
+                            recoveryView.setRecoverDbAvailable();
+                        } catch (WindowManager.BadTokenException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
-            @Override
-            public void onFailure(DATA_ERROR data_error) {
-                recoverDbHandlerThread.quit();
-                recoveryRunning = false;
-                try {
-                    recoveryView.setErrorRecovering(data_error.details());
-                    recoveryView.setRecoverDbAvailable();
-                } catch (WindowManager.BadTokenException e) {
-                    e.printStackTrace();
+                    @Override
+                    public void onFailure(DATA_ERROR data_error) {
+                        recoverDbHandlerThread.quit();
+                        recoveryRunning = false;
+                        try {
+                            recoveryView.setErrorRecovering(data_error.details());
+                            recoveryView.setRecoverDbAvailable();
+                        } catch (WindowManager.BadTokenException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
-            }
-        });
+        );
     }
 
     private class RecoverDbHandlerThread extends HandlerThread {
