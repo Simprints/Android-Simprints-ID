@@ -7,8 +7,6 @@ import com.simprints.remoteadminclient.ApiException
 import com.simprints.remoteadminclient.Configuration
 import com.simprints.remoteadminclient.api.DefaultApi
 import com.simprints.remoteadminclient.auth.ApiKeyAuth
-import com.squareup.okhttp.OkHttpClient
-
 import java.util.concurrent.TimeUnit
 
 object RemoteAdminUtils {
