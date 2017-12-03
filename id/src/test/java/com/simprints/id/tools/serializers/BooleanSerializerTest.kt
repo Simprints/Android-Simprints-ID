@@ -1,6 +1,6 @@
 package com.simprints.id.tools.serializers
 
-import junit.framework.Assert
+import junit.framework.Assert.assertEquals
 import org.junit.Test
 
 /**
@@ -8,11 +8,15 @@ import org.junit.Test
  */
 class BooleanSerializerTest {
 
+    private val booleanSerializer = BooleanSerializer()
+
     @Test
-    fun testConsistentSerialization() {
-        val serializer = BooleanSerializer()
-        for (boolean in arrayOf(true, false))
-            Assert.assertEquals(boolean, serializer.deserialize(serializer.serialize(boolean)))
+    fun testSerializeThenDeserializeGivesOriginalBoolean() {
+        for (originalBoolean in arrayOf(true, false)) {
+            val serializedBoolean =  booleanSerializer.serialize(originalBoolean)
+            val deserializedBoolean = booleanSerializer.deserialize(serializedBoolean)
+            assertEquals(originalBoolean, deserializedBoolean)
+        }
     }
 
 }

@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-
 apply plugin: 'io.fabric'
 apply plugin: 'com.google.firebase.firebase-crash'
 
@@ -14,8 +13,9 @@ android {
         minSdkVersion 14
         targetSdkVersion 26
         versionCode 55
-        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
         versionName '2017.4.1'
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         debug {
@@ -108,7 +108,7 @@ dependencies {
     implementation 'com.simprints:LibSimprints:1.0.12'
 
     // Test
-    // TODO: migrate to JUnit 5
+    // TODO: migrate to JUnit 5. Tried https://github.com/mannodermaus/android-junit5 on 03/12/17 and it did not work out of the box.
     testImplementation 'junit:junit:4.12'
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"

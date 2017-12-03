@@ -2,18 +2,19 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.simprints.id.testUtils.assertThrows
 import junit.framework.Assert
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import kotlin.reflect.KClass
 import org.mockito.Mockito.`when` as whenever
 
 // TODO: Figure out why Roboletric is not happy when running tests with code coverage
 
 /**
- * At first, I implemented getAny() and putAny() as extension functions of the SharedPreferences
+ * At first, I implemented getPrimitive() and putPrimitive() as extension functions of the SharedPreferences
  * interface.
  *
  * I had trouble mocking SharedPreferences to check that these functions would delegate their work
@@ -31,103 +32,96 @@ class RobolectricImprovedSharedPreferencesImplTest {
 
         val sharedPrefName = "aSharedPrefName"
 
-        val key = "key"
+        val aKey = "aKey"
+        val aByte: Byte = 1
+        val aShort: Short = 2
+        val anInt: Int  = 3
+        val aLong: Long = 4
+        val aFloat: Float = 5.0f
+        val aDouble: Double = 6.0
+        val aString: String = "aString"
+        val aBoolean: Boolean = false
+        val aClass: KClass<*> = RobolectricImprovedSharedPreferencesImplTest::class
 
-        val defStringValue = "defValue"
-        val stringValue = "value"
+        val storedByte: Byte = -1
+        val storedShort: Short = -2
+        val storedInt: Int  = -3
+        val storedLong: Long = -4
+        val storedFloat: Float = -5.0f
+        val storedDouble: Double = -6.0
+        val storedString: String = "storedString"
+        val storedBoolean: Boolean = true
 
-        val defLongValue = 0L
-        val longValue = 1L
-
-        val defIntValue = 0
-        val intValue = 1
-
-        val defBooleanValue = false
-        val booleanValue = true
-
-        val defFloatValue = 0f
-        val floatValue = 1f
-
-        val classValue = RobolectricImprovedSharedPreferencesImplTest::class
     }
 
-    private lateinit var basePrefs: SharedPreferences
-    private lateinit var baseEditor: SharedPreferences.Editor
-    private lateinit var prefs: ImprovedSharedPreferences
+    private val basePrefs: SharedPreferences = RuntimeEnvironment.application
+            .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
 
-    @Before
-    fun setUp() {
-        basePrefs = RuntimeEnvironment.application
-                .getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
-        baseEditor = basePrefs.edit()
-        prefs = ImprovedSharedPreferencesImpl(basePrefs)
-    }
+    private val improvedPrefs: ImprovedSharedPreferences = ImprovedSharedPreferencesImpl(basePrefs)
 
 
     @Test
-    fun getAnyNonExistentString() {
-        Assert.assertEquals(defStringValue, prefs.getAny(key, defStringValue))
+    fun testGetPrimitiveReturnsBytePassedToPutPrimitive() {
+        improvedPrefs.edit().putPrimitive(aKey, storedByte).apply()
+        Assert.assertEquals(storedByte, improvedPrefs.getPrimitive(aKey, aByte))
     }
 
     @Test
-    fun getAnyExistentString() {
-        baseEditor.putString(key, stringValue).apply()
-        Assert.assertEquals(stringValue, prefs.getAny(key, defStringValue))
+    fun testGetPrimitiveReturnsShortPassedToPutPrimitive() {
+        improvedPrefs.edit().putPrimitive(aKey, storedShort).apply()
+        Assert.assertEquals(storedShort, improvedPrefs.getPrimitive(aKey, aShort))
     }
 
     @Test
-    fun getAnyNonExistentLong() {
-        Assert.assertEquals(defLongValue, prefs.getAny(key, defLongValue))
+    fun testGetPrimitiveReturnsIntPassedToPutPrimitive() {
+        improvedPrefs.edit().putPrimitive(aKey, storedInt).apply()
+        Assert.assertEquals(storedInt, improvedPrefs.getPrimitive(aKey, anInt))
     }
 
     @Test
-    fun getAnyExistentLong() {
-        baseEditor.putLong(key, longValue).apply()
-        Assert.assertEquals(longValue, prefs.getAny(key, defLongValue))
+    fun testGetPrimitiveReturnsLongPassedToPutPrimitive() {
+        improvedPrefs.edit().putPrimitive(aKey, storedLong).apply()
+        Assert.assertEquals(storedLong, improvedPrefs.getPrimitive(aKey, aLong))
     }
 
     @Test
-    fun getAnyNonExistentInt() {
-        Assert.assertEquals(defIntValue, prefs.getAny(key, defIntValue))
+    fun testGetPrimitiveReturnsFloatPassedToPutPrimitive() {
+        improvedPrefs.edit().putPrimitive(aKey, storedFloat).apply()
+        Assert.assertEquals(storedFloat, improvedPrefs.getPrimitive(aKey, aFloat))
     }
 
     @Test
-    fun getAnyExistentInt() {
-        baseEditor.putInt(key, intValue).apply()
-        Assert.assertEquals(intValue, prefs.getAny(key, defIntValue))
+    fun testGetPrimitiveReturnsDoublePassedToPutPrimitive() {
+        improvedPrefs.edit().putPrimitive(aKey, storedDouble).apply()
+        Assert.assertEquals(storedDouble, improvedPrefs.getPrimitive(aKey, aDouble))
     }
 
     @Test
-    fun getAnyNonExistentBoolean() {
-        Assert.assertEquals(defBooleanValue, prefs.getAny(key, defBooleanValue))
+    fun testGetPrimitiveReturnsStringPassedToPutPrimitive() {
+        improvedPrefs.edit().putPrimitive(aKey, storedString).apply()
+        Assert.assertEquals(storedString, improvedPrefs.getPrimitive(aKey, aString))
     }
 
     @Test
-    fun getAnyExistentBoolean() {
-        baseEditor.putBoolean(key, booleanValue).apply()
-        Assert.assertEquals(booleanValue, prefs.getAny(key, defBooleanValue))
+    fun testGetPrimitiveReturnsBooleanPassedToPutPrimitive() {
+        improvedPrefs.edit().putPrimitive(aKey, storedBoolean).apply()
+        Assert.assertEquals(storedBoolean, improvedPrefs.getPrimitive(aKey, aBoolean))
     }
 
     @Test
-    fun getAnyNonExistentFloat() {
-        Assert.assertEquals(defFloatValue, prefs.getAny(key, defFloatValue))
+    fun testGetPrimitiveThrowsMismatchedTypeExceptionIfMismatchedTypes() {
+        improvedPrefs.edit().putPrimitive(aKey, storedBoolean).apply()
+        assertThrows<MismatchedTypeException> {
+            improvedPrefs.getPrimitive(aKey, anInt)
+        }
     }
 
     @Test
-    fun getAnyExistentFloat() {
-        baseEditor.putFloat(key, floatValue).apply()
-        Assert.assertEquals(floatValue, prefs.getAny(key, defFloatValue))
+    fun testGetPrimitiveThrowsExceptionWhenValueIsUnsupportedType() {
+        assertThrows<NonPrimitiveTypeException> {
+            improvedPrefs.getPrimitive(aKey, aClass)
+        }
     }
 
-    @Test(expected = ClassCastException::class)
-    fun getAnyMismatchedType() {
-        baseEditor.putFloat(key, floatValue).apply()
-        prefs.getAny(key, defIntValue)
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun getAnyUnsupportedType() {
-        prefs.getAny(key, classValue)
-    }
 
 }

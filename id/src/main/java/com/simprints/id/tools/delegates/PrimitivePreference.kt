@@ -1,14 +1,16 @@
 package com.simprints.id.tools.delegates
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.improvedSharedPreferences.NonPrimitiveTypeException
+import isPrimitive
 import timber.log.Timber
-import java.security.InvalidParameterException
 import kotlin.reflect.KProperty
 
 /**
- * Delegate to read/write Boolean, Float, Int, Long, and String values to Shared Preferences.
+ * Delegate to read/write values of primitive types ([Byte], [Short], [Int], [Long], [Float], [Double],
+ * [String] or [Boolean]) from the Shared Preferences.
  *
- * Thread-safety: a property delegated to PrimitivePreference can be access concurrently
+ * Thread-safety: a property delegated to PrimitivePreference can be accessed concurrently
  * from different threads.
  *
  * Lazy-initialization: reads to Shared Preferences are performed not on instantiation but on first
@@ -24,15 +26,14 @@ class PrimitivePreference<T: Any>(private val preferences: ImprovedSharedPrefere
                                   private val defValue: T) {
 
     init {
-        when (defValue) {
-            is Boolean, is Float, is Int, is Long, is String -> {}
-            else -> throw InvalidParameterException("${defValue::class.java.simpleName} is not a primitive type. Use ComplexPreference instead.")
+        if (!defValue.isPrimitive()) {
+            throw NonPrimitiveTypeException.forTypeOf(defValue)
         }
     }
 
     private var value: T by lazyVar {
         Timber.d("PrimitivePreference read $key from Shared Preferences")
-        preferences.getAny(key, defValue)
+        preferences.getPrimitive(key, defValue)
     }
 
     @Synchronized
@@ -46,6 +47,9 @@ class PrimitivePreference<T: Any>(private val preferences: ImprovedSharedPrefere
         Timber.d("PrimitivePreference.setValue $key")
         this.value = value
         Timber.d("PrimitivePreference write $key to Shared Preferences")
-        preferences.edit().putAny(key, value).apply()
+        preferences.edit()
+                .putPrimitive(key, value)
+                .apply()
     }
+
 }

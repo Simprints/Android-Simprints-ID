@@ -1,10 +1,10 @@
 package com.simprints.id.tools.serializers
 
 import com.google.gson.Gson
+import com.simprints.id.testUtils.mock
+import com.simprints.id.testUtils.whenever
 import junit.framework.Assert
-import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
 
 /**
  * @author: Etienne Thiery (etienne@simprints.com)
@@ -12,31 +12,37 @@ import org.mockito.Mockito
 class MapSerializerTest {
 
     companion object {
-        private val anInt = 1
-        private val aSerializedInt = "1"
-        private val aBoolean = true
-        private val aSerializedBoolean = "true"
-        private val aMap = mapOf(anInt to aBoolean)
+        private val originalInt = 1
+        private val serializedInt = "1"
+        private val originalBoolean = true
+        private val serializedBoolean = "true"
+        private val originalMap = mapOf(originalInt to originalBoolean)
     }
 
-    private lateinit var intSerializer: Serializer<Int>
-    private lateinit var booleanSerializer: Serializer<Boolean>
+    private val intSerializer: Serializer<Int> = mockIntSerializer()
+    private val booleanSerializer: Serializer<Boolean> = mockBooleanSerializer()
+    private val mapSerializer = MapSerializer(intSerializer, booleanSerializer, Gson())
 
-    @Suppress("UNCHECKED_CAST")
-    @Before
-    fun setUp() {
-        intSerializer = Mockito.mock(Serializer::class.java) as Serializer<Int>
-        Mockito.`when`(intSerializer.serialize(anInt)).thenReturn(aSerializedInt)
-        Mockito.`when`(intSerializer.deserialize(aSerializedInt)).thenReturn(anInt)
-        booleanSerializer = Mockito.mock(Serializer::class.java) as Serializer<Boolean>
-        Mockito.`when`(booleanSerializer.serialize(aBoolean)).thenReturn(aSerializedBoolean)
-        Mockito.`when`(booleanSerializer.deserialize(aSerializedBoolean)).thenReturn(aBoolean)
+    private fun mockIntSerializer(): Serializer<Int> {
+        val serializer = mock<Serializer<Int>>()
+        whenever(serializer.serialize(originalInt)).thenReturn(serializedInt)
+        whenever(serializer.deserialize(serializedInt)).thenReturn(originalInt)
+        return serializer
     }
+
+    private fun mockBooleanSerializer(): Serializer<Boolean> {
+        val serializer = mock<Serializer<Boolean>>()
+        whenever(serializer.serialize(originalBoolean)).thenReturn(serializedBoolean)
+        whenever(serializer.deserialize(serializedBoolean)).thenReturn(originalBoolean)
+        return serializer
+    }
+
 
     @Test
-    fun testConsistentSerialization() {
-        val serializer = MapSerializer(intSerializer, booleanSerializer, Gson())
-        Assert.assertEquals(aMap, serializer.deserialize(serializer.serialize(aMap)))
+    fun testSerializeThenDeserializeGivesOriginalEnumValue() {
+        val serializedMap = mapSerializer.serialize(originalMap)
+        val deserializedMap = mapSerializer.deserialize(serializedMap)
+        Assert.assertEquals(originalMap, deserializedMap)
     }
 
 
