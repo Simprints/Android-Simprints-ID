@@ -6,7 +6,7 @@ import timber.log.Timber
 import kotlin.reflect.KProperty
 
 /**
- * Delegate to read/write maps to Shared Preferences.
+ * Delegate to read/write any type to Shared Preferences.
  *
  * Backed by a PrimitivePreference<String>, after serialization with the specified serializer.
  * Thus, has the same guarantees as PrimitivePreference.

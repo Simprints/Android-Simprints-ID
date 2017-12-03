@@ -1,11 +1,14 @@
 package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.content.SharedPreferences
-import junit.framework.Assert
-import org.junit.Before
+import com.simprints.id.testUtils.assertThrows
+import com.simprints.id.testUtils.mock
+import com.simprints.id.testUtils.verifyOnlyInteraction
+import com.simprints.id.testUtils.whenever
+import junit.framework.Assert.assertEquals
 import org.junit.Test
-import org.mockito.Mockito.*
-import org.mockito.Mockito.`when` as whenever
+import org.mockito.ArgumentMatchers.*
+import kotlin.reflect.KClass
 
 /**
  * @author: Etienne Thiery (etienne@simprints.com)
@@ -13,77 +16,143 @@ import org.mockito.Mockito.`when` as whenever
 class ImprovedSharedPreferencesImplTest {
 
     companion object {
-        val aKey = "key"
-        val aString = "0"
-        val anotherString = "1"
-        val aLong = 0L
-        val anotherLong = 1L
-        val anInt = 0
-        val anotherInt = 1
-        val aBoolean = false
-        val anotherBoolean = true
-        val aFloat = 0f
-        val anotherFloat = 1f
-        val aClass = ImprovedSharedPreferencesImplTest::class
+        val aKey = "aKey"
+
+        val storedInt: Int = -1
+        val storedLong: Long = -2
+        val storedFloat: Float = -3.0f
+        val storedString: String = "storedString"
+        val storedBoolean: Boolean = true
+
+        val aByte: Byte = 1
+        val aShort: Short = 2
+        val anInt: Int = 3
+        val aLong: Long = 4
+        val aFloat: Float = 5.0f
+        val aDouble: Double = 6.0
+        val aBoolean: Boolean = false
+        val aString: String = "aString"
+        val aClass: KClass<*> = ImprovedSharedPreferencesImplTest::class
     }
 
-    private lateinit var basePrefs: SharedPreferences
-    private lateinit var prefs: ImprovedSharedPreferences
+    private val basePrefs: SharedPreferences =
+            mockBasePrefsWithValues(storedInt, storedLong, storedFloat, storedString, storedBoolean)
 
+    private val improvedPrefs: ImprovedSharedPreferences =
+            ImprovedSharedPreferencesImpl(basePrefs)
 
-    @Before
-    fun setUp() {
-        basePrefs = mock(SharedPreferences::class.java)
-        prefs = ImprovedSharedPreferencesImpl(basePrefs)
-    }
-
-
-    @Test
-    fun getAnyString() {
-        whenever(basePrefs.getString(aKey, aString)).thenReturn(anotherString)
-        Assert.assertEquals("getAny() should delegate to getString() when default value is a String",
-                anotherString, prefs.getAny(aKey, aString))
-    }
-
-    @Test
-    fun getAnyLong() {
-        whenever(basePrefs.getLong(aKey, aLong)).thenReturn(anotherLong)
-        Assert.assertEquals("getAny() should delegate to getLong() when default value is a Long",
-                anotherLong, prefs.getAny(aKey, aLong))
+    private fun mockBasePrefsWithValues(int: Int, long: Long, float: Float, string: String,
+                                        boolean: Boolean): SharedPreferences {
+        val prefs = mock<SharedPreferences>()
+        whenever(prefs.getInt(anyString(), anyInt())).thenReturn(int)
+        whenever(prefs.getLong(anyString(), anyLong())).thenReturn(long)
+        whenever(prefs.getFloat(anyString(), anyFloat())).thenReturn(float)
+        whenever(prefs.getString(anyString(), anyString())).thenReturn(string)
+        whenever(prefs.getBoolean(anyString(), anyBoolean())).thenReturn(boolean)
+        return prefs
     }
 
     @Test
-    fun getAnyInt() {
-        whenever(basePrefs.getInt(aKey, anInt)).thenReturn(anotherInt)
-        Assert.assertEquals("getAny() should delegate to getInt() when default value is a Int",
-                anotherInt, prefs.getAny(aKey, anInt))
+    fun testGetPrimitiveGetsIntWhenDefaultIsByte() {
+        improvedPrefs.getPrimitive(aKey, aByte)
+        verifyOnlyInteraction(basePrefs) { getInt(aKey, aByte.toInt())}
     }
 
     @Test
-    fun getAnyBoolean() {
-        whenever(basePrefs.getBoolean(aKey, aBoolean)).thenReturn(anotherBoolean)
-        Assert.assertEquals("getAny() should delegate to getBoolean() when default value is a Boolean",
-                anotherBoolean, prefs.getAny(aKey, aBoolean))
+    fun testGetPrimitiveReturnsStoredIntAsByteWhenDefaultIsByte() {
+        assertEquals(storedInt.toByte(), improvedPrefs.getPrimitive(aKey, aByte))
     }
 
     @Test
-    fun getAnyFloat() {
-        whenever(basePrefs.getFloat(aKey, aFloat)).thenReturn(anotherFloat)
-        Assert.assertEquals("getAny() should delegate to getFloat() when default value is a Float",
-                anotherFloat, prefs.getAny(aKey, aFloat))
+    fun testGetPrimitiveGetsIntWhenDefaultIsShort() {
+        improvedPrefs.getPrimitive(aKey, aShort)
+        verifyOnlyInteraction(basePrefs) { getInt(aKey, aShort.toInt()) }
     }
 
-    @Test(expected = ClassCastException::class)
-    fun getAnyMismatchedType() {
-        whenever(basePrefs.getString(aKey, aString)).then { throw ClassCastException() }
-        prefs.getAny(aKey, aString)
+    @Test
+    fun testGetPrimitiveReturnsStoredIntAsShortWhenDefaultIsShort() {
+        assertEquals(storedInt.toShort(), improvedPrefs.getPrimitive(aKey, aShort))
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun getAnyUnsupportedType() {
-        prefs.getAny(aKey, aClass)
+    @Test
+    fun testGetPrimitiveGetsIntWhenDefaultIsInt() {
+        improvedPrefs.getPrimitive(aKey, anInt)
+        verifyOnlyInteraction(basePrefs) { getInt(aKey, anInt) }
     }
 
+    @Test
+    fun testGetPrimitiveReturnsStoredIntWhenDefaultIsInt() {
+        assertEquals(storedInt, improvedPrefs.getPrimitive(aKey, anInt))
+    }
 
+    @Test
+    fun testGetPrimitiveGetsLongWhenDefaultIsLong() {
+        improvedPrefs.getPrimitive(aKey, aLong)
+        verifyOnlyInteraction(basePrefs) { getLong(aKey, aLong) }
+    }
+
+    @Test
+    fun testGetPrimitiveReturnsStoredLongWhenDefaultIsLong() {
+        assertEquals(storedLong, improvedPrefs.getPrimitive(aKey, aLong))
+    }
+
+    @Test
+    fun testGetPrimitiveGetsFloatWhenDefaultIsFloat() {
+        improvedPrefs.getPrimitive(aKey, aFloat)
+        verifyOnlyInteraction(basePrefs) { getFloat(aKey, aFloat) }
+    }
+
+    @Test
+    fun testGetPrimitiveReturnsStoredFloatWhenDefaultIsFloat() {
+        assertEquals(storedFloat, improvedPrefs.getPrimitive(aKey, aFloat))
+    }
+
+    @Test
+    fun testGetPrimitiveGetsLongWhenDefaultIsDouble() {
+        improvedPrefs.getPrimitive(aKey, aDouble)
+        verifyOnlyInteraction(basePrefs) { getLong(aKey, aDouble.toRawBits()) }
+    }
+
+    @Test
+    fun testGetPrimitiveReturnsStoredLongAsDoubleBitsWhenDefaultIsDouble() {
+        assertEquals(Double.fromBits(storedLong), improvedPrefs.getPrimitive(aKey, aDouble))
+    }
+
+    @Test
+    fun testGetPrimitiveGetsBooleanWhenDefaultIsBoolean() {
+        improvedPrefs.getPrimitive(aKey, aBoolean)
+        verifyOnlyInteraction(basePrefs) { getBoolean(aKey, aBoolean) }
+    }
+
+    @Test
+    fun testGetPrimitiveReturnsStoredBooleanWhenDefaultIsBoolean() {
+        assertEquals(storedBoolean, improvedPrefs.getPrimitive(aKey, aBoolean))
+    }
+
+    @Test
+    fun testGetPrimitiveGetsStringWhenDefaultIsString() {
+        improvedPrefs.getPrimitive(aKey, aString)
+        verifyOnlyInteraction(basePrefs) { getString(aKey, aString) }
+    }
+
+    @Test
+    fun testGetPrimitiveReturnsStoredStringWhenDefaultIsString() {
+        assertEquals(storedString, improvedPrefs.getPrimitive(aKey, aString))
+    }
+
+    @Test
+    fun testGetPrimitiveWrapsExceptionsAsMismatchedTypeExceptions() {
+        whenever(basePrefs.getInt(anyString(), anyInt())).then { throw ClassCastException() }
+        assertThrows<MismatchedTypeException> {
+            improvedPrefs.getPrimitive(aKey, anInt)
+        }
+    }
+
+    @Test
+    fun testGetPrimitiveThrowsExceptionWhenValueIsUnsupportedType() {
+        assertThrows<NonPrimitiveTypeException> {
+            improvedPrefs.getPrimitive(aKey, aClass)
+        }
+    }
 
 }

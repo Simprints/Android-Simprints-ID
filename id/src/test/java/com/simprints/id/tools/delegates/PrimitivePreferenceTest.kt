@@ -1,13 +1,11 @@
 package com.simprints.id.tools.delegates
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.improvedSharedPreferences.NonPrimitiveTypeException
+import com.simprints.id.testUtils.*
 import junit.framework.Assert
-import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
 import org.mockito.Mockito.*
-import java.security.InvalidParameterException
-import org.mockito.Mockito.`when` as whenever
 
 /**
  * @author: Etienne Thiery (etienne@simprints.com)
@@ -17,85 +15,98 @@ class PrimitivePreferenceTest {
     companion object {
         val aKey = "aKey"
         val aString = "0"
-        val anotherString = "1"
+        val storedString = "1"
         val aClass = PrimitivePreferenceTest::class.java
     }
 
-    private lateinit var prefs: ImprovedSharedPreferences
-    private lateinit var editor: ImprovedSharedPreferences.Editor
+    private val improvedEditor: ImprovedSharedPreferences.Editor = mockImprovedEditor()
+    private val improvedPrefs: ImprovedSharedPreferences = mockImprovedPrefs(improvedEditor)
+    private var stringPref by PrimitivePreference(improvedPrefs, aKey, aString)
 
-    @Before
-    fun setUp() {
-        editor = Mockito.mock(ImprovedSharedPreferences.Editor::class.java)
-        whenever(editor.putAny(anyString(), any())).thenReturn(editor)
-        prefs = Mockito.mock(ImprovedSharedPreferences::class.java)
-        whenever(prefs.getAny(aKey, aString)).thenReturn(anotherString)
-        whenever(prefs.edit()).thenReturn(editor)
+    private fun mockImprovedEditor(): ImprovedSharedPreferences.Editor {
+        val editor = mock<ImprovedSharedPreferences.Editor>()
+        whenever(editor.putPrimitive(anyString(), any())).thenReturn(editor)
+        whenever(editor.putPrimitive(anyString(), any())).thenReturn(editor)
+        return editor
+    }
+
+    private fun mockImprovedPrefs(editorToReturn: ImprovedSharedPreferences.Editor)
+            : ImprovedSharedPreferences {
+        val prefs = mock<ImprovedSharedPreferences>()
+        whenever(prefs.edit()).thenReturn(editorToReturn)
+        whenever(prefs.getPrimitive(aKey, aString)).thenReturn(storedString)
+        return prefs
+    }
+
+    @Test
+    fun testDeclarationDoesNotReadPreferences() {
+        verifyZeroInteractions(improvedPrefs)
     }
 
     @Suppress("UNUSED_VARIABLE")
     @Test
-    fun testLazyInitialization() {
-        val stringPref by PrimitivePreference(prefs, aKey, aString)
-        verifyZeroInteractions(prefs)
-        val firstAccess = stringPref
-        verify(prefs).getAny(aKey, aString)
-        verifyNoMoreInteractions(prefs)
+    fun testFirstGetValueReadsPreferencesWithGetPrimitive() {
+        val firstGet = stringPref
+        verifyOnlyInteraction(improvedPrefs) {
+            getPrimitive(aKey, aString)
+        }
     }
 
-    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE", "UNUSED_VALUE")
     @Test
-    fun testSetValue() {
-        var stringPref by PrimitivePreference(prefs, aKey, aString)
-        stringPref = anotherString
-        verify(editor).putAny(aKey, anotherString)
-        verify(editor).apply()
-        verifyNoMoreInteractions(editor)
+    fun testFirstGetValueReturnsResultOfGetPrimitive() {
+        Assert.assertEquals(storedString, stringPref)
     }
-
-    @Suppress("UnnecessaryVariable")
-    @Test
-    fun testGetValueFirstAccess() {
-        val stringPref by PrimitivePreference(prefs, aKey, aString)
-        Assert.assertEquals("getValue() should return whatever prefs.getAny() returns on first access",
-                anotherString, stringPref)
-    }
-
-    @Suppress("UnnecessaryVariable")
-    @Test
-    fun testGetValueAfterSet() {
-        var stringPref by PrimitivePreference(prefs, aKey, aString)
-        stringPref = anotherString
-        Assert.assertEquals("getValue() should return whatever value was set with setValue()",
-                anotherString, stringPref)
-    }
-
 
     @Suppress("UNUSED_VARIABLE", "UnnecessaryVariable")
     @Test
-    fun testCachingOnGet() {
-        val stringPref by PrimitivePreference(prefs, aKey, aString)
+    fun testSecondGetValueDoesNotReadPreferences() {
         val firstGet = stringPref
-        verify(prefs, times(1)).getAny(aKey, aString)
         val secondGet = stringPref
-        verifyNoMoreInteractions(prefs)
-        Assert.assertEquals("getValue() should cache the value read in Shared Preferences",
-                anotherString, secondGet)
+        verifyOnlyInteraction(improvedPrefs) {
+            getPrimitive(aKey, aString)
+        }
+    }
+
+    @Suppress("UNUSED_VARIABLE")
+    @Test
+    fun testSecondGetValueReturnsCachedValue() {
+        val firstGet = stringPref
+        val secondGet = stringPref
+        Assert.assertEquals(storedString, secondGet)
+    }
+
+
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE", "UNUSED_VALUE")
+    @Test
+    fun testSetValuePutsPrimitiveAndAppliesChange() {
+        stringPref = storedString
+        verifyOnlyInteractions(improvedEditor,
+                { putPrimitive(aKey, storedString) },
+                { apply() })
     }
 
     @Suppress("UNUSED_VALUE", "UNUSED_VARIABLE")
     @Test
-    fun testCachingOnSet() {
-        var stringPref by PrimitivePreference(prefs, aKey, aString)
-        stringPref = anotherString
-        val get = stringPref
-        verify(prefs, never()).getAny(aKey, aString)
+    fun testGetValueAfterSetValueDoesNotReadPreferences() {
+        stringPref = storedString
+        val firstGet = stringPref
+        verify(improvedPrefs, never()).getPrimitive(aKey, aString)
     }
 
+    @Suppress("UnnecessaryVariable")
+    @Test
+    fun testGetValueAfterSetValueReturnsValueSet() {
+        stringPref = storedString
+        Assert.assertEquals(storedString, stringPref)
+    }
+
+
     @Suppress("UNUSED_VARIABLE")
-    @Test(expected = InvalidParameterException::class)
-    fun testInvalidTypeDetection() {
-        val classPref by PrimitivePreference(prefs, aKey, aClass)
+    @Test
+    fun testDeclarationOfNonPrimitiveTypeThrowsNonPrimitiveException() {
+        assertThrows<NonPrimitiveTypeException> {
+            val classPref by PrimitivePreference(improvedPrefs, aKey, aClass)
+        }
     }
 
     // TODO: figure out how to test thread safety

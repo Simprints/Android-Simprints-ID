@@ -9,11 +9,16 @@ import org.junit.Test
  */
 class EnumSerializerTest {
 
+    private val enumClass = FingerIdentifier::class.java
+    private val enumSerializer = EnumSerializer(enumClass)
+
     @Test
-    fun testConsistentSerialization() {
-        val serializer = EnumSerializer(FingerIdentifier::class.java)
-        for (fingerId in FingerIdentifier.values())
-        Assert.assertEquals(fingerId, serializer.deserialize(serializer.serialize(fingerId)))
+    fun testSerializeThenDeserializeGivesOriginalEnumValue() {
+        for (originalEnumValue in enumClass.enumConstants) {
+            val serializedEnumValue =  enumSerializer.serialize(originalEnumValue)
+            val deserializedEnumValue = enumSerializer.deserialize(serializedEnumValue)
+            Assert.assertEquals(originalEnumValue, deserializedEnumValue)
+        }
     }
 
 }
