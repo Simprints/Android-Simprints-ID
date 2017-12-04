@@ -12,26 +12,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.simprints.id.Application;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
-import com.simprints.id.tools.SharedPref;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT;
+import com.simprints.libdata.tools.Constants.GROUP;
 import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
 import com.simprints.libmatcher.Progress;
 import com.simprints.libmatcher.sourceafis.MatcherEventListener;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.Identification;
-import com.simprints.libdata.tools.Constants.GROUP;
 import com.simprints.libsimprints.Verification;
 
 import java.util.ArrayList;
@@ -49,25 +48,33 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
     private MatchingView matchingView;
 
-    private AppState appState;
     private Person probe;
     private List<Person> candidates = new ArrayList<>();
     private List<Float> scores = new ArrayList<>();
     private Handler handler = new Handler();
     private OnMatchStartHandlerThread onMatchStartHandlerThread;
 
+    private DataManager dataManager;
+    private AppState appState;
+
+    // Singletons
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+        appState = app.getAppState();
+        appState.logMatchStart();
+
         initViews();
 
-        appState = AppState.getInstance();
-        appState.logMatchStart();
 
         Bundle extras = getIntent().getExtras();
         probe = extras.getParcelable("Person");
 
-        switch (appState.getCallout()) {
+        switch (dataManager.getCallout()) {
             case IDENTIFY:
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
@@ -87,14 +94,15 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 onVerifyStart();
                 break;
             default:
-                FirebaseCrash.report(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
+                dataManager.logException(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
 
     private void initViews() {
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_matching);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         matchingView = new MatchingView();
@@ -115,15 +123,15 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         }
 
         private void initProgressBar() {
-            progressBar = (ProgressBar) findViewById(R.id.pb_identification);
+            progressBar = findViewById(R.id.pb_identification);
         }
 
         private void initProgressTextViews() {
-            progressText1 = (TextView) findViewById(R.id.tv_matchingProgressStatus1);
-            progressText2 = (TextView) findViewById(R.id.tv_matchingProgressStatus2);
-            resultText1 = (TextView) findViewById(R.id.tv_matchingResultStatus1);
-            resultText2 = (TextView) findViewById(R.id.tv_matchingResultStatus2);
-            resultText3 = (TextView) findViewById(R.id.tv_matchingResultStatus3);
+            progressText1 = findViewById(R.id.tv_matchingProgressStatus1);
+            progressText2 = findViewById(R.id.tv_matchingProgressStatus2);
+            resultText1 = findViewById(R.id.tv_matchingResultStatus1);
+            resultText2 = findViewById(R.id.tv_matchingResultStatus2);
+            resultText3 = findViewById(R.id.tv_matchingResultStatus3);
         }
 
         void setProgress(int progress) {
@@ -174,7 +182,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 public void run() {
                     finish();
                 }
-            }, new SharedPref(getApplicationContext()).getMatchingEndWaitTime() * 1000);
+            }, dataManager.getMatchingEndWaitTimeS() * 1000);
         }
     }
 
@@ -207,16 +215,16 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     }
 
     private void onIdentifyStart() {
-        final GROUP matchGroup = new SharedPref(getApplicationContext()).getMatchGroup();
+        final GROUP matchGroup = dataManager.getMatchGroup();
 
-        appState.getData().loadPeople(candidates, matchGroup, new DataCallback() {
+        dataManager.loadPeople(candidates, matchGroup, new DataCallback() {
             @Override
             public void onSuccess() {
                 Log.d(MatchingActivity.this, String.format(Locale.UK,
                         "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
-                int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
+                int matcherType = dataManager.getMatcherType();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -243,21 +251,21 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
+                dataManager.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
     }
 
     private void onVerifyStart() {
-        final String guid = appState.getGuid();
+        final String guid = dataManager.getPatientId();
 
-        appState.getData().loadPerson(candidates, guid, new DataCallback() {
+        dataManager.loadPerson(candidates, guid, new DataCallback() {
             @Override
             public void onSuccess() {
                 Log.d(MatchingActivity.this, "Successfully loaded candidate");
 
-                int matcherType = new SharedPref(getApplicationContext()).getMatcherTypeInt();
+                int matcherType = dataManager.getMatcherType();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -285,7 +293,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onVerifyStart()"));
+                dataManager.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onVerifyStart()"));
                 launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
@@ -299,12 +307,11 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 break;
             }
             case MATCH_COMPLETED: {
-                Callout callout = appState.getCallout();
-                switch (callout) {
+                switch (dataManager.getCallout()) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();
                         matchingView.setIdentificationProgressReturningStart();
-                        int nbOfResults = new SharedPref(getApplicationContext()).getReturnIdCountInt();
+                        int nbOfResults = dataManager.getReturnIdCount();
 
                         ArrayList<Identification> topCandidates = new ArrayList<>();
 
@@ -328,9 +335,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                                     scores.get(idx[i]).intValue(), computeTier(scores.get(idx[i]))));
                         }
 
-                        if (appState.getData() != null) {
-                            appState.getData().saveIdentification(probe, candidates.size(), topCandidates, appState.getSessionId());
-                        }
+                        dataManager.saveIdentification(probe, candidates.size(), topCandidates);
 
                         // finish
                         int tier1Or2Matches = 0;
@@ -353,7 +358,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                         Intent resultData;
                         resultData = new Intent(Constants.SIMPRINTS_IDENTIFY_INTENT);
-                        FormatResult.put( resultData, topCandidates);
+                        FormatResult.put(resultData, topCandidates, dataManager);
                         setResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                                 tier1Or2Matches, tier3Matches, tier4Matches);
@@ -366,7 +371,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
 
                         if (candidates.size() > 0 && scores.size() > 0) {
                             int score = scores.get(0).intValue();
-                            verification = new Verification(score, computeTier(score), appState.getGuid());
+                            verification = new Verification(score, computeTier(score), dataManager.getPatientId());
                             guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_FOUND;
                             resultCode = RESULT_OK;
                         } else {
@@ -375,14 +380,12 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                             resultCode = Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
                         }
 
-                        if (appState.getData() != null) {
-                            appState.getData().saveVerification(probe, appState.getGuid(), verification, appState.getSessionId(), guidExistsResult);
-                        }
+                        dataManager.saveVerification(probe, verification, guidExistsResult);
 
                         // finish
                         Intent resultData;
                         resultData = new Intent(Constants.SIMPRINTS_VERIFY_INTENT);
-                        FormatResult.put(resultData, verification);
+                        FormatResult.put(resultData, verification, dataManager.getResultFormat());
                         setResult(resultCode, resultData);
                         finish();
                         break;

@@ -2,6 +2,7 @@ package com.simprints.id.tools;
 
 import android.content.Intent;
 
+import com.simprints.id.data.DataManager;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.Identification;
 import com.simprints.libsimprints.Registration;
@@ -31,12 +32,12 @@ public class FormatResult {
         return sb.toString();
     }
 
-    static private boolean isODK( ){
-        return Constants.SIMPRINTS_ODK_RESULT_FORMAT_V01.equalsIgnoreCase(AppState.getInstance().getResultFormat());
+    static private boolean isODK(String resultFormat){
+        return Constants.SIMPRINTS_ODK_RESULT_FORMAT_V01.equalsIgnoreCase(resultFormat);
     }
 
-    static public void put(Intent intent, Registration registration){
-        if( isODK() ){
+    static public void put(Intent intent, Registration registration, String resultFormat) {
+        if( isODK(resultFormat) ){
             intent.putExtra(guidKey, registration.getGuid());
         }
         else {
@@ -44,8 +45,8 @@ public class FormatResult {
         }
     }
 
-    static public void put(Intent intent, Verification verification){
-        if( isODK() ){
+    static public void put(Intent intent, Verification verification, String resultFormat){
+        if( isODK(resultFormat) ){
             intent.putExtra(guidKey, verification.getGuid());
             intent.putExtra(confidenceKey, Float.toString(verification.getConfidence()));
             intent.putExtra(tierKey, verification.getTier().toString());
@@ -55,12 +56,12 @@ public class FormatResult {
         }
     }
 
-    static public void put(Intent intent, ArrayList<Identification> identifications){
+    static public void put(Intent intent, ArrayList<Identification> identifications, DataManager dataManager){
 
 
-        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, AppState.getInstance().getSessionId());
+        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, dataManager.getSessionId());
 
-        if( isODK()) {
+        if( isODK(dataManager.getResultFormat())) {
             // a bit inefficient to run through the array x times but there will be <= 20 objects in there
             String guids = constructString(identifications, new attributeGetter() {
                 @Override
