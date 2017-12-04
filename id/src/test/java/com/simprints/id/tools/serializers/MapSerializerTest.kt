@@ -6,9 +6,7 @@ import com.simprints.id.testUtils.whenever
 import junit.framework.Assert
 import org.junit.Test
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class MapSerializerTest {
 
     companion object {

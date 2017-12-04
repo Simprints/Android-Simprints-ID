@@ -3,9 +3,7 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class ImprovedSharedPreferencesImpl(private val prefs: SharedPreferences)
     : ImprovedSharedPreferences,
         SharedPreferences by prefs {

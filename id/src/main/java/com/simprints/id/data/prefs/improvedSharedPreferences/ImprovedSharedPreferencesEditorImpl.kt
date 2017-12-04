@@ -2,9 +2,7 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.content.SharedPreferences
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class ImprovedSharedPreferencesEditorImpl(private val editor: SharedPreferences.Editor)
     : ImprovedSharedPreferences.Editor,
         SharedPreferences.Editor by editor {

@@ -1,8 +1,9 @@
-package com.simprints.id.activities;
+package com.simprints.id.activities.front;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -13,38 +14,29 @@ import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.RemoteConfig;
-import com.simprints.libdata.DATA_ERROR;
-import com.simprints.libdata.DataCallback;
 
-public class FrontActivity extends AppCompatActivity {
+public class FrontActivity extends AppCompatActivity implements FrontContract.View {
+
+    private FrontContract.Presenter frontPresenter;
+
     private ImageView syncStatus;
     private Button syncButton;
-    private DataCallback dataCallback;
-
-    private DataManager dataManager;
-
-    // Singletons
-    private SyncService syncService;
-    private AppState appState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Application app = ((Application) getApplication());
-        dataManager = app.getDataManager();
-        syncService = app.getSyncService();
-        appState = app.getAppState();
+        DataManager dataManager = app.getDataManager();
+        SyncService syncService = app.getSyncService();
 
         getBaseContext().getResources().updateConfiguration(
                 Language.selectLanguage(dataManager.getLanguage()),
                 getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_front);
-
         RemoteConfig.init();
 
         syncStatus = findViewById(R.id.iv_sync);
@@ -63,46 +55,58 @@ public class FrontActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.libSimprintsTextView)).setText(R.string.front_libSimprints_version);
 
         PermissionManager.requestAllPermissions(FrontActivity.this, dataManager.getCallingPackage());
-
-        dataCallback = new DataCallback() {
-            @Override
-            public void onSuccess() {
-                syncButton.setEnabled(true);
-                syncButton.setText(R.string.sync_data);
-                syncStatus.setImageResource(R.drawable.ic_menu_sync_success);
-            }
-
-            @Override
-            public void onFailure(DATA_ERROR data_error) {
-                switch (data_error) {
-                    case SYNC_INTERRUPTED:
-                        syncButton.setEnabled(true);
-                        syncButton.setText(R.string.sync_data);
-                        syncStatus.setImageResource(R.drawable.ic_menu_sync_failed);
-                        break;
-                    default:
-                        throw new RuntimeException();
-                }
-            }
-        };
-
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                syncButton.setEnabled(false);
-                syncButton.setText(R.string.syncing);
-                syncStatus.setImageResource(R.drawable.ic_menu_syncing);
-                if (!syncService.startAndListen(getApplicationContext(), dataCallback)) {
-                    syncButton.setText(R.string.not_signed_in);
-                    syncStatus.setImageResource(R.drawable.ic_menu_sync_off);
-                }
+                frontPresenter.sync(getApplicationContext());
             }
         });
+
+        frontPresenter = new FrontPresenter(this, syncService);
+    }
+
+    @Override
+    public void setPresenter(@NonNull FrontContract.Presenter presenter) {
+        frontPresenter = presenter;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        frontPresenter.start();
+    }
+
+    @Override
+    public void setSyncUnavailable() {
+        syncButton.setText(R.string.not_signed_in);
+        syncStatus.setImageResource(R.drawable.ic_menu_sync_off);
+    }
+
+    @Override
+    public void setSyncInProgress() {
+        syncButton.setEnabled(false);
+        syncButton.setText(R.string.syncing);
+        syncStatus.setImageResource(R.drawable.ic_menu_syncing);
+    }
+
+    @Override
+    public void setSyncSuccess() {
+        syncButton.setEnabled(true);
+        syncButton.setText(R.string.sync_data);
+        syncStatus.setImageResource(R.drawable.ic_menu_sync_success);
+    }
+
+    @Override
+    public void setSyncFailed() {
+        syncButton.setEnabled(true);
+        syncButton.setText(R.string.sync_data);
+        syncStatus.setImageResource(R.drawable.ic_menu_sync_failed);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        syncService.stopListening(dataCallback);
+        frontPresenter.stopListening();
     }
 }

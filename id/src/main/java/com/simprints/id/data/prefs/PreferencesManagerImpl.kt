@@ -9,9 +9,7 @@ import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.FingerIdentifier
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                              fingerIdentifierToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                              calloutSerializer: Serializer<Callout>,
@@ -164,7 +162,7 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var vibrateMode: Boolean by PrimitivePreference(prefs, VIBRATE_KEY, VIBRATE_DEFAULT)
 
     // TODO: document that
-    override var matchingEndWaitTimeS: Int by PrimitivePreference(prefs, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
+    override var matchingEndWaitTimeSeconds: Int by PrimitivePreference(prefs, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
 
     // True if the fingers status should be persisted, false else
     override var fingerStatusPersist: Boolean by PrimitivePreference(prefs, PERSIST_FINGER_KEY, PERSIST_FINGER_DEFAULT)

@@ -4,9 +4,7 @@ import com.simprints.libsimprints.FingerIdentifier
 import junit.framework.Assert
 import org.junit.Test
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class EnumSerializerTest {
 
     private val enumClass = FingerIdentifier::class.java

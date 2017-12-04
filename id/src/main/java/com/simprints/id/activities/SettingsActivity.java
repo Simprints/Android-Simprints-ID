@@ -179,7 +179,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         ((TextView) findViewById(R.id.tv_min_id_wait_time)).setText(String.valueOf(MIN_ID_WAIT_TIME));
         ((TextView) findViewById(R.id.tv_max_id_wait_time)).setText(String.valueOf(MAX_ID_WAIT_TIME));
         final TextView tv_idWaitTime = (TextView) findViewById(R.id.tv_id_wait_time);
-        final int idWaitTime = dataManager.getMatchingEndWaitTimeS() - MIN_ID_WAIT_TIME;
+        final int idWaitTime = dataManager.getMatchingEndWaitTimeSeconds() - MIN_ID_WAIT_TIME;
         idWaitTimeSeekBar = (SeekBar) findViewById(R.id.sb_id_wait_time);
         idWaitTimeSeekBar.setMax(MAX_ID_WAIT_TIME - MIN_ID_WAIT_TIME);
         idWaitTimeSeekBar.setProgress(idWaitTime);
@@ -188,7 +188,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         idWaitTimeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                dataManager.setMatchingEndWaitTimeS(idWaitTimeSeekBar.getProgress() + MIN_ID_WAIT_TIME);
+                dataManager.setMatchingEndWaitTimeSeconds(idWaitTimeSeekBar.getProgress() + MIN_ID_WAIT_TIME);
                 tv_idWaitTime.setText(String.format(
                         getString(R.string.id_wait_time_value), progress + MIN_ID_WAIT_TIME));
             }

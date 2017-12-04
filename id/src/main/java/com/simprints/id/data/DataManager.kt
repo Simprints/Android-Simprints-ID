@@ -16,9 +16,7 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, ApiManager, AnalyticsManager {
 
     val androidSdkVersion: Int

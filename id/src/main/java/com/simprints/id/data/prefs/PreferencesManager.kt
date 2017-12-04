@@ -37,7 +37,7 @@ interface PreferencesManager {
     var syncGroup: Constants.GROUP
     var matchGroup: Constants.GROUP
     var vibrateMode: Boolean
-    var matchingEndWaitTimeS: Int
+    var matchingEndWaitTimeSeconds: Int
     var fingerStatusPersist: Boolean
     var fingerStatus: Map<FingerIdentifier, Boolean>
 
