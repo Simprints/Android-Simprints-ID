@@ -5,22 +5,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
-import com.google.firebase.crash.FirebaseCrash;
-import com.simprints.id.BuildConfig;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.libcommon.Person;
-import com.simprints.libdata.AuthListener;
-import com.simprints.libdata.ConnectionListener;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
-import com.simprints.libdata.DatabaseContext;
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
@@ -30,26 +25,28 @@ import com.simprints.libscanner.ScannerUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 import static android.app.Activity.RESULT_CANCELED;
 
 public class Setup {
 
     private static Setup singleton;
 
-    public synchronized static Setup getInstance() {
+    public synchronized static Setup getInstance(DataManager dataManager, AppState appState) {
         if (singleton == null) {
-            singleton = new Setup();
+            singleton = new Setup(dataManager, appState);
         }
         return singleton;
     }
 
+    private Setup(DataManager dataManager, AppState appState) {
+        this.dataManager = dataManager;
+        this.appState = appState;
+    }
+
+
     private SetupCallback callback;
-
-    private AppState appState = AppState.getInstance();
-
-
-    // True iff the database context was initialized
-    private boolean databaseInitialized = false;
 
     // True iff the api key was validated successfully
     private boolean apiKeyValidated = false;
@@ -61,6 +58,11 @@ public class Setup {
     private boolean uiResetSinceConnection = false;
 
     private volatile Boolean paused = false;
+
+    private DataManager dataManager;
+
+    // Singletons
+    private AppState appState;
 
     public void stop() {
         paused = true;
@@ -82,14 +84,14 @@ public class Setup {
             return;
 
         // Step 1: check permissions. These can be revoked, so it has to be done every time
-        boolean permissionsReady = PermissionManager.checkAllPermissions(activity);
+        boolean permissionsReady = PermissionManager.checkAllPermissions(activity, dataManager.getCallingPackage());
         if (!permissionsReady) {
             this.requestPermissions(activity);
             return;
         }
 
         // Step 2: initialize database context + port db from aa to realm if needed . Only has to be done once.
-        if (!databaseInitialized) {
+        if (!dataManager.isInitialized()) {
             this.initDbContext(activity);
             return;
         }
@@ -136,46 +138,16 @@ public class Setup {
     // STEP 1
     private void requestPermissions(@NonNull Activity activity) {
         onProgress(0, R.string.launch_checking_permissions);
-        PermissionManager.requestAllPermissions(activity);
+        PermissionManager.requestAllPermissions(activity, dataManager.getCallingPackage());
     }
 
     // STEP 2
     private void initDbContext(@NonNull final Activity activity) {
         onProgress(10, R.string.updating_database);
-        DatabaseContext dbContext = new DatabaseContext(appState.getApiKey(), appState.getUserId(), appState.getModuleId(), appState.getDeviceId(), activity, BuildConfig.DEBUG);
-        appState.setData(dbContext);
-
-        dbContext.registerAuthListener(new AuthListener() {
-            @Override
-            public void onSignIn() {
-                appState.setSignedIn(true);
-            }
-
-            @Override
-            public void onSignOut() {
-                appState.setSignedIn(false);
-            }
-        });
-
-        dbContext.registerConnectionListener(new ConnectionListener() {
-            @Override
-            public void onConnection() {
-                if (!appState.getSignedIn()) {
-                    apiKeyValidated = false;
-                    goOn(activity);
-                }
-            }
-
-            @Override
-            public void onDisconnection() {
-            }
-        });
-
-        dbContext.initDatabase(new DataCallback() {
+        dataManager.initialize(new DataCallback() {
             @Override
             public void onSuccess() {
-                Log.d("Setup", "Database context initialized.");
-                databaseInitialized = true;
+                Timber.d("Setup: Database context initialized.");
                 goOn(activity);
             }
 
@@ -183,14 +155,10 @@ public class Setup {
             public void onFailure(DATA_ERROR error) {
                 switch (error) {
                     case DATABASE_INIT_RESTART:
-                        if (appState.getData() != null) {
-                            appState.getData().destroy();
-                            appState.setData(null);
-                        }
                         goOn(activity);
                         break;
                     default:
-                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure Setup.initDbContext()"));
+                        dataManager.logException(new Exception("Unknown error returned in onFailure Setup.initDbContext()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -201,12 +169,12 @@ public class Setup {
     private void validateApiKey(@NonNull final Activity activity) {
         onProgress(20, R.string.launch_checking_api_key);
 
-        appState.getData().signIn(new DataCallback() {
+        dataManager.signIn(new DataCallback() {
             @Override
             public void onSuccess() {
                 if (!apiKeyValidated) {
                     apiKeyValidated = true;
-                    Log.d("Setup", "Api key validated.");
+                    Timber.d("Setup: Api key validated.");
                     goOn(activity);
                 }
             }
@@ -225,7 +193,7 @@ public class Setup {
                         callback.onAlert(ALERT_TYPE.INVALID_API_KEY);
                         break;
                     default:
-                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure Setup.validateApiKey()"));
+                        dataManager.logException(new Exception("Unknown error returned in onFailure Setup.validateApiKey()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -248,7 +216,7 @@ public class Setup {
         appState.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
 
-        Log.d("Setup", "Scanner initialized.");
+        Timber.d("Setup: Scanner initialized.");
         goOn(activity);
     }
 
@@ -260,12 +228,13 @@ public class Setup {
             @Override
             public void onSuccess() {
                 if (appState != null && appState.getScanner() != null) {
-                    Log.d("Setup", "Connected to Vero.");
+                    Timber.d("Setup: Connected to Vero.");
                     uiResetSinceConnection = false;
                     appState.setScannerId(appState.getScanner().getScannerId());
+                    dataManager.logScannerProperties(appState.getMacAddress(), appState.getScannerId());
                     goOn(activity);
                 } else {
-                    FirebaseCrash.report(new Exception("Null values in onSuccess Setup.connectToScanner()"));
+                    dataManager.logException(new Exception("Null values in onSuccess Setup.connectToScanner()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -274,7 +243,7 @@ public class Setup {
             public void onFailure(SCANNER_ERROR scanner_error) {
                 switch (scanner_error) {
                     case INVALID_STATE: // Already connected, considered as a success
-                        Log.d("Setup", "Connected to Vero.");
+                        Timber.d("Setup: Connected to Vero.");
                         uiResetSinceConnection = false;
                         goOn(activity);
                         break;
@@ -300,7 +269,7 @@ public class Setup {
 
     // STEP 6
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
-        if (appState.getCallout() != Callout.VERIFY) {
+        if (dataManager.getCallout() != Callout.VERIFY) {
             guidExists = true;
             goOn(activity);
             return;
@@ -309,11 +278,11 @@ public class Setup {
         callback.onProgress(60, R.string.launch_checking_person_in_db);
 
         List<Person> loadedPerson = new ArrayList<>();
-        final String guid = appState.getGuid();
-        appState.getData().loadPerson(loadedPerson, guid, new DataCallback() {
+        final String guid = dataManager.getPatientId();
+        dataManager.loadPerson(loadedPerson, guid, new DataCallback() {
             @Override
             public void onSuccess() {
-                Log.d("Setup", "GUID found.");
+                Timber.d("Setup: GUID found.");
                 guidExists = true;
                 goOn(activity);
             }
@@ -323,22 +292,20 @@ public class Setup {
                 switch (data_error) {
                     case NOT_FOUND:
                         Person probe = new Person(guid);
-                        if (appState.getData().isConnected()) {
+                        if (dataManager.isConnected()) {
                             // We've synced with the online db and they're not in the db
-                            appState.getData().saveVerification(probe, guid, null,
-                                    appState.getSessionId(),
+                            dataManager.saveVerification(probe, null,
                                     VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE);
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
                         } else {
                             // We're offline but might find the person if we sync
-                            appState.getData().saveVerification(probe, guid, null,
-                                    appState.getSessionId(),
+                            dataManager.saveVerification(probe,null,
                                     VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE);
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
                         }
                         break;
                     default:
-                        FirebaseCrash.report(new Exception("Unknown error returned in onFailure Setup.checkIfVerifyAndGuidExists()"));
+                        dataManager.logException(new Exception("Unknown error returned in onFailure Setup.checkIfVerifyAndGuidExists()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -352,7 +319,7 @@ public class Setup {
         appState.getScanner().resetUI(new ScannerCallback() {
             @Override
             public void onSuccess() {
-                Log.d("Setup", "UI reset.");
+                Timber.d("Setup: UI reset.");
                 uiResetSinceConnection = true;
                 goOn(activity);
             }
@@ -374,15 +341,16 @@ public class Setup {
     // STEP 8
     private void wakeUpUn20(@NonNull final Activity activity) {
         callback.onProgress(85, R.string.launch_wake_un20);
+
         appState.getScanner().un20Wakeup(new ScannerCallback() {
             @Override
             public void onSuccess() {
                 if (appState != null && appState.getScanner() != null) {
-                    Log.d("Setup", "UN20 ready.");
+                    Timber.d("Setup: UN20 ready.");
                     appState.setHardwareVersion(appState.getScanner().getUcVersion());
                     Setup.this.onSuccess();
                 } else {
-                    FirebaseCrash.report(new Exception("Null values in onSuccess Setup.wakeUpUn20()"));
+                    dataManager.logException(new Exception("Null values in onSuccess Setup.wakeUpUn20()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -416,7 +384,7 @@ public class Setup {
                     return;
                 }
             }
-            Log.d("Setup", "Permissions granted.");
+            Timber.d("Setup: Permissions granted.");
             goOn(activity);
         }
     }
