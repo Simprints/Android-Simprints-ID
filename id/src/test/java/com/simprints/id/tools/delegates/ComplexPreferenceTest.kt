@@ -11,9 +11,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.verify
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class ComplexPreferenceTest {
 
     companion object {

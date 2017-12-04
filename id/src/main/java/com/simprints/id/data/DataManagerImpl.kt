@@ -20,9 +20,7 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import timber.log.Timber
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class DataManagerImpl(private val context: Context,
                       private val preferencesManager: PreferencesManager,
                       private val localDbManager: LocalDbManager,
@@ -123,7 +121,7 @@ class DataManagerImpl(private val context: Context,
     override fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback) {
         val filename = "${deviceId}_${System.currentTimeMillis()}.json"
         dbContext.callSafelyOrLogNonFatalExceptionOn("recoverRealmDb",
-                { it.recoverRealmDb(filename, deviceId, group, BuildConfig.DEBUG, callback) })
+                { it.recoverRealmDb(filename, deviceId, group, callback) })
     }
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
@@ -173,7 +171,7 @@ class DataManagerImpl(private val context: Context,
             dbContext != null
 
     override fun initialize(callback: DataCallback?) {
-        val tentativeDbContext = DatabaseContext(apiKey, userId, moduleId, deviceId, context, BuildConfig.DEBUG)
+        val tentativeDbContext = DatabaseContext(apiKey, userId, moduleId, deviceId, context, BuildConfig.FIREBASE_PROJECT)
 
         tentativeDbContext.initDatabase(object : DataCallback {
             override fun onSuccess() {

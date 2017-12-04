@@ -1,0 +1,49 @@
+package com.simprints.id.bucket01
+
+import android.support.test.InstrumentationRegistry
+import android.util.Log
+
+import com.simprints.cerberuslibrary.BluetoothUtility
+import com.simprints.cerberuslibrary.WifiUtility
+import com.simprints.cerberuslibrary.services.UtilityServiceClient
+
+import org.junit.AfterClass
+import org.junit.BeforeClass
+import org.junit.runner.RunWith
+import org.junit.runners.Suite
+
+@RunWith(Suite::class)
+@Suite.SuiteClasses(HappyWorkflowAllMainFeatures::class)
+object Bucket01Suite {
+
+    private val macAddress = "F0:AC:D7:C0:E1:A3" //SP057763 //"F0:AC:D7:CA:BE:1D";
+    private val networkSsid = "Simprints 2.0"
+    private val networkPassword = "Tech4Dev"
+
+    @BeforeClass @JvmStatic
+    fun suiteSetUp() {
+        val client = UtilityServiceClient(InstrumentationRegistry.getContext())
+        val bluetoothUtility = BluetoothUtility(client)
+        val wifiUtility = WifiUtility(client)
+
+        Log.d("EndToEndTests", "Bucket01Suite.suiteSetUp(): ensuring bluetooth is enabled")
+        bluetoothUtility.setBluetoothStateSync(true)
+        Log.d("EndToEndTests", "Bucket01Suite.suiteSetUp(): ensuring wifi is enabled")
+        wifiUtility.setWifiStateSync(true)
+        Log.d("EndToEndTests", "Bucket01Suite.suiteSetUp(): ensuring scanner is paired")
+        bluetoothUtility.setBluetoothPairingStateSync(macAddress, true)
+        Log.d("EndToEndTests", "Bucket01Suite.suiteSetUp(): ensuring wifi is connected")
+        wifiUtility.setWifiNetworkSync(networkSsid, networkPassword)
+        Log.d("EndToEndTests", "Bucket01Suite.suiteSetUp(): ensuring internet is connected")
+        wifiUtility.waitForInternetStateSync(true)
+    }
+
+    @AfterClass @JvmStatic
+    fun suiteTearDown() {
+        val client = UtilityServiceClient(InstrumentationRegistry.getContext())
+        val bluetoothUtility = BluetoothUtility(client)
+        Log.d("EndToEndTests", "Bucket01Suite.suiteTearDown(): un-pairing scanner")
+        bluetoothUtility.setBluetoothPairingStateSync(macAddress, false)
+    }
+
+}

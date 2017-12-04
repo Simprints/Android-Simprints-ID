@@ -1,35 +1,26 @@
-package com.simprints.id.activities;
+package com.simprints.id.activities.matching;
 
-import android.animation.ObjectAnimator;
+
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.support.annotation.NonNull;
 
-import com.simprints.id.Application;
-import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
+import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
-import com.simprints.id.tools.Language;
 import com.simprints.id.tools.Log;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT;
-import com.simprints.libdata.tools.Constants.GROUP;
+import com.simprints.libdata.tools.Constants;
 import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
 import com.simprints.libmatcher.Progress;
 import com.simprints.libmatcher.sourceafis.MatcherEventListener;
-import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.Identification;
 import com.simprints.libsimprints.Verification;
 
@@ -39,14 +30,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import static com.simprints.id.tools.ResourceHelper.getStringPlural;
+import static android.app.Activity.RESULT_OK;
 import static com.simprints.id.tools.TierHelper.computeTier;
 
-public class MatchingActivity extends AppCompatActivity implements MatcherEventListener {
+class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListener {
 
-    private final static int ALERT_ACTIVITY_REQUEST_CODE = 0;
-
-    private MatchingView matchingView;
+    @NonNull
+    private final MatchingContract.View matchingView;
 
     private Person probe;
     private List<Person> candidates = new ArrayList<>();
@@ -54,26 +44,24 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     private Handler handler = new Handler();
     private OnMatchStartHandlerThread onMatchStartHandlerThread;
 
+    @NonNull
     private DataManager dataManager;
-    private AppState appState;
 
-    // Singletons
+    MatchingPresenter(@NonNull MatchingContract.View matchingView,
+                      @NonNull DataManager dataManager,
+                      @NonNull AppState appState,
+                      Person probe) {
+        appState.logMatchStart();
+        this.dataManager = dataManager;
+        this.probe = probe;
+
+        this.matchingView = matchingView;
+        this.matchingView.setPresenter(this);
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Application app = ((Application) getApplication());
-        dataManager = app.getDataManager();
-        appState = app.getAppState();
-        appState.logMatchStart();
-
-        initViews();
-
-
-        Bundle extras = getIntent().getExtras();
-        probe = extras.getParcelable("Person");
-
+    public void start() {
+        // TODO : Use polymorphism
         switch (dataManager.getCallout()) {
             case IDENTIFY:
                 final Runnable onMatchStartRunnable = new Runnable() {
@@ -95,106 +83,8 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 break;
             default:
                 dataManager.logException(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
-    }
-
-    private void initViews() {
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
-        setContentView(R.layout.activity_matching);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        matchingView = new MatchingView();
-    }
-
-    private class MatchingView {
-
-        private ProgressBar progressBar;
-        private TextView progressText1;
-        private TextView progressText2;
-        private TextView resultText1;
-        private TextView resultText2;
-        private TextView resultText3;
-
-        MatchingView() {
-            initProgressBar();
-            initProgressTextViews();
-        }
-
-        private void initProgressBar() {
-            progressBar = findViewById(R.id.pb_identification);
-        }
-
-        private void initProgressTextViews() {
-            progressText1 = findViewById(R.id.tv_matchingProgressStatus1);
-            progressText2 = findViewById(R.id.tv_matchingProgressStatus2);
-            resultText1 = findViewById(R.id.tv_matchingResultStatus1);
-            resultText2 = findViewById(R.id.tv_matchingResultStatus2);
-            resultText3 = findViewById(R.id.tv_matchingResultStatus3);
-        }
-
-        void setProgress(int progress) {
-            ObjectAnimator.ofInt(progressBar, "progress", progressBar.getProgress(), progress)
-                    .setDuration(progress * 10)
-                    .start();
-        }
-
-        void setVerificationProgress() {
-            setProgress(100);
-        }
-
-        void setIdentificationProgressLoadingStart() {
-            progressText1.setText(R.string.loading_candidates);
-            setProgress(25);
-        }
-
-        void setIdentificationProgressMatchingStart(int matchSize) {
-            progressText1.setText(getStringPlural(MatchingActivity.this, R.string.loaded_candidates_quantity_key, matchSize, matchSize));
-            progressText2.setText(R.string.matching_fingerprints);
-            setProgress(50);
-        }
-
-        void setIdentificationProgressReturningStart() {
-            progressText2.setText(R.string.returning_results);
-            setProgress(90);
-        }
-
-        void setIdentificationProgressFinished(int returnSize, int tier1Or2Matches, int tier3Matches, int tier4Matches) {
-            progressText2.setText(getStringPlural(MatchingActivity.this, R.string.returned_results_quantity_key, returnSize, returnSize));
-
-            if (tier1Or2Matches > 0) {
-                resultText1.setVisibility(View.VISIBLE);
-                resultText1.setText(getStringPlural(MatchingActivity.this, R.string.tier1or2_matches_quantity_key, tier1Or2Matches, tier1Or2Matches));
-            }
-            if (tier3Matches > 0) {
-                resultText2.setVisibility(View.VISIBLE);
-                resultText2.setText(getStringPlural(MatchingActivity.this, R.string.tier3_matches_quantity_key, tier3Matches, tier3Matches));
-            }
-            if ((tier1Or2Matches < 1 && tier3Matches < 1) || tier4Matches > 1) {
-                resultText3.setVisibility(View.VISIBLE);
-                resultText3.setText(getStringPlural(MatchingActivity.this, R.string.tier4_matches_quantity_key, tier4Matches, tier4Matches));
-            }
-            setProgress(100);
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    finish();
-                }
-            }, dataManager.getMatchingEndWaitTimeS() * 1000);
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    private void launchAlert(ALERT_TYPE alertType) {
-        Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra("alertType", alertType);
-        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
     private class OnMatchStartHandlerThread extends HandlerThread {
@@ -215,12 +105,12 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     }
 
     private void onIdentifyStart() {
-        final GROUP matchGroup = dataManager.getMatchGroup();
+        final Constants.GROUP matchGroup = dataManager.getMatchGroup();
 
         dataManager.loadPeople(candidates, matchGroup, new DataCallback() {
             @Override
             public void onSuccess() {
-                Log.d(MatchingActivity.this, String.format(Locale.UK,
+                Log.d(MatchingPresenter.this, String.format(Locale.UK,
                         "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
@@ -243,7 +133,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 new Thread(new Runnable() {
                     public void run() {
                         LibMatcher matcher = new LibMatcher(probe, candidates,
-                                matcher_type, scores, MatchingActivity.this, 1);
+                                matcher_type, scores, MatchingPresenter.this, 1);
                         matcher.start();
                     }
                 }).start();
@@ -252,7 +142,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
             @Override
             public void onFailure(DATA_ERROR data_error) {
                 dataManager.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
     }
@@ -263,7 +153,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         dataManager.loadPerson(candidates, guid, new DataCallback() {
             @Override
             public void onSuccess() {
-                Log.d(MatchingActivity.this, "Successfully loaded candidate");
+                Log.d(MatchingPresenter.this, "Successfully loaded candidate");
 
                 int matcherType = dataManager.getMatcherType();
 
@@ -284,7 +174,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                 new Thread(new Runnable() {
                     public void run() {
                         LibMatcher matcher = new LibMatcher(probe, candidates,
-                                matcher_type, scores, MatchingActivity.this, 1);
+                                matcher_type, scores, MatchingPresenter.this, 1);
                         matcher.start();
                     }
                 }).start();
@@ -294,7 +184,7 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
             @Override
             public void onFailure(DATA_ERROR data_error) {
                 dataManager.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onVerifyStart()"));
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
     }
@@ -303,11 +193,12 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
     public void onMatcherEvent(EVENT event) {
         switch (event) {
             case MATCH_NOT_RUNNING: {
-                Toast.makeText(MatchingActivity.this, event.details(), Toast.LENGTH_LONG).show();
+                matchingView.makeToastMatchNotRunning(event.details());
                 break;
             }
             case MATCH_COMPLETED: {
-                switch (dataManager.getCallout()) {
+                Callout callout = dataManager.getCallout();
+                switch (callout) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();
                         matchingView.setIdentificationProgressReturningStart();
@@ -357,11 +248,11 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         }
 
                         Intent resultData;
-                        resultData = new Intent(Constants.SIMPRINTS_IDENTIFY_INTENT);
+                        resultData = new Intent(com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFY_INTENT);
                         FormatResult.put(resultData, topCandidates, dataManager);
-                        setResult(RESULT_OK, resultData);
+                        matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
-                                tier1Or2Matches, tier3Matches, tier4Matches);
+                                tier1Or2Matches, tier3Matches, tier4Matches, dataManager.getMatchingEndWaitTimeSeconds() * 1000);
                         break;
                     }
                     case VERIFY: {
@@ -377,17 +268,16 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
                         } else {
                             verification = null;
                             guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_UNKNOWN;
-                            resultCode = Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
+                            resultCode = com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
                         }
-
                         dataManager.saveVerification(probe, verification, guidExistsResult);
 
                         // finish
                         Intent resultData;
-                        resultData = new Intent(Constants.SIMPRINTS_VERIFY_INTENT);
+                        resultData = new Intent(com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_INTENT);
                         FormatResult.put(resultData, verification, dataManager.getResultFormat());
-                        setResult(resultCode, resultData);
-                        finish();
+                        matchingView.doSetResult(resultCode, resultData);
+                        matchingView.doFinish();
                         break;
                     }
                 }
@@ -396,13 +286,13 @@ public class MatchingActivity extends AppCompatActivity implements MatcherEventL
         }
     }
 
-    // TODO Remove or fix this
+    // TODO : Fix or remove this
     @Override
     public void onMatcherProgress(final Progress progress) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                matchingView.setProgress(progress.getProgress());
+                matchingView.setIdentificationProgress(progress.getProgress());
             }
         });
     }

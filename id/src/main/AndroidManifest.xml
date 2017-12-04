@@ -53,7 +53,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.FrontActivity"
+            android:name=".activities.front.FrontActivity"
             android:label="@string/title_activity_front"
             android:launchMode="standard">
             <intent-filter>
@@ -73,7 +73,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.MatchingActivity"
+            android:name=".activities.matching.MatchingActivity"
             android:label="Matching"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
@@ -95,7 +95,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.AboutActivity"
+            android:name=".activities.about.AboutActivity"
             android:label="@string/about_title"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />

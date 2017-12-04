@@ -1,8 +1,6 @@
 package com.simprints.id.data.prefs.improvedSharedPreferences
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class NonPrimitiveTypeException(message: String): Exception(message) {
 
     companion object {

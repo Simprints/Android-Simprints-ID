@@ -7,9 +7,7 @@ import junit.framework.Assert
 import org.junit.Test
 import org.mockito.Mockito.*
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class PrimitivePreferenceTest {
 
     companion object {

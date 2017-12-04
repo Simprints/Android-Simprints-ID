@@ -3,9 +3,7 @@ package com.simprints.id.tools.serializers
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class BooleanSerializerTest {
 
     private val booleanSerializer = BooleanSerializer()

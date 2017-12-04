@@ -10,9 +10,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.*
 import kotlin.reflect.KClass
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class ImprovedSharedPreferencesImplTest {
 
     companion object {

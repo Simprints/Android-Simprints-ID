@@ -22,8 +22,6 @@ import org.mockito.Mockito.`when` as whenever
  *
  * It allows doing "black box" testing, that is test ImprovedSharedPreferences without making any
  * assumption about the underlying implementation.
- *
- * @author: Etienne Thiery (etienne@simprints.com)
  */
 @RunWith(RobolectricTestRunner::class)
 class RobolectricImprovedSharedPreferencesImplTest {

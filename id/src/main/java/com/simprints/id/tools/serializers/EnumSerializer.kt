@@ -2,9 +2,7 @@ package com.simprints.id.tools.serializers
 
 import java.security.InvalidParameterException
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class EnumSerializer<T : Enum<*>>(enumClass: Class<T>): Serializer<T> {
 
     private val stringToEnumValue = enumClass.enumConstants

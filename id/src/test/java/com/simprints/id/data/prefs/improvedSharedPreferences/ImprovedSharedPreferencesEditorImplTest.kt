@@ -8,9 +8,7 @@ import com.simprints.id.testUtils.whenever
 import org.junit.Test
 import org.mockito.ArgumentMatchers.*
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com)
- */
+
 class ImprovedSharedPreferencesEditorImplTest {
 
     companion object {
