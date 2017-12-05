@@ -29,7 +29,7 @@ class AboutPresenter implements AboutContract.Presenter {
      * @param view      The AboutActivity
      */
     AboutPresenter(@NonNull AboutContract.View view, DataManager dataManager) {
-        appState = AppState.getInstance(dataManager);
+        appState = AppState.getInstance();
         this.dataManager = dataManager;
         aboutView = view;
         aboutView.setPresenter(this);

@@ -1,4 +1,4 @@
-package com.simprints.id.data.prefs.improvedSharedPreferences
+package com.simprints.id.tools.exceptions
 
 
 class NonPrimitiveTypeException(message: String): Exception(message) {

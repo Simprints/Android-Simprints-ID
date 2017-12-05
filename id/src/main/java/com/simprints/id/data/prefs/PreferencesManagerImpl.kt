@@ -1,8 +1,9 @@
 package com.simprints.id.data.prefs
 
 import android.content.Context
+import com.simprints.id.data.model.CalloutType
+import com.simprints.id.data.model.calloutParameters.MainCalloutParameters
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.model.Callout
 import com.simprints.id.tools.delegates.ComplexPreference
 import com.simprints.id.tools.delegates.PrimitivePreference
 import com.simprints.id.tools.serializers.Serializer
@@ -12,7 +13,7 @@ import com.simprints.libsimprints.FingerIdentifier
 
 class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                              fingerIdentifierToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                             calloutSerializer: Serializer<Callout>,
+                             calloutTypeSerializer: Serializer<CalloutType>,
                              groupSerializer: Serializer<Constants.GROUP>): PreferencesManager {
 
     companion object {
@@ -24,8 +25,8 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private val API_KEY_KEY = "ApiKey"
         private val API_KEY_DEFAULT = ""
 
-        private val CALLOUT_KEY = "Callout"
-        private val CALLOUT_DEFAULT = Callout.NULL
+        private val CALLOUT_KEY = "CalloutType"
+        private val CALLOUT_DEFAULT = CalloutType.INVALID_OR_MISSING
 
         private val MODULE_ID_KEY = "ModuleId"
         private val MODULE_ID_DEFAULT = ""
@@ -74,9 +75,6 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private val TIMEOUT_KEY = "TimeoutInt"
         private val TIMEOUT_DEFAULT = 3
 
-        private val APP_KEY_KEY = "AppKey"
-        private val APP_KEY_DEFAULT = ""
-
         private val SYNC_GROUP_KEY = "SyncGroup"
         private val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
 
@@ -102,8 +100,8 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // API key of the current sessions
     override var apiKey: String by PrimitivePreference(prefs, API_KEY_KEY, API_KEY_DEFAULT)
 
-    // Callout of the current session
-    override var callout: Callout by ComplexPreference(prefs, CALLOUT_KEY, CALLOUT_DEFAULT, calloutSerializer)
+    // CalloutType of the current session
+    override var calloutType: CalloutType by ComplexPreference(prefs, CALLOUT_KEY, CALLOUT_DEFAULT, calloutTypeSerializer)
 
     // Module ID of the current session
     override var moduleId: String by PrimitivePreference(prefs, MODULE_ID_KEY, MODULE_ID_DEFAULT)
@@ -122,6 +120,22 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Result format of the current session
     override var resultFormat: String by PrimitivePreference(prefs, RESULT_FORMAT_KEY, RESULT_FORMAT_DEFAULT)
+
+    override var mainCalloutParameters: MainCalloutParameters
+        get() = throw IllegalAccessException("mainCalloutParameters is write only.")
+        set(calloutParameters) {
+            with(calloutParameters) {
+                calloutType = typeParameter.value
+                apiKey = apiKeyParameter.value
+                moduleId = moduleIdParameter.value
+                userId = userIdParameter.value
+                patientId = patientIdParameter.value
+                callingPackage = callingPackageParameter.value
+                metadata = metadataParameter.value
+                resultFormat = resultFormatParameter.value
+            }
+        }
+
 
     override var sessionId: String by PrimitivePreference(prefs, SESSION_ID_KEY, SESSION_ID_DEFAULT)
 
@@ -148,9 +162,6 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Timeout seconds
     override var timeoutS: Int by PrimitivePreference(prefs, TIMEOUT_KEY, TIMEOUT_DEFAULT)
-
-    // App Key
-    override var appKey: String by PrimitivePreference(prefs, APP_KEY_KEY, APP_KEY_DEFAULT)
 
     // Sync group. Default is user
     override var syncGroup: Constants.GROUP by ComplexPreference(prefs, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)

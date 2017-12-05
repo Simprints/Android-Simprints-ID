@@ -46,6 +46,7 @@ class DataManagerImpl(private val context: Context,
     override val appVersionName: String
         get() = context.packageVersionName
 
+
     override fun logAlert(alertType: ALERT_TYPE) =
             analyticsManager.logAlert(alertType.name, apiKey, moduleId, userId, deviceId)
 
@@ -53,7 +54,7 @@ class DataManagerImpl(private val context: Context,
             analyticsManager.logUserProperties(userId, apiKey, moduleId, deviceId)
 
     override fun logLogin() =
-            analyticsManager.logLogin(callout)
+            analyticsManager.logLogin(calloutType)
 
     override fun logGuidSelectionService(selectedGuid: String, callbackSent: Boolean) =
             analyticsManager.logGuidSelectionService(selectedGuid, callbackSent, apiKey, deviceId,

@@ -147,6 +147,7 @@
     <string name="missing_apikey_message">A configuration error has occurred (missing API key), please contact your system administrator</string>
     <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
     <string name="invalid_intentAction_message">A configuration error has occurred (invalid intent action), please contact your system administrator</string>
+    <string name="unexpected_parameter_message">A configuration error has occurred (unexpected parameter), please contact your system administrator</string>
     <string name="invalid_metadata_message">A configuration error has occurred (invalid metadata), please contact your system administrator</string>
     <string name="missing_userId_message">A configuration error has occurred (no user ID), please contact your system administrator</string>
     <string name="missing_moduleId_message">A configuration error has occurred (no module ID), please contact your system administrator</string>
