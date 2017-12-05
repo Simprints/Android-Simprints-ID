@@ -12,7 +12,8 @@ public enum Callout {
     REGISTER(Constants.SIMPRINTS_REGISTER_INTENT),
     IDENTIFY(Constants.SIMPRINTS_IDENTIFY_INTENT),
     UPDATE(Constants.SIMPRINTS_UPDATE_INTENT),
-    VERIFY(Constants.SIMPRINTS_VERIFY_INTENT);
+    VERIFY(Constants.SIMPRINTS_VERIFY_INTENT),
+    NULL("");
 
     private final static Map<String, Callout> actionCalloutMapping;
 

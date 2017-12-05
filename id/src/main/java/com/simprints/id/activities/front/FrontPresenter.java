@@ -13,13 +13,17 @@ class FrontPresenter implements FrontContract.Presenter {
     @NonNull
     private final FrontContract.View frontView;
 
+    @NonNull
+    private final SyncService syncService;
+
     private DataCallback dataCallback;
 
     /**
      * @param view      The FrontActivity
      */
-    FrontPresenter(@NonNull FrontContract.View view) {
+    FrontPresenter(@NonNull FrontContract.View view, @NonNull SyncService syncService) {
         frontView = view;
+        this.syncService = syncService;
         frontView.setPresenter(this);
     }
 
@@ -48,13 +52,13 @@ class FrontPresenter implements FrontContract.Presenter {
     @Override
     public void sync(Context appContext) {
         frontView.setSyncInProgress();
-        if (!SyncService.getInstance().startAndListen(appContext, dataCallback)) {
+        if (!syncService.startAndListen(appContext, dataCallback)) {
             frontView.setSyncUnavailable();
         }
     }
 
     @Override
     public void stopListening() {
-        SyncService.getInstance().stopListening(dataCallback);
+        syncService.stopListening(dataCallback);
     }
 }

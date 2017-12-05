@@ -6,13 +6,12 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Log;
-import com.simprints.id.tools.SharedPref;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
@@ -39,20 +38,21 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
     @NonNull
     private final MatchingContract.View matchingView;
 
-    private AppState appState;
-    private SharedPref sharedPref;
     private Person probe;
     private List<Person> candidates = new ArrayList<>();
     private List<Float> scores = new ArrayList<>();
     private Handler handler = new Handler();
     private OnMatchStartHandlerThread onMatchStartHandlerThread;
 
+    @NonNull
+    private DataManager dataManager;
+
     MatchingPresenter(@NonNull MatchingContract.View matchingView,
-                      SharedPref sharedPref,
+                      @NonNull DataManager dataManager,
+                      @NonNull AppState appState,
                       Person probe) {
-        appState = AppState.getInstance();
         appState.logMatchStart();
-        this.sharedPref = sharedPref;
+        this.dataManager = dataManager;
         this.probe = probe;
 
         this.matchingView = matchingView;
@@ -61,7 +61,8 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
     @Override
     public void start() {
-        switch (appState.getCallout()) {
+        // TODO : Use polymorphism
+        switch (dataManager.getCallout()) {
             case IDENTIFY:
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
@@ -81,7 +82,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 onVerifyStart();
                 break;
             default:
-                FirebaseCrash.report(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
+                dataManager.logException(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -104,16 +105,16 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
     }
 
     private void onIdentifyStart() {
-        final Constants.GROUP matchGroup = sharedPref.getMatchGroup();
+        final Constants.GROUP matchGroup = dataManager.getMatchGroup();
 
-        appState.getData().loadPeople(candidates, matchGroup, new DataCallback() {
+        dataManager.loadPeople(candidates, matchGroup, new DataCallback() {
             @Override
             public void onSuccess() {
                 Log.d(MatchingPresenter.this, String.format(Locale.UK,
                         "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
-                int matcherType = sharedPref.getMatcherTypeInt();
+                int matcherType = dataManager.getMatcherType();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -140,21 +141,21 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
+                dataManager.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
     }
 
     private void onVerifyStart() {
-        final String guid = appState.getGuid();
+        final String guid = dataManager.getPatientId();
 
-        appState.getData().loadPerson(candidates, guid, new DataCallback() {
+        dataManager.loadPerson(candidates, guid, new DataCallback() {
             @Override
             public void onSuccess() {
                 Log.d(MatchingPresenter.this, "Successfully loaded candidate");
 
-                int matcherType = sharedPref.getMatcherTypeInt();
+                int matcherType = dataManager.getMatcherType();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -182,7 +183,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                FirebaseCrash.report(new Exception("Unknown error returned in onFailure MatchingActivity.onVerifyStart()"));
+                dataManager.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onVerifyStart()"));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
@@ -196,12 +197,12 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 break;
             }
             case MATCH_COMPLETED: {
-                Callout callout = appState.getCallout();
+                Callout callout = dataManager.getCallout();
                 switch (callout) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();
                         matchingView.setIdentificationProgressReturningStart();
-                        int nbOfResults = sharedPref.getReturnIdCountInt();
+                        int nbOfResults = dataManager.getReturnIdCount();
 
                         ArrayList<Identification> topCandidates = new ArrayList<>();
 
@@ -225,9 +226,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                                     scores.get(idx[i]).intValue(), computeTier(scores.get(idx[i]))));
                         }
 
-                        if (appState.getData() != null) {
-                            appState.getData().saveIdentification(probe, candidates.size(), topCandidates, appState.getSessionId());
-                        }
+                        dataManager.saveIdentification(probe, candidates.size(), topCandidates);
 
                         // finish
                         int tier1Or2Matches = 0;
@@ -250,10 +249,10 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
                         Intent resultData;
                         resultData = new Intent(com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFY_INTENT);
-                        FormatResult.put( resultData, topCandidates);
+                        FormatResult.put(resultData, topCandidates, dataManager);
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
-                                tier1Or2Matches, tier3Matches, tier4Matches);
+                                tier1Or2Matches, tier3Matches, tier4Matches, dataManager.getMatchingEndWaitTimeSeconds() * 1000);
                         break;
                     }
                     case VERIFY: {
@@ -263,7 +262,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
                         if (candidates.size() > 0 && scores.size() > 0) {
                             int score = scores.get(0).intValue();
-                            verification = new Verification(score, computeTier(score), appState.getGuid());
+                            verification = new Verification(score, computeTier(score), dataManager.getPatientId());
                             guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_FOUND;
                             resultCode = RESULT_OK;
                         } else {
@@ -271,15 +270,12 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                             guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_UNKNOWN;
                             resultCode = com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
                         }
-
-                        if (appState.getData() != null) {
-                            appState.getData().saveVerification(probe, appState.getGuid(), verification, appState.getSessionId(), guidExistsResult);
-                        }
+                        dataManager.saveVerification(probe, verification, guidExistsResult);
 
                         // finish
                         Intent resultData;
                         resultData = new Intent(com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_INTENT);
-                        FormatResult.put(resultData, verification);
+                        FormatResult.put(resultData, verification, dataManager.getResultFormat());
                         matchingView.doSetResult(resultCode, resultData);
                         matchingView.doFinish();
                         break;

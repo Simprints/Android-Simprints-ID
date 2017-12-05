@@ -15,7 +15,10 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.simprints.id.Application;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
+import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
 
 
@@ -35,13 +38,18 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
     private ProgressDialog recoveryDialog;
     private AlertDialog errorDialog;
     private AlertDialog successDialog;
+    DataManager dataManager;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
+
         setContentView(R.layout.activity_about);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -96,7 +104,7 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
                 }).create();
 
         // Create the presenter and pass it the information it needs
-        aboutPresenter = new AboutPresenter(this);
+        aboutPresenter = new AboutPresenter(this, dataManager);
     }
 
     @Override

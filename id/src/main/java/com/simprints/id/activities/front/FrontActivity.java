@@ -4,21 +4,19 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
+import com.simprints.id.Application;
 import com.simprints.id.R;
-import com.simprints.id.tools.Analytics;
+import com.simprints.id.backgroundSync.SyncService;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.Language;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.RemoteConfig;
-
-import io.fabric.sdk.android.Fabric;
 
 public class FrontActivity extends AppCompatActivity implements FrontContract.View {
 
@@ -28,14 +26,17 @@ public class FrontActivity extends AppCompatActivity implements FrontContract.Vi
     private Button syncButton;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Fabric.with(this, new Crashlytics());
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+        Application app = ((Application) getApplication());
+        DataManager dataManager = app.getDataManager();
+        SyncService syncService = app.getSyncService();
+
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_front);
-        Analytics.getInstance(getApplicationContext());
         RemoteConfig.init();
 
         syncStatus = findViewById(R.id.iv_sync);
@@ -53,7 +54,7 @@ public class FrontActivity extends AppCompatActivity implements FrontContract.Vi
         ((TextView) findViewById(R.id.versionTextView)).setText(String.format("Simprints ID: %s", version));
         ((TextView) findViewById(R.id.libSimprintsTextView)).setText(R.string.front_libSimprints_version);
 
-        PermissionManager.requestAllPermissions(FrontActivity.this);
+        PermissionManager.requestAllPermissions(FrontActivity.this, dataManager.getCallingPackage());
         syncButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -61,7 +62,7 @@ public class FrontActivity extends AppCompatActivity implements FrontContract.Vi
             }
         });
 
-        frontPresenter = new FrontPresenter(this);
+        frontPresenter = new FrontPresenter(this, syncService);
     }
 
     @Override
