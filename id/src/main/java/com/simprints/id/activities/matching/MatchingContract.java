@@ -21,7 +21,7 @@ interface MatchingContract {
 
         void setIdentificationProgressReturningStart();
 
-        void setIdentificationProgressFinished(int returnSize, int tier1Or2Matches, int tier3Matches, int tier4Matches);
+        void setIdentificationProgressFinished(int returnSize, int tier1Or2Matches, int tier3Matches, int tier4Matches, int matchingEndWaitTimeMillis);
 
         void launchAlert(ALERT_TYPE alertType);
 

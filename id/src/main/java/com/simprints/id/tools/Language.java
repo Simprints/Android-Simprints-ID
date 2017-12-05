@@ -1,14 +1,12 @@
 package com.simprints.id.tools;
 
-import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
 
 import java.util.Locale;
 
 public class Language {
-    public static Configuration selectLanguage(Context context) {
-        String languageToLoad = new SharedPref(context).getLanguageString();
+    public static Configuration selectLanguage(String languageString) {
 
         Locale locale;
 
@@ -16,22 +14,22 @@ public class Language {
          * Languages are usually two characters, except if they also contain a region.
          * If they contain a region they follow the format [language]-r[REGION] e.g. fa-rAF
          */
-        if (languageToLoad.contains("-r") && languageToLoad.length() > 2) {
+        if (languageString.contains("-r") && languageString.length() > 2) {
 
             int indexOfFlag = -1;
-            for (int i = 0; i < languageToLoad.length() - 1; i++) {
-                if (languageToLoad.substring(i, i + 2).equals("-r")) {
+            for (int i = 0; i < languageString.length() - 1; i++) {
+                if (languageString.substring(i, i + 2).equals("-r")) {
                     indexOfFlag = i;
                 }
             }
 
-            String language = languageToLoad.substring(0, indexOfFlag);
-            String country = languageToLoad.substring(indexOfFlag + 1, languageToLoad.length());
+            String language = languageString.substring(0, indexOfFlag);
+            String country = languageString.substring(indexOfFlag + 1, languageString.length());
 
             locale = new Locale(language, country);
 
         } else {
-            locale = new Locale(languageToLoad);
+            locale = new Locale(languageString);
         }
 
         Locale.setDefault(locale);

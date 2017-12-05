@@ -5,16 +5,25 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import com.simprints.id.Application;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.Language;
 
 public class TutorialActivity extends AppCompatActivity {
 
+    private DataManager dataManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_tutorial);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_tutorial);

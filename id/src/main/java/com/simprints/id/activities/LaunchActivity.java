@@ -11,11 +11,12 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
+import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
@@ -25,9 +26,6 @@ import com.simprints.id.tools.RemoteConfig;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.ScannerCallback;
-import com.simprints.libsimprints.RefusalForm;
-
-import io.fabric.sdk.android.Fabric;
 
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.ALERT_TYPE_EXTRA;
@@ -42,8 +40,6 @@ import static com.simprints.id.tools.Vibrate.vibrate;
 @SuppressLint("HardwareIds")
 public class LaunchActivity extends AppCompatActivity {
 
-    // Application state (singleton containing scanner, database context, analytics, ...)
-    private AppState appState = AppState.getInstance();
 
     // Position tracker, used to locate the user
     private PositionTracker positionTracker;
@@ -59,7 +55,6 @@ public class LaunchActivity extends AppCompatActivity {
     };
 
     // Setup callback
-    private Setup setup = Setup.getInstance();
     private SetupCallback setupCallback;
 
     // True iff the user confirmed consent
@@ -72,13 +67,24 @@ public class LaunchActivity extends AppCompatActivity {
     private boolean launchOutOfFocus = false;
 
 
+    private DataManager dataManager;
+    // Singletons
+    private AppState appState;
+    private Setup setup;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+        appState = app.getAppState();
+        setup = app.getSetup();
+
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_launch);
-        Fabric.with(this, new Crashlytics());
 
         // Keep screen from going to sleep
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -87,22 +93,26 @@ public class LaunchActivity extends AppCompatActivity {
         RemoteConfig.init();
 
         // Parse/verify callout, initialize app state
-        ALERT_TYPE alert = appState.init(getIntent(), getApplicationContext());
+        ALERT_TYPE alert = appState.init(getIntent());
         if (alert != null) {
             launchAlert(alert);
             return;
         }
+        // Log some attributes to analytics
+        dataManager.logUserProperties();
+        dataManager.logLogin();
+
 
         // Initialize position tracker
-        positionTracker = new PositionTracker(this);
+        positionTracker = new PositionTracker(this, appState);
         positionTracker.start();
 
         // Start the background sync service in case it has failed for some reason
         new SyncSetup(getApplicationContext()).initialize();
 
-        final ProgressBar launchProgress = (ProgressBar) findViewById(R.id.pb_launch_progress);
-        final TextView loadingInfoTextView = (TextView) findViewById(R.id.tv_loadingInfo);
-        final TextView confirmConsentTextView = (TextView) findViewById(R.id.confirm_consent_text_view);
+        final ProgressBar launchProgress = findViewById(R.id.pb_launch_progress);
+        final TextView loadingInfoTextView = findViewById(R.id.tv_loadingInfo);
+        final TextView confirmConsentTextView = findViewById(R.id.confirm_consent_text_view);
 
         confirmConsentTextView.setVisibility(View.INVISIBLE);
         loadingInfoTextView.setVisibility(View.VISIBLE);
@@ -119,7 +129,7 @@ public class LaunchActivity extends AppCompatActivity {
                     loadingInfoTextView.setVisibility(View.INVISIBLE);
                     waitingForConfirmation = true;
                     appState.getScanner().registerButtonListener(scannerButton);
-                    vibrate(LaunchActivity.this, 100);
+                    vibrate(LaunchActivity.this, dataManager.getVibrateMode(), 100);
                 } else {
                     finishLaunch();
                 }
@@ -161,16 +171,6 @@ public class LaunchActivity extends AppCompatActivity {
         intent.putExtra(ALERT_TYPE_EXTRA, alertType);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST);
     }
-
-    /**
-     * Close Simprints ID
-     */
-    private void finishWith(final int resultCode, final Intent resultData) {
-        waitingForConfirmation = false;
-        setResult(resultCode, resultData);
-        finish();
-    }
-
 
     private void tryAgain() {
         launchOutOfFocus = false;
@@ -240,16 +240,20 @@ public class LaunchActivity extends AppCompatActivity {
         startActivityForResult(new Intent(this, RefusalActivity.class), REFUSAL_ACTIVITY_REQUEST);
     }
 
-    @Override
-    public void onDestroy() {
-        appState.logSessionEnd();
-        if (appState.getData() != null) {
-            // Save refusal form to firebase
-            RefusalForm refusalForm = appState.getRefusalForm();
-            if (refusalForm != null)
-                appState.getData().saveRefusalForm(refusalForm, appState.getSessionId());
+    /**
+     * Close Simprints ID
+     */
+    private void finishWith(final int resultCode, final Intent resultData) {
+        waitingForConfirmation = false;
+        setResult(resultCode, resultData);
+        finish();
+    }
 
-            appState.getData().destroy();
+    @Override
+    protected void onDestroy() {
+        appState.logSessionEnd();
+        if (dataManager.isInitialized()) {
+            dataManager.finish();
         }
 
         if (positionTracker != null)
@@ -271,7 +275,6 @@ public class LaunchActivity extends AppCompatActivity {
         }
 
         setup.destroy();
-
         super.onDestroy();
     }
 

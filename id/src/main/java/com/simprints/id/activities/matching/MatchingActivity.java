@@ -12,11 +12,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.activities.AlertActivity;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
+import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.Language;
-import com.simprints.id.tools.SharedPref;
 import com.simprints.libcommon.Person;
 
 import static com.simprints.id.tools.ResourceHelper.getStringPlural;
@@ -38,8 +40,15 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+        Application app = ((Application) getApplication());
+        DataManager dataManager = app.getDataManager();
+        AppState appState = app.getAppState();
+        appState.logMatchStart();
+
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
+
         setContentView(R.layout.activity_matching);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -51,11 +60,17 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         resultText3 = findViewById(R.id.tv_matchingResultStatus3);
 
         // Create the Presenter, and pass it all the information and handles it needs
-        Bundle extras = getIntent().getExtras();
+        final Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+            finish();
+            return;
+        }
         Person probe = extras.getParcelable("Person");
         matchingPresenter = new MatchingPresenter(
                 this,
-                new SharedPref(getApplicationContext()),
+                dataManager,
+                appState,
                 probe
         );
     }
@@ -103,7 +118,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     }
 
     @Override
-    public void setIdentificationProgressFinished(int returnSize, int tier1Or2Matches, int tier3Matches, int tier4Matches) {
+    public void setIdentificationProgressFinished(int returnSize, int tier1Or2Matches, int tier3Matches, int tier4Matches, int matchingEndWaitTimeMillis) {
         progressText2.setText(getStringPlural(MatchingActivity.this, R.string.returned_results_quantity_key, returnSize, returnSize));
 
         if (tier1Or2Matches > 0) {
@@ -125,7 +140,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
             public void run() {
                 finish();
             }
-        }, new SharedPref(getApplicationContext()).getMatchingEndWaitTime() * 1000);
+        }, matchingEndWaitTimeMillis);
     }
 
     @Override

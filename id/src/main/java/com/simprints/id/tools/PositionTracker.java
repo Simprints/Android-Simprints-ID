@@ -38,8 +38,8 @@ public class PositionTracker implements
     private Activity activity;
     private LocationRequest locationRequest;
 
-    public PositionTracker(Activity activity) {
-        appState = AppState.getInstance();
+    public PositionTracker(Activity activity, AppState appState) {
+        this.appState = appState;
         this.activity = activity;
         locationRequest = new LocationRequest();
         locationRequest.setInterval(5000);

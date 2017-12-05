@@ -9,18 +9,25 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 
+import com.simprints.id.Application;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.Language;
-import com.simprints.id.tools.SharedPref;
 
 public class PrivacyActivity extends AppCompatActivity {
-    private SharedPref sharedPref;
+
+    private DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+
+        getBaseContext().getResources().updateConfiguration(
+                Language.selectLanguage(dataManager.getLanguage()),
+                getBaseContext().getResources().getDisplayMetrics());
         setContentView(R.layout.activity_privacy);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -33,9 +40,7 @@ public class PrivacyActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        sharedPref = new SharedPref(getApplicationContext());
-
-        boolean consent = sharedPref.getConsentBool();
+        boolean consent = dataManager.getConsent();
         CheckBox checkBox = (CheckBox) findViewById(R.id.consentCheckBox);
 
         checkBox.setChecked(consent);
@@ -45,7 +50,7 @@ public class PrivacyActivity extends AppCompatActivity {
         // Check which checkbox was clicked
         switch (view.getId()) {
             case R.id.consentCheckBox:
-                sharedPref.setConsentBool(true);
+                dataManager.setConsent(true);
                 ((CheckBox) view).setChecked(true);
                 break;
         }
