@@ -1,6 +1,6 @@
 package com.simprints.id.testUtils
 
-import junit.framework.Assert.fail
+import junit.framework.AssertionFailedError
 import org.mockito.Mockito
 import org.mockito.stubbing.OngoingStubbing
 
@@ -27,15 +27,15 @@ fun <T> verifyOnlyInteractions(mock: T, vararg methodCalls: T.() -> Any?) {
  * (http://junit.org/junit5/docs/current/api/org/junit/jupiter/api/Assertions.html#assertThrows-java.lang.Class-org.junit.jupiter.api.function.Executable-)
  * This is a placeholder until we migrate from JUnit 4 to Junit 5
  */
-inline fun <reified T: Throwable> assertThrows(executable: () -> Unit) {
+inline fun <reified T: Throwable> assertThrows(executable: () -> Unit): T {
     try {
         executable()
-        fail("Expected an ${T::class.java.simpleName} to be thrown")
     } catch(exception: Throwable) {
         when (exception) {
-            is T -> {}
+            is T -> return exception
             else -> throw(exception)
         }
     }
+    throw AssertionFailedError("Expected an ${T::class.java.simpleName} to be thrown")
 }
 
