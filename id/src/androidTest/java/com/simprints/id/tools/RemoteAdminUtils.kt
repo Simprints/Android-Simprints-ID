@@ -1,4 +1,4 @@
-package com.simprints.id
+package com.simprints.id.tools
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -30,16 +30,28 @@ object RemoteAdminUtils {
             return apiInstance
         }
 
-    @JvmStatic
     @Throws(ApiException::class)
     fun getPatientsNode(apiInstance: DefaultApi, projectApiKey: String): JsonObject {
         val patientsFirebaseNode = apiInstance.getAny("/$FIREBASE_PROJECTS_NODE/$projectApiKey/$FIREBASE_PATIENTS_NODE") as LinkedTreeMap<*, *>
         return Gson().toJsonTree(patientsFirebaseNode).asJsonObject
     }
 
-    @JvmStatic
     @Throws(ApiException::class)
     fun clearProjectNode(apiInstance: DefaultApi, projectApiKey: String) {
         apiInstance.deleteAny("/$FIREBASE_PROJECTS_NODE/$projectApiKey")
+    }
+
+    @Throws(ApiException::class)
+    fun createSimpleValidProject(apiInstance: DefaultApi, calloutCredentials: CalloutCredentials, numberOfPatients: Int) {
+
+        val simpleValidGroups = "{\"patientGroups\": [{" +
+                "\"userId\":\"${calloutCredentials.userId}\"," +
+                "\"moduleId\":\"${calloutCredentials.moduleId}\"," +
+                "\"patientType\": \"valid\"," +
+                "\"patientCount\": $numberOfPatients" +
+                "}]" +
+                "}"
+
+        apiInstance.putProject(calloutCredentials.apiKey, simpleValidGroups)
     }
 }

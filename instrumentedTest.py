@@ -265,8 +265,8 @@ def main():
     run.update_log_format(LogState.default())
     run.log("Hello world!")
 
-    run.clean_cerberus_build()
-    run.assemble_cerberus_apk()
+    # run.clean_cerberus_build()
+    # run.assemble_cerberus_apk()
 
     run.clean_simprints_id_build()
     run.assemble_simprints_id_apk()
@@ -277,7 +277,7 @@ def main():
     for device in devices:
         run.update_log_format(LogState.device(device))
 
-        run.install_cerberus_apk(device)
+        # run.install_cerberus_apk(device)
         run.install_apk(device)
         run.install_test_apk(device)
 
