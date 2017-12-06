@@ -18,7 +18,7 @@
         app:srcCompat="@drawable/ic_menu_sync_ready" />
 
     <TextView
-        android:id="@+id/libSimprintsTextView"
+        android:id="@+id/libSimprintsVersionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -32,12 +32,12 @@
         android:textSize="20sp" />
 
     <TextView
-        android:id="@+id/versionTextView"
+        android:id="@+id/simprintsIdVersionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/libSimprintsTextView"
-        android:layout_alignLeft="@+id/libSimprintsTextView"
-        android:layout_alignStart="@+id/libSimprintsTextView"
+        android:layout_above="@+id/libSimprintsVersionTextView"
+        android:layout_alignLeft="@+id/libSimprintsVersionTextView"
+        android:layout_alignStart="@+id/libSimprintsVersionTextView"
         android:layout_marginBottom="15dp"
         android:text="@string/simprints_label"
         android:textColor="@color/simprints_white"
@@ -47,7 +47,7 @@
         android:id="@+id/bt_sync"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/libSimprintsTextView"
+        android:layout_alignBottom="@+id/libSimprintsVersionTextView"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_marginEnd="60dp"

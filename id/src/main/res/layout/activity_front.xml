@@ -6,10 +6,10 @@
     android:background="@color/simprints_blue">
 
     <TextView
-        android:id="@+id/libSimprintsTextView"
+        android:id="@+id/libSimprintsVersionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/versionTextView"
+        android:layout_alignTop="@+id/simprintsIdVersionTextView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="43dp"
         android:text="@string/libsimprints_label"
@@ -38,7 +38,7 @@
         android:text="@string/sync_data" />
 
     <TextView
-        android:id="@+id/versionTextView"
+        android:id="@+id/simprintsIdVersionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"

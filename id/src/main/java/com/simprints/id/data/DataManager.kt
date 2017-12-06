@@ -23,6 +23,7 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
     val deviceModel: String
     val deviceId: String
     val appVersionName: String
+    val libVersionName: String
 
     // Analytics
 
