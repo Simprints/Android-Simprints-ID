@@ -141,7 +141,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                dataManager.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
+                dataManager.logException(new Exception("Failed to load people during identification: " + data_error.details()));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
