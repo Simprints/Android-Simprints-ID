@@ -46,6 +46,9 @@ class DataManagerImpl(private val context: Context,
     override val appVersionName: String
         get() = context.packageVersionName
 
+    override val libVersionName: String
+        get() = com.simprints.libsimprints.BuildConfig.VERSION_NAME
+
     override fun logAlert(alertType: ALERT_TYPE) =
             analyticsManager.logAlert(alertType.name, apiKey, moduleId, userId, deviceId)
 

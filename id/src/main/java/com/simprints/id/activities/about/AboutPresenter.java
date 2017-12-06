@@ -8,7 +8,6 @@ import android.view.WindowManager;
 
 import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.InternalConstants;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.tools.Constants;
@@ -39,7 +38,7 @@ class AboutPresenter implements AboutContract.Presenter {
     public void start() {
         aboutView.setVersionData(
                 dataManager.getAppVersionName(),
-                InternalConstants.LIBSIMPRINTS_VERSION,
+                dataManager.getLibVersionName(),
                 appState.getHardwareVersion() > -1 ? String.valueOf(appState.getHardwareVersion()) : "null");
 
         aboutView.setDbCountData(

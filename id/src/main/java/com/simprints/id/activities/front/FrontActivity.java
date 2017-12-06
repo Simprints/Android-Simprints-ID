@@ -1,7 +1,5 @@
 package com.simprints.id.activities.front;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -42,17 +40,8 @@ public class FrontActivity extends AppCompatActivity implements FrontContract.Vi
         syncStatus = findViewById(R.id.iv_sync);
         syncButton = findViewById(R.id.bt_sync);
 
-        PackageInfo pInfo;
-        String version = "";
-        try {
-            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            version = pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        ((TextView) findViewById(R.id.versionTextView)).setText(String.format("Simprints ID: %s", version));
-        ((TextView) findViewById(R.id.libSimprintsTextView)).setText(R.string.front_libSimprints_version);
+        initSimprintsIdVersionTextView(dataManager.getAppVersionName());
+        initLibSimprintsVersionTextView(dataManager.getLibVersionName());
 
         PermissionManager.requestAllPermissions(FrontActivity.this, dataManager.getCallingPackage());
         syncButton.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +52,21 @@ public class FrontActivity extends AppCompatActivity implements FrontContract.Vi
         });
 
         frontPresenter = new FrontPresenter(this, syncService);
+    }
+
+    private void initSimprintsIdVersionTextView(String simprintsIdVersion) {
+        TextView simprintsIdVersionTextView = findViewById(R.id.simprintsIdVersionTextView);
+        String simprintsIdVersionString =
+                String.format(getString(R.string.front_simprintsId_version), simprintsIdVersion);
+        simprintsIdVersionTextView.setText(simprintsIdVersionString);
+    }
+
+    private void initLibSimprintsVersionTextView(String libSimprintsVersion) {
+        TextView libSimprintsVersionTextView = findViewById(R.id.libSimprintsVersionTextView);
+        String libSimprintsVersionString =
+                String.format(getString(R.string.front_libSimprints_version), libSimprintsVersion);
+        libSimprintsVersionTextView.setText(libSimprintsVersionString);
+
     }
 
     @Override
