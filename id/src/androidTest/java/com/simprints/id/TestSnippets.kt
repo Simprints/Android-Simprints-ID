@@ -1,16 +1,17 @@
 package com.simprints.id
 
 import android.support.test.espresso.Espresso
-import android.support.test.espresso.action.ViewActions
-import android.support.test.espresso.assertion.ViewAssertions
+import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
-import android.support.test.espresso.contrib.NavigationViewActions
-import android.support.test.espresso.matcher.ViewMatchers
+import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
+import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import com.simprints.id.activities.LaunchActivity
 import com.simprints.id.tools.*
 import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
+import org.hamcrest.Matchers.anyOf
 import org.junit.Assert
 
 fun testHappyWorkflowEnrolment(calloutCredentials: CalloutCredentials,
@@ -80,29 +81,29 @@ private fun testSetupActivityAndContinue() {
 
 private fun testSetupActivity() {
     log("testSetupActivity")
-    Espresso.onView(ViewMatchers.withId(R.id.tv_consent_text))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-            .check(ViewAssertions.matches(ViewMatchers.withText(R.string.short_consent)))
+    Espresso.onView(withId(R.id.tv_consent_text))
+            .check(matches(isDisplayed()))
+            .check(matches(withText(R.string.short_consent)))
 
     WaitingUtils.waitOnUiForSetupToFinish()
 }
 
 private fun testSetupActivityContinue() {
     log("testSetupActivityContinue")
-    Espresso.onView(ViewMatchers.withId(R.id.confirm_consent_text_view))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-            .check(ViewAssertions.matches(ViewMatchers.withText(R.string.confirm_consent)))
-            .perform(ViewActions.click())
+    Espresso.onView(withId(R.id.confirm_consent_text_view))
+            .check(matches(isDisplayed()))
+            .check(matches(withText(R.string.confirm_consent)))
+            .perform(click())
 
     WaitingUtils.waitOnUiForActivityToSettle()
 }
 
 private fun testMainActivityScanFinger() {
     log("testMainActivityScanFinger")
-    Espresso.onView(ViewMatchers.withId(R.id.scan_button))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-            .check(ViewAssertions.matches(ViewMatchers.withText(R.string.scan)))
-            .perform(ViewActions.click())
+    Espresso.onView(withId(R.id.scan_button))
+            .check(matches(isDisplayed()))
+            .check(matches(withText(R.string.scan)))
+            .perform(click())
 
     WaitingUtils.waitOnUiForScanningToComplete()
 }
@@ -161,9 +162,9 @@ private fun testVerificationSuccessful(verifyTestRule: ActivityTestRule<LaunchAc
 
 private fun testMainActivityPressContinue() {
     log("testMainActivityPressContinue")
-    Espresso.onView(ViewMatchers.withId(R.id.action_forward))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-            .perform(ViewActions.click())
+    Espresso.onView(withId(R.id.action_forward))
+            .check(matches(isDisplayed()))
+            .perform(click())
 }
 
 fun testHappySync(calloutCredentials: CalloutCredentials, identifyTestRule: ActivityTestRule<LaunchActivity>) {
@@ -177,11 +178,12 @@ private fun testMainActivitySync() {
     log("testMainActivitySync")
     testMainActivityOpenDrawer()
     testMainActivityPressSync()
+    testVerifySyncCompletedUi()
 }
 
 private fun testMainActivityOpenDrawer() {
     log("testMainActivityOpenDrawer")
-    Espresso.onView(ViewMatchers.withId(R.id.drawer_layout))
+    Espresso.onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
 
     WaitingUtils.waitOnUiForActivityToSettle()
@@ -189,8 +191,20 @@ private fun testMainActivityOpenDrawer() {
 
 private fun testMainActivityPressSync() {
     log("testMainActivityPressSync")
-    Espresso.onView(ViewMatchers.withId(R.id.nav_view))
-            .perform(NavigationViewActions.navigateTo(R.id.nav_sync))
-
+    Espresso.onView(withId(R.id.nav_view))
+            .perform(navigateTo(R.id.nav_sync))
+    testVerifySyncStartedUi()
     WaitingUtils.waitOnUiForMediumSyncToComplete()
+}
+
+private fun testVerifySyncStartedUi() {
+    log("testVerifySyncStartedUi")
+    Espresso.onView(anyOf(withText(R.string.syncing), withText(R.string.nav_sync_complete)))
+            .check(matches(isDisplayed()))
+}
+
+private fun testVerifySyncCompletedUi() {
+    log("testVerifySyncCompletedUi")
+    Espresso.onView(withText(R.string.nav_sync_complete))
+            .check(matches(isDisplayed()))
 }
