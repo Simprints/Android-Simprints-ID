@@ -1,4 +1,4 @@
-package com.simprints.id
+package com.simprints.id.tools
 
 import android.content.Context
 import com.simprints.cerberuslibrary.RealmUtility
@@ -7,7 +7,6 @@ import java.io.File
 
 object StorageUtils {
 
-    @JvmStatic
     fun clearApplicationData(context: Context, realmConfiguration: RealmConfiguration) {
         clearRealmDatabase(realmConfiguration)
         val cacheDirectory = context.cacheDir ?: return
