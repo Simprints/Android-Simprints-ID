@@ -12,7 +12,7 @@ import android.widget.CheckBox;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.tools.Language;
+import com.simprints.id.tools.LanguageHelper;
 
 public class PrivacyActivity extends AppCompatActivity {
 
@@ -25,13 +25,11 @@ public class PrivacyActivity extends AppCompatActivity {
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
 
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_privacy);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
+        Toolbar toolbar = findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -41,7 +39,7 @@ public class PrivacyActivity extends AppCompatActivity {
         }
 
         boolean consent = dataManager.getConsent();
-        CheckBox checkBox = (CheckBox) findViewById(R.id.consentCheckBox);
+        CheckBox checkBox = findViewById(R.id.consentCheckBox);
 
         checkBox.setChecked(consent);
     }
