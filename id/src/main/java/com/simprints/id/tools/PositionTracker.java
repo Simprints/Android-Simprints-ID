@@ -105,7 +105,7 @@ public class PositionTracker implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d(activity, "PositionTracker.onConnected");
+        Log.INSTANCE.d(activity, "PositionTracker.onConnected");
         if (requestPermission()) {
             getLastLocation();
             startLocationUpdates();
@@ -118,7 +118,7 @@ public class PositionTracker implements
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d(activity, String.format(Locale.UK,
+        Log.INSTANCE.d(activity, String.format(Locale.UK,
                 "PositionTracker.onConnectionFailed : %s", connectionResult.toString()));
 
         switch (connectionResult.getErrorCode()) {
@@ -144,17 +144,17 @@ public class PositionTracker implements
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     InternalConstants.LOCATION_PERMISSION_REQUEST
             );
-            Log.d(activity, "PositionTracker.requestionPermission() -> false");
+            Log.INSTANCE.d(activity, "PositionTracker.requestionPermission() -> false");
             return false;
         } else {
-            Log.d(activity, "PositionTracker.requestionPermission() -> true");
+            Log.INSTANCE.d(activity, "PositionTracker.requestionPermission() -> true");
             return true;
         }
 
     }
 
     private void getLastLocation() {
-        Log.d(activity, "PositionTracker.getLastLocation()");
+        Log.INSTANCE.d(activity, "PositionTracker.getLastLocation()");
 
         int locationPermission = ContextCompat.checkSelfPermission(
                 activity, Manifest.permission.ACCESS_FINE_LOCATION
@@ -169,7 +169,7 @@ public class PositionTracker implements
                 appState.setPosition(String.valueOf(lastLocation.getLatitude()),
                         String.valueOf(lastLocation.getLongitude()));
             }
-            Log.d(activity, String.format(Locale.UK, "Last location: %s", lastLocation));
+            Log.INSTANCE.d(activity, String.format(Locale.UK, "Last location: %s", lastLocation));
         }
     }
 
@@ -192,12 +192,12 @@ public class PositionTracker implements
                     switch (status.getStatusCode()) {
 
                         case LocationSettingsStatusCodes.SUCCESS:
-                            Log.d(activity, "PositionTracker.startLocationUpdates() -> SUCCESS");
+                            Log.INSTANCE.d(activity, "PositionTracker.startLocationUpdates() -> SUCCESS");
                             requestLocationUpdates();
                             break;
 
                         case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            Log.d(activity, "PositionTracker.startLocationUpdates() -> RESOLUTION");
+                            Log.INSTANCE.d(activity, "PositionTracker.startLocationUpdates() -> RESOLUTION");
                             try {
                                 status.startResolutionForResult(
                                         activity, InternalConstants.RESOLUTION_REQUEST
@@ -207,7 +207,7 @@ public class PositionTracker implements
                             break;
 
                         default:
-                            Log.d(activity, "PositionTracker.startLocationUpdates() -> FAILURE");
+                            Log.INSTANCE.d(activity, "PositionTracker.startLocationUpdates() -> FAILURE");
                     }
                 }
             });
@@ -215,7 +215,7 @@ public class PositionTracker implements
     }
 
     private void requestLocationUpdates() {
-        Log.d(activity, "PositionTracker.requestLocationUpdates()");
+        Log.INSTANCE.d(activity, "PositionTracker.requestLocationUpdates()");
         int locationPermission = ContextCompat.checkSelfPermission(
                 activity,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -236,7 +236,7 @@ public class PositionTracker implements
         if (location != null) {
             appState.setPosition(String.valueOf(location.getLatitude()),
                     String.valueOf(location.getLongitude()));
-            Log.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
+            Log.INSTANCE.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
                     location.getLatitude(), location.getLongitude()));
         }
     }

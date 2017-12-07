@@ -987,26 +987,26 @@ public class MainActivity extends AppCompatActivity implements
         SetupCallback setupCallback = new SetupCallback() {
             @Override
             public void onSuccess() {
-                Log.d(MainActivity.this, "reconnect.onSuccess()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onSuccess()");
                 un20WakeupDialog.dismiss();
                 appState.getScanner().registerButtonListener(scannerButtonListener);
             }
 
             @Override
             public void onProgress(int progress, int detailsId) {
-                Log.d(MainActivity.this, "reconnect.onProgress()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onProgress()");
             }
 
             @Override
             public void onError(int resultCode, Intent resultData) {
-                Log.d(MainActivity.this, "reconnect.onError()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onError()");
                 un20WakeupDialog.dismiss();
                 launchAlert(ALERT_TYPE.DISCONNECTED);
             }
 
             @Override
             public void onAlert(@NonNull ALERT_TYPE alertType) {
-                Log.d(MainActivity.this, "reconnect.onAlert()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onAlert()");
                 un20WakeupDialog.dismiss();
                 launchAlert(alertType);
             }

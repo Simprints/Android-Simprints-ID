@@ -135,7 +135,7 @@ public class LaunchActivity extends AppCompatActivity {
 
             @Override
             public void onProgress(int progress, int detailsId) {
-                Log.d(LaunchActivity.this, "onprogress");
+                Log.INSTANCE.d(LaunchActivity.this, "onprogress");
                 launchProgress.setProgress(progress);
                 loadingInfoTextView.setText(detailsId);
             }
