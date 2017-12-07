@@ -12,7 +12,7 @@ import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.tools.Language;
+import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.RemoteConfig;
 
@@ -31,9 +31,7 @@ public class FrontActivity extends AppCompatActivity implements FrontContract.Vi
         DataManager dataManager = app.getDataManager();
         SyncService syncService = app.getSyncService();
 
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_front);
         RemoteConfig.init();
 

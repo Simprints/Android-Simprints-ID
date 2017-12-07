@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,11 +17,10 @@ import android.widget.TextView;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.Language;
+import com.simprints.id.tools.LanguageHelper;
 
 
-public class AboutActivity extends AppCompatActivity implements AboutContract.View{
+public class AboutActivity extends AppCompatActivity implements AboutContract.View {
 
     private AboutContract.Presenter aboutPresenter;
 
@@ -46,9 +44,7 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
 
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
 
         setContentView(R.layout.activity_about);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
