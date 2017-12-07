@@ -4,6 +4,7 @@ apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 apply plugin: "io.fabric"
 apply plugin: "com.google.firebase.firebase-crash"
+apply plugin: "realm-android"
 
 android {
     compileSdkVersion 26
@@ -147,4 +148,3 @@ crashlytics {
 }
 
 apply plugin: "com.google.gms.google-services"
-apply plugin: "realm-android"
