@@ -569,12 +569,10 @@ public class MainActivity extends AppCompatActivity implements
                 dataManager.savePerson(person);
 
                 registrationResult = new Registration(dataManager.getPatientId());
-                for (Fingerprint fp : fingerprints) {
-                    if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES))
+                if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES)) {
+                    for (Fingerprint fp : fingerprints) {
                         registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
-                    else
-                        registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
-//                        registrationResult.setTemplate(fp.getFingerId(), new byte[1]);
+                    }
                 }
 
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
