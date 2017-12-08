@@ -21,9 +21,6 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         val PREF_MODE = Context.MODE_PRIVATE
 
         // Session state
-        private val API_KEY_KEY = "ApiKey"
-        private val API_KEY_DEFAULT = ""
-
         private val CALLOUT_KEY = "Callout"
         private val CALLOUT_DEFAULT = Callout.NULL
 
@@ -97,10 +94,6 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                 .map { Pair(it, false) }
                 .toMap()
     }
-
-
-    // API key of the current sessions
-    override var apiKey: String by PrimitivePreference(prefs, API_KEY_KEY, API_KEY_DEFAULT)
 
     // Callout of the current session
     override var callout: Callout by ComplexPreference(prefs, CALLOUT_KEY, CALLOUT_DEFAULT, calloutSerializer)

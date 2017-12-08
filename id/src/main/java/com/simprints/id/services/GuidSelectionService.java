@@ -30,7 +30,15 @@ public class GuidSelectionService extends IntentService {
 
     private boolean hasValidApiKeyExtra(@NonNull Intent intent) {
         String apiKey = intent.getStringExtra(Constants.SIMPRINTS_API_KEY);
-        return apiKey != null && apiKey.equals(dataManager.getApiKey());
+
+        String dmApiKey;
+        try {
+            dmApiKey = dataManager.getApiKey();
+        } catch (NullPointerException npe) {
+            return false;
+        }
+
+        return apiKey != null && apiKey.equals(dmApiKey);
     }
 
     private boolean hasValidSessionIdExtra(@NonNull Intent intent) {
