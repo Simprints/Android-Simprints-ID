@@ -1,6 +1,7 @@
 package com.simprints.id
 
 import android.support.test.espresso.Espresso
+import android.support.test.espresso.NoMatchingViewException
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
@@ -178,14 +179,13 @@ private fun testMainActivitySync() {
     log("testMainActivitySync")
     testMainActivityOpenDrawer()
     testMainActivityPressSync()
-    testVerifySyncCompletedUi()
+    testWaitAndVerifyUiForSyncCompleted()
 }
 
 private fun testMainActivityOpenDrawer() {
     log("testMainActivityOpenDrawer")
     Espresso.onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-
     WaitingUtils.waitOnUiForActivityToSettle()
 }
 
@@ -193,18 +193,35 @@ private fun testMainActivityPressSync() {
     log("testMainActivityPressSync")
     Espresso.onView(withId(R.id.nav_view))
             .perform(navigateTo(R.id.nav_sync))
-    testVerifySyncStartedUi()
-    WaitingUtils.waitOnUiForMediumSyncToComplete()
+    testVerifyUiForSyncStarted()
+
 }
 
-private fun testVerifySyncStartedUi() {
-    log("testVerifySyncStartedUi")
+private fun testVerifyUiForSyncStarted() {
+    log("testVerifyUiForSyncStarted")
     Espresso.onView(anyOf(withText(R.string.syncing), withText(R.string.nav_sync_complete)))
             .check(matches(isDisplayed()))
 }
 
-private fun testVerifySyncCompletedUi() {
-    log("testVerifySyncCompletedUi")
-    Espresso.onView(withText(R.string.nav_sync_complete))
-            .check(matches(isDisplayed()))
+private fun testWaitAndVerifyUiForSyncCompleted() {
+    log("testWaitAndVerifyUiForSyncCompleted")
+    testCheckUiForSyncCompleted()
+}
+
+private fun testCheckUiForSyncCompleted(iteration: Int = 1) {
+    WaitingUtils.waitOnUiForMediumSyncInterval()
+    log("testCheckUiForSyncCompleted seconds elapsed: " + iteration * SyncParameters.SYNC_CHECK_INTERVAL)
+    try {
+        Espresso.onView(withText(R.string.nav_sync_complete))
+                .check(matches(isDisplayed()))
+    } catch (e: NoMatchingViewException) {
+        try {
+            Espresso.onView(withText(R.string.syncing))
+                    .check(matches(isDisplayed()))
+            testCheckUiForSyncCompleted(iteration + 1)
+        } catch (e: NoMatchingViewException) {
+            log("testCheckUiForSyncCompleted failed: not showing syncing progress or complete")
+            throw Exception("Sync failed to complete")
+        }
+    }
 }
