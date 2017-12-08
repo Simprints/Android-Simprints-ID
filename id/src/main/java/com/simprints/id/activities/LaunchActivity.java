@@ -19,7 +19,7 @@ import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.Language;
+import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
@@ -81,9 +81,7 @@ public class LaunchActivity extends AppCompatActivity {
         appState = app.getAppState();
         setup = app.getSetup();
 
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_launch);
 
         // Keep screen from going to sleep
@@ -137,7 +135,7 @@ public class LaunchActivity extends AppCompatActivity {
 
             @Override
             public void onProgress(int progress, int detailsId) {
-                Log.d(LaunchActivity.this, "onprogress");
+                Log.INSTANCE.d(LaunchActivity.this, "onprogress");
                 launchProgress.setProgress(progress);
                 loadingInfoTextView.setText(detailsId);
             }

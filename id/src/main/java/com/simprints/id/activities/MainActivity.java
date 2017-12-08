@@ -44,7 +44,7 @@ import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
-import com.simprints.id.tools.Language;
+import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.id.tools.TimeoutBar;
@@ -222,9 +222,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onResume() {
         super.onResume();
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
         if (syncItem != null && dataManager.isConnected())
             syncItem.setIcon(R.drawable.ic_menu_sync_ready);
     }
@@ -571,12 +569,10 @@ public class MainActivity extends AppCompatActivity implements
                 dataManager.savePerson(person);
 
                 registrationResult = new Registration(dataManager.getPatientId());
-                for (Fingerprint fp : fingerprints) {
-                    if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES))
+                if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES)) {
+                    for (Fingerprint fp : fingerprints) {
                         registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
-                    else
-                        registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
-//                        registrationResult.setTemplate(fp.getFingerId(), new byte[1]);
+                    }
                 }
 
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
@@ -989,26 +985,26 @@ public class MainActivity extends AppCompatActivity implements
         SetupCallback setupCallback = new SetupCallback() {
             @Override
             public void onSuccess() {
-                Log.d(MainActivity.this, "reconnect.onSuccess()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onSuccess()");
                 un20WakeupDialog.dismiss();
                 appState.getScanner().registerButtonListener(scannerButtonListener);
             }
 
             @Override
             public void onProgress(int progress, int detailsId) {
-                Log.d(MainActivity.this, "reconnect.onProgress()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onProgress()");
             }
 
             @Override
             public void onError(int resultCode, Intent resultData) {
-                Log.d(MainActivity.this, "reconnect.onError()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onError()");
                 un20WakeupDialog.dismiss();
                 launchAlert(ALERT_TYPE.DISCONNECTED);
             }
 
             @Override
             public void onAlert(@NonNull ALERT_TYPE alertType) {
-                Log.d(MainActivity.this, "reconnect.onAlert()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onAlert()");
                 un20WakeupDialog.dismiss();
                 launchAlert(alertType);
             }

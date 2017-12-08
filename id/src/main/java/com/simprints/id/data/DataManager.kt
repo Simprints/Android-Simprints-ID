@@ -26,7 +26,6 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
     val libVersionName: String
 
     // Analytics
-
     fun logAlert(alertType: ALERT_TYPE)
     fun logUserProperties()
     fun logLogin()

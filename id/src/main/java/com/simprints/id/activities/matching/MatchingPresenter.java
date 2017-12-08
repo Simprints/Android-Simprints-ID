@@ -110,7 +110,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
         dataManager.loadPeople(candidates, matchGroup, new DataCallback() {
             @Override
             public void onSuccess() {
-                Log.d(MatchingPresenter.this, String.format(Locale.UK,
+                Log.INSTANCE.d(MatchingPresenter.this, String.format(Locale.UK,
                         "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
@@ -153,7 +153,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
         dataManager.loadPerson(candidates, guid, new DataCallback() {
             @Override
             public void onSuccess() {
-                Log.d(MatchingPresenter.this, "Successfully loaded candidate");
+                Log.INSTANCE.d(MatchingPresenter.this, "Successfully loaded candidate");
 
                 int matcherType = dataManager.getMatcherType();
 
