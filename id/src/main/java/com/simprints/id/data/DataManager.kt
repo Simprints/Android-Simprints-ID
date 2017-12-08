@@ -5,6 +5,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.libcommon.Person
 import com.simprints.libdata.AuthListener
@@ -17,7 +18,8 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 
 
-interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, ApiManager, AnalyticsManager {
+interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, ApiManager,
+        AnalyticsManager, SecureDataManager {
 
     val androidSdkVersion: Int
     val deviceModel: String
@@ -57,7 +59,7 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
 
     // Local + remote + api which need to be split into smaller bits
     fun isInitialized(): Boolean
-    fun initialize(callback: DataCallback?)
+    fun initialize(callback: DataCallback)
     fun signIn(callback: DataCallback?)
     fun finish()
 }

@@ -157,6 +157,10 @@ public class Setup {
                     case DATABASE_INIT_RESTART:
                         goOn(activity);
                         break;
+                    case NOT_FOUND:
+                        dataManager.logException(new Exception("API Key was null in dataManager"));
+                        onAlert(ALERT_TYPE.MISSING_API_KEY);
+                        break;
                     default:
                         dataManager.logException(new Exception("Unknown error returned in onFailure Setup.initDbContext()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
@@ -299,7 +303,7 @@ public class Setup {
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
                         } else {
                             // We're offline but might find the person if we sync
-                            dataManager.saveVerification(probe,null,
+                            dataManager.saveVerification(probe, null,
                                     VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE);
                             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
                         }

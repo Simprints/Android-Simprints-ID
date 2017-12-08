@@ -8,6 +8,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
@@ -26,13 +27,15 @@ class DataManagerImpl(private val context: Context,
                       private val localDbManager: LocalDbManager,
                       private val remoteDbManager: RemoteDbManager,
                       private val apiManager: ApiManager,
-                      private val analyticsManager: AnalyticsManager)
+                      private val analyticsManager: AnalyticsManager,
+                      private val secureDataManager: SecureDataManager)
     : DataManager,
         PreferencesManager by preferencesManager,
         AnalyticsManager by analyticsManager,
         LocalDbManager by localDbManager,
         RemoteDbManager by remoteDbManager,
-        ApiManager by apiManager {
+        ApiManager by apiManager,
+        SecureDataManager by secureDataManager {
 
     override val androidSdkVersion: Int
         get() = Build.VERSION.SDK_INT
@@ -50,30 +53,30 @@ class DataManagerImpl(private val context: Context,
         get() = com.simprints.libsimprints.BuildConfig.VERSION_NAME
 
     override fun logAlert(alertType: ALERT_TYPE) =
-            analyticsManager.logAlert(alertType.name, apiKey, moduleId, userId, deviceId)
+            analyticsManager.logAlert(alertType.name, getApiKeyOrDefault(), moduleId, userId, deviceId)
 
     override fun logUserProperties() =
-            analyticsManager.logUserProperties(userId, apiKey, moduleId, deviceId)
+            analyticsManager.logUserProperties(userId, getApiKeyOrDefault(), moduleId, deviceId)
 
     override fun logLogin() =
             analyticsManager.logLogin(callout)
 
     override fun logGuidSelectionService(selectedGuid: String, callbackSent: Boolean) =
-            analyticsManager.logGuidSelectionService(selectedGuid, callbackSent, apiKey, deviceId,
+            analyticsManager.logGuidSelectionService(selectedGuid, callbackSent, getApiKeyOrDefault(), deviceId,
                     sessionId)
 
     override fun logConnectionStateChange(connected: Boolean) =
-            analyticsManager.logConnectionStateChange(connected, apiKey, deviceId, sessionId)
+            analyticsManager.logConnectionStateChange(connected, getApiKeyOrDefault(), deviceId, sessionId)
 
     override fun logAuthStateChange(authenticated: Boolean) =
-            analyticsManager.logAuthStateChange(authenticated, apiKey, deviceId, sessionId)
+            analyticsManager.logAuthStateChange(authenticated, getApiKeyOrDefault(), deviceId, sessionId)
 
-    private val connectionStateLogger = object: ConnectionListener {
+    private val connectionStateLogger = object : ConnectionListener {
         override fun onConnection() = logConnectionStateChange(true)
         override fun onDisconnection() = logConnectionStateChange(false)
     }
 
-    private val authStateLogger = object: AuthListener {
+    private val authStateLogger = object : AuthListener {
         override fun onSignIn() = logAuthStateChange(true)
         override fun onSignOut() = logAuthStateChange(false)
     }
@@ -101,8 +104,14 @@ class DataManagerImpl(private val context: Context,
             dbContext.callSafelyOrLogNonFatalExceptionOn("unregisterConnectionListener")
             { remoteDbManager.unregisterConnectionListener(it, connectionListener) }
 
-    override fun updateIdentification(selectedGuid: String): Boolean =
-        remoteDbManager.updateIdentification(apiKey, selectedGuid, deviceId, sessionId)
+    override fun updateIdentification(selectedGuid: String): Boolean {
+        return try {
+            val apiKey = this.apiKey
+            remoteDbManager.updateIdentification(apiKey, selectedGuid, deviceId, sessionId)
+        } catch (npe: NullPointerException) {
+            false
+        }
+    }
 
     // Local only
 
@@ -170,18 +179,27 @@ class DataManagerImpl(private val context: Context,
     override fun isInitialized(): Boolean =
             dbContext != null
 
-    override fun initialize(callback: DataCallback?) {
+    override fun initialize(callback: DataCallback) {
+
+        val apiKey: String
+        try {
+            apiKey = this.apiKey
+        } catch (npe: NullPointerException) {
+            callback.onFailure(DATA_ERROR.NOT_FOUND)
+            return
+        }
+
         val tentativeDbContext = DatabaseContext(apiKey, userId, moduleId, deviceId, context, BuildConfig.FIREBASE_PROJECT)
 
         tentativeDbContext.initDatabase(object : DataCallback {
             override fun onSuccess() {
                 dbContext = tentativeDbContext
-                callback?.onSuccess()
+                callback.onSuccess()
             }
 
             override fun onFailure(error: DATA_ERROR) {
                 tentativeDbContext.destroy()
-                callback?.onFailure(error)
+                callback.onFailure(error)
             }
         })
     }
@@ -200,7 +218,7 @@ class DataManagerImpl(private val context: Context,
      * Performs the specified call using this database context if it is non null.
      * Else, log a non fatal exception.
      */
-    private fun <T: Any?> DatabaseContext?.callSafelyOrLogNonFatalExceptionOn(
+    private fun <T : Any?> DatabaseContext?.callSafelyOrLogNonFatalExceptionOn(
             methodName: String, call: (DatabaseContext) -> T, onFailureReturn: T): T {
         return if (this == null) {
             logNonFatalException("Cannot $methodName because dbContext is null")
@@ -213,6 +231,5 @@ class DataManagerImpl(private val context: Context,
     private fun DatabaseContext?.callSafelyOrLogNonFatalExceptionOn(methodName: String,
                                                                     call: (DatabaseContext) -> Unit) =
             callSafelyOrLogNonFatalExceptionOn(methodName, call, Unit)
-
 
 }
