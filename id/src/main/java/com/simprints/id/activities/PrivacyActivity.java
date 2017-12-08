@@ -9,22 +9,27 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 
+import com.simprints.id.Application;
 import com.simprints.id.R;
-import com.simprints.id.tools.Language;
-import com.simprints.id.tools.SharedPref;
+import com.simprints.id.data.DataManager;
+import com.simprints.id.tools.LanguageHelper;
 
 public class PrivacyActivity extends AppCompatActivity {
-    private SharedPref sharedPref;
+
+    private DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_privacy);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
+        Toolbar toolbar = findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -33,10 +38,8 @@ public class PrivacyActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        sharedPref = new SharedPref(getApplicationContext());
-
-        boolean consent = sharedPref.getConsentBool();
-        CheckBox checkBox = (CheckBox) findViewById(R.id.consentCheckBox);
+        boolean consent = dataManager.getConsent();
+        CheckBox checkBox = findViewById(R.id.consentCheckBox);
 
         checkBox.setChecked(consent);
     }
@@ -45,7 +48,7 @@ public class PrivacyActivity extends AppCompatActivity {
         // Check which checkbox was clicked
         switch (view.getId()) {
             case R.id.consentCheckBox:
-                sharedPref.setConsentBool(true);
+                dataManager.setConsent(true);
                 ((CheckBox) view).setChecked(true);
                 break;
         }
