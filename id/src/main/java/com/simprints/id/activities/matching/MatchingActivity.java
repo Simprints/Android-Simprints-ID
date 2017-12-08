@@ -18,7 +18,7 @@ import com.simprints.id.activities.AlertActivity;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.Language;
+import com.simprints.id.tools.LanguageHelper;
 import com.simprints.libcommon.Person;
 
 import static com.simprints.id.tools.ResourceHelper.getStringPlural;
@@ -45,10 +45,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         AppState appState = app.getAppState();
         appState.logMatchStart();
 
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
-
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_matching);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

@@ -106,7 +106,6 @@ class DataManagerImpl(private val context: Context,
 
     // Local only
 
-
     override fun getPeopleCount(group: Constants.GROUP): Long =
             dbContext.callSafelyOrLogNonFatalExceptionOn("getPeopleCount",
                     { localDbManager.getPeopleCount(it, group) },
@@ -119,7 +118,6 @@ class DataManagerImpl(private val context: Context,
     }
 
     // Local + remote which need to be split into smaller bits
-
 
     override fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback) {
         val filename = "${deviceId}_${System.currentTimeMillis()}.json"
@@ -152,7 +150,6 @@ class DataManagerImpl(private val context: Context,
     override fun loadPerson(destinationList: MutableList<Person>, guid: String, callback: DataCallback) =
             dbContext.callSafelyOrLogNonFatalExceptionOn("loadPerson")
             { it.loadPerson(destinationList, guid, callback) }
-
 
     // Local + remote + api which need to be split into smaller bits
 

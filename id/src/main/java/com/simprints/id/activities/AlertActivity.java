@@ -24,7 +24,6 @@ public class AlertActivity extends AppCompatActivity {
     // Singletons
     AppState appState;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
