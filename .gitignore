@@ -35,3 +35,6 @@ build/
 
 #NDK
 obj/
+
+# Test Log Files
+testing/logs/

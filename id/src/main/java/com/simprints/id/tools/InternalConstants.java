@@ -16,8 +16,4 @@ public class InternalConstants {
     public final static int REFUSAL_ACTIVITY_REQUEST = 66;
 
     public final static int RESULT_TRY_AGAIN = 100;
-
-    //Version numbers
-    public final static int DATABASE_VERSION_NUMBER = 4;
-    public final static String LIBSIMPRINTS_VERSION = "1.0.12";
 }

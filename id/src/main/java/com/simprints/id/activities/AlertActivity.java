@@ -10,18 +10,19 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.CustomEvent;
+import com.simprints.id.Application;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.tools.Analytics;
 import com.simprints.id.tools.AppState;
 
 public class AlertActivity extends AppCompatActivity {
 
-    AppState appState;
-    Analytics analytics;
+    DataManager dataManager;
     ALERT_TYPE alertType;
+
+    // Singletons
+    AppState appState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +30,9 @@ public class AlertActivity extends AppCompatActivity {
         setContentView(R.layout.activity_alert);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        appState = AppState.getInstance();
-        analytics = Analytics.getInstance(getApplicationContext());
-
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+        appState = app.getAppState();
 
         Bundle extras = getIntent().getExtras();
         assert extras != null;
@@ -39,12 +40,7 @@ public class AlertActivity extends AppCompatActivity {
         assert alertType != null;
         this.alertType = alertType;
 
-        if (alertType.mustBeLogged()) {
-            Answers.getInstance().logCustom(new CustomEvent("Alert Triggered")
-                    .putCustomAttribute("Alert Type", alertType.name() != null ? alertType.name() : "null")
-                    .putCustomAttribute("API Key", appState.getApiKey() != null ? appState.getApiKey() : "null")
-                    .putCustomAttribute("MAC Address", appState.getMacAddress() != null ? appState.getMacAddress() : "null"));
-        }
+        dataManager.logAlert(alertType);
 
         int color = ResourcesCompat.getColor(getResources(), alertType.getBackgroundColor(), null);
         findViewById(R.id.alertLayout).setBackgroundColor(color);
@@ -55,7 +51,7 @@ public class AlertActivity extends AppCompatActivity {
 
         ((ImageView) findViewById(R.id.graphic)).setImageResource(alertType.getAlertMainDrawableId());
 
-        ImageView alertHint = (ImageView) findViewById(R.id.hintGraphic);
+        ImageView alertHint = findViewById(R.id.hintGraphic);
         if (alertType.getAlertHintDrawableId() != -1) {
             alertHint.setImageResource(alertType.getAlertHintDrawableId());
         } else {
@@ -64,20 +60,19 @@ public class AlertActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.message)).setText(alertType.getAlertMessageId());
 
-        TextView alertLeftButtonTextView = (TextView) findViewById(R.id.left_button);
+        TextView alertLeftButtonTextView = findViewById(R.id.left_button);
         if (alertType.isLeftButtonActive()) {
             alertLeftButtonTextView.setText(alertType.getAlertLeftButtonTextId());
             alertLeftButtonTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     setResult(alertType.getResultCode());
-                    analytics.logAlert(alertType, false);
                     finish();
                 }
             });
         }
 
-        TextView alertRightButtonTextView = (TextView) findViewById(R.id.right_button);
+        TextView alertRightButtonTextView = findViewById(R.id.right_button);
         if (alertType.isRightButtonActive()) {
             alertRightButtonTextView.setText(alertType.getAlertRightButtonTextId());
             alertRightButtonTextView.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +97,6 @@ public class AlertActivity extends AppCompatActivity {
 
                         default:
                             setResult(RESULT_CANCELED);
-                            analytics.logAlert(alertType, false);
                             finish();
                             break;
                     }
