@@ -24,9 +24,9 @@ object WaitingUtils {
         sleep(8, TimeUnit.SECONDS)
     }
 
-    fun waitOnUiForMediumSyncToComplete() {
-        setMasterPolicyTimeout(120, TimeUnit.SECONDS)
-        sleep(60, TimeUnit.SECONDS)
+    fun waitOnUiForMediumSyncInterval() {
+        setMasterPolicyTimeout(SyncParameters.MEDIUM_DATABASE_SYNC_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        sleep(SyncParameters.SYNC_CHECK_INTERVAL, TimeUnit.SECONDS)
     }
 
     fun waitOnSystemForQuickDataCalls() {
