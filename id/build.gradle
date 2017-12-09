@@ -27,7 +27,8 @@ android {
         }
         release {
             lintOptions {
-                // Added in 1.4.0 - remove whenever possible
+                // TODO : Remove whenever possible
+                // Check in the Translations Editor for crucial translations that may be missing
                 disable "MissingTranslation"
             }
             minifyEnabled true

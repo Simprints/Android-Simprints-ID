@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.activities.AlertActivity;
+import com.simprints.id.activities.IntentKeys;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
@@ -59,11 +60,12 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         // Create the Presenter, and pass it all the information and handles it needs
         final Bundle extras = getIntent().getExtras();
         if (extras == null) {
+            dataManager.logNonFatalException("Null extras passed to MatchingActivity");
             launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             finish();
             return;
         }
-        Person probe = extras.getParcelable("Person");
+        Person probe = extras.getParcelable(IntentKeys.matchingActivityProbePersonKey);
         matchingPresenter = new MatchingPresenter(
                 this,
                 dataManager,
@@ -148,7 +150,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     @Override
     public void launchAlert(ALERT_TYPE alertType) {
         Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra("alertType", alertType);
+        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
