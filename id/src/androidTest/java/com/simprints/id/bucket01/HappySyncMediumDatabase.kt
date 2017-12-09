@@ -43,8 +43,9 @@ class HappySyncMediumDatabase : FirstUseTest() {
         realmConfiguration = RealmConfig.get(calloutCredentials.apiKey)
         super.setUp()
 
+        log("bucket01.HappySyncMediumDatabase.setUp() creating remote database with ${SyncParameters.MEDIUM_DATABASE_NUMBER_OF_PATIENTS} patients")
         val apiInstance = RemoteAdminUtils.configuredApiInstance
-        RemoteAdminUtils.createSimpleValidProject(apiInstance, calloutCredentials, SyncParameters.MEDIUM_SIZED_DATABASE)
+        RemoteAdminUtils.createSimpleValidProject(apiInstance, calloutCredentials, SyncParameters.MEDIUM_DATABASE_NUMBER_OF_PATIENTS)
     }
 
     @Test
@@ -55,7 +56,7 @@ class HappySyncMediumDatabase : FirstUseTest() {
 
     @After
     override fun tearDown() {
-        log("bucket01.HappySyncMediumDatabase.tearDown()" + this::class)
+        log("bucket01.HappySyncMediumDatabase.tearDown()")
         super.tearDown()
     }
 }
