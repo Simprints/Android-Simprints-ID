@@ -19,7 +19,7 @@ class FrontPresenter implements FrontContract.Presenter {
     private DataCallback dataCallback;
 
     /**
-     * @param view      The FrontActivity
+     * @param view The FrontActivity
      */
     FrontPresenter(@NonNull FrontContract.View view, @NonNull SyncService syncService) {
         frontView = view;

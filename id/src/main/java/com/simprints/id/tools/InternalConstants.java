@@ -2,7 +2,6 @@ package com.simprints.id.tools;
 
 public class InternalConstants {
 
-    public final static String ALERT_TYPE_EXTRA = "alertType";
     public final static String COMMCARE_PACKAGE = "org.commcare.dalvik";
 
     public final static String COMMCARE_PERMISSION = "org.commcare.dalvik.provider.cases.read";
