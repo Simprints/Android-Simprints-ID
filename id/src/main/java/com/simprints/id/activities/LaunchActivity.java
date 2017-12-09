@@ -28,7 +28,6 @@ import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.ScannerCallback;
 
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
-import static com.simprints.id.tools.InternalConstants.ALERT_TYPE_EXTRA;
 import static com.simprints.id.tools.InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST;
 import static com.simprints.id.tools.InternalConstants.MAIN_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST;
@@ -166,7 +165,7 @@ public class LaunchActivity extends AppCompatActivity {
         launchOutOfFocus = true;
         setup.stop();
         Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra(ALERT_TYPE_EXTRA, alertType);
+        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST);
     }
 
