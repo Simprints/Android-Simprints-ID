@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 
 import com.simprints.id.Application;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.data.secure.ApiKeyNotFoundException;
 import com.simprints.libsimprints.Constants;
 
 import static com.simprints.libsimprints.Constants.SIMPRINTS_SELECTED_GUID;
@@ -34,7 +35,8 @@ public class GuidSelectionService extends IntentService {
         String dmApiKey;
         try {
             dmApiKey = dataManager.getApiKey();
-        } catch (NullPointerException npe) {
+        } catch (ApiKeyNotFoundException ex) {
+            dataManager.logException(ex);
             return false;
         }
 

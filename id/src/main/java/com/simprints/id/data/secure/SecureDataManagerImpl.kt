@@ -1,22 +1,26 @@
 package com.simprints.id.data.secure
 
+import com.simprints.id.data.DataManager
+
 class SecureDataManagerImpl : SecureDataManager {
 
     override var apiKey: String = ""
         get() {
             if (field.isBlank()) {
-                throw NullPointerException()
+                throw ApiKeyNotFoundException()
             }
             return field
         }
 
-
-    override fun getApiKeyOrDefault(): String {
+    override fun getApiKeyOrDefault(dataManager: DataManager): String {
         return try {
             apiKey
-        } catch (nullPointerException: NullPointerException) {
+        } catch (ex: ApiKeyNotFoundException) {
+            dataManager.logException(ex)
             ""
         }
     }
 
 }
+
+class ApiKeyNotFoundException(override var message: String = "") : RuntimeException()
