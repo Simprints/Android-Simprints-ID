@@ -8,6 +8,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.secure.ApiKeyNotFoundException
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.extensions.deviceId
@@ -108,7 +109,8 @@ class DataManagerImpl(private val context: Context,
         return try {
             val apiKey = this.apiKey
             remoteDbManager.updateIdentification(apiKey, selectedGuid, deviceId, sessionId)
-        } catch (npe: NullPointerException) {
+        } catch (ex: ApiKeyNotFoundException) {
+            logException(ex)
             false
         }
     }
@@ -184,7 +186,8 @@ class DataManagerImpl(private val context: Context,
         val apiKey: String
         try {
             apiKey = this.apiKey
-        } catch (npe: NullPointerException) {
+        } catch (ex: ApiKeyNotFoundException) {
+            logException(ex)
             callback.onFailure(DATA_ERROR.NOT_FOUND)
             return
         }
@@ -231,5 +234,11 @@ class DataManagerImpl(private val context: Context,
     private fun DatabaseContext?.callSafelyOrLogNonFatalExceptionOn(methodName: String,
                                                                     call: (DatabaseContext) -> Unit) =
             callSafelyOrLogNonFatalExceptionOn(methodName, call, Unit)
+
+    //Secure Data
+
+    override fun getApiKeyOrDefault(): String {
+        return secureDataManager.getApiKeyOrDefault(this)
+    }
 
 }

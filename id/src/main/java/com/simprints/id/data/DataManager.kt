@@ -29,6 +29,7 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
 
     // Analytics
     fun logAlert(alertType: ALERT_TYPE)
+
     fun logUserProperties()
     fun logLogin()
     fun logGuidSelectionService(selectedGuid: String, callbackSent: Boolean)
@@ -37,6 +38,7 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
 
     // Remote only
     fun isConnected(): Boolean
+
     fun registerAuthListener(authListener: AuthListener)
     fun registerConnectionListener(connectionListener: ConnectionListener)
     fun unregisterAuthListener(authListener: AuthListener)
@@ -45,21 +47,28 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
 
     // Local only
     fun getPeopleCount(group: Constants.GROUP): Long
+
     fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP,
                    callback: DataCallback?)
 
     // Local + remote which need to be split into smaller bits
     fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback)
+
     fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>): Boolean
     fun savePerson(person: Person): Boolean
     fun saveRefusalForm(refusalForm: RefusalForm): Boolean
     fun saveVerification(probe: Person, match: Verification?,
                          guidExistsResult: VERIFY_GUID_EXISTS_RESULT): Boolean
+
     fun loadPerson(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
 
     // Local + remote + api which need to be split into smaller bits
     fun isInitialized(): Boolean
+
     fun initialize(callback: DataCallback)
     fun signIn(callback: DataCallback?)
     fun finish()
+
+    // Secure data
+    fun getApiKeyOrDefault(): String
 }
