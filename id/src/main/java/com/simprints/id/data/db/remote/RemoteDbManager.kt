@@ -14,6 +14,6 @@ interface RemoteDbManager {
     fun unregisterConnectionListener(dbContext: DatabaseContext,
                                      connectionListener: ConnectionListener)
     fun updateIdentification(apiKey: String, selectedGuid: String, deviceId: String,
-                             sessionId: String): Boolean
+                             sessionId: String)
 
 }
