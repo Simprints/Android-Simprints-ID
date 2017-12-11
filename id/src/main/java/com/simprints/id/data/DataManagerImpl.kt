@@ -8,8 +8,8 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.secure.ApiKeyNotFoundException
 import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.exceptions.ApiKeyNotFoundException
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
@@ -54,23 +54,24 @@ class DataManagerImpl(private val context: Context,
         get() = com.simprints.libsimprints.BuildConfig.VERSION_NAME
 
     override fun logAlert(alertType: ALERT_TYPE) =
-            analyticsManager.logAlert(alertType.name, getApiKeyOrDefault(), moduleId, userId, deviceId)
+            analyticsManager.logAlert(alertType.name, getApiKeyOrEmpty(), moduleId, userId, deviceId)
 
     override fun logUserProperties() =
-            analyticsManager.logUserProperties(userId, getApiKeyOrDefault(), moduleId, deviceId)
+            analyticsManager.logUserProperties(userId, getApiKeyOrEmpty(), moduleId, deviceId)
 
     override fun logLogin() =
             analyticsManager.logLogin(callout)
 
-    override fun logGuidSelectionService(selectedGuid: String, callbackSent: Boolean) =
-            analyticsManager.logGuidSelectionService(selectedGuid, callbackSent, getApiKeyOrDefault(), deviceId,
-                    sessionId)
+    override fun logGuidSelectionService(apiKey: String, sessionId: String, selectedGuid: String,
+                                         callbackSent: Boolean) =
+            analyticsManager.logGuidSelectionService(apiKey, sessionId, selectedGuid, callbackSent,
+                    deviceId)
 
     override fun logConnectionStateChange(connected: Boolean) =
-            analyticsManager.logConnectionStateChange(connected, getApiKeyOrDefault(), deviceId, sessionId)
+            analyticsManager.logConnectionStateChange(connected, getApiKeyOrEmpty(), deviceId, sessionId)
 
     override fun logAuthStateChange(authenticated: Boolean) =
-            analyticsManager.logAuthStateChange(authenticated, getApiKeyOrDefault(), deviceId, sessionId)
+            analyticsManager.logAuthStateChange(authenticated, getApiKeyOrEmpty(), deviceId, sessionId)
 
     private val connectionStateLogger = object : ConnectionListener {
         override fun onConnection() = logConnectionStateChange(true)
@@ -105,15 +106,9 @@ class DataManagerImpl(private val context: Context,
             dbContext.callSafelyOrLogNonFatalExceptionOn("unregisterConnectionListener")
             { remoteDbManager.unregisterConnectionListener(it, connectionListener) }
 
-    override fun updateIdentification(selectedGuid: String): Boolean {
-        return try {
-            val apiKey = this.apiKey
+    @Throws(ApiKeyNotFoundException::class)
+    override fun updateIdentification(apiKey: String, selectedGuid: String) =
             remoteDbManager.updateIdentification(apiKey, selectedGuid, deviceId, sessionId)
-        } catch (ex: ApiKeyNotFoundException) {
-            logException(ex)
-            false
-        }
-    }
 
     // Local only
 
@@ -224,7 +219,7 @@ class DataManagerImpl(private val context: Context,
     private fun <T : Any?> DatabaseContext?.callSafelyOrLogNonFatalExceptionOn(
             methodName: String, call: (DatabaseContext) -> T, onFailureReturn: T): T {
         return if (this == null) {
-            logNonFatalException("Cannot $methodName because dbContext is null")
+            logNonFatalException(NullPointerException("Cannot $methodName because dbContext is null"))
             onFailureReturn
         } else {
             call(this)
@@ -237,8 +232,14 @@ class DataManagerImpl(private val context: Context,
 
     //Secure Data
 
-    override fun getApiKeyOrDefault(): String {
-        return secureDataManager.getApiKeyOrDefault(this)
-    }
+    override fun getApiKeyOrDefault(default: String): String =
+            try {
+                apiKey
+            } catch (exception: ApiKeyNotFoundException) {
+                logNonFatalException(exception)
+                default
+            }
 
+    override fun getApiKeyOrEmpty(): String =
+            getApiKeyOrDefault("")
 }
