@@ -1,6 +1,6 @@
 package com.simprints.id.data.secure
 
-import com.simprints.id.data.DataManager
+import com.simprints.id.exceptions.ApiKeyNotFoundException
 
 class SecureDataManagerImpl : SecureDataManager {
 
@@ -12,15 +12,5 @@ class SecureDataManagerImpl : SecureDataManager {
             return field
         }
 
-    override fun getApiKeyOrDefault(dataManager: DataManager): String {
-        return try {
-            apiKey
-        } catch (ex: ApiKeyNotFoundException) {
-            dataManager.logException(ex)
-            ""
-        }
-    }
-
 }
 
-class ApiKeyNotFoundException(override var message: String = "") : RuntimeException()
