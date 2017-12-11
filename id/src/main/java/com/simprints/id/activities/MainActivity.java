@@ -515,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void launchAlert(ALERT_TYPE alertType) {
         Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra("alertType", alertType);
+        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
@@ -581,7 +581,7 @@ public class MainActivity extends AppCompatActivity implements
                 finish();
             } else {
                 Intent intent = new Intent(this, MatchingActivity.class);
-                intent.putExtra("Person", person);
+                intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person);
                 startActivityForResult(intent, MATCHING_ACTIVITY_REQUEST_CODE);
             }
         }
