@@ -45,11 +45,11 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         Crashlytics.logException(throwable)
     }
 
-    override fun logNonFatalException(description: String) {
-        Timber.d("FirebaseAnalyticsManager.logNonFatalException(description=$description")
-        Crashlytics.log(description)
+    override fun logNonFatalException(throwable: Throwable) {
+        Timber.d("FirebaseAnalyticsManager.logNonFatalException(description=$throwable")
+        Crashlytics.log(throwable.message)
         val bundle = Bundle()
-        bundle.putString("description", description)
+        bundle.putString("description", throwable.message)
         firebaseAnalytics.logEvent("non_fatal_exception", bundle)
     }
 
@@ -74,8 +74,8 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
     }
 
-    override fun logGuidSelectionService(selectedGuid: String, callbackSent: Boolean,
-                                         apiKey: String, androidId: String, sessionId: String) {
+    override fun logGuidSelectionService(apiKey: String, sessionId: String,
+                                         selectedGuid: String, callbackSent: Boolean, androidId: String) {
         Timber.d("FirebaseAnalyticsManager.logGuidSelectionService(selectedGuid=$selectedGuid, callbackSent=$callbackSent)")
         val bundle = Bundle()
         bundle.putString("api_key", apiKey)
