@@ -20,6 +20,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
+import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.model.Callout
 import com.simprints.id.tools.AppState
 import com.simprints.id.tools.serializers.BooleanSerializer
@@ -98,9 +100,14 @@ class Application : AndroidApplication() {
     private val analyticsManager: AnalyticsManager by lazy {
         FirebaseAnalyticsManager(firebaseAnalytics)
     }
+
+    private val secureDataManager: SecureDataManager by lazy {
+        SecureDataManagerImpl()
+    }
+
     val dataManager: DataManager by lazy {
         DataManagerImpl(this, preferencesManager, localDbManager, remoteDbManager,
-                apiManager, analyticsManager)
+                apiManager, analyticsManager, secureDataManager)
     }
 
     // TODO: These are all the singletons that are used in Simprints ID right now. This is temporary, until we get rid of all these singletons
