@@ -37,6 +37,8 @@ import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.InvalidSyncParametersError;
+import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
@@ -825,7 +827,7 @@ public class MainActivity extends AppCompatActivity implements
                     syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                     break;
                 default:
-                    dataManager.logException(new Exception("Unknown error returned in onFailure MainActivity.syncListener()"));
+                    dataManager.logError(UnexpectedDataError.forDataError(data_error, "MainActivity.syncListener()"));
                     launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         }
@@ -838,9 +840,12 @@ public class MainActivity extends AppCompatActivity implements
             syncItem.setIcon(R.drawable.ic_menu_syncing);
         }
 
-        if (!syncService.startAndListen(getApplicationContext(), syncListener)) {
-            dataManager.logException(new Exception("Error in MainActivity.backgroundSync()"));
+        try {
+            syncService.startAndListen(getApplicationContext(), syncListener);
+        } catch (InvalidSyncParametersError e) {
+            dataManager.logError(e);
             launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+            finish();
         }
     }
 
@@ -912,8 +917,9 @@ public class MainActivity extends AppCompatActivity implements
                                 new Fingerprint(
                                         finger.getId(),
                                         appState.getScanner().getTemplate()));
+                // TODO : change exceptions in libcommon
             } catch (IllegalArgumentException ex) {
-                dataManager.logException(ex);
+                dataManager.logError(ex);
                 resetUIFromError();
                 return;
             }
