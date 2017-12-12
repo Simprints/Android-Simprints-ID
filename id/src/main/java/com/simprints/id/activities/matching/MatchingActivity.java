@@ -60,7 +60,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         // Create the Presenter, and pass it all the information and handles it needs
         final Bundle extras = getIntent().getExtras();
         if (extras == null) {
-            dataManager.logNonFatalException("Null extras passed to MatchingActivity");
+            dataManager.logNonFatalException(new Exception("Null extras passed to MatchingActivity"));
             launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             finish();
             return;

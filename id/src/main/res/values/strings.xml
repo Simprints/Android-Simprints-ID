@@ -71,6 +71,8 @@
     <string name="finger_image_description" translatable="false">Hands with arrow pointing to a finger</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+    <!-- Toasts -->
+    <string name="wait_for_current_sync_to_finish" translatable="false">Please wait for the current sync operation to finish</string>
 
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the MainActivity -->
