@@ -1,4 +1,4 @@
-package com.simprints.id.exceptions
+package com.simprints.id.exceptions.safe
 
 
 class InvalidCalloutParameterException(message: String): RuntimeException(message) {

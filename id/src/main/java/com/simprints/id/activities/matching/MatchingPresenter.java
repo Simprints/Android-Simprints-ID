@@ -7,6 +7,8 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
+import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
@@ -82,7 +84,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 onVerifyStart();
                 break;
             default:
-                dataManager.logException(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
+                dataManager.logError(new InvalidMatchingCalloutError("Invalid callout in MatchingActivity"));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -141,7 +143,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                dataManager.logException(new Exception("Failed to load people during identification: " + data_error.details()));
+                dataManager.logError(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
@@ -183,7 +185,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                dataManager.logException(new Exception("Failed to load person during verification: " + data_error.details()));
+                dataManager.logError(new Exception("Failed to load person during verification: " + data_error.details()));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });

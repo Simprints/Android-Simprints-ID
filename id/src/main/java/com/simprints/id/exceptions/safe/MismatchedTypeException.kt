@@ -1,4 +1,4 @@
-package com.simprints.id.data.prefs.improvedSharedPreferences
+package com.simprints.id.exceptions.safe
 
 
 class MismatchedTypeException(message: String, cause: Throwable): Throwable(message, cause)
