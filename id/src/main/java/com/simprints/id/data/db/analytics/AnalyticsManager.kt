@@ -5,12 +5,12 @@ import com.simprints.id.model.Callout
 
 interface AnalyticsManager {
 
-    fun logError(throwable: Throwable)
+    fun logError(error: Error)
 
     fun logAlert(alertName: String, apiKey: String, moduleId: String, userId: String,
                  deviceId: String)
 
-    fun logSafeException(throwable: Throwable)
+    fun logSafeException(exception: RuntimeException)
 
     fun logUserProperties(userId: String, apiKey: String, moduleId: String, deviceId: String)
 

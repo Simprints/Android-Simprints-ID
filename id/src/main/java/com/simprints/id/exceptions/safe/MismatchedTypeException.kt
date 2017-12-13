@@ -1,4 +1,4 @@
 package com.simprints.id.exceptions.safe
 
 
-class MismatchedTypeException(message: String, cause: Throwable): Throwable(message, cause)
+class MismatchedTypeException(message: String = "MismatchedTypeException", cause: Throwable): RuntimeException(message, cause)
