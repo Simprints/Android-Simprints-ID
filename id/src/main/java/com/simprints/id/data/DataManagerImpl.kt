@@ -9,8 +9,8 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError
 import com.simprints.id.exceptions.safe.NullDbContextException
+import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
@@ -233,15 +233,6 @@ class DataManagerImpl(private val context: Context,
 
     //Secure Data
 
-    override fun getApiKeyOrDefault(default: String): String =
-            try {
-                apiKey
-            } catch (error: ApiKeyNotFoundError) {
-                // TODO : This is not okay behaviour for an error
-                logError(error)
-                default
-            }
-
     override fun getApiKeyOrEmpty(): String =
-            getApiKeyOrDefault("")
+            getApiKeyOr("")
 }
