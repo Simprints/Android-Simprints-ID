@@ -199,6 +199,7 @@ private fun testMainActivityPressSync() {
 
 private fun testVerifyUiForSyncStarted() {
     log("testVerifyUiForSyncStarted")
+    WaitingUtils.waitOnUiForSyncingToStart()
     Espresso.onView(anyOf(withText(R.string.syncing), withText(R.string.nav_sync_complete)))
             .check(matches(isDisplayed()))
 }
