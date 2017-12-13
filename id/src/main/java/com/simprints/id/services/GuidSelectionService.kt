@@ -5,7 +5,7 @@ import android.content.Intent
 
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
-import com.simprints.id.exceptions.InvalidCalloutParameterException
+import com.simprints.id.exceptions.safe.InvalidCalloutParameterException
 import com.simprints.libsimprints.Constants.*
 
 
@@ -36,7 +36,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
             dataManager.updateIdentification(apiKey, selectedGuid)
             true
         } catch (exception: InvalidCalloutParameterException) {
-            dataManager.logNonFatalException(exception)
+            dataManager.logSafeException(exception)
             false
         }
         dataManager.logGuidSelectionService(apiKey, sessionId, selectedGuid, callbackSent)
@@ -64,8 +64,8 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     }
 
     private fun checkApiKey(apiKey: String) {
-        if (apiKey.isEmpty() || apiKey != dataManager.getApiKeyOrDefault(apiKey)) {
-            throw InvalidCalloutParameterException.forParameter(SIMPRINTS_SESSION_ID)
+        if (apiKey.isEmpty() || apiKey != dataManager.getApiKeyOr(apiKey)) {
+            throw InvalidCalloutParameterException.forParameter(SIMPRINTS_API_KEY)
         }
     }
 

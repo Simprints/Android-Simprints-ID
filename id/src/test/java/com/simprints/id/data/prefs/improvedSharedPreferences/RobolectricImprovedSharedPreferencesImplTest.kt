@@ -2,6 +2,8 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.simprints.id.exceptions.safe.MismatchedTypeException
+import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
 import com.simprints.id.testUtils.assertThrows
 import junit.framework.Assert
 import org.junit.Test
@@ -116,7 +118,7 @@ class RobolectricImprovedSharedPreferencesImplTest {
 
     @Test
     fun testGetPrimitiveThrowsExceptionWhenValueIsUnsupportedType() {
-        assertThrows<NonPrimitiveTypeException> {
+        assertThrows<NonPrimitiveTypeError> {
             improvedPrefs.getPrimitive(aKey, aClass)
         }
     }

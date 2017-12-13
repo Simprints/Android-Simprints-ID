@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.InvalidSyncParametersError;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.DatabaseSync;
@@ -38,13 +39,13 @@ public class SyncService implements DataCallback {
     /**
      * Don't start a new sync if there is only one in progress
      */
-    public synchronized boolean startAndListen(@NonNull Context appContext, @Nullable DataCallback dataCallback) {
+    public synchronized void startAndListen(@NonNull Context appContext, @Nullable DataCallback dataCallback) {
         String appKey = dataManager.getAppKey();
         String userId = dataManager.getUserId();
         Timber.d("sync: startAndListen()");
         if (appKey.isEmpty() || userId.isEmpty()) {
             Timber.d("sync: first if");
-            return false;
+            throw new InvalidSyncParametersError("Empty appKey or userId in SyncService.startAndListen()");
         }
 
         if (dataCallback != null)
@@ -63,7 +64,6 @@ public class SyncService implements DataCallback {
                     break;
             }
         }
-        return true;
     }
 
     public synchronized void stopListening(@Nullable DataCallback dataCallback) {
