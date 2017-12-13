@@ -33,7 +33,7 @@ Thumbs.db
 build/
 **/output.json
 
-/ PyCharm
+# PyCharm
 testing/__pycache__/
 __pycache__/
 
