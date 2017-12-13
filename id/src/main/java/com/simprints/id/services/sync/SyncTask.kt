@@ -1,12 +1,12 @@
 package com.simprints.id.services.sync
 
 import com.simprints.id.data.DataManager
+import com.simprints.id.exceptions.safe.InterruptedSyncException
+import com.simprints.id.exceptions.unsafe.UnexpectedSyncError
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.service.ProgressTask
 import com.simprints.id.services.sync.SyncTaskParameters.GlobalSyncTaskParameters
 import com.simprints.id.services.sync.SyncTaskParameters.UserSyncTaskParameters
-import com.simprints.id.throwables.safe.InterruptedSyncException
-import com.simprints.id.throwables.unsafe.UnexpectedSyncError
 import com.simprints.libdata.DATA_ERROR
 import com.simprints.libdata.DataCallback
 import io.reactivex.Emitter

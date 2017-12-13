@@ -3,7 +3,7 @@ package com.simprints.id.services.sync
 import android.content.Context
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.client.ProgressClientImpl
-import com.simprints.id.throwables.safe.TaskInProgressException
+import com.simprints.id.exceptions.safe.TaskInProgressException
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableObserver

@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.simprints.id.services.progress.service.ProgressTaskParameters
-import com.simprints.id.throwables.unsafe.InvalidServiceError
+import com.simprints.id.exceptions.unsafe.InvalidServiceError
 import timber.log.Timber
 
 
