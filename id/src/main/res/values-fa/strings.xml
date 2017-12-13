@@ -29,6 +29,7 @@
     <!-- Sync Button Text -->
     <string name="sync_data">همگام کردن معلومات</string>
     <string name="syncing">همگام کردن</string>
+    <string name="syncing_with_progress">%1$d/%2$d ..همگام کردن</string>
     <string name="not_signed_in">در سیستم داخل نشدید</string>
 
 

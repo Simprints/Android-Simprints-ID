@@ -1,22 +1,29 @@
 package com.simprints.libdata
 
-import android.util.Log
 import com.google.firebase.database.*
+import com.simprints.libcommon.Progress
+import com.simprints.libdata.exceptions.safe.InterruptedSyncException
+import com.simprints.libdata.exceptions.unsafe.UnexpectedSyncError
 import com.simprints.libdata.models.firebase.fb_Person
 import com.simprints.libdata.models.firebase.fb_User
 import com.simprints.libdata.models.realm.rl_Person
 import com.simprints.libdata.tools.Routes.patientNode
 import com.simprints.libdata.tools.Routes.userPatientListNode
+import io.reactivex.Emitter
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import timber.log.Timber
 import java.util.HashMap
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.ArrayList
 
 class NaiveSync(
+        private val isInterrupted: () -> Boolean,
+        private val emitter: Emitter<Progress>,
         private val userId: String = "",
-        private val callback: SyncCallback,
         private val realmConfig: RealmConfiguration,
         private val projectRef: DatabaseReference,
         private val usersRef: DatabaseReference,
@@ -26,42 +33,46 @@ class NaiveSync(
     private var patientsToDownload: ArrayList<String> = ArrayList()
     private var patientsToSave: ArrayList<rl_Person> = ArrayList()
     private var downloadingCount = 0
-    private val realm = Realm.getInstance(realmConfig)
+    private lateinit var realm: Realm
+
+    private val currentProgress = AtomicInteger(0)
+    private val maxProgress = AtomicInteger(0)
 
     /**
      * This method starts the sync by downloading all of the required users and calling
      * setPatientList()
      */
     fun sync() {
+        // All firebase callbacks are executed on the ui thread, so we initialize the realm on
+        // this thread and make sure that it will only be used on this thread.
+        async(UI) {
+            realm = Realm.getInstance(realmConfig)
 
-        // Get the query
-        val query: Query = if (userId.isBlank()) {
-            usersRef
-        } else {
-            usersRef.orderByChild(userId).limitToFirst(1)
-        }
+            // Get the query
+            val query: Query = if (userId.isBlank()) {
+                usersRef
+            } else {
+                usersRef.orderByChild(userId).limitToFirst(1)
+            }
 
-        callback.onInit()
+            // Set the user return listener
+            query.addListenerForSingleValueEvent(object : ValueEventListener {
 
-        // Set the user return listener
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
 
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.childrenCount <= 0) {
+                        emitter.onComplete()
+                        return
+                    }
 
-                if (dataSnapshot.childrenCount <= 0) {
-                    callback.onFinish()
-                    return
+                    setDownloadListAndUpload(dataSnapshot)
                 }
 
-                setDownloadListAndUpload(dataSnapshot)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                callback.onError(DATA_ERROR.SYNC_INTERRUPTED)
-            }
-
-        })
-
+                override fun onCancelled(error: DatabaseError) {
+                    emitter.onError(UnexpectedSyncError(error.toException()))
+                }
+            })
+        }
     }
 
     /**
@@ -93,10 +104,10 @@ class NaiveSync(
 
             bgRealm.close()
 
-            uiThread {
-                callback.onStart(patientsToDownload.size)
-                clearPatientList()
-            }
+            maxProgress.set(patientsToDownload.size)
+            emitProgress()
+
+            clearPatientList()
         }
 
     }
@@ -106,10 +117,15 @@ class NaiveSync(
      */
     private fun clearPatientList() {
 
+        if (isInterrupted()) {
+            emitter.onError(InterruptedSyncException())
+            return
+        }
+
         if (patientsToDownload.isEmpty() && downloadingCount <= 0) {
             if (!patientsToSave.isEmpty())
                 saveBatch()
-            callback.onFinish()
+            emitter.onComplete()
             return
         }
 
@@ -138,7 +154,7 @@ class NaiveSync(
                         override fun onCancelled(error: DatabaseError) {
                             downloadingCount--
                             clearPatientList()
-                            Log.d("LOAD FAILED", "LOAD FAILED")
+                            Timber.d("LOAD FAILED")
                         }
 
                     })
@@ -161,7 +177,8 @@ class NaiveSync(
             iterator.remove()
         }
 
-        callback.onProgress(patientsToDownload.size)
+        currentProgress.set(maxProgress.get() - patientsToDownload.size)
+        emitProgress()
 
         realm.executeTransactionAsync { realm ->
             realm.copyToRealmOrUpdate(batch)
@@ -179,5 +196,8 @@ class NaiveSync(
         projectRef.updateChildren(updates)
     }
 
-}
+    private fun emitProgress() {
+        emitter.onNext(Progress(currentProgress.get(), maxProgress.get()))
+    }
 
+}

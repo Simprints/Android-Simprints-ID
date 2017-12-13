@@ -32,6 +32,7 @@
     <!-- Sync Button Text -->
     <string name="sync_data">Sync Data</string>
     <string name="syncing">Syncing…</string>
+    <string name="syncing_with_progress">Syncing… %1$d/%2$d</string>
     <string name="not_signed_in">Not Signed In</string>
 
 

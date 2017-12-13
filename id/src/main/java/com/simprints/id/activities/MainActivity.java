@@ -41,7 +41,6 @@ import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
-import com.simprints.libcommon.Progress;
 import com.simprints.id.services.sync.SyncClient;
 import com.simprints.id.services.sync.SyncService;
 import com.simprints.id.services.sync.SyncTaskParameters;
@@ -58,6 +57,7 @@ import com.simprints.id.tools.ViewPagerCustom;
 import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
+import com.simprints.libcommon.Progress;
 import com.simprints.libcommon.ScanConfig;
 import com.simprints.libdata.AuthListener;
 import com.simprints.libdata.ConnectionListener;
@@ -843,11 +843,10 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onNext(Progress progress) {
                 Timber.d("onNext");
-                if (progress.getCurrentValue() == 0) {
-                    syncItem.setEnabled(false);
-                    syncItem.setTitle(R.string.syncing);
-                    syncItem.setIcon(R.drawable.ic_menu_syncing);
-                }
+                syncItem.setEnabled(false);
+                syncItem.setTitle(getString(R.string.syncing_with_progress,
+                        progress.getCurrentValue(), progress.getMaxValue()));
+                syncItem.setIcon(R.drawable.ic_menu_syncing);
             }
 
             @Override

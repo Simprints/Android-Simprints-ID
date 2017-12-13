@@ -21,6 +21,7 @@
     <!-- Sync Button Text -->
     <string name="sync_data">সঙ্কি ডাটা</string>
     <string name="syncing">সিঙ্ক করা হচ্ছে…</string>
+    <string name="syncing_with_progress">সিঙ্ক করা হচ্ছে… %1$d/%2$d</string>
     <string name="not_signed_in">সাইন ইন করনেনি</string>
 
 
