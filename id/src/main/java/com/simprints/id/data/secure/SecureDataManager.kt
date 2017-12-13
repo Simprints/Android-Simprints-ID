@@ -4,4 +4,6 @@ interface SecureDataManager {
 
     var apiKey: String
 
+    fun getApiKeyOr(default: String): String
+
 }
