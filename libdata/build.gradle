@@ -1,0 +1,77 @@
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'realm-android'
+apply plugin: 'maven-publish'
+
+android {
+
+    compileSdkVersion 27
+    buildToolsVersion "27.0.2"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.4.2"
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        endToEndTesting {
+            initWith debug
+            testCoverageEnabled true
+        }
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+    google()
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Kotlin goodness
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.anko:anko:$anko_version"
+
+    // Android
+    implementation "com.android.support:appcompat-v7:$support_version"
+    implementation "com.android.support:design:$support_version"
+    implementation "com.android.support:support-v4:$support_version"
+
+    // ActiveAndroid
+    implementation 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
+
+    // Volley
+    implementation 'com.android.volley:volley:1.0.0'
+
+    // Simprints
+    implementation 'com.simprints:LibSimprints:1.0.12'
+    implementation 'com.simprints:libcommon:2017.4.2'
+
+    // Firebase
+    implementation "com.google.firebase:firebase-core:$google_version"
+    implementation "com.google.firebase:firebase-database:$google_version"
+    implementation "com.google.firebase:firebase-storage:$google_version"
+    implementation "com.google.firebase:firebase-auth:$google_version"
+
+    // Reactive
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation "io.reactivex.rxjava2:rxjava:2.1.7"
+
+    // Testing
+    testImplementation 'junit:junit:4.12'
+}
