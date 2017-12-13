@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import com.simprints.id.services.progress.Progress
+import com.simprints.libcommon.Progress
 import com.simprints.id.services.progress.notifications.ProgressNotificationBuilder
 import com.simprints.id.services.progress.notifications.ResultNotificationBuilder
 import com.simprints.id.exceptions.safe.TaskInProgressException

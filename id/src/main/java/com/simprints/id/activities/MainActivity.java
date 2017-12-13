@@ -41,7 +41,7 @@ import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
-import com.simprints.id.services.progress.Progress;
+import com.simprints.libcommon.Progress;
 import com.simprints.id.services.sync.SyncClient;
 import com.simprints.id.services.sync.SyncService;
 import com.simprints.id.services.sync.SyncTaskParameters;
