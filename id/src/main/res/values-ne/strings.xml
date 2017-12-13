@@ -21,6 +21,7 @@
     <!-- Sync Button Text -->
     <string name="sync_data">डेटा समक्रमण गर्नुहोस्</string>
     <string name="syncing">समक्रमण हुँदै…</string>
+    <string name="syncing_with_progress">समक्रमण हुँदै… %1$d/%2$d</string>
     <string name="not_signed_in">साइन इन भएको छैन</string>
 
 

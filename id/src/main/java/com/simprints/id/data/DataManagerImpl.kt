@@ -15,12 +15,14 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
+import com.simprints.libcommon.Progress
 import com.simprints.libdata.*
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Emitter
 import timber.log.Timber
 
 
@@ -207,11 +209,13 @@ class DataManagerImpl(private val context: Context,
             dbContext.callSafelyOrLogSafeExceptionOn("signIn")
             { it.signIn(callback) }
 
-    override fun syncGlobal(appKey: String, dataCallback: DataCallback) =
-            DatabaseSync(context, appKey, dataCallback).sync()
+    override fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
+            dbContext.callSafelyOrLogSafeExceptionOn("syncGlobal")
+            { it.naiveSyncManager.syncGlobal(isInterrupted, emitter) }
 
-    override fun syncUser(appKey: String, userId: String, dataCallback: DataCallback) =
-            DatabaseSync(context, appKey, dataCallback, userId).sync()
+    override fun syncUser(userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
+            dbContext.callSafelyOrLogSafeExceptionOn("syncUser")
+            { it.naiveSyncManager.syncUser(userId, isInterrupted, emitter) }
 
     override fun finish() {
         dbContext.callSafelyOrLogSafeExceptionOn("finish")

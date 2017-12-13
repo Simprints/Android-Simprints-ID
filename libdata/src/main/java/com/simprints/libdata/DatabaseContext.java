@@ -760,36 +760,9 @@ public class DatabaseContext {
         realm.close();
     }
 
-    public void syncUser(SyncCallback callback) {
-
-        DatabaseReference projRef = Utils.getDatabase(firebaseApp)
-                .getReference("projects")
-                .child(key.apiKey);
-
-        NaiveSync sync = new NaiveSync(key.userId,
-                callback,
-                RealmConfig.get(key.apiKey),
-                projRef,
-                projRef.child("users"),
-                projRef.child("patients"),
-                50);
-
-        sync.sync();
+    public NaiveSyncManager getNaiveSyncManager() {
+        return new NaiveSyncManager(firebaseApp, key.apiKey);
     }
 
-    public void syncGlobal(SyncCallback callback) {
-        DatabaseReference projRef = Utils.getDatabase(firebaseApp)
-                .getReference("projects")
-                .child(key.apiKey);
 
-        NaiveSync sync = new NaiveSync("",
-                callback,
-                RealmConfig.get(key.apiKey),
-                projRef,
-                projRef.child("users"),
-                projRef.child("patients"),
-                50);
-
-        sync.sync();
-    }
 }
