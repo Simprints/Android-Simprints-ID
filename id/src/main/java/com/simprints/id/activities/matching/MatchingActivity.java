@@ -17,6 +17,7 @@ import com.simprints.id.R;
 import com.simprints.id.activities.AlertActivity;
 import com.simprints.id.activities.IntentKeys;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.LanguageHelper;
@@ -60,7 +61,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         // Create the Presenter, and pass it all the information and handles it needs
         final Bundle extras = getIntent().getExtras();
         if (extras == null) {
-            dataManager.logNonFatalException(new Exception("Null extras passed to MatchingActivity"));
+            dataManager.logError(new NoIntentExtrasError("Null extras passed to MatchingActivity"));
             launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             finish();
             return;

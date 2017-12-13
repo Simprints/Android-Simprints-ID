@@ -1,7 +1,7 @@
-package com.simprints.id.data.prefs.improvedSharedPreferences
+package com.simprints.id.exceptions.safe
 
 
-class NonPrimitiveTypeException(message: String): Exception(message) {
+class NonPrimitiveTypeException(message: String): RuntimeException(message) {
 
     companion object {
 

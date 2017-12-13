@@ -1,7 +1,7 @@
 package com.simprints.id.tools.delegates
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.prefs.improvedSharedPreferences.NonPrimitiveTypeException
+import com.simprints.id.exceptions.safe.NonPrimitiveTypeException
 import isPrimitive
 import timber.log.Timber
 import kotlin.reflect.KProperty

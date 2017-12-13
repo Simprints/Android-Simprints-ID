@@ -36,6 +36,8 @@ import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.InvalidSyncParametersError;
+import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
@@ -871,7 +873,7 @@ public class MainActivity extends AppCompatActivity implements
                         syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                     }
                 } else {
-                    dataManager.logException(throwable);
+                    dataManager.logError(new Error(throwable));
                     launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
                 syncClient.stopListening();
@@ -947,8 +949,9 @@ public class MainActivity extends AppCompatActivity implements
                                 new Fingerprint(
                                         finger.getId(),
                                         appState.getScanner().getTemplate()));
+                // TODO : change exceptions in libcommon
             } catch (IllegalArgumentException ex) {
-                dataManager.logException(ex);
+                dataManager.logError(ex);
                 resetUIFromError();
                 return;
             }
