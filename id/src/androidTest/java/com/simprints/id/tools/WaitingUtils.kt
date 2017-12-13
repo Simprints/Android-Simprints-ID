@@ -36,4 +36,9 @@ object WaitingUtils {
     fun waitOnSystemToSettle() {
         SystemClock.sleep(2000)
     }
+
+    fun waitOnUiForSyncingToStart() {
+        sleep(1, TimeUnit.SECONDS)
+    }
+
 }
