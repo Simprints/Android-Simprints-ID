@@ -3,14 +3,12 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.2"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 26
-        versionCode 2
-        versionName "2017.4.2"
+        targetSdkVersion 27
     }
     buildTypes {
         debug {
@@ -29,8 +27,8 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.simprints:LibSimprints:1.0.12'
-    testImplementation 'junit:junit:4.12'
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.android.support:appcompat-v7:$support_version"
+    implementation "com.simprints:LibSimprints:$libsimprints_version"
+    testImplementation "junit:junit:$junit_version"
 }
