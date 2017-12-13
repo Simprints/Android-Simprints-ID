@@ -869,9 +869,9 @@ public class MainActivity extends AppCompatActivity implements
                     syncItem.setIcon(R.drawable.ic_menu_sync_failed);
                 }
                 if (throwable instanceof Error) {
-                    dataManager.logError(throwable);
+                    dataManager.logError((Error) throwable);
                 } else if (throwable instanceof RuntimeException) {
-                    dataManager.logSafeException(throwable);
+                    dataManager.logSafeException((RuntimeException) throwable);
                 }
                 syncClient.stopListening();
             }
