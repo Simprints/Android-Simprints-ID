@@ -72,6 +72,5 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
     fun finish()
 
     // Secure data
-    fun getApiKeyOrDefault(default: String): String
     fun getApiKeyOrEmpty(): String
 }

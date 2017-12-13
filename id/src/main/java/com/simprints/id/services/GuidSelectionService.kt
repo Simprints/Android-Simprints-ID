@@ -64,7 +64,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     }
 
     private fun checkApiKey(apiKey: String) {
-        if (apiKey.isEmpty() || apiKey != dataManager.getApiKeyOrDefault(apiKey)) {
+        if (apiKey.isEmpty() || apiKey != dataManager.getApiKeyOr(apiKey)) {
             throw InvalidCalloutParameterException.forParameter(SIMPRINTS_SESSION_ID)
         }
     }
