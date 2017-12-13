@@ -2,6 +2,8 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import com.simprints.id.exceptions.safe.MismatchedTypeException
+import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
 
 
 class ImprovedSharedPreferencesImpl(private val prefs: SharedPreferences)
@@ -15,8 +17,8 @@ class ImprovedSharedPreferencesImpl(private val prefs: SharedPreferences)
     override fun <T: Any> getPrimitive(key: String, defaultValue: T): T =
             try {
                 tryGetPrimitive(key, defaultValue)
-            } catch (nonPrimitiveTypeException: NonPrimitiveTypeException) {
-                throw nonPrimitiveTypeException
+            } catch (nonPrimitiveTypeError: NonPrimitiveTypeError) {
+                throw nonPrimitiveTypeError
             } catch (anyOtherException: Throwable) {
                 val msg = "Value stored for key $key is not a ${defaultValue.javaClass.simpleName}."
                 throw MismatchedTypeException(msg, anyOtherException)
@@ -33,7 +35,7 @@ class ImprovedSharedPreferencesImpl(private val prefs: SharedPreferences)
                 is Double -> getDouble(key, defaultValue) as T
                 is String -> getString(key, defaultValue) as T
                 is Boolean -> getBoolean(key, defaultValue) as T
-                else -> throw NonPrimitiveTypeException.forTypeOf(defaultValue)
+                else -> throw NonPrimitiveTypeError.forTypeOf(defaultValue)
             }
 
     private fun getByte(key: String, defaultValue: Byte): Byte =

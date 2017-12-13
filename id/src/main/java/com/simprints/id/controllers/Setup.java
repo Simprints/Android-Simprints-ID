@@ -8,6 +8,9 @@ import android.support.annotation.Nullable;
 
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError;
+import com.simprints.id.exceptions.unsafe.NullScannerError;
+import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
@@ -152,17 +155,17 @@ public class Setup {
             }
 
             @Override
-            public void onFailure(DATA_ERROR error) {
-                switch (error) {
+            public void onFailure(DATA_ERROR dataError) {
+                switch (dataError) {
                     case DATABASE_INIT_RESTART:
                         goOn(activity);
                         break;
                     case NOT_FOUND:
-                        dataManager.logException(new Exception("API Key was null in dataManager"));
+                        dataManager.logError(new ApiKeyNotFoundError("API Key was null in Setup.initDbContext()"));
                         onAlert(ALERT_TYPE.MISSING_API_KEY);
                         break;
                     default:
-                        dataManager.logException(new Exception("Unknown error returned in onFailure Setup.initDbContext()"));
+                        dataManager.logError(UnexpectedDataError.forDataError(dataError, "Setup.initDbContext()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -184,8 +187,8 @@ public class Setup {
             }
 
             @Override
-            public void onFailure(DATA_ERROR error) {
-                switch (error) {
+            public void onFailure(DATA_ERROR dataError) {
+                switch (dataError) {
                     case UNVERIFIED_API_KEY:
                         apiKeyValidated = false;
                         paused = true;
@@ -197,7 +200,7 @@ public class Setup {
                         callback.onAlert(ALERT_TYPE.INVALID_API_KEY);
                         break;
                     default:
-                        dataManager.logException(new Exception("Unknown error returned in onFailure Setup.validateApiKey()"));
+                        dataManager.logError(UnexpectedDataError.forDataError(dataError, "Setup.validateApiKey()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -238,7 +241,7 @@ public class Setup {
                     dataManager.logScannerProperties(appState.getMacAddress(), appState.getScannerId());
                     goOn(activity);
                 } else {
-                    dataManager.logException(new Exception("Null values in onSuccess Setup.connectToScanner()"));
+                    dataManager.logError(new NullScannerError("Null values in onSuccess Setup.connectToScanner()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -309,7 +312,7 @@ public class Setup {
                         }
                         break;
                     default:
-                        dataManager.logException(new Exception("Unknown error returned in onFailure Setup.checkIfVerifyAndGuidExists()"));
+                        dataManager.logError(UnexpectedDataError.forDataError(data_error, "Setup.checkIfVerifyAndGuidExists()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -354,7 +357,7 @@ public class Setup {
                     appState.setHardwareVersion(appState.getScanner().getUcVersion());
                     Setup.this.onSuccess();
                 } else {
-                    dataManager.logException(new Exception("Null values in onSuccess Setup.wakeUpUn20()"));
+                    dataManager.logError(new NullScannerError("Null values in onSuccess Setup.wakeUpUn20()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }

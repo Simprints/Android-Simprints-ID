@@ -5,6 +5,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.backgroundSync.SyncService;
+import com.simprints.id.exceptions.unsafe.InvalidSyncParametersError;
+import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 
@@ -43,7 +45,7 @@ class FrontPresenter implements FrontContract.Presenter {
                         frontView.setSyncFailed();
                         break;
                     default:
-                        throw new RuntimeException();
+                        throw UnexpectedDataError.forDataError(data_error, "FrontPresenter");
                 }
             }
         };
@@ -52,7 +54,9 @@ class FrontPresenter implements FrontContract.Presenter {
     @Override
     public void sync(Context appContext) {
         frontView.setSyncInProgress();
-        if (!syncService.startAndListen(appContext, dataCallback)) {
+        try {
+            syncService.startAndListen(appContext, dataCallback);
+        } catch (InvalidSyncParametersError e) {
             frontView.setSyncUnavailable();
         }
     }
