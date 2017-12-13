@@ -1,4 +1,4 @@
-package com.simprints.id.throwables.safe
+package com.simprints.id.exceptions.safe
 
 
 class TaskInProgressException: RuntimeException()

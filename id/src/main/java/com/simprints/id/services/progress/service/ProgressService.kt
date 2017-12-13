@@ -7,7 +7,7 @@ import android.os.IBinder
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.notifications.ProgressNotificationBuilder
 import com.simprints.id.services.progress.notifications.ResultNotificationBuilder
-import com.simprints.id.throwables.safe.TaskInProgressException
+import com.simprints.id.exceptions.safe.TaskInProgressException
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver

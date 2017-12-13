@@ -1,4 +1,4 @@
-package com.simprints.id.throwables.unsafe
+package com.simprints.id.exceptions.unsafe
 
 
-class UnexpectedSyncError : RuntimeException()
+class UnexpectedSyncError : Error()

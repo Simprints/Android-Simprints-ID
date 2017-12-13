@@ -36,8 +36,6 @@ import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.exceptions.unsafe.InvalidSyncParametersError;
-import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
@@ -49,7 +47,6 @@ import com.simprints.id.services.sync.SyncService;
 import com.simprints.id.services.sync.SyncTaskParameters;
 import com.simprints.id.services.sync.SyncTaskParameters.GlobalSyncTaskParameters;
 import com.simprints.id.services.sync.SyncTaskParameters.UserSyncTaskParameters;
-import com.simprints.id.throwables.safe.InterruptedSyncException;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.LanguageHelper;
@@ -866,15 +863,15 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onError(Throwable throwable) {
-                if (throwable instanceof InterruptedSyncException) {
-                    if (syncItem != null) {
-                        syncItem.setEnabled(true);
-                        syncItem.setTitle(R.string.nav_sync_failed);
-                        syncItem.setIcon(R.drawable.ic_menu_sync_failed);
-                    }
-                } else {
-                    dataManager.logError(new Error(throwable));
-                    launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                if (syncItem != null) {
+                    syncItem.setEnabled(true);
+                    syncItem.setTitle(R.string.nav_sync_failed);
+                    syncItem.setIcon(R.drawable.ic_menu_sync_failed);
+                }
+                if (throwable instanceof Error) {
+                    dataManager.logError(throwable);
+                } else if (throwable instanceof RuntimeException) {
+                    dataManager.logSafeException(throwable);
                 }
                 syncClient.stopListening();
             }
