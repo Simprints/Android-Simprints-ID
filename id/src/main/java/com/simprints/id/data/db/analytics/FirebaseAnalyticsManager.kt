@@ -20,7 +20,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         Crashlytics.log(alertName)
     }
 
-    // TODO: Do we have to log things like api_key, user_id, etc to every firebase event? Or is it enough to log it once, and then we can link everything togeter in big query requests?
+    // TODO: Do we have to log things like api_key, user_id, etc to every firebase event? Or is it enough to log it once, and then we can link everything together in big query requests?
     private fun logAlertToFirebaseAnalytics(alertName: String, apiKey: String, moduleId: String,
                                             userId: String, deviceId: String) {
         Timber.d("FirebaseAnalyticsManager.logAlertToFirebaseAnalytics(alertName=$alertName, ...)")
@@ -40,17 +40,16 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         logAlertToFirebaseAnalytics(alertName, apiKey, moduleId, userId, deviceId)
     }
 
-    override fun logException(throwable: Throwable?) {
-        Timber.d("FirebaseAnalyticsManager.logException(throwable=$throwable)")
+    override fun logError(throwable: Throwable) {
+        Timber.d("FirebaseAnalyticsManager.logError(throwable=$throwable)")
         Crashlytics.logException(throwable)
     }
 
-    override fun logNonFatalException(throwable: Throwable) {
-        Timber.d("FirebaseAnalyticsManager.logNonFatalException(description=$throwable")
-        Crashlytics.log(throwable.message)
+    override fun logSafeException(throwable: Throwable) {
+        Timber.d("FirebaseAnalyticsManager.logSafeException(description=$throwable")
         val bundle = Bundle()
         bundle.putString("description", throwable.message)
-        firebaseAnalytics.logEvent("non_fatal_exception", bundle)
+        firebaseAnalytics.logEvent("safe_exception", bundle)
     }
 
     override fun logUserProperties(userId: String, apiKey: String, moduleId: String, deviceId: String) {

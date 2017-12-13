@@ -70,6 +70,7 @@ class AboutPresenter implements AboutContract.Presenter {
                                     aboutView.setSuccessRecovering();
                                     aboutView.setRecoverDbAvailable();
                                 } catch (WindowManager.BadTokenException e) {
+                                    dataManager.logSafeException(e);
                                     e.printStackTrace();
                                 }
                             }
@@ -82,6 +83,7 @@ class AboutPresenter implements AboutContract.Presenter {
                                     aboutView.setErrorRecovering(data_error.details());
                                     aboutView.setRecoverDbAvailable();
                                 } catch (WindowManager.BadTokenException e) {
+                                    dataManager.logSafeException(e);
                                     e.printStackTrace();
                                 }
                             }

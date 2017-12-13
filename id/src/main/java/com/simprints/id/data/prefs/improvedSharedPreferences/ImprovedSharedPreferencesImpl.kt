@@ -2,6 +2,8 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import com.simprints.id.exceptions.safe.MismatchedTypeException
+import com.simprints.id.exceptions.safe.NonPrimitiveTypeException
 
 
 class ImprovedSharedPreferencesImpl(private val prefs: SharedPreferences)

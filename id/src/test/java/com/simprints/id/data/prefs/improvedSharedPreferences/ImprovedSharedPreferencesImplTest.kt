@@ -1,6 +1,8 @@
 package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.content.SharedPreferences
+import com.simprints.id.exceptions.safe.MismatchedTypeException
+import com.simprints.id.exceptions.safe.NonPrimitiveTypeException
 import com.simprints.id.testUtils.assertThrows
 import com.simprints.id.testUtils.mock
 import com.simprints.id.testUtils.verifyOnlyInteraction

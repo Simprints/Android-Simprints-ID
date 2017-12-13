@@ -1,6 +1,7 @@
 package com.simprints.id.data.secure
 
-import com.simprints.id.exceptions.ApiKeyNotFoundException
+import com.simprints.id.exceptions.safe.ApiKeyNotFoundException
+
 
 class SecureDataManagerImpl : SecureDataManager {
 
@@ -13,4 +14,3 @@ class SecureDataManagerImpl : SecureDataManager {
         }
 
 }
-

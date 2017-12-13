@@ -158,11 +158,11 @@ public class Setup {
                         goOn(activity);
                         break;
                     case NOT_FOUND:
-                        dataManager.logException(new Exception("API Key was null in dataManager"));
+                        dataManager.logError(new Exception("API Key was null in dataManager"));
                         onAlert(ALERT_TYPE.MISSING_API_KEY);
                         break;
                     default:
-                        dataManager.logException(new Exception("Unknown error returned in onFailure Setup.initDbContext()"));
+                        dataManager.logError(new Exception("Unknown error returned in onFailure Setup.initDbContext()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -197,7 +197,7 @@ public class Setup {
                         callback.onAlert(ALERT_TYPE.INVALID_API_KEY);
                         break;
                     default:
-                        dataManager.logException(new Exception("Unknown error returned in onFailure Setup.validateApiKey()"));
+                        dataManager.logError(new Exception("Unknown error returned in onFailure Setup.validateApiKey()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -238,7 +238,7 @@ public class Setup {
                     dataManager.logScannerProperties(appState.getMacAddress(), appState.getScannerId());
                     goOn(activity);
                 } else {
-                    dataManager.logException(new Exception("Null values in onSuccess Setup.connectToScanner()"));
+                    dataManager.logError(new Exception("Null values in onSuccess Setup.connectToScanner()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -309,7 +309,7 @@ public class Setup {
                         }
                         break;
                     default:
-                        dataManager.logException(new Exception("Unknown error returned in onFailure Setup.checkIfVerifyAndGuidExists()"));
+                        dataManager.logError(new Exception("Unknown error returned in onFailure Setup.checkIfVerifyAndGuidExists()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -354,7 +354,7 @@ public class Setup {
                     appState.setHardwareVersion(appState.getScanner().getUcVersion());
                     Setup.this.onSuccess();
                 } else {
-                    dataManager.logException(new Exception("Null values in onSuccess Setup.wakeUpUn20()"));
+                    dataManager.logError(new Exception("Null values in onSuccess Setup.wakeUpUn20()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
