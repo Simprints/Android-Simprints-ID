@@ -919,7 +919,7 @@ public class MainActivity extends AppCompatActivity implements
                                         appState.getScanner().getTemplate()));
                 // TODO : change exceptions in libcommon
             } catch (IllegalArgumentException ex) {
-                dataManager.logError(ex);
+                dataManager.logError(new Error("IllegalArgumentException in MainActivity.captureSuccess()"));
                 resetUIFromError();
                 return;
             }

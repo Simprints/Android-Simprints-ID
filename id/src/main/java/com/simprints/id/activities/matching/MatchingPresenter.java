@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
+import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
@@ -184,8 +185,8 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
             }
 
             @Override
-            public void onFailure(DATA_ERROR data_error) {
-                dataManager.logError(new Exception("Failed to load person during verification: " + data_error.details()));
+            public void onFailure(DATA_ERROR dataError) {
+                dataManager.logError(UnexpectedDataError.forDataError(dataError,"MatchingActivity.onVerifyStart()"));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
