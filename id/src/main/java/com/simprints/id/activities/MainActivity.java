@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -142,25 +144,20 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         public void onSignOut() {
-            syncItem.setEnabled(false);
-            syncItem.setTitle(R.string.not_signed_in);
-            syncItem.setIcon(R.drawable.ic_menu_sync_off);
+            setOfflineSyncItem();
         }
+
     };
 
     private ConnectionListener connectionListener = new ConnectionListener() {
         @Override
         public void onConnection() {
-            syncItem.setEnabled(true);
-            syncItem.setTitle(R.string.nav_sync);
-            syncItem.setIcon(R.drawable.ic_menu_sync_ready);
+            setReadySyncItem();
         }
 
         @Override
         public void onDisconnection() {
-            syncItem.setEnabled(false);
-            syncItem.setTitle(R.string.nav_offline);
-            syncItem.setIcon(R.drawable.ic_menu_sync_off);
+            setOfflineSyncItem();
         }
     };
 
@@ -229,8 +226,12 @@ public class MainActivity extends AppCompatActivity implements
     public void onResume() {
         super.onResume();
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
-        if (syncItem != null && dataManager.isConnected())
-            syncItem.setIcon(R.drawable.ic_menu_sync_ready);
+        if (dataManager.isConnected()) {
+            setReadySyncItem();
+        } else {
+            setOfflineSyncItem();
+        }
+        syncClient.startListening(newSyncObserver());
     }
 
     private void setFingerStatus() {
@@ -796,6 +797,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        syncClient.stopListening();
+    }
+
+
+    @Override
     protected void onStop() {
         super.onStop();
         Scanner scanner = appState.getScanner();
@@ -804,7 +812,6 @@ public class MainActivity extends AppCompatActivity implements
         }
         dataManager.unregisterAuthListener(authListener);
         dataManager.unregisterConnectionListener(connectionListener);
-        syncClient.stopListening();
     }
 
 
@@ -822,13 +829,17 @@ public class MainActivity extends AppCompatActivity implements
                 return;
         }
         syncClient.sync(syncParameters,
-                newSyncObserver(),
                 new Function0<Unit>() {
                     @Override
                     public Unit invoke() {
-                        syncItem.setEnabled(true);
-                        syncItem.setTitle(R.string.nav_sync_failed);
-                        syncItem.setIcon(R.drawable.ic_menu_sync_failed);
+                        syncClient.startListening(newSyncObserver());
+                        return null;
+                    }
+                },
+                new Function0<Unit>() {
+                    @Override
+                    public Unit invoke() {
+                        setErrorSyncItem();
                         Toast.makeText(MainActivity.this,
                                 R.string.wait_for_current_sync_to_finish,
                                 Toast.LENGTH_LONG).show();
@@ -837,43 +848,72 @@ public class MainActivity extends AppCompatActivity implements
                 });
     }
 
+    private void setCompleteSyncItem() {
+        setSyncItem(true, R.string.nav_sync_complete, R.drawable.ic_menu_sync_success);
+    }
+
+    private void setReadySyncItem() {
+        setSyncItem(true, R.string.nav_sync, R.drawable.ic_menu_sync_ready);
+    }
+
+    private void setOfflineSyncItem() {
+        setSyncItem(false, R.string.not_signed_in, R.drawable.ic_menu_sync_off);
+    }
+
+    private void setSyncItem(Boolean enabled, @StringRes int title, @DrawableRes int icon) {
+        setSyncItem(enabled, getString(title), icon);
+    }
+
+    private void setSyncItem(Boolean enabled, String title, @DrawableRes int icon) {
+        if (syncItem != null) {
+            syncItem.setEnabled(enabled);
+            syncItem.setTitle(title);
+            syncItem.setIcon(icon);
+        }
+    }
+
+    private void setErrorSyncItem() {
+        setSyncItem(true, R.string.nav_sync_failed, R.drawable.ic_menu_sync_failed);
+    }
+
+    private void setProgressSyncItem(Progress progress) {
+        setSyncItem(false,
+                getString(R.string.syncing_with_progress, progress.getCurrentValue(), progress.getMaxValue()),
+                R.drawable.ic_menu_syncing);
+    }
+
     private DisposableObserver<Progress> newSyncObserver() {
         return new DisposableObserver<Progress>() {
 
             @Override
             public void onNext(Progress progress) {
                 Timber.d("onNext");
-                syncItem.setEnabled(false);
-                syncItem.setTitle(getString(R.string.syncing_with_progress,
-                        progress.getCurrentValue(), progress.getMaxValue()));
-                syncItem.setIcon(R.drawable.ic_menu_syncing);
+                setProgressSyncItem(progress);
             }
 
             @Override
             public void onComplete() {
                 Timber.d("onComplete");
-                if (syncItem != null) {
-                    syncItem.setEnabled(true);
-                    syncItem.setTitle(R.string.nav_sync_complete);
-                    syncItem.setIcon(R.drawable.ic_menu_sync_success);
-                }
+                setCompleteSyncItem();
                 syncClient.stopListening();
             }
 
             @Override
             public void onError(Throwable throwable) {
-                if (syncItem != null) {
-                    syncItem.setEnabled(true);
-                    syncItem.setTitle(R.string.nav_sync_failed);
-                    syncItem.setIcon(R.drawable.ic_menu_sync_failed);
-                }
+                Timber.d("onError");
+                setErrorSyncItem();
+                logThrowable(throwable);
+                syncClient.stopListening();
+            }
+
+            private void logThrowable(Throwable throwable) {
                 if (throwable instanceof Error) {
                     dataManager.logError((Error) throwable);
                 } else if (throwable instanceof RuntimeException) {
                     dataManager.logSafeException((RuntimeException) throwable);
                 }
-                syncClient.stopListening();
             }
+
         };
     }
 
