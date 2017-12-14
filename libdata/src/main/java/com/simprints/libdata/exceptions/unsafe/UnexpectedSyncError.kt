@@ -1,4 +1,5 @@
 package com.simprints.libdata.exceptions.unsafe
 
 
-class UnexpectedSyncError(cause: Throwable) : Error(cause)
+class UnexpectedSyncError(message: String = "UnexpectedSyncError", cause: Throwable)
+    : Error(message, cause)
