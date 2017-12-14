@@ -7,26 +7,41 @@ import android.content.Context
 import android.os.Build
 import android.support.v4.app.NotificationCompat
 import com.simprints.id.R
+import com.simprints.id.services.progress.notifications.CompleteNotificationBuilder
+import com.simprints.id.services.progress.notifications.ErrorNotificationBuilder
+import com.simprints.id.services.progress.notifications.NotificationBuilder
 import com.simprints.id.services.progress.notifications.ProgressNotificationBuilder
-import com.simprints.id.services.progress.notifications.ResultNotificationBuilder
 import org.jetbrains.anko.notificationManager
 
 
 class NotificationFactory(private val context: Context) {
 
-    companion object {
+    private val channelId: String
+        get() = context.getString(R.string.notification_channel_id)
 
-        private val channelId = "SimprintsID"
-        private val channelName = "SimprintsID"
-        private val channelDescription = "Notifications from SimprintsID"
+    private val channelName: String
+        get() = context.getString(R.string.notification_channel_name)
 
-        private val tag = "SimprintsID"
-        private val title = "Simprints ID sync"
-        private val icon = R.drawable.ic_progress_notification
-        private val progressContentText = "Sync in progress."
-        private val completeContentText = "Sync completed."
-        private val errorContentText = "Sync failed."
-    }
+    private val channelDescription: String
+        get() = context.getString(R.string.notification_channel_description)
+
+    private val syncTag: String
+        get() = context.getString(R.string.sync_notification_tag)
+
+    private val syncTitle: String
+        get() = context.getString(R.string.sync_notification_title)
+
+    private val syncCompleteContent: String
+        get() = context.getString(R.string.sync_complete_notification_content)
+
+    private val syncErrorContent: String
+        get() = context.getString(R.string.sync_error_notification_content)
+
+    private val syncProgressIcon: Int = R.drawable.ic_syncing
+
+    private val syncCompleteIcon: Int = R.drawable.ic_sync_success
+
+    private val syncErrorIcon: Int = R.drawable.ic_sync_failed
 
     private val notificationManager = context.notificationManager
 
@@ -38,8 +53,7 @@ class NotificationFactory(private val context: Context) {
 
     @TargetApi(Build.VERSION_CODES.O)
     private fun initSyncNotificationChannelPostO() {
-        val channel = NotificationChannel(channelId, channelName,
-                NotificationManager.IMPORTANCE_DEFAULT)
+        val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
         channel.description = channelDescription
         notificationManager.createNotificationChannel(channel)
     }
@@ -47,17 +61,29 @@ class NotificationFactory(private val context: Context) {
     fun syncProgressNotification() =
             ProgressNotificationBuilder(notificationManager,
                     NotificationCompat.Builder(context, channelId),
-                    tag,
-                    title,
-                    icon,
-                    { progressContentText })
+                    syncTag,
+                    syncTitle,
+                    syncProgressIcon,
+                    { progress ->
+                        context.getString(R.string.sync_progress_notification_content,
+                                progress.currentValue,
+                                progress.maxValue) })
 
-    fun syncResultNotification() =
-            ResultNotificationBuilder(notificationManager,
+    fun syncCompleteNotification(): NotificationBuilder =
+            CompleteNotificationBuilder(notificationManager,
                     NotificationCompat.Builder(context, channelId),
-                    tag,
-                    title,
-                    icon,
-                    completeContentText,
-                    { errorContentText })
+                    syncTag,
+                    syncTitle,
+                    syncCompleteIcon,
+                    { syncCompleteContent })
+
+
+    fun syncErrorNotification(): NotificationBuilder =
+            ErrorNotificationBuilder(notificationManager,
+                    NotificationCompat.Builder(context, channelId),
+                    syncTag,
+                    syncTitle,
+                    syncErrorIcon,
+                    { syncErrorContent })
+
 }
