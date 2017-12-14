@@ -849,7 +849,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setCompleteSyncItem() {
-        setSyncItem(true, R.string.nav_sync_complete, R.drawable.ic_menu_sync_success);
+        setSyncItem(true, R.string.nav_sync_complete, R.drawable.ic_sync_success);
     }
 
     private void setReadySyncItem() {
@@ -873,13 +873,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setErrorSyncItem() {
-        setSyncItem(true, R.string.nav_sync_failed, R.drawable.ic_menu_sync_failed);
+        setSyncItem(true, R.string.nav_sync_failed, R.drawable.ic_sync_failed);
     }
 
     private void setProgressSyncItem(Progress progress) {
         setSyncItem(false,
                 getString(R.string.syncing_with_progress, progress.getCurrentValue(), progress.getMaxValue()),
-                R.drawable.ic_menu_syncing);
+                R.drawable.ic_syncing);
     }
 
     private DisposableObserver<Progress> newSyncObserver() {

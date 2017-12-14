@@ -2,9 +2,7 @@ package com.simprints.id.services.sync
 
 import android.content.Context
 import com.simprints.id.Application
-import com.simprints.id.data.DataManager
-import com.simprints.id.services.progress.notifications.ProgressNotificationBuilder
-import com.simprints.id.services.progress.notifications.ResultNotificationBuilder
+import com.simprints.id.services.progress.notifications.NotificationBuilder
 import com.simprints.id.services.progress.service.ProgressService
 import com.simprints.id.services.progress.service.ProgressTask
 
@@ -18,20 +16,20 @@ class SyncService: ProgressService<SyncTaskParameters>() {
 
     }
 
-    private lateinit var dataManager: DataManager
-
-    override fun onCreate() {
-        super.onCreate()
-        dataManager = (application as Application).dataManager
+    private val app: Application by lazy {
+        (application as Application)
     }
 
     override fun getTask(taskParameters: SyncTaskParameters): ProgressTask =
-            SyncTask(dataManager, taskParameters)
+            SyncTask(app.dataManager, taskParameters)
 
-    override fun getProgressNotificationBuilder(taskParameters: SyncTaskParameters): ProgressNotificationBuilder =
-            (application as Application).notificationFactory.syncProgressNotification()
+    override fun getProgressNotificationBuilder(taskParameters: SyncTaskParameters): NotificationBuilder =
+            app.notificationFactory.syncProgressNotification()
 
-    override fun getResultNotificationBuilder(taskParameters: SyncTaskParameters): ResultNotificationBuilder =
-            (application as Application).notificationFactory.syncResultNotification()
+    override fun getCompleteNotificationBuilder(taskParameters: SyncTaskParameters): NotificationBuilder =
+            app.notificationFactory.syncCompleteNotification()
+
+    override fun getErrorNotificationBuilder(taskParameters: SyncTaskParameters): NotificationBuilder =
+            app.notificationFactory.syncErrorNotification()
 
 }
