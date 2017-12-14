@@ -6,19 +6,19 @@ import com.simprints.libcommon.Progress
 import io.reactivex.observers.DisposableObserver
 
 
-class ProgressNotificationBuilder(private val notificationManager: NotificationManager,
+class ProgressNotificationBuilder(notificationManager: NotificationManager,
                                   notificationBuilder: NotificationCompat.Builder,
                                   tag: String,
                                   title: String,
                                   icon: Int,
                                   progressTextBuilder: (progress: Progress) -> String)
-    : BaseNotificationBuilder(notificationBuilder, tag, title, icon) {
+    : BaseNotificationBuilder(notificationManager, notificationBuilder, tag, title, icon) {
 
     init {
         updateBuilder {
-            this.setOngoing(true)
-                    .setProgress(0, 0, true)
-                    .setContentText(progressTextBuilder(Progress(0, 0)))
+            setOngoing(true)
+            setProgress(0, 0, true)
+            setContentText(progressTextBuilder(Progress(0, 0)))
         }
     }
 
@@ -34,24 +34,19 @@ class ProgressNotificationBuilder(private val notificationManager: NotificationM
 
                 override fun onNext(progress: Progress) {
                     updateBuilder {
-                        setProgress(progress.maxValue,
-                                progress.currentValue,
-                                progress.maxValue == 0)
+                        setProgress(progress.maxValue, progress.currentValue, progress.maxValue == 0)
+                        setContentText(progressTextBuilder(progress))
                     }
-                    if (visible.get()) {
-                        notificationManager.notify(id, build())
-                    }
+                    notifyIfVisible()
                 }
             }
 
     private fun finish() {
         updateBuilder {
-            this.setProgress(0, 0, false)
-                    .setOngoing(false)
+            setProgress(0, 0, false)
+            setOngoing(false)
         }
-        if (visible.get()) {
-            notificationManager.cancel(id)
-        }
+        cancelIfVisible()
         progressObserver.dispose()
     }
 
