@@ -1,40 +1,17 @@
 import datetime
 import os
-import platform
 import queue
 import subprocess
 import sys
 import threading
 import time
-
 from logging import Formatter, Logger, getLogger, DEBUG, StreamHandler, FileHandler, INFO, WARN, ERROR, CRITICAL
 
-# Use the custom version of adb that configures devices by their usb port rather than serial number
-ADB = 'adb' if platform.system() == 'Windows' else './testing/adb'
-GRADLEW_PATH = 'gradlew.bat' if platform.system() == 'Windows' else './gradlew'
-CERBERUS_DIR_PATH = '../Android-Cerberus/'
+from testing.commands import *
+from testing.directory_paths import LOG_DIR_BASE_NAME
 
 buckets = {
     'bucket_01': 'com.simprints.id.bucket01.Bucket01Suite',
-}
-
-commands = {
-    'clean cerberus build': 'cd ' + CERBERUS_DIR_PATH + ';' + GRADLEW_PATH + ' :cerberus-app:clean',
-    'clean simprints id build': GRADLEW_PATH + ' :id:clean',
-    'assemble cerberus debug apk': 'cd ' + CERBERUS_DIR_PATH + ';' + GRADLEW_PATH + ' :cerberus-app:assembleDebug',
-    'assemble simprints id endToEndTesting apk': (GRADLEW_PATH + ' :id:assembleEndToEndTesting'),
-    'assemble simprints id endToEndTesting test apk': (GRADLEW_PATH + ' :id:assembleEndToEndTestingAndroidTest'),
-    'devices query': ADB + ' devices -l',
-    'install cerberus debug apk': ADB + ' -s {0} install -t -d -r ' + CERBERUS_DIR_PATH + 'cerberus-app/build/outputs'
-                                                                                          '/apk/debug/cerberus-app'
-                                                                                          '-debug.apk',
-    'install simprints id endToEndTesting apk': ADB + ' -s {0} install -t -d -r '
-                                                      'id/build/outputs/apk/endToEndTesting/id-endToEndTesting.apk',
-    'install simprints id endToEndTesting test apk': ADB + ' -s {0} install -t -d -r '
-                                                           'id/build/outputs/apk/androidTest/endToEndTesting/id'
-                                                           '-endToEndTesting-androidTest.apk',
-    'run test': ADB + ' -s {0} shell am instrument -w '
-                      '-e class {1} com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner '
 }
 
 
@@ -46,6 +23,7 @@ class Scanner:
         self.description: str = description
 
 
+# TODO : Pass a scanner/ scanners as extras to the am instrument command : https://stackoverflow.com/a/3229077/4072335
 scanners = {
     'SP576290': Scanner('SP576290', 'F0:AC:D7:C8:CB:22', 6),
     'SP337428': Scanner('SP337428', 'F0:AC:D7:C5:26:14', 6),
@@ -64,22 +42,6 @@ class LogState:
     """
     These methods return a LogState to be passed to Run.updateLogFormat()
     They represent different beginning strings for each of the logs corresponding to what state the program is in.
-    Here are the states and when they should be used:
-
-    default()
-    [time] name :
-    This is the base line for the whole log. All other methods call this one. This is for commands and log output that
-    is not directed at any particular device.
-
-    device(arg1: Device)
-    [time] name : phone model :
-    This is for when commands are directed at a particular device, usually to change the state of the device.
-
-    test(arg1: Device)
-    [time] name : phone model : device state :
-    This is for executing a test with a preset, known, constant device state.
-
-
     """
 
     @staticmethod
@@ -99,14 +61,12 @@ class LogState:
 
 
 class Run:
-    LOG_DIR_BASE_NAME = 'testing/logs'
-
     if not os.path.exists(LOG_DIR_BASE_NAME):
         os.makedirs(LOG_DIR_BASE_NAME)
 
     def __init__(self, logger_name, log_commands=True):
 
-        self.log_dir_name = Run.LOG_DIR_BASE_NAME + '/' \
+        self.log_dir_name = LOG_DIR_BASE_NAME + '/' \
                             + logger_name + '_' + datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
         if not os.path.exists(self.log_dir_name):
@@ -181,79 +141,61 @@ class Run:
                 lines.append(formatted_line)
                 self.log(formatted_line, INFO)
 
-    ##############
-    #  Command methods
-    #
-    #  Template:
-    #
-    #  command_method_name(self, ...):
-    #      self.update_log_format(LogSate.appropriate_log_state())
-    #      lines = self.run_and_log(command['the_command'].format(the, command, arguments))
-    #
-    #      processed_lines = process_the_raw_outputted_lines(lines)
-    #      update_state_or_logs_if_necessary(processed_lines)
-    #
-    #      return nothing_or_some_information_if_necessary
-    #
-    ##############
-
     def clean_cerberus_build(self):
-        self.run_and_log(commands['clean cerberus build'])
-
-    def clean_simprints_id_build(self):
-        self.run_and_log(commands['clean simprints id build'])
+        self.run_and_log(cerberus_app_gradlew_command('clean'))
 
     def assemble_cerberus_apk(self):
-        self.run_and_log(commands['assemble cerberus debug apk'])
+        self.run_and_log(cerberus_app_gradlew_command('assembleDebug'))
+
+    def clean_simprints_id_build(self):
+        self.run_and_log(simprints_id_gradlew_command('clean'))
 
     def assemble_simprints_id_apk(self):
-        self.run_and_log(commands['assemble simprints id endToEndTesting apk'])
+        self.run_and_log(simprints_id_gradlew_command('assembleEndToEndTesting'))
 
     def assemble_simprints_id_test_apk(self):
-        self.run_and_log(commands['assemble simprints id endToEndTesting test apk'])
+        self.run_and_log(simprints_id_gradlew_command('assembleEndToEndTestingAndroidTest'))
 
     def install_cerberus_apk(self, device: Device):
-        self.run_and_log(commands['install cerberus debug apk'].format(device.device_id))
+        self.run_and_log(cerberus_app_install_apk_command('debug', device))
 
     def install_apk(self, device: Device):
-        self.run_and_log(commands['install simprints id endToEndTesting apk'].format(device.device_id))
+        self.run_and_log(simprints_id_install_apk_command('endToEndTesting', device))
 
     def install_test_apk(self, device: Device):
-        self.run_and_log(commands['install simprints id endToEndTesting test apk'].format(device.device_id))
+        self.run_and_log(simprints_id_install_android_test_apk_command('endToEndTesting', device))
 
-    def devices_query(self):
-        lines = self.run_and_log(commands['devices query'])
+    def query_devices(self):
+        lines = self.run_and_log(query_devices())
 
         # The first line is "List of devices attached". The last line is blank. Lines in between contain a device.
-        # If the ADB daemon isn't started or is invalid, there is some preamble that cane ignored.
+        # If the ADB daemon isn't started or is invalid, there is some preamble that can be ignored.
         relevant_lines = []
         for line in lines[1:-1]:
             if line[0] != '*':
                 relevant_lines.append(line)
-        devices_strs = []
-        for line in relevant_lines:
-            devices_strs.append(line.split())
+        devices_strs = [line.split() for line in relevant_lines]
         devices = []
-        for deviceStr in devices_strs:
+        for device_str in devices_strs:
             # The 0th element is the device Id
             # The 3rd element is the model name, the first 6 characters are 'model:'
-            for deviceStrSection in deviceStr:
-                if deviceStrSection[0:6] == 'model:':
-                    devices.append(Device(deviceStr[0], deviceStrSection[6:]))
+            for segment in device_str:
+                if segment[0:6] == 'model:':
+                    devices.append(Device(device_str[0], segment[6:]))
         return devices
 
     def run_test(self, device: Device, test_id: str):
-        test_dir_name = self.log_dir_name + '/' + device.model + '/' + test_id
+        test_dir_name = f'{self.log_dir_name}/{device.model}/{test_id}'
 
         if not os.path.exists(test_dir_name):
             os.makedirs(test_dir_name)
 
-        test_file_handler: FileHandler = FileHandler(test_dir_name + '/' + test_id + '.log', mode='w')
+        test_file_handler: FileHandler = FileHandler(f'{test_dir_name}/{test_id}.log', mode='w')
 
         self.logger.addHandler(test_file_handler)
         self.update_log_format(LogState.test(device, test_id), test_file_handler)
 
-        self.run_and_log(commands['run test'].format(device.device_id, buckets[test_id]))
+        self.run_and_log(simprints_id_test_command(device, buckets[test_id]))
 
         self.logger.removeHandler(test_file_handler)
 
@@ -265,19 +207,19 @@ def main():
     run.update_log_format(LogState.default())
     run.log("Hello world!")
 
-    # run.clean_cerberus_build()
-    # run.assemble_cerberus_apk()
+    run.clean_cerberus_build()
+    run.assemble_cerberus_apk()
 
     run.clean_simprints_id_build()
     run.assemble_simprints_id_apk()
     run.assemble_simprints_id_test_apk()
 
-    devices = run.devices_query()
+    devices = run.query_devices()
 
     for device in devices:
         run.update_log_format(LogState.device(device))
 
-        # run.install_cerberus_apk(device)
+        run.install_cerberus_apk(device)
         run.install_apk(device)
         run.install_test_apk(device)
 

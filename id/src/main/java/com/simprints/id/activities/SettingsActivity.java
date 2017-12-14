@@ -19,7 +19,7 @@ import android.widget.ToggleButton;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.tools.Language;
+import com.simprints.id.tools.LanguageHelper;
 import com.simprints.libdata.tools.Constants;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -48,13 +48,11 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
 
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_settings);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
+        Toolbar toolbar = findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -64,7 +62,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         }
 
         //Set language spinner
-        Spinner spinner = (Spinner) findViewById(R.id.language_spinner);
+        Spinner spinner = findViewById(R.id.language_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.language_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -74,7 +72,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
         //Set nudge mode
         boolean nudgeMode = dataManager.getNudgeMode();
-        nudgeToggleButton = (ToggleButton) findViewById(R.id.nudgeToggleButton);
+        nudgeToggleButton = findViewById(R.id.nudgeToggleButton);
         nudgeToggleButton.setChecked(nudgeMode);
         nudgeToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -85,7 +83,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
 
         //Set vibrate mode
         boolean vibrate = dataManager.getVibrateMode();
-        vibrateToggleButton = (ToggleButton) findViewById(R.id.vibrateToggleButton);
+        vibrateToggleButton = findViewById(R.id.vibrateToggleButton);
         vibrateToggleButton.setChecked(vibrate);
         vibrateToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -97,9 +95,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         //Set the quality score threshold
         ((TextView) findViewById(R.id.minQualityTextView)).setText(String.valueOf(MIN_QUALITY));
         ((TextView) findViewById(R.id.maxQualityTextView)).setText(String.valueOf(MAX_QUALITY));
-        final TextView qualityThresholdTextView = (TextView) findViewById(R.id.qualityTextView);
+        final TextView qualityThresholdTextView = findViewById(R.id.qualityTextView);
         final int qualityThreshold = dataManager.getQualityThreshold() - MIN_QUALITY;
-        qualitySeekBar = (SeekBar) findViewById(R.id.qualitySeekBar);
+        qualitySeekBar = findViewById(R.id.qualitySeekBar);
         qualitySeekBar.setMax(MAX_QUALITY - MIN_QUALITY);
         qualitySeekBar.setProgress(qualityThreshold);
         qualityThresholdTextView.setText(String.format(
@@ -124,9 +122,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         //Set the return # of IDs
         ((TextView) findViewById(R.id.minNbOfIdsTextView)).setText(String.valueOf(MIN_NB_OF_IDS));
         ((TextView) findViewById(R.id.maxNbOfIdsTextView)).setText(String.valueOf(MAX_NB_OF_IDS));
-        final TextView nbOfIdsTextView = (TextView) findViewById(R.id.nbOfIdsTextView);
+        final TextView nbOfIdsTextView = findViewById(R.id.nbOfIdsTextView);
         final int nbOfIds = dataManager.getReturnIdCount() - MIN_NB_OF_IDS;
-        nbOfIdsSeekBar = (SeekBar) findViewById(R.id.nbOfIdsSeekBar);
+        nbOfIdsSeekBar = findViewById(R.id.nbOfIdsSeekBar);
         nbOfIdsSeekBar.setMax(MAX_NB_OF_IDS - MIN_NB_OF_IDS);
         nbOfIdsSeekBar.setProgress(nbOfIds);
         nbOfIdsTextView.setText(String.format(
@@ -151,9 +149,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         //Set the timeout slider
         ((TextView) findViewById(R.id.tv_minTimeout)).setText(String.valueOf(MIN_TIMEOUT));
         ((TextView) findViewById(R.id.tv_maxTimeout)).setText(String.valueOf(MAX_TIMEOUT));
-        final TextView tv_timeout = (TextView) findViewById(R.id.tv_timeout);
+        final TextView tv_timeout = findViewById(R.id.tv_timeout);
         final int timeout = dataManager.getTimeoutS() - MIN_TIMEOUT;
-        timeoutSeekBar = (SeekBar) findViewById(R.id.sb_timeout);
+        timeoutSeekBar = findViewById(R.id.sb_timeout);
         timeoutSeekBar.setMax(MAX_TIMEOUT - MIN_TIMEOUT);
         timeoutSeekBar.setProgress(timeout);
         tv_timeout.setText(String.format(
@@ -178,9 +176,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         //Set the id wait time slider
         ((TextView) findViewById(R.id.tv_min_id_wait_time)).setText(String.valueOf(MIN_ID_WAIT_TIME));
         ((TextView) findViewById(R.id.tv_max_id_wait_time)).setText(String.valueOf(MAX_ID_WAIT_TIME));
-        final TextView tv_idWaitTime = (TextView) findViewById(R.id.tv_id_wait_time);
+        final TextView tv_idWaitTime = findViewById(R.id.tv_id_wait_time);
         final int idWaitTime = dataManager.getMatchingEndWaitTimeSeconds() - MIN_ID_WAIT_TIME;
-        idWaitTimeSeekBar = (SeekBar) findViewById(R.id.sb_id_wait_time);
+        idWaitTimeSeekBar = findViewById(R.id.sb_id_wait_time);
         idWaitTimeSeekBar.setMax(MAX_ID_WAIT_TIME - MIN_ID_WAIT_TIME);
         idWaitTimeSeekBar.setProgress(idWaitTime);
         tv_idWaitTime.setText(String.format(

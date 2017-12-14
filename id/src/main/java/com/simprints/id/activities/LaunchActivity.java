@@ -13,13 +13,12 @@ import android.widget.TextView;
 
 import com.simprints.id.Application;
 import com.simprints.id.R;
-import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.Language;
+import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
@@ -28,7 +27,6 @@ import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.ScannerCallback;
 
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
-import static com.simprints.id.tools.InternalConstants.ALERT_TYPE_EXTRA;
 import static com.simprints.id.tools.InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST;
 import static com.simprints.id.tools.InternalConstants.MAIN_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST;
@@ -81,9 +79,7 @@ public class LaunchActivity extends AppCompatActivity {
         appState = app.getAppState();
         setup = app.getSetup();
 
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_launch);
 
         // Keep screen from going to sleep
@@ -107,8 +103,6 @@ public class LaunchActivity extends AppCompatActivity {
         positionTracker = new PositionTracker(this, appState);
         positionTracker.start();
 
-        // Start the background sync service in case it has failed for some reason
-        new SyncSetup(getApplicationContext()).initialize();
 
         final ProgressBar launchProgress = findViewById(R.id.pb_launch_progress);
         final TextView loadingInfoTextView = findViewById(R.id.tv_loadingInfo);
@@ -137,7 +131,7 @@ public class LaunchActivity extends AppCompatActivity {
 
             @Override
             public void onProgress(int progress, int detailsId) {
-                Log.d(LaunchActivity.this, "onprogress");
+                Log.INSTANCE.d(LaunchActivity.this, "onprogress");
                 launchProgress.setProgress(progress);
                 loadingInfoTextView.setText(detailsId);
             }
@@ -168,7 +162,7 @@ public class LaunchActivity extends AppCompatActivity {
         launchOutOfFocus = true;
         setup.stop();
         Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra(ALERT_TYPE_EXTRA, alertType);
+        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST);
     }
 

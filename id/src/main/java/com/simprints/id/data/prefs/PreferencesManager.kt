@@ -14,7 +14,6 @@ import com.simprints.libsimprints.FingerIdentifier
 interface PreferencesManager {
 
     // Session state
-    var apiKey: String
     var callout: Callout
     var moduleId: String
     var userId: String

@@ -20,7 +20,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         Crashlytics.log(alertName)
     }
 
-    // TODO: Do we have to log things like api_key, user_id, etc to every firebase event? Or is it enough to log it once, and then we can link everything togeter in big query requests?
+    // TODO: Do we have to log things like api_key, user_id, etc to every firebase event? Or is it enough to log it once, and then we can link everything together in big query requests?
     private fun logAlertToFirebaseAnalytics(alertName: String, apiKey: String, moduleId: String,
                                             userId: String, deviceId: String) {
         Timber.d("FirebaseAnalyticsManager.logAlertToFirebaseAnalytics(alertName=$alertName, ...)")
@@ -40,17 +40,17 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         logAlertToFirebaseAnalytics(alertName, apiKey, moduleId, userId, deviceId)
     }
 
-    override fun logException(throwable: Throwable?) {
-        Timber.d("FirebaseAnalyticsManager.logException(throwable=$throwable)")
-        Crashlytics.logException(throwable)
+    override fun logError(error: Error) {
+        Timber.d("FirebaseAnalyticsManager.logError(throwable=$error)")
+        Crashlytics.logException(error)
     }
 
-    override fun logNonFatalException(description: String) {
-        Timber.d("FirebaseAnalyticsManager.logNonFatalException(description=$description")
-        Crashlytics.log(description)
+    override fun logSafeException(exception: RuntimeException) {
+        Timber.d("FirebaseAnalyticsManager.logSafeException(description=$exception")
         val bundle = Bundle()
-        bundle.putString("description", description)
-        firebaseAnalytics.logEvent("non_fatal_exception", bundle)
+        bundle.putString("exception", exception.toString())
+        bundle.putString("description", exception.message)
+        firebaseAnalytics.logEvent("safe_exception", bundle)
     }
 
     override fun logUserProperties(userId: String, apiKey: String, moduleId: String, deviceId: String) {
@@ -74,8 +74,8 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
     }
 
-    override fun logGuidSelectionService(selectedGuid: String, callbackSent: Boolean,
-                                         apiKey: String, androidId: String, sessionId: String) {
+    override fun logGuidSelectionService(apiKey: String, sessionId: String,
+                                         selectedGuid: String, callbackSent: Boolean, androidId: String) {
         Timber.d("FirebaseAnalyticsManager.logGuidSelectionService(selectedGuid=$selectedGuid, callbackSent=$callbackSent)")
         val bundle = Bundle()
         bundle.putString("api_key", apiKey)

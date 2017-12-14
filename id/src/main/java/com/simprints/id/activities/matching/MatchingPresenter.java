@@ -7,6 +7,9 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
+import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
+import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
@@ -82,7 +85,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 onVerifyStart();
                 break;
             default:
-                dataManager.logException(new IllegalArgumentException("Illegal callout in MatchingActivity.onCreate()"));
+                dataManager.logError(new InvalidMatchingCalloutError("Invalid callout in MatchingActivity"));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -110,7 +113,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
         dataManager.loadPeople(candidates, matchGroup, new DataCallback() {
             @Override
             public void onSuccess() {
-                Log.d(MatchingPresenter.this, String.format(Locale.UK,
+                Log.INSTANCE.d(MatchingPresenter.this, String.format(Locale.UK,
                         "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
@@ -141,7 +144,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                dataManager.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onIdentifyStart()"));
+                dataManager.logError(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });
@@ -153,7 +156,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
         dataManager.loadPerson(candidates, guid, new DataCallback() {
             @Override
             public void onSuccess() {
-                Log.d(MatchingPresenter.this, "Successfully loaded candidate");
+                Log.INSTANCE.d(MatchingPresenter.this, "Successfully loaded candidate");
 
                 int matcherType = dataManager.getMatcherType();
 
@@ -182,8 +185,8 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
             }
 
             @Override
-            public void onFailure(DATA_ERROR data_error) {
-                dataManager.logException(new Exception("Unknown error returned in onFailure MatchingActivity.onVerifyStart()"));
+            public void onFailure(DATA_ERROR dataError) {
+                dataManager.logError(UnexpectedDataError.forDataError(dataError,"MatchingActivity.onVerifyStart()"));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
         });

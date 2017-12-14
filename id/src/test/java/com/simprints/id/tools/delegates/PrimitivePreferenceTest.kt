@@ -1,7 +1,7 @@
 package com.simprints.id.tools.delegates
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.prefs.improvedSharedPreferences.NonPrimitiveTypeException
+import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
 import com.simprints.id.testUtils.*
 import junit.framework.Assert
 import org.junit.Test
@@ -102,7 +102,7 @@ class PrimitivePreferenceTest {
     @Suppress("UNUSED_VARIABLE")
     @Test
     fun testDeclarationOfNonPrimitiveTypeThrowsNonPrimitiveException() {
-        assertThrows<NonPrimitiveTypeException> {
+        assertThrows<NonPrimitiveTypeError> {
             val classPref by PrimitivePreference(improvedPrefs, aKey, aClass)
         }
     }
