@@ -1,4 +1,5 @@
 package com.simprints.id.exceptions.unsafe
 
 
-class UnexpectedSyncError : Error()
+class UnexpectedSyncError(message: String = "UnexpectedSyncError")
+    : Error(message)

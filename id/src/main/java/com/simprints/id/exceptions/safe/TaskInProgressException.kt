@@ -1,4 +1,5 @@
 package com.simprints.id.exceptions.safe
 
 
-class TaskInProgressException: RuntimeException()
+class TaskInProgressException(message: String = "TaskInProgressException"):
+        RuntimeException(message)
