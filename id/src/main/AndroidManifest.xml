@@ -110,21 +110,17 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <service
-            android:name=".backgroundSync.GcmSyncService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
-            <intent-filter>
-                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
-            </intent-filter>
-        </service>
-
         <service android:name="com.simprints.id.services.GuidSelectionService"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="com.simprints.id.CONFIRM_IDENTITY"/>
             </intent-filter>
         </service>
+
+        <service android:name=".services.sync.SyncService"
+            android:exported="false"/>
+
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"

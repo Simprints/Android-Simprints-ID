@@ -207,6 +207,12 @@ class DataManagerImpl(private val context: Context,
             dbContext.callSafelyOrLogSafeExceptionOn("signIn")
             { it.signIn(callback) }
 
+    override fun syncGlobal(appKey: String, dataCallback: DataCallback) =
+            DatabaseSync(context, appKey, dataCallback).sync()
+
+    override fun syncUser(appKey: String, userId: String, dataCallback: DataCallback) =
+            DatabaseSync(context, appKey, dataCallback, userId).sync()
+
     override fun finish() {
         dbContext.callSafelyOrLogSafeExceptionOn("finish")
         { it.destroy() }

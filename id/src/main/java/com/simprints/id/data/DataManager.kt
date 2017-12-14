@@ -67,6 +67,8 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
 
     fun initialize(callback: DataCallback)
     fun signIn(callback: DataCallback?)
+    fun syncGlobal(appKey: String, dataCallback: DataCallback)
+    fun syncUser(appKey: String, userId: String, dataCallback: DataCallback)
     fun finish()
 
     // Secure data
