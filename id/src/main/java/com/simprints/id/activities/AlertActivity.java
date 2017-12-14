@@ -24,7 +24,6 @@ public class AlertActivity extends AppCompatActivity {
     // Singletons
     AppState appState;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +36,7 @@ public class AlertActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         assert extras != null;
-        final ALERT_TYPE alertType = (ALERT_TYPE) extras.get("alertType");
+        final ALERT_TYPE alertType = (ALERT_TYPE) extras.get(IntentKeys.alertActivityAlertTypeKey);
         assert alertType != null;
         this.alertType = alertType;
 

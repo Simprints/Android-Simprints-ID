@@ -15,10 +15,12 @@ import android.widget.Toast;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.activities.AlertActivity;
+import com.simprints.id.activities.IntentKeys;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.Language;
+import com.simprints.id.tools.LanguageHelper;
 import com.simprints.libcommon.Person;
 
 import static com.simprints.id.tools.ResourceHelper.getStringPlural;
@@ -45,10 +47,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         AppState appState = app.getAppState();
         appState.logMatchStart();
 
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
-
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_matching);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -62,11 +61,12 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         // Create the Presenter, and pass it all the information and handles it needs
         final Bundle extras = getIntent().getExtras();
         if (extras == null) {
+            dataManager.logError(new NoIntentExtrasError("Null extras passed to MatchingActivity"));
             launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             finish();
             return;
         }
-        Person probe = extras.getParcelable("Person");
+        Person probe = extras.getParcelable(IntentKeys.matchingActivityProbePersonKey);
         matchingPresenter = new MatchingPresenter(
                 this,
                 dataManager,
@@ -151,7 +151,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     @Override
     public void launchAlert(ALERT_TYPE alertType) {
         Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra("alertType", alertType);
+        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 

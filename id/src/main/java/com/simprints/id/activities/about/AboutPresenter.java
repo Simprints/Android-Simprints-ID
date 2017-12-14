@@ -8,7 +8,6 @@ import android.view.WindowManager;
 
 import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.AppState;
-import com.simprints.id.tools.InternalConstants;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.tools.Constants;
@@ -26,7 +25,7 @@ class AboutPresenter implements AboutContract.Presenter {
     private DataManager dataManager;
 
     /**
-     * @param view      The AboutActivity
+     * @param view The AboutActivity
      */
     AboutPresenter(@NonNull AboutContract.View view, DataManager dataManager) {
         appState = AppState.getInstance(dataManager);
@@ -39,7 +38,7 @@ class AboutPresenter implements AboutContract.Presenter {
     public void start() {
         aboutView.setVersionData(
                 dataManager.getAppVersionName(),
-                InternalConstants.LIBSIMPRINTS_VERSION,
+                dataManager.getLibVersionName(),
                 appState.getHardwareVersion() > -1 ? String.valueOf(appState.getHardwareVersion()) : "null");
 
         aboutView.setDbCountData(
@@ -71,6 +70,7 @@ class AboutPresenter implements AboutContract.Presenter {
                                     aboutView.setSuccessRecovering();
                                     aboutView.setRecoverDbAvailable();
                                 } catch (WindowManager.BadTokenException e) {
+                                    dataManager.logSafeException(e);
                                     e.printStackTrace();
                                 }
                             }
@@ -83,6 +83,7 @@ class AboutPresenter implements AboutContract.Presenter {
                                     aboutView.setErrorRecovering(data_error.details());
                                     aboutView.setRecoverDbAvailable();
                                 } catch (WindowManager.BadTokenException e) {
+                                    dataManager.logSafeException(e);
                                     e.printStackTrace();
                                 }
                             }

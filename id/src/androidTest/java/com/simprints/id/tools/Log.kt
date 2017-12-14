@@ -3,11 +3,10 @@ package com.simprints.id.tools
 import android.app.Instrumentation
 import android.os.Bundle
 import android.support.test.InstrumentationRegistry
-import android.util.Log
-
+import timber.log.Timber
 
 fun log(message: String) {
-    Log.d("EndToEndTesting", message)
+    Timber.d(String.format("EndToEndTesting: %s", message))
     val b = Bundle()
     b.putString(Instrumentation.REPORT_KEY_STREAMRESULT, "\n" + message)
     InstrumentationRegistry.getInstrumentation().sendStatus(0, b)

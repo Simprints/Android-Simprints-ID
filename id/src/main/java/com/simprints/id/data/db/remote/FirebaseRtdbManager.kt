@@ -21,6 +21,9 @@ class FirebaseRtdbManager: RemoteDbManager {
     override fun unregisterConnectionListener(dbContext: DatabaseContext, connectionListener: ConnectionListener) =
             dbContext.unregisterConnectionListener(connectionListener)
 
-    override fun updateIdentification(apiKey: String, selectedGuid: String, deviceId: String, sessionId: String): Boolean =
-            DatabaseContext.updateIdentification(apiKey, selectedGuid, deviceId, sessionId)
+    override fun updateIdentification(apiKey: String, selectedGuid: String, deviceId: String, sessionId: String) {
+        // DatabaseContext.updateIdentification always returns true (erk legacy code)
+        // hence why we are not checking its return value
+        DatabaseContext.updateIdentification(apiKey, selectedGuid, deviceId, sessionId)
+    }
 }

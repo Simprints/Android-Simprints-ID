@@ -33,7 +33,6 @@ import com.simprints.id.R;
 import com.simprints.id.activities.about.AboutActivity;
 import com.simprints.id.activities.matching.MatchingActivity;
 import com.simprints.id.adapters.FingerPageAdapter;
-import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
@@ -42,9 +41,15 @@ import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
+import com.simprints.id.services.progress.Progress;
+import com.simprints.id.services.sync.SyncClient;
+import com.simprints.id.services.sync.SyncService;
+import com.simprints.id.services.sync.SyncTaskParameters;
+import com.simprints.id.services.sync.SyncTaskParameters.GlobalSyncTaskParameters;
+import com.simprints.id.services.sync.SyncTaskParameters.UserSyncTaskParameters;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
-import com.simprints.id.tools.Language;
+import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.RemoteConfig;
 import com.simprints.id.tools.TimeoutBar;
@@ -56,8 +61,6 @@ import com.simprints.libcommon.Person;
 import com.simprints.libcommon.ScanConfig;
 import com.simprints.libdata.AuthListener;
 import com.simprints.libdata.ConnectionListener;
-import com.simprints.libdata.DATA_ERROR;
-import com.simprints.libdata.DataCallback;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
@@ -72,6 +75,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.observers.DisposableObserver;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 import timber.log.Timber;
 
 import static com.simprints.id.model.Finger.NB_OF_FINGERS;
@@ -160,11 +166,11 @@ public class MainActivity extends AppCompatActivity implements
 
     private DataManager dataManager;
 
+    private SyncClient syncClient;
+
     // Singletons
     private AppState appState;
     private Setup setup;
-    private SyncService syncService;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements
         dataManager = app.getDataManager();
         appState = app.getAppState();
         setup = app.getSetup();
-        syncService = app.getSyncService();
+        syncClient = SyncService.Companion.getClient(this);
 
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -222,9 +228,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onResume() {
         super.onResume();
-        getBaseContext().getResources().updateConfiguration(
-                Language.selectLanguage(dataManager.getLanguage()),
-                getBaseContext().getResources().getDisplayMetrics());
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
         if (syncItem != null && dataManager.isConnected())
             syncItem.setIcon(R.drawable.ic_menu_sync_ready);
     }
@@ -517,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void launchAlert(ALERT_TYPE alertType) {
         Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra("alertType", alertType);
+        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
@@ -571,12 +575,10 @@ public class MainActivity extends AppCompatActivity implements
                 dataManager.savePerson(person);
 
                 registrationResult = new Registration(dataManager.getPatientId());
-                for (Fingerprint fp : fingerprints) {
-                    if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES))
+                if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES)) {
+                    for (Fingerprint fp : fingerprints) {
                         registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
-                    else
-                        registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
-//                        registrationResult.setTemplate(fp.getFingerId(), new byte[1]);
+                    }
                 }
 
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
@@ -585,7 +587,7 @@ public class MainActivity extends AppCompatActivity implements
                 finish();
             } else {
                 Intent intent = new Intent(this, MatchingActivity.class);
-                intent.putExtra("Person", person);
+                intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person);
                 startActivityForResult(intent, MATCHING_ACTIVITY_REQUEST_CODE);
             }
         }
@@ -647,7 +649,7 @@ public class MainActivity extends AppCompatActivity implements
                         PRIVACY_ACTIVITY_REQUEST_CODE);
                 break;
             case R.id.nav_sync:
-                backgroundSync();
+                sync();
                 return true;
             case R.id.nav_about:
                 startActivityForResult(new Intent(this, AboutActivity.class),
@@ -802,50 +804,78 @@ public class MainActivity extends AppCompatActivity implements
         }
         dataManager.unregisterAuthListener(authListener);
         dataManager.unregisterConnectionListener(connectionListener);
-        syncService.stopListening(syncListener);
+        syncClient.stopListening();
     }
 
-    DataCallback syncListener = new DataCallback() {
-        public void onSuccess() {
-            Timber.d("sync: onSuccess");
-            if (syncItem == null)
+
+    private void sync() {
+        SyncTaskParameters syncParameters;
+        switch (dataManager.getSyncGroup()) {
+            case GLOBAL:
+                syncParameters = new GlobalSyncTaskParameters(dataManager.getAppKey());
+                break;
+            case USER:
+                syncParameters = new UserSyncTaskParameters(dataManager.getAppKey(), dataManager.getUserId());
+                break;
+            default:
+                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 return;
-
-            syncItem.setEnabled(true);
-            syncItem.setTitle(R.string.nav_sync_complete);
-            syncItem.setIcon(R.drawable.ic_menu_sync_success);
         }
+        syncClient.sync(syncParameters,
+                newSyncObserver(),
+                new Function0<Unit>() {
+                    @Override
+                    public Unit invoke() {
+                        syncItem.setEnabled(true);
+                        syncItem.setTitle(R.string.nav_sync_failed);
+                        syncItem.setIcon(R.drawable.ic_sync_failed);
+                        Toast.makeText(MainActivity.this,
+                                R.string.wait_for_current_sync_to_finish,
+                                Toast.LENGTH_LONG).show();
+                        return null;
+                    }
+                });
+    }
 
-        @Override
-        public void onFailure(DATA_ERROR data_error) {
-            Timber.d("sync: onFailure");
-            switch (data_error) {
-                case SYNC_INTERRUPTED:
-                    if (syncItem == null)
-                        return;
+    private DisposableObserver<Progress> newSyncObserver() {
+        return new DisposableObserver<Progress>() {
 
+            @Override
+            public void onNext(Progress progress) {
+                Timber.d("onNext");
+                if (progress.getCurrentValue() == 0) {
+                    syncItem.setEnabled(false);
+                    syncItem.setTitle(R.string.syncing);
+                    syncItem.setIcon(R.drawable.ic_syncing);
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                Timber.d("onComplete");
+                if (syncItem != null) {
+                    syncItem.setEnabled(true);
+                    syncItem.setTitle(R.string.nav_sync_complete);
+                    syncItem.setIcon(R.drawable.ic_sync_success);
+                }
+                syncClient.stopListening();
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                if (syncItem != null) {
                     syncItem.setEnabled(true);
                     syncItem.setTitle(R.string.nav_sync_failed);
-                    syncItem.setIcon(R.drawable.ic_menu_sync_failed);
-                    break;
-                default:
-                    dataManager.logException(new Exception("Unknown error returned in onFailure MainActivity.syncListener()"));
-                    launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                    syncItem.setIcon(R.drawable.ic_sync_failed);
+                }
+                if (throwable instanceof Error) {
+                    dataManager.logError((Error) throwable);
+                } else if (throwable instanceof RuntimeException) {
+                    dataManager.logSafeException((RuntimeException) throwable);
+                }
+                syncClient.stopListening();
             }
-        }
-    };
-
-    private void backgroundSync() {
-        if (syncItem != null) {
-            syncItem.setEnabled(false);
-            syncItem.setTitle(R.string.syncing);
-            syncItem.setIcon(R.drawable.ic_menu_syncing);
-        }
-
-        if (!syncService.startAndListen(getApplicationContext(), syncListener)) {
-            dataManager.logException(new Exception("Error in MainActivity.backgroundSync()"));
-            launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-        }
+        };
     }
 
     private void startContinuousCapture() {
@@ -916,8 +946,9 @@ public class MainActivity extends AppCompatActivity implements
                                 new Fingerprint(
                                         finger.getId(),
                                         appState.getScanner().getTemplate()));
+                // TODO : change exceptions in libcommon
             } catch (IllegalArgumentException ex) {
-                dataManager.logException(ex);
+                dataManager.logError(new Error("IllegalArgumentException in MainActivity.captureSuccess()"));
                 resetUIFromError();
                 return;
             }
@@ -989,26 +1020,26 @@ public class MainActivity extends AppCompatActivity implements
         SetupCallback setupCallback = new SetupCallback() {
             @Override
             public void onSuccess() {
-                Log.d(MainActivity.this, "reconnect.onSuccess()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onSuccess()");
                 un20WakeupDialog.dismiss();
                 appState.getScanner().registerButtonListener(scannerButtonListener);
             }
 
             @Override
             public void onProgress(int progress, int detailsId) {
-                Log.d(MainActivity.this, "reconnect.onProgress()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onProgress()");
             }
 
             @Override
             public void onError(int resultCode, Intent resultData) {
-                Log.d(MainActivity.this, "reconnect.onError()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onError()");
                 un20WakeupDialog.dismiss();
                 launchAlert(ALERT_TYPE.DISCONNECTED);
             }
 
             @Override
             public void onAlert(@NonNull ALERT_TYPE alertType) {
-                Log.d(MainActivity.this, "reconnect.onAlert()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onAlert()");
                 un20WakeupDialog.dismiss();
                 launchAlert(alertType);
             }

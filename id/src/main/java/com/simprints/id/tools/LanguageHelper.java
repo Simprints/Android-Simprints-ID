@@ -1,11 +1,15 @@
 package com.simprints.id.tools;
 
+import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Build;
 
 import java.util.Locale;
 
-public class Language {
+// TODO: improve language switching. Either don't go against android, or implement a bulletproof solution.
+public class LanguageHelper {
+
     public static Configuration selectLanguage(String languageString) {
 
         Locale locale;
@@ -41,5 +45,10 @@ public class Language {
         }
 
         return config;
+    }
+
+    public static void setLanguage(Context context, String languageString) {
+        Resources res = context.getResources();
+        res.updateConfiguration(LanguageHelper.selectLanguage(languageString), res.getDisplayMetrics());
     }
 }

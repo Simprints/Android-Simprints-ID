@@ -8,6 +8,9 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.exceptions.safe.NullDbContextException
+import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
@@ -26,13 +29,15 @@ class DataManagerImpl(private val context: Context,
                       private val localDbManager: LocalDbManager,
                       private val remoteDbManager: RemoteDbManager,
                       private val apiManager: ApiManager,
-                      private val analyticsManager: AnalyticsManager)
+                      private val analyticsManager: AnalyticsManager,
+                      private val secureDataManager: SecureDataManager)
     : DataManager,
         PreferencesManager by preferencesManager,
         AnalyticsManager by analyticsManager,
         LocalDbManager by localDbManager,
         RemoteDbManager by remoteDbManager,
-        ApiManager by apiManager {
+        ApiManager by apiManager,
+        SecureDataManager by secureDataManager {
 
     override val androidSdkVersion: Int
         get() = Build.VERSION.SDK_INT
@@ -46,31 +51,35 @@ class DataManagerImpl(private val context: Context,
     override val appVersionName: String
         get() = context.packageVersionName
 
+    override val libVersionName: String
+        get() = com.simprints.libsimprints.BuildConfig.VERSION_NAME
+
     override fun logAlert(alertType: ALERT_TYPE) =
-            analyticsManager.logAlert(alertType.name, apiKey, moduleId, userId, deviceId)
+            analyticsManager.logAlert(alertType.name, getApiKeyOrEmpty(), moduleId, userId, deviceId)
 
     override fun logUserProperties() =
-            analyticsManager.logUserProperties(userId, apiKey, moduleId, deviceId)
+            analyticsManager.logUserProperties(userId, getApiKeyOrEmpty(), moduleId, deviceId)
 
     override fun logLogin() =
             analyticsManager.logLogin(callout)
 
-    override fun logGuidSelectionService(selectedGuid: String, callbackSent: Boolean) =
-            analyticsManager.logGuidSelectionService(selectedGuid, callbackSent, apiKey, deviceId,
-                    sessionId)
+    override fun logGuidSelectionService(apiKey: String, sessionId: String, selectedGuid: String,
+                                         callbackSent: Boolean) =
+            analyticsManager.logGuidSelectionService(apiKey, sessionId, selectedGuid, callbackSent,
+                    deviceId)
 
     override fun logConnectionStateChange(connected: Boolean) =
-            analyticsManager.logConnectionStateChange(connected, apiKey, deviceId, sessionId)
+            analyticsManager.logConnectionStateChange(connected, getApiKeyOrEmpty(), deviceId, sessionId)
 
     override fun logAuthStateChange(authenticated: Boolean) =
-            analyticsManager.logAuthStateChange(authenticated, apiKey, deviceId, sessionId)
+            analyticsManager.logAuthStateChange(authenticated, getApiKeyOrEmpty(), deviceId, sessionId)
 
-    private val connectionStateLogger = object: ConnectionListener {
+    private val connectionStateLogger = object : ConnectionListener {
         override fun onConnection() = logConnectionStateChange(true)
         override fun onDisconnection() = logConnectionStateChange(false)
     }
 
-    private val authStateLogger = object: AuthListener {
+    private val authStateLogger = object : AuthListener {
         override fun onSignIn() = logAuthStateChange(true)
         override fun onSignOut() = logAuthStateChange(false)
     }
@@ -78,78 +87,76 @@ class DataManagerImpl(private val context: Context,
     // Remote only
 
     override fun isConnected(): Boolean =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("isConnected",
+            dbContext.callSafelyOrLogSafeExceptionOn("isConnected",
                     { remoteDbManager.isConnected(it) },
                     false)
 
     override fun registerAuthListener(authListener: AuthListener) =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("registerAuthListener")
+            dbContext.callSafelyOrLogSafeExceptionOn("registerAuthListener")
             { remoteDbManager.registerAuthListener(it, authListener) }
 
     override fun registerConnectionListener(connectionListener: ConnectionListener) =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("registerConnectionListener")
+            dbContext.callSafelyOrLogSafeExceptionOn("registerConnectionListener")
             { remoteDbManager.registerConnectionListener(it, connectionListener) }
 
     override fun unregisterAuthListener(authListener: AuthListener) =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("unregisterAuthListener")
+            dbContext.callSafelyOrLogSafeExceptionOn("unregisterAuthListener")
             { remoteDbManager.unregisterAuthListener(it, authListener) }
 
     override fun unregisterConnectionListener(connectionListener: ConnectionListener) =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("unregisterConnectionListener")
+            dbContext.callSafelyOrLogSafeExceptionOn("unregisterConnectionListener")
             { remoteDbManager.unregisterConnectionListener(it, connectionListener) }
 
-    override fun updateIdentification(selectedGuid: String): Boolean =
-        remoteDbManager.updateIdentification(apiKey, selectedGuid, deviceId, sessionId)
+    @Throws(ApiKeyNotFoundError::class)
+    override fun updateIdentification(apiKey: String, selectedGuid: String) =
+            remoteDbManager.updateIdentification(apiKey, selectedGuid, deviceId, sessionId)
 
     // Local only
 
-
     override fun getPeopleCount(group: Constants.GROUP): Long =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("getPeopleCount",
+            dbContext.callSafelyOrLogSafeExceptionOn("getPeopleCount",
                     { localDbManager.getPeopleCount(it, group) },
                     -1)
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP,
                             callback: DataCallback?) {
-        dbContext.callSafelyOrLogNonFatalExceptionOn("loadPeople",
+        dbContext.callSafelyOrLogSafeExceptionOn("loadPeople",
                 { localDbManager.loadPeople(it, destinationList, group, callback) })
     }
 
     // Local + remote which need to be split into smaller bits
 
-
     override fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback) {
         val filename = "${deviceId}_${System.currentTimeMillis()}.json"
-        dbContext.callSafelyOrLogNonFatalExceptionOn("recoverRealmDb",
+        dbContext.callSafelyOrLogSafeExceptionOn("recoverRealmDb",
                 { it.recoverRealmDb(filename, deviceId, group, callback) })
     }
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
             : Boolean =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("saveIdentification",
+            dbContext.callSafelyOrLogSafeExceptionOn("saveIdentification",
                     { it.saveIdentification(probe, matchSize, matches, sessionId) },
                     false)
 
     override fun savePerson(person: Person): Boolean =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("savePerson",
+            dbContext.callSafelyOrLogSafeExceptionOn("savePerson",
                     { it.savePerson(person) },
                     false)
 
     override fun saveRefusalForm(refusalForm: RefusalForm): Boolean =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("saveRefusalForm",
+            dbContext.callSafelyOrLogSafeExceptionOn("saveRefusalForm",
                     { it.saveRefusalForm(refusalForm, sessionId) },
                     false)
 
     override fun saveVerification(probe: Person, match: Verification?,
                                   guidExistsResult: VERIFY_GUID_EXISTS_RESULT): Boolean =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("saveVerification",
+            dbContext.callSafelyOrLogSafeExceptionOn("saveVerification",
                     { it.saveVerification(probe, patientId, match, sessionId, guidExistsResult) },
                     false)
 
     override fun loadPerson(destinationList: MutableList<Person>, guid: String, callback: DataCallback) =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("loadPerson")
+            dbContext.callSafelyOrLogSafeExceptionOn("loadPerson")
             { it.loadPerson(destinationList, guid, callback) }
-
 
     // Local + remote + api which need to be split into smaller bits
 
@@ -170,28 +177,44 @@ class DataManagerImpl(private val context: Context,
     override fun isInitialized(): Boolean =
             dbContext != null
 
-    override fun initialize(callback: DataCallback?) {
+    override fun initialize(callback: DataCallback) {
+
+        val apiKey: String
+        try {
+            apiKey = this.apiKey
+        } catch (e: ApiKeyNotFoundError) {
+            logError(e)
+            callback.onFailure(DATA_ERROR.NOT_FOUND)
+            return
+        }
+
         val tentativeDbContext = DatabaseContext(apiKey, userId, moduleId, deviceId, context, BuildConfig.FIREBASE_PROJECT)
 
         tentativeDbContext.initDatabase(object : DataCallback {
             override fun onSuccess() {
                 dbContext = tentativeDbContext
-                callback?.onSuccess()
+                callback.onSuccess()
             }
 
             override fun onFailure(error: DATA_ERROR) {
                 tentativeDbContext.destroy()
-                callback?.onFailure(error)
+                callback.onFailure(error)
             }
         })
     }
 
     override fun signIn(callback: DataCallback?) =
-            dbContext.callSafelyOrLogNonFatalExceptionOn("signIn")
+            dbContext.callSafelyOrLogSafeExceptionOn("signIn")
             { it.signIn(callback) }
 
+    override fun syncGlobal(appKey: String, dataCallback: DataCallback) =
+            DatabaseSync(context, appKey, dataCallback).sync()
+
+    override fun syncUser(appKey: String, userId: String, dataCallback: DataCallback) =
+            DatabaseSync(context, appKey, dataCallback, userId).sync()
+
     override fun finish() {
-        dbContext.callSafelyOrLogNonFatalExceptionOn("finish")
+        dbContext.callSafelyOrLogSafeExceptionOn("finish")
         { it.destroy() }
         dbContext = null
     }
@@ -200,19 +223,22 @@ class DataManagerImpl(private val context: Context,
      * Performs the specified call using this database context if it is non null.
      * Else, log a non fatal exception.
      */
-    private fun <T: Any?> DatabaseContext?.callSafelyOrLogNonFatalExceptionOn(
+    private fun <T : Any?> DatabaseContext?.callSafelyOrLogSafeExceptionOn(
             methodName: String, call: (DatabaseContext) -> T, onFailureReturn: T): T {
         return if (this == null) {
-            logNonFatalException("Cannot $methodName because dbContext is null")
+            logSafeException(NullDbContextException.forAttemptedMethod(methodName))
             onFailureReturn
         } else {
             call(this)
         }
     }
 
-    private fun DatabaseContext?.callSafelyOrLogNonFatalExceptionOn(methodName: String,
-                                                                    call: (DatabaseContext) -> Unit) =
-            callSafelyOrLogNonFatalExceptionOn(methodName, call, Unit)
+    private fun DatabaseContext?.callSafelyOrLogSafeExceptionOn(methodName: String,
+                                                                call: (DatabaseContext) -> Unit) =
+            callSafelyOrLogSafeExceptionOn(methodName, call, Unit)
 
+    //Secure Data
 
+    override fun getApiKeyOrEmpty(): String =
+            getApiKeyOr("")
 }
