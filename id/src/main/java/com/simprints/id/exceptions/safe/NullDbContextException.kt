@@ -1,7 +1,8 @@
 package com.simprints.id.exceptions.safe
 
 
-class NullDbContextException(message: String = "NullDbContextException") : RuntimeException(message) {
+class NullDbContextException(message: String = "NullDbContextException")
+    : RuntimeException(message) {
 
     companion object {
 

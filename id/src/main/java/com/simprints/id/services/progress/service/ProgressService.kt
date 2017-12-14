@@ -5,8 +5,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import com.simprints.libcommon.Progress
-import com.simprints.id.services.progress.notifications.ProgressNotificationBuilder
-import com.simprints.id.services.progress.notifications.ResultNotificationBuilder
+import com.simprints.id.services.progress.notifications.NotificationBuilder
 import com.simprints.id.exceptions.safe.TaskInProgressException
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -48,8 +47,9 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
     private lateinit var progressLiveObservable: Observable<Progress>
     private lateinit var progressReplayObservable: ReplaySubject<Progress>
 
-    private lateinit var progressNotificationBuilder: ProgressNotificationBuilder
-    private lateinit var resultNotificationBuilder: ResultNotificationBuilder
+    private lateinit var progressNotificationBuilder: NotificationBuilder
+    private lateinit var completeNotificationBuilder: NotificationBuilder
+    private lateinit var errorNotificationBuilder: NotificationBuilder
 
     override fun onCreate() {
         Timber.d("onCreate()")
@@ -72,14 +72,19 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
 
         override fun startForeground() {
             startForeground(progressNotificationBuilder.id, progressNotificationBuilder.build())
-            progressNotificationBuilder.setVisibility(true)
-            resultNotificationBuilder.setVisibility(true)
+            setNotificationVisibility(true)
         }
 
         override fun stopForeground() {
             stopForeground(true)
-            progressNotificationBuilder.setVisibility(false)
-            resultNotificationBuilder.setVisibility(false)
+            setNotificationVisibility(false)
+        }
+
+        private fun setNotificationVisibility(visible: Boolean) {
+            progressNotificationBuilder.setVisibility(visible)
+            completeNotificationBuilder.setVisibility(visible)
+            errorNotificationBuilder.setVisibility(visible)
+
         }
 
     }
@@ -88,7 +93,7 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         if (executing.getAndSet(true)) {
             checkTaskOverlap(taskParameters)
         } else {
-            initiateTask(taskParameters)
+            startExecution(taskParameters)
         }
     }
 
@@ -98,29 +103,49 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         }
     }
 
-    private fun initiateTask(taskParameters: T) {
+    private fun startExecution(taskParameters: T) {
+        initTask(taskParameters)
+        subscribeCoreObservers()
+        initNotificationBuilders()
+        subscribeNotificationProgressObservers()
+    }
+
+    private fun initTask(taskParameters: T) {
         this.taskParameters = taskParameters
         task = getTask(taskParameters)
-        progressNotificationBuilder = getProgressNotificationBuilder(taskParameters)
-        resultNotificationBuilder = getResultNotificationBuilder(taskParameters)
-        progressLiveObservable = observableTask()
+        progressLiveObservable = wrapTaskInObservable()
+    }
+
+    private fun subscribeCoreObservers() {
         progressLiveObservable.subscribe(progressReplayObservable)
-        progressReplayObservable.subscribe(progressNotificationBuilder.progressObserver)
         progressReplayObservable.subscribe(finishObserver)
-        // This delay is necessary on devices running O. Dirty...
-        // If stopSelf happens after notify, it deletes the notification.
-        progressReplayObservable.delay(100, TimeUnit.MILLISECONDS)
-                .subscribe(resultNotificationBuilder.progressObserver)
+    }
+
+    private fun initNotificationBuilders() {
+        progressNotificationBuilder = getProgressNotificationBuilder(taskParameters)
+        completeNotificationBuilder = getCompleteNotificationBuilder(taskParameters)
+        errorNotificationBuilder = getErrorNotificationBuilder(taskParameters)
+    }
+
+    private fun subscribeNotificationProgressObservers() {
+        progressReplayObservable.subscribe(progressNotificationBuilder.progressObserver)
+        // Dirty... but necessary on devices running O, where any notification posted before
+        // stopSelf() is cancelled on stopSelf()
+        val delayedProgressReplayObservable = progressReplayObservable.delay(100, TimeUnit.MILLISECONDS)
+        delayedProgressReplayObservable.subscribe(completeNotificationBuilder.progressObserver)
+        delayedProgressReplayObservable.subscribe(errorNotificationBuilder.progressObserver)
 
     }
 
     abstract fun getTask(taskParameters: T): ProgressTask
 
-    abstract fun getProgressNotificationBuilder(taskParameters: T): ProgressNotificationBuilder
+    abstract fun getProgressNotificationBuilder(taskParameters: T): NotificationBuilder
 
-    abstract fun getResultNotificationBuilder(taskParameters: T): ResultNotificationBuilder
+    abstract fun getCompleteNotificationBuilder(taskParameters: T): NotificationBuilder
 
-    private fun observableTask(): Observable<Progress> =
+    abstract fun getErrorNotificationBuilder(taskParameters: T): NotificationBuilder
+
+    private fun wrapTaskInObservable(): Observable<Progress> =
             Observable.create<Progress>({ emitter ->
                 task.run({ isInterrupted.get() }, emitter)
             })

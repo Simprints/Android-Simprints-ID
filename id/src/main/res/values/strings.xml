@@ -72,8 +72,6 @@
     <string name="finger_image_description" translatable="false">Hands with arrow pointing to a finger</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
-    <!-- Toasts -->
-    <string name="wait_for_current_sync_to_finish" translatable="false">Please wait for the current sync operation to finish</string>
 
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the MainActivity -->
@@ -98,6 +96,7 @@
     <string name="persistence_label">Remember these settings next time</string>
     <!-- Toast Messages -->
     <string name="coming_soon">Coming soon…</string>
+    <string name="wait_for_current_sync_to_finish">Please wait for the current sync operation to finish</string>
     <!-- Finger Names -->
     <string name="l_5_finger_name">LEFT FIFTH FINGER</string>
     <string name="l_4_finger_name">LEFT FOURTH FINGER</string>
@@ -277,9 +276,21 @@
     </string>
 
 
+    <!-- Notifications -->
+    <!-- Channel -->
+    <string name="notification_channel_id">SimprintsID</string>
+    <string name="notification_channel_name">Simprints ID notifications</string>
+    <string name="notification_channel_description">Notifications from Simprints ID</string>
+    <!-- Sync Notifications -->
+    <string name="sync_notification_tag">SimprintsID_sync</string>
+    <string name="sync_notification_title">Simprints ID Sync</string>
+    <string name="sync_progress_notification_content">Syncing… %1$d/%2$d</string>
+    <string name="sync_error_notification_content">Sync failed.</string>
+    <string name="sync_complete_notification_content">Sync completed.</string>
+
+
     <!-- Miscellaneous -->
     <!-- The Empty String -->
     <string name="empty" translatable="false" />
-
 
 </resources>
