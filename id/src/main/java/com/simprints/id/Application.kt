@@ -1,10 +1,10 @@
 package com.simprints.id
 
 import android.content.SharedPreferences
+import android.support.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
-import com.simprints.id.backgroundSync.SyncService
 import com.simprints.id.controllers.Setup
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
@@ -24,6 +24,7 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.model.Callout
 import com.simprints.id.tools.AppState
+import com.simprints.id.tools.NotificationFactory
 import com.simprints.id.tools.serializers.BooleanSerializer
 import com.simprints.id.tools.serializers.EnumSerializer
 import com.simprints.id.tools.serializers.MapSerializer
@@ -35,7 +36,7 @@ import timber.log.Timber
 import android.app.Application as AndroidApplication
 
 
-class Application : AndroidApplication() {
+class Application : MultiDexApplication() {
 
     // TODO: dependency injection with Dagger 2!
 
@@ -110,6 +111,12 @@ class Application : AndroidApplication() {
                 apiManager, analyticsManager, secureDataManager)
     }
 
+    val notificationFactory: NotificationFactory by lazy {
+        val factory = NotificationFactory(this)
+        factory.initSyncNotificationChannel()
+        factory
+    }
+
     // TODO: These are all the singletons that are used in Simprints ID right now. This is temporary, until we get rid of all these singletons
     val appState: AppState by lazy {
         AppState.getInstance(dataManager)
@@ -119,9 +126,6 @@ class Application : AndroidApplication() {
         Setup.getInstance(dataManager, appState)
     }
 
-    val syncService: SyncService by lazy {
-        SyncService.getInstance(dataManager)
-    }
 
     override fun onCreate() {
         super.onCreate()

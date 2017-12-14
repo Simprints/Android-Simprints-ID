@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.simprints.id.Application;
 import com.simprints.id.R;
-import com.simprints.id.backgroundSync.SyncSetup;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
@@ -104,8 +103,6 @@ public class LaunchActivity extends AppCompatActivity {
         positionTracker = new PositionTracker(this, appState);
         positionTracker.start();
 
-        // Start the background sync service in case it has failed for some reason
-        new SyncSetup(getApplicationContext()).initialize();
 
         final ProgressBar launchProgress = findViewById(R.id.pb_launch_progress);
         final TextView loadingInfoTextView = findViewById(R.id.tv_loadingInfo);
