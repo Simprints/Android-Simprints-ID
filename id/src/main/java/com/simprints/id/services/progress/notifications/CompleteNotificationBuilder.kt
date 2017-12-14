@@ -6,21 +6,21 @@ import com.simprints.libcommon.Progress
 import io.reactivex.observers.DisposableObserver
 
 
-class CompleteNotificationBuilder(private val notificationManager: NotificationManager,
+class CompleteNotificationBuilder(notificationManager: NotificationManager,
                                   notificationBuilder: NotificationCompat.Builder,
                                   tag: String,
                                   title: String,
                                   icon: Int,
                                   private val completeTextBuilder: () -> String)
-    : BaseNotificationBuilder(notificationBuilder, tag, title, icon) {
+    : BaseNotificationBuilder(notificationManager, notificationBuilder, tag, title, icon) {
 
     override val progressObserver: DisposableObserver<Progress> =
             object : DisposableObserver<Progress>() {
                 override fun onComplete() {
-                    updateBuilder { setContentText(completeTextBuilder()) }
-                    if (visible.get()) {
-                        notificationManager.notify(id, build())
+                    updateBuilder {
+                        setContentText(completeTextBuilder())
                     }
+                    notifyIfVisible()
                     dispose()
                 }
 
