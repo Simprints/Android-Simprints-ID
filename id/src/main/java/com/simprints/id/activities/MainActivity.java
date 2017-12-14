@@ -828,7 +828,7 @@ public class MainActivity extends AppCompatActivity implements
                     public Unit invoke() {
                         syncItem.setEnabled(true);
                         syncItem.setTitle(R.string.nav_sync_failed);
-                        syncItem.setIcon(R.drawable.ic_menu_sync_failed);
+                        syncItem.setIcon(R.drawable.ic_sync_failed);
                         Toast.makeText(MainActivity.this,
                                 R.string.wait_for_current_sync_to_finish,
                                 Toast.LENGTH_LONG).show();
@@ -846,7 +846,7 @@ public class MainActivity extends AppCompatActivity implements
                 if (progress.getCurrentValue() == 0) {
                     syncItem.setEnabled(false);
                     syncItem.setTitle(R.string.syncing);
-                    syncItem.setIcon(R.drawable.ic_menu_syncing);
+                    syncItem.setIcon(R.drawable.ic_syncing);
                 }
             }
 
@@ -856,7 +856,7 @@ public class MainActivity extends AppCompatActivity implements
                 if (syncItem != null) {
                     syncItem.setEnabled(true);
                     syncItem.setTitle(R.string.nav_sync_complete);
-                    syncItem.setIcon(R.drawable.ic_menu_sync_success);
+                    syncItem.setIcon(R.drawable.ic_sync_success);
                 }
                 syncClient.stopListening();
             }
@@ -866,7 +866,7 @@ public class MainActivity extends AppCompatActivity implements
                 if (syncItem != null) {
                     syncItem.setEnabled(true);
                     syncItem.setTitle(R.string.nav_sync_failed);
-                    syncItem.setIcon(R.drawable.ic_menu_sync_failed);
+                    syncItem.setIcon(R.drawable.ic_sync_failed);
                 }
                 if (throwable instanceof Error) {
                     dataManager.logError((Error) throwable);
