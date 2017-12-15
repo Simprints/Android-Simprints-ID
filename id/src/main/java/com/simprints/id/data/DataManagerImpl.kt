@@ -63,7 +63,7 @@ class DataManagerImpl(private val context: Context,
             analyticsManager.logUserProperties(userId, getApiKeyOrEmpty(), moduleId, deviceId)
 
     override fun logLogin() =
-            analyticsManager.logLogin(callout)
+            analyticsManager.logLogin(calloutType)
 
     override fun logGuidSelectionService(apiKey: String, sessionId: String, selectedGuid: String,
                                          callbackSent: Boolean) =

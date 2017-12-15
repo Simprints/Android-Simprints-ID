@@ -3,7 +3,8 @@ package com.simprints.id.data.db.analytics
 import android.os.Bundle
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.simprints.id.model.Callout
+import com.simprints.id.data.model.CalloutType
+import com.simprints.id.data.model.calloutParameters.MainCalloutParameters
 import timber.log.Timber
 
 /**
@@ -14,6 +15,14 @@ import timber.log.Timber
  */
 
 class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics): AnalyticsManager {
+
+
+    override fun logAlert(alertName: String, apiKey: String, moduleId: String, userId: String,
+                          deviceId: String) {
+        Timber.d("FirebaseAnalyticsManager.logAlert(alertName=$alertName, ...)")
+        logAlertToCrashlytics(alertName)
+        logAlertToFirebaseAnalytics(alertName, apiKey, moduleId, userId, deviceId)
+    }
 
     private fun logAlertToCrashlytics(alertName: String) {
         Timber.d("FirebaseAnalyticsManager.logAlertToCrashlytics(alertName=$alertName)")
@@ -33,13 +42,6 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         firebaseAnalytics.logEvent("alert", bundle)
     }
 
-    override fun logAlert(alertName: String, apiKey: String, moduleId: String, userId: String,
-                          deviceId: String) {
-        Timber.d("FirebaseAnalyticsManager.logAlert(alertName=$alertName, ...)")
-        logAlertToCrashlytics(alertName)
-        logAlertToFirebaseAnalytics(alertName, apiKey, moduleId, userId, deviceId)
-    }
-
     override fun logError(error: Error) {
         Timber.d("FirebaseAnalyticsManager.logError(throwable=$error)")
         Crashlytics.logException(error)
@@ -51,6 +53,24 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         bundle.putString("exception", exception.toString())
         bundle.putString("description", exception.message)
         firebaseAnalytics.logEvent("safe_exception", bundle)
+    }
+
+    override fun logMainCalloutParameters(parameters: MainCalloutParameters) {
+        Timber.d("FirebaseAnalyticsManager.logMainCalloutParameters(parameters=$parameters)")
+        with(parameters) {
+            val bundle = Bundle()
+            bundle.putString("type", typeParameter.value.intentAction)
+            bundle.putString("api_key", apiKeyParameter.value)
+            bundle.putString("module_id", moduleIdParameter.value)
+            bundle.putString("user_id", userIdParameter.value)
+            bundle.putString("update_id", patientIdParameter.updateIdParameter.value)
+            bundle.putString("verify_id", patientIdParameter.verifyIdParameter.value)
+            bundle.putString("calling_package", callingPackageParameter.value)
+            bundle.putString("metadata", metadataParameter.value)
+            bundle.putString("result_format", resultFormatParameter.value)
+            bundle.putString("unexpected_parameters", unexpectedParameters.value.toString())
+            firebaseAnalytics.logEvent("main_callout_parameters", bundle)
+        }
     }
 
     override fun logUserProperties(userId: String, apiKey: String, moduleId: String, deviceId: String) {
@@ -67,10 +87,10 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         firebaseAnalytics.setUserProperty("scanner_id", scannerId)
     }
 
-    override fun logLogin(callout: Callout) {
-        Timber.d("FirebaseAnalyticsManager.logLogin(callout=$callout)")
+    override fun logLogin(calloutType: CalloutType) {
+        Timber.d("FirebaseAnalyticsManager.logLogin(calloutType=$calloutType)")
         val bundle = Bundle()
-        bundle.putString("callout", callout.name)
+        bundle.putString("calloutType", calloutType.name)
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LOGIN, bundle)
     }
 

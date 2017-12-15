@@ -11,7 +11,7 @@ import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.model.Callout;
+import com.simprints.id.data.model.CalloutType;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Log;
@@ -65,7 +65,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
     @Override
     public void start() {
         // TODO : Use polymorphism
-        switch (dataManager.getCallout()) {
+        switch (dataManager.getCalloutType()) {
             case IDENTIFY:
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
@@ -85,7 +85,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 onVerifyStart();
                 break;
             default:
-                dataManager.logError(new InvalidMatchingCalloutError("Invalid callout in MatchingActivity"));
+                dataManager.logError(new InvalidMatchingCalloutError("Invalid calloutType in MatchingActivity"));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -200,7 +200,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 break;
             }
             case MATCH_COMPLETED: {
-                Callout callout = dataManager.getCallout();
+                CalloutType callout = dataManager.getCalloutType();
                 switch (callout) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();

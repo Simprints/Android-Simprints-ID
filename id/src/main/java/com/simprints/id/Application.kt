@@ -14,6 +14,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.remote.FirebaseRtdbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.model.CalloutType
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.network.ApiManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -22,7 +23,6 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
-import com.simprints.id.model.Callout
 import com.simprints.id.tools.AppState
 import com.simprints.id.tools.NotificationFactory
 import com.simprints.id.tools.serializers.BooleanSerializer
@@ -52,8 +52,8 @@ class Application : MultiDexApplication() {
         EnumSerializer(FingerIdentifier::class.java)
     }
 
-    private val calloutSerializer: Serializer<Callout> by lazy {
-        EnumSerializer(Callout::class.java)
+    private val calloutTypeSerializer: Serializer<CalloutType> by lazy {
+        EnumSerializer(CalloutType::class.java)
     }
 
     private val groupSerializer: Serializer<Constants.GROUP> by lazy {
@@ -73,7 +73,7 @@ class Application : MultiDexApplication() {
     }
 
     private val preferencesManager: PreferencesManager by lazy {
-        PreferencesManagerImpl(prefs, fingerIdToBooleanSerializer, calloutSerializer, groupSerializer)
+        PreferencesManagerImpl(prefs, fingerIdToBooleanSerializer, calloutTypeSerializer, groupSerializer)
     }
 
     private val localDbManager: LocalDbManager by lazy {
@@ -119,7 +119,7 @@ class Application : MultiDexApplication() {
 
     // TODO: These are all the singletons that are used in Simprints ID right now. This is temporary, until we get rid of all these singletons
     val appState: AppState by lazy {
-        AppState.getInstance(dataManager)
+        AppState.getInstance()
     }
 
     val setup: Setup by lazy {

@@ -1,4 +1,4 @@
-package com.simprints.id.activities;
+package com.simprints.id.activities.launch;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -13,18 +13,26 @@ import android.widget.TextView;
 
 import com.simprints.id.Application;
 import com.simprints.id.R;
+import com.simprints.id.activities.AlertActivity;
+import com.simprints.id.activities.IntentKeys;
+import com.simprints.id.activities.MainActivity;
+import com.simprints.id.activities.RefusalActivity;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.data.model.calloutParameters.MainCalloutParameters;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
+import com.simprints.id.tools.exceptions.InvalidCalloutException;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.ScannerCallback;
+
+import java.util.UUID;
 
 import static com.simprints.id.tools.InternalConstants.ALERT_ACTIVITY_REQUEST;
 import static com.simprints.id.tools.InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST;
@@ -88,21 +96,26 @@ public class LaunchActivity extends AppCompatActivity {
         // Initialize remote config
         RemoteConfig.init();
 
-        // Parse/verify callout, initialize app state
-        ALERT_TYPE alert = appState.init(getIntent());
-        if (alert != null) {
-            launchAlert(alert);
+        dataManager.setSessionId(newSessionId());
+
+        MainCalloutParameters calloutParameters = new MainCalloutParameters(getIntent());
+        dataManager.setMainCalloutParameters(calloutParameters);
+        dataManager.logMainCalloutParameters(calloutParameters);
+
+        try {
+            calloutParameters.validate();
+        } catch (InvalidCalloutException exception) {
+            launchAlert(exception.getAlertType());
             return;
         }
+
         // Log some attributes to analytics
         dataManager.logUserProperties();
         dataManager.logLogin();
 
-
         // Initialize position tracker
         positionTracker = new PositionTracker(this, appState);
         positionTracker.start();
-
 
         final ProgressBar launchProgress = findViewById(R.id.pb_launch_progress);
         final TextView loadingInfoTextView = findViewById(R.id.tv_loadingInfo);
@@ -150,6 +163,10 @@ public class LaunchActivity extends AppCompatActivity {
 
         // Start the launch process
         setup.start(this, setupCallback);
+    }
+
+    private String newSessionId() {
+        return UUID.randomUUID().toString();
     }
 
     /**

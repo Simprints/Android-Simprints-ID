@@ -42,6 +42,11 @@ public enum ALERT_TYPE {
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
             false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_VERIFY_GUID),
 
+    // TODO: add Unexpected Parameter return code to LibSimprints.
+    UNEXPECTED_PARAMETER(R.string.configuration_error_title, R.string.unexpected_parameter_message,
+            R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_CANCELLED),
+
     // Verification errors
 
     UNVERIFIED_API_KEY(R.string.alert_api_key_verify_failed, R.string.alert_api_key_verify_failed_body,

@@ -7,6 +7,8 @@ import com.simprints.id.testUtils.assertThrows
 import com.simprints.id.testUtils.mock
 import com.simprints.id.testUtils.verifyOnlyInteraction
 import com.simprints.id.testUtils.whenever
+import com.simprints.id.tools.exceptions.MismatchedTypeException
+import com.simprints.id.tools.exceptions.NonPrimitiveTypeException
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 import org.mockito.ArgumentMatchers.*
