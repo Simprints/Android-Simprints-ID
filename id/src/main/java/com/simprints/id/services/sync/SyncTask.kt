@@ -1,6 +1,7 @@
 package com.simprints.id.services.sync
 
 import com.simprints.id.data.DataManager
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.services.progress.service.ProgressTask
 import com.simprints.id.services.sync.SyncTaskParameters.GlobalSyncTaskParameters
 import com.simprints.id.services.sync.SyncTaskParameters.UserSyncTaskParameters
@@ -15,12 +16,21 @@ class SyncTask(private val dataManager: DataManager,
     override fun run(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
         thread (start = true) {
             emitter.onNext(Progress(0, 0))
-            when (parameters) {
-                is UserSyncTaskParameters ->
-                    dataManager.syncUser(parameters.userId, isInterrupted, emitter)
-                is GlobalSyncTaskParameters ->
-                    dataManager.syncGlobal(isInterrupted, emitter)
+            try {
+                sync(isInterrupted, emitter)
+            } catch (error: UninitializedDataManagerError) {
+                dataManager.logError(error)
+                emitter.onError(error)
             }
+        }
+    }
+
+    private fun sync(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        when (parameters) {
+            is UserSyncTaskParameters ->
+                dataManager.syncUser(parameters.userId, isInterrupted, emitter)
+            is GlobalSyncTaskParameters ->
+                dataManager.syncGlobal(isInterrupted, emitter)
         }
     }
 
