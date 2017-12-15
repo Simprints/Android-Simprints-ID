@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.content.SharedPreferences
-import com.simprints.id.exceptions.safe.MismatchedTypeException
+import com.simprints.id.exceptions.unsafe.MismatchedTypeError
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
 import com.simprints.id.testUtils.assertThrows
 import com.simprints.id.testUtils.mock
@@ -143,7 +143,7 @@ class ImprovedSharedPreferencesImplTest {
     @Test
     fun testGetPrimitiveWrapsExceptionsAsMismatchedTypeExceptions() {
         whenever(basePrefs.getInt(anyString(), anyInt())).then { throw ClassCastException() }
-        assertThrows<MismatchedTypeException> {
+        assertThrows<MismatchedTypeError> {
             improvedPrefs.getPrimitive(aKey, anInt)
         }
     }
