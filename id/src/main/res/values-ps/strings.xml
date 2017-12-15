@@ -21,7 +21,7 @@
     <!-- Sync Button Text -->
     <string name="sync_data">د معلوماتو همګامول</string>
     <string name="syncing">همګامول</string>
-    <string name="syncing_with_progress">%1$d/%2$d …همګامول</string>
+    <string name="syncing_with_progress">همګامول… %1$d/%2$d </string>
     <string name="not_signed_in">سیسټم کې دننه شوی نه یاست</string>
 
 

@@ -10,6 +10,7 @@ import com.simprints.id.data.DataManager;
 import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.data.model.CalloutType;
 import com.simprints.id.tools.AppState;
@@ -109,8 +110,16 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
     private void onIdentifyStart() {
         final Constants.GROUP matchGroup = dataManager.getMatchGroup();
+        try {
+            dataManager.loadPeople(candidates, matchGroup, newOnLoadPeopleCallback());
+        } catch (UninitializedDataManagerError error) {
+            dataManager.logError(error);
+            matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+        }
+    }
 
-        dataManager.loadPeople(candidates, matchGroup, new DataCallback() {
+    private DataCallback newOnLoadPeopleCallback() {
+        return new DataCallback() {
             @Override
             public void onSuccess() {
                 Log.INSTANCE.d(MatchingPresenter.this, String.format(Locale.UK,
@@ -147,13 +156,21 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 dataManager.logError(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
-        });
+        };
     }
 
     private void onVerifyStart() {
         final String guid = dataManager.getPatientId();
+        try {
+            dataManager.loadPerson(candidates, guid, newOnLoadPersonCallback());
+        } catch (UninitializedDataManagerError error) {
+            dataManager.logError(error);
+            matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+        }
+    }
 
-        dataManager.loadPerson(candidates, guid, new DataCallback() {
+    private DataCallback newOnLoadPersonCallback() {
+        return new DataCallback() {
             @Override
             public void onSuccess() {
                 Log.INSTANCE.d(MatchingPresenter.this, "Successfully loaded candidate");
@@ -189,7 +206,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 dataManager.logError(UnexpectedDataError.forDataError(dataError,"MatchingActivity.onVerifyStart()"));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
             }
-        });
+        };
     }
 
     @Override
@@ -229,7 +246,13 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                                     scores.get(idx[i]).intValue(), computeTier(scores.get(idx[i]))));
                         }
 
-                        dataManager.saveIdentification(probe, candidates.size(), topCandidates);
+                        try {
+                            dataManager.saveIdentification(probe, candidates.size(), topCandidates);
+                        } catch (UninitializedDataManagerError error) {
+                            dataManager.logError(error);
+                            matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                            return;
+                        }
 
                         // finish
                         int tier1Or2Matches = 0;
@@ -273,7 +296,14 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                             guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_UNKNOWN;
                             resultCode = com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
                         }
-                        dataManager.saveVerification(probe, verification, guidExistsResult);
+
+                        try {
+                            dataManager.saveVerification(probe, verification, guidExistsResult);
+                        } catch (UninitializedDataManagerError error) {
+                            dataManager.logError(error);
+                            matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                            return;
+                        }
 
                         // finish
                         Intent resultData;
