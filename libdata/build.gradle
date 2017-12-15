@@ -33,8 +33,6 @@ android {
             testCoverageEnabled true
         }
     }
-    compileOptions {
-    }
 }
 
 repositories {
