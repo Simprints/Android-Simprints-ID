@@ -2,6 +2,7 @@ package com.simprints.id.tools
 
 import android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.support.test.InstrumentationRegistry
 import android.support.test.rule.ActivityTestRule
 import android.view.WindowManager
@@ -30,7 +31,7 @@ object ActivityUtils {
         if (verifyGuidExtra != null) intent.putExtra(Constants.SIMPRINTS_VERIFY_GUID, verifyGuidExtra)
         activityTestRule.launchActivity(intent)
         runActivityOnUiThread(activityTestRule)
-        grantPermissions()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) grantPermissions()
     }
 
     private fun createLaunchActivityIntent(calloutCredentials: CalloutCredentials, action: String): Intent {
