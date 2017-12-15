@@ -12,7 +12,7 @@ import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError;
 import com.simprints.id.exceptions.unsafe.NullScannerError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.model.Callout;
+import com.simprints.id.data.model.CalloutType;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
@@ -276,7 +276,7 @@ public class Setup {
 
     // STEP 6
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
-        if (dataManager.getCallout() != Callout.VERIFY) {
+        if (dataManager.getCalloutType() != CalloutType.VERIFY) {
             guidExists = true;
             goOn(activity);
             return;

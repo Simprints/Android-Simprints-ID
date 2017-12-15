@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.analytics
 
-import com.simprints.id.model.Callout
+import com.simprints.id.data.model.CalloutType
+import com.simprints.id.data.model.calloutParameters.MainCalloutParameters
 
 
 interface AnalyticsManager {
@@ -12,11 +13,13 @@ interface AnalyticsManager {
 
     fun logSafeException(exception: RuntimeException)
 
+    fun logMainCalloutParameters(parameters: MainCalloutParameters)
+
     fun logUserProperties(userId: String, apiKey: String, moduleId: String, deviceId: String)
 
     fun logScannerProperties(macAddress: String, scannerId: String)
 
-    fun logLogin(callout: Callout)
+    fun logLogin(calloutType: CalloutType)
 
     fun logGuidSelectionService(apiKey: String, sessionId: String, selectedGuid: String,
                                 callbackSent: Boolean, androidId: String)

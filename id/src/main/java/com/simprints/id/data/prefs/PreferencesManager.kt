@@ -1,6 +1,7 @@
 package com.simprints.id.data.prefs
 
-import com.simprints.id.model.Callout
+import com.simprints.id.data.model.CalloutType
+import com.simprints.id.data.model.calloutParameters.MainCalloutParameters
 import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.FingerIdentifier
 
@@ -13,14 +14,17 @@ import com.simprints.libsimprints.FingerIdentifier
  */
 interface PreferencesManager {
 
-    // Session state
-    var callout: Callout
+    // Main callout parameters
+    var mainCalloutParameters: MainCalloutParameters
+    var calloutType: CalloutType
     var moduleId: String
     var userId: String
     var patientId: String
     var callingPackage: String
     var metadata: String
     var resultFormat: String
+
+    // Other session state
     var sessionId: String
 
     // Settings

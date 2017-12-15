@@ -40,7 +40,7 @@ import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.model.Callout;
+import com.simprints.id.data.model.CalloutType;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.services.sync.SyncClient;
@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements
         //noinspection ConstantConditions
         actionBar.show();
 
-        switch (dataManager.getCallout()) {
+        switch (dataManager.getCalloutType()) {
             case REGISTER:
                 actionBar.setTitle(R.string.register_title);
                 break;
@@ -572,7 +572,7 @@ public class MainActivity extends AppCompatActivity implements
             Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show();
         } else {
             Person person = new Person(dataManager.getPatientId(), fingerprints);
-            if (dataManager.getCallout() == Callout.REGISTER || dataManager.getCallout() == Callout.UPDATE) {
+            if (dataManager.getCalloutType() == CalloutType.REGISTER || dataManager.getCalloutType() == CalloutType.UPDATE) {
                 dataManager.savePerson(person);
 
                 registrationResult = new Registration(dataManager.getPatientId());

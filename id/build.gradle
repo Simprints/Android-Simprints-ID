@@ -49,11 +49,6 @@ android {
             testCoverageEnabled true
         }
     }
-    testOptions {
-        unitTests {
-            includeAndroidResources = true
-        }
-    }
     testBuildType "endToEndTesting"
 }
 
@@ -89,6 +84,7 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$support_version"
     implementation "com.android.support:design:$support_version"
     implementation "com.android.support:support-v4:$support_version"
+
 
     // Google play services
     implementation "com.google.android.gms:play-services-location:$google_version"

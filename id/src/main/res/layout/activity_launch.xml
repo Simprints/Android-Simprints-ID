@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/simprints_blue"
     android:orientation="vertical"
-    tools:context=".activities.LaunchActivity">
+    tools:context=".activities.launch.LaunchActivity">
 
     <ImageView
         android:layout_width="match_parent"
