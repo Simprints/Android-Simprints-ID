@@ -9,8 +9,8 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.safe.NullDbContextException
 import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
@@ -88,26 +88,25 @@ class DataManagerImpl(private val context: Context,
 
     // Remote only
 
+    @Throws(UninitializedDataManagerError::class)
     override fun isConnected(): Boolean =
-            dbContext.callSafelyOrLogSafeExceptionOn("isConnected",
-                    { remoteDbManager.isConnected(it) },
-                    false)
+            remoteDbManager.isConnected(getDbContextOrErr())
 
+    @Throws(UninitializedDataManagerError::class)
     override fun registerAuthListener(authListener: AuthListener) =
-            dbContext.callSafelyOrLogSafeExceptionOn("registerAuthListener")
-            { remoteDbManager.registerAuthListener(it, authListener) }
+            remoteDbManager.registerAuthListener(getDbContextOrErr(), authListener)
 
+    @Throws(UninitializedDataManagerError::class)
     override fun registerConnectionListener(connectionListener: ConnectionListener) =
-            dbContext.callSafelyOrLogSafeExceptionOn("registerConnectionListener")
-            { remoteDbManager.registerConnectionListener(it, connectionListener) }
+            remoteDbManager.registerConnectionListener(getDbContextOrErr(), connectionListener)
 
+    @Throws(UninitializedDataManagerError::class)
     override fun unregisterAuthListener(authListener: AuthListener) =
-            dbContext.callSafelyOrLogSafeExceptionOn("unregisterAuthListener")
-            { remoteDbManager.unregisterAuthListener(it, authListener) }
+            remoteDbManager.unregisterAuthListener(getDbContextOrErr(), authListener)
 
+    @Throws(UninitializedDataManagerError::class)
     override fun unregisterConnectionListener(connectionListener: ConnectionListener) =
-            dbContext.callSafelyOrLogSafeExceptionOn("unregisterConnectionListener")
-            { remoteDbManager.unregisterConnectionListener(it, connectionListener) }
+            remoteDbManager.unregisterConnectionListener(getDbContextOrErr(), connectionListener)
 
     @Throws(ApiKeyNotFoundError::class)
     override fun updateIdentification(apiKey: String, selectedGuid: String) =
@@ -115,56 +114,50 @@ class DataManagerImpl(private val context: Context,
 
     // Local only
 
+    @Throws(UninitializedDataManagerError::class)
     override fun getPeopleCount(group: Constants.GROUP): Long =
-            dbContext.callSafelyOrLogSafeExceptionOn("getPeopleCount",
-                    { localDbManager.getPeopleCount(it, group) },
-                    -1)
+            localDbManager.getPeopleCount(getDbContextOrErr(), group)
 
+    @Throws(UninitializedDataManagerError::class)
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP,
-                            callback: DataCallback?) {
-        dbContext.callSafelyOrLogSafeExceptionOn("loadPeople",
-                { localDbManager.loadPeople(it, destinationList, group, callback) })
-    }
+                            callback: DataCallback?) =
+            localDbManager.loadPeople(getDbContextOrErr(), destinationList, group, callback)
 
     // Local + remote which need to be split into smaller bits
 
+    @Throws(UninitializedDataManagerError::class)
     override fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback) {
         val filename = "${deviceId}_${System.currentTimeMillis()}.json"
-        dbContext.callSafelyOrLogSafeExceptionOn("recoverRealmDb",
-                { it.recoverRealmDb(filename, deviceId, group, callback) })
+        getDbContextOrErr().recoverRealmDb(filename, deviceId, group, callback)
     }
 
+    @Throws(UninitializedDataManagerError::class)
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
             : Boolean =
-            dbContext.callSafelyOrLogSafeExceptionOn("saveIdentification",
-                    { it.saveIdentification(probe, matchSize, matches, sessionId) },
-                    false)
+            getDbContextOrErr().saveIdentification(probe, matchSize, matches, sessionId)
 
+    @Throws(UninitializedDataManagerError::class)
     override fun savePerson(person: Person): Boolean =
-            dbContext.callSafelyOrLogSafeExceptionOn("savePerson",
-                    { it.savePerson(person) },
-                    false)
+            getDbContextOrErr().savePerson(person)
 
+    @Throws(UninitializedDataManagerError::class)
     override fun saveRefusalForm(refusalForm: RefusalForm): Boolean =
-            dbContext.callSafelyOrLogSafeExceptionOn("saveRefusalForm",
-                    { it.saveRefusalForm(refusalForm, sessionId) },
-                    false)
+            getDbContextOrErr().saveRefusalForm(refusalForm, sessionId)
 
+    @Throws(UninitializedDataManagerError::class)
     override fun saveVerification(probe: Person, match: Verification?,
                                   guidExistsResult: VERIFY_GUID_EXISTS_RESULT): Boolean =
-            dbContext.callSafelyOrLogSafeExceptionOn("saveVerification",
-                    { it.saveVerification(probe, patientId, match, sessionId, guidExistsResult) },
-                    false)
+            getDbContextOrErr().saveVerification(probe, patientId, match, sessionId, guidExistsResult)
 
+    @Throws(UninitializedDataManagerError::class)
     override fun loadPerson(destinationList: MutableList<Person>, guid: String, callback: DataCallback) =
-            dbContext.callSafelyOrLogSafeExceptionOn("loadPerson")
-            { it.loadPerson(destinationList, guid, callback) }
+            getDbContextOrErr().loadPerson(destinationList, guid, callback)
 
     // Local + remote + api which need to be split into smaller bits
 
     private var dbContext: DatabaseContext? = null
-        set(value) {
-            Timber.d("DataManagerImpl: set dbContext = $dbContext")
+        set(value) = synchronized(this) {
+            Timber.d("DataManagerImpl: set dbContext = $value")
             if (field != null) {
                 unregisterConnectionListener(connectionStateLogger)
                 unregisterAuthListener(authStateLogger)
@@ -175,6 +168,9 @@ class DataManagerImpl(private val context: Context,
                 registerAuthListener(authStateLogger)
             }
         }
+
+    private fun getDbContextOrErr(): DatabaseContext =
+            dbContext ?: throw UninitializedDataManagerError()
 
     override fun isInitialized(): Boolean =
             dbContext != null
@@ -205,41 +201,23 @@ class DataManagerImpl(private val context: Context,
         })
     }
 
+    @Throws(UninitializedDataManagerError::class)
     override fun signIn(callback: DataCallback?) =
-            dbContext.callSafelyOrLogSafeExceptionOn("signIn")
-            { it.signIn(callback) }
+            getDbContextOrErr().signIn(callback)
 
+    @Throws(UninitializedDataManagerError::class)
     override fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
-            dbContext.callSafelyOrLogSafeExceptionOn("syncGlobal")
-            { it.naiveSyncManager.syncGlobal(isInterrupted, emitter) }
+            getDbContextOrErr().naiveSyncManager.syncGlobal(isInterrupted, emitter)
 
+    @Throws(UninitializedDataManagerError::class)
     override fun syncUser(userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
-            dbContext.callSafelyOrLogSafeExceptionOn("syncUser")
-            { it.naiveSyncManager.syncUser(userId, isInterrupted, emitter) }
+            getDbContextOrErr().naiveSyncManager.syncUser(userId, isInterrupted, emitter)
 
+    @Throws(UninitializedDataManagerError::class)
     override fun finish() {
-        dbContext.callSafelyOrLogSafeExceptionOn("finish")
-        { it.destroy() }
+        getDbContextOrErr().destroy()
         dbContext = null
     }
-
-    /**
-     * Performs the specified call using this database context if it is non null.
-     * Else, log a non fatal exception.
-     */
-    private fun <T : Any?> DatabaseContext?.callSafelyOrLogSafeExceptionOn(
-            methodName: String, call: (DatabaseContext) -> T, onFailureReturn: T): T {
-        return if (this == null) {
-            logSafeException(NullDbContextException.forAttemptedMethod(methodName))
-            onFailureReturn
-        } else {
-            call(this)
-        }
-    }
-
-    private fun DatabaseContext?.callSafelyOrLogSafeExceptionOn(methodName: String,
-                                                                call: (DatabaseContext) -> Unit) =
-            callSafelyOrLogSafeExceptionOn(methodName, call, Unit)
 
     //Secure Data
 
