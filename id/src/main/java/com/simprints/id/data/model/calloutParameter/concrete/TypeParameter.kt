@@ -4,7 +4,7 @@ import android.content.Intent
 import com.simprints.id.data.model.CalloutType
 import com.simprints.id.data.model.calloutParameter.CalloutParameter
 import com.simprints.id.model.ALERT_TYPE
-import com.simprints.id.tools.exceptions.InvalidCalloutException
+import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import java.security.InvalidParameterException
 
 class TypeParameter(intent: Intent) : CalloutParameter<CalloutType> {
@@ -16,7 +16,7 @@ class TypeParameter(intent: Intent) : CalloutParameter<CalloutType> {
     override fun validate() {
         val calloutType = value
         if (calloutType == CalloutType.INVALID_OR_MISSING) {
-            throw InvalidCalloutException(ALERT_TYPE.INVALID_INTENT_ACTION)
+            throw InvalidCalloutError(ALERT_TYPE.INVALID_INTENT_ACTION)
         }
     }
 

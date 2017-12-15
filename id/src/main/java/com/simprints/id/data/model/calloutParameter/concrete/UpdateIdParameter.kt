@@ -1,7 +1,7 @@
 package com.simprints.id.data.model.calloutParameter.concrete
 
 import android.content.Intent
-import com.simprints.id.tools.exceptions.InvalidCalloutException
+import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.data.model.CalloutType
 import com.simprints.id.data.model.calloutParameter.CalloutExtraParameter
 import com.simprints.id.model.ALERT_TYPE
@@ -15,10 +15,10 @@ class UpdateIdParameter(intent: Intent)
     override fun validate() {
         val updateId = value
         if (intentAction.isUpdate() && updateId.isEmpty()) {
-            throw InvalidCalloutException(ALERT_TYPE.MISSING_UPDATE_GUID)
+            throw InvalidCalloutError(ALERT_TYPE.MISSING_UPDATE_GUID)
         }
         if (!intentAction.isUpdate() && !updateId.isEmpty()) {
-            throw InvalidCalloutException(ALERT_TYPE.UNEXPECTED_PARAMETER)
+            throw InvalidCalloutError(ALERT_TYPE.UNEXPECTED_PARAMETER)
         }
     }
 

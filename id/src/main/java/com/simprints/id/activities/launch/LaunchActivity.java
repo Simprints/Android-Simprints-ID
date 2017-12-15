@@ -28,7 +28,7 @@ import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
-import com.simprints.id.tools.exceptions.InvalidCalloutException;
+import com.simprints.id.exceptions.unsafe.InvalidCalloutError;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.ScannerCallback;
@@ -105,7 +105,7 @@ public class LaunchActivity extends AppCompatActivity {
 
         try {
             calloutParameters.validate();
-        } catch (InvalidCalloutException exception) {
+        } catch (InvalidCalloutError exception) {
             launchAlert(exception.getAlertType());
             return;
         }
