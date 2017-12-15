@@ -1,7 +1,7 @@
 package com.simprints.id.data.model.calloutParameter.concrete
 
 import android.content.Intent
-import com.simprints.id.tools.exceptions.InvalidCalloutException
+import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.data.model.calloutParameter.CalloutExtraParameter
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.libsimprints.Constants
@@ -15,7 +15,7 @@ class MetadataParameter(intent: Intent)
         try {
             Metadata(metadata)
         } catch (e: Metadata.InvalidMetadataException) {
-            throw InvalidCalloutException(ALERT_TYPE.INVALID_METADATA)
+            throw InvalidCalloutError(ALERT_TYPE.INVALID_METADATA)
         }
     }
 

@@ -6,7 +6,7 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.testUtils.assertThrows
 import com.simprints.id.testUtils.mock
 import com.simprints.id.testUtils.whenever
-import com.simprints.id.tools.exceptions.InvalidCalloutException
+import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -48,7 +48,7 @@ class TypeParameterTest {
     fun testValidateThrowsExpectedExceptionWhenIntentActionIsNull() {
         val intentWithNullAction: Intent = mockIntentWithAction(null)
         val typeParameter = TypeParameter(intentWithNullAction)
-        val exception = assertThrows<InvalidCalloutException> {
+        val exception = assertThrows<InvalidCalloutError> {
             typeParameter.validate()
         }
         assertEquals(ALERT_TYPE.INVALID_INTENT_ACTION, exception.alertType)
@@ -58,7 +58,7 @@ class TypeParameterTest {
     fun testValidateThrowsExpectedExceptionWhenIntentActionIsInvalid() {
         val intentWithInvalidAction: Intent = mockIntentWithAction(invalidIntentAction)
         val typeParameter = TypeParameter(intentWithInvalidAction)
-        val exception = assertThrows<InvalidCalloutException> {
+        val exception = assertThrows<InvalidCalloutError> {
             typeParameter.validate()
         }
         assertEquals(ALERT_TYPE.INVALID_INTENT_ACTION, exception.alertType)

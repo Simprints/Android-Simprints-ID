@@ -1,7 +1,7 @@
 package com.simprints.id.data.model.calloutParameter.concrete
 
 import android.content.Intent
-import com.simprints.id.tools.exceptions.InvalidCalloutException
+import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.data.model.calloutParameter.CalloutParameter
 import com.simprints.id.model.ALERT_TYPE
 
@@ -17,7 +17,7 @@ class UnexpectedParameters(intent: Intent, expectedKeysInExtras: Collection<Stri
 
     override fun validate() {
         if (value.isNotEmpty()) {
-            throw InvalidCalloutException(ALERT_TYPE.UNEXPECTED_PARAMETER)
+            throw InvalidCalloutError(ALERT_TYPE.UNEXPECTED_PARAMETER)
         }
     }
 
