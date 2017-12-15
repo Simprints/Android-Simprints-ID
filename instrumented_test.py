@@ -156,6 +156,15 @@ class Run:
     def assemble_simprints_id_test_apk(self):
         self.run_and_log(simprints_id_gradlew_command('assembleEndToEndTestingAndroidTest'))
 
+    def uninstall_cerberus_apk(self, device):
+        self.run_and_log(cerberus_app_uninstall_apk_command(device))
+
+    def uninstall_simprints_id_apk(self, device):
+        self.run_and_log(simprints_id_uninstall_apk_command(device))
+
+    def uninstall_simprints_id_test_apk(self, device):
+        self.run_and_log(simprints_id_uninstall_android_test_apk_command(device))
+
     def install_cerberus_apk(self, device: Device):
         self.run_and_log(cerberus_app_install_apk_command('debug', device))
 
@@ -218,6 +227,10 @@ def main():
 
     for device in devices:
         run.update_log_format(LogState.device(device))
+
+        run.uninstall_cerberus_apk(device)
+        run.uninstall_simprints_id_apk(device)
+        run.uninstall_simprints_id_test_apk(device)
 
         run.install_cerberus_apk(device)
         run.install_apk(device)
