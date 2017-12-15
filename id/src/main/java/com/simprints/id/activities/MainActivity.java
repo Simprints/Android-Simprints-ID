@@ -38,6 +38,10 @@ import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError;
+import com.simprints.id.exceptions.unsafe.InvalidSyncGroupError;
+import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
@@ -48,6 +52,7 @@ import com.simprints.id.services.sync.SyncService;
 import com.simprints.id.services.sync.SyncTaskParameters;
 import com.simprints.id.services.sync.SyncTaskParameters.GlobalSyncTaskParameters;
 import com.simprints.id.services.sync.SyncTaskParameters.UserSyncTaskParameters;
+import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.LanguageHelper;
@@ -165,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private SyncClient syncClient;
 
+    private AlertLauncher alertLauncher;
+
     // Singletons
     private AppState appState;
     private Setup setup;
@@ -178,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements
         appState = app.getAppState();
         setup = app.getSetup();
         syncClient = SyncService.Companion.getClient(this);
+        alertLauncher = new AlertLauncher(this);
 
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -217,8 +225,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStart() {
         super.onStart();
         appState.getScanner().registerButtonListener(scannerButtonListener);
-        dataManager.registerAuthListener(authListener);
-        dataManager.registerConnectionListener(connectionListener);
     }
 
     @SuppressWarnings("deprecation")
@@ -226,12 +232,27 @@ public class MainActivity extends AppCompatActivity implements
     public void onResume() {
         super.onResume();
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
-        if (dataManager.isConnected()) {
-            setReadySyncItem();
-        } else {
-            setOfflineSyncItem();
+        try {
+            startListeners();
+        } catch (UninitializedDataManagerError error) {
+            dataManager.logError(error);
+            handleUnexpectedError(error);
         }
+    }
+
+    private void startListeners() {
+        dataManager.registerAuthListener(authListener);
+        dataManager.registerConnectionListener(connectionListener);
+        updateConnectionState();
         syncClient.startListening(newSyncObserver());
+    }
+
+    private void updateConnectionState() {
+        if (dataManager.isConnected()) {
+            connectionListener.onConnection();
+        } else {
+            connectionListener.onDisconnection();
+        }
     }
 
     private void setFingerStatus() {
@@ -328,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements
                 actionBar.setTitle(R.string.verify_title);
                 break;
             default:
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                handleUnexpectedError(InvalidCalloutParameterError.Companion.forParameter("Callout"));
         }
     }
 
@@ -510,7 +531,7 @@ public class MainActivity extends AppCompatActivity implements
                         reconnect();
                         break;
                     default:
-                        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                        handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "MainActivity"));
                 }
             }
         });
@@ -521,15 +542,12 @@ public class MainActivity extends AppCompatActivity implements
      * Start alert activity
      */
     private void launchAlert(ALERT_TYPE alertType) {
-        Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType);
-        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
+        alertLauncher.launch(alertType, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
-    @Override
-    public void startActivityForResult(Intent intent, int requestCode) {
-        appState.getScanner().unregisterButtonListener(scannerButtonListener);
-        super.startActivityForResult(intent, requestCode);
+    private void handleUnexpectedError(Error error) {
+        dataManager.logError(error);
+        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
     }
 
     private void nudgeMode() {
@@ -573,7 +591,13 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             Person person = new Person(dataManager.getPatientId(), fingerprints);
             if (dataManager.getCallout() == Callout.REGISTER || dataManager.getCallout() == Callout.UPDATE) {
-                dataManager.savePerson(person);
+                try {
+                    dataManager.savePerson(person);
+                } catch (UninitializedDataManagerError error) {
+                    dataManager.logError(error);
+                    launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                    return;
+                }
 
                 registrationResult = new Registration(dataManager.getPatientId());
                 if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES)) {
@@ -799,9 +823,18 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        syncClient.stopListening();
+        stopListeners();
     }
 
+    private void stopListeners() {
+        try {
+            syncClient.stopListening();
+            dataManager.unregisterAuthListener(authListener);
+            dataManager.unregisterConnectionListener(connectionListener);
+        } catch (UninitializedDataManagerError error) {
+            handleUnexpectedError(error);
+        }
+    }
 
     @Override
     protected void onStop() {
@@ -810,8 +843,6 @@ public class MainActivity extends AppCompatActivity implements
         if (scanner != null) {
             scanner.unregisterButtonListener(scannerButtonListener);
         }
-        dataManager.unregisterAuthListener(authListener);
-        dataManager.unregisterConnectionListener(connectionListener);
     }
 
 
@@ -825,7 +856,7 @@ public class MainActivity extends AppCompatActivity implements
                 syncParameters = new UserSyncTaskParameters(dataManager.getAppKey(), dataManager.getUserId());
                 break;
             default:
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                handleUnexpectedError(new InvalidSyncGroupError());
                 return;
         }
         syncClient.sync(syncParameters,
@@ -1049,7 +1080,7 @@ public class MainActivity extends AppCompatActivity implements
             case UN20_FAILURE:
             case UN20_LOW_VOLTAGE:
                 cancelCaptureUI();
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "MainActivity"));
         }
     }
 

@@ -11,6 +11,7 @@ import com.simprints.id.data.DataManager;
 import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError;
 import com.simprints.id.exceptions.unsafe.NullScannerError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.tools.AppState;
@@ -19,7 +20,6 @@ import com.simprints.id.tools.PermissionManager;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
-import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
@@ -31,6 +31,8 @@ import java.util.List;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_CANCELED;
+import static com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE;
+import static com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE;
 
 public class Setup {
 
@@ -176,7 +178,16 @@ public class Setup {
     private void validateApiKey(@NonNull final Activity activity) {
         onProgress(20, R.string.launch_checking_api_key);
 
-        dataManager.signIn(new DataCallback() {
+        try {
+            dataManager.signIn(newSignInCallback(activity));
+        } catch (UninitializedDataManagerError error) {
+            dataManager.logError(error);
+            onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+        }
+    }
+
+    private DataCallback newSignInCallback(@NonNull final Activity activity) {
+        return new DataCallback() {
             @Override
             public void onSuccess() {
                 if (!apiKeyValidated) {
@@ -204,7 +215,7 @@ public class Setup {
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
-        });
+        };
     }
 
     // STEP 4
@@ -286,7 +297,16 @@ public class Setup {
 
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = dataManager.getPatientId();
-        dataManager.loadPerson(loadedPerson, guid, new DataCallback() {
+        try {
+            dataManager.loadPerson(loadedPerson, guid, newLoadPersonCallback(activity, guid));
+        } catch (UninitializedDataManagerError error) {
+            dataManager.logError(error);
+            onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+        }
+    }
+
+    private DataCallback newLoadPersonCallback(@NonNull final Activity activity, final String guid) {
+        return new DataCallback() {
             @Override
             public void onSuccess() {
                 Timber.d("Setup: GUID found.");
@@ -299,16 +319,11 @@ public class Setup {
                 switch (data_error) {
                     case NOT_FOUND:
                         Person probe = new Person(guid);
-                        if (dataManager.isConnected()) {
-                            // We've synced with the online db and they're not in the db
-                            dataManager.saveVerification(probe, null,
-                                    VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE);
-                            onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
-                        } else {
-                            // We're offline but might find the person if we sync
-                            dataManager.saveVerification(probe, null,
-                                    VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE);
-                            onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
+                        try {
+                            saveNotFoundVerification(probe);
+                        } catch (UninitializedDataManagerError error) {
+                            dataManager.logError(error);
+                            onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                         }
                         break;
                     default:
@@ -316,7 +331,19 @@ public class Setup {
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
-        });
+        };
+    }
+
+    private void saveNotFoundVerification(Person probe) {
+        if (dataManager.isConnected()) {
+            // We've synced with the online db and they're not in the db
+            dataManager.saveVerification(probe, null, GUID_NOT_FOUND_ONLINE);
+            onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
+        } else {
+            // We're offline but might find the person if we sync
+            dataManager.saveVerification(probe, null, GUID_NOT_FOUND_OFFLINE);
+            onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
+        }
     }
 
     // STEP 7

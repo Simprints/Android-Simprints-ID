@@ -16,6 +16,7 @@ import com.simprints.id.R;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.LanguageHelper;
@@ -247,7 +248,11 @@ public class LaunchActivity extends AppCompatActivity {
     protected void onDestroy() {
         appState.logSessionEnd();
         if (dataManager.isInitialized()) {
-            dataManager.finish();
+            try {
+                dataManager.finish();
+            } catch (UninitializedDataManagerError error) {
+                dataManager.logError(error);
+            }
         }
 
         if (positionTracker != null)
