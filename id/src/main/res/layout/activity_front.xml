@@ -1,44 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/simprints_blue">
 
     <TextView
-        android:id="@+id/libSimprintsTextView"
+        android:id="@+id/libSimprintsVersionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/versionTextView"
+        android:layout_alignTop="@+id/simprintsIdVersionTextView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="43dp"
         android:text="@string/libsimprints_label"
         android:textColor="@color/simprints_white"
         android:textSize="20sp" />
 
-    <ImageView
-        android:id="@+id/iv_sync"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/bt_sync"
-        android:layout_alignTop="@+id/bt_sync"
-        android:layout_marginEnd="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_toLeftOf="@+id/bt_sync"
-        android:layout_toStartOf="@+id/bt_sync"
-        app:srcCompat="@drawable/ic_menu_sync_ready" />
-
-    <Button
-        android:id="@+id/bt_sync"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="30dp"
-        android:text="@string/sync_data" />
 
     <TextView
-        android:id="@+id/versionTextView"
+        android:id="@+id/simprintsIdVersionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
