@@ -1,4 +1,4 @@
-package com.simprints.id.exceptions.safe
+package com.simprints.libdata.exceptions.safe
 
 
 class InterruptedSyncException(message: String = "InterruptedSyncException")

@@ -8,6 +8,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.libcommon.Person
+import com.simprints.libcommon.Progress
 import com.simprints.libdata.AuthListener
 import com.simprints.libdata.ConnectionListener
 import com.simprints.libdata.DataCallback
@@ -16,6 +17,7 @@ import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Emitter
 
 
 interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, ApiManager,
@@ -67,8 +69,8 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
 
     fun initialize(callback: DataCallback)
     fun signIn(callback: DataCallback?)
-    fun syncGlobal(appKey: String, dataCallback: DataCallback)
-    fun syncUser(appKey: String, userId: String, dataCallback: DataCallback)
+    fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
+    fun syncUser(userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
     fun finish()
 
     // Secure data

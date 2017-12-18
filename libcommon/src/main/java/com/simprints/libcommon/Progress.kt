@@ -1,4 +1,4 @@
-package com.simprints.id.services.progress
+package com.simprints.libcommon
 
 
 data class Progress(val currentValue: Int, val maxValue: Int)
