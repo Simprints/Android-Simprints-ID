@@ -20,13 +20,6 @@
 
 
     <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
-    <!-- Version Names -->
-    <!-- App Titles -->
-    <!-- Content Descriptions -->
-    <!-- Sync Button Text -->
-    <string name="sync_data">همگام کردن معلومات</string>
-    <string name="syncing">همگام کردن</string>
-    <string name="not_signed_in">در سیستم داخل نشدید</string>
 
 
     <!-- SetupActivity : the loading screen -->
@@ -84,6 +77,12 @@
     <string name="nav_sync_failed">همگام سازی ناکام شد</string>
     <string name="privacy_and_consent">محرمیت و رضایت</string>
     <string name="persistence_label">این تنظیمات را برای بار دیگر به یاد داشته باشید</string>
+    <!-- Sync Button Text -->
+    <string name="sync_data">همگام کردن معلومات</string>
+    <string name="syncing">همگام کردن…</string>
+    <string name="syncing_calculating">همگام کردن… محاسبه کردن</string>
+    <string name="syncing_with_progress">همگام کردن… %1$d/%2$d</string>
+    <string name="not_signed_in">در سیستم داخل نشدید</string>
     <!-- Toast Messages -->
     <string name="coming_soon">بزودی…</string>
     <!-- Finger Names -->

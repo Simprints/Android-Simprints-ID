@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -28,36 +30,47 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.simprints.id.Application;
 import com.simprints.id.R;
+import com.simprints.id.activities.about.AboutActivity;
+import com.simprints.id.activities.matching.MatchingActivity;
 import com.simprints.id.adapters.FingerPageAdapter;
-import com.simprints.id.backgroundSync.SyncService;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
+import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError;
+import com.simprints.id.exceptions.unsafe.InvalidSyncGroupError;
+import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
+import com.simprints.id.services.sync.SyncClient;
+import com.simprints.id.services.sync.SyncService;
+import com.simprints.id.services.sync.SyncTaskParameters;
+import com.simprints.id.services.sync.SyncTaskParameters.GlobalSyncTaskParameters;
+import com.simprints.id.services.sync.SyncTaskParameters.UserSyncTaskParameters;
+import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
-import com.simprints.id.tools.Language;
+import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.RemoteConfig;
-import com.simprints.id.tools.SharedPref;
 import com.simprints.id.tools.TimeoutBar;
 import com.simprints.id.tools.Vibrate;
 import com.simprints.id.tools.ViewPagerCustom;
 import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
+import com.simprints.libcommon.Progress;
 import com.simprints.libcommon.ScanConfig;
 import com.simprints.libdata.AuthListener;
 import com.simprints.libdata.ConnectionListener;
-import com.simprints.libdata.DATA_ERROR;
-import com.simprints.libdata.DataCallback;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
+import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.FingerIdentifier;
@@ -67,6 +80,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import io.reactivex.observers.DisposableObserver;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
+import timber.log.Timber;
 
 import static com.simprints.id.model.Finger.NB_OF_FINGERS;
 import static com.simprints.id.model.Finger.Status;
@@ -92,13 +111,15 @@ public class MainActivity extends AppCompatActivity implements
 
     private static ScanConfig DEFAULT_CONFIG;
 
-    private SharedPref sharedPref;
-
-    private ButtonListener scannerButton;
-
-    private AppState appState;
-
-    private Setup setup = Setup.getInstance();
+    private final ButtonListener scannerButtonListener = new ButtonListener() {
+        @Override
+        public void onClick() {
+            if (buttonContinue)
+                onActionForward();
+            else if (activeFingers.get(currentActiveFingerNo).getStatus() != Status.GOOD_SCAN)
+                toggleContinuousCapture();
+        }
+    };
 
     private Handler handler;
 
@@ -120,16 +141,58 @@ public class MainActivity extends AppCompatActivity implements
 
     private ProgressDialog un20WakeupDialog;
 
+    private AuthListener authListener = new AuthListener() {
+        @Override
+        public void onSignIn() {
+
+        }
+
+        @Override
+        public void onSignOut() {
+            setOfflineSyncItem();
+        }
+
+    };
+
+    private ConnectionListener connectionListener = new ConnectionListener() {
+        @Override
+        public void onConnection() {
+            setReadySyncItem();
+        }
+
+        @Override
+        public void onDisconnection() {
+            setOfflineSyncItem();
+        }
+    };
+
+    private DataManager dataManager;
+
+    private SyncClient syncClient;
+
+    private AlertLauncher alertLauncher;
+
+    // Singletons
+    private AppState appState;
+    private Setup setup;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+        appState = app.getAppState();
+        setup = app.getSetup();
+        syncClient = SyncService.Companion.getClient(this);
+        alertLauncher = new AlertLauncher(this);
+
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navView = findViewById(R.id.nav_view);
         navView.setItemIconTintList(null);
 
-        appState = AppState.getInstance();
         appState.logMainStart();
 
         handler = new Handler();
@@ -140,13 +203,14 @@ public class MainActivity extends AppCompatActivity implements
         previousStatus = Status.NOT_COLLECTED;
 
         indicators = new ArrayList<>();
-        scanButton = (Button) findViewById(R.id.scan_button);
-        viewPager = (ViewPagerCustom) findViewById(R.id.view_pager);
+        scanButton = findViewById(R.id.scan_button);
+        viewPager = findViewById(R.id.view_pager);
         pageAdapter = new FingerPageAdapter(getSupportFragmentManager(), activeFingers);
         un20WakeupDialog = initUn20Dialog();
         registrationResult = null;
-        sharedPref = new SharedPref(getApplicationContext());
-        timeoutBar = new TimeoutBar(getApplicationContext(), (ProgressBar) findViewById(R.id.pb_timeout));
+        timeoutBar = new TimeoutBar(getApplicationContext(),
+                (ProgressBar) findViewById(R.id.pb_timeout),
+                dataManager.getTimeoutS() * 1000);
 
         setFingerStatus();
         initActiveFingers();
@@ -155,8 +219,40 @@ public class MainActivity extends AppCompatActivity implements
         initScanButton();
         initViewPager();
         refreshDisplay();
-        initConnectionListener();
-        initAuthInListener();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        appState.getScanner().registerButtonListener(scannerButtonListener);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onResume() {
+        super.onResume();
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
+        try {
+            startListeners();
+        } catch (UninitializedDataManagerError error) {
+            dataManager.logError(error);
+            handleUnexpectedError(error);
+        }
+    }
+
+    private void startListeners() {
+        dataManager.registerAuthListener(authListener);
+        dataManager.registerConnectionListener(connectionListener);
+        updateConnectionState();
+        syncClient.startListening(newSyncObserver());
+    }
+
+    private void updateConnectionState() {
+        if (dataManager.isConnected()) {
+            connectionListener.onConnection();
+        } else {
+            connectionListener.onDisconnection();
+        }
     }
 
     private void setFingerStatus() {
@@ -174,51 +270,28 @@ public class MainActivity extends AppCompatActivity implements
 
 
         // We set the two defaults in the config for the first reset.
-        sharedPref.setFingerStatus(FingerIdentifier.LEFT_THUMB, true);
-        sharedPref.setFingerStatus(FingerIdentifier.LEFT_INDEX_FINGER, true);
-    }
-
-    private void initConnectionListener() {
-        appState.getData().registerConnectionListener(new ConnectionListener() {
-            @Override
-            public void onConnection() {
-                syncItem.setEnabled(true);
-                syncItem.setTitle(R.string.nav_sync);
-                syncItem.setIcon(R.drawable.ic_menu_sync_ready);
-            }
-
-            @Override
-            public void onDisconnection() {
-                syncItem.setEnabled(false);
-                syncItem.setTitle(R.string.nav_offline);
-                syncItem.setIcon(R.drawable.ic_menu_sync_off);
-            }
-        });
-    }
-
-    private void initAuthInListener() {
-        appState.getData().registerAuthListener(new AuthListener() {
-            @Override
-            public void onSignIn() {
-
-            }
-
-            @Override
-            public void onSignOut() {
-                syncItem.setEnabled(false);
-                syncItem.setTitle(R.string.not_signed_in);
-                syncItem.setIcon(R.drawable.ic_menu_sync_off);
-            }
-        });
+        Map<FingerIdentifier, Boolean> fingerStatus = dataManager.getFingerStatus();
+        fingerStatus.put(FingerIdentifier.LEFT_THUMB, true);
+        fingerStatus.put(FingerIdentifier.LEFT_INDEX_FINGER, true);
+        dataManager.setFingerStatus(fingerStatus);
     }
 
     private void initActiveFingers() {
-        for (int i = 0; i < NB_OF_FINGERS; i++) {
-            FingerIdentifier id = FingerIdentifier.values()[i];
-            if (sharedPref.getFingerStatusPersist())
-                fingers[i] = new Finger(id, sharedPref.getFingerStatus(id), false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
-            else
+        FingerIdentifier[] fingerIdentifiers = FingerIdentifier.values();
+        if (dataManager.getFingerStatusPersist()) {
+            Map<FingerIdentifier, Boolean> fingerStatus = dataManager.getFingerStatus();
+            for (int i = 0; i < NB_OF_FINGERS; i++) {
+                FingerIdentifier id = fingerIdentifiers[i];
+                fingers[i] = new Finger(id, fingerStatus.get(id), false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
+            }
+        } else {
+            for (int i = 0; i < NB_OF_FINGERS; i++) {
+                FingerIdentifier id = fingerIdentifiers[i];
                 fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
+            }
+        }
+
+        for (int i = 0; i < NB_OF_FINGERS; i++) {
             if (fingers[i].isActive()) {
                 activeFingers.add(fingers[i]);
             }
@@ -244,16 +317,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initBarAndDrawer() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         syncItem = navigationView.getMenu().findItem(R.id.nav_sync);
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -262,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements
         //noinspection ConstantConditions
         actionBar.show();
 
-        switch (appState.getCallout()) {
+        switch (dataManager.getCallout()) {
             case REGISTER:
                 actionBar.setTitle(R.string.register_title);
                 break;
@@ -275,11 +348,13 @@ public class MainActivity extends AppCompatActivity implements
             case VERIFY:
                 actionBar.setTitle(R.string.verify_title);
                 break;
+            default:
+                handleUnexpectedError(InvalidCalloutParameterError.Companion.forParameter("Callout"));
         }
     }
 
     private void initIndicators() {
-        LinearLayout indicatorLayout = (LinearLayout) findViewById(R.id.indicator_layout);
+        LinearLayout indicatorLayout = findViewById(R.id.indicator_layout);
         indicatorLayout.removeAllViewsInLayout();
         indicators.clear();
         for (int i = 0; i < activeFingers.size(); i++) {
@@ -299,24 +374,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initScanButton() {
-        scannerButton = new ButtonListener() {
-            @Override
-            public void onClick() {
-                if (buttonContinue)
-                    onActionForward();
-                else if (activeFingers.get(currentActiveFingerNo).getStatus() != Status.GOOD_SCAN)
-                    toggleContinuousCapture();
-            }
-        };
-        appState.getScanner().registerButtonListener(scannerButton);
-
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 toggleContinuousCapture();
             }
         });
-
         scanButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -468,7 +531,7 @@ public class MainActivity extends AppCompatActivity implements
                         reconnect();
                         break;
                     default:
-                        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                        handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "MainActivity"));
                 }
             }
         });
@@ -479,19 +542,16 @@ public class MainActivity extends AppCompatActivity implements
      * Start alert activity
      */
     private void launchAlert(ALERT_TYPE alertType) {
-        Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra("alertType", alertType);
-        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
+        alertLauncher.launch(alertType, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
-    @Override
-    public void startActivityForResult(Intent intent, int requestCode) {
-        appState.getScanner().unregisterButtonListener(scannerButton);
-        super.startActivityForResult(intent, requestCode);
+    private void handleUnexpectedError(Error error) {
+        dataManager.logError(error);
+        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
     }
 
     private void nudgeMode() {
-        boolean nudge = sharedPref.getNudgeModeBool();
+        boolean nudge = dataManager.getNudgeMode();
 
         if (nudge) {
             handler.postDelayed(new Runnable() {
@@ -529,26 +589,30 @@ public class MainActivity extends AppCompatActivity implements
         if (nbRequiredFingerprints < 1) {
             Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show();
         } else {
-            Person person = new Person(appState.getGuid(), fingerprints);
-            if (appState.getCallout() == Callout.REGISTER || appState.getCallout() == Callout.UPDATE) {
-                appState.getData().savePerson(person);
+            Person person = new Person(dataManager.getPatientId(), fingerprints);
+            if (dataManager.getCallout() == Callout.REGISTER || dataManager.getCallout() == Callout.UPDATE) {
+                try {
+                    dataManager.savePerson(person);
+                } catch (UninitializedDataManagerError error) {
+                    dataManager.logError(error);
+                    launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                    return;
+                }
 
-                registrationResult = new Registration(appState.getGuid());
-                for (Fingerprint fp : fingerprints) {
-                    if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES))
+                registrationResult = new Registration(dataManager.getPatientId());
+                if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES)) {
+                    for (Fingerprint fp : fingerprints) {
                         registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
-                    else
-                        registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
-//                        registrationResult.setTemplate(fp.getFingerId(), new byte[1]);
+                    }
                 }
 
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
-                FormatResult.put(resultData, registrationResult);
+                FormatResult.put(resultData, registrationResult, dataManager.getResultFormat());
                 setResult(RESULT_OK, resultData);
                 finish();
             } else {
                 Intent intent = new Intent(this, MatchingActivity.class);
-                intent.putExtra("Person", person);
+                intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person);
                 startActivityForResult(intent, MATCHING_ACTIVITY_REQUEST_CODE);
             }
         }
@@ -556,7 +620,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (activeFingers.get(currentActiveFingerNo).getStatus() == Status.COLLECTING) {
@@ -610,7 +674,7 @@ public class MainActivity extends AppCompatActivity implements
                         PRIVACY_ACTIVITY_REQUEST_CODE);
                 break;
             case R.id.nav_sync:
-                backgroundSync();
+                sync();
                 return true;
             case R.id.nav_about:
                 startActivityForResult(new Intent(this, AboutActivity.class),
@@ -621,7 +685,7 @@ public class MainActivity extends AppCompatActivity implements
                         SETTINGS_ACTIVITY_REQUEST_CODE);
                 break;
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -634,7 +698,7 @@ public class MainActivity extends AppCompatActivity implements
             labels[i] = getString(FingerRes.get(fingers[i]).getNameId());
         }
         labels[fingers.length] = getString(R.string.persistence_label);
-        checked[fingers.length] = sharedPref.getFingerStatusPersist();
+        checked[fingers.length] = dataManager.getFingerStatusPersist();
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle("Add Finger(s)")
                 .setMultiChoiceItems(labels, checked, new DialogInterface.OnMultiChoiceClickListener() {
@@ -642,7 +706,7 @@ public class MainActivity extends AppCompatActivity implements
                     public void onClick(DialogInterface dialogInterface, int i, boolean isChecked) {
                         if (i == fingers.length) {
                             checked[i] = isChecked;
-                            sharedPref.setFingerStatusPersist(isChecked);
+                            dataManager.setFingerStatusPersist(isChecked);
                             return;
                         }
 
@@ -668,18 +732,21 @@ public class MainActivity extends AppCompatActivity implements
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Finger currentActiveFinger = activeFingers.get(currentActiveFingerNo);
                         activeFingers.get(activeFingers.size() - 1).setLastFinger(false);
+                        Map<FingerIdentifier, Boolean> fingerStatus = dataManager.getFingerStatus();
+
                         for (Finger finger : fingers) {
                             if (finger.isActive() && !activeFingers.contains(finger)) {
                                 activeFingers.add(finger);
-                                if (sharedPref.getFingerStatusPersist())
-                                    sharedPref.setFingerStatus(finger.getId(), true);
+                                if (dataManager.getFingerStatusPersist())
+                                    fingerStatus.put(finger.getId(), true);
                             }
                             if (!finger.isActive() && activeFingers.contains(finger)) {
                                 activeFingers.remove(finger);
-                                if (sharedPref.getFingerStatusPersist())
-                                    sharedPref.setFingerStatus(finger.getId(), false);
+                                if (dataManager.getFingerStatusPersist())
+                                    fingerStatus.put(finger.getId(), false);
                             }
                         }
+                        dataManager.setFingerStatus(fingerStatus);
                         Collections.sort(activeFingers);
 
                         if (currentActiveFinger.isActive()) {
@@ -733,7 +800,7 @@ public class MainActivity extends AppCompatActivity implements
             case SETTINGS_ACTIVITY_REQUEST_CODE:
             case PRIVACY_ACTIVITY_REQUEST_CODE:
             case ABOUT_ACTIVITY_REQUEST_CODE:
-                appState.getScanner().registerButtonListener(scannerButton);
+                appState.getScanner().registerButtonListener(scannerButtonListener);
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
 
@@ -754,72 +821,147 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (appState.getScanner() != null) {
-            appState.getScanner().unregisterButtonListener(scannerButton);
-        }
-        SyncService.getInstance().stopListening(syncListener);
+    protected void onPause() {
+        super.onPause();
+        stopListeners();
     }
 
-    @SuppressWarnings("deprecation")
+    private void stopListeners() {
+        try {
+            syncClient.stopListening();
+            dataManager.unregisterAuthListener(authListener);
+            dataManager.unregisterConnectionListener(connectionListener);
+        } catch (UninitializedDataManagerError error) {
+            handleUnexpectedError(error);
+        }
+    }
+
     @Override
-    public void onResume() {
-        super.onResume();
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
-        if (syncItem != null && appState.getData().isConnected())
-            syncItem.setIcon(R.drawable.ic_menu_sync_ready);
+    protected void onStop() {
+        super.onStop();
+        Scanner scanner = appState.getScanner();
+        if (scanner != null) {
+            scanner.unregisterButtonListener(scannerButtonListener);
+        }
     }
 
-    DataCallback syncListener = new DataCallback() {
-        public void onSuccess() {
-            android.util.Log.d("sync", "onSuccess");
-            if (syncItem == null)
+
+    private void sync() {
+        SyncTaskParameters syncParameters;
+        switch (dataManager.getSyncGroup()) {
+            case GLOBAL:
+                syncParameters = new GlobalSyncTaskParameters(dataManager.getAppKey());
+                break;
+            case USER:
+                syncParameters = new UserSyncTaskParameters(dataManager.getAppKey(), dataManager.getUserId());
+                break;
+            default:
+                handleUnexpectedError(new InvalidSyncGroupError());
                 return;
-
-            syncItem.setEnabled(true);
-            syncItem.setTitle(R.string.nav_sync_complete);
-            syncItem.setIcon(R.drawable.ic_menu_sync_success);
         }
+        syncClient.sync(syncParameters,
+                new Function0<Unit>() {
+                    @Override
+                    public Unit invoke() {
+                        syncClient.startListening(newSyncObserver());
+                        return null;
+                    }
+                },
+                new Function0<Unit>() {
+                    @Override
+                    public Unit invoke() {
+                        setErrorSyncItem();
+                        Toast.makeText(MainActivity.this,
+                                R.string.wait_for_current_sync_to_finish,
+                                Toast.LENGTH_LONG).show();
+                        return null;
+                    }
+                });
+    }
 
-        @Override
-        public void onFailure(DATA_ERROR data_error) {
-            android.util.Log.d("sync", "onFailure");
-            switch (data_error) {
-                case SYNC_INTERRUPTED:
-                    if (syncItem == null)
-                        return;
+    private void setCompleteSyncItem() {
+        setSyncItem(true, R.string.nav_sync_complete, R.drawable.ic_sync_success);
+    }
 
-                    syncItem.setEnabled(true);
-                    syncItem.setTitle(R.string.nav_sync_failed);
-                    syncItem.setIcon(R.drawable.ic_menu_sync_failed);
-                    break;
-                default:
-                    FirebaseCrash.report(new Exception("Unknown error returned in onFailure MainActivity.syncListener()"));
-                    launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-            }
-        }
-    };
+    private void setReadySyncItem() {
+        setSyncItem(true, R.string.nav_sync, R.drawable.ic_menu_sync_ready);
+    }
 
-    private void backgroundSync() {
+    private void setOfflineSyncItem() {
+        setSyncItem(false, R.string.not_signed_in, R.drawable.ic_menu_sync_off);
+    }
+
+    private void setSyncItem(Boolean enabled, @StringRes int title, @DrawableRes int icon) {
+        setSyncItem(enabled, getString(title), icon);
+    }
+
+    private void setSyncItem(Boolean enabled, String title, @DrawableRes int icon) {
         if (syncItem != null) {
-            syncItem.setEnabled(false);
-            syncItem.setTitle(R.string.syncing);
-            syncItem.setIcon(R.drawable.ic_menu_syncing);
+            syncItem.setEnabled(enabled);
+            syncItem.setTitle(title);
+            syncItem.setIcon(icon);
         }
+    }
 
-        if (!SyncService.getInstance().startAndListen(getApplicationContext(), syncListener)) {
-            FirebaseCrash.report(new Exception("Error in MainActivity.backgroundSync()"));
-            launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-        }
+    private void setErrorSyncItem() {
+        setSyncItem(true, R.string.nav_sync_failed, R.drawable.ic_sync_failed);
+    }
+
+    private void setProgressSyncItem(Progress progress) {
+        if (isProgressZero(progress))
+            setSyncItem(false,
+                    getString(R.string.syncing_calculating),
+                    R.drawable.ic_syncing);
+        else
+            setSyncItem(false,
+                    getString(R.string.syncing_with_progress, progress.getCurrentValue(), progress.getMaxValue()),
+                    R.drawable.ic_syncing);
+    }
+
+    private boolean isProgressZero(Progress progress) {
+        return progress.getCurrentValue() == 0 && progress.getMaxValue() == 0;
+    }
+
+    private DisposableObserver<Progress> newSyncObserver() {
+        return new DisposableObserver<Progress>() {
+
+            @Override
+            public void onNext(Progress progress) {
+                Timber.d("onNext");
+                setProgressSyncItem(progress);
+            }
+
+            @Override
+            public void onComplete() {
+                Timber.d("onComplete");
+                setCompleteSyncItem();
+                syncClient.stopListening();
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                Timber.d("onError");
+                setErrorSyncItem();
+                logThrowable(throwable);
+                syncClient.stopListening();
+            }
+
+            private void logThrowable(Throwable throwable) {
+                if (throwable instanceof Error) {
+                    dataManager.logError((Error) throwable);
+                } else if (throwable instanceof RuntimeException) {
+                    dataManager.logSafeException((RuntimeException) throwable);
+                }
+            }
+
+        };
     }
 
     private void startContinuousCapture() {
         timeoutBar.startTimeoutBar();
 
-        appState.getScanner().startContinuousCapture(sharedPref.getQualityThresholdInt(),
-                sharedPref.getTimeoutInt() * 1000, new ScannerCallback() {
+        appState.getScanner().startContinuousCapture(dataManager.getQualityThreshold(),
+                dataManager.getTimeoutS() * 1000, new ScannerCallback() {
                     @Override
                     public void onSuccess() {
                         timeoutBar.stopTimeoutBar();
@@ -842,7 +984,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private void forceCapture() {
-        appState.getScanner().forceCapture(sharedPref.getQualityThresholdInt(), new ScannerCallback() {
+        appState.getScanner().forceCapture(dataManager.getQualityThreshold(), new ScannerCallback() {
                     @Override
                     public void onSuccess() {
                         captureSuccess();
@@ -861,7 +1003,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void forceCaptureNotPossible() {
         activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
-        Vibrate.vibrate(MainActivity.this, 100);
+        Vibrate.vibrate(MainActivity.this, dataManager.getVibrateMode(), 100);
         refreshDisplay();
     }
 
@@ -883,14 +1025,15 @@ public class MainActivity extends AppCompatActivity implements
                                 new Fingerprint(
                                         finger.getId(),
                                         appState.getScanner().getTemplate()));
+                // TODO : change exceptions in libcommon
             } catch (IllegalArgumentException ex) {
-                FirebaseCrash.report(ex);
+                dataManager.logError(new Error("IllegalArgumentException in MainActivity.captureSuccess()"));
                 resetUIFromError();
                 return;
             }
         }
 
-        int qualityScore1 = sharedPref.getQualityThresholdInt();
+        int qualityScore1 = dataManager.getQualityThreshold();
 
         if (quality >= qualityScore1) {
             activeFingers.get(currentActiveFingerNo).setStatus(Status.GOOD_SCAN);
@@ -899,7 +1042,7 @@ public class MainActivity extends AppCompatActivity implements
             activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
         }
 
-        Vibrate.vibrate(MainActivity.this, 100);
+        Vibrate.vibrate(MainActivity.this, dataManager.getVibrateMode(), 100);
         refreshDisplay();
     }
 
@@ -946,36 +1089,36 @@ public class MainActivity extends AppCompatActivity implements
             case UN20_FAILURE:
             case UN20_LOW_VOLTAGE:
                 cancelCaptureUI();
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "MainActivity"));
         }
     }
 
     private void reconnect() {
-        appState.getScanner().unregisterButtonListener(scannerButton);
+        appState.getScanner().unregisterButtonListener(scannerButtonListener);
 
         SetupCallback setupCallback = new SetupCallback() {
             @Override
             public void onSuccess() {
-                Log.d(MainActivity.this, "reconnect.onSuccess()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onSuccess()");
                 un20WakeupDialog.dismiss();
-                appState.getScanner().registerButtonListener(scannerButton);
+                appState.getScanner().registerButtonListener(scannerButtonListener);
             }
 
             @Override
             public void onProgress(int progress, int detailsId) {
-                Log.d(MainActivity.this, "reconnect.onProgress()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onProgress()");
             }
 
             @Override
             public void onError(int resultCode, Intent resultData) {
-                Log.d(MainActivity.this, "reconnect.onError()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onError()");
                 un20WakeupDialog.dismiss();
                 launchAlert(ALERT_TYPE.DISCONNECTED);
             }
 
             @Override
             public void onAlert(@NonNull ALERT_TYPE alertType) {
-                Log.d(MainActivity.this, "reconnect.onAlert()");
+                Log.INSTANCE.d(MainActivity.this, "reconnect.onAlert()");
                 un20WakeupDialog.dismiss();
                 launchAlert(alertType);
             }
