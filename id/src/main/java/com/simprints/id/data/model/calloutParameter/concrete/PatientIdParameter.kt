@@ -11,7 +11,7 @@ class PatientIdParameter(intent: Intent)
     private val valueWhenMissing: String = ""
 
     val updateIdParameter = UpdateIdParameter(intent)
-    val verifyIdParameter = UpdateIdParameter(intent)
+    val verifyIdParameter = VerifyIdParameter(intent)
 
     private fun newId() = UUID.randomUUID().toString()
 
