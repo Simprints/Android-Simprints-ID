@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -36,17 +38,21 @@ import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError;
+import com.simprints.id.exceptions.unsafe.InvalidSyncGroupError;
+import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.model.Callout;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
-import com.simprints.id.services.progress.Progress;
 import com.simprints.id.services.sync.SyncClient;
 import com.simprints.id.services.sync.SyncService;
 import com.simprints.id.services.sync.SyncTaskParameters;
 import com.simprints.id.services.sync.SyncTaskParameters.GlobalSyncTaskParameters;
 import com.simprints.id.services.sync.SyncTaskParameters.UserSyncTaskParameters;
+import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.LanguageHelper;
@@ -58,6 +64,7 @@ import com.simprints.id.tools.ViewPagerCustom;
 import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
+import com.simprints.libcommon.Progress;
 import com.simprints.libcommon.ScanConfig;
 import com.simprints.libdata.AuthListener;
 import com.simprints.libdata.ConnectionListener;
@@ -142,31 +149,28 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         public void onSignOut() {
-            syncItem.setEnabled(false);
-            syncItem.setTitle(R.string.not_signed_in);
-            syncItem.setIcon(R.drawable.ic_menu_sync_off);
+            setOfflineSyncItem();
         }
+
     };
 
     private ConnectionListener connectionListener = new ConnectionListener() {
         @Override
         public void onConnection() {
-            syncItem.setEnabled(true);
-            syncItem.setTitle(R.string.nav_sync);
-            syncItem.setIcon(R.drawable.ic_menu_sync_ready);
+            setReadySyncItem();
         }
 
         @Override
         public void onDisconnection() {
-            syncItem.setEnabled(false);
-            syncItem.setTitle(R.string.nav_offline);
-            syncItem.setIcon(R.drawable.ic_menu_sync_off);
+            setOfflineSyncItem();
         }
     };
 
     private DataManager dataManager;
 
     private SyncClient syncClient;
+
+    private AlertLauncher alertLauncher;
 
     // Singletons
     private AppState appState;
@@ -181,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements
         appState = app.getAppState();
         setup = app.getSetup();
         syncClient = SyncService.Companion.getClient(this);
+        alertLauncher = new AlertLauncher(this);
 
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -220,8 +225,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStart() {
         super.onStart();
         appState.getScanner().registerButtonListener(scannerButtonListener);
-        dataManager.registerAuthListener(authListener);
-        dataManager.registerConnectionListener(connectionListener);
     }
 
     @SuppressWarnings("deprecation")
@@ -229,8 +232,27 @@ public class MainActivity extends AppCompatActivity implements
     public void onResume() {
         super.onResume();
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
-        if (syncItem != null && dataManager.isConnected())
-            syncItem.setIcon(R.drawable.ic_menu_sync_ready);
+        try {
+            startListeners();
+        } catch (UninitializedDataManagerError error) {
+            dataManager.logError(error);
+            handleUnexpectedError(error);
+        }
+    }
+
+    private void startListeners() {
+        dataManager.registerAuthListener(authListener);
+        dataManager.registerConnectionListener(connectionListener);
+        updateConnectionState();
+        syncClient.startListening(newSyncObserver());
+    }
+
+    private void updateConnectionState() {
+        if (dataManager.isConnected()) {
+            connectionListener.onConnection();
+        } else {
+            connectionListener.onDisconnection();
+        }
     }
 
     private void setFingerStatus() {
@@ -327,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements
                 actionBar.setTitle(R.string.verify_title);
                 break;
             default:
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                handleUnexpectedError(InvalidCalloutParameterError.Companion.forParameter("Callout"));
         }
     }
 
@@ -509,7 +531,7 @@ public class MainActivity extends AppCompatActivity implements
                         reconnect();
                         break;
                     default:
-                        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                        handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "MainActivity"));
                 }
             }
         });
@@ -520,15 +542,12 @@ public class MainActivity extends AppCompatActivity implements
      * Start alert activity
      */
     private void launchAlert(ALERT_TYPE alertType) {
-        Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType);
-        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
+        alertLauncher.launch(alertType, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
-    @Override
-    public void startActivityForResult(Intent intent, int requestCode) {
-        appState.getScanner().unregisterButtonListener(scannerButtonListener);
-        super.startActivityForResult(intent, requestCode);
+    private void handleUnexpectedError(Error error) {
+        dataManager.logError(error);
+        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
     }
 
     private void nudgeMode() {
@@ -572,7 +591,13 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             Person person = new Person(dataManager.getPatientId(), fingerprints);
             if (dataManager.getCallout() == Callout.REGISTER || dataManager.getCallout() == Callout.UPDATE) {
-                dataManager.savePerson(person);
+                try {
+                    dataManager.savePerson(person);
+                } catch (UninitializedDataManagerError error) {
+                    dataManager.logError(error);
+                    launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                    return;
+                }
 
                 registrationResult = new Registration(dataManager.getPatientId());
                 if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES)) {
@@ -796,15 +821,28 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        stopListeners();
+    }
+
+    private void stopListeners() {
+        try {
+            syncClient.stopListening();
+            dataManager.unregisterAuthListener(authListener);
+            dataManager.unregisterConnectionListener(connectionListener);
+        } catch (UninitializedDataManagerError error) {
+            handleUnexpectedError(error);
+        }
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         Scanner scanner = appState.getScanner();
         if (scanner != null) {
             scanner.unregisterButtonListener(scannerButtonListener);
         }
-        dataManager.unregisterAuthListener(authListener);
-        dataManager.unregisterConnectionListener(connectionListener);
-        syncClient.stopListening();
     }
 
 
@@ -818,17 +856,21 @@ public class MainActivity extends AppCompatActivity implements
                 syncParameters = new UserSyncTaskParameters(dataManager.getAppKey(), dataManager.getUserId());
                 break;
             default:
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                handleUnexpectedError(new InvalidSyncGroupError());
                 return;
         }
         syncClient.sync(syncParameters,
-                newSyncObserver(),
                 new Function0<Unit>() {
                     @Override
                     public Unit invoke() {
-                        syncItem.setEnabled(true);
-                        syncItem.setTitle(R.string.nav_sync_failed);
-                        syncItem.setIcon(R.drawable.ic_sync_failed);
+                        syncClient.startListening(newSyncObserver());
+                        return null;
+                    }
+                },
+                new Function0<Unit>() {
+                    @Override
+                    public Unit invoke() {
+                        setErrorSyncItem();
                         Toast.makeText(MainActivity.this,
                                 R.string.wait_for_current_sync_to_finish,
                                 Toast.LENGTH_LONG).show();
@@ -837,44 +879,72 @@ public class MainActivity extends AppCompatActivity implements
                 });
     }
 
+    private void setCompleteSyncItem() {
+        setSyncItem(true, R.string.nav_sync_complete, R.drawable.ic_sync_success);
+    }
+
+    private void setReadySyncItem() {
+        setSyncItem(true, R.string.nav_sync, R.drawable.ic_menu_sync_ready);
+    }
+
+    private void setOfflineSyncItem() {
+        setSyncItem(false, R.string.not_signed_in, R.drawable.ic_menu_sync_off);
+    }
+
+    private void setSyncItem(Boolean enabled, @StringRes int title, @DrawableRes int icon) {
+        setSyncItem(enabled, getString(title), icon);
+    }
+
+    private void setSyncItem(Boolean enabled, String title, @DrawableRes int icon) {
+        if (syncItem != null) {
+            syncItem.setEnabled(enabled);
+            syncItem.setTitle(title);
+            syncItem.setIcon(icon);
+        }
+    }
+
+    private void setErrorSyncItem() {
+        setSyncItem(true, R.string.nav_sync_failed, R.drawable.ic_sync_failed);
+    }
+
+    private void setProgressSyncItem(Progress progress) {
+        setSyncItem(false,
+                getString(R.string.syncing_with_progress, progress.getCurrentValue(), progress.getMaxValue()),
+                R.drawable.ic_syncing);
+    }
+
     private DisposableObserver<Progress> newSyncObserver() {
         return new DisposableObserver<Progress>() {
 
             @Override
             public void onNext(Progress progress) {
                 Timber.d("onNext");
-                if (progress.getCurrentValue() == 0) {
-                    syncItem.setEnabled(false);
-                    syncItem.setTitle(R.string.syncing);
-                    syncItem.setIcon(R.drawable.ic_syncing);
-                }
+                setProgressSyncItem(progress);
             }
 
             @Override
             public void onComplete() {
                 Timber.d("onComplete");
-                if (syncItem != null) {
-                    syncItem.setEnabled(true);
-                    syncItem.setTitle(R.string.nav_sync_complete);
-                    syncItem.setIcon(R.drawable.ic_sync_success);
-                }
+                setCompleteSyncItem();
                 syncClient.stopListening();
             }
 
             @Override
             public void onError(Throwable throwable) {
-                if (syncItem != null) {
-                    syncItem.setEnabled(true);
-                    syncItem.setTitle(R.string.nav_sync_failed);
-                    syncItem.setIcon(R.drawable.ic_sync_failed);
-                }
+                Timber.d("onError");
+                setErrorSyncItem();
+                logThrowable(throwable);
+                syncClient.stopListening();
+            }
+
+            private void logThrowable(Throwable throwable) {
                 if (throwable instanceof Error) {
                     dataManager.logError((Error) throwable);
                 } else if (throwable instanceof RuntimeException) {
                     dataManager.logSafeException((RuntimeException) throwable);
                 }
-                syncClient.stopListening();
             }
+
         };
     }
 
@@ -1010,7 +1080,7 @@ public class MainActivity extends AppCompatActivity implements
             case UN20_FAILURE:
             case UN20_LOW_VOLTAGE:
                 cancelCaptureUI();
-                launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "MainActivity"));
         }
     }
 

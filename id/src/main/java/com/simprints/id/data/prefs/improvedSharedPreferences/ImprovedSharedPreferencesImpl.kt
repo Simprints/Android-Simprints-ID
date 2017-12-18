@@ -2,7 +2,7 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import com.simprints.id.exceptions.safe.MismatchedTypeException
+import com.simprints.id.exceptions.unsafe.MismatchedTypeError
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
 
 
@@ -21,7 +21,7 @@ class ImprovedSharedPreferencesImpl(private val prefs: SharedPreferences)
                 throw nonPrimitiveTypeError
             } catch (anyOtherException: Throwable) {
                 val msg = "Value stored for key $key is not a ${defaultValue.javaClass.simpleName}."
-                throw MismatchedTypeException(msg, anyOtherException)
+                throw MismatchedTypeError(msg, anyOtherException)
             }
 
     @Suppress("UNCHECKED_CAST")
