@@ -1,6 +1,7 @@
 package com.simprints.id
 
 import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.Espresso.pressBack
 import android.support.test.espresso.NoMatchingViewException
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
@@ -176,6 +177,7 @@ fun testHappySync(calloutCredentials: CalloutCredentials, identifyTestRule: Acti
     testLaunchActivityIdentify(calloutCredentials, identifyTestRule)
     testSetupActivityAndContinue()
     testMainActivitySync()
+    testExitFromMainActivity()
 }
 
 private fun testMainActivitySync() {
@@ -183,6 +185,7 @@ private fun testMainActivitySync() {
     testMainActivityOpenDrawer()
     testMainActivityPressSync()
     testWaitAndVerifyUiForSyncCompleted()
+    testMainActivityCloseDrawer()
 }
 
 private fun testMainActivityOpenDrawer() {
@@ -190,6 +193,11 @@ private fun testMainActivityOpenDrawer() {
     onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
     WaitingUtils.waitOnUiForActivityToSettle()
+}
+
+private fun testMainActivityCloseDrawer() {
+    log("testMainActivityCloseDrawer")
+    testPressBackButton()
 }
 
 private fun testMainActivityPressSync() {
@@ -228,4 +236,14 @@ private fun testCheckUiForSyncCompleted(iteration: Int = 1) {
             throw Exception("Sync failed to complete")
         }
     }
+}
+
+private fun testExitFromMainActivity() {
+    log("testExitFromMainActivity")
+    testPressBackButton()
+}
+
+private fun testPressBackButton() {
+    log("testPressBackButton")
+    pressBack()
 }
