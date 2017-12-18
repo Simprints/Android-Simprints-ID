@@ -1,6 +1,6 @@
 package com.simprints.id
 
-import android.support.test.espresso.Espresso
+import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.NoMatchingViewException
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
@@ -10,10 +10,13 @@ import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import com.simprints.id.activities.LaunchActivity
 import com.simprints.id.tools.*
+import com.simprints.id.tools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
 import org.hamcrest.Matchers.anyOf
+import org.hamcrest.Matchers.containsString
 import org.junit.Assert
+
 
 fun testHappyWorkflowEnrolment(calloutCredentials: CalloutCredentials,
                                enrolTestRule: ActivityTestRule<LaunchActivity>): String {
@@ -82,7 +85,7 @@ private fun testSetupActivityAndContinue() {
 
 private fun testSetupActivity() {
     log("testSetupActivity")
-    Espresso.onView(withId(R.id.tv_consent_text))
+    onView(withId(R.id.tv_consent_text))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.short_consent)))
 
@@ -91,7 +94,7 @@ private fun testSetupActivity() {
 
 private fun testSetupActivityContinue() {
     log("testSetupActivityContinue")
-    Espresso.onView(withId(R.id.confirm_consent_text_view))
+    onView(withId(R.id.confirm_consent_text_view))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.confirm_consent)))
             .perform(click())
@@ -101,7 +104,7 @@ private fun testSetupActivityContinue() {
 
 private fun testMainActivityScanFinger() {
     log("testMainActivityScanFinger")
-    Espresso.onView(withId(R.id.scan_button))
+    onView(withId(R.id.scan_button))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.scan)))
             .perform(click())
@@ -163,7 +166,7 @@ private fun testVerificationSuccessful(verifyTestRule: ActivityTestRule<LaunchAc
 
 private fun testMainActivityPressContinue() {
     log("testMainActivityPressContinue")
-    Espresso.onView(withId(R.id.action_forward))
+    onView(withId(R.id.action_forward))
             .check(matches(isDisplayed()))
             .perform(click())
 }
@@ -184,14 +187,14 @@ private fun testMainActivitySync() {
 
 private fun testMainActivityOpenDrawer() {
     log("testMainActivityOpenDrawer")
-    Espresso.onView(withId(R.id.drawer_layout))
+    onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
     WaitingUtils.waitOnUiForActivityToSettle()
 }
 
 private fun testMainActivityPressSync() {
     log("testMainActivityPressSync")
-    Espresso.onView(withId(R.id.nav_view))
+    onView(withId(R.id.nav_view))
             .perform(navigateTo(R.id.nav_sync))
     testVerifyUiForSyncStarted()
 
@@ -200,7 +203,7 @@ private fun testMainActivityPressSync() {
 private fun testVerifyUiForSyncStarted() {
     log("testVerifyUiForSyncStarted")
     WaitingUtils.waitOnUiForSyncingToStart()
-    Espresso.onView(anyOf(withText(R.string.syncing), withText(R.string.nav_sync_complete)))
+    onView(anyOf(withText(containsString(getResourceString(R.string.syncing))), withText(containsString(getResourceString(R.string.nav_sync_complete)))))
             .check(matches(isDisplayed()))
 }
 
@@ -213,11 +216,11 @@ private fun testCheckUiForSyncCompleted(iteration: Int = 1) {
     WaitingUtils.waitOnUiForMediumSyncInterval()
     log("testCheckUiForSyncCompleted seconds elapsed: " + iteration * SyncParameters.SYNC_CHECK_INTERVAL)
     try {
-        Espresso.onView(withText(R.string.nav_sync_complete))
+        onView(withText(containsString(getResourceString(R.string.nav_sync_complete))))
                 .check(matches(isDisplayed()))
     } catch (e: NoMatchingViewException) {
         try {
-            Espresso.onView(withText(R.string.syncing))
+            onView(withText(containsString(getResourceString(R.string.syncing))))
                     .check(matches(isDisplayed()))
             testCheckUiForSyncCompleted(iteration + 1)
         } catch (e: NoMatchingViewException) {
