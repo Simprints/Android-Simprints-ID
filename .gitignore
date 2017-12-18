@@ -33,5 +33,12 @@ Thumbs.db
 build/
 **/output.json
 
+# PyCharm
+testing/__pycache__/
+__pycache__/
+
 #NDK
 obj/
+
+# Test Log Files
+testing/logs/

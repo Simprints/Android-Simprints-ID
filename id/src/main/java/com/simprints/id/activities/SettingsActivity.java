@@ -16,13 +16,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.simprints.id.Application;
 import com.simprints.id.R;
-import com.simprints.id.tools.Language;
-import com.simprints.id.tools.SharedPref;
+import com.simprints.id.data.DataManager;
+import com.simprints.id.tools.LanguageHelper;
 import com.simprints.libdata.tools.Constants;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    private SharedPref sharedPref;
 
     private final static int MIN_QUALITY = 40;
     private final static int MAX_QUALITY = 99;
@@ -39,15 +39,20 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     SeekBar timeoutSeekBar;
     SeekBar idWaitTimeSeekBar;
 
+    private DataManager dataManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getBaseContext().getResources().updateConfiguration(Language.selectLanguage(
-                getApplicationContext()), getBaseContext().getResources().getDisplayMetrics());
+
+        Application app = ((Application) getApplication());
+        dataManager = app.getDataManager();
+
+        LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_settings);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
+        Toolbar toolbar = findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -56,45 +61,43 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        sharedPref = new SharedPref(getApplicationContext());
-
         //Set language spinner
-        Spinner spinner = (Spinner) findViewById(R.id.language_spinner);
+        Spinner spinner = findViewById(R.id.language_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.language_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
-        spinner.setSelection(sharedPref.getLanguagePositionInt());
+        spinner.setSelection(dataManager.getLanguagePosition());
 
         //Set nudge mode
-        boolean nudgeMode = sharedPref.getNudgeModeBool();
-        nudgeToggleButton = (ToggleButton) findViewById(R.id.nudgeToggleButton);
+        boolean nudgeMode = dataManager.getNudgeMode();
+        nudgeToggleButton = findViewById(R.id.nudgeToggleButton);
         nudgeToggleButton.setChecked(nudgeMode);
         nudgeToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                sharedPref.setNudgeModeBool(nudgeToggleButton.isChecked());
+                dataManager.setNudgeMode(nudgeToggleButton.isChecked());
             }
         });
 
         //Set vibrate mode
-        boolean vibrate = sharedPref.getVibrateBool();
-        vibrateToggleButton = (ToggleButton) findViewById(R.id.vibrateToggleButton);
+        boolean vibrate = dataManager.getVibrateMode();
+        vibrateToggleButton = findViewById(R.id.vibrateToggleButton);
         vibrateToggleButton.setChecked(vibrate);
         vibrateToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                sharedPref.setVibrateBool(vibrateToggleButton.isChecked());
+                dataManager.setVibrateMode(vibrateToggleButton.isChecked());
             }
         });
 
         //Set the quality score threshold
         ((TextView) findViewById(R.id.minQualityTextView)).setText(String.valueOf(MIN_QUALITY));
         ((TextView) findViewById(R.id.maxQualityTextView)).setText(String.valueOf(MAX_QUALITY));
-        final TextView qualityThresholdTextView = (TextView) findViewById(R.id.qualityTextView);
-        final int qualityThreshold = sharedPref.getQualityThresholdInt() - MIN_QUALITY;
-        qualitySeekBar = (SeekBar) findViewById(R.id.qualitySeekBar);
+        final TextView qualityThresholdTextView = findViewById(R.id.qualityTextView);
+        final int qualityThreshold = dataManager.getQualityThreshold() - MIN_QUALITY;
+        qualitySeekBar = findViewById(R.id.qualitySeekBar);
         qualitySeekBar.setMax(MAX_QUALITY - MIN_QUALITY);
         qualitySeekBar.setProgress(qualityThreshold);
         qualityThresholdTextView.setText(String.format(
@@ -102,7 +105,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         qualitySeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                sharedPref.setQualityThresholdInt(qualitySeekBar.getProgress() + MIN_QUALITY);
+                dataManager.setQualityThreshold(qualitySeekBar.getProgress() + MIN_QUALITY);
                 qualityThresholdTextView.setText(String.format(
                         getString(R.string.quality_threshold_value), progress + MIN_QUALITY));
             }
@@ -119,9 +122,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         //Set the return # of IDs
         ((TextView) findViewById(R.id.minNbOfIdsTextView)).setText(String.valueOf(MIN_NB_OF_IDS));
         ((TextView) findViewById(R.id.maxNbOfIdsTextView)).setText(String.valueOf(MAX_NB_OF_IDS));
-        final TextView nbOfIdsTextView = (TextView) findViewById(R.id.nbOfIdsTextView);
-        final int nbOfIds = sharedPref.getReturnIdCountInt() - MIN_NB_OF_IDS;
-        nbOfIdsSeekBar = (SeekBar) findViewById(R.id.nbOfIdsSeekBar);
+        final TextView nbOfIdsTextView = findViewById(R.id.nbOfIdsTextView);
+        final int nbOfIds = dataManager.getReturnIdCount() - MIN_NB_OF_IDS;
+        nbOfIdsSeekBar = findViewById(R.id.nbOfIdsSeekBar);
         nbOfIdsSeekBar.setMax(MAX_NB_OF_IDS - MIN_NB_OF_IDS);
         nbOfIdsSeekBar.setProgress(nbOfIds);
         nbOfIdsTextView.setText(String.format(
@@ -129,7 +132,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         nbOfIdsSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                sharedPref.setReturnIdCountInt(nbOfIdsSeekBar.getProgress() + MIN_NB_OF_IDS);
+                dataManager.setReturnIdCount(nbOfIdsSeekBar.getProgress() + MIN_NB_OF_IDS);
                 nbOfIdsTextView.setText(String.format(
                         getString(R.string.nb_of_ids_value), progress + MIN_NB_OF_IDS));
             }
@@ -146,9 +149,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         //Set the timeout slider
         ((TextView) findViewById(R.id.tv_minTimeout)).setText(String.valueOf(MIN_TIMEOUT));
         ((TextView) findViewById(R.id.tv_maxTimeout)).setText(String.valueOf(MAX_TIMEOUT));
-        final TextView tv_timeout = (TextView) findViewById(R.id.tv_timeout);
-        final int timeout = sharedPref.getTimeoutInt() - MIN_TIMEOUT;
-        timeoutSeekBar = (SeekBar) findViewById(R.id.sb_timeout);
+        final TextView tv_timeout = findViewById(R.id.tv_timeout);
+        final int timeout = dataManager.getTimeoutS() - MIN_TIMEOUT;
+        timeoutSeekBar = findViewById(R.id.sb_timeout);
         timeoutSeekBar.setMax(MAX_TIMEOUT - MIN_TIMEOUT);
         timeoutSeekBar.setProgress(timeout);
         tv_timeout.setText(String.format(
@@ -156,7 +159,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         timeoutSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                sharedPref.setTimeoutInt(timeoutSeekBar.getProgress() + MIN_TIMEOUT);
+                dataManager.setTimeoutS(timeoutSeekBar.getProgress() + MIN_TIMEOUT);
                 tv_timeout.setText(String.format(
                         getString(R.string.timeout_value), progress + MIN_TIMEOUT));
             }
@@ -173,9 +176,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         //Set the id wait time slider
         ((TextView) findViewById(R.id.tv_min_id_wait_time)).setText(String.valueOf(MIN_ID_WAIT_TIME));
         ((TextView) findViewById(R.id.tv_max_id_wait_time)).setText(String.valueOf(MAX_ID_WAIT_TIME));
-        final TextView tv_idWaitTime = (TextView) findViewById(R.id.tv_id_wait_time);
-        final int idWaitTime = sharedPref.getMatchingEndWaitTime() - MIN_ID_WAIT_TIME;
-        idWaitTimeSeekBar = (SeekBar) findViewById(R.id.sb_id_wait_time);
+        final TextView tv_idWaitTime = findViewById(R.id.tv_id_wait_time);
+        final int idWaitTime = dataManager.getMatchingEndWaitTimeSeconds() - MIN_ID_WAIT_TIME;
+        idWaitTimeSeekBar = findViewById(R.id.sb_id_wait_time);
         idWaitTimeSeekBar.setMax(MAX_ID_WAIT_TIME - MIN_ID_WAIT_TIME);
         idWaitTimeSeekBar.setProgress(idWaitTime);
         tv_idWaitTime.setText(String.format(
@@ -183,7 +186,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         idWaitTimeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                sharedPref.setMatchingEndWaitTime(idWaitTimeSeekBar.getProgress() + MIN_ID_WAIT_TIME);
+                dataManager.setMatchingEndWaitTimeSeconds(idWaitTimeSeekBar.getProgress() + MIN_ID_WAIT_TIME);
                 tv_idWaitTime.setText(String.format(
                         getString(R.string.id_wait_time_value), progress + MIN_ID_WAIT_TIME));
             }
@@ -200,7 +203,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         });
 
         //Set the sync group radio buttons
-        Constants.GROUP syncGroup = sharedPref.getSyncGroup();
+        Constants.GROUP syncGroup = dataManager.getSyncGroup();
         switch (syncGroup) {
             case GLOBAL:
                 ((RadioButton) findViewById(R.id.rb_globalSyncGroup)).setChecked(true);
@@ -211,7 +214,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         }
 
         //Set the match group radio buttons
-        Constants.GROUP matchGroup = sharedPref.getMatchGroup();
+        Constants.GROUP matchGroup = dataManager.getMatchGroup();
         switch (matchGroup) {
             case GLOBAL:
                 ((RadioButton) findViewById(R.id.rb_globalMatchGroup)).setChecked(true);
@@ -225,7 +228,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         }
 
         //Set the matcher radio buttons
-        int matcher = sharedPref.getMatcherTypeInt();
+        int matcher = dataManager.getMatcherType();
         if (matcher == 0) {
             ((RadioButton) findViewById(R.id.radio_simAfis)).setChecked(true);
         } else if (matcher == 1) {
@@ -249,26 +252,26 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long i) {
         switch (pos) {
             case 0:
-                sharedPref.setLanguageString("");
-                sharedPref.setLanguagePositionInt(0);
+                dataManager.setLanguage("");
+                dataManager.setLanguagePosition(0);
 
                 break;
             case 1:
-                sharedPref.setLanguageString("ne");
-                sharedPref.setLanguagePositionInt(1);
+                dataManager.setLanguage("ne");
+                dataManager.setLanguagePosition(1);
                 break;
             case 2:
 
-                sharedPref.setLanguageString("bn");
-                sharedPref.setLanguagePositionInt(2);
+                dataManager.setLanguage("bn");
+                dataManager.setLanguagePosition(2);
                 break;
             case 3:
-                sharedPref.setLanguageString("ps");
-                sharedPref.setLanguagePositionInt(3);
+                dataManager.setLanguage("ps");
+                dataManager.setLanguagePosition(3);
                 break;
             case 4:
-                sharedPref.setLanguageString("fa-rAF");
-                sharedPref.setLanguagePositionInt(4);
+                dataManager.setLanguage("fa-rAF");
+                dataManager.setLanguagePosition(4);
         }
     }
 
@@ -285,11 +288,11 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         switch (view.getId()) {
             case R.id.radio_simAfis:
                 if (checked)
-                    sharedPref.setMatcherTypeInt(0);
+                    dataManager.setMatcherType(0);
                 break;
             case R.id.radio_sourceAfis:
                 if (checked)
-                    sharedPref.setMatcherTypeInt(1);
+                    dataManager.setMatcherType(1);
                 break;
         }
     }
@@ -302,11 +305,11 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         switch (view.getId()) {
             case R.id.rb_userSyncGroup:
                 if (checked)
-                    sharedPref.setSyncGroup(Constants.GROUP.USER);
+                    dataManager.setSyncGroup(Constants.GROUP.USER);
                 break;
             case R.id.rb_globalSyncGroup:
                 if (checked)
-                    sharedPref.setSyncGroup(Constants.GROUP.GLOBAL);
+                    dataManager.setSyncGroup(Constants.GROUP.GLOBAL);
                 break;
         }
     }
@@ -319,15 +322,15 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
         switch (view.getId()) {
             case R.id.rb_userMatchGroup:
                 if (checked)
-                    sharedPref.setMatchGroup(Constants.GROUP.USER);
+                    dataManager.setMatchGroup(Constants.GROUP.USER);
                 break;
             case R.id.rb_moduleMatchGroup:
                 if (checked)
-                    sharedPref.setMatchGroup(Constants.GROUP.MODULE);
+                    dataManager.setMatchGroup(Constants.GROUP.MODULE);
                 break;
             case R.id.rb_globalMatchGroup:
                 if (checked)
-                    sharedPref.setMatchGroup(Constants.GROUP.GLOBAL);
+                    dataManager.setMatchGroup(Constants.GROUP.GLOBAL);
                 break;
         }
     }
