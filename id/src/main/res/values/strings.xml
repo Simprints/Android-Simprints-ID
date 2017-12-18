@@ -29,11 +29,6 @@
     <string name="libsimprints_label" translatable="false">LibSimprints</string>
     <!-- Content Descriptions -->
     <string name="launch_background_description" translatable="false">Simprint\'s logo as background image</string>
-    <!-- Sync Button Text -->
-    <string name="sync_data">Sync Data</string>
-    <string name="syncing">Syncing…</string>
-    <string name="syncing_with_progress">Syncing… %1$d/%2$d</string>
-    <string name="not_signed_in">Not Signed In</string>
 
 
     <!-- SetupActivity : the loading screen -->
@@ -94,6 +89,12 @@
     <string name="nav_sync_failed">Sync Failed</string>
     <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
     <string name="persistence_label">Remember these settings next time</string>
+    <!-- Sync Button Text -->
+    <string name="sync_data">Sync Data</string>
+    <string name="syncing">Syncing…</string>
+    <string name="syncing_calculating">Syncing… Calculating</string>
+    <string name="syncing_with_progress">Syncing… %1$d/%2$d</string>
+    <string name="not_signed_in">Not Signed In</string>
     <!-- Toast Messages -->
     <string name="coming_soon">Coming soon…</string>
     <string name="wait_for_current_sync_to_finish">Please wait for the current sync operation to finish</string>
