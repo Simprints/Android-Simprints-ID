@@ -1,1 +1,1 @@
-include ':id'
+include ':id', ':libdata', ':libcommon'

@@ -2,17 +2,17 @@ package com.simprints.id.services.progress.notifications
 
 import android.app.NotificationManager
 import android.support.v4.app.NotificationCompat
-import com.simprints.id.services.progress.Progress
+import com.simprints.libcommon.Progress
 import io.reactivex.observers.DisposableObserver
 
 
-class ErrorNotificationBuilder(private val notificationManager: NotificationManager,
+class ErrorNotificationBuilder(notificationManager: NotificationManager,
                                notificationBuilder: NotificationCompat.Builder,
                                tag: String,
                                title: String,
                                icon: Int,
                                private val errorTextBuilder: (throwable: Throwable) -> String)
-    : BaseNotificationBuilder(notificationBuilder, tag, title, icon) {
+    : BaseNotificationBuilder(notificationManager, notificationBuilder, tag, title, icon) {
 
     override val progressObserver: DisposableObserver<Progress> =
             object : DisposableObserver<Progress>() {
@@ -21,10 +21,10 @@ class ErrorNotificationBuilder(private val notificationManager: NotificationMana
                 }
 
                 override fun onError(throwable: Throwable) {
-                    updateBuilder { setContentText(errorTextBuilder(throwable)) }
-                    if (visible.get()) {
-                        notificationManager.notify(id, build())
+                    updateBuilder {
+                        setContentText(errorTextBuilder(throwable))
                     }
+                    notifyIfVisible()
                     dispose()
                 }
 

@@ -11,7 +11,20 @@ import java.util.Locale;
 public class LanguageHelper {
 
     public static Configuration selectLanguage(String languageString) {
+        Locale locale = localeFor(languageString);
 
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            config.setLocale(locale);
+        } else {
+            config.locale = locale;
+        }
+
+        return config;
+    }
+
+    private static Locale localeFor(String languageString) {
         Locale locale;
 
         /*
@@ -36,15 +49,7 @@ public class LanguageHelper {
             locale = new Locale(languageString);
         }
 
-        Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            config.setLocale(locale);
-        } else {
-            config.locale = locale;
-        }
-
-        return config;
+        return locale;
     }
 
     public static void setLanguage(Context context, String languageString) {

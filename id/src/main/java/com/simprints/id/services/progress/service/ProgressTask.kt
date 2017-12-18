@@ -1,6 +1,6 @@
 package com.simprints.id.services.progress.service
 
-import com.simprints.id.services.progress.Progress
+import com.simprints.libcommon.Progress
 import io.reactivex.Emitter
 
 
