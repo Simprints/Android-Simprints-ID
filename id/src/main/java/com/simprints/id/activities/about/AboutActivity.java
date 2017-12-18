@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.LanguageHelper;
 
 
@@ -100,7 +101,7 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
                 }).create();
 
         // Create the presenter and pass it the information it needs
-        aboutPresenter = new AboutPresenter(this, dataManager);
+        aboutPresenter = new AboutPresenter(this, dataManager, new AlertLauncher(this));
     }
 
     @Override

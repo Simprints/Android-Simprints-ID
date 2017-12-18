@@ -18,3 +18,6 @@ ADB = 'adb' if platform.system() == 'Windows' else f'{SIMPRINTS_ID_DIR_PATH}/tes
 GRADLEW = 'gradlew.bat' if platform.system() == 'Windows' else 'gradlew'
 SIMPRINTS_ID_MODULE_NAME = 'id'
 CERBERUS_APP_MODULE_NAME = 'cerberus-app'
+
+SIMPRINTS_ID_PACKAGE_NAME = 'com.simprints.id'
+CERBERUS_APP_PACKAGE_NAME = 'com.simprints.cerberusapp'
