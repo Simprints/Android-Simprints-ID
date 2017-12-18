@@ -125,7 +125,6 @@ class NaiveSync(
         if (patientsToDownload.isEmpty() && downloadingCount <= 0) {
             if (!patientsToSave.isEmpty())
                 saveBatch()
-            emitter.onComplete()
             return
         }
 
@@ -177,11 +176,10 @@ class NaiveSync(
             iterator.remove()
         }
 
-        currentProgress.set(maxProgress.get() - patientsToDownload.size)
-        emitProgress()
-
         realm.executeTransactionAsync { realm ->
             realm.copyToRealmOrUpdate(batch)
+            currentProgress.set(maxProgress.get() - patientsToDownload.size)
+            emitProgress()
         }
     }
 
@@ -198,6 +196,9 @@ class NaiveSync(
 
     private fun emitProgress() {
         emitter.onNext(Progress(currentProgress.get(), maxProgress.get()))
+        if (patientsToDownload.isEmpty() && patientsToSave.isEmpty()) {
+            emitter.onComplete()
+        }
     }
 
 }
