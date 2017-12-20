@@ -18,11 +18,6 @@
 
 
     <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
-    <!-- Sync Button Text -->
-    <string name="sync_data">د معلوماتو همګامول</string>
-    <string name="syncing">همګامول</string>
-    <string name="syncing_with_progress">همګامول… %1$d/%2$d </string>
-    <string name="not_signed_in">سیسټم کې دننه شوی نه یاست</string>
 
 
     <!-- SetupActivity : the loading screen -->
@@ -80,6 +75,12 @@
     <string name="nav_sync_failed">همګامول ناکامه شو</string>
     <string name="privacy_and_consent">محرمیت او رضایت</string>
     <string name="persistence_label">دغه تنظیمات مو د بل وخت لپاره په یاد وي</string>
+    <!-- Sync Button Text -->
+    <string name="sync_data">د معلوماتو همګامول</string>
+    <string name="syncing">همګامول…</string>
+    <string name="syncing_calculating">همګامول… شمېرنه</string>
+    <string name="syncing_with_progress">همګامول… %1$d/%2$d </string>
+    <string name="not_signed_in">سیسټم کې دننه شوی نه یاست</string>
     <!-- Toast Messages -->
     <string name="coming_soon">ډیر ژر…</string>
     <!-- Finger Names -->

@@ -11,6 +11,7 @@ import com.simprints.id.services.progress.notifications.CompleteNotificationBuil
 import com.simprints.id.services.progress.notifications.ErrorNotificationBuilder
 import com.simprints.id.services.progress.notifications.NotificationBuilder
 import com.simprints.id.services.progress.notifications.ProgressNotificationBuilder
+import com.simprints.libcommon.Progress
 import org.jetbrains.anko.notificationManager
 
 
@@ -65,9 +66,18 @@ class NotificationFactory(private val context: Context) {
                     syncTitle,
                     syncProgressIcon,
                     { progress ->
-                        context.getString(R.string.sync_progress_notification_content,
-                                progress.currentValue,
-                                progress.maxValue) })
+                        formatProgressContent(progress) })
+
+    private fun formatProgressContent(progress: Progress): String =
+            if (isProgressZero(progress))
+                context.getString(R.string.syncing_calculating)
+            else
+                context.getString(R.string.sync_progress_notification_content,
+                        progress.currentValue,
+                        progress.maxValue)
+
+    private fun isProgressZero(progress: Progress): Boolean =
+            progress.currentValue == 0 && progress.maxValue == 0
 
     fun syncCompleteNotification(): NotificationBuilder =
             CompleteNotificationBuilder(notificationManager,
