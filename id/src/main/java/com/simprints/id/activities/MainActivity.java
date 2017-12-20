@@ -908,9 +908,18 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setProgressSyncItem(Progress progress) {
-        setSyncItem(false,
-                getString(R.string.syncing_with_progress, progress.getCurrentValue(), progress.getMaxValue()),
-                R.drawable.ic_syncing);
+        if (isProgressZero(progress))
+            setSyncItem(false,
+                    getString(R.string.syncing_calculating),
+                    R.drawable.ic_syncing);
+        else
+            setSyncItem(false,
+                    getString(R.string.syncing_with_progress, progress.getCurrentValue(), progress.getMaxValue()),
+                    R.drawable.ic_syncing);
+    }
+
+    private boolean isProgressZero(Progress progress) {
+        return progress.getCurrentValue() == 0 && progress.getMaxValue() == 0;
     }
 
     private DisposableObserver<Progress> newSyncObserver() {
