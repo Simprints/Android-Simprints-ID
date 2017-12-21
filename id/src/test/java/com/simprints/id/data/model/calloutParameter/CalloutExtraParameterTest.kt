@@ -1,12 +1,8 @@
 package com.simprints.id.data.model.calloutParameter
 
 import android.content.Intent
-import android.os.Bundle
-import com.simprints.id.testUtils.mock
-import com.simprints.id.testUtils.whenever
 import org.junit.Assert.*
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
 
 class CalloutExtraParameterTest {
 
@@ -16,7 +12,6 @@ class CalloutExtraParameterTest {
         val stringParamDefaultValue = "defaultValue"
         val intParamDefaultValue = 314
     }
-
 
     class StringParameterWithoutValidation(intent: Intent)
         : CalloutExtraParameter<String>(intent, paramKey, stringParamDefaultValue)  {
@@ -32,30 +27,11 @@ class CalloutExtraParameterTest {
         }
     }
 
-
     private val emptyIntent: Intent =
-            mockIntentContaining(mockEmptyBundle())
+            mockIntent()
 
     private val intentWithStringParam: Intent =
-            mockIntentContaining(mockBundleWithSingleParam(paramKey, stringParamValue))
-
-    private fun mockIntentContaining(bundle: Bundle): Intent {
-        val intent = mock<Intent>()
-        whenever(intent.extras).thenReturn(bundle)
-        return intent
-    }
-
-    private fun mockEmptyBundle(): Bundle {
-        val bundle = mock<Bundle>()
-        whenever(bundle.get(anyString())).thenReturn(null)
-        return bundle
-    }
-
-    private fun <T: Any> mockBundleWithSingleParam(paramKey: String, paramValue: T): Bundle {
-        val bundle = mock<Bundle>()
-        whenever(bundle.get(paramKey)).thenReturn(paramValue)
-        return bundle
-    }
+            mockIntent(paramKey to stringParamValue)
 
     @Test
     fun testParameterValueIsExtraValueWhenExtraIsInIntent() {
@@ -99,6 +75,5 @@ class CalloutExtraParameterTest {
         val stringParameter = StringParameterWithoutValidation(intentWithStringParam)
         assertFalse(stringParameter.isMismatchedType)
     }
-
 
 }

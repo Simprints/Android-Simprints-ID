@@ -25,7 +25,8 @@ class MainCalloutParameters(intent: Intent?) : CalloutParametersImp() {
     val apiKeyParameter = ApiKeyParameter(intentToParse)
     val moduleIdParameter = ModuleIdParameter(intentToParse)
     val userIdParameter = UserIdParameter(intentToParse)
-    val patientIdParameter = PatientIdParameter(intentToParse)
+    val patientIdParameter = PatientIdParameter(typeParameter,
+            UpdateIdParameter(intentToParse), VerifyIdParameter(intentToParse))
     val callingPackageParameter = CallingPackageParameter(intentToParse)
     val metadataParameter = MetadataParameter(intentToParse)
     val resultFormatParameter = ResultFormatParameter(intentToParse)

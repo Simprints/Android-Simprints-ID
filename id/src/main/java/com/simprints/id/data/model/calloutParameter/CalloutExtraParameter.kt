@@ -2,6 +2,7 @@ package com.simprints.id.data.model.calloutParameter
 
 import android.content.Intent
 
+
 /**
  * Abstraction of any callout parameter that is parsed from the extras of the intent.
  */

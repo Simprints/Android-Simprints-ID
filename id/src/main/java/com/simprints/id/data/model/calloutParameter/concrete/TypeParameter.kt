@@ -3,15 +3,15 @@ package com.simprints.id.data.model.calloutParameter.concrete
 import android.content.Intent
 import com.simprints.id.data.model.CalloutType
 import com.simprints.id.data.model.calloutParameter.CalloutParameter
-import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
+import com.simprints.id.model.ALERT_TYPE
 import java.security.InvalidParameterException
 
 class TypeParameter(intent: Intent) : CalloutParameter<CalloutType> {
 
     private val defaultValue: CalloutType = CalloutType.INVALID_OR_MISSING
 
-    override val value: CalloutType = CalloutType.forNullableIntentAction(intent.action, defaultValue)
+    override val value: CalloutType = CalloutType.forNullableAction(intent.action, defaultValue)
 
     override fun validate() {
         val calloutType = value
@@ -20,16 +20,16 @@ class TypeParameter(intent: Intent) : CalloutParameter<CalloutType> {
         }
     }
 
-    private fun CalloutType.Companion.forNullableIntentAction(intentAction: String?, default: CalloutType) =
-            if (intentAction != null) {
-                forNonNullIntentAction(intentAction, default)
+    private fun CalloutType.Companion.forNullableAction(action: String?, default: CalloutType) =
+            if (action != null) {
+                forNonNullAction(action, default)
             } else {
                 default
             }
 
-    private fun CalloutType.Companion.forNonNullIntentAction(intentAction: String, default: CalloutType) =
+    private fun CalloutType.Companion.forNonNullAction(action: String, default: CalloutType) =
             try {
-                forIntentAction(intentAction)
+                forAction(action)
             } catch (exception: InvalidParameterException) {
                 default
             }
