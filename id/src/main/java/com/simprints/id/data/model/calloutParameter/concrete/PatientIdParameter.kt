@@ -1,26 +1,22 @@
 package com.simprints.id.data.model.calloutParameter.concrete
 
-import android.content.Intent
-import com.simprints.id.data.model.CalloutType
+import com.simprints.id.data.model.CalloutType.UPDATE
+import com.simprints.id.data.model.CalloutType.VERIFY
 import com.simprints.id.data.model.calloutParameter.CalloutParameter
-import java.util.*
 
-class PatientIdParameter(intent: Intent)
+
+class PatientIdParameter(typeParameter: TypeParameter,
+                         val updateIdParameter: UpdateIdParameter,
+                         val verifyIdParameter: VerifyIdParameter)
     : CalloutParameter<String> {
 
-    private val valueWhenMissing: String = ""
-
-    val updateIdParameter = UpdateIdParameter(intent)
-    val verifyIdParameter = VerifyIdParameter(intent)
-
-    private fun newId() = UUID.randomUUID().toString()
+    private val defaultValue: String = ""
 
     override val value: String =
-            when (intent.action) {
-                CalloutType.UPDATE.intentAction -> updateIdParameter.value
-                CalloutType.VERIFY.intentAction -> verifyIdParameter.value
-                CalloutType.IDENTIFY.intentAction -> newId()
-                else -> valueWhenMissing
+            when (typeParameter.value) {
+                UPDATE -> updateIdParameter.value
+                VERIFY -> verifyIdParameter.value
+                else -> defaultValue
             }
 
     override fun validate() {
