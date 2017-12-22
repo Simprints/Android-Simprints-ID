@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.analytics
 
-import com.simprints.id.data.model.CalloutType
-import com.simprints.id.data.model.calloutParameters.MainCalloutParameters
+import com.simprints.id.domain.calloutValidation.CalloutType
+import com.simprints.id.domain.calloutValidation.calloutParameters.MainCalloutParameters
 
 
 interface AnalyticsManager {

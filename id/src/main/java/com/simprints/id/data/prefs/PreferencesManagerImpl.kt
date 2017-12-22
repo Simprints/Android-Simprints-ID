@@ -1,8 +1,8 @@
 package com.simprints.id.data.prefs
 
 import android.content.Context
-import com.simprints.id.data.model.CalloutType
-import com.simprints.id.data.model.calloutParameters.MainCalloutParameters
+import com.simprints.id.domain.calloutValidation.CalloutType
+import com.simprints.id.domain.calloutValidation.calloutParameters.MainCalloutParameters
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.tools.delegates.ComplexPreference
 import com.simprints.id.tools.delegates.PrimitivePreference

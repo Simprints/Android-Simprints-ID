@@ -12,7 +12,7 @@ import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.data.model.CalloutType;
+import com.simprints.id.domain.calloutValidation.CalloutType;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Log;

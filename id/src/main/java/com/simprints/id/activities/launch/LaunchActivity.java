@@ -21,7 +21,7 @@ import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
-import com.simprints.id.data.model.calloutParameters.MainCalloutParameters;
+import com.simprints.id.domain.calloutValidation.calloutParameters.MainCalloutParameters;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.LanguageHelper;

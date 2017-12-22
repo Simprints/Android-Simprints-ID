@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.remote.model
 
-import com.simprints.id.data.model.CalloutType
+import com.simprints.id.domain.calloutValidation.CalloutType
 import java.util.*
 
 
