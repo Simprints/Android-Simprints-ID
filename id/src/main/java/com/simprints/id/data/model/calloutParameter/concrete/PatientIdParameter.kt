@@ -7,10 +7,9 @@ import com.simprints.id.data.model.calloutParameter.CalloutParameter
 
 class PatientIdParameter(private val typeParameter: TypeParameter,
                          val updateIdParameter: UpdateIdParameter,
-                         val verifyIdParameter: VerifyIdParameter)
+                         val verifyIdParameter: VerifyIdParameter,
+                         private val defaultValue: String = "")
     : CalloutParameter<String> {
-
-    private val defaultValue: String = ""
 
     override val value: String
         get() =

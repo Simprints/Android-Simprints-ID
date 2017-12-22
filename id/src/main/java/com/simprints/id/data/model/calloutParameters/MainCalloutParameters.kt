@@ -26,11 +26,12 @@ class MainCalloutParameters(intent: Intent?) : CalloutParametersImp() {
     val moduleIdParameter = ModuleIdParameter(intentToParse)
     val userIdParameter = UserIdParameter(intentToParse)
     val patientIdParameter = PatientIdParameter(typeParameter,
-            UpdateIdParameter(intentToParse), VerifyIdParameter(intentToParse))
+        UpdateIdParameter(intentToParse, typeParameter),
+        VerifyIdParameter(intentToParse, typeParameter))
     val callingPackageParameter = CallingPackageParameter(intentToParse)
     val metadataParameter = MetadataParameter(intentToParse)
     val resultFormatParameter = ResultFormatParameter(intentToParse)
-    val unexpectedParameters = UnexpectedParameters(intentToParse, expectedKeys)
+    val unexpectedParameters = UnexpectedExtraParameters(intentToParse, expectedKeys)
 
     override val parameters = listOf(
             typeParameter,
