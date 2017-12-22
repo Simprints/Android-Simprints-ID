@@ -1,12 +1,13 @@
 package com.simprints.id.domain.calloutValidation.calloutParameter.concrete
 
 import android.content.Intent
-import com.simprints.id.domain.calloutValidation.calloutParameter.CalloutExtraParameter
 import com.simprints.id.domain.calloutValidation.CalloutType
+import com.simprints.id.domain.calloutValidation.calloutParameter.CalloutExtraParameter
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.GuidValidator
 import com.simprints.libsimprints.Constants
+
 
 class VerifyIdParameter(intent: Intent,
                         private val typeParameter: TypeParameter,
