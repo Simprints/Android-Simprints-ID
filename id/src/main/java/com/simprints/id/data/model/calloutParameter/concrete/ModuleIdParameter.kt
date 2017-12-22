@@ -7,8 +7,8 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.libsimprints.Constants
 
 
-class ModuleIdParameter(intent: Intent)
-    : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_MODULE_ID, "") {
+class ModuleIdParameter(intent: Intent, defaultValue: String = "")
+    : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_MODULE_ID, defaultValue) {
 
     override fun validate() {
         validateValueIsNotMissing()
@@ -19,4 +19,5 @@ class ModuleIdParameter(intent: Intent)
             throw InvalidCalloutError(ALERT_TYPE.MISSING_MODULE_ID)
         }
     }
+
 }

@@ -19,6 +19,10 @@ enum class CalloutType(val intentAction: String) {
 
         fun forAction(action: String): CalloutType =
                 ACTION_TO_CALLOUT_TYPE[action] ?: throw InvalidParameterException()
+
+        fun forActionOrDefault(action: String, defaultValue: CalloutType): CalloutType =
+                ACTION_TO_CALLOUT_TYPE[action] ?: defaultValue
+
     }
 
 }

@@ -9,9 +9,9 @@ import com.simprints.libsimprints.Metadata
 
 
 class MetadataParameter(intent: Intent,
-                        private val isMetadataValid: (metadata: String) -> Boolean
-                        = isMetadataValidWithLibSimprints)
-    : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_METADATA, "") {
+                        private val isMetadataValid: (metadata: String) -> Boolean = isMetadataValidWithLibSimprints,
+                        defaultValue: String = "")
+    : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_METADATA, defaultValue) {
 
     companion object {
         private val isMetadataValidWithLibSimprints = { metadata: String ->

@@ -1,27 +1,46 @@
 package com.simprints.id.data.model.calloutParameter.concrete
 
 import android.content.Intent
-import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.data.model.CalloutType
 import com.simprints.id.data.model.calloutParameter.CalloutExtraParameter
+import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.tools.GuidValidator
 import com.simprints.libsimprints.Constants
 
-class VerifyIdParameter(intent: Intent)
-    : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_VERIFY_GUID, "") {
-
-    private val intentAction: String? = intent.action
+class VerifyIdParameter(intent: Intent,
+                        private val typeParameter: TypeParameter,
+                        private val guidValidator: GuidValidator = GuidValidator(),
+                        defaultValue: String = "")
+    : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_VERIFY_GUID, defaultValue) {
 
     override fun validate() {
-        val verifyId = value
-        if (intentAction.isVerify() && verifyId.isEmpty()) {
-            throw InvalidCalloutError(ALERT_TYPE.MISSING_VERIFY_GUID)
-        }
-        if (!intentAction.isVerify() && !verifyId.isEmpty()) {
-            throw InvalidCalloutError(ALERT_TYPE.UNEXPECTED_PARAMETER)
+        if (isVerify()) {
+            validateValueIsNotMissing()
+            validateValueIsGuid()
+        } else {
+            validateValueIsMissing()
         }
     }
 
-    private fun String?.isVerify(): Boolean =
-            this == CalloutType.VERIFY.intentAction
+    private fun isVerify(): Boolean =
+        typeParameter.value == CalloutType.VERIFY
+
+    private fun validateValueIsNotMissing() {
+        if (isMissing) {
+            throw InvalidCalloutError(ALERT_TYPE.MISSING_VERIFY_GUID)
+        }
+    }
+
+    private fun validateValueIsGuid() {
+        if (!guidValidator.isGuid(value)) {
+            throw InvalidCalloutError(ALERT_TYPE.INVALID_VERIFY_GUID)
+        }
+    }
+
+    private fun validateValueIsMissing() {
+        if (!isMissing) {
+            throw InvalidCalloutError(ALERT_TYPE.UNEXPECTED_PARAMETER)
+        }
+    }
 }

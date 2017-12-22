@@ -5,8 +5,8 @@ import com.simprints.id.data.model.calloutParameter.CalloutExtraParameter
 import com.simprints.libsimprints.Constants
 
 
-class CallingPackageParameter(intent: Intent)
-    : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_CALLING_PACKAGE, "") {
+class CallingPackageParameter(intent: Intent, defaultValue: String = "")
+    : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_CALLING_PACKAGE, defaultValue) {
 
     override fun validate() {
 

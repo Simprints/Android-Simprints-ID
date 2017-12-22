@@ -9,8 +9,9 @@ import com.simprints.libsimprints.Constants
 
 
 class ApiKeyParameter(intent: Intent,
-                      private val guidValidator: GuidValidator = GuidValidator())
-    : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_API_KEY, "") {
+                      private val guidValidator: GuidValidator = GuidValidator(),
+                      defaultValue: String = "")
+    : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_API_KEY, defaultValue) {
 
     override fun validate() {
         validateValueIsNotMissing()
