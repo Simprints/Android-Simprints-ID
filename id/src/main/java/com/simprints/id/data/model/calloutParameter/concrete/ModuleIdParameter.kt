@@ -11,6 +11,10 @@ class ModuleIdParameter(intent: Intent)
     : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_MODULE_ID, "") {
 
     override fun validate() {
+        validateValueIsNotMissing()
+    }
+
+    private fun validateValueIsNotMissing() {
         if (isMissing) {
             throw InvalidCalloutError(ALERT_TYPE.MISSING_MODULE_ID)
         }
