@@ -1,7 +1,6 @@
 package com.simprints.id.data.prefs
 
 import com.simprints.id.domain.calloutValidation.CalloutType
-import com.simprints.id.domain.calloutValidation.calloutParameters.MainCalloutParameters
 import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.FingerIdentifier
 
@@ -15,7 +14,6 @@ import com.simprints.libsimprints.FingerIdentifier
 interface PreferencesManager {
 
     // Main callout parameters
-    var mainCalloutParameters: MainCalloutParameters
     var calloutType: CalloutType
     var moduleId: String
     var userId: String

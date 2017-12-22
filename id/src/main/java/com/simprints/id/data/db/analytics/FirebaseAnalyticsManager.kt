@@ -68,7 +68,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
             bundle.putString("calling_package", callingPackageParameter.value)
             bundle.putString("metadata", metadataParameter.value)
             bundle.putString("result_format", resultFormatParameter.value)
-            bundle.putString("unexpected_parameters", unexpectedParameters.value.toString())
+            bundle.putString("unexpected_parameters", unexpectedExtrasParameter.value.toString())
             firebaseAnalytics.logEvent("main_callout_parameters", bundle)
         }
     }

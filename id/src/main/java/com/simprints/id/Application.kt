@@ -14,7 +14,6 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.remote.FirebaseRtdbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.domain.calloutValidation.CalloutType
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.network.ApiManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -23,6 +22,8 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.domain.calloutValidation.CalloutType
+import com.simprints.id.domain.calloutValidation.calloutParameters.CalloutParametersFactory
 import com.simprints.id.tools.AppState
 import com.simprints.id.tools.NotificationFactory
 import com.simprints.id.tools.serializers.BooleanSerializer
@@ -115,6 +116,10 @@ class Application : MultiDexApplication() {
         val factory = NotificationFactory(this)
         factory.initSyncNotificationChannel()
         factory
+    }
+
+    val calloutParametersFactory: CalloutParametersFactory by lazy {
+        CalloutParametersFactory()
     }
 
     // TODO: These are all the singletons that are used in Simprints ID right now. This is temporary, until we get rid of all these singletons

@@ -20,15 +20,16 @@ import com.simprints.id.activities.RefusalActivity;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
+import com.simprints.id.domain.calloutValidation.calloutParameters.CalloutParametersFactory;
 import com.simprints.id.domain.calloutValidation.calloutParameters.MainCalloutParameters;
+import com.simprints.id.exceptions.unsafe.InvalidCalloutError;
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.PositionTracker;
 import com.simprints.id.tools.RemoteConfig;
-import com.simprints.id.exceptions.unsafe.InvalidCalloutError;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.ScannerCallback;
@@ -73,8 +74,10 @@ public class LaunchActivity extends AppCompatActivity {
     // True iff another activity launched by this activity is running
     private boolean launchOutOfFocus = false;
 
-
     private DataManager dataManager;
+
+    private CalloutParametersFactory calloutParametersFactory;
+
     // Singletons
     private AppState appState;
     private Setup setup;
@@ -85,8 +88,10 @@ public class LaunchActivity extends AppCompatActivity {
 
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
+        calloutParametersFactory = app.getCalloutParametersFactory();
         appState = app.getAppState();
         setup = app.getSetup();
+
 
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_launch);
@@ -99,8 +104,11 @@ public class LaunchActivity extends AppCompatActivity {
 
         dataManager.setSessionId(newSessionId());
 
-        MainCalloutParameters calloutParameters = new MainCalloutParameters(getIntent());
-        dataManager.setMainCalloutParameters(calloutParameters);
+        Intent intent = getIntent();
+        if (intent == null) {
+            intent = new Intent();
+        }
+        MainCalloutParameters calloutParameters = calloutParametersFactory.newMainCalloutParameters(intent);
         dataManager.logMainCalloutParameters(calloutParameters);
 
         try {

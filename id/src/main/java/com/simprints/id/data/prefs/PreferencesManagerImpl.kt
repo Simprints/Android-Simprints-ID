@@ -1,9 +1,8 @@
 package com.simprints.id.data.prefs
 
 import android.content.Context
-import com.simprints.id.domain.calloutValidation.CalloutType
-import com.simprints.id.domain.calloutValidation.calloutParameters.MainCalloutParameters
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.domain.calloutValidation.CalloutType
 import com.simprints.id.tools.delegates.ComplexPreference
 import com.simprints.id.tools.delegates.PrimitivePreference
 import com.simprints.id.tools.serializers.Serializer
@@ -116,20 +115,6 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Result format of the current session
     override var resultFormat: String by PrimitivePreference(prefs, RESULT_FORMAT_KEY, RESULT_FORMAT_DEFAULT)
-
-    override var mainCalloutParameters: MainCalloutParameters
-        get() = throw IllegalAccessException("mainCalloutParameters is write only.")
-        set(calloutParameters) {
-            with(calloutParameters) {
-                calloutType = typeParameter.value
-                moduleId = moduleIdParameter.value
-                userId = userIdParameter.value
-                patientId = patientIdParameter.value
-                callingPackage = callingPackageParameter.value
-                metadata = metadataParameter.value
-                resultFormat = resultFormatParameter.value
-            }
-        }
 
     override var sessionId: String by PrimitivePreference(prefs, SESSION_ID_KEY, SESSION_ID_DEFAULT)
 
