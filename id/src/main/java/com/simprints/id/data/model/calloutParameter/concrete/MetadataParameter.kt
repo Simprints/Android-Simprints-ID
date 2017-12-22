@@ -25,11 +25,13 @@ class MetadataParameter(intent: Intent,
     }
 
     override fun validate() {
-        val metadata = value
-        if (isMissing) {
-            return
+        if (!isMissing) {
+            validateValueIsValidMetadata()
         }
-        if (!isMetadataValid(metadata)) {
+    }
+
+    private fun validateValueIsValidMetadata() {
+        if (!isMetadataValid(value)) {
             throw InvalidCalloutError(ALERT_TYPE.INVALID_METADATA)
         }
     }
