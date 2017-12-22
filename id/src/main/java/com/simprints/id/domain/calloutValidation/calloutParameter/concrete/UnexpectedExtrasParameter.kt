@@ -7,7 +7,7 @@ import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.model.ALERT_TYPE
 
 
-class UnexpectedExtraParameters(intent: Intent, expectedExtraKeys: Collection<String>)
+class UnexpectedExtrasParameter(intent: Intent, expectedExtraKeys: Collection<String>)
     : CalloutParameter<Map<String, Any>> {
 
     override val value: Map<String, Any> = intent.extras

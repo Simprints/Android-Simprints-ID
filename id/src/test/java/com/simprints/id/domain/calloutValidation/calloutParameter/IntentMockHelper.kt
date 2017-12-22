@@ -18,5 +18,7 @@ private fun mockBundle(vararg params: Pair<String, Any>): Bundle {
     for ((key, value) in params) {
         whenever(bundle.get(key)).thenReturn(value)
     }
+    val keys = params.map { (key, _) -> key }.toSet()
+    whenever(bundle.keySet()).thenReturn(keys)
     return bundle
 }

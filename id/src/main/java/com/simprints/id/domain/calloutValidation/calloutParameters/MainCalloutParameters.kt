@@ -31,7 +31,7 @@ class MainCalloutParameters(intent: Intent?) : CalloutParametersImp() {
     val callingPackageParameter = CallingPackageParameter(intentToParse)
     val metadataParameter = MetadataParameter(intentToParse)
     val resultFormatParameter = ResultFormatParameter(intentToParse)
-    val unexpectedParameters = UnexpectedExtraParameters(intentToParse, expectedKeys)
+    val unexpectedParameters = UnexpectedExtrasParameter(intentToParse, expectedKeys)
 
     override val parameters = listOf(
             typeParameter,
