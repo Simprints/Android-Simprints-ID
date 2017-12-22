@@ -20,8 +20,6 @@ class PatientIdParameter(private val typeParameter: TypeParameter,
             }
 
     override fun validate() {
-        updateIdParameter.validate()
-        verifyIdParameter.validate()
     }
 
 }

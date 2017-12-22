@@ -8,7 +8,7 @@ import android.content.Intent
  */
 @Suppress("UNCHECKED_CAST", "USELESS_IS_CHECK")
 abstract class CalloutExtraParameter<out T: Any>(intent: Intent,
-                                                 key: String,
+                                                 val key: String,
                                                  defaultValue: T)
     : CalloutParameter<T> {
 

@@ -1,11 +1,10 @@
 package com.simprints.id.domain.calloutValidation.calloutParameter.concrete
 
+import com.simprints.id.domain.calloutValidation.CalloutType
 import com.simprints.id.domain.calloutValidation.calloutParameter.mockInvalidCalloutParameter
 import com.simprints.id.domain.calloutValidation.calloutParameter.mockTypeParameter
 import com.simprints.id.domain.calloutValidation.calloutParameter.mockValidCalloutParameter
-import com.simprints.id.domain.calloutValidation.CalloutType
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
-import com.simprints.id.testUtils.assertThrows
 import com.simprints.id.testUtils.mock
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -63,30 +62,6 @@ class PatientIdParameterTest {
     fun testPatientIdIsEmptyWhenActionIsInvalidOrMissing() {
         val patientIdParam = PatientIdParameter(invalidOrMissingTypeParam, validUpdateIdParam, validVerifyIdParam)
         assertEquals(emptyId, patientIdParam.value)
-    }
-
-    @Test
-    fun testValidateThrowsErrorThrownByVerifyIdValidation() {
-        val patientIdParam = PatientIdParameter(anyTypeParam, validUpdateIdParam, invalidVerifyIdParam)
-        val throwable = assertThrows<InvalidCalloutError> {
-            patientIdParam.validate()
-        }
-        assertEquals(invalidCalloutError, throwable)
-    }
-
-    @Test
-    fun testValidateThrowsErrorThrownByUpdateIdValidation() {
-        val patientIdParam = PatientIdParameter(anyTypeParam, invalidUpdateIdParam, validVerifyIdParam)
-        val throwable = assertThrows<InvalidCalloutError> {
-            patientIdParam.validate()
-        }
-        assertEquals(invalidCalloutError, throwable)
-    }
-
-    @Test
-    fun testValidateSucceedsWhenUpdateIdAndVerifyIdAreValid() {
-        val patientIdParam = PatientIdParameter(anyTypeParam, validUpdateIdParam, validVerifyIdParam)
-        patientIdParam.validate()
     }
 
 }
