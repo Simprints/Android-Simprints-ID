@@ -40,7 +40,7 @@ class UpdateIdParameterTest {
     }
 
     @Test
-    fun testValidateSucceedsWhenTypeIsUpdateAndIntentContainValidGuidUpdateId() {
+    fun testValidateSucceedsWhenTypeIsUpdateAndIntentContainsValidGuidUpdateId() {
         val updateIdParam = UpdateIdParameter(validGuidUpdateIdIntent, updateTypeParam)
         updateIdParam.validate()
     }
