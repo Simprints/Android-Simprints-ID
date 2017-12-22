@@ -6,6 +6,7 @@ import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.libsimprints.Constants
 
+
 class UserIdParameter(intent: Intent, defaultValue: String = "")
     : CalloutExtraParameter<String>(intent, Constants.SIMPRINTS_USER_ID, defaultValue) {
 
