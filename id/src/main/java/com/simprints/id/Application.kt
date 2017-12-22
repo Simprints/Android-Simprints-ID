@@ -14,7 +14,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.remote.FirebaseRtdbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.model.CalloutType
+import com.simprints.id.domain.calloutValidation.CalloutType
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.network.ApiManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager

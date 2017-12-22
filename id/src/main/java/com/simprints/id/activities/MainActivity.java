@@ -44,7 +44,7 @@ import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.data.model.CalloutType;
+import com.simprints.id.domain.calloutValidation.CalloutType;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.services.sync.SyncClient;
