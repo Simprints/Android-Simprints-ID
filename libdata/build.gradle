@@ -47,6 +47,7 @@ repositories {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':libcommon')
+    implementation project(':libsimprints')
 
     // Kotlin goodness
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
@@ -62,9 +63,6 @@ dependencies {
 
     // Volley
     implementation "com.android.volley:volley:$volley_version"
-
-    // Simprints
-    implementation "com.simprints:LibSimprints:$libsimprints_version"
 
     // Firebase
     implementation "com.google.firebase:firebase-core:$google_version"

@@ -5,14 +5,15 @@ import com.simprints.id.data.model.CalloutType.VERIFY
 import com.simprints.id.data.model.calloutParameter.CalloutParameter
 
 
-class PatientIdParameter(typeParameter: TypeParameter,
+class PatientIdParameter(private val typeParameter: TypeParameter,
                          val updateIdParameter: UpdateIdParameter,
                          val verifyIdParameter: VerifyIdParameter)
     : CalloutParameter<String> {
 
     private val defaultValue: String = ""
 
-    override val value: String =
+    override val value: String
+        get() =
             when (typeParameter.value) {
                 UPDATE -> updateIdParameter.value
                 VERIFY -> verifyIdParameter.value

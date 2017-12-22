@@ -46,6 +46,10 @@ public enum ALERT_TYPE {
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
             false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_VERIFY_GUID),
 
+    INVALID_VERIFY_GUID(R.string.configuration_error_title, R.string.invalid_verifyId_message,
+            R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_VERIFY_GUID),
+
     // TODO: add Unexpected Parameter return code to LibSimprints.
     UNEXPECTED_PARAMETER(R.string.configuration_error_title, R.string.unexpected_parameter_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,

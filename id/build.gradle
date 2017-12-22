@@ -74,6 +74,7 @@ dependencies {
     implementation fileTree(include: ["*.jar"], dir: "libs")
     implementation project(":libdata")
     implementation project(":libcommon")
+    implementation project(":libsimprints")
 
     // Kotlin awesomeness
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
@@ -119,7 +120,6 @@ dependencies {
     // Simprints
     implementation "com.simprints:libscanner:1.3.1"
     implementation "com.simprints:libmatcher:1.3.2"
-    implementation "com.simprints:LibSimprints:$libsimprints_version"
 
     // Test
     // TODO: migrate to JUnit 5. Tried https://github.com/mannodermaus/android-junit5 on 03/12/17 and it did not work out of the box.
