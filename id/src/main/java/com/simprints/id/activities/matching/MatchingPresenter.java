@@ -4,16 +4,16 @@ package com.simprints.id.activities.matching;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.data.DataManager;
+import com.simprints.id.domain.callout.CalloutAction;
 import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.domain.calloutValidation.CalloutType;
-import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Log;
 import com.simprints.libcommon.Person;
@@ -53,9 +53,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
     MatchingPresenter(@NonNull MatchingContract.View matchingView,
                       @NonNull DataManager dataManager,
-                      @NonNull AppState appState,
                       Person probe) {
-        appState.logMatchStart();
         this.dataManager = dataManager;
         this.probe = probe;
 
@@ -65,8 +63,9 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
     @Override
     public void start() {
+        dataManager.setElapsedRealtimeOnMatchStart(SystemClock.elapsedRealtime());
         // TODO : Use polymorphism
-        switch (dataManager.getCalloutType()) {
+        switch (dataManager.getCalloutAction()) {
             case IDENTIFY:
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
@@ -86,7 +85,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 onVerifyStart();
                 break;
             default:
-                dataManager.logError(new InvalidMatchingCalloutError("Invalid calloutType in MatchingActivity"));
+                dataManager.logError(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -217,7 +216,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 break;
             }
             case MATCH_COMPLETED: {
-                CalloutType callout = dataManager.getCalloutType();
+                CalloutAction callout = dataManager.getCalloutAction();
                 switch (callout) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
@@ -44,7 +45,7 @@ import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.domain.calloutValidation.CalloutType;
+import com.simprints.id.domain.callout.CalloutAction;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.services.sync.SyncClient;
@@ -193,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView navView = findViewById(R.id.nav_view);
         navView.setItemIconTintList(null);
 
-        appState.logMainStart();
+        dataManager.setElapsedRealtimeOnMainStart(SystemClock.elapsedRealtime());
 
         handler = new Handler();
 
@@ -335,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements
         //noinspection ConstantConditions
         actionBar.show();
 
-        switch (dataManager.getCalloutType()) {
+        switch (dataManager.getCalloutAction()) {
             case REGISTER:
                 actionBar.setTitle(R.string.register_title);
                 break;
@@ -349,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements
                 actionBar.setTitle(R.string.verify_title);
                 break;
             default:
-                handleUnexpectedError(InvalidCalloutParameterError.Companion.forParameter("Callout"));
+                handleUnexpectedError(InvalidCalloutParameterError.Companion.forParameter("CalloutParameters"));
         }
     }
 
@@ -590,7 +591,7 @@ public class MainActivity extends AppCompatActivity implements
             Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show();
         } else {
             Person person = new Person(dataManager.getPatientId(), fingerprints);
-            if (dataManager.getCalloutType() == CalloutType.REGISTER || dataManager.getCalloutType() == CalloutType.UPDATE) {
+            if (dataManager.getCalloutAction() == CalloutAction.REGISTER || dataManager.getCalloutAction() == CalloutAction.UPDATE) {
                 try {
                     dataManager.savePerson(person);
                 } catch (UninitializedDataManagerError error) {

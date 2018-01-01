@@ -69,6 +69,7 @@ import static com.simprints.libdata.tools.Routes.idUpdateRef;
 import static com.simprints.libdata.tools.Routes.patientNode;
 import static com.simprints.libdata.tools.Routes.projectRef;
 import static com.simprints.libdata.tools.Routes.refusalRef;
+import static com.simprints.libdata.tools.Routes.sessionRef;
 import static com.simprints.libdata.tools.Routes.userNode;
 import static com.simprints.libdata.tools.Routes.userPatientListNode;
 import static com.simprints.libdata.tools.Routes.vfEventRef;
@@ -749,6 +750,15 @@ public class DatabaseContext {
     private void setSync() {
         //projectRef.child(usersNode()).keepSynced(true);
     }
+
+    /**
+     * Save the specified session to the remote database
+     * @return The corresponding asynchronous task
+     */
+    public Task<Void> saveSession(fb_Session session) {
+        return sessionRef(firebaseApp).push().setValue(session);
+    }
+
 
     public void destroy() {
         // Unregister listeners

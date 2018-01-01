@@ -22,15 +22,20 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
-import com.simprints.id.domain.calloutValidation.CalloutType
-import com.simprints.id.domain.calloutValidation.calloutParameters.CalloutParametersFactory
+import com.simprints.id.domain.Location
+import com.simprints.id.domain.callout.CalloutAction
+import com.simprints.id.domain.sessionParameters.SessionParameters
+import com.simprints.id.domain.sessionParameters.extractors.Extractor
+import com.simprints.id.domain.sessionParameters.extractors.ParameterExtractor
+import com.simprints.id.domain.sessionParameters.extractors.SessionParametersExtractor
+import com.simprints.id.domain.sessionParameters.readers.*
+import com.simprints.id.domain.sessionParameters.validators.*
+import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.AppState
 import com.simprints.id.tools.NotificationFactory
-import com.simprints.id.tools.serializers.BooleanSerializer
-import com.simprints.id.tools.serializers.EnumSerializer
-import com.simprints.id.tools.serializers.MapSerializer
-import com.simprints.id.tools.serializers.Serializer
+import com.simprints.id.tools.serializers.*
 import com.simprints.libdata.tools.Constants
+import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
@@ -53,8 +58,8 @@ class Application : MultiDexApplication() {
         EnumSerializer(FingerIdentifier::class.java)
     }
 
-    private val calloutTypeSerializer: Serializer<CalloutType> by lazy {
-        EnumSerializer(CalloutType::class.java)
+    private val calloutActionSerializer: Serializer<CalloutAction> by lazy {
+        EnumSerializer(CalloutAction::class.java)
     }
 
     private val groupSerializer: Serializer<Constants.GROUP> by lazy {
@@ -63,6 +68,10 @@ class Application : MultiDexApplication() {
 
     private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>> by lazy {
         MapSerializer(fingerIdentifierSerializer, booleanSerializer, gson)
+    }
+
+    private val locationSerializer: Serializer<Location> by lazy {
+        LocationSerializer()
     }
 
     private val basePrefs: SharedPreferences by lazy {
@@ -74,7 +83,8 @@ class Application : MultiDexApplication() {
     }
 
     private val preferencesManager: PreferencesManager by lazy {
-        PreferencesManagerImpl(prefs, fingerIdToBooleanSerializer, calloutTypeSerializer, groupSerializer)
+        PreferencesManagerImpl(prefs, fingerIdToBooleanSerializer, calloutActionSerializer,
+            groupSerializer, locationSerializer)
     }
 
     private val localDbManager: LocalDbManager by lazy {
@@ -118,8 +128,135 @@ class Application : MultiDexApplication() {
         factory
     }
 
-    val calloutParametersFactory: CalloutParametersFactory by lazy {
-        CalloutParametersFactory()
+    private val actionReader: Reader<CalloutAction> by lazy {
+        ActionReader()
+    }
+
+    private val actionValidator: Validator<CalloutAction> by lazy {
+        ValueValidator(CalloutAction.validValues, ALERT_TYPE.INVALID_INTENT_ACTION)
+    }
+
+    private val actionExtractor: Extractor<CalloutAction> by lazy {
+        ParameterExtractor(actionReader, actionValidator)
+    }
+
+    private val apiKeyReader: Reader<String> by lazy {
+        MandatoryParameterReader(SIMPRINTS_API_KEY, String::class,
+            ALERT_TYPE.MISSING_API_KEY, ALERT_TYPE.INVALID_API_KEY)
+    }
+
+    private val apiKeyValidator: Validator<String> by lazy {
+        GuidValidator(ALERT_TYPE.INVALID_API_KEY)
+    }
+
+    private val apiKeyExtractor: Extractor<String> by lazy {
+        ParameterExtractor(apiKeyReader, apiKeyValidator)
+    }
+
+    private val moduleIdReader: Reader<String> by lazy {
+        MandatoryParameterReader(SIMPRINTS_MODULE_ID,
+            String::class, ALERT_TYPE.MISSING_MODULE_ID, ALERT_TYPE.INVALID_MODULE_ID)
+    }
+
+    private val moduleIdValidator: Validator<String> by lazy {
+        NoOpValidator<String>()
+    }
+
+    private val moduleIdExtractor: Extractor<String> by lazy {
+        ParameterExtractor(moduleIdReader, moduleIdValidator)
+    }
+
+    private val userIdReader: Reader<String> by lazy {
+        MandatoryParameterReader(SIMPRINTS_USER_ID,
+            String::class, ALERT_TYPE.MISSING_USER_ID, ALERT_TYPE.INVALID_USER_ID)
+    }
+
+    private val userIdValidator: Validator<String> by lazy {
+        NoOpValidator<String>()
+    }
+
+    private val userIdExtractor: Extractor<String> by lazy {
+        ParameterExtractor(userIdReader, userIdValidator)
+    }
+
+    private val verifyIdReader: Reader<String> by lazy {
+        MandatoryParameterReader(SIMPRINTS_VERIFY_GUID,
+            String::class, ALERT_TYPE.MISSING_VERIFY_GUID, ALERT_TYPE.INVALID_VERIFY_GUID)
+    }
+
+    private val updateIdReader: Reader<String> by lazy {
+        MandatoryParameterReader(SIMPRINTS_UPDATE_GUID,
+            String::class, ALERT_TYPE.MISSING_UPDATE_GUID, ALERT_TYPE.INVALID_UPDATE_GUID)
+    }
+
+    private val patientIdReader: Reader<String> by lazy {
+        PatientIdReader(verifyIdReader, updateIdReader)
+    }
+
+    private val patientIdValidator: Validator<String> by lazy {
+        GuidValidator(ALERT_TYPE.INVALID_VERIFY_GUID)
+    }
+
+    private val patientIdExtractor: Extractor<String> by lazy {
+        ParameterExtractor(patientIdReader, patientIdValidator)
+    }
+
+    private val callingPackageReader: Reader<String> by lazy {
+        OptionalParameterReader(SIMPRINTS_CALLING_PACKAGE,
+            "", ALERT_TYPE.INVALID_CALLING_PACKAGE)
+    }
+
+    private val callingPackageValidator: Validator<String> by lazy {
+        NoOpValidator<String>()
+    }
+
+    private val callingPackageExtractor: Extractor<String> by lazy {
+        ParameterExtractor(callingPackageReader, callingPackageValidator)
+    }
+
+    private val metadataReader: Reader<String> by lazy {
+        OptionalParameterReader(SIMPRINTS_METADATA,
+            "", ALERT_TYPE.INVALID_CALLING_PACKAGE)
+    }
+
+    private val metadataValidator: Validator<String> by lazy {
+        MetadataValidator(ALERT_TYPE.INVALID_CALLING_PACKAGE)
+    }
+
+    private val metadataExtractor: Extractor<String> by lazy {
+        ParameterExtractor(metadataReader, metadataValidator)
+    }
+
+    private val resultFormatReader: Reader<String> by lazy {
+        OptionalParameterReader(SIMPRINTS_RESULT_FORMAT, "", ALERT_TYPE.INVALID_RESULT_FORMAT)
+    }
+
+    private val resultFormatValidator: Validator<String> by lazy {
+        val validResultFormats = listOf(SIMPRINTS_ODK_RESULT_FORMAT_V01, "")
+        ValueValidator(validResultFormats, ALERT_TYPE.INVALID_RESULT_FORMAT)
+    }
+
+    private val resultFormatExtractor: Extractor<String> by lazy {
+        ParameterExtractor(resultFormatReader, resultFormatValidator)
+    }
+
+    private val unexpectedParametersReader: Reader<Map<String, Any?>> by lazy {
+        UnexpectedParametersReader()
+    }
+
+    private val unexpectedParametersValidator: Validator<Map<String, Any?>> by lazy {
+        val validUnexpectedParametersValues = listOf(emptyMap<String, Any?>())
+        ValueValidator(validUnexpectedParametersValues, ALERT_TYPE.UNEXPECTED_PARAMETER)
+    }
+
+    private val unexpectedParametersExtractor: Extractor<Map<String, Any?>> by lazy {
+        ParameterExtractor(unexpectedParametersReader, unexpectedParametersValidator)
+    }
+
+    val sessionParametersExtractor: Extractor<SessionParameters> by lazy {
+        SessionParametersExtractor(actionExtractor, apiKeyExtractor, moduleIdExtractor,
+            userIdExtractor, patientIdExtractor, callingPackageExtractor, metadataExtractor,
+            resultFormatExtractor, unexpectedParametersExtractor)
     }
 
     // TODO: These are all the singletons that are used in Simprints ID right now. This is temporary, until we get rid of all these singletons

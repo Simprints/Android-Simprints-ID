@@ -78,6 +78,7 @@ dependencies {
 
     // Kotlin awesomeness
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "org.jetbrains.anko:anko:$anko_version"
 
     // Support libraries
@@ -87,8 +88,9 @@ dependencies {
     implementation "com.android.support:support-v4:$support_version"
 
 
-    // Google play services
+    // Google
     implementation "com.google.android.gms:play-services-location:$google_version"
+    implementation "com.google.guava:guava:23.6-android"
 
     // Databases
     implementation "com.michaelpardo:activeandroid:$active_android_version"
@@ -133,6 +135,7 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-core:2.8.9"
     androidTestImplementation("com.schibsted.spain:barista:1.7.0") {
         exclude group: "com.android.support"
+        exclude group: 'com.google.code.findbugs'
     }
 
     androidTestImplementation "com.simprints:cerberus-library:2017.4.1-dev-4"

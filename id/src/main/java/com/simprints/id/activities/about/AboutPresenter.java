@@ -42,10 +42,11 @@ class AboutPresenter implements AboutContract.Presenter {
 
     @Override
     public void start() {
+        Short hardwareVersion = dataManager.getHardwareVersion();
         aboutView.setVersionData(
                 dataManager.getAppVersionName(),
                 dataManager.getLibVersionName(),
-                appState.getHardwareVersion() > -1 ? String.valueOf(appState.getHardwareVersion()) : "null");
+                hardwareVersion > -1 ? String.valueOf(hardwareVersion) : "null");
 
         try {
             aboutView.setDbCountData(
