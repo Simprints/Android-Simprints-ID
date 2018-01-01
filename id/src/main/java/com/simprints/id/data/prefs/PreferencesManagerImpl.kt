@@ -2,7 +2,8 @@ package com.simprints.id.data.prefs
 
 import android.content.Context
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.domain.calloutValidation.CalloutType
+import com.simprints.id.domain.Location
+import com.simprints.id.domain.callout.CalloutAction
 import com.simprints.id.tools.delegates.ComplexPreference
 import com.simprints.id.tools.delegates.PrimitivePreference
 import com.simprints.id.tools.serializers.Serializer
@@ -12,17 +13,19 @@ import com.simprints.libsimprints.FingerIdentifier
 
 class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                              fingerIdentifierToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                             calloutTypeSerializer: Serializer<CalloutType>,
-                             groupSerializer: Serializer<Constants.GROUP>): PreferencesManager {
+                             calloutActionSerializer: Serializer<CalloutAction>,
+                             groupSerializer: Serializer<Constants.GROUP>,
+                             locationSerializer: Serializer<Location>): PreferencesManager {
 
     companion object {
 
         val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
         val PREF_MODE = Context.MODE_PRIVATE
 
-        // Session state
-        private val CALLOUT_KEY = "CalloutType"
-        private val CALLOUT_DEFAULT = CalloutType.INVALID_OR_MISSING
+        // Main Callout Parameters
+
+        private val CALLOUT_ACTION_KEY = "CalloutAction"
+        private val CALLOUT_ACTION_DEFAULT = CalloutAction.MISSING
 
         private val MODULE_ID_KEY = "ModuleId"
         private val MODULE_ID_DEFAULT = ""
@@ -42,8 +45,40 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private val RESULT_FORMAT_KEY = "ResultFormat"
         private val RESULT_FORMAT_DEFAULT = ""
 
+        private val APP_KEY_KEY = "AppKey"
+        private val APP_KEY_DEFAULT = ""
+
+        // Other session state
+
         private val SESSION_ID_KEY = "SessionId"
         private val SESSION_ID_DEFAULT = ""
+
+        private val MAC_ADDRESS_KEY = "MacAddress"
+        private val MAC_ADDRESS_DEFAULT = ""
+
+        private val HARDWARE_VERSION_KEY = "HardwareVersion"
+        private val HARDWARE_VERSION_DEFAULT: Short = -1
+
+        private val SCANNER_ID_KEY = "ScannerId"
+        private val SCANNER_ID_DEFAULT = ""
+
+        private val LOCATION_KEY = "Location"
+        private val LOCATION_DEFAULT = Location("", "")
+
+        private val ELAPSED_REALTIME_ON_SESSION_START_KEY = "ElapsedRealtimeOnSessionStart"
+        private val ELAPSED_REALTIME_ON_SESSION_START_DEFAULT = 0L
+
+        private val ELAPSED_REALTIME_ON_LOAD_END_KEY = "ElapsedRealtimeOnLoadEnd"
+        private val ELAPSED_REALTIME_ON_LOAD_END_DEFAULT = -1L
+
+        private val ELAPSED_REALTIME_ON_MAIN_START_KEY = "ElapsedRealtimeOnMainStart"
+        private val ELAPSED_REALTIME_ON_MAIN_START_DEFAULT = -1L
+
+        private val ELAPSED_REALTIME_ON_MATCH_START_KEY = "ElapsedRealtimeOnMatchStart"
+        private val ELAPSED_REALTIME_ON_MATCH_START_DEFAULT = -1L
+
+        private val ELAPSED_REALTIME_ON_SESSION_END_KEY = "ElapsedRealtimeOnSessionEnd"
+        private val ELAPSED_REALTIME_ON_SESSION_END_DEFAULT = -1L
 
         // Settings
 
@@ -71,9 +106,6 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private val TIMEOUT_KEY = "TimeoutInt"
         private val TIMEOUT_DEFAULT = 3
 
-        private val APP_KEY_KEY = "AppKey"
-        private val APP_KEY_DEFAULT = ""
-
         private val SYNC_GROUP_KEY = "SyncGroup"
         private val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
 
@@ -95,8 +127,8 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                 .toMap()
     }
 
-    // CalloutType of the current session
-    override var calloutType: CalloutType by ComplexPreference(prefs, CALLOUT_KEY, CALLOUT_DEFAULT, calloutTypeSerializer)
+    // CalloutAction of the current session
+    override var calloutAction: CalloutAction by ComplexPreference(prefs, CALLOUT_ACTION_KEY, CALLOUT_ACTION_DEFAULT, calloutActionSerializer)
 
     // Module ID of the current session
     override var moduleId: String by PrimitivePreference(prefs, MODULE_ID_KEY, MODULE_ID_DEFAULT)
@@ -116,7 +148,45 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Result format of the current session
     override var resultFormat: String by PrimitivePreference(prefs, RESULT_FORMAT_KEY, RESULT_FORMAT_DEFAULT)
 
+    // App Key
+    override var appKey: String by PrimitivePreference(prefs, APP_KEY_KEY, APP_KEY_DEFAULT)
+
+
+    // Unique identifier of the current session
     override var sessionId: String by PrimitivePreference(prefs, SESSION_ID_KEY, SESSION_ID_DEFAULT)
+
+    // Mac address of the scanner used for the current session
+    override var macAddress: String by PrimitivePreference(prefs, MAC_ADDRESS_KEY, MAC_ADDRESS_DEFAULT)
+
+    // Firmware version of the scanner used for the current session
+    override var hardwareVersion: Short by PrimitivePreference(prefs, HARDWARE_VERSION_KEY, HARDWARE_VERSION_DEFAULT)
+
+    // Unique identifier of the scanner used for the current session
+    override var scannerId: String by PrimitivePreference(prefs, SCANNER_ID_KEY, SCANNER_ID_DEFAULT)
+
+    // Last known location
+    override var location: Location by ComplexPreference(prefs, LOCATION_KEY, LOCATION_DEFAULT, locationSerializer)
+
+    // Milliseconds since boot, on current session start, as returned by SystemClock.elapsedRealtime()
+    override var elapsedRealtimeOnSessionStart: Long by PrimitivePreference(prefs,
+        ELAPSED_REALTIME_ON_SESSION_START_KEY, ELAPSED_REALTIME_ON_SESSION_START_DEFAULT)
+
+    // Milliseconds elapsed between current session started, and current session loading ended.
+    override var elapsedRealtimeOnLoadEnd: Long by PrimitivePreference(prefs,
+        ELAPSED_REALTIME_ON_LOAD_END_KEY, ELAPSED_REALTIME_ON_LOAD_END_DEFAULT)
+
+    // Milliseconds elapsed between current session started and main activity started.
+    override var elapsedRealtimeOnMainStart: Long by PrimitivePreference(prefs,
+        ELAPSED_REALTIME_ON_MAIN_START_KEY, ELAPSED_REALTIME_ON_MAIN_START_DEFAULT)
+
+    // Milliseconds elapsed between current session started and matching started.
+    override var elapsedRealtimeOnMatchStart: Long by PrimitivePreference(prefs,
+        ELAPSED_REALTIME_ON_MATCH_START_KEY, ELAPSED_REALTIME_ON_MATCH_START_DEFAULT)
+
+    // Milliseconds elapsed between current session started and it ended.
+    override var elapsedRealtimeOnSessionEnd: Long by PrimitivePreference(prefs,
+        ELAPSED_REALTIME_ON_SESSION_END_KEY, ELAPSED_REALTIME_ON_SESSION_END_DEFAULT)
+
 
     // Should the UI automatically slide forward?
     override var nudgeMode: Boolean by PrimitivePreference(prefs, NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)
@@ -142,9 +212,6 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Timeout seconds
     override var timeoutS: Int by PrimitivePreference(prefs, TIMEOUT_KEY, TIMEOUT_DEFAULT)
 
-    // App Key
-    override var appKey: String by PrimitivePreference(prefs, APP_KEY_KEY, APP_KEY_DEFAULT)
-
     // Sync group. Default is user
     override var syncGroup: Constants.GROUP by ComplexPreference(prefs, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
 
@@ -163,4 +230,24 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var fingerStatus: Map<FingerIdentifier, Boolean>
             by ComplexPreference(prefs, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdentifierToBooleanSerializer)
 
+    override fun initializeSessionState(sessionId: String, elapsedRealtimeOnSessionStart: Long) {
+        calloutAction = CALLOUT_ACTION_DEFAULT
+        moduleId = MODULE_ID_DEFAULT
+        userId = USER_ID_DEFAULT
+        patientId = PATIENT_ID_DEFAULT
+        callingPackage = CALLING_PACKAGE_DEFAULT
+        metadata = METADATA_DEFAULT
+        resultFormat = RESULT_FORMAT_DEFAULT
+        appKey = APP_KEY_DEFAULT
+        this.sessionId = sessionId
+        macAddress = MAC_ADDRESS_DEFAULT
+        hardwareVersion = HARDWARE_VERSION_DEFAULT
+        scannerId = SCANNER_ID_DEFAULT
+        location = LOCATION_DEFAULT
+        this.elapsedRealtimeOnSessionStart = elapsedRealtimeOnSessionStart
+        elapsedRealtimeOnLoadEnd = elapsedRealtimeOnSessionStart - 1
+        elapsedRealtimeOnMainStart = elapsedRealtimeOnSessionStart - 1
+        elapsedRealtimeOnMatchStart = elapsedRealtimeOnSessionStart - 1
+        elapsedRealtimeOnSessionEnd = elapsedRealtimeOnSessionStart - 1
+    }
 }

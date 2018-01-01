@@ -1,5 +1,8 @@
 package com.simprints.id.data.db.remote
 
+import com.google.android.gms.tasks.Tasks
+import com.simprints.id.data.db.remote.adapters.toFirebaseSession
+import com.simprints.id.data.models.Session
 import com.simprints.libdata.AuthListener
 import com.simprints.libdata.ConnectionListener
 import com.simprints.libdata.DatabaseContext
@@ -26,4 +29,10 @@ class FirebaseRtdbManager: RemoteDbManager {
         // hence why we are not checking its return value
         DatabaseContext.updateIdentification(apiKey, selectedGuid, deviceId, sessionId)
     }
+
+    override fun saveSession(dbContext: DatabaseContext, session: Session) {
+        val task = dbContext.saveSession(session.toFirebaseSession())
+        Tasks.await(task)
+    }
+
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/launchLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/simprints_blue"
@@ -16,7 +17,7 @@
         android:src="@drawable/launch_background" />
 
     <TextView
-        android:id="@+id/tv_consent_text"
+        android:id="@+id/consentTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="4"
@@ -29,7 +30,7 @@
         android:textSize="20sp" />
 
     <TextView
-        android:id="@+id/confirm_consent_text_view"
+        android:id="@+id/confirmConsentTextView"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_gravity="center_horizontal"
@@ -41,16 +42,17 @@
         android:visibility="invisible" />
 
     <TextView
-        android:id="@+id/tv_loadingInfo"
+        android:id="@+id/loadingInfoTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:gravity="center"
         android:text="@string/loading"
-        android:textColor="@color/simprints_white" />
+        android:textColor="@color/simprints_white"
+        android:visibility="visible" />
 
     <ProgressBar
-        android:id="@+id/pb_launch_progress"
+        android:id="@+id/launchProgressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
