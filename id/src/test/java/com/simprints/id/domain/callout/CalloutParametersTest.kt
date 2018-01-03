@@ -2,7 +2,6 @@ package com.simprints.id.domain.callout
 
 import android.content.Intent
 import com.simprints.id.domain.callout.CalloutParameters.Companion.calloutParameters
-import com.simprints.id.domain.sessionParameters.calloutParameter.mockIntent
 import com.simprints.id.exceptions.unsafe.MissingCalloutParameterError
 import com.simprints.id.testUtils.assertThrows
 import org.junit.Assert.*

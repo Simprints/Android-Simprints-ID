@@ -1,4 +1,4 @@
-package com.simprints.id.domain.sessionParameters.calloutParameter
+package com.simprints.id.domain.callout
 
 import android.content.Intent
 import android.os.Bundle

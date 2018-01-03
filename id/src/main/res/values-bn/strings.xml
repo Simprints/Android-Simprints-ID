@@ -111,7 +111,7 @@
     <!-- Error Message Text -->
     <string name="missing_apikey_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ API Key), আপনার সিস্টেম অ্যাডমিনস্ট্রেটরের সঙ্গে যোগাযোগ করুন</string>
     <string name="invalid_apikey_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ API Key), আপনার সিস্টেম অ্যাডমিনস্ট্রেটরের সঙ্গে যোগাযোগ করুন</string>
-    <string name="invalid_intentAction_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid intent action)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
+    <string name="invalid_intentAction_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid intent registerAction)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
     <string name="invalid_metadata_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid metadata)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
     <string name="missing_userId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (ইউজার আইডি নই)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
     <string name="missing_moduleId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (no module ID)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>

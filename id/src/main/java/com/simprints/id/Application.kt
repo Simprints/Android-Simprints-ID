@@ -24,12 +24,17 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.domain.Location
 import com.simprints.id.domain.callout.CalloutAction
+import com.simprints.id.domain.callout.CalloutParameter
 import com.simprints.id.domain.sessionParameters.SessionParameters
 import com.simprints.id.domain.sessionParameters.extractors.Extractor
 import com.simprints.id.domain.sessionParameters.extractors.ParameterExtractor
 import com.simprints.id.domain.sessionParameters.extractors.SessionParametersExtractor
 import com.simprints.id.domain.sessionParameters.readers.*
+import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.ExpectedParametersLister
+import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.ExpectedParametersListerImpl
+import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.UnexpectedParametersReader
 import com.simprints.id.domain.sessionParameters.validators.*
+import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.AppState
 import com.simprints.id.tools.NotificationFactory
@@ -39,6 +44,7 @@ import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
+import java.util.*
 import android.app.Application as AndroidApplication
 
 
@@ -132,30 +138,50 @@ class Application : MultiDexApplication() {
         ActionReader()
     }
 
+    private val invalidActionError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_INTENT_ACTION)
+    }
+
     private val actionValidator: Validator<CalloutAction> by lazy {
-        ValueValidator(CalloutAction.validValues, ALERT_TYPE.INVALID_INTENT_ACTION)
+        ValueValidator(CalloutAction.validValues, invalidActionError)
     }
 
     private val actionExtractor: Extractor<CalloutAction> by lazy {
         ParameterExtractor(actionReader, actionValidator)
     }
 
+    private val invalidApiKeyError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_API_KEY)
+    }
+
+    private val missingApiKeyError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.MISSING_API_KEY)
+    }
+
     private val apiKeyReader: Reader<String> by lazy {
         MandatoryParameterReader(SIMPRINTS_API_KEY, String::class,
-            ALERT_TYPE.MISSING_API_KEY, ALERT_TYPE.INVALID_API_KEY)
+            missingApiKeyError, invalidApiKeyError)
     }
 
     private val apiKeyValidator: Validator<String> by lazy {
-        GuidValidator(ALERT_TYPE.INVALID_API_KEY)
+        GuidValidator(invalidApiKeyError)
     }
 
     private val apiKeyExtractor: Extractor<String> by lazy {
         ParameterExtractor(apiKeyReader, apiKeyValidator)
     }
 
+    private val invalidModuleIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_MODULE_ID)
+    }
+
+    private val missingModuleIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.MISSING_MODULE_ID)
+    }
+
     private val moduleIdReader: Reader<String> by lazy {
-        MandatoryParameterReader(SIMPRINTS_MODULE_ID,
-            String::class, ALERT_TYPE.MISSING_MODULE_ID, ALERT_TYPE.INVALID_MODULE_ID)
+        MandatoryParameterReader(SIMPRINTS_MODULE_ID, String::class,
+            missingModuleIdError, invalidModuleIdError)
     }
 
     private val moduleIdValidator: Validator<String> by lazy {
@@ -166,9 +192,17 @@ class Application : MultiDexApplication() {
         ParameterExtractor(moduleIdReader, moduleIdValidator)
     }
 
+    private val invalidUserIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_USER_ID)
+    }
+
+    private val missingUserIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.MISSING_USER_ID)
+    }
+
     private val userIdReader: Reader<String> by lazy {
-        MandatoryParameterReader(SIMPRINTS_USER_ID,
-            String::class, ALERT_TYPE.MISSING_USER_ID, ALERT_TYPE.INVALID_USER_ID)
+        MandatoryParameterReader(SIMPRINTS_USER_ID, String::class,
+            missingUserIdError, invalidUserIdError)
     }
 
     private val userIdValidator: Validator<String> by lazy {
@@ -179,31 +213,54 @@ class Application : MultiDexApplication() {
         ParameterExtractor(userIdReader, userIdValidator)
     }
 
+    private val missingVerifyIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.MISSING_VERIFY_GUID)
+    }
+
     private val verifyIdReader: Reader<String> by lazy {
-        MandatoryParameterReader(SIMPRINTS_VERIFY_GUID,
-            String::class, ALERT_TYPE.MISSING_VERIFY_GUID, ALERT_TYPE.INVALID_VERIFY_GUID)
+        MandatoryParameterReader(SIMPRINTS_VERIFY_GUID, String::class,
+            missingVerifyIdError, invalidPatientIdError)
+    }
+
+    private val invalidPatientIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_GUID)
+    }
+
+    private val missingUpdateIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.MISSING_UPDATE_GUID)
     }
 
     private val updateIdReader: Reader<String> by lazy {
-        MandatoryParameterReader(SIMPRINTS_UPDATE_GUID,
-            String::class, ALERT_TYPE.MISSING_UPDATE_GUID, ALERT_TYPE.INVALID_UPDATE_GUID)
+        MandatoryParameterReader(SIMPRINTS_UPDATE_GUID, String::class,
+            missingUpdateIdError, invalidPatientIdError)
+    }
+
+    private val guidGenerator: Reader<String> by lazy {
+        GeneratorReader({ UUID.randomUUID().toString() })
     }
 
     private val patientIdReader: Reader<String> by lazy {
-        PatientIdReader(verifyIdReader, updateIdReader)
+        val patientIdSwitch = mapOf(
+            CalloutAction.UPDATE to updateIdReader,
+            CalloutAction.VERIFY to verifyIdReader,
+            CalloutAction.REGISTER to guidGenerator)
+        ActionDependentReader(patientIdSwitch, "")
     }
 
     private val patientIdValidator: Validator<String> by lazy {
-        GuidValidator(ALERT_TYPE.INVALID_VERIFY_GUID)
+        GuidValidator(invalidPatientIdError)
     }
 
     private val patientIdExtractor: Extractor<String> by lazy {
         ParameterExtractor(patientIdReader, patientIdValidator)
     }
 
+    private val invalidCallingPackageError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_CALLING_PACKAGE)
+    }
+
     private val callingPackageReader: Reader<String> by lazy {
-        OptionalParameterReader(SIMPRINTS_CALLING_PACKAGE,
-            "", ALERT_TYPE.INVALID_CALLING_PACKAGE)
+        OptionalParameterReader(SIMPRINTS_CALLING_PACKAGE,"", invalidCallingPackageError)
     }
 
     private val callingPackageValidator: Validator<String> by lazy {
@@ -215,41 +272,56 @@ class Application : MultiDexApplication() {
     }
 
     private val metadataReader: Reader<String> by lazy {
-        OptionalParameterReader(SIMPRINTS_METADATA,
-            "", ALERT_TYPE.INVALID_CALLING_PACKAGE)
+        OptionalParameterReader(SIMPRINTS_METADATA,"", invalidCallingPackageError)
+    }
+
+    private val invalidMetadataError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_METADATA)
     }
 
     private val metadataValidator: Validator<String> by lazy {
-        MetadataValidator(ALERT_TYPE.INVALID_CALLING_PACKAGE)
+        MetadataValidator(invalidMetadataError, gson)
     }
 
     private val metadataExtractor: Extractor<String> by lazy {
         ParameterExtractor(metadataReader, metadataValidator)
     }
 
+    private val invalidResultFormatError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_RESULT_FORMAT)
+    }
+
     private val resultFormatReader: Reader<String> by lazy {
-        OptionalParameterReader(SIMPRINTS_RESULT_FORMAT, "", ALERT_TYPE.INVALID_RESULT_FORMAT)
+        OptionalParameterReader(SIMPRINTS_RESULT_FORMAT, "", invalidResultFormatError)
     }
 
     private val resultFormatValidator: Validator<String> by lazy {
         val validResultFormats = listOf(SIMPRINTS_ODK_RESULT_FORMAT_V01, "")
-        ValueValidator(validResultFormats, ALERT_TYPE.INVALID_RESULT_FORMAT)
+        ValueValidator(validResultFormats, invalidResultFormatError)
     }
 
     private val resultFormatExtractor: Extractor<String> by lazy {
         ParameterExtractor(resultFormatReader, resultFormatValidator)
     }
 
-    private val unexpectedParametersReader: Reader<Map<String, Any?>> by lazy {
-        UnexpectedParametersReader()
+    private val expectedParametersLister: ExpectedParametersLister by lazy {
+        ExpectedParametersListerImpl()
     }
 
-    private val unexpectedParametersValidator: Validator<Map<String, Any?>> by lazy {
-        val validUnexpectedParametersValues = listOf(emptyMap<String, Any?>())
-        ValueValidator(validUnexpectedParametersValues, ALERT_TYPE.UNEXPECTED_PARAMETER)
+    private val unexpectedParametersReader: Reader<Set<CalloutParameter>> by lazy {
+        UnexpectedParametersReader(expectedParametersLister)
     }
 
-    private val unexpectedParametersExtractor: Extractor<Map<String, Any?>> by lazy {
+    private val invalidUnexpectedParametersError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.UNEXPECTED_PARAMETER)
+    }
+
+    private val unexpectedParametersValidator: Validator<Set<CalloutParameter>> by lazy {
+        val validUnexpectedParametersValues = listOf(emptySet<CalloutParameter>())
+        ValueValidator(validUnexpectedParametersValues, invalidUnexpectedParametersError)
+    }
+
+    private val unexpectedParametersExtractor: Extractor<Set<CalloutParameter>> by lazy {
         ParameterExtractor(unexpectedParametersReader, unexpectedParametersValidator)
     }
 
