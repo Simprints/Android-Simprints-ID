@@ -3,17 +3,15 @@ package com.simprints.id.domain.sessionParameters.readers
 import com.simprints.id.domain.callout.Callout
 import com.simprints.id.domain.callout.CalloutParameter
 import com.simprints.id.domain.callout.CalloutParameters
-import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterTypeError
 import com.simprints.id.exceptions.unsafe.MissingCalloutParameterError
-import com.simprints.id.model.ALERT_TYPE
 import kotlin.reflect.KClass
 
 
 class MandatoryParameterReader<out T: Any>(private val key: String,
                                            private val kClass: KClass<T>,
-                                           private val alertWhenMissing: ALERT_TYPE,
-                                           private val alertWhenInvalidType: ALERT_TYPE): Reader<T> {
+                                           private val errorWhenMissing: Error,
+                                           private val errorWhenInvalidType: Error): Reader<T> {
 
     override fun readFrom(callout: Callout): T =
         callout.parameters
@@ -24,14 +22,14 @@ class MandatoryParameterReader<out T: Any>(private val key: String,
         try {
             get(key)
         } catch (error: MissingCalloutParameterError) {
-            throw InvalidCalloutError(alertWhenMissing)
+            throw errorWhenMissing
         }
 
     private fun CalloutParameter.tryCast() =
         try {
             castAs(kClass)
         } catch (error: InvalidCalloutParameterTypeError) {
-            throw InvalidCalloutError(alertWhenInvalidType)
+            throw errorWhenInvalidType
         }
 
 }

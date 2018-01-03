@@ -1,18 +1,17 @@
 package com.simprints.id.domain.sessionParameters.validators
 
-import com.simprints.id.exceptions.unsafe.InvalidCalloutError
-import com.simprints.id.model.ALERT_TYPE
-import com.simprints.libsimprints.Metadata
+import com.google.gson.Gson
 
 
-class MetadataValidator(private val alertWhenInvalid: ALERT_TYPE) : Validator<String>{
+class MetadataValidator(private val errorWhenInvalid: Error,
+                        private val gson: Gson) : Validator<String>{
 
     override fun validate(value: String) {
         if (value.isNotEmpty()) {
             try {
-                Metadata(value)
-            } catch (e: Metadata.InvalidMetadataException) {
-                throw InvalidCalloutError(alertWhenInvalid)
+                gson.fromJson(value, Any::class.java)
+            } catch (ex: com.google.gson.JsonSyntaxException) {
+                throw errorWhenInvalid
             }
         }
     }

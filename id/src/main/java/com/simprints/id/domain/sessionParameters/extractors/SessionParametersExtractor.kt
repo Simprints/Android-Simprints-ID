@@ -2,6 +2,7 @@ package com.simprints.id.domain.sessionParameters.extractors
 
 import com.simprints.id.domain.callout.Callout
 import com.simprints.id.domain.callout.CalloutAction
+import com.simprints.id.domain.callout.CalloutParameter
 import com.simprints.id.domain.sessionParameters.SessionParameters
 
 
@@ -13,8 +14,7 @@ class SessionParametersExtractor(private val actionExtractor: Extractor<CalloutA
                                  private val callingPackageExtractor: Extractor<String>,
                                  private val metadataExtractor: Extractor<String>,
                                  private val resultFormatExtractor: Extractor<String>,
-                                 private val unexpectedParametersExtractor: Extractor<Map<String, Any?>>
-                                 )
+                                 private val unexpectedParametersExtractor: Extractor<Set<CalloutParameter>>)
     : Extractor<SessionParameters> {
 
     override fun extractFrom(callout: Callout): SessionParameters {

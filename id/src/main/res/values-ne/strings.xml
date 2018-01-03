@@ -129,7 +129,7 @@
     <!-- Error Message Text -->
     <string name="missing_apikey_message">API Key मिलेन | कृपया सिस्टम प्रशासकलाइ खबर गर्नुहोस |</string>
     <string name="invalid_apikey_message">API Key मिलेन | कृपया सिस्टम प्रशासकलाइ खबर गर्नुहोस |</string>
-    <string name="invalid_intentAction_message">कन्फिगरेसन त्रुटि फेला परेको छ (invalid intent action), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
+    <string name="invalid_intentAction_message">कन्फिगरेसन त्रुटि फेला परेको छ (invalid intent registerAction), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="invalid_metadata_message">कन्फिगरेसन त्रुटि फेला परेको छ (invalid metadata), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="missing_userId_message">कन्फिगरेसन त्रुटि फेला परेको छ (कुनै प्रयोगकर्ता आइडी छैन), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="missing_moduleId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no module ID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
