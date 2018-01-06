@@ -159,7 +159,8 @@
     <string name="invalid_moduleId_message">A configuration error has occurred (invalid module ID), please contact your system administrator</string>
     <string name="missing_updateId_message">A configuration error has occurred (no update GUID), please contact your system administrator</string>
     <string name="missing_verifyId_message">A configuration error has occurred (no verify GUID), please contact your system administrator</string>
-    <string name="invalid_guid_message">A configuration error has occurred (invalid GUID), please contact your system administrator</string>
+    <string name="invalid_updateId_message">A configuration error has occurred (invalid update GUID), please contact your system administrator</string>
+    <string name="invalid_verifyId_message">A configuration error has occurred (invalid verify GUID), please contact your system administrator</string>
     <string name="invalid_resultFormat_message">A configuration error has occurred (invalid result format), please contact your system administrator</string>
     <string name="invalid_callingPackage_message">A configuration error has occurred (invalid result format), please contact your system administrator</string>
     <string name="verify_guid_not_found_online_message">The person selected for verification is not in the database</string>
