@@ -26,6 +26,7 @@ import com.simprints.id.domain.Location
 import com.simprints.id.domain.callout.CalloutAction
 import com.simprints.id.domain.callout.CalloutParameter
 import com.simprints.id.domain.sessionParameters.SessionParameters
+import com.simprints.id.domain.sessionParameters.extractors.ActionDependentExtractor
 import com.simprints.id.domain.sessionParameters.extractors.Extractor
 import com.simprints.id.domain.sessionParameters.extractors.ParameterExtractor
 import com.simprints.id.domain.sessionParameters.extractors.SessionParametersExtractor
@@ -217,42 +218,55 @@ class Application : MultiDexApplication() {
         InvalidCalloutError(ALERT_TYPE.MISSING_VERIFY_GUID)
     }
 
-    private val verifyIdReader: Reader<String> by lazy {
-        MandatoryParameterReader(SIMPRINTS_VERIFY_GUID, String::class,
-            missingVerifyIdError, invalidPatientIdError)
+    private val invalidVerifyIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_VERIFY_GUID)
     }
 
-    private val invalidPatientIdError: Error by lazy {
-        InvalidCalloutError(ALERT_TYPE.INVALID_GUID)
+    private val verifyIdReader: Reader<String> by lazy {
+        MandatoryParameterReader(SIMPRINTS_VERIFY_GUID, String::class,
+            missingVerifyIdError, invalidVerifyIdError)
+    }
+
+    private val verifyIdValidator: Validator<String> by lazy {
+        GuidValidator(invalidVerifyIdError)
+    }
+
+    private val verifyIdExtractor: Extractor<String> by lazy {
+        ParameterExtractor(verifyIdReader, verifyIdValidator)
     }
 
     private val missingUpdateIdError: Error by lazy {
         InvalidCalloutError(ALERT_TYPE.MISSING_UPDATE_GUID)
     }
 
+    private val invalidUpdateIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_UPDATE_GUID)
+    }
+
     private val updateIdReader: Reader<String> by lazy {
         MandatoryParameterReader(SIMPRINTS_UPDATE_GUID, String::class,
-            missingUpdateIdError, invalidPatientIdError)
+            missingUpdateIdError, invalidUpdateIdError)
     }
 
-    private val guidGenerator: Reader<String> by lazy {
-        GeneratorReader({ UUID.randomUUID().toString() })
+    private val updateIdValidator: Validator<String> by lazy {
+        GuidValidator(invalidVerifyIdError)
     }
 
-    private val patientIdReader: Reader<String> by lazy {
-        val patientIdSwitch = mapOf(
-            CalloutAction.UPDATE to updateIdReader,
-            CalloutAction.VERIFY to verifyIdReader,
-            CalloutAction.REGISTER to guidGenerator)
-        ActionDependentReader(patientIdSwitch, "")
+    private val updateIdExtractor: Extractor<String> by lazy {
+        ParameterExtractor(updateIdReader, updateIdValidator)
     }
 
-    private val patientIdValidator: Validator<String> by lazy {
-        GuidValidator(invalidPatientIdError)
+    private val guidGenerator: Extractor<String> by lazy {
+        ParameterExtractor(GeneratorReader({ UUID.randomUUID().toString() }),
+            NoOpValidator())
     }
 
     private val patientIdExtractor: Extractor<String> by lazy {
-        ParameterExtractor(patientIdReader, patientIdValidator)
+        val patientIdSwitch = mapOf(
+            CalloutAction.UPDATE to updateIdExtractor,
+            CalloutAction.VERIFY to verifyIdExtractor,
+            CalloutAction.REGISTER to guidGenerator)
+        ActionDependentExtractor(patientIdSwitch, "")
     }
 
     private val invalidCallingPackageError: Error by lazy {
