@@ -115,6 +115,8 @@ private fun testMainActivityScanFinger() {
 
 private fun testEnrolmentReturnedResult(enrolTestRule: ActivityTestRule<LaunchActivity>): String {
     log("testEnrolmentReturnedResult")
+    WaitingUtils.waitOnUiForActivityToSettle()
+
     val registration = enrolTestRule.activityResult
             .resultData.getParcelableExtra<Registration>(Constants.SIMPRINTS_REGISTRATION)
     val guid = registration.guid
@@ -143,6 +145,7 @@ private fun testEnrolmentReceivedOnline(apiKey: String, guid: String) {
 private fun testGuidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTestRule<LaunchActivity>, guid: String) {
     log("testGuidIsTheOnlyReturnedIdentification")
     WaitingUtils.waitOnUiForMatchingToComplete()
+    WaitingUtils.waitOnUiForActivityToSettle()
 
     val identifications = identifyTestRule.activityResult
             .resultData.getParcelableArrayListExtra<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS)
@@ -156,6 +159,8 @@ private fun testGuidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTe
 
 private fun testVerificationSuccessful(verifyTestRule: ActivityTestRule<LaunchActivity>, guid: String) {
     log("testVerificationSuccessful")
+    WaitingUtils.waitOnUiForActivityToSettle()
+
     val verification = verifyTestRule.activityResult
             .resultData.getParcelableExtra<Verification>(Constants.SIMPRINTS_VERIFICATION)
     Assert.assertEquals(guid, verification.guid)
