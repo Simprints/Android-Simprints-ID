@@ -39,7 +39,6 @@ import java.util.*
 @SuppressLint("HardwareIds")
 class LaunchActivity : AppCompatActivity() {
 
-
     // Scanner button callback
     private val scannerButton = ButtonListener {
         if (!launchOutOfFocus) {
