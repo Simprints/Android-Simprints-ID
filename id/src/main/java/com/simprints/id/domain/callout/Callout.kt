@@ -7,7 +7,6 @@ import com.simprints.id.domain.callout.CalloutParameters.Companion.calloutParame
 class Callout(val action: CalloutAction, val parameters: CalloutParameters) {
 
     companion object {
-        @JvmStatic
         fun Intent?.toCallout(): Callout =
             Callout(this.calloutAction, this.calloutParameters)
     }
