@@ -7,7 +7,7 @@ import android.support.test.InstrumentationRegistry
 import android.support.test.rule.ActivityTestRule
 import android.view.WindowManager
 import com.schibsted.spain.barista.permission.PermissionGranter
-import com.simprints.id.activities.LaunchActivity
+import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.libsimprints.Constants
 import java.util.*
 

@@ -19,7 +19,6 @@ import com.simprints.id.activities.IntentKeys;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.libcommon.Person;
 
@@ -44,8 +43,6 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
 
         Application app = ((Application) getApplication());
         DataManager dataManager = app.getDataManager();
-        AppState appState = app.getAppState();
-        appState.logMatchStart();
 
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_matching);
@@ -70,7 +67,6 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         matchingPresenter = new MatchingPresenter(
                 this,
                 dataManager,
-                appState,
                 probe
         );
     }

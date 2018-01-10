@@ -9,7 +9,7 @@ import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
-import com.simprints.id.activities.LaunchActivity
+import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.tools.*
 import com.simprints.id.tools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
@@ -86,7 +86,7 @@ private fun testSetupActivityAndContinue() {
 
 private fun testSetupActivity() {
     log("testSetupActivity")
-    onView(withId(R.id.tv_consent_text))
+    onView(withId(R.id.consentTextView))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.short_consent)))
 
@@ -95,7 +95,7 @@ private fun testSetupActivity() {
 
 private fun testSetupActivityContinue() {
     log("testSetupActivityContinue")
-    onView(withId(R.id.confirm_consent_text_view))
+    onView(withId(R.id.confirmConsentTextView))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.confirm_consent)))
             .perform(click())
@@ -115,6 +115,8 @@ private fun testMainActivityScanFinger() {
 
 private fun testEnrolmentReturnedResult(enrolTestRule: ActivityTestRule<LaunchActivity>): String {
     log("testEnrolmentReturnedResult")
+    WaitingUtils.waitOnUiForActivityToSettle()
+
     val registration = enrolTestRule.activityResult
             .resultData.getParcelableExtra<Registration>(Constants.SIMPRINTS_REGISTRATION)
     val guid = registration.guid
@@ -143,6 +145,7 @@ private fun testEnrolmentReceivedOnline(apiKey: String, guid: String) {
 private fun testGuidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTestRule<LaunchActivity>, guid: String) {
     log("testGuidIsTheOnlyReturnedIdentification")
     WaitingUtils.waitOnUiForMatchingToComplete()
+    WaitingUtils.waitOnUiForActivityToSettle()
 
     val identifications = identifyTestRule.activityResult
             .resultData.getParcelableArrayListExtra<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS)
@@ -156,6 +159,8 @@ private fun testGuidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTe
 
 private fun testVerificationSuccessful(verifyTestRule: ActivityTestRule<LaunchActivity>, guid: String) {
     log("testVerificationSuccessful")
+    WaitingUtils.waitOnUiForActivityToSettle()
+
     val verification = verifyTestRule.activityResult
             .resultData.getParcelableExtra<Verification>(Constants.SIMPRINTS_VERIFICATION)
     Assert.assertEquals(guid, verification.guid)

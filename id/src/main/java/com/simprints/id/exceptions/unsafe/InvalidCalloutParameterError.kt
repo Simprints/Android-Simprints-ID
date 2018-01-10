@@ -7,7 +7,7 @@ class InvalidCalloutParameterError(message: String = "InvalidCalloutParameterErr
     companion object {
 
         fun forParameter(parameterName: String) =
-                InvalidCalloutParameterError("Callout parameter $parameterName is invalid")
+                InvalidCalloutParameterError("CalloutParameters parameter $parameterName is invalid")
 
     }
 
