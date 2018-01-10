@@ -13,7 +13,7 @@ import com.simprints.id.exceptions.unsafe.NullScannerError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.domain.calloutValidation.CalloutType;
+import com.simprints.id.domain.callout.CalloutAction;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
@@ -95,7 +95,7 @@ public class Setup {
             return;
         }
 
-        // Step 2: initialize database context + port db from aa to realm if needed . Only has to be done once.
+        // Step 2: extractFrom database context + port db from aa to realm if needed . Only has to be done once.
         if (!dataManager.isInitialized()) {
             this.initDbContext(activity);
             return;
@@ -110,7 +110,7 @@ public class Setup {
             return;
         }
 
-        // Step 4: initialize scanner object.
+        // Step 4: extractFrom scanner object.
         if (appState.getScanner() == null) {
             this.initScanner(activity);
             return;
@@ -231,7 +231,7 @@ public class Setup {
             return;
         }
         String macAddress = pairedScanners.get(0);
-        appState.setMacAddress(macAddress);
+        dataManager.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
 
         Timber.d("Setup: Scanner initialized.");
@@ -248,8 +248,8 @@ public class Setup {
                 if (appState != null && appState.getScanner() != null) {
                     Timber.d("Setup: Connected to Vero.");
                     uiResetSinceConnection = false;
-                    appState.setScannerId(appState.getScanner().getScannerId());
-                    dataManager.logScannerProperties(appState.getMacAddress(), appState.getScannerId());
+                    dataManager.setScannerId(appState.getScanner().getScannerId());
+                    dataManager.logScannerProperties();
                     goOn(activity);
                 } else {
                     dataManager.logError(new NullScannerError("Null values in onSuccess Setup.connectToScanner()"));
@@ -287,7 +287,7 @@ public class Setup {
 
     // STEP 6
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
-        if (dataManager.getCalloutType() != CalloutType.VERIFY) {
+        if (dataManager.getCalloutAction() != CalloutAction.VERIFY) {
             guidExists = true;
             goOn(activity);
             return;
@@ -381,7 +381,7 @@ public class Setup {
             public void onSuccess() {
                 if (appState != null && appState.getScanner() != null) {
                     Timber.d("Setup: UN20 ready.");
-                    appState.setHardwareVersion(appState.getScanner().getUcVersion());
+                    dataManager.setHardwareVersion(appState.getScanner().getUcVersion());
                     Setup.this.onSuccess();
                 } else {
                     dataManager.logError(new NullScannerError("Null values in onSuccess Setup.wakeUpUn20()"));

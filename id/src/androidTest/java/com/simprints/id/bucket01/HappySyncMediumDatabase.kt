@@ -4,7 +4,7 @@ import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import com.simprints.id.activities.LaunchActivity
+import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.templates.FirstUseTest
 import com.simprints.id.testHappySync
 import com.simprints.id.tools.CalloutCredentials

@@ -1,6 +1,7 @@
 package com.simprints.id.testUtils
 
 import junit.framework.AssertionFailedError
+import org.junit.Assert.assertEquals
 import org.mockito.Mockito
 import org.mockito.stubbing.OngoingStubbing
 
@@ -39,3 +40,8 @@ inline fun <reified T: Throwable> assertThrows(executable: () -> Unit): T {
     throw AssertionFailedError("Expected an ${T::class.java.simpleName} to be thrown")
 }
 
+inline fun <reified T: Throwable> assertThrows(throwable: T, executable: () -> Unit): T {
+    val thrown = assertThrows<T>(executable)
+    assertEquals(throwable, thrown)
+    return thrown
+}
