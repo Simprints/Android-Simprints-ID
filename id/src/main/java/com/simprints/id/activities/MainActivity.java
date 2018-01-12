@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView navView = findViewById(R.id.nav_view);
         navView.setItemIconTintList(null);
 
-        dataManager.setElapsedRealtimeOnMainStart(timeHelper.millisecondsSinceBoot());
+        dataManager.setMsSinceBootOnMainStart(timeHelper.msSinceBoot());
 
         handler = new Handler();
 
