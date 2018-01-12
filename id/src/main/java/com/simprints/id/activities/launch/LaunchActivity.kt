@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.SystemClock
 import android.support.v7.app.AppCompatActivity
 import android.view.MotionEvent
 import android.view.View
@@ -60,6 +59,7 @@ class LaunchActivity : AppCompatActivity() {
     private lateinit var positionTracker: PositionTracker
     private lateinit var appState: AppState
     private lateinit var setup: Setup
+    private val timeHelper by lazy { app.timeHelper }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,7 +93,7 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private fun initSession() {
-        dataManager.initializeSessionState(newSessionId(), SystemClock.elapsedRealtime())
+        dataManager.initializeSessionState(newSessionId(), timeHelper.millisecondsSinceBoot())
     }
 
     private fun newSessionId(): String {
@@ -128,7 +128,7 @@ class LaunchActivity : AppCompatActivity() {
     private fun getSetupCallback() : SetupCallback =
         object : SetupCallback {
             override fun onSuccess() {
-                dataManager.elapsedRealtimeOnLoadEnd = SystemClock.elapsedRealtime()
+                dataManager.elapsedRealtimeOnLoadEnd = timeHelper.millisecondsSinceBoot()
                 // If it is the first time the launch process finishes, wait for consent confirmation
                 // Else, go directly to the main activity
                 if (!consentConfirmed) {
@@ -223,7 +223,7 @@ class LaunchActivity : AppCompatActivity() {
     private fun finishWith(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
         setResult(resultCode, resultData)
-        dataManager.elapsedRealtimeOnSessionEnd = SystemClock.elapsedRealtime()
+        dataManager.elapsedRealtimeOnSessionEnd = timeHelper.millisecondsSinceBoot()
         async(UI) {
             bg { dataManager.saveSession() }.await()
             finish()

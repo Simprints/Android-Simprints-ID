@@ -67,6 +67,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         matchingPresenter = new MatchingPresenter(
                 this,
                 dataManager,
+                app.getTimeHelper(),
                 probe
         );
     }

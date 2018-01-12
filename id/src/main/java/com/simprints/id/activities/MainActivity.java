@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
@@ -39,13 +38,13 @@ import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.domain.callout.CalloutAction;
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError;
 import com.simprints.id.exceptions.unsafe.InvalidSyncGroupError;
 import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.domain.callout.CalloutAction;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.services.sync.SyncClient;
@@ -59,6 +58,7 @@ import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.RemoteConfig;
+import com.simprints.id.tools.TimeHelper;
 import com.simprints.id.tools.TimeoutBar;
 import com.simprints.id.tools.Vibrate;
 import com.simprints.id.tools.ViewPagerCustom;
@@ -173,6 +173,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private AlertLauncher alertLauncher;
 
+    private TimeHelper timeHelper;
+
     // Singletons
     private AppState appState;
     private Setup setup;
@@ -187,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements
         setup = app.getSetup();
         syncClient = SyncService.Companion.getClient(this);
         alertLauncher = new AlertLauncher(this);
+        timeHelper = app.getTimeHelper();
 
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -194,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView navView = findViewById(R.id.nav_view);
         navView.setItemIconTintList(null);
 
-        dataManager.setElapsedRealtimeOnMainStart(SystemClock.elapsedRealtime());
+        dataManager.setElapsedRealtimeOnMainStart(timeHelper.millisecondsSinceBoot());
 
         handler = new Handler();
 

@@ -39,6 +39,8 @@ import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.AppState
 import com.simprints.id.tools.NotificationFactory
+import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.serializers.*
 import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.Constants.*
@@ -343,6 +345,10 @@ class Application : MultiDexApplication() {
         SessionParametersExtractor(actionExtractor, apiKeyExtractor, moduleIdExtractor,
             userIdExtractor, patientIdExtractor, callingPackageExtractor, metadataExtractor,
             resultFormatExtractor, unexpectedParametersExtractor)
+    }
+
+    val timeHelper: TimeHelper by lazy {
+        TimeHelperImpl()
     }
 
     // TODO: These are all the singletons that are used in Simprints ID right now. This is temporary, until we get rid of all these singletons
