@@ -10,6 +10,7 @@ import com.simprints.id.data.models.Session
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.domain.sessionParameters.SessionParameters
 import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.model.ALERT_TYPE
@@ -56,6 +57,13 @@ class DataManagerImpl(private val context: Context,
 
     override val libVersionName: String
         get() = com.simprints.libsimprints.BuildConfig.VERSION_NAME
+
+    override var sessionParameters: SessionParameters
+        get() = preferencesManager.sessionParameters
+        set(value) {
+            preferencesManager.sessionParameters = value
+            secureDataManager.apiKey = value.apiKey
+        }
 
     override fun logAlert(alertType: ALERT_TYPE) =
         analyticsManager.logAlert(alertType.name, getApiKeyOrEmpty(), moduleId, userId, deviceId)
@@ -119,8 +127,8 @@ class DataManagerImpl(private val context: Context,
             libVersionName, calloutAction.toString(), getApiKeyOrEmpty(), moduleId, userId,
             patientId, callingPackage, metadata, resultFormat, macAddress, scannerId,
             hardwareVersion.toInt(), location.latitude, location.longitude,
-            elapsedRealtimeOnSessionStart, elapsedRealtimeOnLoadEnd, elapsedRealtimeOnMainStart,
-            elapsedRealtimeOnMatchStart, elapsedRealtimeOnSessionEnd)
+            msSinceBootOnSessionStart, msSinceBootOnLoadEnd, msSinceBootOnMainStart,
+            msSinceBootOnMatchStart, msSinceBootOnSessionEnd)
         remoteDbManager.saveSession(getDbContextOrErr(), session)
         analyticsManager.logSession(session)
     }
