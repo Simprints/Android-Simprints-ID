@@ -5,7 +5,7 @@ import android.os.SystemClock
 
 class TimeHelperImpl : TimeHelper {
 
-    override fun millisecondsSinceBoot(): Long =
+    override fun msSinceBoot(): Long =
         SystemClock.elapsedRealtime()
 
 }

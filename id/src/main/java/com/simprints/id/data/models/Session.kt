@@ -26,10 +26,10 @@ data class Session(
     val latitude: String,
     val longitude: String,
 
-    var elapsedRealtimeOnSessionStart: Long,
-    var elapsedRealtimeOnLoadEnd: Long,
-    var elapsedRealtimeOnMainStart: Long,
-    var elapsedRealtimeOnMatchStart: Long,
-    var elapsedRealtimeOnSessionEnd: Long
+    var msSinceBootOnSessionStart: Long,
+    var msSinceBootOnLoadEnd: Long,
+    var msSinceBootOnMainStart: Long,
+    var msSinceBootOnMatchStart: Long,
+    var msSinceBootOnSessionEnd: Long
 
 )

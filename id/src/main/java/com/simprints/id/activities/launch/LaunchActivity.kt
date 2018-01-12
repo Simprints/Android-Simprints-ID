@@ -19,7 +19,6 @@ import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.callout.Callout
 import com.simprints.id.domain.callout.Callout.Companion.toCallout
-import com.simprints.id.domain.sessionParameters.SessionParameters
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.model.ALERT_TYPE
@@ -93,7 +92,7 @@ class LaunchActivity : AppCompatActivity() {
     }
 
     private fun initSession() {
-        dataManager.initializeSessionState(newSessionId(), timeHelper.millisecondsSinceBoot())
+        dataManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
     }
 
     private fun newSessionId(): String {
@@ -108,27 +107,17 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun extractSessionParameters(callout: Callout) {
         val sessionParameters = app.sessionParametersExtractor.extractFrom(callout)
-        dataManager.saveSessionParameters(sessionParameters)
+        dataManager.sessionParameters = sessionParameters
+        dataManager.apiKey = sessionParameters.apiKey
+        dataManager.appKey = sessionParameters.apiKey.substring(0, 8)
         dataManager.logUserProperties()
-    }
-
-    private fun DataManager.saveSessionParameters(sessionParameters: SessionParameters) {
-        calloutAction = sessionParameters.calloutAction
-        apiKey = sessionParameters.apiKey
-        appKey = sessionParameters.apiKey.substring(0, 8)
-        moduleId = sessionParameters.moduleId
-        userId = sessionParameters.userId
-        patientId = sessionParameters.patientId
-        callingPackage = sessionParameters.callingPackage
-        metadata = sessionParameters.metadata
-        resultFormat = sessionParameters.resultFormat
     }
 
     // Setup callback
     private fun getSetupCallback() : SetupCallback =
         object : SetupCallback {
             override fun onSuccess() {
-                dataManager.elapsedRealtimeOnLoadEnd = timeHelper.millisecondsSinceBoot()
+                dataManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
                 // If it is the first time the launch process finishes, wait for consent confirmation
                 // Else, go directly to the main activity
                 if (!consentConfirmed) {
@@ -223,7 +212,7 @@ class LaunchActivity : AppCompatActivity() {
     private fun finishWith(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
         setResult(resultCode, resultData)
-        dataManager.elapsedRealtimeOnSessionEnd = timeHelper.millisecondsSinceBoot()
+        dataManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
         async(UI) {
             bg { dataManager.saveSession() }.await()
             finish()
