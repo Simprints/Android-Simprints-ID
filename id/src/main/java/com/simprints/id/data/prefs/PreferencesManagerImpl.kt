@@ -161,13 +161,6 @@ class PreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Firmware version of the scanner used for the current session
     override var hardwareVersion: Short by PrimitivePreference(prefs, HARDWARE_VERSION_KEY, HARDWARE_VERSION_DEFAULT)
 
-    override val hardwareVersionString: String
-        get() = if (hardwareVersion > -1) {
-            hardwareVersion.toString()
-        } else {
-            "unknown"
-        }
-
     // Unique identifier of the scanner used for the current session
     override var scannerId: String by PrimitivePreference(prefs, SCANNER_ID_KEY, SCANNER_ID_DEFAULT)
 
