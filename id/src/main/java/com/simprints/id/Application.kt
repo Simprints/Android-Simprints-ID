@@ -20,6 +20,16 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
+import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
+import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManagerImpl
+import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManager
+import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManagerImpl
+import com.simprints.id.data.prefs.sessionState.sessionParameters.SessionParametersPreferencesManager
+import com.simprints.id.data.prefs.sessionState.sessionParameters.SessionParametersPreferencesManagerImpl
+import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimestampsPreferencesManager
+import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimestampsPreferencesManagerImpl
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.domain.Location
@@ -91,9 +101,32 @@ class Application : MultiDexApplication() {
         ImprovedSharedPreferencesImpl(basePrefs)
     }
 
+    private val scannerAttributesPreferencesManager: ScannerAttributesPreferencesManager by lazy {
+        ScannerAttributesPreferencesManagerImpl(prefs)
+    }
+
+    private val sessionParametersPreferencesManager: SessionParametersPreferencesManager by lazy {
+        SessionParametersPreferencesManagerImpl(prefs, calloutActionSerializer)
+    }
+
+    private val sessionTimestampsPreferencesManager: SessionTimestampsPreferencesManager by lazy {
+        SessionTimestampsPreferencesManagerImpl(prefs)
+    }
+
+    private val sessionStatePreferencesManager: SessionStatePreferencesManager by lazy {
+        SessionStatePreferencesManagerImpl(prefs,
+            scannerAttributesPreferencesManager,
+            sessionParametersPreferencesManager,
+            sessionTimestampsPreferencesManager,
+            locationSerializer)
+    }
+
+    private val settingsPreferencesManager: SettingsPreferencesManager by lazy {
+        SettingsPreferencesManagerImpl(prefs, fingerIdToBooleanSerializer, groupSerializer)
+    }
+
     private val preferencesManager: PreferencesManager by lazy {
-        PreferencesManagerImpl(prefs, fingerIdToBooleanSerializer, calloutActionSerializer,
-            groupSerializer, locationSerializer)
+        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager)
     }
 
     private val localDbManager: LocalDbManager by lazy {

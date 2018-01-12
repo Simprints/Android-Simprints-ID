@@ -67,7 +67,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
     @Override
     public void start() {
-        dataManager.setElapsedRealtimeOnMatchStart(timeHelper.millisecondsSinceBoot());
+        dataManager.setMsSinceBootOnMatchStart(timeHelper.msSinceBoot());
         // TODO : Use polymorphism
         switch (dataManager.getCalloutAction()) {
             case IDENTIFY:

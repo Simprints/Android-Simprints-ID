@@ -25,9 +25,9 @@ fun Session.toFirebaseSession(): fb_Session =
             hardwareVersion,
             latitude,
             longitude,
-            elapsedRealtimeOnLoadEnd - elapsedRealtimeOnSessionStart,
-            elapsedRealtimeOnMainStart - elapsedRealtimeOnSessionStart,
-            elapsedRealtimeOnMatchStart - elapsedRealtimeOnSessionStart,
-            elapsedRealtimeOnSessionEnd - elapsedRealtimeOnSessionStart,
+            msSinceBootOnLoadEnd - msSinceBootOnSessionStart,
+            msSinceBootOnMainStart - msSinceBootOnSessionStart,
+            msSinceBootOnMatchStart - msSinceBootOnSessionStart,
+            msSinceBootOnSessionEnd - msSinceBootOnSessionStart,
             ServerValue.TIMESTAMP)
     }
