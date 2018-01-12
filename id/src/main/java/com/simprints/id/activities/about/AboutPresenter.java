@@ -10,7 +10,6 @@ import com.simprints.id.data.DataManager;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AlertLauncher;
-import com.simprints.id.tools.AppState;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
 import com.simprints.libdata.tools.Constants;
@@ -22,7 +21,6 @@ class AboutPresenter implements AboutContract.Presenter {
 
     private static boolean recoveryRunning = false;
 
-    private AppState appState;
     private RecoverDbHandlerThread recoverDbHandlerThread;
 
     private DataManager dataManager;
@@ -33,7 +31,6 @@ class AboutPresenter implements AboutContract.Presenter {
      * @param view The AboutActivity
      */
     AboutPresenter(@NonNull AboutContract.View view, DataManager dataManager, AlertLauncher alertLauncher) {
-        appState = AppState.getInstance();
         this.dataManager = dataManager;
         aboutView = view;
         aboutView.setPresenter(this);
@@ -42,23 +39,40 @@ class AboutPresenter implements AboutContract.Presenter {
 
     @Override
     public void start() {
-        aboutView.setVersionData(
-                dataManager.getAppVersionName(),
-                dataManager.getLibVersionName(),
-                dataManager.getHardwareVersionString());
+        initView();
+    }
 
+    private void initView() {
         try {
-            aboutView.setDbCountData(
-                    Long.toString(dataManager.getPeopleCount(Constants.GROUP.USER)),
-                    Long.toString(dataManager.getPeopleCount(Constants.GROUP.MODULE)),
-                    Long.toString(dataManager.getPeopleCount(Constants.GROUP.GLOBAL)));
+            initVersions();
+            initCounts();
+            initRecoveryAvailability();
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             alertLauncher.launch(ALERT_TYPE.UNEXPECTED_ERROR ,0);
         }
+    }
 
-        if (recoveryRunning) aboutView.setRecoverDbUnavailable();
-        else aboutView.setRecoverDbAvailable();
+    private void initVersions() {
+        aboutView.setVersionData(
+            dataManager.getAppVersionName(),
+            dataManager.getLibVersionName(),
+            dataManager.getHardwareVersionString());
+    }
+
+    private void initCounts() {
+        aboutView.setDbCountData(
+            Long.toString(dataManager.getPeopleCount(Constants.GROUP.USER)),
+            Long.toString(dataManager.getPeopleCount(Constants.GROUP.MODULE)),
+            Long.toString(dataManager.getPeopleCount(Constants.GROUP.GLOBAL)));
+    }
+
+    private void initRecoveryAvailability() {
+        if (recoveryRunning) {
+            aboutView.setRecoverDbUnavailable();
+        } else {
+            aboutView.setRecoverDbAvailable();
+        }
     }
 
     @Override
