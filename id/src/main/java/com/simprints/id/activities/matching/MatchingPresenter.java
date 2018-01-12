@@ -4,7 +4,6 @@ package com.simprints.id.activities.matching;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.data.DataManager;
@@ -16,6 +15,7 @@ import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Log;
+import com.simprints.id.tools.TimeHelper;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
@@ -51,19 +51,23 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
     @NonNull
     private DataManager dataManager;
 
+    @NonNull
+    private TimeHelper timeHelper;
+
     MatchingPresenter(@NonNull MatchingContract.View matchingView,
                       @NonNull DataManager dataManager,
+                      @NonNull TimeHelper timeHelper,
                       Person probe) {
-        this.dataManager = dataManager;
-        this.probe = probe;
-
         this.matchingView = matchingView;
+        this.dataManager = dataManager;
+        this.timeHelper = timeHelper;
+        this.probe = probe;
         this.matchingView.setPresenter(this);
     }
 
     @Override
     public void start() {
-        dataManager.setElapsedRealtimeOnMatchStart(SystemClock.elapsedRealtime());
+        dataManager.setElapsedRealtimeOnMatchStart(timeHelper.millisecondsSinceBoot());
         // TODO : Use polymorphism
         switch (dataManager.getCalloutAction()) {
             case IDENTIFY:
