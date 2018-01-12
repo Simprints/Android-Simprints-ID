@@ -28,6 +28,7 @@ interface PreferencesManager {
     var sessionId: String
     var macAddress: String
     var hardwareVersion: Short
+    val hardwareVersionString: String
     var scannerId: String
     var location: Location
     var elapsedRealtimeOnSessionStart: Long
