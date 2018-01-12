@@ -29,6 +29,7 @@ interface PreferencesManager {
     var macAddress: String
     var hardwareVersion: Short
     val hardwareVersionString: String
+        get() = if (hardwareVersion > -1) hardwareVersion.toString() else "unknown"
     var scannerId: String
     var location: Location
     var elapsedRealtimeOnSessionStart: Long
