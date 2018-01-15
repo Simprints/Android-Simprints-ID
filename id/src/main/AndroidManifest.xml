@@ -55,7 +55,8 @@
         <activity
             android:name=".activities.front.FrontActivity"
             android:label="@string/title_activity_front"
-            android:launchMode="standard">
+            android:launchMode="standard"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -110,16 +111,18 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <service android:name="com.simprints.id.services.GuidSelectionService"
+        <service
+            android:name="com.simprints.id.services.GuidSelectionService"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
-                <action android:name="com.simprints.id.CONFIRM_IDENTITY"/>
+                <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
             </intent-filter>
         </service>
 
-        <service android:name=".services.sync.SyncService"
-            android:exported="false"/>
+        <service
+            android:name=".services.sync.SyncService"
+            android:exported="false" />
 
 
         <meta-data
