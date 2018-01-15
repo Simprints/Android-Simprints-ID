@@ -26,13 +26,14 @@ import org.junit.runner.RunWith
 class HappySyncMediumDatabase : FirstUseTest() {
 
     override val calloutCredentials: CalloutCredentials = CalloutCredentials(
-            "00000002-0000-0000-0000-000000000000",
-            "the_one_and_only_module",
-            "the_lone_user")
+        "00000002-0000-0000-0000-000000000000",
+        "the_one_and_only_module",
+        "the_lone_user")
 
     override var realmConfiguration: RealmConfiguration? = null
 
-    @Rule @JvmField
+    @Rule
+    @JvmField
     val identifyTestRule = ActivityTestRule(LaunchActivity::class.java, false, false)
 
     @Before
