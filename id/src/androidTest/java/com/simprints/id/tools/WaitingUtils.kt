@@ -21,7 +21,8 @@ object WaitingUtils {
     /**
      * This function will keep trying to execute snippet every pollingInterval milliseconds
      * (ignoring all errors), until timeout milliseconds is reached. Then it will execute snippet
-     * one last time allowing it to fail and throw errors.
+     * one last time allowing it to fail and throw errors. It will return successfully the first
+     * time snippet succeeds.
      */
     private tailrec fun tryUntilTimeout(timeout: Long,
                                         pollingInterval: Long,
