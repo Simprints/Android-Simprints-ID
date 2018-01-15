@@ -2,7 +2,6 @@ package com.simprints.id
 
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.Espresso.pressBack
-import android.support.test.espresso.NoMatchingViewException
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
@@ -35,6 +34,7 @@ fun testHappyWorkflowIdentification(calloutCredentials: CalloutCredentials,
     log("testHappyWorkflowIdentification")
     testLaunchActivityIdentify(calloutCredentials, identifyTestRule)
     testFullHappyWorkflow()
+    testMatchingActivityCheckFinished(identifyTestRule)
     testGuidIsTheOnlyReturnedIdentification(identifyTestRule, guidToLookFor)
 }
 
@@ -73,8 +73,9 @@ private fun testLaunchActivityVerify(calloutCredentials: CalloutCredentials,
 private fun testFullHappyWorkflow() {
     log("testFullHappyWorkflow")
     testSetupActivityAndContinue()
-    testMainActivityScanFinger()
-    testMainActivityScanFinger()
+    testMainActivityPressScan()
+    testMainActivityPressScan()
+    testMainActivityCheckGoodScan()
     testMainActivityPressContinue()
 }
 
@@ -86,31 +87,49 @@ private fun testSetupActivityAndContinue() {
 
 private fun testSetupActivity() {
     log("testSetupActivity")
-    onView(withId(R.id.tv_consent_text))
-            .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.short_consent)))
-
-    WaitingUtils.waitOnUiForSetupToFinish()
+    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
+        onView(withId(R.id.tv_consent_text))
+                .check(matches(isDisplayed()))
+                .check(matches(withText(R.string.short_consent)))
+    })
 }
 
 private fun testSetupActivityContinue() {
     log("testSetupActivityContinue")
-    onView(withId(R.id.confirm_consent_text_view))
-            .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.confirm_consent)))
-            .perform(click())
-
-    WaitingUtils.waitOnUiForActivityToSettle()
+    WaitingUtils.tryOnUiUntilTimeout(12000, 1000, {
+        onView(withId(R.id.confirm_consent_text_view))
+                .check(matches(isDisplayed()))
+                .check(matches(withText(R.string.confirm_consent)))
+                .perform(click())
+    })
 }
 
-private fun testMainActivityScanFinger() {
+private fun testMainActivityPressScan() {
     log("testMainActivityScanFinger")
-    onView(withId(R.id.scan_button))
-            .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.scan)))
-            .perform(click())
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200, {
+        onView(withId(R.id.scan_button))
+                .check(matches(isDisplayed()))
+                .check(matches(withText(R.string.scan)))
+                .perform(click())
+    })
+}
 
-    WaitingUtils.waitOnUiForScanningToComplete()
+private fun testMainActivityCheckGoodScan() {
+    log("testMainActivityCheckGoodScan")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200, {
+        onView(withId(R.id.scan_button))
+                .check(matches(isDisplayed()))
+                .check(matches(withText(R.string.good_scan_message)))
+    })
+}
+
+private fun testMainActivityPressContinue() {
+    log("testMainActivityPressContinue")
+    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
+        onView(withId(R.id.action_forward))
+                .check(matches(isDisplayed()))
+                .perform(click())
+    })
 }
 
 private fun testEnrolmentReturnedResult(enrolTestRule: ActivityTestRule<LaunchActivity>): String {
@@ -124,34 +143,35 @@ private fun testEnrolmentReturnedResult(enrolTestRule: ActivityTestRule<LaunchAc
 
 private fun testEnrolmentReceivedOnline(apiKey: String, guid: String) {
     log("testEnrolmentReceivedOnline")
-    WaitingUtils.waitOnSystemForQuickDataCalls()
+    WaitingUtils.tryOnSystemUntilTimeout(12000, 3000, {
+        val apiInstance = RemoteAdminUtils.configuredApiInstance
+        try {
+            // Check to see if the patient made it to the database
+            val patientsJson = RemoteAdminUtils.getPatientsNode(apiInstance, apiKey)
+            Assert.assertNotNull(patientsJson)
+            Assert.assertEquals(1, patientsJson.size().toLong())
+            Assert.assertTrue(patientsJson.has(guid))
+        } catch (e: ApiException) {
+            Assert.assertNull("ApiException", e)
+        }
+    })
+}
 
-    val apiInstance = RemoteAdminUtils.configuredApiInstance
-    try {
-        // Check to see if the patient made it to the database
-        val patientsJson = RemoteAdminUtils.getPatientsNode(apiInstance, apiKey)
-        Assert.assertNotNull(patientsJson)
-        Assert.assertEquals(1, patientsJson.size().toLong())
-        Assert.assertTrue(patientsJson.has(guid))
-    } catch (e: ApiException) {
-        Assert.assertNull("ApiException", e)
-    }
-
-    WaitingUtils.waitOnSystemToSettle()
+private fun testMatchingActivityCheckFinished(identifyTestRule: ActivityTestRule<LaunchActivity>) {
+    log("testMatchingActivityCheckFinished")
+    WaitingUtils.tryOnSystemUntilTimeout(20000,500, {
+        Assert.assertTrue(identifyTestRule.activity.isDestroyed)
+    })
 }
 
 private fun testGuidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTestRule<LaunchActivity>, guid: String) {
     log("testGuidIsTheOnlyReturnedIdentification")
-    WaitingUtils.waitOnUiForMatchingToComplete()
-
     val identifications = identifyTestRule.activityResult
             .resultData.getParcelableArrayListExtra<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS)
     Assert.assertEquals(1, identifications.size.toLong())
     Assert.assertEquals(guid, identifications[0].guid)
     Assert.assertTrue(identifications[0].confidence > 0)
     Assert.assertNotEquals(Tier.TIER_5, identifications[0].tier)
-
-    WaitingUtils.waitOnSystemToSettle()
 }
 
 private fun testVerificationSuccessful(verifyTestRule: ActivityTestRule<LaunchActivity>, guid: String) {
@@ -161,15 +181,6 @@ private fun testVerificationSuccessful(verifyTestRule: ActivityTestRule<LaunchAc
     Assert.assertEquals(guid, verification.guid)
     Assert.assertTrue(verification.confidence > 0)
     Assert.assertNotEquals(Tier.TIER_5, verification.tier)
-
-    WaitingUtils.waitOnSystemToSettle()
-}
-
-private fun testMainActivityPressContinue() {
-    log("testMainActivityPressContinue")
-    onView(withId(R.id.action_forward))
-            .check(matches(isDisplayed()))
-            .perform(click())
 }
 
 fun testHappySync(calloutCredentials: CalloutCredentials, identifyTestRule: ActivityTestRule<LaunchActivity>) {
@@ -184,15 +195,17 @@ private fun testMainActivitySync() {
     log("testMainActivitySync")
     testMainActivityOpenDrawer()
     testMainActivityPressSync()
-    testWaitAndVerifyUiForSyncCompleted()
+    testVerifyUiForSyncStarted()
+    testVerifyUiForSyncCompleted()
     testMainActivityCloseDrawer()
 }
 
 private fun testMainActivityOpenDrawer() {
     log("testMainActivityOpenDrawer")
-    onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-    WaitingUtils.waitOnUiForActivityToSettle()
+    WaitingUtils.tryOnUiUntilTimeout(4000, 50, {
+        onView(withId(R.id.drawer_layout))
+                .perform(DrawerActions.open())
+    })
 }
 
 private fun testMainActivityCloseDrawer() {
@@ -202,40 +215,26 @@ private fun testMainActivityCloseDrawer() {
 
 private fun testMainActivityPressSync() {
     log("testMainActivityPressSync")
-    onView(withId(R.id.nav_view))
-            .perform(navigateTo(R.id.nav_sync))
-    testVerifyUiForSyncStarted()
-
+    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
+        onView(withId(R.id.nav_view))
+                .perform(navigateTo(R.id.nav_sync))
+    })
 }
 
 private fun testVerifyUiForSyncStarted() {
     log("testVerifyUiForSyncStarted")
-    WaitingUtils.waitOnUiForSyncingToStart()
-    onView(anyOf(withText(containsString(getResourceString(R.string.syncing))), withText(containsString(getResourceString(R.string.nav_sync_complete)))))
-            .check(matches(isDisplayed()))
+    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
+        onView(anyOf(withText(containsString(getResourceString(R.string.syncing))), withText(containsString(getResourceString(R.string.nav_sync_complete)))))
+                .check(matches(isDisplayed()))
+    })
 }
 
-private fun testWaitAndVerifyUiForSyncCompleted() {
-    log("testWaitAndVerifyUiForSyncCompleted")
-    testCheckUiForSyncCompleted()
-}
-
-private fun testCheckUiForSyncCompleted(iteration: Int = 1) {
-    WaitingUtils.waitOnUiForMediumSyncInterval()
-    log("testCheckUiForSyncCompleted seconds elapsed: " + iteration * SyncParameters.SYNC_CHECK_INTERVAL)
-    try {
+private fun testVerifyUiForSyncCompleted() {
+    log("testVerifyUiForSyncCompleted")
+    WaitingUtils.tryOnUiUntilTimeout(SyncParameters.MEDIUM_DATABASE_SYNC_TIMEOUT_MILLIS, 1000, {
         onView(withText(containsString(getResourceString(R.string.nav_sync_complete))))
                 .check(matches(isDisplayed()))
-    } catch (e: NoMatchingViewException) {
-        try {
-            onView(withText(containsString(getResourceString(R.string.syncing))))
-                    .check(matches(isDisplayed()))
-            testCheckUiForSyncCompleted(iteration + 1)
-        } catch (e: NoMatchingViewException) {
-            log("testCheckUiForSyncCompleted failed: not showing syncing progress or complete")
-            throw Exception("Sync failed to complete")
-        }
-    }
+    })
 }
 
 private fun testExitFromMainActivity() {
