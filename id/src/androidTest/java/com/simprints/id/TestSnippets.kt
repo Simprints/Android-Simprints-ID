@@ -15,7 +15,7 @@ import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
 import org.hamcrest.Matchers.anyOf
 import org.hamcrest.Matchers.containsString
-import org.junit.Assert
+import org.junit.Assert.*
 
 
 fun testHappyWorkflowEnrolment(calloutCredentials: CalloutCredentials,
@@ -137,7 +137,7 @@ private fun testEnrolmentReturnedResult(enrolTestRule: ActivityTestRule<LaunchAc
     val registration = enrolTestRule.activityResult
             .resultData.getParcelableExtra<Registration>(Constants.SIMPRINTS_REGISTRATION)
     val guid = registration.guid
-    Assert.assertNotNull(guid)
+    assertNotNull(guid)
     return guid
 }
 
@@ -148,11 +148,11 @@ private fun testEnrolmentReceivedOnline(apiKey: String, guid: String) {
         try {
             // Check to see if the patient made it to the database
             val patientsJson = RemoteAdminUtils.getPatientsNode(apiInstance, apiKey)
-            Assert.assertNotNull(patientsJson)
-            Assert.assertEquals(1, patientsJson.size().toLong())
-            Assert.assertTrue(patientsJson.has(guid))
+            assertNotNull(patientsJson)
+            assertEquals(1, patientsJson.size().toLong())
+            assertTrue(patientsJson.has(guid))
         } catch (e: ApiException) {
-            Assert.assertNull("ApiException", e)
+            assertNull("ApiException", e)
         }
     })
 }
@@ -160,7 +160,7 @@ private fun testEnrolmentReceivedOnline(apiKey: String, guid: String) {
 private fun testMatchingActivityCheckFinished(identifyTestRule: ActivityTestRule<LaunchActivity>) {
     log("testMatchingActivityCheckFinished")
     WaitingUtils.tryOnSystemUntilTimeout(20000,500, {
-        Assert.assertTrue(identifyTestRule.activity.isDestroyed)
+        assertTrue(identifyTestRule.activity.isDestroyed)
     })
 }
 
@@ -168,19 +168,19 @@ private fun testGuidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTe
     log("testGuidIsTheOnlyReturnedIdentification")
     val identifications = identifyTestRule.activityResult
             .resultData.getParcelableArrayListExtra<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS)
-    Assert.assertEquals(1, identifications.size.toLong())
-    Assert.assertEquals(guid, identifications[0].guid)
-    Assert.assertTrue(identifications[0].confidence > 0)
-    Assert.assertNotEquals(Tier.TIER_5, identifications[0].tier)
+    assertEquals(1, identifications.size.toLong())
+    assertEquals(guid, identifications[0].guid)
+    assertTrue(identifications[0].confidence > 0)
+    assertNotEquals(Tier.TIER_5, identifications[0].tier)
 }
 
 private fun testVerificationSuccessful(verifyTestRule: ActivityTestRule<LaunchActivity>, guid: String) {
     log("testVerificationSuccessful")
     val verification = verifyTestRule.activityResult
             .resultData.getParcelableExtra<Verification>(Constants.SIMPRINTS_VERIFICATION)
-    Assert.assertEquals(guid, verification.guid)
-    Assert.assertTrue(verification.confidence > 0)
-    Assert.assertNotEquals(Tier.TIER_5, verification.tier)
+    assertEquals(guid, verification.guid)
+    assertTrue(verification.confidence > 0)
+    assertNotEquals(Tier.TIER_5, verification.tier)
 }
 
 fun testHappySync(calloutCredentials: CalloutCredentials, identifyTestRule: ActivityTestRule<LaunchActivity>) {
