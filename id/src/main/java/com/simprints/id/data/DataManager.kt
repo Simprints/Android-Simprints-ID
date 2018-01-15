@@ -31,9 +31,8 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
 
     // Analytics
     fun logAlert(alertType: ALERT_TYPE)
-
     fun logUserProperties()
-    fun logLogin()
+    fun logScannerProperties()
     fun logGuidSelectionService(apiKey: String, sessionId: String, selectedGuid: String, callbackSent: Boolean)
     fun logConnectionStateChange(connected: Boolean)
     fun logAuthStateChange(authenticated: Boolean)
@@ -46,6 +45,7 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
     fun unregisterAuthListener(authListener: AuthListener)
     fun unregisterConnectionListener(connectionListener: ConnectionListener)
     fun updateIdentification(apiKey: String, selectedGuid: String)
+    fun saveSession()
 
     // Local only
     fun getPeopleCount(group: Constants.GROUP): Long

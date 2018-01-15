@@ -1,0 +1,3 @@
+[submodule "libsimprints"]
+	path = libsimprints
+	url = https://github.com/Simprints/LibSimprints
