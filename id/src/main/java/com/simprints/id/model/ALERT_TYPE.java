@@ -30,17 +30,48 @@ public enum ALERT_TYPE {
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
             false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_USER_ID),
 
+    INVALID_USER_ID(R.string.configuration_error_title, R.string.invalid_userId_message,
+        R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
+        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_USER_ID),
+
+
     MISSING_MODULE_ID(R.string.configuration_error_title, R.string.missing_moduleId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
             false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_MODULE_ID),
+
+    INVALID_MODULE_ID(R.string.configuration_error_title, R.string.invalid_moduleId_message,
+        R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
+        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_MODULE_ID),
 
     MISSING_UPDATE_GUID(R.string.configuration_error_title, R.string.missing_updateId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
             false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_UPDATE_GUID),
 
+    INVALID_UPDATE_GUID(R.string.configuration_error_title, R.string.invalid_updateId_message,
+            R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_UPDATE_GUID),
+
     MISSING_VERIFY_GUID(R.string.configuration_error_title, R.string.missing_verifyId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
             false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_VERIFY_GUID),
+
+    INVALID_VERIFY_GUID(R.string.configuration_error_title, R.string.invalid_verifyId_message,
+        R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
+        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_VERIFY_GUID),
+
+    INVALID_RESULT_FORMAT(R.string.configuration_error_title, R.string.invalid_resultFormat_message,
+            R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_RESULT_FORMAT),
+
+    INVALID_CALLING_PACKAGE(R.string.configuration_error_title, R.string.invalid_callingPackage_message,
+        R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
+        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_CALLING_PACKAGE),
+
+
+    // TODO: add Unexpected Parameter return code to LibSimprints.
+    UNEXPECTED_PARAMETER(R.string.configuration_error_title, R.string.unexpected_parameter_message,
+            R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
+            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_CANCELLED),
 
     // Verification errors
 

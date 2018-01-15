@@ -45,12 +45,12 @@ object RemoteAdminUtils {
     fun createSimpleValidProject(apiInstance: DefaultApi, calloutCredentials: CalloutCredentials, numberOfPatients: Int) {
 
         val simpleValidGroups = "{\"patientGroups\": [{" +
-                "\"userId\":\"${calloutCredentials.userId}\"," +
-                "\"moduleId\":\"${calloutCredentials.moduleId}\"," +
-                "\"patientType\": \"valid\"," +
-                "\"patientCount\": $numberOfPatients" +
-                "}]" +
-                "}"
+            "\"userId\":\"${calloutCredentials.userId}\"," +
+            "\"moduleId\":\"${calloutCredentials.moduleId}\"," +
+            "\"patientType\": \"valid\"," +
+            "\"patientCount\": $numberOfPatients" +
+            "}]" +
+            "}"
 
         apiInstance.putProject(calloutCredentials.apiKey, simpleValidGroups)
     }
