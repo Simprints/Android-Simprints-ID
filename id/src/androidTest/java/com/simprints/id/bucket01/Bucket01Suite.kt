@@ -19,15 +19,14 @@ import org.junit.runners.Suite
 object Bucket01Suite {
 
     private val testArguments: TestArguments = TestArguments.getArguments()
+    private val client = UtilityServiceClient(InstrumentationRegistry.getContext())
+    private val bluetoothUtility = BluetoothUtility(client)
+    private val wifiUtility = WifiUtility(client)
 
     @BeforeClass
     @JvmStatic
     fun suiteSetUp() {
         log("Bucket01Suite.suiteSetUp()")
-        val client = UtilityServiceClient(InstrumentationRegistry.getContext())
-        val bluetoothUtility = BluetoothUtility(client)
-        val wifiUtility = WifiUtility(client)
-
         log("Bucket01Suite.suiteSetUp(): ensuring bluetooth is enabled")
         bluetoothUtility.setBluetoothStateSync(true)
         log("Bucket01Suite.suiteSetUp(): ensuring wifi is enabled")
@@ -44,8 +43,6 @@ object Bucket01Suite {
     @JvmStatic
     fun suiteTearDown() {
         log("Bucket01Suite.suiteTearDown()")
-        val client = UtilityServiceClient(InstrumentationRegistry.getContext())
-        val bluetoothUtility = BluetoothUtility(client)
         log("Bucket01Suite.suiteTearDown(): un-pairing scanner")
         bluetoothUtility.setBluetoothPairingStateSync(testArguments.scannerMacAddress!!, false)
     }
