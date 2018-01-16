@@ -231,7 +231,7 @@ private fun testMainActivityCloseDrawer() {
 
 private fun testMainActivityPressSync() {
     log("testMainActivityPressSync")
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
+    WaitingUtils.tryOnUiUntilTimeout(4000, 50, {
         onView(withId(R.id.nav_view))
             .perform(navigateTo(R.id.nav_sync))
     })
