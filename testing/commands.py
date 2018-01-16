@@ -1,4 +1,6 @@
 from instrumented_test import Device
+from instrumented_test import Scanner
+from instrumented_test import WifiNetwork
 from testing.directory_paths import *
 
 
@@ -35,8 +37,11 @@ def query_devices():
 # Specific implementations
 
 
-def simprints_id_test_command(device: Device, test: str):
-    return f'{ADB} -s {device.device_id} shell am instrument -w ' \
+def simprints_id_test_command(device: Device, test: str, scanner: Scanner = None, wifi_network: WifiNetwork = None):
+    return f'{ADB} -s {device.device_id} shell am instrument -w ' + \
+           (f'' if scanner is None else f'-e scanner_mac_address \"\'{scanner.mac_address}\'\" ') + \
+           (f'' if wifi_network is None else f'-e wifi_network_ssid \"\'{wifi_network.ssid}\'\" ') + \
+           (f'' if wifi_network is None else f'-e wifi_network_password \"\'{wifi_network.password}\'\" ') + \
            f'-e class {test} com.simprints.id.test/android.support.test.runner.AndroidJUnitRunner '
 
 

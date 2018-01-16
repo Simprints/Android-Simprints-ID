@@ -16,26 +16,27 @@ buckets = {
 
 
 class Scanner:
-    def __init__(self, scanner_id: str, mac_address: str, hardware_version: int, description: str = ''):
+    def __init__(self, scanner_id: str):
         self.scanner_id: str = scanner_id
-        self.mac_address: str = mac_address
-        self.hardware_version: int = hardware_version
-        self.description: str = description
+        self.mac_address: str = Scanner.scanner_id_to_mac_address(scanner_id)
 
-
-# TODO : Pass a scanner/ scanners as extras to the am instrument command : https://stackoverflow.com/a/3229077/4072335
-scanners = {
-    'SP576290': Scanner('SP576290', 'F0:AC:D7:C8:CB:22', 6),
-    'SP337428': Scanner('SP337428', 'F0:AC:D7:C5:26:14', 6),
-    'SP443761': Scanner('SP443761', 'F0:AC:D7:C6:C5:71', 6),
-    'SP898185': Scanner('SP898185', 'F0:AC:D7:CD:B4:89', 4)
-}
+    @staticmethod
+    def scanner_id_to_mac_address(scanner_id: str):
+        hex_string = str(hex(int(scanner_id[2:8])))
+        hex_string_digits = hex_string[2:len(hex_string)].zfill(5).upper()
+        return f'F0:AC:D7:C{hex_string_digits[0]}:{hex_string_digits[1:3]}:{hex_string_digits[3:5]}'
 
 
 class Device:
     def __init__(self, device_id: str, model: str):
         self.device_id: str = device_id
         self.model: str = model
+
+
+class WifiNetwork:
+    def __init__(self, ssid: str, password: str):
+        self.ssid = ssid
+        self.password = password
 
 
 class LogState:
@@ -193,7 +194,7 @@ class Run:
                     devices.append(Device(device_str[0], segment[6:]))
         return devices
 
-    def run_test(self, device: Device, test_id: str):
+    def run_test(self, device: Device, test_id: str, scanner: Scanner, wifi_network: WifiNetwork):
         test_dir_name = f'{self.log_dir_name}/{device.model}/{test_id}'
 
         if not os.path.exists(test_dir_name):
@@ -204,7 +205,7 @@ class Run:
         self.logger.addHandler(test_file_handler)
         self.update_log_format(LogState.test(device, test_id), test_file_handler)
 
-        self.run_and_log(simprints_id_test_command(device, buckets[test_id]))
+        self.run_and_log(simprints_id_test_command(device, buckets[test_id], scanner, wifi_network))
 
         self.logger.removeHandler(test_file_handler)
 
@@ -236,7 +237,7 @@ def main():
         run.install_apk(device)
         run.install_test_apk(device)
 
-        run.run_test(device, 'bucket_01')
+        run.run_test(device, 'bucket_01', Scanner('SP057763'), WifiNetwork('Simprints 2.0', 'Tech4Dev'))
 
     run.update_log_format(LogState.default())
     run.log('TEST END')

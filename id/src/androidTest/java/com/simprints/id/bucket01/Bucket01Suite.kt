@@ -4,6 +4,7 @@ import android.support.test.InstrumentationRegistry
 import com.simprints.cerberuslibrary.BluetoothUtility
 import com.simprints.cerberuslibrary.WifiUtility
 import com.simprints.cerberuslibrary.services.UtilityServiceClient
+import com.simprints.id.tools.IntentUtils
 import com.simprints.id.tools.log
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -17,9 +18,7 @@ import org.junit.runners.Suite
 )
 object Bucket01Suite {
 
-    private val macAddress = "F0:AC:D7:C0:E1:A3" //SP057763 //"F0:AC:D7:CA:BE:1D";
-    private val networkSsid = "Simprints 2.0"
-    private val networkPassword = "Tech4Dev"
+    private val intentExtras : IntentUtils.IntentExtras = IntentUtils.getIntentExtras()
 
     @BeforeClass
     @JvmStatic
@@ -34,9 +33,9 @@ object Bucket01Suite {
         log("Bucket01Suite.suiteSetUp(): ensuring wifi is enabled")
         wifiUtility.setWifiStateSync(true)
         log("Bucket01Suite.suiteSetUp(): ensuring scanner is paired")
-        bluetoothUtility.setBluetoothPairingStateSync(macAddress, true)
+        bluetoothUtility.setBluetoothPairingStateSync(intentExtras.scannerMacAddress!!, true)
         log("Bucket01Suite.suiteSetUp(): ensuring wifi is connected")
-        wifiUtility.setWifiNetworkSync(networkSsid, networkPassword)
+        wifiUtility.setWifiNetworkSync(intentExtras.wifiNetworkSsid!!, intentExtras.wifiNetworkPassword!!)
         log("Bucket01Suite.suiteSetUp(): ensuring internet is connected")
         wifiUtility.waitForInternetStateSync(true)
     }
@@ -48,7 +47,7 @@ object Bucket01Suite {
         val client = UtilityServiceClient(InstrumentationRegistry.getContext())
         val bluetoothUtility = BluetoothUtility(client)
         log("Bucket01Suite.suiteTearDown(): un-pairing scanner")
-        bluetoothUtility.setBluetoothPairingStateSync(macAddress, false)
+        bluetoothUtility.setBluetoothPairingStateSync(intentExtras.scannerMacAddress!!, false)
     }
 
 }
