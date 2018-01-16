@@ -38,13 +38,13 @@ import com.simprints.id.adapters.FingerPageAdapter;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.domain.callout.CalloutAction;
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError;
 import com.simprints.id.exceptions.unsafe.InvalidSyncGroupError;
 import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.model.Callout;
 import com.simprints.id.model.Finger;
 import com.simprints.id.model.FingerRes;
 import com.simprints.id.services.sync.SyncClient;
@@ -58,6 +58,7 @@ import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.RemoteConfig;
+import com.simprints.id.tools.TimeHelper;
 import com.simprints.id.tools.TimeoutBar;
 import com.simprints.id.tools.Vibrate;
 import com.simprints.id.tools.ViewPagerCustom;
@@ -172,6 +173,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private AlertLauncher alertLauncher;
 
+    private TimeHelper timeHelper;
+
     // Singletons
     private AppState appState;
     private Setup setup;
@@ -186,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements
         setup = app.getSetup();
         syncClient = SyncService.Companion.getClient(this);
         alertLauncher = new AlertLauncher(this);
+        timeHelper = app.getTimeHelper();
 
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -193,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements
         NavigationView navView = findViewById(R.id.nav_view);
         navView.setItemIconTintList(null);
 
-        appState.logMainStart();
+        dataManager.setMsSinceBootOnMainStart(timeHelper.msSinceBoot());
 
         handler = new Handler();
 
@@ -335,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements
         //noinspection ConstantConditions
         actionBar.show();
 
-        switch (dataManager.getCallout()) {
+        switch (dataManager.getCalloutAction()) {
             case REGISTER:
                 actionBar.setTitle(R.string.register_title);
                 break;
@@ -349,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements
                 actionBar.setTitle(R.string.verify_title);
                 break;
             default:
-                handleUnexpectedError(InvalidCalloutParameterError.Companion.forParameter("Callout"));
+                handleUnexpectedError(InvalidCalloutParameterError.Companion.forParameter("CalloutParameters"));
         }
     }
 
@@ -590,7 +594,7 @@ public class MainActivity extends AppCompatActivity implements
             Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show();
         } else {
             Person person = new Person(dataManager.getPatientId(), fingerprints);
-            if (dataManager.getCallout() == Callout.REGISTER || dataManager.getCallout() == Callout.UPDATE) {
+            if (dataManager.getCalloutAction() == CalloutAction.REGISTER || dataManager.getCalloutAction() == CalloutAction.UPDATE) {
                 try {
                     dataManager.savePerson(person);
                 } catch (UninitializedDataManagerError error) {

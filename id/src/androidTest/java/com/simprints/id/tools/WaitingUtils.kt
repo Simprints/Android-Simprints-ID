@@ -1,6 +1,7 @@
 package com.simprints.id.tools
 
 import android.os.SystemClock
+import android.support.test.espresso.IdlingPolicies.getMasterIdlingPolicy
 import android.support.test.espresso.IdlingPolicies.setMasterPolicyTimeout
 import com.schibsted.spain.barista.BaristaSleepActions.sleep
 import java.util.concurrent.TimeUnit
@@ -8,37 +9,42 @@ import java.util.concurrent.TimeUnit
 
 object WaitingUtils {
 
-    fun waitOnUiForSetupToFinish() {
-        sleep(12, TimeUnit.SECONDS)
+    fun tryOnUiUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Unit) {
+        changeUiTimeoutPolicyIfNeeded(timeout)
+        tryUntilTimeout(timeout, pollingInterval, snippet, ::waitOnUi)
     }
 
-    fun waitOnUiForScanningToComplete() {
-        sleep(8, TimeUnit.SECONDS)
+    fun tryOnSystemUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Unit) {
+        tryUntilTimeout(timeout, pollingInterval, snippet, ::waitOnSystem)
     }
 
-    fun waitOnUiForActivityToSettle() {
-        sleep(2, TimeUnit.SECONDS)
+    private fun tryUntilTimeout(timeout: Long,
+                                pollingInterval: Long,
+                                snippet: () -> Any?,
+                                waitingFunction: (Long) -> Unit): Any? {
+        for (runningTime in 0..timeout step pollingInterval) {
+            try {
+                return snippet()
+            } catch (e: Throwable) {
+            }
+            waitingFunction(pollingInterval)
+        }
+
+        return snippet()
     }
 
-    fun waitOnUiForMatchingToComplete() {
-        sleep(8, TimeUnit.SECONDS)
+    private fun waitOnUi(millis: Long) {
+        sleep(millis, TimeUnit.MILLISECONDS)
     }
 
-    fun waitOnUiForMediumSyncInterval() {
-        setMasterPolicyTimeout(SyncParameters.MEDIUM_DATABASE_SYNC_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-        sleep(SyncParameters.SYNC_CHECK_INTERVAL, TimeUnit.SECONDS)
+    private fun waitOnSystem(millis: Long) {
+        SystemClock.sleep(millis)
     }
 
-    fun waitOnSystemForQuickDataCalls() {
-        SystemClock.sleep(2000)
+    private fun changeUiTimeoutPolicyIfNeeded(timeout: Long) {
+        val idlingPolicy = getMasterIdlingPolicy()
+        val currentTimeoutMillis = TimeUnit.MILLISECONDS.convert(idlingPolicy.idleTimeout, idlingPolicy.idleTimeoutUnit)
+        if (currentTimeoutMillis <= timeout)
+            setMasterPolicyTimeout(timeout * 2, TimeUnit.MILLISECONDS)
     }
-
-    fun waitOnSystemToSettle() {
-        SystemClock.sleep(2000)
-    }
-
-    fun waitOnUiForSyncingToStart() {
-        sleep(1, TimeUnit.SECONDS)
-    }
-
 }

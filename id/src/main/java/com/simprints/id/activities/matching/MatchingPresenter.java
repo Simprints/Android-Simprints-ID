@@ -7,15 +7,15 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.data.DataManager;
+import com.simprints.id.domain.callout.CalloutAction;
 import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.model.Callout;
-import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Log;
+import com.simprints.id.tools.TimeHelper;
 import com.simprints.libcommon.Person;
 import com.simprints.libdata.DATA_ERROR;
 import com.simprints.libdata.DataCallback;
@@ -51,22 +51,25 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
     @NonNull
     private DataManager dataManager;
 
+    @NonNull
+    private TimeHelper timeHelper;
+
     MatchingPresenter(@NonNull MatchingContract.View matchingView,
                       @NonNull DataManager dataManager,
-                      @NonNull AppState appState,
+                      @NonNull TimeHelper timeHelper,
                       Person probe) {
-        appState.logMatchStart();
-        this.dataManager = dataManager;
-        this.probe = probe;
-
         this.matchingView = matchingView;
+        this.dataManager = dataManager;
+        this.timeHelper = timeHelper;
+        this.probe = probe;
         this.matchingView.setPresenter(this);
     }
 
     @Override
     public void start() {
+        dataManager.setMsSinceBootOnMatchStart(timeHelper.msSinceBoot());
         // TODO : Use polymorphism
-        switch (dataManager.getCallout()) {
+        switch (dataManager.getCalloutAction()) {
             case IDENTIFY:
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
@@ -86,7 +89,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 onVerifyStart();
                 break;
             default:
-                dataManager.logError(new InvalidMatchingCalloutError("Invalid callout in MatchingActivity"));
+                dataManager.logError(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
                 matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -217,7 +220,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 break;
             }
             case MATCH_COMPLETED: {
-                Callout callout = dataManager.getCallout();
+                CalloutAction callout = dataManager.getCalloutAction();
                 switch (callout) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();
