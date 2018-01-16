@@ -12,8 +12,8 @@ import org.junit.runners.Suite
 
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
-        HappyWorkflowAllMainFeatures::class,
-        HappySyncMediumDatabase::class
+    HappyWorkflowAllMainFeatures::class,
+    HappySyncMediumDatabase::class
 )
 object Bucket01Suite {
 
@@ -21,7 +21,8 @@ object Bucket01Suite {
     private val networkSsid = "Simprints 2.0"
     private val networkPassword = "Tech4Dev"
 
-    @BeforeClass @JvmStatic
+    @BeforeClass
+    @JvmStatic
     fun suiteSetUp() {
         log("Bucket01Suite.suiteSetUp()")
         val client = UtilityServiceClient(InstrumentationRegistry.getContext())
@@ -40,7 +41,8 @@ object Bucket01Suite {
         wifiUtility.waitForInternetStateSync(true)
     }
 
-    @AfterClass @JvmStatic
+    @AfterClass
+    @JvmStatic
     fun suiteTearDown() {
         log("Bucket01Suite.suiteTearDown()")
         val client = UtilityServiceClient(InstrumentationRegistry.getContext())

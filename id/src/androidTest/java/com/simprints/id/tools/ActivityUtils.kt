@@ -7,20 +7,20 @@ import android.support.test.InstrumentationRegistry
 import android.support.test.rule.ActivityTestRule
 import android.view.WindowManager
 import com.schibsted.spain.barista.permission.PermissionGranter
-import com.simprints.id.activities.LaunchActivity
+import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.libsimprints.Constants
 import java.util.*
 
 object ActivityUtils {
 
     private val permissions = ArrayList(Arrays.asList(
-            Manifest.permission.ACCESS_NETWORK_STATE,
-            Manifest.permission.BLUETOOTH,
-            Manifest.permission.INTERNET,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.RECEIVE_BOOT_COMPLETED,
-            Manifest.permission.WAKE_LOCK,
-            Manifest.permission.VIBRATE
+        Manifest.permission.ACCESS_NETWORK_STATE,
+        Manifest.permission.BLUETOOTH,
+        Manifest.permission.INTERNET,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.RECEIVE_BOOT_COMPLETED,
+        Manifest.permission.WAKE_LOCK,
+        Manifest.permission.VIBRATE
     ))
 
     fun launchActivityAndRunOnUiThread(calloutCredentials: CalloutCredentials,
@@ -48,8 +48,8 @@ object ActivityUtils {
         val activity = activityTestRule.activity
         val wakeUpDevice = Runnable {
             activity.window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
         activity.runOnUiThread(wakeUpDevice)
     }

@@ -5,7 +5,7 @@ import android.support.test.InstrumentationRegistry.getInstrumentation
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import com.simprints.id.activities.LaunchActivity
+import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.templates.FirstUseTest
 import com.simprints.id.testHappyWorkflowEnrolment
 import com.simprints.id.testHappyWorkflowIdentification
@@ -27,19 +27,22 @@ import org.junit.runner.RunWith
 class HappyWorkflowAllMainFeatures : FirstUseTest() {
 
     override val calloutCredentials: CalloutCredentials = CalloutCredentials(
-            "00000001-0000-0000-0000-000000000000",
-            "the_one_and_only_module",
-            "the_lone_user")
+        "00000001-0000-0000-0000-000000000000",
+        "the_one_and_only_module",
+        "the_lone_user")
 
     override var realmConfiguration: RealmConfiguration? = null
 
-    @Rule @JvmField
+    @Rule
+    @JvmField
     val enrolTestRule = ActivityTestRule(LaunchActivity::class.java, false, false)
 
-    @Rule @JvmField
+    @Rule
+    @JvmField
     val identifyTestRule = ActivityTestRule(LaunchActivity::class.java, false, false)
 
-    @Rule @JvmField
+    @Rule
+    @JvmField
     val verifyTestRule = ActivityTestRule(LaunchActivity::class.java, false, false)
 
     @Before

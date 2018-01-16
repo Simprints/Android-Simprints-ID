@@ -14,8 +14,8 @@ object StorageUtils {
         if (applicationDirectory.exists()) {
             val fileNames = applicationDirectory.list() ?: return
             fileNames
-                    .filter { it != "lib" }
-                    .forEach { deleteFile(File(applicationDirectory, it)) }
+                .filter { it != "lib" }
+                .forEach { deleteFile(File(applicationDirectory, it)) }
         }
     }
 
