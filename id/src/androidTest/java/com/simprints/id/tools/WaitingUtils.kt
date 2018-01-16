@@ -18,29 +18,19 @@ object WaitingUtils {
         tryUntilTimeout(timeout, pollingInterval, snippet, ::waitOnSystem)
     }
 
-    /**
-     * This function will keep trying to execute snippet every pollingInterval milliseconds
-     * (ignoring all errors), until timeout milliseconds is reached. Then it will execute snippet
-     * one last time allowing it to fail and throw errors. It will return successfully the first
-     * time snippet succeeds.
-     */
-    private tailrec fun tryUntilTimeout(timeout: Long,
-                                        pollingInterval: Long,
-                                        snippet: () -> Any?,
-                                        waitingFunction: (Long) -> Unit,
-                                        runningTime: Long = 0): Any? {
-        if (runningTime >= timeout) {
-            return snippet()
+    private fun tryUntilTimeout(timeout: Long,
+                                pollingInterval: Long,
+                                snippet: () -> Any?,
+                                waitingFunction: (Long) -> Unit): Any? {
+        for (runningTime in 0..timeout step pollingInterval) {
+            try {
+                return snippet()
+            } catch (e: Throwable) {
+            }
+            waitingFunction(pollingInterval)
         }
 
-        waitingFunction(pollingInterval)
-
-        try {
-            return snippet()
-        } catch (e: Throwable) {
-        }
-
-        return tryUntilTimeout(timeout, pollingInterval, snippet, waitingFunction, runningTime + pollingInterval)
+        return snippet()
     }
 
     private fun waitOnUi(millis: Long) {
