@@ -136,7 +136,7 @@ private fun testMainActivityPressContinue() {
 
 private fun testMainActivityEnrolmentCheckFinished(enrolTestRule: ActivityTestRule<LaunchActivity>) {
     log("testMainActivityEnrolmentCheckFinished")
-    WaitingUtils.tryOnSystemUntilTimeout(3000, 500, {
+    WaitingUtils.tryOnSystemUntilTimeout(5000, 500, {
         assertTrue(enrolTestRule.activity.isDestroyed)
     })
 }
@@ -185,7 +185,7 @@ private fun testGuidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTe
 
 private fun testMatchingActivityVerificationCheckFinished(verifyTestRule: ActivityTestRule<LaunchActivity>) {
     log("testMatchingActivityVerificationCheckFinished")
-    WaitingUtils.tryOnSystemUntilTimeout(3000, 500, {
+    WaitingUtils.tryOnSystemUntilTimeout(5000, 500, {
         assertTrue(verifyTestRule.activity.isDestroyed)
     })
 }
