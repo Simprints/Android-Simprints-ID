@@ -1,6 +1,4 @@
-from instrumented_test import Device
-from instrumented_test import Scanner
-from instrumented_test import WifiNetwork
+from testing.models import Scanner, Device, WifiNetwork
 from testing.directory_paths import *
 
 
