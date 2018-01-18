@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.support.test.InstrumentationRegistry
 
 
-class TestArguments {
-
-    var scannerMacAddress: String? = null
-    var wifiNetworkSsid: String? = null
-    var wifiNetworkPassword: String? = null
+class TestArguments(val scannerMacAddress: String? = null,
+                    val wifiNetworkSsid: String? = null,
+                    val wifiNetworkPassword: String? = null) {
 
     companion object {
 
@@ -16,23 +14,26 @@ class TestArguments {
         private val wifiNetworkSsidKey = "wifi_network_ssid"
         private val wifiNetworkPasswordKey = "wifi_network_password"
 
-        private val none = "none"
-
         fun getArguments(): TestArguments {
             val extras: Bundle = InstrumentationRegistry.getArguments()!!
 
-            val result = TestArguments()
+            val result = TestArguments(
+                extras[scannerMacAddressKey] as String?,
+                extras[wifiNetworkSsidKey] as String?,
+                extras[wifiNetworkPasswordKey] as String?
+            )
 
-            if (extras.containsKey(scannerMacAddressKey)) result.scannerMacAddress = extras.getString(scannerMacAddressKey)
-            log("TestArguments.getArguments: $scannerMacAddressKey = ${result.scannerMacAddress?: none}")
-
-            if (extras.containsKey(wifiNetworkSsidKey)) result.wifiNetworkSsid = extras.getString(wifiNetworkSsidKey)
-            log("TestArguments.getArguments: $wifiNetworkSsidKey = ${result.wifiNetworkSsid?: none}")
-
-            if (extras.containsKey(wifiNetworkPasswordKey)) result.wifiNetworkPassword = extras.getString(wifiNetworkPasswordKey)
-            log("TestArguments.getArguments: $wifiNetworkPasswordKey = ${result.wifiNetworkPassword?: none}")
+            log("TestArguments.getArguments: $result")
 
             return result
         }
+    }
+
+    override fun toString(): String {
+        return """
+            $scannerMacAddressKey = $scannerMacAddress,
+            $wifiNetworkSsidKey = $wifiNetworkSsid,
+            $wifiNetworkPasswordKey = $wifiNetworkPassword
+            """.trimIndent()
     }
 }
