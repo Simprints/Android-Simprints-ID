@@ -22,6 +22,8 @@ import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.libdata.tools.Constants;
 
+import javax.inject.Inject;
+
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private final static int MIN_QUALITY = 40;
@@ -39,14 +41,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     SeekBar timeoutSeekBar;
     SeekBar idWaitTimeSeekBar;
 
-    private DataManager dataManager;
+    @Inject DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Application app = ((Application) getApplication());
-        dataManager = app.getDataManager();
+        Application.component.inject(this);
 
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_settings);

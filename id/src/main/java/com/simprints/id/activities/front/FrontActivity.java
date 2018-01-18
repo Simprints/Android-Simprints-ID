@@ -12,16 +12,17 @@ import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.RemoteConfig;
 
+import javax.inject.Inject;
+
 public class FrontActivity extends AppCompatActivity implements FrontContract.View {
 
     private FrontContract.Presenter frontPresenter;
+    @Inject DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Application app = ((Application) getApplication());
-        DataManager dataManager = app.getDataManager();
+        Application.component.inject(this);
 
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_front);

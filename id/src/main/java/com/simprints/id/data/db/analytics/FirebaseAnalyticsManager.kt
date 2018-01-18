@@ -8,6 +8,7 @@ import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
 import com.simprints.id.domain.callout.Callout
 import com.simprints.libdata.models.firebase.fb_Session
+import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 import kotlin.reflect.full.memberProperties
 
@@ -30,7 +31,9 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
 
     private fun logAlertToCrashlytics(alertName: String) {
         Timber.d("FirebaseAnalyticsManager.logAlertToCrashlytics(alertName=$alertName)")
-        Crashlytics.log(alertName)
+        if (Fabric.isInitialized()) {
+            Crashlytics.log(alertName)
+        }
     }
 
     // TODO: Do we have to log things like api_key, user_id, etc to every firebase event? Or is it enough to log it once, and then we can link everything together in big query requests?
@@ -48,7 +51,9 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
 
     override fun logError(error: Error) {
         Timber.d("FirebaseAnalyticsManager.logError(throwable=$error)")
-        Crashlytics.logException(error)
+        if (Fabric.isInitialized()) {
+            Crashlytics.logException(error)
+        }
     }
 
     override fun logSafeException(exception: RuntimeException) {

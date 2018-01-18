@@ -19,6 +19,7 @@ import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.callout.Callout
 import com.simprints.id.domain.callout.Callout.Companion.toCallout
+import com.simprints.id.domain.sessionParameters.extractors.SessionParametersExtractor
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.model.ALERT_TYPE
@@ -33,6 +34,7 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import org.jetbrains.anko.coroutines.experimental.bg
 import java.util.*
+import javax.inject.Inject
 
 @SuppressLint("HardwareIds")
 class LaunchActivity : AppCompatActivity() {
@@ -54,11 +56,12 @@ class LaunchActivity : AppCompatActivity() {
     private var launchOutOfFocus = false
 
     private lateinit var app: Application
-    private lateinit var dataManager: DataManager
+    @Inject lateinit var dataManager: DataManager
     private lateinit var positionTracker: PositionTracker
-    private lateinit var appState: AppState
-    private lateinit var setup: Setup
-    private val timeHelper by lazy { app.timeHelper }
+    @Inject lateinit var appState: AppState
+    @Inject lateinit var setup: Setup
+    @Inject lateinit var timeHelper:TimeHelper
+    @Inject lateinit var sessionParametersExtractor: SessionParametersExtractor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,10 +82,8 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun injectDependencies() {
         app = application as Application
-        dataManager = app.dataManager
+        Application.component.inject(this)
         positionTracker = PositionTracker(this, dataManager)
-        appState = app.appState
-        setup = app.setup
     }
 
     private fun initView() {
@@ -106,7 +107,7 @@ class LaunchActivity : AppCompatActivity() {
             }
 
     private fun extractSessionParameters(callout: Callout) {
-        val sessionParameters = app.sessionParametersExtractor.extractFrom(callout)
+        val sessionParameters = sessionParametersExtractor.extractFrom(callout)
         dataManager.sessionParameters = sessionParameters
         dataManager.apiKey = sessionParameters.apiKey
         dataManager.appKey = sessionParameters.apiKey.substring(0, 8)
