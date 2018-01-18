@@ -83,6 +83,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import io.reactivex.observers.DisposableObserver;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -167,29 +169,25 @@ public class MainActivity extends AppCompatActivity implements
         }
     };
 
-    private DataManager dataManager;
 
     private SyncClient syncClient;
 
     private AlertLauncher alertLauncher;
 
-    private TimeHelper timeHelper;
 
     // Singletons
-    private AppState appState;
-    private Setup setup;
+    @Inject DataManager dataManager;
+    @Inject AppState appState;
+    @Inject Setup setup;
+    @Inject TimeHelper timeHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Application.component.inject(this);
 
-        Application app = ((Application) getApplication());
-        dataManager = app.getDataManager();
-        appState = app.getAppState();
-        setup = app.getSetup();
         syncClient = SyncService.Companion.getClient(this);
         alertLauncher = new AlertLauncher(this);
-        timeHelper = app.getTimeHelper();
 
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

@@ -20,6 +20,8 @@ import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.LanguageHelper;
 
+import javax.inject.Inject;
+
 
 public class AboutActivity extends AppCompatActivity implements AboutContract.View {
 
@@ -37,14 +39,13 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
     private ProgressDialog recoveryDialog;
     private AlertDialog errorDialog;
     private AlertDialog successDialog;
-    DataManager dataManager;
+    @Inject DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Application.component.inject(this);
 
-        Application app = ((Application) getApplication());
-        dataManager = app.getDataManager();
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
 
         setContentView(R.layout.activity_about);

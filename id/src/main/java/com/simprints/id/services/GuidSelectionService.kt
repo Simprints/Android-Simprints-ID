@@ -7,16 +7,16 @@ import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.libsimprints.Constants.*
+import javax.inject.Inject
 
 
 class GuidSelectionService : IntentService("GuidSelectionService") {
 
-    private lateinit var dataManager: DataManager
+    @Inject lateinit var dataManager: DataManager
 
     override fun onCreate() {
         super.onCreate()
-        val app = application as Application
-        dataManager = app.dataManager
+        Application.component.inject(this)
     }
 
     override fun onHandleIntent(intent: Intent?) {
