@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-python3 ./instrumented_test.py
+git clone -b dev-v2018.1.0 git@github.com:Simprints/Android-Cerberus.git
+/usr/bin/python3.6 ./instrumented_test.py
