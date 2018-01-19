@@ -6,6 +6,14 @@ apply plugin: "io.fabric"
 apply plugin: "com.google.firebase.firebase-crash"
 apply plugin: "realm-android"
 
+def getDevProjectId = { ->
+    if (project.hasProperty('development_gcp_project')) {
+        return development_gcp_project
+    } else {
+        return "simprints-dev"
+    }
+}
+
 kotlin {
     experimental {
         coroutines "enable"
@@ -30,7 +38,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
-            buildConfigField("String", "FIREBASE_PROJECT", "\"${development_gcp_project}\"")
+            buildConfigField("String", "FIREBASE_PROJECT", "\"${getDevProjectId()}\"")
         }
         release {
             lintOptions {
@@ -151,34 +159,16 @@ crashlytics {
     androidNdkLibsOut "src/main/libs"
 }
 
-def getDevGoogleServicesJsonPath = { ->
-    if (project.hasProperty('dev_google_services_json_path')) {
-        println dev_google_services_json_path
-        return dev_google_services_json_path
-    } else {
-        println "${project.rootDir}/id/src/debug/default-google-services.json"
-        return "${project.rootDir}/id/src/debug/default-google-services.json"
-    }
-}
-
-task copyDevGoogleServicesJson(type: Exec) {
-    group "simprints"
-    description "Copies google-services.json into id/src/debug"
-    // on windows:
-    commandLine "copy", getDevGoogleServicesJsonPath(), "${project.rootDir}\\id\\src\\debug\\google-services.json"
-    // on UNIX systems:
-    commandLine "cp", getDevGoogleServicesJsonPath(), "${project.rootDir}/id/src/debug/google-services.json"
+task copyDevGoogleServicesJson(type: Copy) {
+    def jsonName = "${getDevProjectId()}-google-services.json"
+    from "${project.rootDir}/id/src/debug/googleServicesJsons/${jsonName}"
+    into "${project.rootDir}/id/src/debug/"
+    rename { filename -> "google-services.json" }
 }
 
 tasks.whenTaskAdded { task ->
     if (task.name == 'preDebugBuild') {
         preDebugBuild.dependsOn(copyDevGoogleServicesJson)
-    }
-}
-
-gradle.taskGraph.whenReady { graph ->
-    if (graph.hasTask(copyDevGoogleServicesJson)) {
-        processDebugGoogleServices.enabled = false
     }
 }
 
