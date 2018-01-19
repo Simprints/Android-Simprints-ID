@@ -12,9 +12,13 @@ Temporarily, until the libsimprints git submodule makes it to master:
 By default, any debug build of Simprints ID will interact with the `simprints-dev` GCP project.
 
 To change that behaviour:
-- download the google-services.json file of the GCP project you want to use
-- add the two following properties into your `gradle.properties` (in `~/.gradle` on Linux systems)
+- Add the following property into your `gradle.properties` (in `~/.gradle` on Linux systems)
 ```
 development_gcp_project=[YOUR_GCP_PROJECT_ID]
-dev_google_services_json_path=[ABSOLUTE_PATH_TO_YOUR_GOOGLE_SERVICES_JSON]
 ```
+- Download the google-services.json file of your GCP project, rename it as 
+`[YOUR_GCP_PROJECT_ID]-google-services.json` and place it in id/src/debug/googleServicesJsons (it won't be committed thanks to the .gitignore)
+
+- Rebuild. Gradle might complain at first, but the build should eventually succeed.
+
+Note: When switching from a GCP project to another, it's recommended to do a clean reinstall of the app.
