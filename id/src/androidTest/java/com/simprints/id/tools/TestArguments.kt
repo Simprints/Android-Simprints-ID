@@ -23,7 +23,7 @@ class TestArguments(val scannerMacAddress: String? = null,
                 extras[wifiNetworkPasswordKey] as String?
             )
 
-            log("TestArguments.getArguments: $result")
+            log("TestArguments.getArguments(): \n$result")
 
             return result
         }
@@ -31,8 +31,8 @@ class TestArguments(val scannerMacAddress: String? = null,
 
     override fun toString(): String {
         return """
-            $scannerMacAddressKey = $scannerMacAddress,
-            $wifiNetworkSsidKey = $wifiNetworkSsid,
+            $scannerMacAddressKey = $scannerMacAddress
+            $wifiNetworkSsidKey = $wifiNetworkSsid
             $wifiNetworkPasswordKey = $wifiNetworkPassword
             """.trimIndent()
     }
