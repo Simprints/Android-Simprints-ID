@@ -6,7 +6,7 @@ HERE = '' if platform.system() == 'Windows' else '.'
 # Relative paths should be relative to instrumented_test.py
 
 SIMPRINTS_ID_DIR_PATH = f'{HERE}'
-CERBERUS_DIR_PATH = f'{SIMPRINTS_ID_DIR_PATH}/../Android-Cerberus'
+CERBERUS_DIR_PATH = f'{SIMPRINTS_ID_DIR_PATH}/Android-Cerberus'
 LOG_DIR_BASE_NAME = f'{SIMPRINTS_ID_DIR_PATH}/testing/logs'
 
 # Some devices are known to use the same serial number.
