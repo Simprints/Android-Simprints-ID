@@ -12,6 +12,7 @@ Temporarily, until the libsimprints git submodule makes it to master:
 By default, any debug build of Simprints ID will interact with the `simprints-dev` GCP project.
 
 To change that behaviour:
+- Your development GCP project should be properly setup. To do so follow [the instructions in the Panda wiki](https://sites.google.com/simprints.com/panda-wiki/cloud/set-up-a-development-gcp-project).
 - Add the following property into your Global `gradle.properties` (located in `USER_HOME/.gradle`)
 ```
 development_gcp_project=[YOUR_GCP_PROJECT_ID]
