@@ -41,9 +41,17 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             buildConfigField("String", "FIREBASE_PROJECT", "\"simprints-152315\"")
+            buildConfigField("String", "SCANNER", getLocalProperty('ext.scanner'))
+            buildConfigField("String", "WIFI_NETWORK", getLocalProperty('ext.wifiNetwork'))
+            buildConfigField("String", "WIFI_PASSWORD", getLocalProperty('ext.wifiPassword'))
+
         }
         endToEndTesting {
             initWith debug
+
+            buildConfigField("String", "SCANNER", getLocalProperty('ext.scanner'))
+            buildConfigField("String", "WIFI_NETWORK", getLocalProperty('ext.wifiNetwork'))
+            buildConfigField("String", "WIFI_PASSWORD", getLocalProperty('ext.wifiPassword'))
             versionNameSuffix "-test"
             buildConfigField("String", "FIREBASE_PROJECT", "\"simprints-testing\"")
             testCoverageEnabled true
@@ -51,6 +59,18 @@ android {
     }
     testBuildType "endToEndTesting"
 }
+
+def getLocalProperty(name) {
+    Properties properties = new Properties()
+    properties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+    def externalModuleDir = properties.getProperty(name, null)
+    if (externalModuleDir == null) {
+        throw new GradleException(
+            name+" not found. Define location with "+name+"in the local.properties file!")
+    }
+    return externalModuleDir
+}
+
 
 buildscript {
     repositories {
@@ -138,7 +158,7 @@ dependencies {
         exclude group: 'com.google.code.findbugs'
     }
 
-    androidTestImplementation "com.simprints:cerberus-library:2017.4.1-dev-4"
+    androidTestImplementation "com.simprints:cerberus-library:2018.1.1-dev-1"
     androidTestImplementation "com.simprints:remote-admin-client:2017.4.0-dev-5"
     androidTestImplementation "com.squareup.okhttp:okhttp:2.7.5"
     androidTestImplementation "joda-time:joda-time:2.9.9"
