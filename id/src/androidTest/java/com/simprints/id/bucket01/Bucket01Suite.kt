@@ -5,7 +5,6 @@ import com.simprints.cerberuslibrary.BluetoothUtility
 import com.simprints.cerberuslibrary.WifiUtility
 import com.simprints.cerberuslibrary.services.UtilityServiceClient
 import com.simprints.id.BuildConfig
-import com.simprints.id.tools.TestArguments
 import com.simprints.id.tools.log
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -19,7 +18,6 @@ import org.junit.runners.Suite
 )
 object Bucket01Suite {
 
-    private val testArguments: TestArguments = TestArguments.getArguments()
     private val client = UtilityServiceClient(InstrumentationRegistry.getContext())
     private val bluetoothUtility = BluetoothUtility(client)
     private val wifiUtility = WifiUtility(client)
