@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
-git clone -b dev-v2018.1.0 git@github.com:Simprints/Android-Cerberus.git
-/usr/bin/python3.6 ./instrumented_test.py
+rm -rf /tmp/Android-Cerberus.git
+git clone -b dev-v2018.1.0 git@github.com:Simprints/Android-Cerberus.git /tmp/Android-Cerberus
+python3.6 ./instrumented_test.py
+rm -rf /tmp/Android-Cerberus.git
