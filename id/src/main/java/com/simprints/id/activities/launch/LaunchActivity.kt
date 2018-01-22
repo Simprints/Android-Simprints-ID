@@ -214,7 +214,11 @@ class LaunchActivity : AppCompatActivity() {
         setResult(resultCode, resultData)
         dataManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
         async(UI) {
-            bg { dataManager.saveSession() }.await()
+            try {
+                bg { dataManager.saveSession() }.await()
+            } catch (exception: Throwable) {
+                Log.d(this@LaunchActivity, exception.message ?: "")
+            }
             finish()
         }
     }
