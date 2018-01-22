@@ -12,12 +12,13 @@ Temporarily, until the libsimprints git submodule makes it to master:
 By default, any debug build of Simprints ID will interact with the `simprints-dev` GCP project.
 
 To change that behaviour:
-- Add the following property into your `gradle.properties` (in `~/.gradle` on Linux systems)
+- Add the following property into your Global `gradle.properties` (located in `USER_HOME/.gradle`)
 ```
 development_gcp_project=[YOUR_GCP_PROJECT_ID]
 ```
-- Download the google-services.json file of your GCP project, rename it as 
-`[YOUR_GCP_PROJECT_ID]-google-services.json` and place it in id/src/debug/googleServicesJsons (it won't be committed thanks to the .gitignore)
+- Follow [these instructions](https://firebase.google.com/docs/android/setup#manually_add_firebase) to add the App to your GCP / Firebase project and download the corresponding `google-services.json` file.
+ 
+- Rename this file as `[YOUR_GCP_PROJECT_ID]-google-services.json` and place it the folder `id/src/debug/googleServicesJsons` (it won't be committed thanks to the .gitignore)
 
 - Rebuild. Gradle might complain at first, but the build should eventually succeed.
 
