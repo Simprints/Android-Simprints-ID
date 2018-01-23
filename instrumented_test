@@ -2,4 +2,3 @@
 rm -rf /tmp/Android-Cerberus
 git clone -b develop git@github.com:Simprints/Android-Cerberus.git /tmp/Android-Cerberus
 python3.6 ./instrumented_test.py
-rm -rf /tmp/Android-Cerberus
