@@ -5,6 +5,7 @@ import subprocess
 import sys
 import threading
 import time
+import shutil
 from logging import Formatter, Logger, getLogger, DEBUG, StreamHandler, FileHandler, INFO, WARN, ERROR, CRITICAL
 
 from testing.commands import *
@@ -185,10 +186,22 @@ class Run:
         self.logger.addHandler(test_file_handler)
         self.update_log_format(LogState.test(device, test_id), test_file_handler)
 
-        self.run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue')
+        self.run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue -Pdevices={device.device_id}')
 
         self.logger.removeHandler(test_file_handler)
 
+    def save_results(self, device:Device):
+        dir_name_to_save_results_html = f'{self.log_dir_name}/{device.model}/html'
+        dir_name_to_save_results_xml = f'{self.log_dir_name}/{device.model}/xml'
+
+        if not os.path.exists(dir_name_to_save_results_html):
+            os.makedirs(dir_name_to_save_results_html)
+
+        if not os.path.exists(dir_name_to_save_results_xml):
+            os.makedirs(dir_name_to_save_results_xml)
+
+        shutil.move("build/reports/androidTests", dir_name_to_save_results_html)
+        shutil.move("id/build/outputs/androidTest-results/connected", dir_name_to_save_results_xml)
 
 def main():
     start_time = time.perf_counter()
@@ -210,18 +223,19 @@ def main():
         run.update_log_format(LogState.device(device))
 
         run.uninstall_cerberus_apk(device)
-
         run.uninstall_simprints_id_apk(device)
-        #run.uninstall_simprints_id_test_apk(device)
+        run.uninstall_simprints_id_test_apk(device)
+
         #run.install_test_apk(device)
 
         run.install_cerberus_apk(device)
         #Cerberus needs to be in foreground to start services in Android versions
         #https://developer.android.com/about/versions/oreo/android-8.0-changes.html#back-all
         run.run_cerberus_apk(device)
-        #run.run_test(device, 'instrumentedTests')
+        run.run_test(device, 'instrumentedTests')
+        run.save_results(device)
 
-    run.run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue')
+    #run.run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue')
 
     run.update_log_format(LogState.default())
     run.log('TEST END')

@@ -60,6 +60,34 @@ android {
     testBuildType "endToEndTesting"
 }
 
+
+project.afterEvaluate {
+    project.("connectedEndToEndTestingAndroidTest").doFirst {
+        def originalProvider = deviceProvider
+        deviceProvider = [
+            getName       : { originalProvider.getName() },
+            init          : { originalProvider.init() },
+            terminate     : { originalProvider.terminate() },
+            getDevices    : { filterDevices(originalProvider.getDevices()) },
+            getTimeoutInMs: { originalProvider.getTimeoutInMs() },
+            isConfigured  : { originalProvider.isConfigured() },
+            getMaxThreads : { originalProvider.getMaxThreads() }
+        ] as com.android.builder.testing.api.DeviceProvider
+    }
+}
+
+def filterDevices(connectedDevices) {
+    def DEVICES_PROPERTY = "devices"
+    def devices = connectedDevices
+    if (project.hasProperty(DEVICES_PROPERTY)) {
+        def devicesSerials = project.getProperties().get(DEVICES_PROPERTY).split(/,/)
+        devices = connectedDevices.findAll { devicesSerials.contains(it.serialNumber) }
+        println "[testy] ${!devices.empty ? "Execute on: ${devices.collect { it.serialNumber }}" : "Devices not found"}"
+    }
+
+    devices
+}
+
 def getLocalProperty(name) {
     Properties properties = new Properties()
     properties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
