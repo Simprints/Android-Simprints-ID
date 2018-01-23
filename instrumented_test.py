@@ -219,8 +219,9 @@ def main():
         #Cerberus needs to be in foreground to start services in Android versions
         #https://developer.android.com/about/versions/oreo/android-8.0-changes.html#back-all
         run.run_cerberus_apk(device)
+        #run.run_test(device, 'instrumentedTests')
 
-        run.run_test(device, 'instrumentedTests')
+    run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue')
 
     run.update_log_format(LogState.default())
     run.log('TEST END')
