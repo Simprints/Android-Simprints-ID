@@ -21,8 +21,8 @@ def install_apk_command(dir_path: str, module_name: str, build_type: str, device
     return f'{ADB} -s {device.device_id} install -t -d -r ' \
            f'{dir_path}/{module_name}/build/outputs/apk/{build_type}/{module_name}-{build_type}.apk'
 
-def open_apk_command(component_name: str, device: Device):
-    return f'{ADB} -s {device.device_id} shell am start -n {componenet_name}'
+def open_apk_command(package_name: str, main_activity: str, device: Device):
+    return f'{ADB} -s {device.device_id} shell am start -n {package_name}/{package_name}.{main_activity}'
 
 def install_android_test_apk_command(dir_path: str, module_name: str, build_type: str, device: Device):
     return f'{ADB} -s {device.device_id} install -t -d -r ' \
@@ -57,7 +57,7 @@ def cerberus_app_install_apk_command(build_type: str, device: Device):
     return install_apk_command(CERBERUS_DIR_PATH, CERBERUS_APP_MODULE_NAME, build_type, device)
 
 def cerberus_app_open_apk_command(device: Device):
-    return open_apk_command(CERBERUS_MAIN_ACTIVITY_NAME, device)
+    return open_apk_command(CERBERUS_APP_PACKAGE_NAME, CERBERUS_MAIN_ACTIVITY_NAME, device)
 
 def simprints_id_gradlew_command(command: str):
     return gradlew_command(SIMPRINTS_ID_DIR_PATH, SIMPRINTS_ID_MODULE_NAME, command)
