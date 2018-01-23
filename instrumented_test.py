@@ -185,7 +185,7 @@ class Run:
         self.logger.addHandler(test_file_handler)
         self.update_log_format(LogState.test(device, test_id), test_file_handler)
 
-        self.run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue &')
+        self.run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue')
 
         self.logger.removeHandler(test_file_handler)
 
