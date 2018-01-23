@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 rm -rf /tmp/Android-Cerberus
+wait
 git clone -b develop git@github.com:Simprints/Android-Cerberus.git /tmp/Android-Cerberus
+wait
 python3.6 ./instrumented_test.py
