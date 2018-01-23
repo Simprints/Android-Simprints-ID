@@ -221,7 +221,7 @@ def main():
         run.run_cerberus_apk(device)
         #run.run_test(device, 'instrumentedTests')
 
-    run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue')
+    run.run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue')
 
     run.update_log_format(LogState.default())
     run.log('TEST END')
