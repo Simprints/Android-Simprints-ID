@@ -8,7 +8,9 @@ Temporarily, until the libsimprints git submodule makes it to master:
 `git submodule update --init --recursive`
 
 ## Testing
-run ./instrumented_tests
+
+Tests can be run in Android Studio, but Cerberus is required (open in foreground) in the devices where instrumented tests will be run on.
+Alternatively, `run ./instrumented_tests` will checkout and build Cerberus before launching the instrumented tests on the devices.
 
 #### Requirements:
 
