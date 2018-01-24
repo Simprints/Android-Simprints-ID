@@ -32,3 +32,4 @@ echo "export ANDROID_HOME=**YOUR_SDK_PATH**" >> ~/.bash_profile
 echo "export PATH=$PATH:$ANDROID_HOME/platform-tools" >> ~/.bash_profile
 
 ```
+
