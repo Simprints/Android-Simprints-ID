@@ -26,7 +26,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class HappyWorkflowAllMainFeatures : FirstUseTest, HappyWifi, HappyBluetooth {
+class HappyWorkflowAllMainFeatures : FirstUseTest(), HappyWifi, HappyBluetooth {
 
     override val calloutCredentials: CalloutCredentials = CalloutCredentials(
         "00000001-0000-0000-0000-000000000000",

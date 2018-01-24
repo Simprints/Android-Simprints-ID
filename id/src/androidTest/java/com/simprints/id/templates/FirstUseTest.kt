@@ -9,14 +9,14 @@ import com.simprints.remoteadminclient.ApiException
 import io.realm.RealmConfiguration
 import org.junit.Before
 
-interface FirstUseTest {
+abstract class FirstUseTest {
 
-    var realmConfiguration: RealmConfiguration?
-    val calloutCredentials: CalloutCredentials
+    protected abstract var realmConfiguration: RealmConfiguration?
+    protected abstract val calloutCredentials: CalloutCredentials
 
     @Before
     @Throws(ApiException::class)
-    fun setUp() {
+    open fun setUp() {
         log("FirstUseTest.setUp(): cleaning app data")
 
         // Clear any internal data
