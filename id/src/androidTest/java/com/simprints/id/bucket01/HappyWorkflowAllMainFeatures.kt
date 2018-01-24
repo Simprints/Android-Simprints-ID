@@ -6,7 +6,6 @@ import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
-import com.simprints.id.templates.FirstUseTest
 import com.simprints.id.testHappyWorkflowEnrolment
 import com.simprints.id.testHappyWorkflowIdentification
 import com.simprints.id.testHappyWorkflowVerification
@@ -24,7 +23,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class HappyWorkflowAllMainFeatures : FirstUseTest() {
+class HappyWorkflowAllMainFeatures : Bucket01Suite() {
 
     override val calloutCredentials: CalloutCredentials = CalloutCredentials(
         "00000001-0000-0000-0000-000000000000",
