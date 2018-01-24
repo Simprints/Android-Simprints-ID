@@ -6,6 +6,14 @@ apply plugin: "io.fabric"
 apply plugin: "com.google.firebase.firebase-crash"
 apply plugin: "realm-android"
 
+def getDevProjectId = { ->
+    if (project.hasProperty('development_gcp_project')) {
+        return development_gcp_project
+    } else {
+        return "simprints-dev"
+    }
+}
+
 kotlin {
     experimental {
         coroutines "enable"
@@ -30,7 +38,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
-            buildConfigField("String", "FIREBASE_PROJECT", "\"simprints-dev\"")
+            buildConfigField("String", "FIREBASE_PROJECT", "\"${getDevProjectId()}\"")
         }
         release {
             lintOptions {
@@ -199,6 +207,19 @@ crashlytics {
     enableNdk true
     androidNdkOut "src/main/obj"
     androidNdkLibsOut "src/main/libs"
+}
+
+task copyDevGoogleServicesJson(type: Copy) {
+    def jsonName = "${getDevProjectId()}-google-services.json"
+    from "${project.rootDir}/id/src/debug/googleServicesJsons/${jsonName}"
+    into "${project.rootDir}/id/src/debug/"
+    rename { filename -> "google-services.json" }
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'preDebugBuild') {
+        preDebugBuild.dependsOn(copyDevGoogleServicesJson)
+    }
 }
 
 apply plugin: "com.google.gms.google-services"
