@@ -33,6 +33,7 @@ Thumbs.db
 .idea/gradle.xml
 .idea/dictionaries
 .idea/libraries
+.idea/jenkinsSettings.xml
 .gradle
 build/
 **/output.json
