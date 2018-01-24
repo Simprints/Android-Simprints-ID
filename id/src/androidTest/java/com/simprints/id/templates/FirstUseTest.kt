@@ -1,30 +1,22 @@
 package com.simprints.id.templates
 
 import android.support.test.InstrumentationRegistry
-import com.simprints.cerberuslibrary.BluetoothUtility
-import com.simprints.cerberuslibrary.WifiUtility
-import com.simprints.cerberuslibrary.services.UtilityServiceClient
 import com.simprints.id.tools.CalloutCredentials
 import com.simprints.id.tools.RemoteAdminUtils
 import com.simprints.id.tools.StorageUtils
 import com.simprints.id.tools.log
 import com.simprints.remoteadminclient.ApiException
 import io.realm.RealmConfiguration
-import org.junit.After
 import org.junit.Before
 
-abstract class FirstUseTest {
+interface FirstUseTest {
 
-    protected abstract var realmConfiguration: RealmConfiguration?
-    protected abstract val calloutCredentials: CalloutCredentials
-
-    private val client = UtilityServiceClient(InstrumentationRegistry.getContext())
-    private val bluetoothUtility = BluetoothUtility(client)
-    private val wifiUtility = WifiUtility(client)
+    var realmConfiguration: RealmConfiguration?
+    val calloutCredentials: CalloutCredentials
 
     @Before
     @Throws(ApiException::class)
-    open fun setUp() {
+    fun setUp() {
         log("FirstUseTest.setUp(): cleaning app data")
 
         // Clear any internal data
@@ -35,10 +27,5 @@ abstract class FirstUseTest {
         log("FirstUseTest.setUp(): cleaning remote data")
         val apiInstance = RemoteAdminUtils.configuredApiInstance
         RemoteAdminUtils.clearProjectNode(apiInstance, calloutCredentials.apiKey)
-    }
-
-    @After
-    open fun tearDown() {
-        log("FirstUseTest.tearDown(): nothing")
     }
 }
