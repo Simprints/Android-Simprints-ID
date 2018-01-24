@@ -76,6 +76,8 @@ project.afterEvaluate {
     }
 }
 
+// Required to run instrumented tests (gradlew connectedAndroidTest) on a single device.
+// By default Android runs on all device at the same time
 def filterDevices(connectedDevices) {
     def DEVICES_PROPERTY = "devices"
     def devices = connectedDevices
