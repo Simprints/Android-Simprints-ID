@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.MotionEvent
 import android.view.View
@@ -14,6 +15,7 @@ import com.simprints.id.activities.AlertActivity
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.MainActivity
 import com.simprints.id.activities.RefusalActivity
+import com.simprints.id.activities.requestProjectKey.RequestProjectKeyActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
@@ -25,6 +27,7 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.Vibrate.vibrate
+import com.simprints.id.tools.extensions.isAppInstallerKnown
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
@@ -74,15 +77,44 @@ class LaunchActivity : AppCompatActivity() {
             return
         }
         positionTracker.start()
-        setup.start(this, getSetupCallback())
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val didSetupNotCompleteYet = setup.setupCompleted == false
+        val isCallingAppFromUnknownSource = app.packageManager.isAppInstallerKnown(dataManager.callingPackage) == false
+        val isProjectKeyInvalid = dataManager.getProjectKeyOrEmpty() == ""
+
+        when {
+            isProjectKeyInvalid -> startRequestProjectKeyActivity()
+            isCallingAppFromUnknownSource -> showErrorAboutNotGenuineCallingApp()
+            didSetupNotCompleteYet -> setup.start(this, getSetupCallback())
+        }
+    }
+
+    private fun startRequestProjectKeyActivity() {
+        overridePendingTransition(R.anim.slide_out_to_up, R.anim.stay)
+        val intent = Intent(this, RequestProjectKeyActivity::class.java)
+        startActivity(intent)
     }
 
     private fun injectDependencies() {
         app = application as Application
         dataManager = app.dataManager
+
         positionTracker = PositionTracker(this, dataManager)
         appState = app.appState
         setup = app.setup
+    }
+
+    private fun showErrorAboutNotGenuineCallingApp() {
+
+        val errorDialog = AlertDialog.Builder(this).create()
+        errorDialog.setTitle(getString(R.string.error))
+        errorDialog.setMessage(getString(R.string.error_calling_app_invalid))
+        errorDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", { dialogInterface, i -> dialogInterface.dismiss() })
+        errorDialog.show()
     }
 
     private fun initView() {
@@ -108,8 +140,6 @@ class LaunchActivity : AppCompatActivity() {
     private fun extractSessionParameters(callout: Callout) {
         val sessionParameters = app.sessionParametersExtractor.extractFrom(callout)
         dataManager.sessionParameters = sessionParameters
-        dataManager.apiKey = sessionParameters.apiKey
-        dataManager.appKey = sessionParameters.apiKey.substring(0, 8)
         dataManager.logUserProperties()
     }
 
