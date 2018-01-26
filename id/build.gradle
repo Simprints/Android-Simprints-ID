@@ -48,23 +48,20 @@ android {
             }
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            buildConfigField("String", "FIREBASE_PROJECT", "\"simprints-152315\"")
-            buildConfigField("String", "SCANNER", getLocalProperty('ext.scanner'))
-            buildConfigField("String", "WIFI_NETWORK", getLocalProperty('ext.wifiNetwork'))
-            buildConfigField("String", "WIFI_PASSWORD", getLocalProperty('ext.wifiPassword'))
 
         }
         endToEndTesting {
             initWith debug
 
-            buildConfigField("String", "SCANNER", getLocalProperty('ext.scanner'))
-            buildConfigField("String", "WIFI_NETWORK", getLocalProperty('ext.wifiNetwork'))
-            buildConfigField("String", "WIFI_PASSWORD", getLocalProperty('ext.wifiPassword'))
+            buildConfigField("String", "SCANNER", getLocalPropertyForTesting('ext.scanner'))
+            buildConfigField("String", "WIFI_NETWORK", getLocalPropertyForTesting('ext.wifiNetwork'))
+            buildConfigField("String", "WIFI_PASSWORD", getLocalPropertyForTesting('ext.wifiPassword'))
             versionNameSuffix "-test"
             buildConfigField("String", "FIREBASE_PROJECT", "\"simprints-testing\"")
             testCoverageEnabled true
         }
     }
+
     testBuildType "endToEndTesting"
 }
 
@@ -82,6 +79,15 @@ project.afterEvaluate {
             getMaxThreads : { originalProvider.getMaxThreads() }
         ] as com.android.builder.testing.api.DeviceProvider
     }
+
+    project.("kaptEndToEndTestingKotlin").doFirst {
+        ["ext.scanner", "ext.wifiNetwork", "ext.wifiNetwork"].each { paramName ->
+            if (getLocalPropertyForTesting(paramName) == "") {
+                throw new GradleException(
+                    paramName + " not found and it's required to run the instrumented tests. Please add " + paramName + " in your local.properties file.")
+            }
+        }
+    }
 }
 
 // Required to run instrumented tests (gradlew connectedAndroidTest) on a single device.
@@ -98,17 +104,12 @@ def filterDevices(connectedDevices) {
     devices
 }
 
-def getLocalProperty(name) {
+def getLocalPropertyForTesting(name) {
     Properties properties = new Properties()
     properties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
-    def externalModuleDir = properties.getProperty(name, null)
-    if (externalModuleDir == null) {
-        throw new GradleException(
-            name+" not found. Define location with "+name+"in the local.properties file!")
-    }
+    def externalModuleDir = properties.getProperty(name, "")
     return externalModuleDir
 }
-
 
 buildscript {
     repositories {
