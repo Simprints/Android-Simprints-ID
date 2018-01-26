@@ -1,8 +1,6 @@
 package com.simprints.id.templates
 
 import android.support.test.InstrumentationRegistry
-import com.simprints.cerberuslibrary.BluetoothUtility
-import com.simprints.cerberuslibrary.WifiUtility
 import com.simprints.cerberuslibrary.services.UtilityServiceClient
 import com.simprints.id.tools.CalloutCredentials
 import com.simprints.id.tools.RemoteAdminUtils
@@ -19,8 +17,6 @@ abstract class FirstUseTest {
     protected abstract val calloutCredentials: CalloutCredentials
 
     private val client = UtilityServiceClient(InstrumentationRegistry.getContext())
-    private val bluetoothUtility = BluetoothUtility(client)
-    private val wifiUtility = WifiUtility(client)
 
     @Before
     @Throws(ApiException::class)
