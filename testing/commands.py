@@ -29,6 +29,8 @@ def install_android_test_apk_command(dir_path: str, module_name: str, build_type
            f'{dir_path}/' \
            f'{module_name}/build/outputs/apk/androidTest/{build_type}/{module_name}-{build_type}-androidTest.apk'
 
+def run_instrumented_tests_command(dir_path: str, device: Device):
+    return f'{dir_path}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue -Pdevices={device.device_id}'
 
 def query_devices():
     return f'{ADB} devices -l'
@@ -77,3 +79,6 @@ def simprints_id_install_apk_command(build_type: str, device: Device):
 
 def simprints_id_install_android_test_apk_command(build_type: str, device: Device):
     return install_android_test_apk_command(SIMPRINTS_ID_DIR_PATH, SIMPRINTS_ID_MODULE_NAME, build_type, device)
+
+def simprints_id_run_instrumented_tests(device: Device):
+    return run_instrumented_tests_command(SIMPRINTS_ID_DIR_PATH, device)
