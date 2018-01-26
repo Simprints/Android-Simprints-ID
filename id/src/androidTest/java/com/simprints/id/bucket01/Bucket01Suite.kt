@@ -11,11 +11,6 @@ import com.simprints.id.tools.log
 import org.junit.After
 import org.junit.Before
 
-//@RunWith(Suite::class)
-//@Suite.SuiteClasses(
-//    HappyWorkflowAllMainFeatures::class,
-//    HappySyncMediumDatabase::class
-//)
 abstract class Bucket01Suite : FirstUseTest() {
 
     private val client = UtilityServiceClient(InstrumentationRegistry.getContext())
@@ -45,7 +40,7 @@ abstract class Bucket01Suite : FirstUseTest() {
     override fun tearDown() {
         log("Bucket01Suite.suiteTearDown()")
         log("Bucket01Suite.suiteTearDown(): un-pairing scanner")
-        bluetoothUtility.setBluetoothPairingStateSync(BuildConfig.SCANNER, false)
+        bluetoothUtility.setBluetoothPairingStateSync(BluetoothUtility.convertNameToMacAddress(BuildConfig.SCANNER), false)
 
         super.tearDown()
 
