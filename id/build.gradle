@@ -48,16 +48,67 @@ android {
             }
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            buildConfigField("String", "FIREBASE_PROJECT", "\"simprints-152315\"")
+
         }
         endToEndTesting {
             initWith debug
+
+            buildConfigField("String", "SCANNER", getLocalPropertyForTesting('ext.scanner'))
+            buildConfigField("String", "WIFI_NETWORK", getLocalPropertyForTesting('ext.wifiNetwork'))
+            buildConfigField("String", "WIFI_PASSWORD", getLocalPropertyForTesting('ext.wifiPassword'))
             versionNameSuffix "-test"
             buildConfigField("String", "FIREBASE_PROJECT", "\"simprints-testing\"")
             testCoverageEnabled true
         }
     }
+
     testBuildType "endToEndTesting"
+}
+
+
+project.afterEvaluate {
+    project.("connectedEndToEndTestingAndroidTest").doFirst {
+        def originalProvider = deviceProvider
+        deviceProvider = [
+            getName       : { originalProvider.getName() },
+            init          : { originalProvider.init() },
+            terminate     : { originalProvider.terminate() },
+            getDevices    : { filterDevices(originalProvider.getDevices()) },
+            getTimeoutInMs: { originalProvider.getTimeoutInMs() },
+            isConfigured  : { originalProvider.isConfigured() },
+            getMaxThreads : { originalProvider.getMaxThreads() }
+        ] as com.android.builder.testing.api.DeviceProvider
+    }
+
+    project.("kaptEndToEndTestingKotlin").doFirst {
+        ["ext.scanner", "ext.wifiNetwork", "ext.wifiNetwork"].each { paramName ->
+            if (getLocalPropertyForTesting(paramName) == "") {
+                throw new GradleException(
+                    paramName + " not found and it's required to run the instrumented tests. Please add " + paramName + " in your local.properties file.")
+            }
+        }
+    }
+}
+
+// Required to run instrumented tests (gradlew connectedAndroidTest) on a single device.
+// By default Android runs on all device at the same time
+def filterDevices(connectedDevices) {
+    def DEVICES_PROPERTY = "devices"
+    def devices = connectedDevices
+    if (project.hasProperty(DEVICES_PROPERTY)) {
+        def devicesSerials = project.getProperties().get(DEVICES_PROPERTY).split(/,/)
+        devices = connectedDevices.findAll { devicesSerials.contains(it.serialNumber) }
+        println "[testy] ${!devices.empty ? "Execute on: ${devices.collect { it.serialNumber }}" : "Devices not found"}"
+    }
+
+    devices
+}
+
+def getLocalPropertyForTesting(name) {
+    Properties properties = new Properties()
+    properties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+    def externalModuleDir = properties.getProperty(name, "")
+    return externalModuleDir
 }
 
 buildscript {
@@ -146,7 +197,7 @@ dependencies {
         exclude group: 'com.google.code.findbugs'
     }
 
-    androidTestImplementation "com.simprints:cerberus-library:2017.4.1-dev-4"
+    androidTestImplementation "com.simprints:cerberus-library:2018.1.1-dev-1"
     androidTestImplementation "com.simprints:remote-admin-client:2017.4.0-dev-5"
     androidTestImplementation "com.squareup.okhttp:okhttp:2.7.5"
     androidTestImplementation "joda-time:joda-time:2.9.9"
