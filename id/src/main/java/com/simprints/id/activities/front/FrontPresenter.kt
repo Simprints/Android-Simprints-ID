@@ -18,7 +18,7 @@ internal class FrontPresenter(val view: FrontContract.View) : FrontContract.Pres
 
     override fun doSecurityChecks(): Boolean {
         if (secureManager == null) { throw Exception("Dependencies not injected!") }
-        if (secureManager!!.getProjectKeyOrEmpty() == "") {
+        if (secureManager!!.getProjectSecretOrEmpty() == "") {
             view.openRequestAPIActivity()
             return false
         }

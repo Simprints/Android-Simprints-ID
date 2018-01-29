@@ -92,8 +92,8 @@
             android:theme="@style/AppTheme.ActionBar" />
 
         <activity
-            android:name=".activities.requestProjectKey.RequestProjectKeyActivity"
-            android:label="@string/requestProjectKey_title"
+            android:name=".activities.requestProjectCredentials.RequestProjectCredentialsActivity"
+            android:label="@string/requestProjectCredentials_title"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 

@@ -4,9 +4,12 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 
 interface SecureDataManager {
 
-    var projectKey: String
+    var projectSecret: String
+    var projectId: String
     var prefs: ImprovedSharedPreferences
-    fun getProjectKeyOrEmpty(): String
+    fun getProjectSecretOrEmpty(): String
+    fun getProjectIdOrEmpty(): String
+    fun areProjectCredentialsStore(): Boolean
 
     /*TODO: Legacy stuff to refactor */
     fun getApiKeyOr(default: String): String

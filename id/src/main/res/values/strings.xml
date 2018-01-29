@@ -303,11 +303,15 @@
     <!-- TODO: what about translation? -->
     <string name="empty" translatable="false" />
     <string name="simprints_logo">Simprints Logo</string>
-    <string name="requestProjectKey_enter_key">Enter API Key</string>
+    <string name="requestProjectCredentials_enter_project_secret_id">Enter your project\'s id and key</string>
     <string name="scan_qr">Scan QR</string>
     <string name="enter">Enter</string>
-    <string name="requestProjectKey_key_hint">xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</string>
-    <string name="requestProjectKey_invalidKey">Invalid API Key</string>
-    <string name="requestProjectKey_title">Request Api Key</string>
+    <string name="requestProjectCredentials_secret_hint">Project secret</string>
+    <string name="requestProjectCredentials_id_hint">Project id</string>
+    <string name="requestProjectCredentials_invalidCredentials">Invalid project\'s id or key</string>
+
+    <string name="requestProjectCredentials_title">Request Api Key</string>
+    <string name="requestProjectCredentials_type_project_details">Type manually</string>
+    <string name="requestProjectCredentials_invalidQrCode">The scanned QR code is invalid.</string>
 
 </resources>
