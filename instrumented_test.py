@@ -1,16 +1,16 @@
 import datetime
 import os
 import queue
+import shutil
 import subprocess
 import sys
 import threading
 import time
-import shutil
 from logging import Formatter, Logger, getLogger, DEBUG, StreamHandler, FileHandler, INFO, WARN, ERROR, CRITICAL
 
 from testing.commands import *
 from testing.directory_paths import LOG_DIR_BASE_NAME
-from testing.models import Scanner, Device, WifiNetwork
+from testing.models import Device
 
 buckets = {
     'bucket_01': 'com.simprints.id.bucket01.Bucket01Suite',
@@ -186,11 +186,11 @@ class Run:
         self.logger.addHandler(test_file_handler)
         self.update_log_format(LogState.test(device, test_id), test_file_handler)
 
-        self.run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue -Pdevices={device.device_id}')
+        self.run_and_log(simprints_id_run_instrumented_tests(device))
 
         self.logger.removeHandler(test_file_handler)
 
-    def save_results(self, device:Device):
+    def save_results(self, device: Device):
         dir_name_to_save_results_html = f'{self.log_dir_name}/{device.model}/html'
         dir_name_to_save_results_xml = f'{self.log_dir_name}/{device.model}/xml'
 
@@ -203,6 +203,7 @@ class Run:
         shutil.move("build/reports/androidTests", dir_name_to_save_results_html)
         shutil.move("id/build/outputs/androidTest-results/connected", dir_name_to_save_results_xml)
 
+
 def main():
     start_time = time.perf_counter()
 
@@ -214,8 +215,8 @@ def main():
     run.assemble_cerberus_apk()
 
     run.clean_simprints_id_build()
-    #run.assemble_simprints_id_apk()
-    #run.assemble_simprints_id_test_apk()
+    # run.assemble_simprints_id_apk()
+    # run.assemble_simprints_id_test_apk()
 
     devices = run.query_devices()
 
@@ -226,16 +227,16 @@ def main():
         run.uninstall_simprints_id_apk(device)
         run.uninstall_simprints_id_test_apk(device)
 
-        #run.install_test_apk(device)
+        # run.install_test_apk(device)
 
         run.install_cerberus_apk(device)
-        #Cerberus needs to be in foreground to start services in Android versions
-        #https://developer.android.com/about/versions/oreo/android-8.0-changes.html#back-all
+        # Cerberus needs to be in foreground to start services in Android versions
+        # https://developer.android.com/about/versions/oreo/android-8.0-changes.html#back-all
         run.run_cerberus_apk(device)
         run.run_test(device, 'instrumentedTests')
         run.save_results(device)
 
-    #run.run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue')
+    # run.run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue')
 
     run.update_log_format(LogState.default())
     run.log('TEST END')
