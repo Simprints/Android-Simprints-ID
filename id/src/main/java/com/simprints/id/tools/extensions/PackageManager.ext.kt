@@ -11,15 +11,13 @@ import android.content.pm.PackageManager
 // we should check for getInstallerPackageName == com.android.vending, but it's not
 // guaranteed it won't change in the future.
 fun PackageManager.isAppInstallerKnown(packageName: String): Boolean {
-    try {
-        return this.getInstallerPackageName(packageName) != null
+    return try {
+        this.getInstallerPackageName(packageName) != null
     } catch (e: Exception) {
         e.printStackTrace()
-    } finally {
-
         // Android doesn't recognise the packageName. We loosely pretend
         // packageName comes from the Google Play Store
-        return true
+        true
     }
 }
 
