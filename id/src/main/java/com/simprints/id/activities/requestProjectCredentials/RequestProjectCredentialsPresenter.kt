@@ -45,8 +45,6 @@ class RequestProjectCredentialsPresenter(val view: RequestProjectCredentialsCont
             true
         } catch (e: ProjectCredentialsNonValidError){
             view.showErrorForInvalidProjectCredentials()
-            secureDataManager!!.projectId = ""
-            secureDataManager!!.projectSecret = ""
             false
         }
     }

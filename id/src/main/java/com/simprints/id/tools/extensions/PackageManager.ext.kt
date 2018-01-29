@@ -13,7 +13,7 @@ import android.content.pm.PackageManager
 fun PackageManager.isAppInstallerKnown(packageName: String): Boolean {
     try {
         return this.getInstallerPackageName(packageName) != null
-    } catch (e: Exception){
+    } catch (e: Exception) {
         e.printStackTrace()
     } finally {
 

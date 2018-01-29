@@ -3,7 +3,6 @@ package com.simprints.id.data.secure
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError
 import com.simprints.id.exceptions.unsafe.ProjectCredentialsNonValidError
-import java.util.*
 
 
 class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
@@ -23,14 +22,8 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             return value
         }
         set(value) {
-            try {
-                // Probably we won't need this check in the future. We will validate it with server
-                UUID.fromString(value)
-                field = value
-                prefs.edit().putPrimitive(PROJECT_SECRET, field).commit()
-            } catch (e: Exception) {
-                throw ProjectCredentialsNonValidError()
-            }
+            field = value
+            prefs.edit().putPrimitive(PROJECT_SECRET, field).commit()
         }
 
     override fun getProjectSecretOrEmpty(): String {
@@ -51,14 +44,8 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             return value
         }
         set(value) {
-            try {
-                // Probably we won't need this check in the future. We will validate it with server
-                UUID.fromString(value)
-                field = value
-                prefs.edit().putPrimitive(PROJECT_SECRET, field).commit()
-            } catch (e: Exception) {
-                throw ProjectCredentialsNonValidError()
-            }
+            field = value
+            prefs.edit().putPrimitive(PROJECT_SECRET, field).commit()
         }
 
     override fun getProjectIdOrEmpty(): String {

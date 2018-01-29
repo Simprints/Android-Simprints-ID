@@ -59,28 +59,32 @@ class RequestProjectCredentialsActivity : AppCompatActivity(), RequestProjectCre
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(data == null) return
 
         if (requestCode == 0) {
             val isResultValid = resultCode == Activity.RESULT_OK
             if (isResultValid) {
                 val scannedText = data.getStringExtra("SCAN_RESULT")
-                var scannedTextComponents = scannedText.split("-")
+                if(scannedText != null) {
+                    var scannedTextComponents = scannedText.split("-")
+                    val doesScannedTextComponentsTwoParts = scannedTextComponents.size > 1
+                    this.runOnUiThread({
+                        if (doesScannedTextComponentsTwoParts) {
+                            val projectId = scannedTextComponents[0]
+                            val projectSecret = scannedTextComponents[1]
 
-                val doesScannedTextComponentsTwoParts = scannedTextComponents.size > 1
-                if (doesScannedTextComponentsTwoParts) {
-                    val projectId = scannedTextComponents[0]
-                    val projectSecret = scannedTextComponents[1]
-
-                    this.runOnUiThread({ viewPresenter.onActivityResultForQRScanned(projectId, projectSecret) })
-                } else {
-                    showErrorForInvalidQRCode()
+                            viewPresenter.onActivityResultForQRScanned(projectId, projectSecret)
+                        } else {
+                            showErrorForInvalidQRCode()
+                        }
+                    })
                 }
             }
         }
     }
 
-    fun showErrorForInvalidQRCode() {
+    private fun showErrorForInvalidQRCode() {
         Toast.makeText(this, getString(R.string.requestProjectCredentials_invalidQrCode), Toast.LENGTH_SHORT).show()
     }
 
