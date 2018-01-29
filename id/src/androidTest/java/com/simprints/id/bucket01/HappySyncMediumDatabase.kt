@@ -6,6 +6,8 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.templates.FirstUseTest
+import com.simprints.id.templates.HappyBluetooth
+import com.simprints.id.templates.HappyWifi
 import com.simprints.id.testHappySync
 import com.simprints.id.tools.CalloutCredentials
 import com.simprints.id.tools.RemoteAdminUtils
@@ -23,7 +25,8 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class HappySyncMediumDatabase : FirstUseTest() {
+
+class HappySyncMediumDatabase : FirstUseTest(), HappyWifi, HappyBluetooth {
 
     override val calloutCredentials: CalloutCredentials = CalloutCredentials(
         "00000002-0000-0000-0000-000000000000",
@@ -40,9 +43,12 @@ class HappySyncMediumDatabase : FirstUseTest() {
     @Throws(ApiException::class)
     override fun setUp() {
         log("bucket01.HappySyncMediumDatabase.setUp()")
+        super<HappyWifi>.setUp()
+        super<HappyBluetooth>.setUp()
+
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
         realmConfiguration = RealmConfig.get(calloutCredentials.apiKey)
-        super.setUp()
+        super<FirstUseTest>.setUp()
 
         log("bucket01.HappySyncMediumDatabase.setUp() creating remote database with ${SyncParameters.MEDIUM_DATABASE_NUMBER_OF_PATIENTS} patients")
         val apiInstance = RemoteAdminUtils.configuredApiInstance
@@ -58,6 +64,6 @@ class HappySyncMediumDatabase : FirstUseTest() {
     @After
     override fun tearDown() {
         log("bucket01.HappySyncMediumDatabase.tearDown()")
-        super.tearDown()
+        super<HappyBluetooth>.tearDown()
     }
 }
