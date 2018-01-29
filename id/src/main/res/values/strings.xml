@@ -196,7 +196,7 @@
     <string name="recovering_db">Recovering Database… \nThis will take a moment.</string>
     <string name="error">Error</string>
     <string name="error_recovery_message">An error occurred while uploading the recovery file.</string>
-    <string name="error_calling_app_invalid">It seems the calling app was not installed from the Google Play Store. Sorry you can\'t use SimprintsID</string>
+    <string name="error_calling_app_invalid">It seems the calling app was not installed from the Google Play Store. Sorry you can\'t use Simprints ID</string>
 
     <string name="success_recovery_message">Recovery file uploaded successfully.</string>
     <string name="dismiss">Dismiss</string>
@@ -310,7 +310,7 @@
     <string name="requestProjectCredentials_id_hint">Project id</string>
     <string name="requestProjectCredentials_invalidCredentials">Invalid project\'s id or key</string>
 
-    <string name="requestProjectCredentials_title">Request Api Key</string>
+    <string name="requestProjectCredentials_title">Request Project credentials</string>
     <string name="requestProjectCredentials_type_project_details">Type manually</string>
     <string name="requestProjectCredentials_invalidQrCode">The scanned QR code is invalid.</string>
 
