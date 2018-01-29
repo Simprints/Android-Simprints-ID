@@ -5,8 +5,8 @@ import android.util.Base64
 import java.security.PublicKey
 
 
-class AsymEncrypter(private val rsaCipher: Cipher,
-                    private val publicKey: PublicKey) {
+class AsymmetricEncrypter(private val rsaCipher: Cipher = AsymmetricEncryptionHelper().getCipher(),
+                          private val publicKey: PublicKey = AsymmetricEncryptionHelper().getPublicKey()) {
 
     fun encrypt(string: String): String {
         rsaCipher.init(Cipher.ENCRYPT_MODE, publicKey)
