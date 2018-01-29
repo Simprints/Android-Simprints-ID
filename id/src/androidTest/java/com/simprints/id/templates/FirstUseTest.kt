@@ -7,7 +7,6 @@ import com.simprints.id.tools.StorageUtils
 import com.simprints.id.tools.log
 import com.simprints.remoteadminclient.ApiException
 import io.realm.RealmConfiguration
-import org.junit.After
 import org.junit.Before
 
 abstract class FirstUseTest {
@@ -28,10 +27,5 @@ abstract class FirstUseTest {
         log("FirstUseTest.setUp(): cleaning remote data")
         val apiInstance = RemoteAdminUtils.configuredApiInstance
         RemoteAdminUtils.clearProjectNode(apiInstance, calloutCredentials.apiKey)
-    }
-
-    @After
-    open fun tearDown() {
-        log("FirstUseTest.tearDown(): nothing")
     }
 }

@@ -1,6 +1,7 @@
 import datetime
 import os
 import queue
+import shutil
 import subprocess
 import sys
 import threading
@@ -9,7 +10,7 @@ from logging import Formatter, Logger, getLogger, DEBUG, StreamHandler, FileHand
 
 from testing.commands import *
 from testing.directory_paths import LOG_DIR_BASE_NAME
-from testing.models import Scanner, Device, WifiNetwork
+from testing.models import Device
 
 buckets = {
     'bucket_01': 'com.simprints.id.bucket01.Bucket01Suite',
@@ -143,6 +144,9 @@ class Run:
     def uninstall_simprints_id_test_apk(self, device):
         self.run_and_log(simprints_id_uninstall_android_test_apk_command(device))
 
+    def run_cerberus_apk(self, device: Device):
+        self.run_and_log(cerberus_app_open_apk_command(device))
+
     def install_cerberus_apk(self, device: Device):
         self.run_and_log(cerberus_app_install_apk_command('debug', device))
 
@@ -171,7 +175,7 @@ class Run:
                     devices.append(Device(device_str[0], segment[6:]))
         return devices
 
-    def run_test(self, device: Device, test_id: str, scanner: Scanner, wifi_network: WifiNetwork):
+    def run_test(self, device: Device, test_id: str):
         test_dir_name = f'{self.log_dir_name}/{device.model}/{test_id}'
 
         if not os.path.exists(test_dir_name):
@@ -182,9 +186,22 @@ class Run:
         self.logger.addHandler(test_file_handler)
         self.update_log_format(LogState.test(device, test_id), test_file_handler)
 
-        self.run_and_log(simprints_id_test_command(device, buckets[test_id], scanner, wifi_network))
+        self.run_and_log(simprints_id_run_instrumented_tests(device))
 
         self.logger.removeHandler(test_file_handler)
+
+    def save_results(self, device: Device):
+        dir_name_to_save_results_html = f'{self.log_dir_name}/{device.model}/html'
+        dir_name_to_save_results_xml = f'{self.log_dir_name}/{device.model}/xml'
+
+        if not os.path.exists(dir_name_to_save_results_html):
+            os.makedirs(dir_name_to_save_results_html)
+
+        if not os.path.exists(dir_name_to_save_results_xml):
+            os.makedirs(dir_name_to_save_results_xml)
+
+        shutil.move("build/reports/androidTests", dir_name_to_save_results_html)
+        shutil.move("id/build/outputs/androidTest-results/connected", dir_name_to_save_results_xml)
 
 
 def main():
@@ -198,8 +215,8 @@ def main():
     run.assemble_cerberus_apk()
 
     run.clean_simprints_id_build()
-    run.assemble_simprints_id_apk()
-    run.assemble_simprints_id_test_apk()
+    # run.assemble_simprints_id_apk()
+    # run.assemble_simprints_id_test_apk()
 
     devices = run.query_devices()
 
@@ -210,11 +227,16 @@ def main():
         run.uninstall_simprints_id_apk(device)
         run.uninstall_simprints_id_test_apk(device)
 
-        run.install_cerberus_apk(device)
-        run.install_apk(device)
-        run.install_test_apk(device)
+        # run.install_test_apk(device)
 
-        run.run_test(device, 'bucket_01', Scanner('SP057763'), WifiNetwork('Simprints 2.0', 'Tech4Dev'))
+        run.install_cerberus_apk(device)
+        # Cerberus needs to be in foreground to start services in Android versions
+        # https://developer.android.com/about/versions/oreo/android-8.0-changes.html#back-all
+        run.run_cerberus_apk(device)
+        run.run_test(device, 'instrumentedTests')
+        run.save_results(device)
+
+    # run.run_and_log(f'{SIMPRINTS_ID_DIR_PATH}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue')
 
     run.update_log_format(LogState.default())
     run.log('TEST END')
