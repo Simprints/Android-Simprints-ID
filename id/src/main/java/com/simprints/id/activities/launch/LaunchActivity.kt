@@ -77,6 +77,7 @@ class LaunchActivity : AppCompatActivity() {
             return
         }
         positionTracker.start()
+        dataManager.callingPackage = callingPackage
     }
 
     override fun onResume() {
@@ -84,16 +85,16 @@ class LaunchActivity : AppCompatActivity() {
 
         val didSetupNotCompleteYet = setup.setupCompleted == false
         val isCallingAppFromUnknownSource = app.packageManager.isAppInstallerKnown(dataManager.callingPackage) == false
-        val areProjectCredentialsStore = dataManager.areProjectCredentialsStore()
+        val areProjectCredentialsNotStore = dataManager.areProjectCredentialsStore() == false
 
         when {
-            areProjectCredentialsStore -> startRequestProjectKeyActivity()
+            areProjectCredentialsNotStore -> startRequestProjectCredentialsActivity()
             isCallingAppFromUnknownSource -> showErrorAboutNotGenuineCallingApp()
             didSetupNotCompleteYet -> setup.start(this, getSetupCallback())
         }
     }
 
-    private fun startRequestProjectKeyActivity() {
+    private fun startRequestProjectCredentialsActivity() {
         overridePendingTransition(R.anim.slide_out_to_up, R.anim.stay)
         val intent = Intent(this, RequestProjectCredentialsActivity::class.java)
         startActivity(intent)
@@ -102,7 +103,6 @@ class LaunchActivity : AppCompatActivity() {
     private fun injectDependencies() {
         app = application as Application
         dataManager = app.dataManager
-
         positionTracker = PositionTracker(this, dataManager)
         appState = app.appState
         setup = app.setup
@@ -113,7 +113,7 @@ class LaunchActivity : AppCompatActivity() {
         val errorDialog = AlertDialog.Builder(this).create()
         errorDialog.setTitle(getString(R.string.error))
         errorDialog.setMessage(getString(R.string.error_calling_app_invalid))
-        errorDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", { dialogInterface, _ -> dialogInterface.dismiss() })
+        errorDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", { _, _ -> finish() })
         errorDialog.show()
     }
 
