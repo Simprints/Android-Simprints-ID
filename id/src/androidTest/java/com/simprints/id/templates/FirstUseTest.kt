@@ -1,22 +1,18 @@
 package com.simprints.id.templates
 
 import android.support.test.InstrumentationRegistry
-import com.simprints.cerberuslibrary.services.UtilityServiceClient
 import com.simprints.id.tools.CalloutCredentials
 import com.simprints.id.tools.RemoteAdminUtils
 import com.simprints.id.tools.StorageUtils
 import com.simprints.id.tools.log
 import com.simprints.remoteadminclient.ApiException
 import io.realm.RealmConfiguration
-import org.junit.After
 import org.junit.Before
 
 abstract class FirstUseTest {
 
     protected abstract var realmConfiguration: RealmConfiguration?
     protected abstract val calloutCredentials: CalloutCredentials
-
-    private val client = UtilityServiceClient(InstrumentationRegistry.getContext())
 
     @Before
     @Throws(ApiException::class)
@@ -31,10 +27,5 @@ abstract class FirstUseTest {
         log("FirstUseTest.setUp(): cleaning remote data")
         val apiInstance = RemoteAdminUtils.configuredApiInstance
         RemoteAdminUtils.clearProjectNode(apiInstance, calloutCredentials.apiKey)
-    }
-
-    @After
-    open fun tearDown() {
-        log("FirstUseTest.tearDown(): nothing")
     }
 }
