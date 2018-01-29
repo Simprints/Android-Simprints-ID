@@ -1,23 +1,21 @@
 package com.simprints.id.activities
 
-import android.content.Context
-import android.content.pm.ActivityInfo
-import android.content.pm.ApplicationInfo
-import android.content.pm.ResolveInfo
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
-import com.simprints.id.activities.front.FrontActivity
-import com.simprints.id.activities.requestProjectKey.RequestProjectKeyActivity
-import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.activities.requestProjectCredentials.RequestProjectCredentialsActivity
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.tools.extensions.scannerAppIntent
-import kotlinx.android.synthetic.main.activity_request_project_key.*
+import com.simprints.id.tools.roboletric.createRoboFrontViewActivity
+import com.simprints.id.tools.roboletric.createRoboRequestProjectCredentialsActivity
+import com.simprints.id.tools.roboletric.getRoboSharedPreferences
+import com.simprints.id.tools.roboletric.injectHowToResolveScannerAppIntent
+import kotlinx.android.synthetic.main.activity_request_project_secret.*
 import org.junit.Assert
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
@@ -33,24 +31,25 @@ class FrontActivityTest {
 
     @Test
     @Throws(Exception::class)
-    fun notApiKeyStored_shouldBringRegistrationActivityUp() {
+    fun notProjectSecretStored_shouldBringRegistrationActivityUp() {
 
-        FirebaseApp.initializeApp(RuntimeEnvironment.application);
-        val controller = Robolectric.buildActivity(FrontActivity::class.java).create().start().resume().visible()
+        FirebaseApp.initializeApp(RuntimeEnvironment.application)
+        val controller = createRoboFrontViewActivity().start().resume().visible()
         val activity = controller.get()
-        assertActivityStarted(RequestProjectKeyActivity::class.java, activity)
+        assertActivityStarted(RequestProjectCredentialsActivity::class.java, activity)
     }
 
     @Test
     @Throws(Exception::class)
-    fun validApiKeyStored_shouldStayOnFrontActivity() {
+    fun validProjectCredentialsStored_shouldStayOnFrontActivity() {
 
         FirebaseApp.initializeApp(RuntimeEnvironment.application);
 
-        val sharedPreferences = RuntimeEnvironment.application.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, Context.MODE_PRIVATE)
-        sharedPreferences.edit().putString("PROJECT_KEY", "some key").commit()
+        val sharedPreferences = getRoboSharedPreferences()
+        sharedPreferences.edit().putString("PROJECT_SECRET", "secret").commit()
+        sharedPreferences.edit().putString("PROJECT_ID", "id").commit()
 
-        val controller = Robolectric.buildActivity(FrontActivity::class.java).create().start().resume().visible()
+        val controller = createRoboFrontViewActivity().start().resume().visible()
         val activity = controller.get()
 
         assertNull(shadowOf(activity).nextStartedActivity)
@@ -58,63 +57,52 @@ class FrontActivityTest {
 
     @Test
     @Throws(Exception::class)
-    fun qrScanPressed_shouldPlayStoreIfScannerNotAvailable() {
+    fun qrScanPressedAndScannerAppNotAvailable_shouldOpenPlayStore() {
 
         FirebaseApp.initializeApp(RuntimeEnvironment.application);
 
-        val controller = Robolectric.buildActivity(RequestProjectKeyActivity::class.java).create().start().resume().visible()
+        val controller = createRoboRequestProjectCredentialsActivity().start().resume().visible()
         val activity = controller.get()
-        activity.requestProjectKeyButtonScanQr.performClick()
 
-        assertNotNull(shadowOf(activity).nextStartedActivity)
+        activity.requestProjectCredentialsButtonScanQr.performClick()
 
-        val isIntentForGooglePlay: Boolean = shadowOf(activity).nextStartedActivity.dataString.contains("play.google.com")
+        val nextActivity = shadowOf(activity).nextStartedActivity
+
+        assertNotNull(nextActivity)
+
+        val isIntentForGooglePlay: Boolean = nextActivity.dataString.contains("play.google.com")
         assert(isIntentForGooglePlay)
     }
 
 
     @Test
     @Throws(Exception::class)
-    fun qrScanPressed_shouldOpenScannerAppIfAvailable() {
+    fun qrScanPressedAndScannerAppIsAvailable_shouldOpenScannerApp() {
 
         val app = RuntimeEnvironment.application as Application
         FirebaseApp.initializeApp(app)
-        val packageManager = app.packageManager
+        val pm = app.packageManager
 
-        val controller = Robolectric.buildActivity(RequestProjectKeyActivity::class.java).create()
+        val controller = createRoboRequestProjectCredentialsActivity()
         val activity = controller.get()
 
-        // Pretend that ScannerQR app is installed
-        val spm = shadowOf(packageManager)
-        val info = ResolveInfo()
-        info.isDefault = true
-        val applicationInfo = ApplicationInfo()
-        applicationInfo.packageName = "com.google.zxing.client.android"
-        applicationInfo.className = "com.google.zxing.client.android.CaptureActivity"
-        info.activityInfo = ActivityInfo()
-        info.activityInfo.applicationInfo = applicationInfo
-        info.activityInfo.name = "Barcode Scanner"
-        spm.addResolveInfoForIntent(packageManager.scannerAppIntent(), info)
+        val spm = shadowOf(pm)
+        spm.addResolveInfoForIntent(pm.scannerAppIntent(), injectHowToResolveScannerAppIntent(pm))
 
         controller.start().resume().visible()
-        activity.requestProjectKeyButtonScanQr.performClick()
+        activity.requestProjectCredentialsButtonScanQr.performClick()
 
-        assertNotNull(shadowOf(activity).nextStartedActivity)
+        val nextActivity = shadowOf(activity).nextStartedActivity
+        assertNotNull(nextActivity)
 
-        val isIntentForGooglePlay: Boolean = shadowOf(activity).nextStartedActivity.dataString.contains("play.google.com")
-        assertFalse(isIntentForGooglePlay)
+        val isIntentForScannerApp = nextActivity.action == "com.google.zxing.client.android.SCAN"
+        assert(isIntentForScannerApp)
     }
 
     @Test
     @Throws(Exception::class)
     fun enterButtonPressed_doSomething() {
 
-        val controller = Robolectric.buildActivity(RequestProjectKeyActivity::class.java).create().start().resume().visible()
-        val activity = controller.get()
-        activity.requestProjectKeyEditTextProjectKey.setText("some key")
-        activity.requestProjectKeyButtonEnterKey.performClick()
-
-        assertTrue(activity.isFinishing)
         Assert.fail("Not implemented yet!")
     }
 }

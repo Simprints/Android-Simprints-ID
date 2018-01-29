@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.widget.TextView
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.requestProjectKey.RequestProjectKeyActivity
+import com.simprints.id.activities.requestProjectCredentials.RequestProjectCredentialsActivity
 import com.simprints.id.data.DataManager
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.PermissionManager
@@ -55,7 +55,7 @@ class FrontActivity : AppCompatActivity(), FrontContract.View {
 
     override fun openRequestAPIActivity(){
         overridePendingTransition(R.anim.slide_out_to_up, R.anim.stay)
-        val intent = Intent(this, RequestProjectKeyActivity::class.java)
+        val intent = Intent(this, RequestProjectCredentialsActivity::class.java)
         startActivity(intent)
     }
 

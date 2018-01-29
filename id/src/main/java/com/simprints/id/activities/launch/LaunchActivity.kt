@@ -15,7 +15,7 @@ import com.simprints.id.activities.AlertActivity
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.MainActivity
 import com.simprints.id.activities.RefusalActivity
-import com.simprints.id.activities.requestProjectKey.RequestProjectKeyActivity
+import com.simprints.id.activities.requestProjectCredentials.RequestProjectCredentialsActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
@@ -84,10 +84,10 @@ class LaunchActivity : AppCompatActivity() {
 
         val didSetupNotCompleteYet = setup.setupCompleted == false
         val isCallingAppFromUnknownSource = app.packageManager.isAppInstallerKnown(dataManager.callingPackage) == false
-        val isProjectKeyInvalid = dataManager.getProjectKeyOrEmpty() == ""
+        val areProjectCredentialsStore = dataManager.areProjectCredentialsStore()
 
         when {
-            isProjectKeyInvalid -> startRequestProjectKeyActivity()
+            areProjectCredentialsStore -> startRequestProjectKeyActivity()
             isCallingAppFromUnknownSource -> showErrorAboutNotGenuineCallingApp()
             didSetupNotCompleteYet -> setup.start(this, getSetupCallback())
         }
@@ -95,7 +95,7 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun startRequestProjectKeyActivity() {
         overridePendingTransition(R.anim.slide_out_to_up, R.anim.stay)
-        val intent = Intent(this, RequestProjectKeyActivity::class.java)
+        val intent = Intent(this, RequestProjectCredentialsActivity::class.java)
         startActivity(intent)
     }
 
@@ -113,7 +113,7 @@ class LaunchActivity : AppCompatActivity() {
         val errorDialog = AlertDialog.Builder(this).create()
         errorDialog.setTitle(getString(R.string.error))
         errorDialog.setMessage(getString(R.string.error_calling_app_invalid))
-        errorDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", { dialogInterface, i -> dialogInterface.dismiss() })
+        errorDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", { dialogInterface, _ -> dialogInterface.dismiss() })
         errorDialog.show()
     }
 
