@@ -10,7 +10,7 @@ import com.simprints.id.data.secure.SecureDataManager
 interface RequestProjectCredentialsContract {
 
     interface View : BaseView<Presenter> {
-        fun userDidWantToOpenScanQRApp() {}
+        fun userDidWantToOpenScanQRApp()
         fun updateProjectSecretInTextView(projectSecret: String)
         fun updateProjectIdInTextView(projectId: String)
         fun showErrorForInvalidProjectCredentials()
