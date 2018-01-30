@@ -4,9 +4,6 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.unsafe.ProjectCredentialsNonValidError
 import com.simprints.id.tools.Log
 
-/**
- * Created by fabiotuzza on 18/01/2018.
- */
 @Suppress("UnnecessaryVariable")
 class RequestProjectCredentialsPresenter(val view: RequestProjectCredentialsContract.View) : RequestProjectCredentialsContract.Presenter {
 

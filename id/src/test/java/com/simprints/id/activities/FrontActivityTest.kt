@@ -22,9 +22,6 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
 
-/**
- * Created by fabiotuzza on 25/01/2018.
- */
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class)
 class FrontActivityTest {

@@ -12,10 +12,6 @@ import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.PermissionManager
 import com.simprints.id.tools.RemoteConfig
 
-/**
- * Created by fabiotuzza on 24/01/2018.
- */
-
 class FrontActivity : AppCompatActivity(), FrontContract.View {
 
     private lateinit var frontPresenter: FrontContract.Presenter
