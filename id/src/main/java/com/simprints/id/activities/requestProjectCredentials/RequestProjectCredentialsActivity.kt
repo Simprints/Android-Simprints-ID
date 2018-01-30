@@ -12,9 +12,6 @@ import com.simprints.id.R
 import com.simprints.id.tools.extensions.scannerAppIntent
 import kotlinx.android.synthetic.main.activity_request_project_secret.*
 
-/**
- * Created by fabiotuzza on 18/01/2018.
- */
 class RequestProjectCredentialsActivity : AppCompatActivity(), RequestProjectCredentialsContract.View {
 
     private lateinit var viewPresenter: RequestProjectCredentialsContract.Presenter

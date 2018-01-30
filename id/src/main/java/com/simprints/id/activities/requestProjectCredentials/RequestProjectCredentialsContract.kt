@@ -4,9 +4,6 @@ import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.data.secure.SecureDataManager
 
-/**
- * Created by fabiotuzza on 18/01/2018.
- */
 interface RequestProjectCredentialsContract {
 
     interface View : BaseView<Presenter> {

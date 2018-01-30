@@ -5,11 +5,6 @@ import com.simprints.id.activities.requestProjectCredentials.RequestProjectCrede
 import org.robolectric.Robolectric
 import org.robolectric.android.controller.ActivityController
 
-/**
- * Created by fabiotuzza on 29/01/2018.
- */
-
-
 inline fun createRoboFrontViewActivity() : ActivityController<FrontActivity> {
     return Robolectric.buildActivity(FrontActivity::class.java).create()
 }
