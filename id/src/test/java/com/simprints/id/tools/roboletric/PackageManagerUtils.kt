@@ -6,9 +6,6 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import org.robolectric.Shadows
 
-/**
- * Created by fabiotuzza on 29/01/2018.
- */
 inline fun injectHowToResolveScannerAppIntent(pm: PackageManager): ResolveInfo {
 
     // Pretend that ScannerQR app is installed
