@@ -3,13 +3,13 @@ package com.simprints.id.secure
 
 class ProjectAuthenticator {
 
-    fun authenticate(nonceBundle: NonceBundle, projectId: String, encryptedProjectSecret: String): ProjectAuthenticationResult {
-        val nonce = getNonce(nonceBundle)
+    fun authenticate(nonceScope: NonceScope, projectId: String, encryptedProjectSecret: String): ProjectAuthenticationResult {
+        val nonce = getNonce(nonceScope)
         val token = getAttestationToken(nonce)
         return runValidation(nonce, token, projectId, encryptedProjectSecret)
     }
 
-    private fun getNonce(nonceBundle: NonceBundle): String {
+    private fun getNonce(nonceScope: NonceScope): String {
         TODO("not implemented")
     }
 
