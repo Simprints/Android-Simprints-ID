@@ -3,7 +3,6 @@ package com.simprints.id.activities.front
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.TextView
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.requestProjectCredentials.RequestProjectCredentialsActivity
@@ -11,6 +10,7 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.PermissionManager
 import com.simprints.id.tools.RemoteConfig
+import kotlinx.android.synthetic.main.activity_front.*
 
 class FrontActivity : AppCompatActivity(), FrontContract.View {
 
@@ -36,8 +36,7 @@ class FrontActivity : AppCompatActivity(), FrontContract.View {
     }
 
     fun initPresenter(){
-        frontPresenter = FrontPresenter(this)
-        frontPresenter.secureManager = app.secureDataManager
+        frontPresenter = FrontPresenter(this, app.secureDataManager)
         frontPresenter.start()
     }
     override fun setPresenter(presenter: FrontContract.Presenter) {
@@ -56,15 +55,12 @@ class FrontActivity : AppCompatActivity(), FrontContract.View {
     }
 
     private fun initSimprintsIdVersionTextView(simprintsIdVersion: String) {
-        val simprintsIdVersionTextView = findViewById<TextView>(R.id.simprintsIdVersionTextView)
         val simprintsIdVersionString = String.format(getString(R.string.front_simprintsId_version), simprintsIdVersion)
         simprintsIdVersionTextView.text = simprintsIdVersionString
     }
 
     private fun initLibSimprintsVersionTextView(libSimprintsVersion: String) {
-        val libSimprintsVersionTextView = findViewById<TextView>(R.id.libSimprintsVersionTextView)
         val libSimprintsVersionString = String.format(getString(R.string.front_libSimprints_version), libSimprintsVersion)
         libSimprintsVersionTextView.text = libSimprintsVersionString
-
     }
 }
