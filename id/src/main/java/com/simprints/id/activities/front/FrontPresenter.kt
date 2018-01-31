@@ -2,9 +2,7 @@ package com.simprints.id.activities.front
 
 import com.simprints.id.data.secure.SecureDataManager
 
-internal class FrontPresenter(val view: FrontContract.View) : FrontContract.Presenter {
-
-    override var secureManager: SecureDataManager? = null
+internal class FrontPresenter(val view: FrontContract.View, override val secureManager: SecureDataManager) : FrontContract.Presenter {
 
     init {
         view.setPresenter(this)
@@ -14,8 +12,7 @@ internal class FrontPresenter(val view: FrontContract.View) : FrontContract.Pres
     }
 
     override fun doSecurityChecks(): Boolean {
-        if (secureManager == null) { throw Exception("Dependencies not injected!") }
-        if (secureManager!!.getProjectSecretOrEmpty() == "") {
+        if (secureManager.getProjectSecretOrEmpty() == "") {
             view.openRequestAPIActivity()
             return false
         }

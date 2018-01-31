@@ -26,14 +26,12 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             prefs.edit().putPrimitive(PROJECT_SECRET, field).commit()
         }
 
-    override fun getProjectSecretOrEmpty(): String {
-        var key = ""
+    override fun getProjectSecretOrEmpty(): String =
         try {
-            key = projectSecret
-        } finally {
-            return key
+            projectSecret
+        } catch (e: Error) {
+            ""
         }
-    }
 
     override var projectId: String = ""
         get() {
@@ -48,17 +46,15 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             prefs.edit().putPrimitive(PROJECT_SECRET, field).commit()
         }
 
-    override fun getProjectIdOrEmpty(): String {
-        var key = ""
+    override fun getProjectIdOrEmpty(): String =
         try {
-            key = projectId
-        } finally {
-            return key
+            projectId
+        } catch (e: Error) {
+            ""
         }
-    }
 
-    override fun areProjectCredentialsStore(): Boolean {
-        return getProjectIdOrEmpty() != "" && getProjectSecretOrEmpty() != ""
+    override fun areProjectCredentialsMissing(): Boolean {
+        return getProjectIdOrEmpty() == "" || getProjectSecretOrEmpty() != ""
     }
 
     /*TODO: Legacy stuff to refactor */
