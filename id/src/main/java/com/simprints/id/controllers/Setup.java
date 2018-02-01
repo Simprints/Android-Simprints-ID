@@ -37,6 +37,7 @@ import static com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_
 public class Setup {
 
     private static Setup singleton;
+    public boolean setupCompleted = false;
 
     public synchronized static Setup getInstance(DataManager dataManager, AppState appState) {
         if (singleton == null) {
@@ -425,8 +426,13 @@ public class Setup {
 
     private void onSuccess() {
         paused = true;
+        setupCompleted = true;
         if (callback != null)
             callback.onSuccess();
+    }
+
+    public boolean isOnGoing() {
+        return setupCompleted == false;
     }
 
     private void onProgress(int progress, int detailsId) {

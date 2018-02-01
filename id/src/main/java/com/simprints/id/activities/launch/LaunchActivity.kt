@@ -14,17 +14,20 @@ import com.simprints.id.activities.AlertActivity
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.MainActivity
 import com.simprints.id.activities.RefusalActivity
+import com.simprints.id.activities.requestProjectCredentials.RequestProjectCredentialsActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.callout.Callout
 import com.simprints.id.domain.callout.Callout.Companion.toCallout
+import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.Vibrate.vibrate
+import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
@@ -35,7 +38,7 @@ import org.jetbrains.anko.coroutines.experimental.bg
 import java.util.*
 
 @SuppressLint("HardwareIds")
-class LaunchActivity : AppCompatActivity() {
+open class LaunchActivity : AppCompatActivity() {
 
     // Scanner button callback
     private val scannerButton = ButtonListener {
@@ -74,7 +77,20 @@ class LaunchActivity : AppCompatActivity() {
             return
         }
         positionTracker.start()
-        setup.start(this, getSetupCallback())
+    }
+
+    override fun onResume() {
+        super.onResume()
+        when {
+            dataManager.areProjectCredentialsMissing() -> startRequestProjectCredentialsActivity()
+            setup.isOnGoing() -> setup.start(this, getSetupCallback())
+        }
+    }
+
+    private fun startRequestProjectCredentialsActivity() {
+        overridePendingTransition(R.anim.slide_out_to_up, R.anim.stay)
+        val intent = Intent(this, RequestProjectCredentialsActivity::class.java)
+        startActivity(intent)
     }
 
     private fun injectDependencies() {
@@ -106,15 +122,22 @@ class LaunchActivity : AppCompatActivity() {
             }
 
     private fun extractSessionParameters(callout: Callout) {
+        dataManager.callingPackage = getCallingPackageName()
+        if (app.packageManager.isCallingAppFromUnknownSource(dataManager.callingPackage)) {
+            dataManager.logSafeException(CallingAppFromUnknownSourceException())
+        }
+
         val sessionParameters = app.sessionParametersExtractor.extractFrom(callout)
         dataManager.sessionParameters = sessionParameters
-        dataManager.apiKey = sessionParameters.apiKey
-        dataManager.appKey = sessionParameters.apiKey.substring(0, 8)
         dataManager.logUserProperties()
     }
 
+    open fun getCallingPackageName(): String {
+        return callingPackage ?: ""
+    }
+
     // Setup callback
-    private fun getSetupCallback() : SetupCallback =
+    private fun getSetupCallback(): SetupCallback =
         object : SetupCallback {
             override fun onSuccess() {
                 dataManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
@@ -160,8 +183,6 @@ class LaunchActivity : AppCompatActivity() {
         intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType)
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST)
     }
-
-
 
     private fun tryAgain() {
         launchOutOfFocus = false
@@ -230,7 +251,6 @@ class LaunchActivity : AppCompatActivity() {
             } catch (error: UninitializedDataManagerError) {
                 dataManager.logError(error)
             }
-
         }
 
         positionTracker.finish()
@@ -259,5 +279,4 @@ class LaunchActivity : AppCompatActivity() {
         startActivityForResult(Intent(this@LaunchActivity, MainActivity::class.java), MAIN_ACTIVITY_REQUEST)
         launchLayout.visibility = View.INVISIBLE
     }
-
 }
