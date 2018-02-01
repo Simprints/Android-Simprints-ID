@@ -1,27 +1,48 @@
 package com.simprints.id.secure
 
+import io.reactivex.Single
+import io.reactivex.functions.BiFunction
+import io.reactivex.internal.operators.single.SingleJust
+import org.json.JSONObject
+
+//      CALLER
+// this.takeToken(projectId, projectSecret_).subscribe(
+//            { token -> print("we got it!!! $token") },
+//            { e -> throw e }
+//        )
 
 class ProjectAuthenticator {
 
-    fun authenticate(nonceScope: NonceScope, projectId: String, encryptedProjectSecret: String): ProjectAuthenticationResult {
-        val nonce = getNonce(nonceScope)
-        val token = getAttestationToken(nonce)
-        return runValidation(nonce, token, projectId, encryptedProjectSecret)
+    private fun authenticate(projectId: String, noneScope: NonceScope, projectSecret: String? = null): Single<String> {
+
+        return Single.zip(
+            getEncryptedProjectSecret(projectSecret),
+            getGoogleAttestation(noneScope),
+            combineAuthParameters(projectId)
+        ).makeAuthRequest()
     }
 
-    private fun getNonce(nonceScope: NonceScope): String {
-        TODO("not implemented")
+    private fun Single<out AuthRequest>.makeAuthRequest(): Single<String> = flatMap { authRequest -> AuthManager.requestAuthToken(authRequest) }
+
+    private fun combineAuthParameters(projectId: String): BiFunction<String, JSONObject, AuthRequest> {
+        return BiFunction { encryptedProjectSecret: String, attestation: JSONObject ->
+            AuthRequest(encryptedProjectSecret, projectId, attestation)
+        }
     }
 
-    private fun getAttestationToken(nonce: String): AttestToken {
-        TODO("not implemented")
+    private fun getGoogleAttestation(noneScope: NonceScope): Single<JSONObject>? {
+        return NonceManager.requestNonce(noneScope).flatMap { nonce ->
+            GoogleManager.requestAttestation(nonce)
+        }
     }
 
-    private fun runValidation(nonce: String,
-                              token: AttestToken,
-                              projectId: String,
-                              encryptedProjectSecret: String)
-        : ProjectAuthenticationResult {
-        TODO("not implemented")
+    private fun getEncryptedProjectSecret(projectSecret: String? = null): Single<String> =
+        if (projectSecret == null)
+            readSharedPreferences() //TODO: Exception if project Secret encrypted is not shared
+        else PublicKeyManager.requestPublicKey()
+            .flatMap { publicKey -> PublicKeyManager.encryptProjectSecret(projectSecret, publicKey) }
+
+    private fun readSharedPreferences(): Single<String> {
+        return SingleJust<String>("")
     }
 }
