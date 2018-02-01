@@ -12,7 +12,7 @@ interface FrontContract {
     }
 
     interface Presenter : BasePresenter {
-        var secureManager: SecureDataManager?
+        val secureManager: SecureDataManager
         fun doSecurityChecks(): Boolean
     }
 }
