@@ -9,7 +9,7 @@ interface SecureDataManager {
     var prefs: ImprovedSharedPreferences
     fun getProjectSecretOrEmpty(): String
     fun getProjectIdOrEmpty(): String
-    fun areProjectCredentialsStore(): Boolean
+    fun areProjectCredentialsMissing(): Boolean
 
     /*TODO: Legacy stuff to refactor */
     fun getApiKeyOr(default: String): String

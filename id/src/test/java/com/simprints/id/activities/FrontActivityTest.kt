@@ -22,9 +22,6 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
 
-/**
- * Created by fabiotuzza on 25/01/2018.
- */
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class)
 class FrontActivityTest {
@@ -43,7 +40,7 @@ class FrontActivityTest {
     @Throws(Exception::class)
     fun validProjectCredentialsStored_shouldStayOnFrontActivity() {
 
-        FirebaseApp.initializeApp(RuntimeEnvironment.application);
+        FirebaseApp.initializeApp(RuntimeEnvironment.application)
 
         val sharedPreferences = getRoboSharedPreferences()
         sharedPreferences.edit().putString("PROJECT_SECRET", "secret").commit()
@@ -59,7 +56,7 @@ class FrontActivityTest {
     @Throws(Exception::class)
     fun qrScanPressedAndScannerAppNotAvailable_shouldOpenPlayStore() {
 
-        FirebaseApp.initializeApp(RuntimeEnvironment.application);
+        FirebaseApp.initializeApp(RuntimeEnvironment.application)
 
         val controller = createRoboRequestProjectCredentialsActivity().start().resume().visible()
         val activity = controller.get()
