@@ -12,11 +12,11 @@ import com.simprints.id.tools.PermissionManager
 import com.simprints.id.tools.RemoteConfig
 import kotlinx.android.synthetic.main.activity_front.*
 
-class FrontActivity : AppCompatActivity(), FrontContract.View {
+open class FrontActivity : AppCompatActivity(), FrontContract.View {
 
     private lateinit var frontPresenter: FrontContract.Presenter
-    lateinit var app:Application
-    lateinit var dataManager:DataManager
+    lateinit var app: Application
+    lateinit var dataManager: DataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +35,7 @@ class FrontActivity : AppCompatActivity(), FrontContract.View {
         initPresenter()
     }
 
-    fun initPresenter(){
+    fun initPresenter() {
         frontPresenter = FrontPresenter(this, app.secureDataManager)
         frontPresenter.start()
     }
@@ -45,10 +45,10 @@ class FrontActivity : AppCompatActivity(), FrontContract.View {
 
     override fun onResume() {
         super.onResume()
-        frontPresenter.doSecurityChecks();
+        frontPresenter.doSecurityChecks()
     }
 
-    override fun openRequestAPIActivity(){
+    override fun openRequestAPIActivity() {
         overridePendingTransition(R.anim.slide_out_to_up, R.anim.stay)
         val intent = Intent(this, RequestProjectCredentialsActivity::class.java)
         startActivity(intent)

@@ -51,6 +51,7 @@ import com.simprints.id.tools.AppState
 import com.simprints.id.tools.NotificationFactory
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.serializers.*
 import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.Constants.*
@@ -58,8 +59,6 @@ import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 import java.util.*
-import android.app.Application as AndroidApplication
-
 
 class Application : MultiDexApplication() {
 
@@ -151,7 +150,8 @@ class Application : MultiDexApplication() {
             setMinimumSessionDuration(0)
         }
     }
-    private val analyticsManager: AnalyticsManager by lazy {
+
+    var analyticsManager: AnalyticsManager by lazyVar {
         FirebaseAnalyticsManager(firebaseAnalytics)
     }
 
@@ -309,7 +309,7 @@ class Application : MultiDexApplication() {
     }
 
     private val callingPackageReader: Reader<String> by lazy {
-        OptionalParameterReader(SIMPRINTS_CALLING_PACKAGE,"", invalidCallingPackageError)
+        OptionalParameterReader(SIMPRINTS_CALLING_PACKAGE, "", invalidCallingPackageError)
     }
 
     private val callingPackageValidator: Validator<String> by lazy {
@@ -321,7 +321,7 @@ class Application : MultiDexApplication() {
     }
 
     private val metadataReader: Reader<String> by lazy {
-        OptionalParameterReader(SIMPRINTS_METADATA,"", invalidCallingPackageError)
+        OptionalParameterReader(SIMPRINTS_METADATA, "", invalidCallingPackageError)
     }
 
     private val invalidMetadataError: Error by lazy {
@@ -392,7 +392,6 @@ class Application : MultiDexApplication() {
     val setup: Setup by lazy {
         Setup.getInstance(dataManager, appState)
     }
-
 
     override fun onCreate() {
         super.onCreate()
