@@ -28,15 +28,21 @@ fun <T> verifyOnlyInteractions(mock: T, vararg methodCalls: T.() -> Any?) {
     Mockito.verifyNoMoreInteractions(mock)
 }
 
+fun <T> anyNotNull(): T {
+    Mockito.any<T>()
+    return uninitialized()
+}
+fun <T> uninitialized(): T = null as T
+
 /**
  * Junit 5 has a nice assertThrows method
  * (http://junit.org/junit5/docs/current/api/org/junit/jupiter/api/Assertions.html#assertThrows-java.lang.Class-org.junit.jupiter.api.function.Executable-)
  * This is a placeholder until we migrate from JUnit 4 to Junit 5
  */
-inline fun <reified T: Throwable> assertThrows(executable: () -> Unit): T {
+inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {
     try {
         executable()
-    } catch(exception: Throwable) {
+    } catch (exception: Throwable) {
         when (exception) {
             is T -> return exception
             else -> throw(exception)
@@ -45,12 +51,11 @@ inline fun <reified T: Throwable> assertThrows(executable: () -> Unit): T {
     throw AssertionFailedError("Expected an ${T::class.java.simpleName} to be thrown")
 }
 
-inline fun <reified T: Throwable> assertThrows(throwable: T, executable: () -> Unit): T {
+inline fun <reified T : Throwable> assertThrows(throwable: T, executable: () -> Unit): T {
     val thrown = assertThrows<T>(executable)
     assertEquals(throwable, thrown)
     return thrown
 }
-
 
 inline fun assertActivityStarted(clazz: Class<out Activity>, activity: FrontActivity) {
     val shadowActivity = Shadows.shadowOf(activity)

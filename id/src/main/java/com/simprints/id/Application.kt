@@ -41,9 +41,6 @@ import com.simprints.id.domain.sessionParameters.extractors.Extractor
 import com.simprints.id.domain.sessionParameters.extractors.ParameterExtractor
 import com.simprints.id.domain.sessionParameters.extractors.SessionParametersExtractor
 import com.simprints.id.domain.sessionParameters.readers.*
-import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.ExpectedParametersLister
-import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.ExpectedParametersListerImpl
-import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.UnexpectedParametersReader
 import com.simprints.id.domain.sessionParameters.validators.*
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.model.ALERT_TYPE
@@ -58,8 +55,6 @@ import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 import java.util.*
-import android.app.Application as AndroidApplication
-
 
 class Application : MultiDexApplication() {
 
@@ -151,7 +146,8 @@ class Application : MultiDexApplication() {
             setMinimumSessionDuration(0)
         }
     }
-    private val analyticsManager: AnalyticsManager by lazy {
+
+    var analyticsManager: AnalyticsManager by lazyVar {
         FirebaseAnalyticsManager(firebaseAnalytics)
     }
 
@@ -309,7 +305,7 @@ class Application : MultiDexApplication() {
     }
 
     private val callingPackageReader: Reader<String> by lazy {
-        OptionalParameterReader(SIMPRINTS_CALLING_PACKAGE,"", invalidCallingPackageError)
+        OptionalParameterReader(SIMPRINTS_CALLING_PACKAGE, "", invalidCallingPackageError)
     }
 
     private val callingPackageValidator: Validator<String> by lazy {
@@ -321,7 +317,7 @@ class Application : MultiDexApplication() {
     }
 
     private val metadataReader: Reader<String> by lazy {
-        OptionalParameterReader(SIMPRINTS_METADATA,"", invalidCallingPackageError)
+        OptionalParameterReader(SIMPRINTS_METADATA, "", invalidCallingPackageError)
     }
 
     private val invalidMetadataError: Error by lazy {
@@ -392,7 +388,6 @@ class Application : MultiDexApplication() {
     val setup: Setup by lazy {
         Setup.getInstance(dataManager, appState)
     }
-
 
     override fun onCreate() {
         super.onCreate()

@@ -431,7 +431,7 @@ public class Setup {
             callback.onSuccess();
     }
 
-    public boolean inOnGoing() {
+    public boolean isOnGoing() {
         return setupCompleted == false;
     }
 
