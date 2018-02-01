@@ -213,10 +213,6 @@ dependencies {
     androidTestImplementation "com.simprints:remote-admin-client:2017.4.0-dev-5"
     androidTestImplementation "com.squareup.okhttp:okhttp:2.7.5"
     androidTestImplementation "joda-time:joda-time:2.9.9"
-
-    //ButterKnife
-    implementation 'com.jakewharton:butterknife:8.8.1'
-    kapt 'com.jakewharton:butterknife-compiler:8.8.1'
 }
 
 crashlytics {

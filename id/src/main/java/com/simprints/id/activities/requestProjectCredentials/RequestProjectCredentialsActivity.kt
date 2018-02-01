@@ -15,38 +15,36 @@ import kotlinx.android.synthetic.main.activity_request_project_secret.*
 class RequestProjectCredentialsActivity : AppCompatActivity(), RequestProjectCredentialsContract.View {
 
     private lateinit var viewPresenter: RequestProjectCredentialsContract.Presenter
-    var app: Application? = null
+    lateinit var app: Application
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_request_project_secret)
         app = (application as Application)
-        viewPresenter = RequestProjectCredentialsPresenter(this)
+        viewPresenter = RequestProjectCredentialsPresenter(this, app.secureDataManager)
         viewPresenter.start()
 
         initUI()
     }
 
-    override fun setPresenter(presenter: RequestProjectCredentialsContract.Presenter?) {
-        if (presenter == null) return
+    override fun setPresenter(presenter: RequestProjectCredentialsContract.Presenter) {
         viewPresenter = presenter
-        viewPresenter.secureDataManager = app?.secureDataManager
     }
 
     private fun initUI() {
-        requestProjectCredentialsButtonScanQr.setOnClickListener { viewPresenter.onScanBarcodeClicked() }
+        requestProjectCredentialsButtonScanQr.setOnClickListener { viewPresenter.userDidWantToOpenScanQRApp() }
         requestProjectCredentialsButtonEnterSecret.setOnClickListener {
             val projectId = requestProjectCredentialsEditTextId.text.toString()
             val projectSecret = requestProjectCredentialsEditTextSecret.text.toString()
-            viewPresenter.onEnterKeyButtonClicked(projectId, projectSecret)
+            viewPresenter.userDidWantToEnterNewProjectCredentials(projectId, projectSecret)
         }
-        requestProjectCredentialsButtonManualTyping.setOnClickListener{
+        requestProjectCredentialsButtonManualTyping.setOnClickListener {
             hideButtonToAddProjectDetailsManually()
             showProjectDetails()
         }
     }
 
-    override fun userDidWantToOpenScanQRApp() {
+    override fun openScanQRApp() {
         val intent = packageManager.scannerAppIntent()
         if (intent.resolveActivity(packageManager) != null) {
             startActivityForResult(intent, 0)
@@ -57,32 +55,41 @@ class RequestProjectCredentialsActivity : AppCompatActivity(), RequestProjectCre
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(data == null) return
+        if (data == null) return
 
         if (requestCode == 0) {
-            val isResultValid = resultCode == Activity.RESULT_OK
-            if (isResultValid) {
-                val scannedText = data.getStringExtra("SCAN_RESULT")
-                if(scannedText != null) {
-                    var scannedTextComponents = scannedText.split("-")
-                    val doesScannedTextComponentsTwoParts = scannedTextComponents.size > 1
-                    this.runOnUiThread({
-                        if (doesScannedTextComponentsTwoParts) {
-                            val projectId = scannedTextComponents[0]
-                            val projectSecret = scannedTextComponents[1]
+            handleScannerAppResult(resultCode, data)
+        }
+    }
 
-                            viewPresenter.onActivityResultForQRScanned(projectId, projectSecret)
-                        } else {
-                            showErrorForInvalidQRCode()
-                        }
-                    })
+    private fun handleScannerAppResult(resultCode: Int, data: Intent) {
+        try {
+            val scannedText = data.getStringExtra("SCAN_RESULT")
+            val isResultValid = resultCode == Activity.RESULT_OK && scannedText != null
+
+            if (isResultValid) {
+                var scannedTextComponents = scannedText.split("-")
+                val doesScannedTextComponentsTwoParts = scannedTextComponents.size == 2
+                this.runOnUiThread {
+                    if (doesScannedTextComponentsTwoParts) {
+                        val projectId = scannedTextComponents[0]
+                        val projectSecret = scannedTextComponents[1]
+
+                        viewPresenter.onActivityResultForQRScanned(projectId, projectSecret)
+                    } else {
+                        throw Exception("The QRCode doesn't have the expected components")
+                    }
                 }
+            } else {
+                throw Exception("Invalid result from the QRCode app")
             }
+        } catch (e: Exception) {
+            showErrorForInvalidQRCode()
         }
     }
 
     private fun showErrorForInvalidQRCode() {
-        Toast.makeText(this, getString(R.string.requestProjectCredentials_invalidQrCode), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, R.string.requestProjectCredentials_invalidQrCode, Toast.LENGTH_SHORT).show()
     }
 
     override fun updateProjectSecretInTextView(projectSecret: String) {
@@ -102,7 +109,7 @@ class RequestProjectCredentialsActivity : AppCompatActivity(), RequestProjectCre
     }
 
     override fun showErrorForInvalidProjectCredentials() {
-        Toast.makeText(this, getString(R.string.requestProjectCredentials_invalidCredentials), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, R.string.requestProjectCredentials_invalidCredentials, Toast.LENGTH_SHORT).show()
     }
 
     override fun dismissRequestProjectSecretActivity() {

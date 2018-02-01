@@ -27,7 +27,7 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.Vibrate.vibrate
-import com.simprints.id.tools.extensions.isAppInstallerKnown
+import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
@@ -77,20 +77,14 @@ class LaunchActivity : AppCompatActivity() {
             return
         }
         positionTracker.start()
-        dataManager.callingPackage = callingPackage
     }
 
     override fun onResume() {
         super.onResume()
-
-        val didSetupNotCompleteYet = setup.setupCompleted == false
-        val isCallingAppFromUnknownSource = app.packageManager.isAppInstallerKnown(dataManager.callingPackage) == false
-        val areProjectCredentialsNotStore = dataManager.areProjectCredentialsStore() == false
-
         when {
-            areProjectCredentialsNotStore -> startRequestProjectCredentialsActivity()
-            isCallingAppFromUnknownSource -> showErrorAboutNotGenuineCallingApp()
-            didSetupNotCompleteYet -> setup.start(this, getSetupCallback())
+            dataManager.areProjectCredentialsMissing() -> startRequestProjectCredentialsActivity()
+            app.packageManager.isCallingAppFromUnknownSource(dataManager.callingPackage) -> showErrorAboutNotGenuineCallingApp()
+            setup.inOnGoing() -> setup.start(this, getSetupCallback())
         }
     }
 
@@ -110,9 +104,10 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun showErrorAboutNotGenuineCallingApp() {
 
-        val errorDialog = AlertDialog.Builder(this).create()
-        errorDialog.setTitle(getString(R.string.error))
-        errorDialog.setMessage(getString(R.string.error_calling_app_invalid))
+        val errorDialog = AlertDialog.Builder(this)
+            .setTitle(getString(R.string.error))
+            .setMessage(getString(R.string.error_calling_app_invalid))
+            .create()
         errorDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", { _, _ -> finish() })
         errorDialog.show()
     }
@@ -140,6 +135,7 @@ class LaunchActivity : AppCompatActivity() {
     private fun extractSessionParameters(callout: Callout) {
         val sessionParameters = app.sessionParametersExtractor.extractFrom(callout)
         dataManager.sessionParameters = sessionParameters
+        dataManager.callingPackage = callingPackage
         dataManager.logUserProperties()
     }
 
