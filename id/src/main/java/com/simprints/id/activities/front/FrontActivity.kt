@@ -3,7 +3,6 @@ package com.simprints.id.activities.front
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.TextView
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.requestProjectCredentials.RequestProjectCredentialsActivity
@@ -11,16 +10,13 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.PermissionManager
 import com.simprints.id.tools.RemoteConfig
+import kotlinx.android.synthetic.main.activity_front.*
 
-/**
- * Created by fabiotuzza on 24/01/2018.
- */
-
-class FrontActivity : AppCompatActivity(), FrontContract.View {
+open class FrontActivity : AppCompatActivity(), FrontContract.View {
 
     private lateinit var frontPresenter: FrontContract.Presenter
-    lateinit var app:Application
-    lateinit var dataManager:DataManager
+    lateinit var app: Application
+    lateinit var dataManager: DataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +35,8 @@ class FrontActivity : AppCompatActivity(), FrontContract.View {
         initPresenter()
     }
 
-    fun initPresenter(){
-        frontPresenter = FrontPresenter(this)
-        frontPresenter.secureManager = app.secureDataManager
+    fun initPresenter() {
+        frontPresenter = FrontPresenter(this, app.secureDataManager)
         frontPresenter.start()
     }
     override fun setPresenter(presenter: FrontContract.Presenter) {
@@ -50,25 +45,22 @@ class FrontActivity : AppCompatActivity(), FrontContract.View {
 
     override fun onResume() {
         super.onResume()
-        frontPresenter.doSecurityChecks();
+        frontPresenter.doSecurityChecks()
     }
 
-    override fun openRequestAPIActivity(){
+    override fun openRequestAPIActivity() {
         overridePendingTransition(R.anim.slide_out_to_up, R.anim.stay)
         val intent = Intent(this, RequestProjectCredentialsActivity::class.java)
         startActivity(intent)
     }
 
     private fun initSimprintsIdVersionTextView(simprintsIdVersion: String) {
-        val simprintsIdVersionTextView = findViewById<TextView>(R.id.simprintsIdVersionTextView)
         val simprintsIdVersionString = String.format(getString(R.string.front_simprintsId_version), simprintsIdVersion)
         simprintsIdVersionTextView.text = simprintsIdVersionString
     }
 
     private fun initLibSimprintsVersionTextView(libSimprintsVersion: String) {
-        val libSimprintsVersionTextView = findViewById<TextView>(R.id.libSimprintsVersionTextView)
         val libSimprintsVersionString = String.format(getString(R.string.front_libSimprints_version), libSimprintsVersion)
         libSimprintsVersionTextView.text = libSimprintsVersionString
-
     }
 }

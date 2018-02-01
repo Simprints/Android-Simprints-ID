@@ -4,13 +4,8 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.unsafe.ProjectCredentialsNonValidError
 import com.simprints.id.tools.Log
 
-/**
- * Created by fabiotuzza on 18/01/2018.
- */
 @Suppress("UnnecessaryVariable")
-class RequestProjectCredentialsPresenter(val view: RequestProjectCredentialsContract.View) : RequestProjectCredentialsContract.Presenter {
-
-    override var secureDataManager: SecureDataManager? = null
+class RequestProjectCredentialsPresenter(val view: RequestProjectCredentialsContract.View, val secureDataManager: SecureDataManager) : RequestProjectCredentialsContract.Presenter {
 
     init {
         view.setPresenter(this)
@@ -20,14 +15,12 @@ class RequestProjectCredentialsPresenter(val view: RequestProjectCredentialsCont
         Log.d("", "RequestProjectCredentialsPresenter started")
     }
 
-    override fun onScanBarcodeClicked() {
-        view.userDidWantToOpenScanQRApp()
+    override fun userDidWantToOpenScanQRApp() {
+        view.openScanQRApp()
     }
 
-    override fun onEnterKeyButtonClicked(potentialProjectId: String, potentialProjectSecret: String) {
-        if (tryToSaveProjectDetails(potentialProjectId, potentialProjectSecret)){
-            view.dismissRequestProjectSecretActivity()
-        }
+    override fun userDidWantToEnterNewProjectCredentials(potentialProjectId: String, potentialProjectSecret: String) {
+        tryToSaveProjectDetails(potentialProjectId, potentialProjectSecret)
     }
 
     override fun onActivityResultForQRScanned(potentialProjectId: String, potentialProjectSecret: String) {
@@ -37,15 +30,13 @@ class RequestProjectCredentialsPresenter(val view: RequestProjectCredentialsCont
         view.updateProjectSecretInTextView(potentialProjectSecret)
     }
 
-    private fun tryToSaveProjectDetails(potentialProjectId: String, potentialProjectSecret: String):Boolean {
-        if (secureDataManager == null) { throw Exception("Dependencies not injected!") }
-        return try {
-            secureDataManager!!.projectId = potentialProjectId
-            secureDataManager!!.projectSecret = potentialProjectSecret
-            true
+    private fun tryToSaveProjectDetails(potentialProjectId: String, potentialProjectSecret: String) {
+        try {
+            secureDataManager.projectId = potentialProjectId
+            secureDataManager.projectSecret = potentialProjectSecret
+            view.dismissRequestProjectSecretActivity()
         } catch (e: ProjectCredentialsNonValidError){
             view.showErrorForInvalidProjectCredentials()
-            false
         }
     }
 }

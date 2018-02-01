@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.MotionEvent
 import android.view.View
@@ -21,13 +20,14 @@ import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.callout.Callout
 import com.simprints.id.domain.callout.Callout.Companion.toCallout
+import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.Vibrate.vibrate
-import com.simprints.id.tools.extensions.isAppInstallerKnown
+import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
@@ -38,7 +38,7 @@ import org.jetbrains.anko.coroutines.experimental.bg
 import java.util.*
 
 @SuppressLint("HardwareIds")
-class LaunchActivity : AppCompatActivity() {
+open class LaunchActivity : AppCompatActivity() {
 
     // Scanner button callback
     private val scannerButton = ButtonListener {
@@ -77,20 +77,13 @@ class LaunchActivity : AppCompatActivity() {
             return
         }
         positionTracker.start()
-        dataManager.callingPackage = callingPackage
     }
 
     override fun onResume() {
         super.onResume()
-
-        val didSetupNotCompleteYet = setup.setupCompleted == false
-        val isCallingAppFromUnknownSource = app.packageManager.isAppInstallerKnown(dataManager.callingPackage) == false
-        val areProjectCredentialsNotStore = dataManager.areProjectCredentialsStore() == false
-
         when {
-            areProjectCredentialsNotStore -> startRequestProjectCredentialsActivity()
-            isCallingAppFromUnknownSource -> showErrorAboutNotGenuineCallingApp()
-            didSetupNotCompleteYet -> setup.start(this, getSetupCallback())
+            dataManager.areProjectCredentialsMissing() -> startRequestProjectCredentialsActivity()
+            setup.isOnGoing() -> setup.start(this, getSetupCallback())
         }
     }
 
@@ -106,15 +99,6 @@ class LaunchActivity : AppCompatActivity() {
         positionTracker = PositionTracker(this, dataManager)
         appState = app.appState
         setup = app.setup
-    }
-
-    private fun showErrorAboutNotGenuineCallingApp() {
-
-        val errorDialog = AlertDialog.Builder(this).create()
-        errorDialog.setTitle(getString(R.string.error))
-        errorDialog.setMessage(getString(R.string.error_calling_app_invalid))
-        errorDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", { _, _ -> finish() })
-        errorDialog.show()
     }
 
     private fun initView() {
@@ -138,13 +122,22 @@ class LaunchActivity : AppCompatActivity() {
             }
 
     private fun extractSessionParameters(callout: Callout) {
+        dataManager.callingPackage = getCallingPackageName()
+        if (app.packageManager.isCallingAppFromUnknownSource(dataManager.callingPackage)) {
+            dataManager.logSafeException(CallingAppFromUnknownSourceException())
+        }
+
         val sessionParameters = app.sessionParametersExtractor.extractFrom(callout)
         dataManager.sessionParameters = sessionParameters
         dataManager.logUserProperties()
     }
 
+    open fun getCallingPackageName(): String {
+        return callingPackage ?: ""
+    }
+
     // Setup callback
-    private fun getSetupCallback() : SetupCallback =
+    private fun getSetupCallback(): SetupCallback =
         object : SetupCallback {
             override fun onSuccess() {
                 dataManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
@@ -190,8 +183,6 @@ class LaunchActivity : AppCompatActivity() {
         intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType)
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST)
     }
-
-
 
     private fun tryAgain() {
         launchOutOfFocus = false
@@ -260,7 +251,6 @@ class LaunchActivity : AppCompatActivity() {
             } catch (error: UninitializedDataManagerError) {
                 dataManager.logError(error)
             }
-
         }
 
         positionTracker.finish()
@@ -289,5 +279,4 @@ class LaunchActivity : AppCompatActivity() {
         startActivityForResult(Intent(this@LaunchActivity, MainActivity::class.java), MAIN_ACTIVITY_REQUEST)
         launchLayout.visibility = View.INVISIBLE
     }
-
 }

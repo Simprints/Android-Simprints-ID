@@ -431,6 +431,10 @@ public class Setup {
             callback.onSuccess();
     }
 
+    public boolean isOnGoing() {
+        return setupCompleted == false;
+    }
+
     private void onProgress(int progress, int detailsId) {
         if (callback != null)
             callback.onProgress(progress, detailsId);
