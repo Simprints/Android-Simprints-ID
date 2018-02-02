@@ -1,4 +1,4 @@
-package com.simprints.id.secure
+package com.simprints.id.secure.domain
 
 import org.json.JSONObject
 

@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.simprints.id.secure.domain.AuthRequest
 import io.reactivex.Single
 
 class AuthManager {
