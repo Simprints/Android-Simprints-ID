@@ -178,7 +178,13 @@ dependencies {
 
     // Network
     implementation "com.android.volley:volley:$volley_version"
-    implementation "com.google.code.gson:gson:2.8.2"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:2.4.0-SNAPSHOT"
+    implementation "com.squareup.retrofit2:converter-gson:2.4.0-SNAPSHOT"
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+
+    // Network - Gson
+    implementation 'com.google.code.gson:gson:2.8.2'
 
     // Logging
     implementation "com.jakewharton.timber:timber:4.6.0"
