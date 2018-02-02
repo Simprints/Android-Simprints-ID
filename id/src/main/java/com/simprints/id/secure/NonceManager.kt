@@ -18,8 +18,6 @@ class NonceManager {
             val headers = Gson().fromJson<HashMap<String, String>>(jsonNonceScope, headersMapType)
 
             return ApiService.nonce(headers, "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s")
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
         }
     }
 }
