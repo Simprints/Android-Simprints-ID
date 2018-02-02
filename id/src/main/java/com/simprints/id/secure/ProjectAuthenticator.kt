@@ -22,28 +22,22 @@ class ProjectAuthenticator {
             combineAuthParameters(projectId)
         ).makeAuthRequest()
 
-    private fun Single<out AuthRequest>.makeAuthRequest(): Single<String> =
-        flatMap { authRequest -> AuthManager.requestAuthToken(authRequest) }
-
-    private fun combineAuthParameters(projectId: String): BiFunction<String, JSONObject, AuthRequest> {
-        return BiFunction { encryptedProjectSecret: String, attestation: JSONObject ->
-            AuthRequest(encryptedProjectSecret, projectId, attestation)
-        }
-    }
-
-    private fun getGoogleAttestation(noneScope: NonceScope): Single<JSONObject>? {
-        return NonceManager.requestNonce(noneScope).flatMap { nonce ->
-            GoogleManager.requestAttestation(nonce)
-        }
-    }
-
     private fun getEncryptedProjectSecret(projectSecret: String? = null): Single<String> =
         if (projectSecret == null)
-            readSharedPreferences() //TODO: Exception if project Secret encrypted is not shared
+            ProjectSecretManager.getEncryptedProjectSecret()
         else PublicKeyManager().requestPublicKey()
-            .flatMap { publicKey -> PublicKeyManager().encryptProjectSecret(projectSecret, publicKey) }
+            .flatMap { publicKey -> ProjectSecretManager.encryptAndStoreProjectSecret(projectSecret, publicKey) }
 
-    private fun readSharedPreferences(): Single<String> {
-        return SingleJust<String>("")
-    }
+    private fun getGoogleAttestation(noneScope: NonceScope): Single<JSONObject>? =
+        NonceManager.requestNonce(noneScope).flatMap { nonce ->
+            GoogleManager.requestAttestation(nonce)
+        }
+
+    private fun combineAuthParameters(projectId: String): BiFunction<String, JSONObject, AuthRequest> =
+        BiFunction { encryptedProjectSecret: String, attestation: JSONObject ->
+            AuthRequest(encryptedProjectSecret, projectId, attestation)
+        }
+
+    private fun Single<out AuthRequest>.makeAuthRequest(): Single<String> =
+        flatMap { authRequest -> AuthManager.requestAuthToken(authRequest) }
 }
