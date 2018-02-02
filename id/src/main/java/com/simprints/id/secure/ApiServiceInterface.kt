@@ -35,6 +35,10 @@ interface ApiServiceInterface {
     @GET("/nonces")
     fun nonce(@HeaderMap headers: Map<String, String>, @Query("key") key: String):
         Single<String>
+
+    @GET("/public-key")
+    fun publicKey(@Query("key") key: String):
+        Single<String>
 }
 
 val ApiService by lazy {
