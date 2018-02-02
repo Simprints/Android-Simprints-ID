@@ -1,3 +1,5 @@
+import com.android.builder.testing.api.DeviceProvider
+
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
 apply plugin: "kotlin-android-extensions"
@@ -5,14 +7,6 @@ apply plugin: "kotlin-kapt"
 apply plugin: "io.fabric"
 apply plugin: "com.google.firebase.firebase-crash"
 apply plugin: "realm-android"
-
-def getDevProjectId = { ->
-    if (project.hasProperty('development_gcp_project')) {
-        return development_gcp_project
-    } else {
-        return "simprints-dev"
-    }
-}
 
 kotlin {
     experimental {
@@ -34,12 +28,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            versionNameSuffix "-dev"
-            buildConfigField("String", "FIREBASE_PROJECT", "\"${getDevProjectId()}\"")
-        }
         release {
             lintOptions {
                 // TODO : Remove whenever possible
@@ -48,23 +36,49 @@ android {
             }
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            versionNameSuffix "-dev"
         }
         endToEndTesting {
             initWith debug
+            versionNameSuffix "-test"
+            testCoverageEnabled true
+        }
+    }
 
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == "release") {
+            buildConfigField("String", "GCP_PROJECT", "\"simprints-152315\"")
+        } else if (variant.buildType.name == "debug") {
+            buildConfigField("String", "GCP_PROJECT", "\"${getDevProjectId()}\"")
+        } else if (variant.buildType.name == "endToEndTesting") {
+            buildConfigField("String", "GCP_PROJECT", "\"simprints-testing\"")
             buildConfigField("String", "SCANNER", getLocalPropertyForTesting('ext.scanner'))
             buildConfigField("String", "WIFI_NETWORK", getLocalPropertyForTesting('ext.wifiNetwork'))
             buildConfigField("String", "WIFI_PASSWORD", getLocalPropertyForTesting('ext.wifiPassword'))
-            versionNameSuffix "-test"
-            buildConfigField("String", "FIREBASE_PROJECT", "\"simprints-testing\"")
-            testCoverageEnabled true
         }
     }
 
     testBuildType "endToEndTesting"
 }
 
+def getDevProjectId() {
+    if (project.hasProperty('development_gcp_project')) {
+        return development_gcp_project
+    } else {
+        return "simprints-dev"
+    }
+}
+
+def getLocalPropertyForTesting(name) {
+    Properties properties = new Properties()
+    properties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
+    def externalModuleDir = properties.getProperty(name, "")
+    return externalModuleDir
+}
 
 project.afterEvaluate {
     project.("connectedEndToEndTestingAndroidTest").doFirst {
@@ -77,7 +91,7 @@ project.afterEvaluate {
             getTimeoutInMs: { originalProvider.getTimeoutInMs() },
             isConfigured  : { originalProvider.isConfigured() },
             getMaxThreads : { originalProvider.getMaxThreads() }
-        ] as com.android.builder.testing.api.DeviceProvider
+        ] as DeviceProvider
     }
 
     project.("kaptEndToEndTestingKotlin").doFirst {
@@ -102,13 +116,6 @@ def filterDevices(connectedDevices) {
     }
 
     devices
-}
-
-def getLocalPropertyForTesting(name) {
-    Properties properties = new Properties()
-    properties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
-    def externalModuleDir = properties.getProperty(name, "")
-    return externalModuleDir
 }
 
 buildscript {
@@ -179,13 +186,13 @@ dependencies {
     // Network
     implementation "com.android.volley:volley:$volley_version"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:2.4.0-SNAPSHOT"
-    implementation "com.squareup.retrofit2:converter-gson:2.4.0-SNAPSHOT"
-    implementation 'com.squareup.retrofit2:converter-scalars:2.4.0-SNAPSHOT'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-scalars:$retrofit_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
 
     // Network - Gson
-    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation "com.google.code.gson:gson:2.8.2"
 
     // Logging
     implementation "com.jakewharton.timber:timber:4.6.0"
@@ -218,7 +225,7 @@ dependencies {
 
     androidTestImplementation "com.simprints:cerberus-library:2018.1.1-dev-1"
     androidTestImplementation "com.simprints:remote-admin-client:2017.4.0-dev-5"
-    androidTestImplementation "com.squareup.okhttp:okhttp:2.7.5"
+    androidTestImplementation "com.squareup.okhttp:okhttp:2.7.5" // TODO : Update to okhttp3 in remote-admin-client
     androidTestImplementation "joda-time:joda-time:2.9.9"
 }
 
