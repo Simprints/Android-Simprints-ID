@@ -1,4 +1,7 @@
 package com.simprints.id.secure
 
+import com.google.gson.annotations.SerializedName
 
-data class NonceScope(val projectId: String, val moduleId: String, val userId: String)
+data class NonceScope(
+    @SerializedName("X-ProjectId") val projectId: String,
+    @SerializedName("X-UserId") val userId: String)
