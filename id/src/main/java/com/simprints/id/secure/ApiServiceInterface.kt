@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.simprints.id.BuildConfig
 import io.reactivex.Single
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -16,6 +17,8 @@ interface ApiServiceInterface {
     companion object {
         fun create(): ApiServiceInterface {
 
+            val baseUrl = "https://project-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
+
             val interceptor = HttpLoggingInterceptor()
             interceptor.level = HttpLoggingInterceptor.Level.BASIC
             val client = OkHttpClient.Builder()
@@ -26,7 +29,7 @@ interface ApiServiceInterface {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(JsonHelper.gson))
-                .baseUrl("https://project-manager-dot-simprints-dev.appspot.com")
+                .baseUrl(baseUrl)
                 .client(client)
                 .build()
 

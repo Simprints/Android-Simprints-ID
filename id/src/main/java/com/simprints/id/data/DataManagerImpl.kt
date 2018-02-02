@@ -207,7 +207,7 @@ class DataManagerImpl(private val context: Context,
             return
         }
 
-        val tentativeDbContext = DatabaseContext(apiKey, userId, moduleId, deviceId, context, BuildConfig.FIREBASE_PROJECT)
+        val tentativeDbContext = DatabaseContext(apiKey, userId, moduleId, deviceId, context, BuildConfig.GCP_PROJECT)
 
         tentativeDbContext.initDatabase(object : DataCallback {
             override fun onSuccess() {
