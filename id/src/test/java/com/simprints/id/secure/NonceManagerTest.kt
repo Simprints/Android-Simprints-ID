@@ -16,16 +16,6 @@ class NonceManagerTest {
     fun testFetchNonce() {
         val future = CompletableFuture<String>()
 
-        NonceManager.requestNonce(NonceScope("projectIdTest", "")).subscribe (
-            { nonce ->
-                print("We got an nonce: $nonce")
-                future.complete(nonce)
-            },
-            { e ->
-                future.complete(e.message)
-            }
-        )
-
         assertEquals("Hello World!", future.get())
     }
 }
