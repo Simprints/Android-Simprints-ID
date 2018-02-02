@@ -13,16 +13,15 @@ import org.json.JSONObject
 
 class ProjectAuthenticator {
 
-    private fun authenticate(projectId: String, noneScope: NonceScope, projectSecret: String? = null): Single<String> {
-
-        return Single.zip(
+    fun authenticate(projectId: String, nonceScope: NonceScope, projectSecret: String? = null): Single<String> =
+        Single.zip(
             getEncryptedProjectSecret(projectSecret),
-            getGoogleAttestation(noneScope),
+            getGoogleAttestation(nonceScope),
             combineAuthParameters(projectId)
         ).makeAuthRequest()
-    }
 
-    private fun Single<out AuthRequest>.makeAuthRequest(): Single<String> = flatMap { authRequest -> AuthManager.requestAuthToken(authRequest) }
+    private fun Single<out AuthRequest>.makeAuthRequest(): Single<String> =
+        flatMap { authRequest -> AuthManager.requestAuthToken(authRequest) }
 
     private fun combineAuthParameters(projectId: String): BiFunction<String, JSONObject, AuthRequest> {
         return BiFunction { encryptedProjectSecret: String, attestation: JSONObject ->
@@ -39,8 +38,8 @@ class ProjectAuthenticator {
     private fun getEncryptedProjectSecret(projectSecret: String? = null): Single<String> =
         if (projectSecret == null)
             readSharedPreferences() //TODO: Exception if project Secret encrypted is not shared
-        else PublicKeyManager.requestPublicKey()
-            .flatMap { publicKey -> PublicKeyManager.encryptProjectSecret(projectSecret, publicKey) }
+        else PublicKeyManager().requestPublicKey()
+            .flatMap { publicKey -> PublicKeyManager().encryptProjectSecret(projectSecret, publicKey) }
 
     private fun readSharedPreferences(): Single<String> {
         return SingleJust<String>("")
