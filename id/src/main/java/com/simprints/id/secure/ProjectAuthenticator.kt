@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.simprints.id.secure.models.NonceScope
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.internal.operators.single.SingleJust
