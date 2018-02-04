@@ -4,7 +4,6 @@ import okhttp3.*
 import retrofit2.mock.NetworkBehavior
 import java.util.concurrent.TimeUnit
 
-
 inline fun getBuilderResponse(statusCode: Int, body: String = "", contentType: String = "\"text/plain\""): Response.Builder {
     return Response.Builder()
         .code(statusCode)

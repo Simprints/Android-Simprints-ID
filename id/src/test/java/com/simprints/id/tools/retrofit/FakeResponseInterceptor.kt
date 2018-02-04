@@ -5,7 +5,7 @@ import okhttp3.Response
 import java.io.IOException
 
 // OKHttpClient interceptor to return a specific response
-class FakeResponseInterceptor(private val statusCode:Int, private val body: String = "", private val contentType: String = "\"text/plain\"") : Interceptor {
+class FakeResponseInterceptor(private val statusCode: Int, private val body: String = "", private val contentType: String = "\"application/json\"") : Interceptor {
 
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response? {

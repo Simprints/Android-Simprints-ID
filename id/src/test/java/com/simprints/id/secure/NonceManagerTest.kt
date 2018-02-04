@@ -1,6 +1,8 @@
 package com.simprints.id.secure
 
 import com.simprints.id.BuildConfig
+import com.simprints.id.secure.models.Nonce
+import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.FakeResponseInterceptor
 import com.simprints.id.tools.retrofit.buildResponse
@@ -18,24 +20,25 @@ import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 import java.io.IOException
 
-
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class)
 class NonceManagerTest : RxJavaTest() {
+
+    private val validNonceJsonResponse = "{\"value\":\"nonce_from_server\"}"
 
     @Test
     fun successfulResponse_shouldObtainANonce() {
         val apiService = ApiService()
 
         // Adding interceptor to return a fake response
-        apiService.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, "nonce_from_server"))
+        apiService.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, validNonceJsonResponse))
 
         val testObserver = NonceManager(apiService.api).requestNonce(NonceScope("projectId", "userID")).test()
         testObserver.awaitTerminalEvent()
 
         testObserver
             .assertNoErrors()
-            .assertValue { nonce -> nonce == "nonce_from_server" }
+            .assertValue { nonce -> nonce.value == "nonce_from_server" }
     }
 
     @Test
@@ -68,10 +71,10 @@ class NonceManagerTest : RxJavaTest() {
     }
 }
 
-// It's required to use NetworkBehavior, even if response is not required (e.g failed comms due to no connectivity)
+// It's required to use NetworkBehavior, even if response is not used for the test (e.g failed comms due to no connectivity)
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class ApiServiceMock(private val delegate: BehaviorDelegate<ApiServiceInterface>) : ApiServiceInterface {
-    override fun nonce(headers: Map<String, String>, key: String): Single<String> {
+    override fun nonce(headers: Map<String, String>, key: String): Single<Nonce> {
         val response = buildResponse(200, "nonce_from_server")
         return delegate.returningResponse(Calls.response(Response.success(response.body(), response))).nonce(headers, key)
     }
