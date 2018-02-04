@@ -36,7 +36,7 @@ class LaunchActivityTest {
     fun unknownCallingAppSource_shouldLogEvent() {
         var controller = Robolectric.buildActivity(LaunchActivityFromBadCallingMock::class.java).create()
         controller.start().resume().visible()
-        verifyALogSafeExceptionWasThrown(0)
+        verifyALogSafeExceptionWasThrown(1)
     }
 
     @Test
@@ -47,7 +47,7 @@ class LaunchActivityTest {
 
         var controller = Robolectric.buildActivity(LaunchActivityFromGoodCallingAppMock::class.java).create()
         controller.start().resume().visible()
-        verifyALogSafeExceptionWasThrown(1)
+        verifyALogSafeExceptionWasThrown(0)
     }
 
     private fun verifyALogSafeExceptionWasThrown(times: Int) {

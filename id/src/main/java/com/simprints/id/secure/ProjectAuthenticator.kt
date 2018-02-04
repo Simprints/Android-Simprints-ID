@@ -13,6 +13,8 @@ import org.json.JSONObject
 
 class ProjectAuthenticator {
 
+    val apiClient = ApiService().api
+
     fun authenticate(projectId: String, nonceScope: NonceScope, projectSecret: String? = null): Single<String> =
         Single.zip(
             getEncryptedProjectSecret(projectSecret),
@@ -30,7 +32,7 @@ class ProjectAuthenticator {
     }
 
     private fun getGoogleAttestation(noneScope: NonceScope): Single<JSONObject>? {
-        return NonceManager.requestNonce(noneScope).flatMap { nonce ->
+        return NonceManager(apiClient).requestNonce(noneScope).flatMap { nonce ->
             GoogleManager.requestAttestation(nonce)
         }
     }
