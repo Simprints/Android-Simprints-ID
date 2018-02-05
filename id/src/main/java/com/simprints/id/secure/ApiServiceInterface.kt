@@ -1,6 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.secure.models.Nonce
+import com.simprints.id.secure.models.PublicKeyString
 import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.HeaderMap
@@ -10,4 +11,7 @@ interface ApiServiceInterface {
 
     @GET("/nonces")
     fun nonce(@HeaderMap headers: Map<String, String>, @Query("key") key: String): Single<Nonce>
+
+    @GET("/public-key")
+    fun publicKey(@Query("key") key: String): Single<PublicKeyString>
 }
