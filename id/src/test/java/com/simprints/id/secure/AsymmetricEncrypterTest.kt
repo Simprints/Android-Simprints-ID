@@ -2,7 +2,7 @@ package com.simprints.id.secure
 
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.cryptography.AsymmetricEncrypter
-import com.simprints.id.secure.domain.PublicKeyString
+import com.simprints.id.secure.models.PublicKeyString
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith

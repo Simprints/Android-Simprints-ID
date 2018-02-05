@@ -1,13 +1,10 @@
 package com.simprints.id.secure
 
-import com.simprints.id.secure.domain.PublicKeyString
+import com.simprints.id.secure.models.PublicKeyString
 import io.reactivex.Single
 
-class PublicKeyManager {
+class PublicKeyManager(val client: ApiServiceInterface) {
 
-    companion object {
-
-        fun requestPublicKey(): Single<PublicKeyString> =
-            ApiService.publicKey("AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s")
-    }
+    fun requestPublicKey(): Single<PublicKeyString> =
+        client.publicKey("AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s")
 }

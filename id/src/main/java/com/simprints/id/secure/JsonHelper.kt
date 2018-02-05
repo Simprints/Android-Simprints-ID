@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import com.google.gson.Gson
-import com.simprints.id.secure.domain.NonceScope
+import com.simprints.id.secure.models.NonceScope
 
 class JsonHelper {
 
