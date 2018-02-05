@@ -8,21 +8,21 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 open class ApiService {
 
-    val okHttpClientConfig: OkHttpClient.Builder by lazy {
+    val api: ApiServiceInterface by lazy {
+        retrofit.create(ApiServiceInterface::class.java)
+    }
+
+    private val okHttpClientConfig: OkHttpClient.Builder by lazy {
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BASIC
         OkHttpClient.Builder().addInterceptor(interceptor)
     }
 
-    val retrofit: Retrofit by lazy {
+    private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(JsonHelper.gson))
             .baseUrl("https://project-manager-dot-simprints-dev.appspot.com")
             .client(okHttpClientConfig.build()).build()
-    }
-
-    val api: ApiServiceInterface by lazy {
-        retrofit.create(ApiServiceInterface::class.java)
     }
 }
