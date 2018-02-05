@@ -4,6 +4,7 @@ import com.simprints.id.secure.models.Nonce
 import io.reactivex.Single
 import org.json.JSONObject
 
+//Temporary to "simulate" an async network for requestAttestation - it will be properly implemented soon
 class GoogleManager {
 
     companion object {

@@ -3,17 +3,22 @@ package com.simprints.id.secure
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
+import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.FakeResponseInterceptor
 import com.simprints.id.tools.retrofit.buildResponse
 import com.simprints.id.tools.retrofit.givenNetworkFailurePercentIs
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.observers.TestObserver
+import io.reactivex.schedulers.Schedulers
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.HttpException
 import retrofit2.Response
+import retrofit2.http.Query
 import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.Calls
 import retrofit2.mock.MockRetrofit
@@ -42,7 +47,7 @@ class NonceManagerTest : RxJavaTest() {
     }
 
     @Test
-    fun ifOffline_shouldThrowAnException() {
+    fun offline_shouldThrowAnException() {
         val apiService = ApiService()
 
         // Creating a mockServer with 100% of failure rate.
@@ -55,7 +60,7 @@ class NonceManagerTest : RxJavaTest() {
 
         var apiServiceMock = ApiServiceMock(mockRetrofit.create(ApiServiceInterface::class.java))
 
-        val testObserver = NonceManager(apiServiceMock).requestNonce(NonceScope("projectId", "userID")).test()
+        val testObserver = makeTestRequestNonce(apiServiceMock)
         testObserver.awaitTerminalEvent()
         testObserver.assertError(IOException::class.java)
     }
@@ -65,17 +70,29 @@ class NonceManagerTest : RxJavaTest() {
         val apiService = ApiService()
         apiService.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(500))
 
-        val testObserver = NonceManager(apiService.api).requestNonce(NonceScope("projectId", "userID")).test()
+        val testObserver = makeTestRequestNonce(apiService.api)
         testObserver.awaitTerminalEvent()
         testObserver.assertError(HttpException::class.java)
+    }
+
+    private fun makeTestRequestNonce(apiServiceMock: ApiServiceInterface): TestObserver<Nonce> {
+        return NonceManager(apiServiceMock).requestNonce(NonceScope("projectId", "userID"))
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .test()
     }
 }
 
 // It's required to use NetworkBehavior, even if response is not used for the test (e.g failed comms due to no connectivity)
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class ApiServiceMock(private val delegate: BehaviorDelegate<ApiServiceInterface>) : ApiServiceInterface {
+    private val response = buildResponse(200, "nonce_from_server")
+
+    override fun publicKey(@Query("key") key: String): Single<PublicKeyString> {
+        return delegate.returningResponse(Calls.response(Response.success(response.body(), response))).publicKey(key)
+    }
+
     override fun nonce(headers: Map<String, String>, key: String): Single<Nonce> {
-        val response = buildResponse(200, "nonce_from_server")
         return delegate.returningResponse(Calls.response(Response.success(response.body(), response))).nonce(headers, key)
     }
 }

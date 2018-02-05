@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.simprints.id.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -8,21 +9,23 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 open class ApiService {
 
+    private val baseUrl = "https://project-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
+
     val api: ApiServiceInterface by lazy {
         retrofit.create(ApiServiceInterface::class.java)
     }
 
-    private val okHttpClientConfig: OkHttpClient.Builder by lazy {
+    val okHttpClientConfig: OkHttpClient.Builder by lazy {
         val interceptor = HttpLoggingInterceptor()
         interceptor.level = HttpLoggingInterceptor.Level.BASIC
         OkHttpClient.Builder().addInterceptor(interceptor)
     }
 
-    private val retrofit: Retrofit by lazy {
+    val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(JsonHelper.gson))
-            .baseUrl("https://project-manager-dot-simprints-dev.appspot.com")
+            .baseUrl(baseUrl)
             .client(okHttpClientConfig.build()).build()
     }
 }

@@ -1,18 +1,21 @@
 package com.simprints.id.secure
 
+import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.NonceScope
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
-import io.reactivex.internal.operators.single.SingleJust
+import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 
 //      CALLER
-// this.takeToken(projectId, projectSecret_).subscribe(
+// ProjectAuthenticator().authenticate(projectId, nonceScope, projectSecret?).subscribe(
 //            { token -> print("we got it!!! $token") },
 //            { e -> throw e }
 //        )
 
-class ProjectAuthenticator {
+// Working in progress
+class ProjectAuthenticator() {
 
     val apiClient = ApiService().api
 
@@ -22,15 +25,14 @@ class ProjectAuthenticator {
             getGoogleAttestation(nonceScope),
             combineAuthParameters(projectId)
         ).makeAuthRequest()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
 
-    private fun Single<out AuthRequest>.makeAuthRequest(): Single<String> =
-        flatMap { authRequest -> AuthManager.requestAuthToken(authRequest) }
-
-    private fun combineAuthParameters(projectId: String): BiFunction<String, JSONObject, AuthRequest> {
-        return BiFunction { encryptedProjectSecret: String, attestation: JSONObject ->
-            AuthRequest(encryptedProjectSecret, projectId, attestation)
-        }
-    }
+    private fun getEncryptedProjectSecret(projectSecret: String? = null): Single<String> =
+        if (projectSecret == null)
+            ProjectSecretManager.getEncryptedProjectSecret()
+        else PublicKeyManager(apiClient).requestPublicKey()
+            .flatMap { publicKey -> ProjectSecretManager.encryptAndStoreProjectSecret(projectSecret, publicKey) }
 
     private fun getGoogleAttestation(noneScope: NonceScope): Single<JSONObject>? {
         return NonceManager(apiClient).requestNonce(noneScope).flatMap { nonce ->
@@ -38,13 +40,11 @@ class ProjectAuthenticator {
         }
     }
 
-    private fun getEncryptedProjectSecret(projectSecret: String? = null): Single<String> =
-        if (projectSecret == null)
-            readSharedPreferences() //TODO: Exception if project Secret encrypted is not shared
-        else PublicKeyManager().requestPublicKey()
-            .flatMap { publicKey -> PublicKeyManager().encryptProjectSecret(projectSecret, publicKey) }
+    private fun combineAuthParameters(projectId: String): BiFunction<String, JSONObject, AuthRequest> =
+        BiFunction { encryptedProjectSecret: String, attestation: JSONObject ->
+            AuthRequest(encryptedProjectSecret, projectId, attestation)
+        }
 
-    private fun readSharedPreferences(): Single<String> {
-        return SingleJust<String>("")
-    }
+    private fun Single<out AuthRequest>.makeAuthRequest(): Single<String> =
+        flatMap { authRequest -> AuthManager.requestAuthToken(authRequest) }
 }

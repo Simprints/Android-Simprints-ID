@@ -1,4 +1,4 @@
-package com.simprints.id.secure
+package com.simprints.id.secure.models
 
 import org.json.JSONObject
 
