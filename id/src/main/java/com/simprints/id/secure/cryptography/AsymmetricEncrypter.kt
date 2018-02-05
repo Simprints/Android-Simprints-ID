@@ -2,7 +2,7 @@ package com.simprints.id.secure.cryptography
 
 import javax.crypto.Cipher
 import android.util.Base64
-import com.simprints.id.secure.domain.PublicKeyString
+import com.simprints.id.secure.models.PublicKeyString
 import java.security.PublicKey
 
 

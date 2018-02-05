@@ -2,22 +2,20 @@ package com.simprints.id.secure
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.simprints.id.secure.domain.Nonce
-import com.simprints.id.secure.domain.NonceScope
+import com.simprints.id.secure.models.Nonce
+import com.simprints.id.secure.models.NonceScope
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
-class NonceManager {
+class NonceManager(val client: ApiServiceInterface) {
 
-    companion object {
-        fun requestNonce(nonceScope: NonceScope): Single<Nonce> {
-            val jsonNonceScope = JsonHelper.toJson(nonceScope)
+    fun requestNonce(nonceScope: NonceScope): Single<Nonce> {
+        val headers = convertNonceScopeIntoMap(nonceScope)
+        return client.nonce(headers, "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s")
+    }
 
-            val headersMapType = object : TypeToken<HashMap<String, String>>() {}.type
-            val headers = Gson().fromJson<HashMap<String, String>>(jsonNonceScope, headersMapType)
-
-            return ApiService.nonce(headers, "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s")
-        }
+    private fun convertNonceScopeIntoMap(nonceScope: NonceScope): Map<String, String> {
+        val jsonNonceScope = JsonHelper.toJson(nonceScope)
+        val headersMapType = object : TypeToken<HashMap<String, String>>() {}.type
+        return Gson().fromJson<HashMap<String, String>>(jsonNonceScope, headersMapType)
     }
 }

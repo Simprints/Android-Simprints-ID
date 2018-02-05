@@ -1,4 +1,4 @@
-package com.simprints.id.secure.domain
+package com.simprints.id.secure.models
 
 
 enum class ProjectAuthenticationResult {
