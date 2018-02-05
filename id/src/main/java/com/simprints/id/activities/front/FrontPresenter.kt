@@ -12,7 +12,7 @@ internal class FrontPresenter(val view: FrontContract.View, override val secureM
     }
 
     override fun doSecurityChecks(): Boolean {
-        if (secureManager.getProjectSecretOrEmpty() == "") {
+        if (secureManager.getEncryptedProjectSecretOrEmpty() == "") {
             view.openRequestAPIActivity()
             return false
         }
