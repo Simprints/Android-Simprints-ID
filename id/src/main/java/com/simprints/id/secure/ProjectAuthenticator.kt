@@ -1,50 +1,63 @@
 package com.simprints.id.secure
 
-import android.app.Activity
+import android.content.Context
 import com.simprints.id.secure.models.AttestToken
+import io.reactivex.functions.BiFunction
+
+import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.exceptions.safe.ProjectCredentialsMissingException
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.Token
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.BiFunction
+import io.reactivex.internal.operators.single.SingleJust
 import io.reactivex.schedulers.Schedulers
 
-//      CALLER
-// ProjectAuthenticator().authenticate(projectId, nonceScope, projectSecret?).subscribe(
-//            { token -> print("we got it!!! $token") },
-//            { e -> throw e }
-//        )
+/**      CALLER
+ProjectAuthenticator(secureDataManager).authenticateWithExistingCredentials(nonceScope) **OR**
+ProjectAuthenticator(secureDataManager).authenticateWithNewCredentials(nonceScope, projectId, encryptedProjectSecret)
+.subscribe(
+{ token -> print("we got it!!! $token") },
+{ e -> handleException(e) }
+)
+ */
+// TODO : Inject apiClient instead of passing as argument
+class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
+                           private val apiClient: ApiServiceInterface = ApiService().api) {
 
-// Working in progress
-class ProjectAuthenticator() {
+    private val projectSecretManager = ProjectSecretManager(secureDataManager)
 
-    val apiClient = ApiService().api
+    @Throws(ProjectCredentialsMissingException::class)
+    fun authenticateWithExistingCredentials(ctx: Context, nonceScope: NonceScope): Single<Token> =
+        authenticate(ctx, nonceScope, SingleJust(secureDataManager.encryptedProjectSecret))
 
-    fun authenticate(act: Activity,
-                     nonceScope: NonceScope,
-                     projectSecret: String? = null): Single<Token> =
-        Single.zip(
-            getEncryptedProjectSecret(projectSecret),
-            getGoogleAttestation(act, nonceScope),
-            combineAuthParameters(nonceScope.projectId, nonceScope.userId)
-        ).makeAuthRequest()
+    fun authenticateWithNewCredentials(ctx: Context, nonceScope: NonceScope, projectSecret: String): Single<Token> =
+        authenticate(ctx, nonceScope, getEncryptedProjectSecret(projectSecret))
+
+    private fun authenticate(ctx: Context, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<Token> =
+        combineProjectSecretAndGoogleAttestationObservables(ctx, nonceScope, encryptedProjectSecret)
+            .makeAuthRequest()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
-    private fun getEncryptedProjectSecret(projectSecret: String? = null): Single<String> =
-        if (projectSecret == null)
-            ProjectSecretManager.getEncryptedProjectSecret()
-        else PublicKeyManager(apiClient).requestPublicKey()
-            .flatMap { publicKey -> ProjectSecretManager.encryptAndStoreProjectSecret(projectSecret, publicKey) }
+    private fun combineProjectSecretAndGoogleAttestationObservables(ctx: Context, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<AuthRequest> =
+        Single.zip(
+            encryptedProjectSecret,
+            getGoogleAttestation(ctx, nonceScope),
+            combineAuthRequestParameters(nonceScope.projectId, nonceScope.userId)
+        )
 
-    private fun getGoogleAttestation(act: Activity, noneScope: NonceScope): Single<AttestToken>? {
-        return NonceManager(apiClient).requestNonce(noneScope).flatMap { nonce ->
-            GoogleManager().requestAttestation(act, nonce)
+    private fun getEncryptedProjectSecret(projectSecret: String): Single<String> =
+        PublicKeyManager(apiClient).requestPublicKey()
+            .flatMap { publicKey -> projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey) }
+
+    private fun getGoogleAttestation(ctx: Context, noneScope: NonceScope): Single<AttestToken> =
+        NonceManager(apiClient).requestNonce(noneScope).flatMap { nonce ->
+            GoogleManager().requestAttestation(ctx, nonce)
         }
-    }
 
-    private fun combineAuthParameters(projectId: String, userId: String): BiFunction<String, AttestToken, AuthRequest> =
+    private fun combineAuthRequestParameters(projectId: String, userId: String): BiFunction<String, AttestToken, AuthRequest> =
         BiFunction { encryptedProjectSecret: String, attestation: AttestToken ->
             AuthRequest(encryptedProjectSecret, projectId, userId, attestation)
         }

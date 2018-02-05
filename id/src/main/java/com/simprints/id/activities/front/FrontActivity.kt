@@ -36,7 +36,7 @@ open class FrontActivity : AppCompatActivity(), FrontContract.View {
 
         initPresenter()
 
-        ProjectAuthenticator().authenticate(
+        ProjectAuthenticator(dataManager).authenticateWithNewCredentials(
             this,
             NonceScope("55KAiL2YmsjeuNNPnSDO", ""),
             "GMoqI_4-UToujbPrIHrNMS9_0EpCbXveTLCvvN7nasVDCNcyhuu7c8u2zrfkuVdL7t3Uxt-Rjo8sDvBi3bkpUA")

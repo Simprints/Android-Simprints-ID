@@ -1,6 +1,6 @@
 package com.simprints.id.secure
 
-import android.app.Activity
+import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
@@ -9,11 +9,11 @@ import io.reactivex.schedulers.Schedulers
 
 class GoogleManager {
 
-   fun requestAttestation(act: Activity, nonce: Nonce): Single<AttestToken> {
+   fun requestAttestation(ctx: Context, nonce: Nonce): Single<AttestToken> {
 
        return Single.create<AttestToken> { emitter ->
 
-           SafetyNet.getClient(act).attest(nonce.value.toByteArray(), "AIzaSyAGYfgKYVGHsRJwrPnbNEwLrFfbbNdlAyE")
+           SafetyNet.getClient(ctx).attest(nonce.value.toByteArray(), "AIzaSyAGYfgKYVGHsRJwrPnbNEwLrFfbbNdlAyE")
                .addOnSuccessListener { attestationResponse ->
                    val result = attestationResponse.jwsResult
                    val attestToken = AttestToken(result)
