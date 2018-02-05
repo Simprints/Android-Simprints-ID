@@ -5,6 +5,7 @@ import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.tools.retrofit.buildResponse
 import io.reactivex.Single
 import retrofit2.Response
+import retrofit2.http.HeaderMap
 import retrofit2.http.Query
 import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.Calls
@@ -22,7 +23,7 @@ class ApiServiceMock(private val delegate: BehaviorDelegate<ApiServiceInterface>
         return delegate.returningResponse(Calls.response(Response.success(publicKeyResponse.body(), publicKeyResponse))).publicKey(key)
     }
 
-    override fun nonce(headers: Map<String, String>, key: String): Single<Nonce> {
+    override fun nonce(@HeaderMap headers: Map<String, String>, @Query("key") key: String): Single<Nonce> {
         return delegate.returningResponse(Calls.response(Response.success(nonceResponse.body(), nonceResponse))).nonce(headers, key)
     }
 }

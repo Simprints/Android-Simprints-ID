@@ -1,10 +1,25 @@
 package com.simprints.id.tools.retrofit
 
+import com.simprints.id.secure.ApiServiceInterface
+import com.simprints.id.secure.ApiServiceMock
 import okhttp3.*
+import retrofit2.Retrofit
+import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 import java.util.concurrent.TimeUnit
 
-inline fun getBuilderResponse(statusCode: Int, body: String = "", contentType: String = "\"text/plain\""): Response.Builder {
+fun createMockServiceToFailRequests(retrofit: Retrofit): ApiServiceInterface {
+    // Creating a mockServer with 100% of failure rate.
+    val networkBehavior = NetworkBehavior.create()
+    givenNetworkFailurePercentIs(networkBehavior, 100)
+
+    val mockRetrofit = MockRetrofit.Builder(retrofit)
+        .networkBehavior(networkBehavior)
+        .build()
+    return ApiServiceMock(mockRetrofit.create(ApiServiceInterface::class.java))
+}
+
+fun getBuilderResponse(statusCode: Int, body: String = "", contentType: String = "\"text/plain\""): Response.Builder {
     return Response.Builder()
         .code(statusCode)
         .message(body)
@@ -14,12 +29,12 @@ inline fun getBuilderResponse(statusCode: Int, body: String = "", contentType: S
         .request(Request.Builder().url("http://localhost").build())
 }
 
-inline fun givenNetworkFailurePercentIs(behavior: NetworkBehavior, failurePercent: Int) {
+fun givenNetworkFailurePercentIs(behavior: NetworkBehavior, failurePercent: Int) {
     behavior.setDelay(0, TimeUnit.MILLISECONDS)
     behavior.setVariancePercent(0)
     behavior.setFailurePercent(failurePercent)
 }
 
-inline fun buildResponse(statusCode: Int, body: String = "", contentType: String = "\"text/plain\""): Response {
+fun buildResponse(statusCode: Int, body: String = "", contentType: String = "\"text/plain\""): Response {
     return getBuilderResponse(statusCode, body, contentType).build()
 }

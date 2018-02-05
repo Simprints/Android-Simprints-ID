@@ -5,7 +5,7 @@ import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.FakeResponseInterceptor
-import com.simprints.id.tools.retrofit.givenNetworkFailurePercentIs
+import com.simprints.id.tools.retrofit.createMockServiceToFailRequests
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -15,9 +15,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.HttpException
-import retrofit2.Retrofit
-import retrofit2.mock.MockRetrofit
-import retrofit2.mock.NetworkBehavior
 import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
@@ -70,16 +67,5 @@ class NonceManagerTest : RxJavaTest() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .test()
-    }
-
-    private fun createMockServiceToFailRequests(retrofit: Retrofit): ApiServiceInterface {
-        // Creating a mockServer with 100% of failure rate.
-        val networkBehavior = NetworkBehavior.create()
-        givenNetworkFailurePercentIs(networkBehavior, 100)
-
-        val mockRetrofit = MockRetrofit.Builder(retrofit)
-            .networkBehavior(networkBehavior)
-            .build()
-        return ApiServiceMock(mockRetrofit.create(ApiServiceInterface::class.java))
     }
 }
