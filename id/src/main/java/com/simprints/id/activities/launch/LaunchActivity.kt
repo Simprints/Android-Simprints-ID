@@ -83,7 +83,7 @@ open class LaunchActivity : AppCompatActivity() {
         super.onResume()
         when {
             dataManager.areProjectCredentialsMissing() -> startRequestProjectCredentialsActivity()
-            setup.isOnGoing() -> setup.start(this, getSetupCallback())
+            setup.isOnGoing -> setup.start(this, getSetupCallback())
         }
     }
 

@@ -43,7 +43,7 @@ class FrontActivityTest {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
 
         val sharedPreferences = getRoboSharedPreferences()
-        sharedPreferences.edit().putString("PROJECT_SECRET", "secret").commit()
+        sharedPreferences.edit().putString("ENCRYPTED_PROJECT_SECRET", "secret").commit()
         sharedPreferences.edit().putString("PROJECT_ID", "id").commit()
 
         val controller = createRoboFrontViewActivity().start().resume().visible()
