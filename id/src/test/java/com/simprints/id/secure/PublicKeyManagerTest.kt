@@ -1,8 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.BuildConfig
-import com.simprints.id.secure.models.Nonce
-import com.simprints.id.secure.models.NonceScope
+import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.FakeResponseInterceptor
 import com.simprints.id.tools.retrofit.givenNetworkFailurePercentIs
@@ -20,31 +19,31 @@ import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 import java.io.IOException
 
+
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class)
-class NonceManagerTest : RxJavaTest() {
+class PublicKeyManagerTest : RxJavaTest() {
 
-    private val validNonceJsonResponse = "{\"value\":\"nonce_from_server\"}"
+    private val validPublicKeyJsonResponse = "{\"value\":\"public_key_from_server\"}"
 
     @Test
-    fun successfulResponse_shouldObtainANonce() {
+    fun successfulResponse_shouldObtainThePublicKey() {
         val apiService = ApiService()
         forceOkHttpToReturnSuccessfulResponse(apiService.okHttpClientConfig)
 
-        val testObserver = makeTestRequestNonce(apiService.api)
+        val testObserver = makeTestRequestPublicKey(apiService.api)
         testObserver.awaitTerminalEvent()
 
         testObserver
             .assertNoErrors()
-            .assertValue { nonce -> nonce.value == "nonce_from_server" }
+            .assertValue { publicKeyString -> publicKeyString.value == "public_key_from_server" }
     }
-
     @Test
     fun offline_shouldThrowAnException() {
         val apiService = ApiService()
         val apiServiceMock = createMockServiceToFailRequests(apiService.retrofit)
 
-        val testObserver = makeTestRequestNonce(apiServiceMock)
+        val testObserver = makeTestRequestPublicKey(apiServiceMock)
         testObserver.awaitTerminalEvent()
 
         testObserver.assertError(IOException::class.java)
@@ -55,18 +54,18 @@ class NonceManagerTest : RxJavaTest() {
         val apiService = ApiService()
         apiService.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(500))
 
-        val testObserver = makeTestRequestNonce(apiService.api)
+        val testObserver = makeTestRequestPublicKey(apiService.api)
         testObserver.awaitTerminalEvent()
 
         testObserver.assertError(HttpException::class.java)
     }
 
     private fun forceOkHttpToReturnSuccessfulResponse(okHttpClientConfig: OkHttpClient.Builder) {
-        okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, validNonceJsonResponse))
+        okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, validPublicKeyJsonResponse))
     }
 
-    private fun makeTestRequestNonce(apiServiceMock: ApiServiceInterface): TestObserver<Nonce> {
-        return NonceManager(apiServiceMock).requestNonce(NonceScope("projectId_param", "userId_param"))
+    private fun makeTestRequestPublicKey(apiServiceMock: ApiServiceInterface): TestObserver<PublicKeyString> {
+        return PublicKeyManager(apiServiceMock).requestPublicKey()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .test()
