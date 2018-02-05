@@ -1,7 +1,7 @@
 package com.simprints.id.activities.requestProjectCredentials
 
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.unsafe.ProjectCredentialsNonValidError
+import com.simprints.id.exceptions.safe.ProjectCredentialsMissingException
 import com.simprints.id.tools.Log
 
 @Suppress("UnnecessaryVariable")
@@ -33,9 +33,9 @@ class RequestProjectCredentialsPresenter(val view: RequestProjectCredentialsCont
     private fun tryToSaveProjectDetails(potentialProjectId: String, potentialProjectSecret: String) {
         try {
             secureDataManager.projectId = potentialProjectId
-            secureDataManager.projectSecret = potentialProjectSecret
+            secureDataManager.encryptedProjectSecret = potentialProjectSecret
             view.dismissRequestProjectSecretActivity()
-        } catch (e: ProjectCredentialsNonValidError){
+        } catch (e: ProjectCredentialsMissingException){
             view.showErrorForInvalidProjectCredentials()
         }
     }
