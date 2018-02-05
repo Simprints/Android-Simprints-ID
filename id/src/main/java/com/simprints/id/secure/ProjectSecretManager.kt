@@ -5,7 +5,6 @@ import com.simprints.id.secure.models.PublicKeyString
 import io.reactivex.Single
 import io.reactivex.internal.operators.single.SingleJust
 
-
 class ProjectSecretManager {
     companion object {
 
@@ -15,7 +14,7 @@ class ProjectSecretManager {
 
         fun encryptAndStoreProjectSecret(projectSecret: String, publicKeyString: PublicKeyString): Single<String> {
             val encryptedProjectSecret = encryptProjectSecret(projectSecret, publicKeyString)
-            storeEncryptedProjectSecret(encryptedProjectSecret)
+            //storeEncryptedProjectSecret(encryptedProjectSecret)
             return encryptedProjectSecret
         }
 

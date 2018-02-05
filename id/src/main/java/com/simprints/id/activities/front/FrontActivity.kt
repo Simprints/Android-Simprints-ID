@@ -7,6 +7,8 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.requestProjectCredentials.RequestProjectCredentialsActivity
 import com.simprints.id.data.DataManager
+import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.PermissionManager
 import com.simprints.id.tools.RemoteConfig
@@ -33,6 +35,14 @@ open class FrontActivity : AppCompatActivity(), FrontContract.View {
         PermissionManager.requestAllPermissions(this@FrontActivity, dataManager.callingPackage)
 
         initPresenter()
+
+        ProjectAuthenticator().authenticate(
+            this,
+            NonceScope("55KAiL2YmsjeuNNPnSDO", ""),
+            "GMoqI_4-UToujbPrIHrNMS9_0EpCbXveTLCvvN7nasVDCNcyhuu7c8u2zrfkuVdL7t3Uxt-Rjo8sDvBi3bkpUA")
+            .subscribe (
+                { token -> print(token) },
+                { e -> throw e })
     }
 
     fun initPresenter() {
