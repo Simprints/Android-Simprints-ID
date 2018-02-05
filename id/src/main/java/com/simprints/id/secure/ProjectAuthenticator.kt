@@ -19,9 +19,10 @@ import org.json.JSONObject
                 { e -> handleException(e) }
             )
 */
-class ProjectAuthenticator(private val secureDataManager: SecureDataManager) {
+// TODO : Inject apiClient instead of passing as argument
+class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
+                           private val apiClient: ApiServiceInterface = ApiService().api) {
 
-    private val apiClient = ApiService().api
     private val projectSecretManager = ProjectSecretManager(secureDataManager)
 
     @Throws(ProjectCredentialsMissingException::class)
