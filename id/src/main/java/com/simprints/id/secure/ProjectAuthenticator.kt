@@ -29,6 +29,7 @@ class ProjectAuthenticator() {
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun getEncryptedProjectSecret(projectSecret: String? = null): Single<String> =
+        // TODO : Make projectSecret if/else more explicit
         if (projectSecret == null)
             ProjectSecretManager.getEncryptedProjectSecret()
         else PublicKeyManager(apiClient).requestPublicKey()
