@@ -11,20 +11,21 @@ import io.reactivex.internal.operators.single.SingleJust
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 
-//      CALLER
-// ProjectAuthenticator().authenticate(projectId, nonceScope, encryptedProjectSecret?).subscribe(
-//            { token -> print("we got it!!! $token") },
-//            { e -> throw e }
-//        )
-
-// Working in progress
+/**      CALLER
+    ProjectAuthenticator(secureDataManager).authenticateWithExistingCredentials(nonceScope) **OR**
+    ProjectAuthenticator(secureDataManager).authenticateWithNewCredentials(nonceScope, projectId, encryptedProjectSecret)
+            .subscribe(
+                { token -> print("we got it!!! $token") },
+                { e -> handleException(e) }
+            )
+*/
 class ProjectAuthenticator(private val secureDataManager: SecureDataManager) {
 
     private val apiClient = ApiService().api
     private val projectSecretManager = ProjectSecretManager(secureDataManager)
 
     @Throws(ProjectCredentialsMissingException::class)
-    fun authenticateWithStoredCredentials(nonceScope: NonceScope): Single<String> =
+    fun authenticateWithExistingCredentials(nonceScope: NonceScope): Single<String> =
         authenticate(nonceScope, secureDataManager.projectId, SingleJust<String>(secureDataManager.encryptedProjectSecret))
 
     fun authenticateWithNewCredentials(nonceScope: NonceScope, projectId: String, projectSecret: String): Single<String> =
