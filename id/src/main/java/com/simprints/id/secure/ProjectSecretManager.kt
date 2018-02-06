@@ -6,7 +6,6 @@ import com.simprints.id.secure.models.PublicKeyString
 import io.reactivex.Single
 import io.reactivex.internal.operators.single.SingleJust
 
-
 class ProjectSecretManager(private val secureDataManager: SecureDataManager) {
 
     fun encryptAndStoreAndReturnProjectSecret(projectSecret: String, publicKeyString: PublicKeyString): Single<String> {

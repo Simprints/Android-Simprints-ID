@@ -35,7 +35,7 @@ class RequestProjectCredentialsPresenter(val view: RequestProjectCredentialsCont
             secureDataManager.projectId = potentialProjectId
             secureDataManager.encryptedProjectSecret = potentialProjectSecret
             view.dismissRequestProjectSecretActivity()
-        } catch (e: ProjectCredentialsMissingException){
+        } catch (e: ProjectCredentialsMissingException) {
             view.showErrorForInvalidProjectCredentials()
         }
     }

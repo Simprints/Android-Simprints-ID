@@ -4,7 +4,6 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError
 import com.simprints.id.exceptions.safe.ProjectCredentialsMissingException
 
-
 class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
 
     companion object {
@@ -57,7 +56,6 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
 
     /*TODO: Legacy stuff to refactor */
     private var apiKeyBackingField: String = ""
-
 
     override var apiKey: String
         get() {

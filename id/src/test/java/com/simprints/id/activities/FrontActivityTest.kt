@@ -21,7 +21,6 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
-
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class)
 class FrontActivityTest {
@@ -70,7 +69,6 @@ class FrontActivityTest {
         val isIntentForGooglePlay: Boolean = nextActivity.dataString.contains("play.google.com")
         assert(isIntentForGooglePlay)
     }
-
 
     @Test
     @Throws(Exception::class)
