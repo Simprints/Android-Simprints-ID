@@ -3,10 +3,12 @@ package com.simprints.id.secure
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.base.RxJavaTest
+import com.simprints.id.tools.retrofit.createMockService
 import com.simprints.id.tools.retrofit.createMockServiceToFailRequests
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.io.IOException
 
@@ -17,10 +19,13 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     @Test
     fun successfulResponse_canAuthenticateProjectNewCredentials() {
 
-        val nonceScope = NonceScope("project_id", "user_id")
+        val app = RuntimeEnvironment.application
 
-        val testObserver = ProjectAuthenticator(SecureDataManagerMock())
-            .authenticateWithNewCredentials(nonceScope, "project_id", "encrypted_project_secret")
+        val authenticator = ProjectAuthenticator(SecureDataManagerMock(), createMockService(ApiService().retrofit, 0))
+        authenticator.googleManager = getMockGoogleManager()
+
+        val testObserver = authenticator
+            .authenticateWithNewCredentials(app, NonceScope("project_id", "user_id"), "encrypted_project_secret")
             .test()
 
         testObserver.awaitTerminalEvent()
@@ -33,10 +38,13 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     @Test
     fun successfulResponse_canAuthenticateProjectExistingCredentials() {
 
-        val nonceScope = NonceScope("project_id", "user_id")
+        val app = RuntimeEnvironment.application
 
-        val testObserver = ProjectAuthenticator(SecureDataManagerMock())
-            .authenticateWithExistingCredentials(nonceScope)
+        val authenticator = ProjectAuthenticator(SecureDataManagerMock(), createMockService(ApiService().retrofit, 0))
+        authenticator.googleManager = getMockGoogleManager()
+
+        val testObserver = authenticator
+            .authenticateWithExistingCredentials(app, NonceScope("project_id", "user_id"))
             .test()
 
         testObserver.awaitTerminalEvent()
@@ -49,11 +57,12 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     @Test
     fun offline_authenticationShouldThrowException() {
 
+        val app = RuntimeEnvironment.application
         val nonceScope = NonceScope("project_id", "user_id")
 
         val testObserver = ProjectAuthenticator(SecureDataManagerMock(),
             createMockServiceToFailRequests(ApiService().retrofit))
-            .authenticateWithExistingCredentials(nonceScope)
+            .authenticateWithExistingCredentials(app, nonceScope)
             .test()
 
         testObserver.awaitTerminalEvent()
