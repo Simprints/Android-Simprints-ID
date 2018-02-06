@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import com.simprints.id.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -9,7 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 open class ApiService {
 
-    val baseUrl = "https://project-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
+    //val baseUrl = "https://project-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
+    var baseUrl = "http://192.168.86.57:8080"
 
     val api: ApiServiceInterface by lazy {
         retrofit.create(ApiServiceInterface::class.java)

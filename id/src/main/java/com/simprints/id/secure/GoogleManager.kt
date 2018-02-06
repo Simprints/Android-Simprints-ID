@@ -2,6 +2,7 @@ package com.simprints.id.secure
 
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
+import com.google.common.io.BaseEncoding
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
 import io.reactivex.Single
@@ -12,9 +13,8 @@ class GoogleManager {
    fun requestAttestation(ctx: Context, nonce: Nonce): Single<AttestToken> {
 
        return Single.create<AttestToken> { emitter ->
-           // emitter.onSuccess(AttestToken(""))
 
-           SafetyNet.getClient(ctx).attest(nonce.value.toByteArray(), "AIzaSyAGYfgKYVGHsRJwrPnbNEwLrFfbbNdlAyE")
+           SafetyNet.getClient(ctx).attest(BaseEncoding.base64().decode(nonce.value), "AIzaSyAGYfgKYVGHsRJwrPnbNEwLrFfbbNdlAyE")
                .addOnSuccessListener { attestationResponse ->
                    val result = attestationResponse.jwsResult
                    val attestToken = AttestToken(result)
