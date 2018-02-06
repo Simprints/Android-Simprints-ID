@@ -8,15 +8,19 @@ import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 import java.util.concurrent.TimeUnit
 
-fun createMockServiceToFailRequests(retrofit: Retrofit): ApiServiceInterface {
+fun createMockService(retrofit: Retrofit, failurePercent: Int): ApiServiceInterface {
     // Creating a mockServer with 100% of failure rate.
     val networkBehavior = NetworkBehavior.create()
-    givenNetworkFailurePercentIs(networkBehavior, 100)
+    givenNetworkFailurePercentIs(networkBehavior, failurePercent)
 
     val mockRetrofit = MockRetrofit.Builder(retrofit)
         .networkBehavior(networkBehavior)
         .build()
     return ApiServiceMock(mockRetrofit.create(ApiServiceInterface::class.java))
+}
+
+fun createMockServiceToFailRequests(retrofit: Retrofit): ApiServiceInterface {
+    return createMockService(retrofit, 100)
 }
 
 fun getBuilderResponse(statusCode: Int, body: String = "", contentType: String = "\"text/plain\""): Response.Builder {

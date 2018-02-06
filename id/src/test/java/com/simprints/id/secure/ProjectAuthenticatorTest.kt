@@ -3,6 +3,7 @@ package com.simprints.id.secure
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.base.RxJavaTest
+import com.simprints.id.tools.retrofit.createMockService
 import com.simprints.id.tools.retrofit.createMockServiceToFailRequests
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,10 +20,12 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     fun successfulResponse_canAuthenticateProjectNewCredentials() {
 
         val app = RuntimeEnvironment.application
-        val nonceScope = NonceScope("project_id", "user_id")
 
-        val testObserver = ProjectAuthenticator(SecureDataManagerMock())
-            .authenticateWithNewCredentials(app, nonceScope, "encrypted_project_secret")
+        val authenticator = ProjectAuthenticator(SecureDataManagerMock(), createMockService(ApiService().retrofit, 0))
+        authenticator.googleManager = getMockGoogleManager()
+
+        val testObserver = authenticator
+            .authenticateWithNewCredentials(app, NonceScope("project_id", "user_id"), "encrypted_project_secret")
             .test()
 
         testObserver.awaitTerminalEvent()
@@ -36,10 +39,12 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     fun successfulResponse_canAuthenticateProjectExistingCredentials() {
 
         val app = RuntimeEnvironment.application
-        val nonceScope = NonceScope("project_id", "user_id")
 
-        val testObserver = ProjectAuthenticator(SecureDataManagerMock())
-            .authenticateWithExistingCredentials(app, nonceScope)
+        val authenticator = ProjectAuthenticator(SecureDataManagerMock(), createMockService(ApiService().retrofit, 0))
+        authenticator.googleManager = getMockGoogleManager()
+
+        val testObserver = authenticator
+            .authenticateWithExistingCredentials(app, NonceScope("project_id", "user_id"))
             .test()
 
         testObserver.awaitTerminalEvent()

@@ -12,6 +12,7 @@ class GoogleManager {
    fun requestAttestation(ctx: Context, nonce: Nonce): Single<AttestToken> {
 
        return Single.create<AttestToken> { emitter ->
+           // emitter.onSuccess(AttestToken(""))
 
            SafetyNet.getClient(ctx).attest(nonce.value.toByteArray(), "AIzaSyAGYfgKYVGHsRJwrPnbNEwLrFfbbNdlAyE")
                .addOnSuccessListener { attestationResponse ->
