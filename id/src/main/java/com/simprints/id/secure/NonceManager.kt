@@ -10,7 +10,7 @@ class NonceManager(val client: ApiServiceInterface) {
 
     fun requestNonce(nonceScope: NonceScope): Single<Nonce> {
         val headers = convertNonceScopeIntoMap(nonceScope)
-        return client.nonce(headers, "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s")
+        return client.nonce(headers)
     }
 
     private fun convertNonceScopeIntoMap(nonceScope: NonceScope): Map<String, String> {

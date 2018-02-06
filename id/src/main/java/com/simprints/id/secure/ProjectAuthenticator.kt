@@ -1,50 +1,69 @@
 package com.simprints.id.secure
 
+import android.content.Context
+import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.exceptions.safe.ProjectCredentialsMissingException
+import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.NonceScope
+import com.simprints.id.secure.models.Token
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
+import io.reactivex.internal.operators.single.SingleJust
 import io.reactivex.schedulers.Schedulers
-import org.json.JSONObject
 
-//      CALLER
-// ProjectAuthenticator().authenticate(projectId, nonceScope, projectSecret?).subscribe(
-//            { token -> print("we got it!!! $token") },
-//            { e -> throw e }
-//        )
+/**      CALLER
+ProjectAuthenticator(secureDataManager).authenticateWithExistingCredentials(nonceScope) **OR**
+ProjectAuthenticator(secureDataManager).authenticateWithNewCredentials(nonceScope, projectId, encryptedProjectSecret)
+.subscribe(
+{ token -> print("we got it!!! $token") },
+{ e -> handleException(e) }
+)
+ */
+class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
+                           apiClient: ApiServiceInterface = ApiService().api) {
 
-// Working in progress
-class ProjectAuthenticator() {
+    private val projectSecretManager = ProjectSecretManager(secureDataManager)
+    private val publicKeyManager = PublicKeyManager(apiClient)
+    private val nonceManager = NonceManager(apiClient)
+    private val authManager = AuthManager(apiClient)
+    var attestationManager = AttestationManager()
 
-    val apiClient = ApiService().api
+    @Throws(ProjectCredentialsMissingException::class)
+    fun authenticateWithExistingCredentials(ctx: Context, nonceScope: NonceScope): Single<Token> =
+        authenticate(ctx, nonceScope, SingleJust(secureDataManager.encryptedProjectSecret))
 
-    fun authenticate(projectId: String, nonceScope: NonceScope, projectSecret: String? = null): Single<String> =
-        Single.zip(
-            getEncryptedProjectSecret(projectSecret),
-            getGoogleAttestation(nonceScope),
-            combineAuthParameters(projectId)
-        ).makeAuthRequest()
+    fun authenticateWithNewCredentials(ctx: Context, nonceScope: NonceScope, projectSecret: String): Single<Token> =
+        authenticate(ctx, nonceScope, getEncryptedProjectSecret(projectSecret))
+
+    private fun authenticate(ctx: Context, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<Token> =
+        combineProjectSecretAndGoogleAttestationObservables(ctx, nonceScope, encryptedProjectSecret)
+            .makeAuthRequest()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
-    private fun getEncryptedProjectSecret(projectSecret: String? = null): Single<String> =
-        if (projectSecret == null)
-            ProjectSecretManager.getEncryptedProjectSecret()
-        else PublicKeyManager(apiClient).requestPublicKey()
-            .flatMap { publicKey -> ProjectSecretManager.encryptAndStoreProjectSecret(projectSecret, publicKey) }
+    private fun combineProjectSecretAndGoogleAttestationObservables(ctx: Context, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<AuthRequest> =
+        Single.zip(
+            encryptedProjectSecret,
+            getGoogleAttestation(ctx, nonceScope),
+            combineAuthRequestParameters(nonceScope.projectId, nonceScope.userId)
+        )
 
-    private fun getGoogleAttestation(noneScope: NonceScope): Single<JSONObject>? {
-        return NonceManager(apiClient).requestNonce(noneScope).flatMap { nonce ->
-            GoogleManager.requestAttestation(nonce)
+    private fun getEncryptedProjectSecret(projectSecret: String): Single<String> =
+        publicKeyManager.requestPublicKey()
+            .flatMap { publicKey -> projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey) }
+
+    private fun getGoogleAttestation(ctx: Context, noneScope: NonceScope): Single<AttestToken> =
+        nonceManager.requestNonce(noneScope).flatMap { nonce ->
+            attestationManager.requestAttestation(ctx, nonce)
         }
-    }
 
-    private fun combineAuthParameters(projectId: String): BiFunction<String, JSONObject, AuthRequest> =
-        BiFunction { encryptedProjectSecret: String, attestation: JSONObject ->
-            AuthRequest(encryptedProjectSecret, projectId, attestation)
+    private fun combineAuthRequestParameters(projectId: String, userId: String): BiFunction<String, AttestToken, AuthRequest> =
+        BiFunction { encryptedProjectSecret: String, attestation: AttestToken ->
+            AuthRequest(encryptedProjectSecret, projectId, userId, attestation)
         }
 
-    private fun Single<out AuthRequest>.makeAuthRequest(): Single<String> =
-        flatMap { authRequest -> AuthManager.requestAuthToken(authRequest) }
+    private fun Single<out AuthRequest>.makeAuthRequest(): Single<Token> =
+        flatMap { authRequest -> authManager.requestAuthToken(authRequest) }
 }

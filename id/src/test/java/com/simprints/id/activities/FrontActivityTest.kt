@@ -21,7 +21,6 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
-
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class)
 class FrontActivityTest {
@@ -43,7 +42,7 @@ class FrontActivityTest {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
 
         val sharedPreferences = getRoboSharedPreferences()
-        sharedPreferences.edit().putString("PROJECT_SECRET", "secret").commit()
+        sharedPreferences.edit().putString("ENCRYPTED_PROJECT_SECRET", "secret").commit()
         sharedPreferences.edit().putString("PROJECT_ID", "id").commit()
 
         val controller = createRoboFrontViewActivity().start().resume().visible()
@@ -70,7 +69,6 @@ class FrontActivityTest {
         val isIntentForGooglePlay: Boolean = nextActivity.dataString.contains("play.google.com")
         assert(isIntentForGooglePlay)
     }
-
 
     @Test
     @Throws(Exception::class)

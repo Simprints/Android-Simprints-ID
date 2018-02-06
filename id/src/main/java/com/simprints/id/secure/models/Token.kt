@@ -1,3 +1,3 @@
 package com.simprints.id.secure.models
 
-class AttestToken(val value: String)
+class Token(val value: String = "")
