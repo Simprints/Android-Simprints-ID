@@ -7,7 +7,7 @@ import com.simprints.id.secure.models.Nonce
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
-class GoogleManager {
+class AttestationManager {
 
    fun requestAttestation(ctx: Context, nonce: Nonce): Single<AttestToken> {
 
@@ -24,6 +24,6 @@ class GoogleManager {
                    print(e)
                    emitter.onError(e)
                }
-       }.subscribeOn(Schedulers.io())
+       }
    }
 }
