@@ -38,7 +38,7 @@ open class FrontActivity : AppCompatActivity(), FrontContract.View {
 
         ProjectAuthenticator(dataManager).authenticateWithNewCredentials(
             this,
-            NonceScope("55KAiL2YmsjeuNNPnSDO", ""),
+            NonceScope("55KAiL2YmsjeuNNPnSDO", "asd"),
             "GMoqI_4-UToujbPrIHrNMS9_0EpCbXveTLCvvN7nasVDCNcyhuu7c8u2zrfkuVdL7t3Uxt-Rjo8sDvBi3bkpUA")
             .subscribe (
                 { token -> print(token) },

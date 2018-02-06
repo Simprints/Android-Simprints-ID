@@ -13,16 +13,17 @@ import org.robolectric.annotation.Config
 @Config(constants = BuildConfig::class)
 class AsymmetricEncrypterTest {
 
-    private val publicKeyString = PublicKeyString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCMu9L/Apu2nWnBhcBAK" +
-        "w+q23vHQ1KSupMgoIO+XZD5BTo3vNkXt2Jqs2xVIKJmRE1yM7Sz0BlOXDxyVasTHXuPaL9OJ0+BRXx3lXrK/" +
-        "Y62LphM/aeHA3m4JacP8S3C5m4ZZieg2h61tzcB1UZFiinR4IpRDhpw85y109Tj4Ar4dwIDAQAB")
+    private val publicKeyString = PublicKeyString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB")
 
     @Test
     fun testCanEncryptString() {
         val string = "this is some string"
         val encryptedString = AsymmetricEncrypter(publicKeyString).encrypt(string)
-        assertNotNull(encryptedString)
-        assert(encryptedString.isNotEmpty())
+        val encryptedString2 = AsymmetricEncrypter(publicKeyString).encrypt(string)
+
+        //assertNotNull(encryptedString)
+        //assert(encryptedString.isEmpty())
+        fail("encrypted: $encryptedString")
     }
 
     @Test
