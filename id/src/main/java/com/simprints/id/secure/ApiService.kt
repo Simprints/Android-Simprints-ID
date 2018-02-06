@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 open class ApiService {
 
-    private val baseUrl = "https://project-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
+    val baseUrl = "https://project-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
 
     val api: ApiServiceInterface by lazy {
         retrofit.create(ApiServiceInterface::class.java)
