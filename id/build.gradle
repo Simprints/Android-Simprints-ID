@@ -166,6 +166,7 @@ dependencies {
     // Google
     implementation "com.google.android.gms:play-services-location:$google_version"
     implementation "com.google.guava:guava:23.6-android"
+    implementation "com.google.android.gms:play-services-safetynet:$google_version"
 
     // Databases
     implementation "com.michaelpardo:activeandroid:$active_android_version"
