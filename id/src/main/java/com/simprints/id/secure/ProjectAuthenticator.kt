@@ -40,13 +40,12 @@ class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
     private fun authenticate(ctx: Context, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<Token> =
         combineProjectSecretAndGoogleAttestationObservables(ctx, nonceScope, encryptedProjectSecret)
             .makeAuthRequest()
-            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun combineProjectSecretAndGoogleAttestationObservables(ctx: Context, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<AuthRequest> =
         Single.zip(
-            encryptedProjectSecret,
-            getGoogleAttestation(ctx, nonceScope),
+            encryptedProjectSecret.subscribeOn(Schedulers.io()),
+            getGoogleAttestation(ctx, nonceScope).subscribeOn(Schedulers.io()),
             combineAuthRequestParameters(nonceScope.projectId, nonceScope.userId)
         )
 
