@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.secure.models.Token
@@ -11,7 +12,8 @@ import retrofit2.http.Query
 interface ApiServiceInterface {
 
     companion object {
-        val apiKey: String = "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s"
+        const val baseUrl = "https://project-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
+        const val apiKey: String = "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s"
     }
 
     @GET("/nonces")

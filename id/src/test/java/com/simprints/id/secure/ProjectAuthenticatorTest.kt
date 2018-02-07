@@ -22,7 +22,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
         val app = RuntimeEnvironment.application
 
         val authenticator = ProjectAuthenticator(SecureDataManagerMock(), createMockService(ApiService().retrofit, 0))
-        authenticator.googleManager = getMockGoogleManager()
+        authenticator.attestationManager = getMockAttestationManager()
 
         val testObserver = authenticator
             .authenticateWithNewCredentials(app, NonceScope("project_id", "user_id"), "encrypted_project_secret")
@@ -41,7 +41,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
         val app = RuntimeEnvironment.application
 
         val authenticator = ProjectAuthenticator(SecureDataManagerMock(), createMockService(ApiService().retrofit, 0))
-        authenticator.googleManager = getMockGoogleManager()
+        authenticator.attestationManager = getMockAttestationManager()
 
         val testObserver = authenticator
             .authenticateWithExistingCredentials(app, NonceScope("project_id", "user_id"))

@@ -14,6 +14,6 @@ class AuthManager(val client: ApiServiceInterface) {
         headers["X-UserId"] = authRequest.userId
         headers["X-EncryptedProjectSecret"] = authRequest.encryptedProjectSecret
         headers["X-AttestationResult"] = authRequest.attestation.value
-        return client.auth(headers).subscribeOn(Schedulers.io())
+        return client.auth(headers)
     }
 }
