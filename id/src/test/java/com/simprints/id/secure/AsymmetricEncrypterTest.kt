@@ -19,11 +19,8 @@ class AsymmetricEncrypterTest {
     fun testCanEncryptString() {
         val string = "this is some string"
         val encryptedString = AsymmetricEncrypter(publicKeyString).encrypt(string)
-        val encryptedString2 = AsymmetricEncrypter(publicKeyString).encrypt(string)
-
-        //assertNotNull(encryptedString)
-        //assert(encryptedString.isEmpty())
-        fail("encrypted: $encryptedString")
+        assertNotNull(encryptedString)
+        assert(encryptedString.isEmpty())
     }
 
     @Test
