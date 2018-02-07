@@ -81,24 +81,28 @@ def getLocalPropertyForTesting(name) {
 }
 
 project.afterEvaluate {
-    project.("connectedEndToEndTestingAndroidTest").doFirst {
-        def originalProvider = deviceProvider
-        deviceProvider = [
-            getName       : { originalProvider.getName() },
-            init          : { originalProvider.init() },
-            terminate     : { originalProvider.terminate() },
-            getDevices    : { filterDevices(originalProvider.getDevices()) },
-            getTimeoutInMs: { originalProvider.getTimeoutInMs() },
-            isConfigured  : { originalProvider.isConfigured() },
-            getMaxThreads : { originalProvider.getMaxThreads() }
-        ] as DeviceProvider
+    if (gradle.startParameter.taskNames.contains("connectedEndToEndTestingAndroidTest")) {
+        project.("connectedEndToEndTestingAndroidTest").doFirst {
+            def originalProvider = deviceProvider
+            deviceProvider = [
+                getName       : { originalProvider.getName() },
+                init          : { originalProvider.init() },
+                terminate     : { originalProvider.terminate() },
+                getDevices    : { filterDevices(originalProvider.getDevices()) },
+                getTimeoutInMs: { originalProvider.getTimeoutInMs() },
+                isConfigured  : { originalProvider.isConfigured() },
+                getMaxThreads : { originalProvider.getMaxThreads() }
+            ] as DeviceProvider
+        }
     }
 
-    project.("kaptEndToEndTestingKotlin").doFirst {
-        ["ext.scanner", "ext.wifiNetwork", "ext.wifiNetwork"].each { paramName ->
-            if (getLocalPropertyForTesting(paramName) == "") {
-                throw new GradleException(
-                    paramName + " not found and it's required to run the instrumented tests. Please add " + paramName + " in your local.properties file.")
+    if (gradle.startParameter.taskNames.contains("kaptEndToEndTestingKotlin")) {
+        project.("kaptEndToEndTestingKotlin").doFirst {
+            ["ext.scanner", "ext.wifiNetwork", "ext.wifiNetwork"].each { paramName ->
+                if (getLocalPropertyForTesting(paramName) == "") {
+                    throw new GradleException(
+                        paramName + " not found and it's required to run the instrumented tests. Please add " + paramName + " in your local.properties file.")
+                }
             }
         }
     }

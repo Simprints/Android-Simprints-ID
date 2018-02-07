@@ -21,15 +21,14 @@ ProjectAuthenticator(secureDataManager).authenticateWithNewCredentials(nonceScop
 { e -> handleException(e) }
 )
  */
-// TODO : Inject apiClient instead of passing as argument
 class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
-                           private val apiClient: ApiServiceInterface = ApiService().api) {
+                           apiClient: ApiServiceInterface = ApiService().api) {
 
     private val projectSecretManager = ProjectSecretManager(secureDataManager)
-    val publicKeyManager = PublicKeyManager(apiClient)
-    val nonceManager = NonceManager(apiClient)
-    val authManager = AuthManager(apiClient)
-    var googleManager = GoogleManager()
+    private val publicKeyManager = PublicKeyManager(apiClient)
+    private val nonceManager = NonceManager(apiClient)
+    private val authManager = AuthManager(apiClient)
+    var attestationManager = AttestationManager()
 
     @Throws(ProjectCredentialsMissingException::class)
     fun authenticateWithExistingCredentials(ctx: Context, nonceScope: NonceScope): Single<Token> =
@@ -41,13 +40,12 @@ class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
     private fun authenticate(ctx: Context, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<Token> =
         combineProjectSecretAndGoogleAttestationObservables(ctx, nonceScope, encryptedProjectSecret)
             .makeAuthRequest()
-            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun combineProjectSecretAndGoogleAttestationObservables(ctx: Context, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<AuthRequest> =
         Single.zip(
-            encryptedProjectSecret,
-            getGoogleAttestation(ctx, nonceScope),
+            encryptedProjectSecret.subscribeOn(Schedulers.io()),
+            getGoogleAttestation(ctx, nonceScope).subscribeOn(Schedulers.io()),
             combineAuthRequestParameters(nonceScope.projectId, nonceScope.userId)
         )
 
@@ -57,7 +55,7 @@ class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
 
     private fun getGoogleAttestation(ctx: Context, noneScope: NonceScope): Single<AttestToken> =
         nonceManager.requestNonce(noneScope).flatMap { nonce ->
-            googleManager.requestAttestation(ctx, nonce)
+            attestationManager.requestAttestation(ctx, nonce)
         }
 
     private fun combineAuthRequestParameters(projectId: String, userId: String): BiFunction<String, AttestToken, AuthRequest> =
