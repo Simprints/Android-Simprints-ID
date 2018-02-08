@@ -1,11 +1,14 @@
 package com.simprints.id.data.db.remote
 
 import com.simprints.id.data.models.Session
+import com.simprints.id.secure.models.Token
 import com.simprints.libcommon.Person
 import com.simprints.libdata.AuthListener
 import com.simprints.libdata.ConnectionListener
 import com.simprints.libdata.DataCallback
+import com.simprints.libdata.NaiveSyncManager
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.libdata.models.firebase.fb_Person
 import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -13,32 +16,38 @@ import com.simprints.libsimprints.Verification
 
 interface RemoteDbManager {
 
-    var isRemoteConnected: Boolean
+    // Lifecycle
+    fun initialiseRemoteDb(projectId: String)
 
-    fun recoverLocalDbSendToRemote(deviceId: String, group: Constants.GROUP, callback: DataCallback)
+    fun signInToRemoteDb(token: Token)
+    fun signOutOfRemoteDb()
+
+    fun isRemoteDbInitialized(): Boolean
+    fun isSignedIn(projectId: String): Boolean
+    fun isRemoteConnected(): Boolean
 
     fun registerRemoteAuthListener(authListener: AuthListener)
     fun unregisterRemoteAuthListener(authListener: AuthListener)
     fun registerRemoteConnectionListener(connectionListener: ConnectionListener)
     fun unregisterRemoteConnectionListener(connectionListener: ConnectionListener)
 
-    fun saveIdentificationInRemote(probe: Person, matchSize: Int, matches: List<Identification>, sessionId: String): Boolean
-    fun savePersonInRemote(person: Person): Boolean
-    fun saveRefusalFormInRemote(refusalForm: RefusalForm, sessionId: String): Boolean
-    fun saveVerificationInRemote(probe: Person, patientId: String, match: Verification?, sessionId: String,
-                         guidExistsResult: VERIFY_GUID_EXISTS_RESULT): Boolean
+    // Data transfer
+    fun getLocalDbKeyFromRemote(): String
+
+    fun savePersonInRemote(fbPerson: fb_Person, projectId: String)
     fun loadPersonFromRemote(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
 
-    fun updateIdentificationInRemote(apiKey: String, selectedGuid: String, deviceId: String,
-                             sessionId: String)
+    fun saveIdentificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
+    fun updateIdentificationInRemote(projectId: String, selectedGuid: String, deviceId: String, sessionId: String)
+
+    fun saveVerificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
+
+    fun saveRefusalFormInRemote(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String)
 
     fun saveSessionInRemote(session: Session)
 
-    fun isRemoteDbInitialized(): Boolean
-    fun initializeRemoteDb(callback: DataCallback)
-    fun signInToRemote()
-    fun finishRemoteDb()
+    fun getSyncManager(projectId: String): NaiveSyncManager
 
-    fun getLocalDbKeyFromRemote(): String
+    fun recoverLocalDbSendToRemote(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback)
 
 }

@@ -151,14 +151,14 @@ public class rl_Person extends RealmObject {
         });
     }
 
-    public static long count(@NonNull Realm realm, @NonNull Key key, @NonNull final Constants.GROUP group) {
+    public static long count(@NonNull Realm realm, @NonNull String userId, @NonNull String moduleId, @NonNull final Constants.GROUP group) {
         switch (group) {
             case GLOBAL:
                 return realm.where(rl_Person.class).count();
             case USER:
-                return realm.where(rl_Person.class).equalTo("userId", key.userId).count();
+                return realm.where(rl_Person.class).equalTo("userId", userId).count();
             case MODULE:
-                return realm.where(rl_Person.class).equalTo("moduleId", key.moduleId).count();
+                return realm.where(rl_Person.class).equalTo("moduleId", moduleId).count();
             default:
                 throw new RuntimeException();
         }

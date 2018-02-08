@@ -97,7 +97,7 @@ public class Setup {
         }
 
         // Step 2: extractFrom database context + port db from aa to realm if needed . Only has to be done once.
-        if (!dataManager.isInitialized()) {
+        if (!dataManager.isDbInitialised()) {
             this.initDbContext(activity);
             return;
         }
@@ -150,7 +150,7 @@ public class Setup {
     // STEP 2
     private void initDbContext(@NonNull final Activity activity) {
         onProgress(10, R.string.updating_database);
-        dataManager.initialize(new DataCallback() {
+        dataManager.initialiseDb(new DataCallback() {
             @Override
             public void onSuccess() {
                 Timber.d("Setup: Database context initialized.");

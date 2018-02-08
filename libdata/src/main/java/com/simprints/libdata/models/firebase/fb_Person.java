@@ -32,10 +32,10 @@ public class fb_Person {
     public fb_Person() {
     }
 
-    public fb_Person(Person person, Key key) {
-        this.userId = key.userId;
-        this.androidId = key.androidId;
-        this.moduleId = key.moduleId;
+    public fb_Person(Person person, String userId, String androidId, String moduleId) {
+        this.userId = userId;
+        this.androidId = androidId;
+        this.moduleId = moduleId;
         this.patientId = person.getGuid();
         this.createdAt = Utils.now().getTime();
 

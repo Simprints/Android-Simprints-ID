@@ -2,18 +2,18 @@ package com.simprints.id.data.db
 
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
+import com.simprints.id.data.models.Session
+import com.simprints.id.secure.models.Token
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Progress
 import com.simprints.libdata.DataCallback
-import com.simprints.libdata.DatabaseContext
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.libdata.models.firebase.fb_Person
 import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Emitter
-import timber.log.Timber
 
 class DbManagerImpl(private val localDbManager: LocalDbManager,
                     private val remoteDbManager: RemoteDbManager) :
@@ -21,105 +21,76 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     LocalDbManager by localDbManager,
     RemoteDbManager by remoteDbManager {
 
-    // Local + remote which need to be split into smaller bits
+    // Lifecycle
 
-    // TODO
-    override fun recoverLocalDb(deviceId: String, group: Constants.GROUP, callback: DataCallback) {
-        localDbManager.recoverLocalDbGetFile(deviceId, group, callback)
-        remoteDbManager.recoverLocalDbSendToRemote(deviceId, group, callback)
+    override fun initialiseDb(projectId: String) {
+        remoteDbManager.initialiseRemoteDb(projectId)
     }
 
-    // TODO
-    override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>, sessionId: String): Boolean =
-        localDbManager.saveIdentificationInLocal(probe, matchSize, matches, sessionId) &&
-            remoteDbManager.saveIdentificationInRemote(probe, matchSize, matches, sessionId)
-
-    // TODO
-    override fun savePerson(person: Person): Boolean =
-        localDbManager.savePersonInLocal(person) &&
-            remoteDbManager.savePersonInRemote(person)
-
-    // TODO
-    override fun saveRefusalForm(refusalForm: RefusalForm, sessionId: String): Boolean =
-        localDbManager.saveRefusalFormInLocal(refusalForm, sessionId) &&
-            remoteDbManager.saveRefusalFormInRemote(refusalForm, sessionId)
-
-    // TODO
-    override fun saveVerification(probe: Person, patientId: String, match: Verification?, sessionId: String,
-                                  guidExistsResult: VERIFY_GUID_EXISTS_RESULT): Boolean =
-        localDbManager.saveVerificationInLocal(probe, patientId, match, sessionId, guidExistsResult) &&
-            remoteDbManager.saveVerificationInRemote(probe, patientId, match, sessionId, guidExistsResult)
-
-    // TODO
-    override fun loadPerson(destinationList: MutableList<Person>, guid: String, callback: DataCallback) {
-        localDbManager.loadPersonFromLocal(destinationList, guid, callback)
-        remoteDbManager.loadPersonFromRemote(destinationList, guid, callback)
-    }
-
-    // Local + remote + api which need to be split into smaller bits
-
-//    private var dbContext: DatabaseContext? = null
-//        set(value) = synchronized(this) {
-//            Timber.d("DataManagerImpl: set dbContext = $value")
-//            if (field != null) {
-//                unregisterRemoteConnectionListener(connectionStateLogger)
-//                unregisterRemoteAuthListener(authStateLogger)
-//            }
-//            field = value
-//            if (value != null) {
-//                registerRemoteConnectionListener(connectionStateLogger)
-//                registerRemoteAuthListener(authStateLogger)
-//            }
-//        }
-//
-//    private fun getDbContextOrErr(): DatabaseContext =
-//        dbContext ?: throw UninitializedDataManagerError()
-
-    // TODO
-    override fun isInitialized(): Boolean =
-        localDbManager.isLocalDbInitialized() &&
-            remoteDbManager.isRemoteDbInitialized()
-
-    override fun initialize(callback: DataCallback) {
-
-//        val tentativeDbContext = DatabaseContext(apiKey, userId, moduleId, deviceId, context, BuildConfig.GCP_PROJECT)
-//
-//        tentativeDbContext.initDatabase(object : DataCallback {
-//            override fun onSuccess() {
-//                dbContext = tentativeDbContext
-//                callback.onSuccess()
-//            }
-//
-//            override fun onFailure(error: DATA_ERROR) {
-//                tentativeDbContext.destroy()
-//                callback.onFailure(error)
-//            }
-//        })
-
-        initializeLocalDb(callback)
-        initializeRemoteDb(callback)
-    }
-
-    // TODO
-    override fun signIn() {
-        remoteDbManager.signInToRemote()
+    override fun signIn(token: Token) {
+        // TODO
+        remoteDbManager.signInToRemoteDb(token)
         val localDbKey = remoteDbManager.getLocalDbKeyFromRemote()
         localDbManager.signInToLocal(localDbKey)
     }
 
-    override fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        TODO()
-        // naiveSyncManager.syncGlobal(isInterrupted, emitter)
+    override fun signOut() {
+        // TODO
+        localDbManager.signOutOfLocal()
+        remoteDbManager.signOutOfRemoteDb()
     }
 
-    override fun syncUser(userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        TODO()
-        // naiveSyncManager.syncUser(userId, isInterrupted, emitter)
+    override fun isDbInitialised(): Boolean =
+        // TODO
+        localDbManager.isLocalDbInitialized() &&
+            remoteDbManager.isRemoteDbInitialized()
+
+
+    // Data transfer
+
+    override fun savePerson(fbPerson: fb_Person, projectId: String) {
+        localDbManager.savePersonInLocal(fbPerson)
+        remoteDbManager.savePersonInRemote(fbPerson, projectId)
     }
 
-    // TODO
-    override fun finish() {
-        localDbManager.finishLocalDb()
-        remoteDbManager.finishRemoteDb()
+    override fun loadPerson(destinationList: MutableList<Person>, guid: String, callback: DataCallback) {
+        localDbManager.loadPersonFromLocal(destinationList, guid, callback)
+        if (destinationList.size == 0) remoteDbManager.loadPersonFromRemote(destinationList, guid, callback)
+    }
+
+    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
+        localDbManager.loadPeopleFromLocal(destinationList, group, userId, moduleId, callback)
+    }
+
+    override fun getPeopleCount(group: Constants.GROUP, userId: String, moduleId: String): Long =
+        localDbManager.getPeopleCountFromLocal(group, userId, moduleId)
+
+    override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
+        remoteDbManager.saveIdentificationInRemote(probe, projectId, userId, androidId, moduleId, matchSize, matches, sessionId)
+    }
+
+    override fun saveVerification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
+        remoteDbManager.saveVerificationInRemote(probe, projectId, userId, androidId, moduleId, patientId, match, sessionId, guidExistsResult)
+    }
+
+    override fun saveSession(session: Session) {
+        remoteDbManager.saveSessionInRemote(session)
+    }
+
+    override fun saveRefusalForm(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String) {
+        remoteDbManager.saveRefusalFormInRemote(refusalForm, projectId, userId, sessionId)
+    }
+
+    override fun syncGlobal(projectId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        remoteDbManager.getSyncManager(projectId).syncGlobal(isInterrupted, emitter)
+    }
+
+    override fun syncUser(projectId: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        remoteDbManager.getSyncManager(projectId).syncUser(userId, isInterrupted, emitter)
+    }
+
+    override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
+        // TODO
+        remoteDbManager.recoverLocalDbSendToRemote(projectId, userId, androidId, moduleId, group, callback)
     }
 }
