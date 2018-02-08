@@ -99,17 +99,17 @@ public class DatabaseContext {
     private fb_User user;
     private ValueEventListener userListener;
 
-    // Connection listener
-    private volatile boolean isConnected = false;
-    private final DatabaseReference connectionDbRef;
-    private final ValueEventListener connectionDispatcher;
-    private final Set<ConnectionListener> connectionListeners;
-
-    // Authentication listener
-    private volatile boolean signedIn = false;
-    private final FirebaseAuth firebaseAuth;
-    private final FirebaseAuth.AuthStateListener authDispatcher;
-    private final Set<AuthListener> authListeners;
+//    // Connection listener
+//    volatile private Boolean isConnected = false;
+//    private final DatabaseReference connectionDbRef;
+//    private final ValueEventListener connectionDispatcher;
+//    private final Set<ConnectionListener> connectionListeners;
+//
+//    // Authentication listener
+//    private volatile boolean signedIn = false;
+//    private final FirebaseAuth firebaseAuth;
+//    private final FirebaseAuth.AuthStateListener authDispatcher;
+//    private final Set<AuthListener> authListeners;
 
 
     /**
@@ -256,60 +256,60 @@ public class DatabaseContext {
         log("Auth state listener set");
     }
 
-    /**
-     * Register a new connection listener whose onConnection() and onDisconnection() method will be
-     * called whenever a connection or disconnection is detected.
-     *
-     * @param listener The new connection listener
-     */
-    public void registerConnectionListener(@NonNull ConnectionListener listener) {
-        synchronized (connectionListeners) {
-            connectionListeners.add(listener);
-        }
-    }
-
-    /**
-     * @return True iff connected
-     */
-    public boolean isConnected() {
-        return isConnected;
-    }
-
-    /**
-     * Unregister a connection listener.
-     * Un-registering a listener that was not registered succeeds but has no effect.
-     *
-     * @param listener The connection listener
-     */
-    public void unregisterConnectionListener(@NonNull ConnectionListener listener) {
-        synchronized (connectionListeners) {
-            connectionListeners.remove(listener);
-        }
-    }
-
-    /**
-     * Register a new auth listener whose onSignIn() and onSignOut() method will be
-     * called whenever a sign in or sign out is detected.
-     *
-     * @param listener The new auth listener
-     */
-    public void registerAuthListener(@NonNull AuthListener listener) {
-        synchronized (authListeners) {
-            authListeners.add(listener);
-        }
-    }
-
-    /**
-     * Unregister a auth listener.
-     * Un-registering a listener that was not registered succeeds but has no effect.
-     *
-     * @param listener The auth listener
-     */
-    public void unregisterAuthListener(@NonNull AuthListener listener) {
-        synchronized (authListeners) {
-            authListeners.remove(listener);
-        }
-    }
+//    /**
+//     * Register a new connection listener whose onConnection() and onDisconnection() method will be
+//     * called whenever a connection or disconnection is detected.
+//     *
+//     * @param listener The new connection listener
+//     */
+//    public void registerConnectionListener(@NonNull ConnectionListener listener) {
+//        synchronized (connectionListeners) {
+//            connectionListeners.add(listener);
+//        }
+//    }
+//
+//    /**
+//     * @return True iff connected
+//     */
+//    public boolean isConnected() {
+//        return isConnected;
+//    }
+//
+//    /**
+//     * Unregister a connection listener.
+//     * Un-registering a listener that was not registered succeeds but has no effect.
+//     *
+//     * @param listener The connection listener
+//     */
+//    public void unregisterConnectionListener(@NonNull ConnectionListener listener) {
+//        synchronized (connectionListeners) {
+//            connectionListeners.remove(listener);
+//        }
+//    }
+//
+//    /**
+//     * Register a new auth listener whose onSignIn() and onSignOut() method will be
+//     * called whenever a sign in or sign out is detected.
+//     *
+//     * @param listener The new auth listener
+//     */
+//    public void registerAuthListener(@NonNull AuthListener listener) {
+//        synchronized (authListeners) {
+//            authListeners.add(listener);
+//        }
+//    }
+//
+//    /**
+//     * Unregister a auth listener.
+//     * Un-registering a listener that was not registered succeeds but has no effect.
+//     *
+//     * @param listener The auth listener
+//     */
+//    public void unregisterAuthListener(@NonNull AuthListener listener) {
+//        synchronized (authListeners) {
+//            authListeners.remove(listener);
+//        }
+//    }
 
 
     /**
@@ -330,59 +330,59 @@ public class DatabaseContext {
         }
     }
 
-    /**
-     * Checks the api key with the server.
-     * If we cannot reach the server, the status of the api key won't change
-     *
-     * @param callback The onSuccess() method of this callback is called when the api key is validated
-     *                 by the server, or was previously valid and the server could not be reached
-     *                 <p>
-     *                 In case of failure, the onFailure() method is called with one of the
-     *                 following errors:
-     *                 - UNVERIFIED_API_KEY if the api key was unchecked and the server could not be reached
-     *                 - INVALID_API_KEY if the api key is invalid, or was invalid and the server could not be reached
-     */
-    public void signIn(@Nullable final DataCallback callback) {
-        log("DatabaseContext.signIn()");
-        final DataCallback wrappedCallback = wrapCallback("DatabaseContext.signIn()", callback);
-
-        if (rl_ApiKey.check(realm, key.apiKey)) {
-            key.status = Key.Status.VALID;
-            wrappedCallback.onSuccess();
-        }
-
-
-        key.validate(context, authUrl, realm, new NetworkRequestCallback() {
-            @Override
-            public void onResult(int statusCode) {
-                log(String.format(Locale.UK, "Key validation: status code %d", statusCode));
-                if (statusCode == 200 && key.token != null)
-                    firebaseAuth.signInWithCustomToken(key.token)
-                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        log("Firebase Auth signInWithCustomToken successful");
-                                    } else {
-                                        log(String.format("Firebase Auth signInWithCustomToken failed: %s", task.getException()));
-                                    }
-                                }
-                            });
-
-                switch (key.status) {
-                    case UNVERIFIED:
-                        wrappedCallback.onFailure(DATA_ERROR.UNVERIFIED_API_KEY);
-                        break;
-                    case VALID:
-                        wrappedCallback.onSuccess();
-                        break;
-                    case INVALID:
-                        wrappedCallback.onFailure(DATA_ERROR.INVALID_API_KEY);
-                        break;
-                }
-            }
-        });
-    }
+//    /**
+//     * Checks the api key with the server.
+//     * If we cannot reach the server, the status of the api key won't change
+//     *
+//     * @param callback The onSuccess() method of this callback is called when the api key is validated
+//     *                 by the server, or was previously valid and the server could not be reached
+//     *                 <p>
+//     *                 In case of failure, the onFailure() method is called with one of the
+//     *                 following errors:
+//     *                 - UNVERIFIED_API_KEY if the api key was unchecked and the server could not be reached
+//     *                 - INVALID_API_KEY if the api key is invalid, or was invalid and the server could not be reached
+//     */
+//    public void signIn(@Nullable final DataCallback callback) {
+//        log("DatabaseContext.signIn()");
+//        final DataCallback wrappedCallback = wrapCallback("DatabaseContext.signIn()", callback);
+//
+//        if (rl_ApiKey.check(realm, key.apiKey)) {
+//            key.status = Key.Status.VALID;
+//            wrappedCallback.onSuccess();
+//        }
+//
+//
+//        key.validate(context, authUrl, realm, new NetworkRequestCallback() {
+//            @Override
+//            public void onResult(int statusCode) {
+//                log(String.format(Locale.UK, "Key validation: status code %d", statusCode));
+//                if (statusCode == 200 && key.token != null)
+//                    firebaseAuth.signInWithCustomToken(key.token)
+//                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<AuthResult> task) {
+//                                    if (task.isSuccessful()) {
+//                                        log("Firebase Auth signInWithCustomToken successful");
+//                                    } else {
+//                                        log(String.format("Firebase Auth signInWithCustomToken failed: %s", task.getException()));
+//                                    }
+//                                }
+//                            });
+//
+//                switch (key.status) {
+//                    case UNVERIFIED:
+//                        wrappedCallback.onFailure(DATA_ERROR.UNVERIFIED_API_KEY);
+//                        break;
+//                    case VALID:
+//                        wrappedCallback.onSuccess();
+//                        break;
+//                    case INVALID:
+//                        wrappedCallback.onFailure(DATA_ERROR.INVALID_API_KEY);
+//                        break;
+//                }
+//            }
+//        });
+//    }
 
     public void signOut() {
         firebaseAuth.signOut();
@@ -751,13 +751,13 @@ public class DatabaseContext {
         //projectRef.child(usersNode()).keepSynced(true);
     }
 
-    /**
-     * Save the specified session to the remote database
-     * @return The corresponding asynchronous task
-     */
-    public Task<Void> saveSession(fb_Session session) {
-        return sessionRef(firebaseApp).push().setValue(session);
-    }
+//    /**
+//     * Save the specified session to the remote database
+//     * @return The corresponding asynchronous task
+//     */
+//    public Task<Void> saveSession(fb_Session session) {
+//        return sessionRef(firebaseApp).push().setValue(session);
+//    }
 
 
     public void destroy() {

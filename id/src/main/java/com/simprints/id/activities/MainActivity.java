@@ -245,8 +245,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void startListeners() {
-        dataManager.registerAuthListener(authListener);
-        dataManager.registerConnectionListener(connectionListener);
+        dataManager.registerRemoteAuthListener(authListener);
+        dataManager.registerRemoteConnectionListener(connectionListener);
         updateConnectionState();
         syncClient.startListening(newSyncObserver());
     }
@@ -833,8 +833,8 @@ public class MainActivity extends AppCompatActivity implements
     private void stopListeners() {
         try {
             syncClient.stopListening();
-            dataManager.unregisterAuthListener(authListener);
-            dataManager.unregisterConnectionListener(connectionListener);
+            dataManager.unregisterRemoteAuthListener(authListener);
+            dataManager.unregisterRemoteConnectionListener(connectionListener);
         } catch (UninitializedDataManagerError error) {
             handleUnexpectedError(error);
         }

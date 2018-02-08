@@ -4,7 +4,7 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.activities.launch.LaunchActivity
-import com.simprints.id.data.db.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.testUtils.anyNotNull
 import org.junit.Before
 import org.junit.Test

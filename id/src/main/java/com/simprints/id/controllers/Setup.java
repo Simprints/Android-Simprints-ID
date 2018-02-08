@@ -336,7 +336,7 @@ public class Setup {
     }
 
     private void saveNotFoundVerification(Person probe) {
-        if (dataManager.isConnected()) {
+        if (dataManager.isRemoteConnected()) {
             // We've synced with the online db and they're not in the db
             dataManager.saveVerification(probe, null, GUID_NOT_FOUND_ONLINE);
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);

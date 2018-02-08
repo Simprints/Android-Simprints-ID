@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.analytics
+package com.simprints.id.data.analytics
 
 import android.os.Bundle
 import com.crashlytics.android.Crashlytics
