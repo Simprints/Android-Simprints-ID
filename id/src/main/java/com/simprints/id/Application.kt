@@ -14,7 +14,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
-import com.simprints.id.data.db.remote.FirebaseRtdbManager
+import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.network.ApiManagerImpl
@@ -135,7 +135,7 @@ class Application : MultiDexApplication() {
     }
 
     private val remoteDbManager: RemoteDbManager by lazy {
-        FirebaseRtdbManager()
+        FirebaseManager()
     }
 
     private val dbManager: DbManager by lazy {

@@ -13,12 +13,15 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
+import com.simprints.libcommon.Progress
 import com.simprints.libdata.*
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.libdata.models.firebase.fb_Person
 import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Emitter
 
 
 class DataManagerImpl(private val context: Context,
@@ -76,20 +79,57 @@ class DataManagerImpl(private val context: Context,
     override fun logAuthStateChange(authenticated: Boolean) =
         analyticsManager.logAuthStateChange(authenticated, getApiKeyOrEmpty(), deviceId, sessionId)
 
-//    private val connectionStateLogger = object : ConnectionListener {
-//        override fun onConnection() = logConnectionStateChange(true)
-//        override fun onDisconnection() = logConnectionStateChange(false)
-//    }
-//
-//    private val authStateLogger = object : AuthListener {
-//        override fun onSignIn() = logAuthStateChange(true)
-//        override fun onSignOut() = logAuthStateChange(false)
-//    }
 
-    // DbManager argument interception
-    // Remote Only
-    override fun updateIdentification(apiKey: String, selectedGuid: String) {
-        dbManager.updateIdentificationInRemote(apiKey, selectedGuid, deviceId, sessionId)
+    // DbManager call interception for populating arguments
+    // Lifecycle
+    override fun initialiseDb(projectId: String) {
+        dbManager.registerRemoteConnectionListener(connectionStateLogger)
+        dbManager.registerRemoteAuthListener(authStateLogger)
+        dbManager.initialiseDb(projectId)
+    }
+
+    override fun signOut() {
+        dbManager.unregisterRemoteConnectionListener(connectionStateLogger)
+        dbManager.unregisterRemoteAuthListener(authStateLogger)
+        dbManager.signOut()
+    }
+
+    private val connectionStateLogger = object : ConnectionListener {
+        override fun onConnection() = logConnectionStateChange(true)
+        override fun onDisconnection() = logConnectionStateChange(false)
+    }
+
+    private val authStateLogger = object : AuthListener {
+        override fun onSignIn() = logAuthStateChange(true)
+        override fun onSignOut() = logAuthStateChange(false)
+    }
+
+    // Data transfer
+    override fun savePerson(person: Person) {
+        dbManager.savePerson(fb_Person(person, userId, deviceId, moduleId), projectId)
+    }
+
+    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
+        dbManager.loadPeople(destinationList, group, userId, moduleId, callback)
+    }
+
+    override fun getPeopleCount(group: Constants.GROUP): Long =
+        dbManager.getPeopleCount(group, userId, moduleId)
+
+    override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
+        dbManager.saveIdentification(probe, projectId, userId, deviceId, moduleId, matchSize, matches, sessionId)
+    }
+
+    override fun updateIdentification(projectId: String, selectedGuid: String) {
+        dbManager.updateIdentificationInRemote(projectId, selectedGuid, deviceId, sessionId)
+    }
+
+    override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
+        dbManager.saveVerification(probe, projectId, userId, deviceId, moduleId, patientId, match, sessionId, guidExistsResult)
+    }
+
+    override fun saveRefusalForm(refusalForm: RefusalForm) {
+        dbManager.saveRefusalForm(refusalForm, projectId, userId, sessionId)
     }
 
     override fun saveSession() {
@@ -103,20 +143,18 @@ class DataManagerImpl(private val context: Context,
         analyticsManager.logSession(session)
     }
 
-    // Local + remote which need to be split into smaller bits
+    override fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        dbManager.syncGlobal(projectId, isInterrupted, emitter)
+    }
+
+    override fun syncUser(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        dbManager.syncUser(projectId, userId, isInterrupted, emitter)
+    }
+
     override fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback) {
-        dbManager.recoverLocalDb(deviceId, group, callback)
+        dbManager.recoverLocalDb(deviceId, userId, deviceId, moduleId, group, callback)
     }
 
-    override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>): Boolean =
-        dbManager.saveIdentification(probe, matchSize, matches, sessionId)
-
-    override fun saveRefusalForm(refusalForm: RefusalForm): Boolean =
-        dbManager.saveRefusalForm(refusalForm, sessionId)
-
-    override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
-        dbManager.saveVerification(probe, patientId, match, sessionId, guidExistsResult)
-    }
 
     // Secure Data
 
