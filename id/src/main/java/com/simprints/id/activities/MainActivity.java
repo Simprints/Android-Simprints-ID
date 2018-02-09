@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void updateConnectionState() {
-        if (dataManager.isConnected()) {
+        if (dataManager.isRemoteConnected()) {
             connectionListener.onConnection();
         } else {
             connectionListener.onDisconnection();

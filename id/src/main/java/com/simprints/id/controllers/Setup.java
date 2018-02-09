@@ -14,6 +14,10 @@ import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.domain.callout.CalloutAction;
+import com.simprints.id.secure.ApiService;
+import com.simprints.id.secure.ProjectAuthenticator;
+import com.simprints.id.secure.models.NonceScope;
+import com.simprints.id.secure.models.Token;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
@@ -28,6 +32,7 @@ import com.simprints.libscanner.ScannerUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.observers.DisposableSingleObserver;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_CANCELED;
@@ -150,74 +155,70 @@ public class Setup {
     // STEP 2
     private void initDbContext(@NonNull final Activity activity) {
         onProgress(10, R.string.updating_database);
-        dataManager.initialiseDb(new DataCallback() {
-            @Override
-            public void onSuccess() {
-                Timber.d("Setup: Database context initialized.");
-                goOn(activity);
-            }
-
-            @Override
-            public void onFailure(DATA_ERROR dataError) {
-                switch (dataError) {
-                    case DATABASE_INIT_RESTART:
-                        goOn(activity);
-                        break;
-                    case NOT_FOUND:
-                        dataManager.logError(new ApiKeyNotFoundError("API Key was null in Setup.initDbContext()"));
-                        onAlert(ALERT_TYPE.MISSING_API_KEY);
-                        break;
-                    default:
-                        dataManager.logError(UnexpectedDataError.forDataError(dataError, "Setup.initDbContext()"));
-                        onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                }
-            }
-        });
-    }
-
-    // STEP 3
-    private void validateApiKey(@NonNull final Activity activity) {
-        onProgress(20, R.string.launch_checking_api_key);
-
         try {
-            dataManager.signIn(newSignInCallback(activity));
+            dataManager.initialiseDb(dataManager.getProjectId());
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
 
-    private DataCallback newSignInCallback(@NonNull final Activity activity) {
-        return new DataCallback() {
-            @Override
-            public void onSuccess() {
-                if (!apiKeyValidated) {
-                    apiKeyValidated = true;
-                    Timber.d("Setup: Api key validated.");
-                    goOn(activity);
-                }
-            }
+    // STEP 3
+    private void validateApiKey(@NonNull final Activity activity) {
+        onProgress(20, R.string.launch_checking_api_key);
 
-            @Override
-            public void onFailure(DATA_ERROR dataError) {
-                switch (dataError) {
-                    case UNVERIFIED_API_KEY:
-                        apiKeyValidated = false;
-                        paused = true;
-                        callback.onAlert(ALERT_TYPE.UNVERIFIED_API_KEY);
-                        break;
-                    case INVALID_API_KEY:
-                        apiKeyValidated = false;
-                        paused = true;
-                        callback.onAlert(ALERT_TYPE.INVALID_API_KEY);
-                        break;
-                    default:
-                        dataManager.logError(UnexpectedDataError.forDataError(dataError, "Setup.validateApiKey()"));
-                        onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                }
-            }
-        };
+        // TODO : implement auth 2.0 sign in
+        new ProjectAuthenticator(dataManager, new ApiService().getApi())
+            .authenticateWithExistingCredentials(activity, new NonceScope(dataManager.getProjectId(), dataManager.getUserId()))
+            .subscribe(new DisposableSingleObserver<Token>() {
+                           @Override
+                           public void onSuccess(Token token) {
+                               dataManager.signIn(token);
+                               apiKeyValidated = true;
+                               Timber.d("Setup: Api key validated.");
+                               goOn(activity);
+                           }
+
+                           @Override
+                           public void onError(Throwable e) {
+                               if (e instanceof Error) dataManager.logError((Error) e);
+                               onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                           }
+                       }
+            );
     }
+
+//    private DataCallback newSignInCallback(@NonNull final Activity activity) {
+//        return new DataCallback() {
+//            @Override
+//            public void onSuccess() {
+//                if (!apiKeyValidated) {
+//                    apiKeyValidated = true;
+//                    Timber.d("Setup: Api key validated.");
+//                    goOn(activity);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(DATA_ERROR dataError) {
+//                switch (dataError) {
+//                    case UNVERIFIED_API_KEY:
+//                        apiKeyValidated = false;
+//                        paused = true;
+//                        callback.onAlert(ALERT_TYPE.UNVERIFIED_API_KEY);
+//                        break;
+//                    case INVALID_API_KEY:
+//                        apiKeyValidated = false;
+//                        paused = true;
+//                        callback.onAlert(ALERT_TYPE.INVALID_API_KEY);
+//                        break;
+//                    default:
+//                        dataManager.logError(UnexpectedDataError.forDataError(dataError, "Setup.validateApiKey()"));
+//                        onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+//                }
+//            }
+//        };
+//    }
 
     // STEP 4
     private void initScanner(@NonNull final Activity activity) {
