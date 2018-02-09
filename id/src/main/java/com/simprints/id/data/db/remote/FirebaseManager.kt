@@ -137,8 +137,17 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
     }
 
     override fun signInToRemoteDb(token: Token) {
+        // TODO : turn into an RxJava Single Observable
         signedIn = true
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        firebaseAuth.signInWithCustomToken(token.value).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                //emitter.onSuccess(token)
+                Timber.d("Firebase Auth signInWithCustomToken successful")
+            } else {
+                //emitter.onError(FirebaseSigninInWithCustomTokenFailed())
+                Timber.d("Firebase Auth signInWithCustomToken failed: ${task.exception}")
+            }
+        }
     }
 
     override fun signOutOfRemoteDb() {
@@ -187,7 +196,8 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
     // Data transfer
 
     override fun getLocalDbKeyFromRemote(): String {
-        TODO("not implemented")
+        // TODO("not implemented")
+        return ""
     }
 
     override fun savePersonInRemote(fbPerson: fb_Person, projectId: String) {
