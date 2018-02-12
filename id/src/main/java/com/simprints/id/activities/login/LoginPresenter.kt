@@ -45,7 +45,7 @@ class LoginPresenter(val view: LoginContract.View,
                         secureDataManager.cleanCredentials()
                     })
         } else {
-            view.showToast(R.string.login_missingCredentials)
+            view.showToast(R.string.login_missing_credentials)
         }
     }
 

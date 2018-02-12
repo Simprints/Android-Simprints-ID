@@ -15,9 +15,10 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
                           override var wasAppOpenedByIntent: Boolean,
                           private val timeHelper: TimeHelper) : CheckLoginContract.Presenter {
 
+    private var started: Boolean = false
+
     init {
         view.setPresenter(this)
-        view.checkCallingApp()
     }
 
     private val nextActivityClassAfterLogin by lazy {
@@ -29,25 +30,27 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
     }
 
     override fun start() {
-
-        // If app was launched by intent, we extract the sessions Params
-        if (wasAppOpenedByIntent) {
-            try {
-                extractSessionParameters()
-            } catch (exception: InvalidCalloutError) {
-                view.launchAlertForError(exception.alertType)
-                return
+        if (!started) {
+            started = true
+            // If app was launched by intent, we extract the sessions Params (if not done before)
+            if (wasAppOpenedByIntent) {
+                try {
+                    extractSessionParameters()
+                } catch (exception: InvalidCalloutError) {
+                    view.launchAlertForError(exception.alertType)
+                    return
+                }
             }
+            view.checkCallingApp()
+            checkIfUserIsLoggedIn()
         }
-        initSession()
-        checkIfUserIsLoggedIn()
     }
 
     override fun checkIfUserIsLoggedIn() {
         if (isUserSignedIn()) {
             startNormalFlow()
         } else {
-            dataManager.signOut()
+            //dataManager.signOut()
             redirectUserForLogin()
         }
     }
@@ -57,7 +60,6 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
         callout.apply {
             dataManager.logCallout(this)
         }
-
         val sessionParameters = sessionParametersExtractor.extractFrom(callout)
         dataManager.sessionParameters = sessionParameters
         dataManager.calloutAction = sessionParameters.calloutAction

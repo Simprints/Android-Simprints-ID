@@ -322,6 +322,6 @@
     <string name="requestLogin_title">Login Required</string>
     <string name="login">Login</string>
     <string name="invalid_projectId_message">A configuration error has occurred (Project Id), please contact your system administrator</string>
-    <string name="login_missingCredentials">Missing credentials. Please check user id, project id and api key again.</string>
+    <string name="login_missing_credentials">Missing credentials. Please check user id, project\'s id and key again.</string>
 
 </resources>

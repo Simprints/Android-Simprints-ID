@@ -18,8 +18,9 @@ import org.jetbrains.anko.indeterminateProgressDialog
 class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     companion object {
-        private const val LOGIN_SUCCESSED: Int = 1
-        private const val REQUEST_QR_CODE: Int = 0
+        public const val LOGIN_SUCCESSED: Int = 1
+        public const val LOGIN_REQUEST_CODE: Int = 1
+        private const val QR_REQUEST_CODE: Int = 0
     }
 
     lateinit var viewPresenter: LoginContract.Presenter
@@ -61,7 +62,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun openScanQRApp() {
         val intent = packageManager.scannerAppIntent()
         if (intent.resolveActivity(packageManager) != null) {
-            startActivityForResult(intent, REQUEST_QR_CODE)
+            startActivityForResult(intent, QR_REQUEST_CODE)
         } else {
             startActivity(Intent(Intent.ACTION_VIEW,
                 Uri.parse("https://play.google.com/store/apps/details?id=com.google.zxing.client.android")))
@@ -69,7 +70,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_QR_CODE) {
+        if (requestCode == QR_REQUEST_CODE) {
             if (data == null) return
             handleScannerAppResult(resultCode, data)
         }

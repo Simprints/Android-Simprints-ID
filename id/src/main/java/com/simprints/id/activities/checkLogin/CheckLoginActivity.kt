@@ -18,10 +18,6 @@ import com.simprints.id.tools.extensions.launchAlert
 
 open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
 
-    companion object {
-        private const val LOGIN_ACTIVITY_REQUEST: Int = 1
-    }
-
     lateinit var viewPresenter: CheckLoginContract.Presenter
     private lateinit var app: Application
     private lateinit var dataManager: DataManager
@@ -67,17 +63,15 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
         launchAlert(alertType)
     }
 
-
     override fun openLoginActivity() {
         val nextIntent = Intent(this, LoginActivity::class.java)
-        startActivityForResult(nextIntent, LOGIN_ACTIVITY_REQUEST)
+        startActivityForResult(nextIntent, LoginActivity.LOGIN_REQUEST_CODE)
     }
 
     override fun openRequestLoginActivity() {
         startActivity(Intent(this, RequestLoginActivity::class.java))
         finish()
     }
-
 
     override fun startActivity(nextActivityClassAfterLogin: Class<out Any>) {
         try {
@@ -89,8 +83,12 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == LOGIN_ACTIVITY_REQUEST) {
-            viewPresenter.checkIfUserIsLoggedIn()
+        if (requestCode == LoginActivity.LOGIN_REQUEST_CODE) {
+            if (resultCode == LoginActivity.LOGIN_SUCCESSED) {
+                viewPresenter.checkIfUserIsLoggedIn()
+            } else {
+                finish()
+            }
         } else {
             setResult(resultCode, data)
             finish()
