@@ -112,7 +112,7 @@ open class LaunchActivity : AppCompatActivity() {
             }
         }
 
-    fun launchAlertAndStopSetup(alertType: ALERT_TYPE){
+    fun launchAlertAndStopSetup(alertType: ALERT_TYPE) {
         if (launchOutOfFocus)
             return
 
@@ -182,9 +182,9 @@ open class LaunchActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        if (dataManager.isDbInitialised()) {
+        if (dataManager.isDbInitialised(dataManager.signedInProjectId)) {
             try {
-                dataManager.signOut()
+                dataManager.signOut(dataManager.signedInProjectId)
             } catch (error: UninitializedDataManagerError) {
                 dataManager.logError(error)
             }
