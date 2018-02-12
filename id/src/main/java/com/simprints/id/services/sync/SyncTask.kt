@@ -28,7 +28,7 @@ class SyncTask(private val dataManager: DataManager,
     private fun sync(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
         when (parameters) {
             is UserSyncTaskParameters ->
-                dataManager.syncUser(parameters.userId, isInterrupted, emitter)
+                dataManager.syncUser(dataManager.projectId ,parameters.userId, isInterrupted, emitter)
             is GlobalSyncTaskParameters ->
                 dataManager.syncGlobal(isInterrupted, emitter)
         }

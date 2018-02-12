@@ -55,7 +55,9 @@ class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
 
     private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, noneScope: NonceScope): Single<AttestToken> =
         nonceManager.requestNonce(noneScope).flatMap { nonce ->
-            attestationManager.requestAttestation(safetyNetClient, nonce).subscribeOn(Schedulers.io())
+            attestationManager
+                .requestAttestation(ctx, nonce)
+                .subscribeOn(Schedulers.io())
         }
 
     private fun combineAuthRequestParameters(projectId: String, userId: String): BiFunction<String, AttestToken, AuthRequest> =
@@ -64,5 +66,9 @@ class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
         }
 
     private fun Single<out AuthRequest>.makeAuthRequest(): Single<Token> =
-        flatMap { authRequest -> authManager.requestAuthToken(authRequest).subscribeOn(Schedulers.io()) }
+        flatMap { authRequest ->
+            authManager
+            .requestAuthToken(authRequest)
+            .subscribeOn(Schedulers.io())
+        }
 }
