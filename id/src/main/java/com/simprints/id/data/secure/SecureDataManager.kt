@@ -11,4 +11,6 @@ interface SecureDataManager {
     fun getSignedInProjectIdOrEmpty(): String
     fun isProjectIdSignedIn(projectId: String): Boolean
     fun cleanCredentials()
+    fun storeProjectIdWithLegacyApiKeyPair(possibleProjectId: String, possibleLegacyApiKey: String?)
+    fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String
 }

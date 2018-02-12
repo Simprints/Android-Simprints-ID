@@ -57,5 +57,17 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
     override fun cleanCredentials() {
         encryptedProjectSecret = ""
         signedInProjectId = ""
+        prefs.edit().putMap("projectId_and_apiKey", "").commit()
+    }
+
+    override fun storeProjectIdWithLegacyApiKeyPair(projectId: String, possibleLegacyApiKey: String?) {
+        if (possibleLegacyApiKey != null) {
+            prefs.edit().putMap("projectId_and_apiKey", mapOf(possibleLegacyApiKey to projectId)).commit()
+        }
+    }
+
+    override fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String {
+        val mapProjectIdAndApiKey = prefs.getMap("projectId_and_apiKey") as Map<String, String>
+        return mapProjectIdAndApiKey[legacyApiKey] ?: ""
     }
 }

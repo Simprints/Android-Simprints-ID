@@ -18,10 +18,10 @@ interface LoginContract {
     }
 
     interface Presenter : BasePresenter {
-        var projectAuthenticator:ProjectAuthenticator
+        var projectAuthenticator: ProjectAuthenticator
 
         fun userDidWantToOpenScanQRApp()
-        fun userDidWantToSignIn(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String)
+        fun userDidWantToSignIn(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String, possibleLegacyApiKey: String? = null)
         fun processQRScannerAppResponse(scannedText: String)
     }
 }

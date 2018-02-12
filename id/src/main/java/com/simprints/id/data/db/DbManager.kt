@@ -6,8 +6,6 @@ import com.simprints.id.data.models.Session
 import com.simprints.id.secure.models.Token
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Progress
-import com.simprints.libdata.AuthListener
-import com.simprints.libdata.ConnectionListener
 import com.simprints.libdata.DataCallback
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.libdata.models.firebase.fb_Person
@@ -17,15 +15,14 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Emitter
 
-
 interface DbManager : LocalDbManager, RemoteDbManager {
 
     // Lifecycle
     fun initialiseDb(projectId: String)
-    fun signIn(token: Token)
-    fun signOut()
+    fun signIn(projectId: String, token: Token)
+    fun signOut(projectId: String)
 
-    fun isDbInitialised(): Boolean
+    fun isDbInitialised(projectId: String): Boolean
 
     // Data transfer
     fun savePerson(fbPerson: fb_Person, projectId: String)

@@ -19,10 +19,10 @@ interface RemoteDbManager {
     // Lifecycle
     fun initialiseRemoteDb(projectId: String)
 
-    fun signInToRemoteDb(token: Token)
-    fun signOutOfRemoteDb()
+    fun signInToRemoteDb(projectId: String, token: Token)
+    fun signOutOfRemoteDb(projectId: String)
 
-    fun isRemoteDbInitialized(): Boolean
+    fun isRemoteDbInitialized(projectId: String): Boolean
     fun isSignedIn(projectId: String): Boolean
     fun isRemoteConnected(): Boolean
 
@@ -49,5 +49,4 @@ interface RemoteDbManager {
     fun getSyncManager(projectId: String): NaiveSyncManager
 
     fun recoverLocalDbSendToRemote(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback)
-
 }

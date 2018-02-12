@@ -60,7 +60,7 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
     }
 
     private fun initDbContext(projectId: String) {
-        if(!dataManager.isDbInitialised()) {
+        if (!dataManager.isDbInitialised(projectId)) {
             try {
                 dataManager.initialiseDb(projectId)
             } catch (error: UninitializedDataManagerError) {
@@ -101,11 +101,8 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
         }
     }
 
-    //Temporary - it will be in RealmManager
-    companion object {
-        fun findProjectIdForApiKey(apiKey: String): String {
-            return "55KAiL2YmsjeuNNPnSDO"
-        }
+    private fun findProjectIdForApiKey(legacyApiKey: String): String {
+        return dataManager.projectIdForLegacyApiKeyOrEmpty(legacyApiKey)
     }
 
     private fun startNormalFlow() {

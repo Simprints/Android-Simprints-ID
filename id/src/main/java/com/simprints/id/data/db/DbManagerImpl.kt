@@ -27,24 +27,23 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.initialiseRemoteDb(projectId)
     }
 
-    override fun signIn(token: Token) {
+    override fun signIn(projectId: String, token: Token) {
         // TODO
-        remoteDbManager.signInToRemoteDb(token)
+        remoteDbManager.signInToRemoteDb(projectId, token)
         val localDbKey = remoteDbManager.getLocalDbKeyFromRemote()
-        localDbManager.signInToLocal(localDbKey)
+        localDbManager.signInToLocal(projectId, localDbKey)
     }
 
-    override fun signOut() {
+    override fun signOut(projectId: String) {
         // TODO
-        localDbManager.signOutOfLocal()
-        remoteDbManager.signOutOfRemoteDb()
+        localDbManager.signOutOfLocal(projectId)
+        remoteDbManager.signOutOfRemoteDb(projectId)
     }
 
-    override fun isDbInitialised(): Boolean =
+    override fun isDbInitialised(projectId: String): Boolean =
         // TODO
-        localDbManager.isLocalDbInitialized() &&
-            remoteDbManager.isRemoteDbInitialized()
-
+        localDbManager.isLocalDbInitialized(projectId) &&
+            remoteDbManager.isRemoteDbInitialized(projectId)
 
     // Data transfer
 

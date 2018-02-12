@@ -8,9 +8,9 @@ import com.simprints.libdata.tools.Constants
 interface LocalDbManager {
 
     // Lifecycle
-    fun signInToLocal(localDbKey: String)
-    fun signOutOfLocal()
-    fun isLocalDbInitialized(): Boolean
+    fun signInToLocal(projectId: String, localDbKey: String)
+    fun signOutOfLocal(projectId: String)
+    fun isLocalDbInitialized(projectId: String): Boolean
 
     // Data transfer
     fun savePersonInLocal(fbPerson: fb_Person)

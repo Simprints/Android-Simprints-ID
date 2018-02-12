@@ -59,9 +59,7 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
     private lateinit var authDispatcher: FirebaseAuth.AuthStateListener
     private var authListeners = mutableSetOf<AuthListener>()
 
-
     // Lifecycle
-
     override fun initialiseRemoteDb(projectId: String) {
         firebaseApp =
             try {
@@ -122,7 +120,7 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
                             authListener.onSignIn()
                     }
                     // setSync()
-                }//User is signed in
+                } //User is signed in
             } else {
                 Timber.d("Signed out")
                 synchronized(authListeners) {
@@ -130,13 +128,13 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
                         authListener.onSignOut()
                 }
                 signedIn = false
-            }//User is signed out
+            } //User is signed out
         }
         firebaseAuth.addAuthStateListener(authDispatcher)
         Timber.d("Auth state listener set")
     }
 
-    override fun signInToRemoteDb(token: Token) {
+    override fun signInToRemoteDb(projectId: String, token: Token) {
         // TODO : turn into an RxJava Single Observable
         signedIn = true
         firebaseAuth.signInWithCustomToken(token.value).addOnCompleteListener { task ->
@@ -150,7 +148,7 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
         }
     }
 
-    override fun signOutOfRemoteDb() {
+    override fun signOutOfRemoteDb(projectId: String) {
         firebaseAuth.signOut()
 
         // Unregister listeners
@@ -158,7 +156,7 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
         connectionDbRef.removeEventListener(connectionDispatcher)
     }
 
-    override fun isRemoteDbInitialized(): Boolean {
+    override fun isRemoteDbInitialized(projectId: String): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -191,7 +189,6 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
             connectionListeners.remove(connectionListener)
         }
     }
-
 
     // Data transfer
 
@@ -293,7 +290,6 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
             e.printStackTrace()
         }
 
-
         // Once the realm request is processed
         request.addChangeListener(object : RealmChangeListener<RealmResults<rl_Person>> {
             override fun onChange(results: RealmResults<rl_Person>) {
@@ -324,7 +320,6 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
                     e.printStackTrace()
                     wrappedCallback.onFailure(DATA_ERROR.IO_BUFFER_WRITE_ERROR)
                 }
-
             }
         })
 
