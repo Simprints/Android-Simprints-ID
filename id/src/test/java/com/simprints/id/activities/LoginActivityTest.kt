@@ -3,19 +3,20 @@ package com.simprints.id.activities
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
-import com.simprints.id.activities.requestProjectCredentials.RequestProjectCredentialsActivity
-import com.simprints.id.testUtils.assertActivityStarted
+import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.tools.extensions.scannerAppIntent
-import com.simprints.id.tools.roboletric.createRoboFrontViewActivity
-import com.simprints.id.tools.roboletric.createRoboRequestProjectCredentialsActivity
-import com.simprints.id.tools.roboletric.getRoboSharedPreferences
+import com.simprints.id.tools.roboletric.createRoboLoginActivity
 import com.simprints.id.tools.roboletric.injectHowToResolveScannerAppIntent
-import kotlinx.android.synthetic.main.activity_request_project_secret.*
+import io.reactivex.internal.operators.single.SingleJust
+import junit.framework.Assert.*
+import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.doReturn
+import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
@@ -23,32 +24,46 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class)
-class FrontActivityTest {
+class LoginActivityTest {
 
-    @Test
-    @Throws(Exception::class)
-    fun notProjectSecretStored_shouldBringRegistrationActivityUp() {
+    private lateinit var app: Application
 
+    @Before
+    fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        val controller = createRoboFrontViewActivity().start().resume().visible()
-        val activity = controller.get()
-        assertActivityStarted(RequestProjectCredentialsActivity::class.java, activity)
+        app = (RuntimeEnvironment.application as Application)
     }
 
     @Test
     @Throws(Exception::class)
-    fun validProjectCredentialsStored_shouldStayOnFrontActivity() {
+    fun shouldUserIdPreFilled() {
+        val userId = "some_user_id"
+        app.dataManager.userId = userId
 
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-
-        val sharedPreferences = getRoboSharedPreferences()
-        sharedPreferences.edit().putString("ENCRYPTED_PROJECT_SECRET", "secret").commit()
-        sharedPreferences.edit().putString("PROJECT_ID", "id").commit()
-
-        val controller = createRoboFrontViewActivity().start().resume().visible()
+        val controller = createRoboLoginActivity().start().resume().visible()
         val activity = controller.get()
+        val userIdInEditText = activity.loginEditTextUserId.text.toString()
+        assertEquals(userIdInEditText, userId)
+    }
 
-        assertNull(shadowOf(activity).nextStartedActivity)
+    @Test
+    @Throws(Exception::class)
+    fun loginSuccesses_shouldReturnSuccessResultCode() {
+
+        val controller = createRoboLoginActivity().start().resume().visible()
+        val loginAct = controller.get()
+        val projectAuthenticator = mock(ProjectAuthenticator::class.java)
+        doReturn(SingleJust("token")).`when`(projectAuthenticator).authenticateWithNewCredentials(anyNotNull(), anyNotNull(), anyNotNull())
+        loginAct.viewPresenter.projectAuthenticator = projectAuthenticator
+        loginAct.loginEditTextUserId.setText("some_user_id")
+        loginAct.loginEditTextProjectId.setText("some_project_id")
+        loginAct.loginEditTextProjectSecret.setText("some_project_secret")
+        loginAct.loginButtonSignIn.performClick()
+
+        val shadowLoginAct = shadowOf(loginAct)
+
+        assertEquals(1, shadowLoginAct.resultCode)
+        assertTrue(shadowLoginAct.isFinishing)
     }
 
     @Test
@@ -57,10 +72,10 @@ class FrontActivityTest {
 
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
 
-        val controller = createRoboRequestProjectCredentialsActivity().start().resume().visible()
+        val controller = createRoboLoginActivity().start().resume().visible()
         val activity = controller.get()
 
-        activity.requestProjectCredentialsButtonScanQr.performClick()
+        activity.loginButtonScanQr.performClick()
 
         val nextActivity = shadowOf(activity).nextStartedActivity
 
@@ -78,14 +93,14 @@ class FrontActivityTest {
         FirebaseApp.initializeApp(app)
         val pm = app.packageManager
 
-        val controller = createRoboRequestProjectCredentialsActivity()
+        val controller = createRoboLoginActivity()
         val activity = controller.get()
 
         val spm = shadowOf(pm)
         spm.addResolveInfoForIntent(pm.scannerAppIntent(), injectHowToResolveScannerAppIntent(pm))
 
         controller.start().resume().visible()
-        activity.requestProjectCredentialsButtonScanQr.performClick()
+        activity.loginButtonScanQr.performClick()
 
         val nextActivity = shadowOf(activity).nextStartedActivity
         assertNotNull(nextActivity)

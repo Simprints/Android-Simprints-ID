@@ -4,6 +4,7 @@ import android.app.IntentService
 import android.content.Intent
 
 import com.simprints.id.Application
+import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.DataManager
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.libsimprints.Constants.*
@@ -64,7 +65,14 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     }
 
     private fun checkApiKey(apiKey: String) {
-        if (apiKey.isEmpty() || apiKey != dataManager.getApiKeyOr(apiKey)) {
+
+        var signed = false
+        if (!apiKey.isEmpty()) {
+            val projectId = CheckLoginPresenter.findProjectIdForApiKey(apiKey)
+            signed = dataManager.isProjectIdSignedIn(projectId)
+        }
+
+        if (!signed) {
             throw InvalidCalloutParameterError.forParameter(SIMPRINTS_API_KEY)
         }
     }

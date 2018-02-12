@@ -190,13 +190,8 @@ class Application : MultiDexApplication() {
         InvalidCalloutError(ALERT_TYPE.INVALID_API_KEY)
     }
 
-    private val missingApiKeyError: Error by lazy {
-        InvalidCalloutError(ALERT_TYPE.MISSING_API_KEY)
-    }
-
     private val apiKeyReader: Reader<String> by lazy {
-        MandatoryParameterReader(SIMPRINTS_API_KEY, String::class,
-            missingApiKeyError, invalidApiKeyError)
+        OptionalParameterReader(SIMPRINTS_API_KEY, "", invalidApiKeyError)
     }
 
     private val apiKeyValidator: Validator<String> by lazy {
@@ -205,6 +200,22 @@ class Application : MultiDexApplication() {
 
     private val apiKeyExtractor: Extractor<String> by lazy {
         ParameterExtractor(apiKeyReader, apiKeyValidator)
+    }
+
+    private val invalidProjectIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_PROJECT_ID)
+    }
+
+    private val projectIdReader: Reader<String> by lazy {
+        OptionalParameterReader(SIMPRINTS_PROJECT_ID, "", invalidProjectIdError)
+    }
+
+    private val projectIdValidator: Validator<String> by lazy {
+        NoOpValidator<String>()
+    }
+
+    private val projectIdExtractor: Extractor<String> by lazy {
+        ParameterExtractor(projectIdReader, projectIdValidator)
     }
 
     private val invalidModuleIdError: Error by lazy {
@@ -375,7 +386,7 @@ class Application : MultiDexApplication() {
     }
 
     val sessionParametersExtractor: Extractor<SessionParameters> by lazy {
-        SessionParametersExtractor(actionExtractor, apiKeyExtractor, moduleIdExtractor,
+        SessionParametersExtractor(actionExtractor, apiKeyExtractor, projectIdExtractor, moduleIdExtractor,
             userIdExtractor, patientIdExtractor, callingPackageExtractor, metadataExtractor,
             resultFormatExtractor, unexpectedParametersExtractor)
     }
@@ -401,4 +412,5 @@ class Application : MultiDexApplication() {
         }
         Fabric.with(fabric)
     }
+
 }

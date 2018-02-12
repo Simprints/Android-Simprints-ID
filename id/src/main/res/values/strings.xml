@@ -20,7 +20,8 @@
     <string name="privacy_label">Privacy</string>
 
 
-    <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
+    <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
+
     <!-- Version Names -->
     <string name="front_libSimprints_version" translatable="false">LibSimprints: %1$s</string>
     <string name="front_simprintsId_version" translatable="false">Simprints ID: %1$s</string>
@@ -303,15 +304,24 @@
     <!-- TODO: what about translation? -->
     <string name="empty" translatable="false" />
     <string name="simprints_logo">Simprints Logo</string>
-    <string name="requestProjectCredentials_enter_project_secret_id">Enter your project\'s id and key</string>
+    <string name="login_enter_project_secret_id">Enter your project\'s id and key</string>
     <string name="scan_qr">Scan QR</string>
     <string name="enter">Enter</string>
-    <string name="requestProjectCredentials_secret_hint">Project secret</string>
-    <string name="requestProjectCredentials_id_hint">Project id</string>
-    <string name="requestProjectCredentials_invalidCredentials">Invalid project\'s id or key</string>
+    <string name="login_id_hint">Project id</string>
+    <string name="login_secret_hint">Project key</string>
+    <string name="login_invalidCredentials">Invalid Login. Check Project\'s id or key</string>
 
-    <string name="requestProjectCredentials_title">Request Project credentials</string>
-    <string name="requestProjectCredentials_type_project_details">Type manually</string>
-    <string name="requestProjectCredentials_invalidQrCode">The scanned QR code is invalid.</string>
+    <string name="login_title">Request Project credentials</string>
+    <string name="login_type_project_details">Type manually</string>
+    <string name="login_invalidQrCode">The scanned QR code is invalid.</string>
+    <string name="progress_title">Signing in</string>
+    <string name="login_progress_message">Please wait ...</string>
+    <string name="check_login_label">Check login</string>
+    <string name="dashboard_label">Dashboad</string>
+    <string name="requestLogin_message">You need to login in. Please use your client App to open Simprints ID and log in.</string>
+    <string name="requestLogin_title">Login Required</string>
+    <string name="login">Login</string>
+    <string name="invalid_projectId_message">A configuration error has occurred (Project Id), please contact your system administrator</string>
+    <string name="login_missingCredentials">Missing credentials. Please check user id, project id and api key again.</string>
 
 </resources>

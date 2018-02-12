@@ -1,0 +1,112 @@
+package com.simprints.id.activities.checkLogin
+
+import com.simprints.id.activities.dashboard.DashboardActivity
+import com.simprints.id.activities.launch.LaunchActivity
+import com.simprints.id.data.DataManager
+import com.simprints.id.domain.sessionParameters.SessionParameters
+import com.simprints.id.domain.sessionParameters.extractors.Extractor
+import com.simprints.id.exceptions.unsafe.InvalidCalloutError
+import com.simprints.id.tools.TimeHelper
+import java.util.*
+
+class CheckLoginPresenter(val view: CheckLoginContract.View,
+                          val dataManager: DataManager,
+                          private val sessionParametersExtractor: Extractor<SessionParameters>,
+                          override var wasAppOpenedByIntent: Boolean,
+                          private val timeHelper: TimeHelper) : CheckLoginContract.Presenter {
+
+    init {
+        view.setPresenter(this)
+        view.checkCallingApp()
+    }
+
+    private val nextActivityClassAfterLogin by lazy {
+        if (wasAppOpenedByIntent /* FUTURE: && calloutAction != LOGIN */) {
+            LaunchActivity::class.java
+        } else {
+            DashboardActivity::class.java
+        }
+    }
+
+    override fun start() {
+
+        // If app was launched by intent, we extract the sessions Params
+        if (wasAppOpenedByIntent) {
+            try {
+                extractSessionParameters()
+            } catch (exception: InvalidCalloutError) {
+                view.launchAlertForError(exception.alertType)
+                return
+            }
+        }
+        initSession()
+        checkIfUserIsLoggedIn()
+    }
+
+    override fun checkIfUserIsLoggedIn() {
+        if (isUserLogged()) {
+            startNormalFlow()
+        } else {
+            redirectUserForLogin()
+        }
+    }
+
+    private fun extractSessionParameters() {
+        val callout = view.parseCallout()
+        callout.apply {
+            dataManager.logCallout(this)
+        }
+
+        val sessionParameters = sessionParametersExtractor.extractFrom(callout)
+        dataManager.sessionParameters = sessionParameters
+        dataManager.calloutAction = sessionParameters.calloutAction
+        dataManager.logUserProperties()
+    }
+
+    private fun isUserLogged(): Boolean {
+        val encProjectSecret = dataManager.getEncryptedProjectSecretOrEmpty()
+        var storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
+        //var validFirebaseToken =
+
+        if (encProjectSecret.isEmpty() || storedProjectId.isEmpty()) {
+            return false
+        }
+
+        return if (wasAppOpenedByIntent) {
+            var projectIdFromIntent = dataManager.projectId
+            if (projectIdFromIntent.isEmpty()) { //Legacy App with ApiKey
+                projectIdFromIntent = findProjectIdForApiKey(dataManager.apiKey)
+            }
+            projectIdFromIntent == dataManager.getSignedInProjectIdOrEmpty()
+        } else {
+            true
+        }
+    }
+
+    //Temporary - it will be in RealmManager
+    companion object {
+        fun findProjectIdForApiKey(apiKey: String): String {
+            return "55KAiL2YmsjeuNNPnSDO"
+        }
+    }
+
+    private fun startNormalFlow() {
+        view.startActivity(nextActivityClassAfterLogin)
+    }
+
+    private fun redirectUserForLogin() {
+        if (wasAppOpenedByIntent) {
+            view.openLoginActivity()
+        } else {
+            view.openRequestLoginActivity()
+        }
+    }
+
+    private fun initSession() {
+        dataManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
+    }
+
+    private fun newSessionId(): String {
+        return UUID.randomUUID().toString()
+    }
+}
