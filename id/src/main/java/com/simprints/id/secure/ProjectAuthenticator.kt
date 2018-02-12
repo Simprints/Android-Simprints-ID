@@ -56,7 +56,7 @@ class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
     private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, noneScope: NonceScope): Single<AttestToken> =
         nonceManager.requestNonce(noneScope).flatMap { nonce ->
             attestationManager
-                .requestAttestation(ctx, nonce)
+                .requestAttestation(safetyNetClient, nonce)
                 .subscribeOn(Schedulers.io())
         }
 

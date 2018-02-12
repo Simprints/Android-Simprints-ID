@@ -38,7 +38,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         setContentView(R.layout.activity_login)
 
         val app = application as Application
-        viewPresenter = LoginPresenter(this, app.secureDataManager, ProjectAuthenticator(app.secureDataManager), SafetyNet.getClient(this))
+        viewPresenter = LoginPresenter(this, app.secureDataManager, app.dataManager, ProjectAuthenticator(app.secureDataManager), SafetyNet.getClient(this))
         viewPresenter.start()
 
         initUI()
@@ -109,7 +109,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         Toast.makeText(this, stringRes, Toast.LENGTH_SHORT).show()
     }
 
-
     override fun showProgressDialog(title: Int, message: Int) {
         progressDialog = indeterminateProgressDialog(title, message)
         progressDialog.show()
@@ -118,7 +117,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun dismissProgressDialog() {
         progressDialog.dismiss()
     }
-
 
     override fun returnSuccessfulResult() {
         setResult(LOGIN_SUCCESSED)

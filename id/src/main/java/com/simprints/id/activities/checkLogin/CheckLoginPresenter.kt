@@ -44,9 +44,10 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
     }
 
     override fun checkIfUserIsLoggedIn() {
-        if (isUserLogged()) {
+        if (isUserSignedIn()) {
             startNormalFlow()
         } else {
+            dataManager.signOut()
             redirectUserForLogin()
         }
     }
@@ -63,12 +64,12 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
         dataManager.logUserProperties()
     }
 
-    private fun isUserLogged(): Boolean {
+    private fun isUserSignedIn(): Boolean {
         val encProjectSecret = dataManager.getEncryptedProjectSecretOrEmpty()
         var storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
-        //var validFirebaseToken =
+        val isFirebaseTokenValid = dataManager.isSignedIn(storedProjectId)
 
-        if (encProjectSecret.isEmpty() || storedProjectId.isEmpty()) {
+        if (encProjectSecret.isEmpty() || storedProjectId.isEmpty() || !isFirebaseTokenValid) {
             return false
         }
 
@@ -77,7 +78,7 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
             if (projectIdFromIntent.isEmpty()) { //Legacy App with ApiKey
                 projectIdFromIntent = findProjectIdForApiKey(dataManager.apiKey)
             }
-            projectIdFromIntent == dataManager.getSignedInProjectIdOrEmpty()
+            projectIdFromIntent == storedProjectId
         } else {
             true
         }
