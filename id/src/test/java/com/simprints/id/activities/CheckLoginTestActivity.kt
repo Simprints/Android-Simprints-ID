@@ -9,12 +9,13 @@ import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.data.db.analytics.AnalyticsManager
-import com.simprints.id.data.db.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.tools.roboletric.createRoboCheckLoginViewActivity
 import com.simprints.id.tools.roboletric.getRoboSharedPreferences
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,6 +64,22 @@ class CheckLoginTestActivity {
         Mockito.verify(analyticsManagerMock, Mockito.times(times)).logSafeException(anyNotNull())
     }
 
+    @Test
+    @Throws(Exception::class)
+    fun byIntent_extractLoginParams() {
+
+        val intent = Intent()
+        intent.action = "com.simprints.id.REGISTER"
+        intent.putExtra("projectId", "some_project")
+        intent.putExtra("apiKey", "some_apiKey")
+        intent.putExtra("userId", "some_userId")
+
+        createRoboCheckLoginViewActivity(intent).start().resume().visible()
+
+        Assert.assertEquals(app.dataManager.projectId, "some_project")
+        Assert.assertEquals(app.dataManager.apiKey, "some_apiKey")
+        Assert.assertEquals(app.dataManager.userId, "some_userId")
+    }
 
     @Test
     @Throws(Exception::class)
@@ -108,7 +125,7 @@ class CheckLoginTestActivity {
         assertActivityStarted(DashboardActivity::class.java, activity)
     }
 
-    private fun startCheckLoginActivity(action: String, projectId: String, logged:Boolean, openedByIntent: Boolean): CheckLoginActivity {
+    private fun startCheckLoginActivity(action: String, projectId: String, logged: Boolean, openedByIntent: Boolean): CheckLoginActivity {
         val sharedPreferences = getRoboSharedPreferences()
         sharedPreferences.edit().putString("ENCRYPTED_PROJECT_SECRET", if (logged) "some_secret" else "").commit()
         sharedPreferences.edit().putString("PROJECT_ID", if (logged) projectId else "$projectId false").commit()

@@ -130,7 +130,7 @@ class Application : MultiDexApplication() {
         PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager)
     }
 
-    private val localDbManager: LocalDbManager by lazy {
+    var localDbManager: LocalDbManager by lazyVar {
         RealmDbManager(this)
     }
 
@@ -418,5 +418,4 @@ class Application : MultiDexApplication() {
         }
         Fabric.with(fabric)
     }
-
 }

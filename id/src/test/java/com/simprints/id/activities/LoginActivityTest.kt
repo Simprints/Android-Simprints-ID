@@ -3,6 +3,7 @@ package com.simprints.id.activities
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
+import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.tools.extensions.scannerAppIntent
@@ -32,6 +33,7 @@ class LoginActivityTest {
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
+        app.localDbManager = mock(RealmDbManager::class.java)
     }
 
     @Test
