@@ -8,16 +8,11 @@ import android.support.annotation.Nullable;
 
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError;
+import com.simprints.id.domain.callout.CalloutAction;
 import com.simprints.id.exceptions.unsafe.NullScannerError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.domain.callout.CalloutAction;
-import com.simprints.id.secure.ApiService;
-import com.simprints.id.secure.ProjectAuthenticator;
-import com.simprints.id.secure.models.NonceScope;
-import com.simprints.id.secure.models.Token;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
@@ -32,7 +27,6 @@ import com.simprints.libscanner.ScannerUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.observers.DisposableSingleObserver;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_CANCELED;
@@ -106,28 +100,19 @@ public class Setup {
             return;
         }
 
-        // Step 3: check the api key. This only has to be done once.
-        // Note: LibData checks a cached value and callback right away if it is valid
-        // (To make the launch faster).
-        // Then it re-validate the key with the server, resulting in a second callback.
-        if (!apiKeyValidated) {
-            this.validateApiKey(activity);
-            return;
-        }
-
-        // Step 4: extractFrom scanner object.
+        // Step 3: extractFrom scanner object.
         if (appState.getScanner() == null) {
             this.initScanner(activity);
             return;
         }
 
-        // Step 5: connect with scanner. Must be done every time the scanner is not connected
+        // Step 4: connect with scanner. Must be done every time the scanner is not connected
         if (!appState.getScanner().isConnected()) {
             this.connectToScanner(activity);
             return;
         }
 
-        // Step 6: check if it's a verify intent. If it is, check if the person is in the database.
+        // Step 5: check if it's a verify intent. If it is, check if the person is in the database.
         // If they are, check if connected to the internet.
         if (!guidExists) {
             this.checkIfVerifyAndGuidExists(activity);
@@ -135,13 +120,13 @@ public class Setup {
         }
 
 
-        // Step 7: reset the UI. This is necessary for the trigger button to work.
+        // Step 6: reset the UI. This is necessary for the trigger button to work.
         if (!uiResetSinceConnection) {
             this.resetUi(activity);
             return;
         }
 
-        // Step 8: turn on the un20 if needed.
+        // Step 7: turn on the un20 if needed.
         this.wakeUpUn20(activity);
     }
 
@@ -163,63 +148,6 @@ public class Setup {
     }
 
     // STEP 3
-    private void validateApiKey(@NonNull final Activity activity) {
-        onProgress(20, R.string.launch_checking_api_key);
-
-        // TODO : implement auth 2.0 sign in
-        new ProjectAuthenticator(dataManager, new ApiService().getApi())
-            .authenticateWithExistingCredentials(activity, new NonceScope(dataManager.getProjectId(), dataManager.getUserId()))
-            .subscribe(new DisposableSingleObserver<Token>() {
-                           @Override
-                           public void onSuccess(Token token) {
-                               dataManager.signIn(token);
-                               apiKeyValidated = true;
-                               Timber.d("Setup: Api key validated.");
-                               goOn(activity);
-                           }
-
-                           @Override
-                           public void onError(Throwable e) {
-                               if (e instanceof Error) dataManager.logError((Error) e);
-                               onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                           }
-                       }
-            );
-    }
-
-//    private DataCallback newSignInCallback(@NonNull final Activity activity) {
-//        return new DataCallback() {
-//            @Override
-//            public void onSuccess() {
-//                if (!apiKeyValidated) {
-//                    apiKeyValidated = true;
-//                    Timber.d("Setup: Api key validated.");
-//                    goOn(activity);
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(DATA_ERROR dataError) {
-//                switch (dataError) {
-//                    case UNVERIFIED_API_KEY:
-//                        apiKeyValidated = false;
-//                        paused = true;
-//                        callback.onAlert(ALERT_TYPE.UNVERIFIED_API_KEY);
-//                        break;
-//                    case INVALID_API_KEY:
-//                        apiKeyValidated = false;
-//                        paused = true;
-//                        callback.onAlert(ALERT_TYPE.INVALID_API_KEY);
-//                        break;
-//                    default:
-//                        dataManager.logError(UnexpectedDataError.forDataError(dataError, "Setup.validateApiKey()"));
-//                        onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-//                }
-//            }
-//        };
-//    }
-
-    // STEP 4
     private void initScanner(@NonNull final Activity activity) {
         callback.onProgress(40, R.string.launch_bt_connect);
         List<String> pairedScanners = ScannerUtils.getPairedScanners();
@@ -239,7 +167,7 @@ public class Setup {
         goOn(activity);
     }
 
-    // STEP 5
+    // STEP 4
     private void connectToScanner(@NonNull final Activity activity) {
         callback.onProgress(50, R.string.launch_bt_connect);
 
@@ -286,7 +214,7 @@ public class Setup {
         });
     }
 
-    // STEP 6
+    // STEP 5
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
         if (dataManager.getCalloutAction() != CalloutAction.VERIFY) {
             guidExists = true;
@@ -347,7 +275,7 @@ public class Setup {
         }
     }
 
-    // STEP 7
+    // STEP 6
     private void resetUi(@NonNull final Activity activity) {
         callback.onProgress(70, R.string.launch_setup);
 
@@ -373,7 +301,7 @@ public class Setup {
         });
     }
 
-    // STEP 8
+    // STEP 7
     private void wakeUpUn20(@NonNull final Activity activity) {
         callback.onProgress(85, R.string.launch_wake_un20);
 

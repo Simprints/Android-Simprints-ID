@@ -101,6 +101,7 @@
             android:name=".activities.requestLogin.RequestLoginActivity"
             android:label="@string/requestLogin_title"
             android:launchMode="singleTop"
+            android:noHistory="true"
             android:screenOrientation="portrait" />
 
         <activity
