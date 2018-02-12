@@ -57,7 +57,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         loginButtonSignIn.setOnClickListener {
             val projectId = loginEditTextProjectId.text.toString()
             val projectSecret = loginEditTextProjectSecret.text.toString()
-            viewPresenter.userDidWantToSignIn(projectId, projectSecret, userId)
+            viewPresenter.userDidWantToSignIn(projectId, projectSecret, userId, app.dataManager.apiKey)
         }
     }
 

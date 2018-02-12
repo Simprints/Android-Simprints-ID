@@ -9,8 +9,8 @@ interface SecureDataManager {
     var prefs: ImprovedSharedPreferences
     fun getEncryptedProjectSecretOrEmpty(): String
     fun getSignedInProjectIdOrEmpty(): String
-    fun isProjectIdSignedIn(projectId: String): Boolean
+    fun isProjectIdSignedIn(possibleProjectId: String): Boolean
     fun cleanCredentials()
-    fun storeProjectIdWithLegacyApiKeyPair(possibleProjectId: String, possibleLegacyApiKey: String?)
+    fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?)
     fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String
 }

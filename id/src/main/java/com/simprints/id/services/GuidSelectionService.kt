@@ -2,13 +2,10 @@ package com.simprints.id.services
 
 import android.app.IntentService
 import android.content.Intent
-
 import com.simprints.id.Application
-import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.DataManager
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.libsimprints.Constants.*
-
 
 class GuidSelectionService : IntentService("GuidSelectionService") {
 
@@ -24,7 +21,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         if (intent != null) {
             onHandleNonNullIntent(intent)
         } else {
-            dataManager.logGuidSelectionService("","", "", false)
+            dataManager.logGuidSelectionService("", "", "", false)
         }
     }
 
@@ -68,7 +65,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
         var signed = false
         if (!apiKey.isEmpty()) {
-            val projectId = CheckLoginPresenter.findProjectIdForApiKey(apiKey)
+            val projectId = dataManager.projectIdForLegacyApiKeyOrEmpty(apiKey)
             signed = dataManager.isProjectIdSignedIn(projectId)
         }
 
@@ -81,5 +78,4 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     private fun checkSelectedGuid(selectedGuid: String) {
         // For now, any selected guid is valid
     }
-
 }
