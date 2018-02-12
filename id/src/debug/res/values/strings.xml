@@ -9,9 +9,7 @@
     <string name="title_activity_front" translatable="false">Simprints ID DEBUG</string>
 
 
-    <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
     <!-- App Titles -->
     <string name="simprints_label" translatable="false">Simprints DEBUG</string>
-
 
 </resources>

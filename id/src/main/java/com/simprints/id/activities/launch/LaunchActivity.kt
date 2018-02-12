@@ -10,24 +10,17 @@ import android.view.View
 import android.view.WindowManager
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.AlertActivity
-import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.MainActivity
 import com.simprints.id.activities.RefusalActivity
-import com.simprints.id.activities.requestProjectCredentials.RequestProjectCredentialsActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
-import com.simprints.id.domain.callout.Callout
-import com.simprints.id.domain.callout.Callout.Companion.toCallout
-import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
-import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.Vibrate.vibrate
-import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
+import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
@@ -35,7 +28,6 @@ import kotlinx.android.synthetic.main.activity_launch.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import org.jetbrains.anko.coroutines.experimental.bg
-import java.util.*
 
 @SuppressLint("HardwareIds")
 open class LaunchActivity : AppCompatActivity() {
@@ -66,31 +58,10 @@ open class LaunchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injectDependencies()
-        initSession()
         initView()
         RemoteConfig.init()
-        val callout = parseCallout()
-        try {
-            extractSessionParameters(callout)
-        } catch (exception: InvalidCalloutError) {
-            launchAlert(exception.alertType)
-            return
-        }
         positionTracker.start()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        when {
-            dataManager.areProjectCredentialsMissing() -> startRequestProjectCredentialsActivity()
-            setup.isOnGoing -> setup.start(this, getSetupCallback())
-        }
-    }
-
-    private fun startRequestProjectCredentialsActivity() {
-        overridePendingTransition(R.anim.slide_out_to_up, R.anim.stay)
-        val intent = Intent(this, RequestProjectCredentialsActivity::class.java)
-        startActivity(intent)
+        setup.start(this, getSetupCallback())
     }
 
     private fun injectDependencies() {
@@ -105,35 +76,6 @@ open class LaunchActivity : AppCompatActivity() {
         LanguageHelper.setLanguage(this, dataManager.language)
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-    }
-
-    private fun initSession() {
-        dataManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
-    }
-
-    private fun newSessionId(): String {
-        return UUID.randomUUID().toString()
-    }
-
-    private fun parseCallout(): Callout =
-        intent.toCallout()
-            .apply {
-                dataManager.logCallout(this)
-            }
-
-    private fun extractSessionParameters(callout: Callout) {
-        dataManager.callingPackage = getCallingPackageName()
-        if (app.packageManager.isCallingAppFromUnknownSource(dataManager.callingPackage)) {
-            dataManager.logSafeException(CallingAppFromUnknownSourceException())
-        }
-
-        val sessionParameters = app.sessionParametersExtractor.extractFrom(callout)
-        dataManager.sessionParameters = sessionParameters
-        dataManager.logUserProperties()
-    }
-
-    open fun getCallingPackageName(): String {
-        return callingPackage ?: ""
     }
 
     // Setup callback
@@ -166,22 +108,17 @@ open class LaunchActivity : AppCompatActivity() {
             }
 
             override fun onAlert(alertType: ALERT_TYPE) {
-                launchAlert(alertType)
+                launchAlertAndStopSetup(alertType)
             }
         }
 
-    /**
-     * Start alert activity
-     */
-    private fun launchAlert(alertType: ALERT_TYPE) {
+    fun launchAlertAndStopSetup(alertType: ALERT_TYPE){
         if (launchOutOfFocus)
             return
 
         launchOutOfFocus = true
         setup.stop()
-        val intent = Intent(this, AlertActivity::class.java)
-        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType)
-        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST)
+        launchAlert(alertType)
     }
 
     private fun tryAgain() {

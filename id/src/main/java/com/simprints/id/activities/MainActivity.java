@@ -854,10 +854,10 @@ public class MainActivity extends AppCompatActivity implements
         SyncTaskParameters syncParameters;
         switch (dataManager.getSyncGroup()) {
             case GLOBAL:
-                syncParameters = new GlobalSyncTaskParameters(dataManager.getAppKey());
+                syncParameters = new GlobalSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty());
                 break;
             case USER:
-                syncParameters = new UserSyncTaskParameters(dataManager.getAppKey(), dataManager.getUserId());
+                syncParameters = new UserSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getUserId());
                 break;
             default:
                 handleUnexpectedError(new InvalidSyncGroupError());

@@ -72,7 +72,4 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
     fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
     fun syncUser(userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
     fun finish()
-
-    // Secure data
-    fun getApiKeyOrEmpty(): String
 }

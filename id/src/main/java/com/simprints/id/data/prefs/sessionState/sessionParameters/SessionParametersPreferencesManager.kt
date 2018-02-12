@@ -7,7 +7,8 @@ import com.simprints.id.domain.sessionParameters.SessionParameters
 interface SessionParametersPreferencesManager {
 
     var calloutAction: CalloutAction
-    var appKey: String
+    var apiKey: String
+    var projectId: String
     var moduleId: String
     var userId: String
     var patientId: String
@@ -18,7 +19,8 @@ interface SessionParametersPreferencesManager {
     var sessionParameters: SessionParameters
         set(value) {
             calloutAction = value.calloutAction
-            appKey = value.apiKey.substring(0, 8)
+            apiKey = value.apiKey ?: ""
+            projectId = value.projectId ?: ""
             moduleId = value.moduleId
             userId = value.userId
             patientId = value.patientId

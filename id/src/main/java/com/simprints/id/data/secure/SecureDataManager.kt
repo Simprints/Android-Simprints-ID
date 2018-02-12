@@ -5,13 +5,10 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 interface SecureDataManager {
 
     var encryptedProjectSecret: String
-    var projectId: String
+    var signedInProjectId: String
     var prefs: ImprovedSharedPreferences
     fun getEncryptedProjectSecretOrEmpty(): String
-    fun getProjectIdOrEmpty(): String
-    fun areProjectCredentialsMissing(): Boolean
-
-    /*TODO: Legacy stuff to refactor */
-    fun getApiKeyOr(default: String): String
-    var apiKey: String
+    fun getSignedInProjectIdOrEmpty(): String
+    fun isProjectIdSignedIn(projectId: String): Boolean
+    fun cleanCredentials()
 }

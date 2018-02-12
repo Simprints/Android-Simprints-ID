@@ -62,14 +62,13 @@ class DataManagerImpl(private val context: Context,
         get() = preferencesManager.sessionParameters
         set(value) {
             preferencesManager.sessionParameters = value
-            secureDataManager.apiKey = value.apiKey
         }
 
     override fun logAlert(alertType: ALERT_TYPE) =
-        analyticsManager.logAlert(alertType.name, getApiKeyOrEmpty(), moduleId, userId, deviceId)
+        analyticsManager.logAlert(alertType.name, getSignedInProjectIdOrEmpty(), moduleId, userId, deviceId)
 
     override fun logUserProperties() =
-        analyticsManager.logUserProperties(userId, getApiKeyOrEmpty(), moduleId, deviceId)
+        analyticsManager.logUserProperties(userId, getSignedInProjectIdOrEmpty(), moduleId, deviceId)
 
     override fun logScannerProperties() =
         analyticsManager.logScannerProperties(macAddress, scannerId)
@@ -80,10 +79,10 @@ class DataManagerImpl(private val context: Context,
             deviceId)
 
     override fun logConnectionStateChange(connected: Boolean) =
-        analyticsManager.logConnectionStateChange(connected, getApiKeyOrEmpty(), deviceId, sessionId)
+        analyticsManager.logConnectionStateChange(connected, getSignedInProjectIdOrEmpty(), deviceId, sessionId)
 
     override fun logAuthStateChange(authenticated: Boolean) =
-        analyticsManager.logAuthStateChange(authenticated, getApiKeyOrEmpty(), deviceId, sessionId)
+        analyticsManager.logAuthStateChange(authenticated, getSignedInProjectIdOrEmpty(), deviceId, sessionId)
 
     private val connectionStateLogger = object : ConnectionListener {
         override fun onConnection() = logConnectionStateChange(true)
@@ -124,7 +123,7 @@ class DataManagerImpl(private val context: Context,
     @Throws(UninitializedDataManagerError::class)
     override fun saveSession() {
         val session = Session(sessionId, androidSdkVersion, deviceModel, deviceId, appVersionName,
-            libVersionName, calloutAction.toString(), getApiKeyOrEmpty(), moduleId, userId,
+            libVersionName, calloutAction.toString(), getSignedInProjectIdOrEmpty(), moduleId, userId,
             patientId, callingPackage, metadata, resultFormat, macAddress, scannerId,
             hardwareVersion.toInt(), location.latitude, location.longitude,
             msSinceBootOnSessionStart, msSinceBootOnLoadEnd, msSinceBootOnMainStart,
@@ -239,9 +238,4 @@ class DataManagerImpl(private val context: Context,
         getDbContextOrErr().destroy()
         dbContext = null
     }
-
-    //Secure Data
-
-    override fun getApiKeyOrEmpty(): String =
-        getApiKeyOr("")
 }

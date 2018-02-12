@@ -1,7 +1,6 @@
 package com.simprints.id.data.secure
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError
 import com.simprints.id.exceptions.safe.ProjectCredentialsMissingException
 
 class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
@@ -25,7 +24,7 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             prefs.edit().putPrimitive(ENCRYPTED_PROJECT_SECRET, field).commit()
         }
 
-    override var projectId: String = ""
+    override var signedInProjectId: String = ""
         get() {
             val value = prefs.getPrimitive(PROJECT_ID, PROJECT_SECRET_AND_ID_DEFAULT)
             if (value.isBlank()) {
@@ -35,7 +34,7 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
         }
         set(value) {
             field = value
-            prefs.edit().putPrimitive(ENCRYPTED_PROJECT_SECRET, field).commit()
+            prefs.edit().putPrimitive(PROJECT_ID, field).commit()
         }
 
     override fun getEncryptedProjectSecretOrEmpty(): String =
@@ -45,33 +44,18 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             ""
         }
 
-    override fun getProjectIdOrEmpty(): String =
+    override fun getSignedInProjectIdOrEmpty(): String =
         try {
-            projectId
+            signedInProjectId
         } catch (e: ProjectCredentialsMissingException) {
             ""
         }
 
-    override fun areProjectCredentialsMissing(): Boolean = getProjectIdOrEmpty() == "" || getEncryptedProjectSecretOrEmpty() == ""
+    override fun isProjectIdSignedIn(potentialProjectId: String): Boolean =
+        !getSignedInProjectIdOrEmpty().isEmpty() && getSignedInProjectIdOrEmpty() == potentialProjectId && !getEncryptedProjectSecretOrEmpty().isEmpty()
 
-    /*TODO: Legacy stuff to refactor */
-    private var apiKeyBackingField: String = ""
-
-    override var apiKey: String
-        get() {
-            if (apiKeyBackingField.isBlank()) {
-                throw ApiKeyNotFoundError()
-            }
-            return apiKeyBackingField
-        }
-        set(value) {
-            apiKeyBackingField = value
-        }
-
-    override fun getApiKeyOr(default: String): String =
-        if (apiKeyBackingField.isBlank()) {
-            default
-        } else {
-            apiKeyBackingField
-        }
+    override fun cleanCredentials() {
+        encryptedProjectSecret = ""
+        signedInProjectId = ""
+    }
 }

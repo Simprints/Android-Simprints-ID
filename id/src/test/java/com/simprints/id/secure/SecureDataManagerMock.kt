@@ -5,11 +5,23 @@ import com.simprints.id.data.secure.SecureDataManager
 
 class SecureDataManagerMock : SecureDataManager {
 
+    override fun getSignedInProjectIdOrEmpty(): String {
+        throw RuntimeException("Not mocked!!!")
+    }
+
+    override fun isProjectIdSignedIn(projectId: String): Boolean {
+        throw RuntimeException("Not mocked!!!")
+    }
+
+    override fun cleanCredentials() {
+        throw RuntimeException("Not mocked!!!")
+    }
+
     override var encryptedProjectSecret: String
         get() = "encrypted_project_secret"
         set(value) {}
 
-    override var projectId: String
+    override var signedInProjectId: String
         get() = "project_id"
         set(value) {}
 
@@ -18,22 +30,6 @@ class SecureDataManagerMock : SecureDataManager {
         set(value) {}
 
     override fun getEncryptedProjectSecretOrEmpty(): String {
-        throw RuntimeException("Not mocked!!!")
-    }
-
-    override fun getProjectIdOrEmpty(): String {
-        throw RuntimeException("Not mocked!!!")
-    }
-
-    override fun areProjectCredentialsMissing(): Boolean {
-        throw RuntimeException("Not mocked!!!")
-    }
-
-    override var apiKey: String
-        get() = throw RuntimeException("Not mocked!!!")
-        set(value) {}
-
-    override fun getApiKeyOr(default: String): String {
         throw RuntimeException("Not mocked!!!")
     }
 }
