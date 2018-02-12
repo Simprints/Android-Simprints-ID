@@ -6,6 +6,8 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.domain.sessionParameters.SessionParameters
 import com.simprints.id.domain.sessionParameters.extractors.Extractor
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
+import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.TimeHelper
 import java.util.*
 
@@ -32,6 +34,8 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
     override fun start() {
         if (!started) {
             started = true
+            initSession()
+
             // If app was launched by intent, we extract the sessions Params (if not done before)
             if (wasAppOpenedByIntent) {
                 try {
@@ -48,10 +52,21 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
 
     override fun checkIfUserIsLoggedIn() {
         if (isUserSignedIn()) {
+            initDbContext(dataManager.signedInProjectId)
             startNormalFlow()
         } else {
-            //dataManager.signOut()
             redirectUserForLogin()
+        }
+    }
+
+    private fun initDbContext(projectId: String) {
+        if(!dataManager.isDbInitialised()) {
+            try {
+                dataManager.initialiseDb(projectId)
+            } catch (error: UninitializedDataManagerError) {
+                dataManager.logError(error)
+                view.launchAlertForError(ALERT_TYPE.UNEXPECTED_ERROR)
+            }
         }
     }
 

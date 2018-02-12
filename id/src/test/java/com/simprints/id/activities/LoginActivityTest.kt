@@ -5,6 +5,7 @@ import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.models.Token
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.tools.roboletric.createRoboLoginActivity
@@ -55,7 +56,7 @@ class LoginActivityTest {
         val controller = createRoboLoginActivity().start().resume().visible()
         val loginAct = controller.get()
         val projectAuthenticator = mock(ProjectAuthenticator::class.java)
-        doReturn(SingleJust("token")).`when`(projectAuthenticator).authenticateWithNewCredentials(anyNotNull(), anyNotNull(), anyNotNull())
+        doReturn(SingleJust(Token("token"))).`when`(projectAuthenticator).authenticateWithNewCredentials(anyNotNull(), anyNotNull(), anyNotNull())
         loginAct.viewPresenter.projectAuthenticator = projectAuthenticator
         loginAct.loginEditTextUserId.setText("some_user_id")
         loginAct.loginEditTextProjectId.setText("some_project_id")

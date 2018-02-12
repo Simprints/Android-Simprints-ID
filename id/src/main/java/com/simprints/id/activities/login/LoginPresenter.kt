@@ -2,7 +2,6 @@ package com.simprints.id.activities.login
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.R
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
@@ -10,7 +9,6 @@ import com.simprints.id.secure.models.NonceScope
 @Suppress("UnnecessaryVariable")
 class LoginPresenter(val view: LoginContract.View,
                      private val secureDataManager: SecureDataManager,
-                     private val dbManager: DbManager,
                      override var projectAuthenticator: ProjectAuthenticator,
                      private val safetyNetClient: SafetyNetClient) : LoginContract.Presenter {
     init {
@@ -34,9 +32,9 @@ class LoginPresenter(val view: LoginContract.View,
                 possibleProjectSecret)
                 .subscribe(
                     { token ->
-                        dbManager.signIn(token)
                         secureDataManager.signedInProjectId = possibleProjectId
-                        view.returnSuccessfulResult()
+                        view.dismissProgressDialog()
+                        view.returnSuccessfulResult(token)
                     },
                     { e ->
                         e.printStackTrace()

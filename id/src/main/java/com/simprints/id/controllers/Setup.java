@@ -94,25 +94,19 @@ public class Setup {
             return;
         }
 
-        // Step 2: extractFrom database context + port db from aa to realm if needed . Only has to be done once.
-        if (!dataManager.isDbInitialised()) {
-            this.initDbContext(activity);
-            return;
-        }
-
-        // Step 3: extractFrom scanner object.
+        // Step 2: extractFrom scanner object.
         if (appState.getScanner() == null) {
             this.initScanner(activity);
             return;
         }
 
-        // Step 4: connect with scanner. Must be done every time the scanner is not connected
+        // Step 3: connect with scanner. Must be done every time the scanner is not connected
         if (!appState.getScanner().isConnected()) {
             this.connectToScanner(activity);
             return;
         }
 
-        // Step 5: check if it's a verify intent. If it is, check if the person is in the database.
+        // Step 4: check if it's a verify intent. If it is, check if the person is in the database.
         // If they are, check if connected to the internet.
         if (!guidExists) {
             this.checkIfVerifyAndGuidExists(activity);
@@ -120,25 +114,25 @@ public class Setup {
         }
 
 
-        // Step 6: reset the UI. This is necessary for the trigger button to work.
+        // Step 5: reset the UI. This is necessary for the trigger button to work.
         if (!uiResetSinceConnection) {
             this.resetUi(activity);
             return;
         }
 
-        // Step 7: turn on the un20 if needed.
+        // Step 6: turn on the un20 if needed.
         this.wakeUpUn20(activity);
     }
 
     // STEP 1
     private void requestPermissions(@NonNull Activity activity) {
-        onProgress(0, R.string.launch_checking_permissions);
+        onProgress(15, R.string.launch_checking_permissions);
         PermissionManager.requestAllPermissions(activity, dataManager.getCallingPackage());
     }
 
     // STEP 2
     private void initDbContext(@NonNull final Activity activity) {
-        onProgress(10, R.string.updating_database);
+        onProgress(30, R.string.updating_database);
         try {
             dataManager.initialiseDb(dataManager.getProjectId());
         } catch (UninitializedDataManagerError error) {
@@ -149,7 +143,7 @@ public class Setup {
 
     // STEP 3
     private void initScanner(@NonNull final Activity activity) {
-        callback.onProgress(40, R.string.launch_bt_connect);
+        callback.onProgress(45, R.string.launch_bt_connect);
         List<String> pairedScanners = ScannerUtils.getPairedScanners();
         if (pairedScanners.size() == 0) {
             onAlert(ALERT_TYPE.NOT_PAIRED);
@@ -169,7 +163,7 @@ public class Setup {
 
     // STEP 4
     private void connectToScanner(@NonNull final Activity activity) {
-        callback.onProgress(50, R.string.launch_bt_connect);
+        callback.onProgress(60, R.string.launch_bt_connect);
 
         appState.getScanner().connect(new ScannerCallback() {
             @Override
@@ -222,7 +216,7 @@ public class Setup {
             return;
         }
 
-        callback.onProgress(60, R.string.launch_checking_person_in_db);
+        callback.onProgress(70, R.string.launch_checking_person_in_db);
 
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = dataManager.getPatientId();
@@ -277,7 +271,7 @@ public class Setup {
 
     // STEP 6
     private void resetUi(@NonNull final Activity activity) {
-        callback.onProgress(70, R.string.launch_setup);
+        callback.onProgress(80, R.string.launch_setup);
 
         appState.getScanner().resetUI(new ScannerCallback() {
             @Override
@@ -303,7 +297,7 @@ public class Setup {
 
     // STEP 7
     private void wakeUpUn20(@NonNull final Activity activity) {
-        callback.onProgress(85, R.string.launch_wake_un20);
+        callback.onProgress(90, R.string.launch_wake_un20);
 
         appState.getScanner().un20Wakeup(new ScannerCallback() {
             @Override

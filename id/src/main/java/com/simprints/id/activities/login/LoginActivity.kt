@@ -10,7 +10,9 @@ import android.widget.Toast
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.IntentKeys
 import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.models.Token
 import com.simprints.id.tools.extensions.scannerAppIntent
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.indeterminateProgressDialog
@@ -39,7 +41,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         setContentView(R.layout.activity_login)
 
         val app = application as Application
-        viewPresenter = LoginPresenter(this, app.secureDataManager, app.dataManager, ProjectAuthenticator(app.secureDataManager), SafetyNet.getClient(this))
+        viewPresenter = LoginPresenter(this, app.secureDataManager, ProjectAuthenticator(app.secureDataManager, app.dataManager), SafetyNet.getClient(this))
         viewPresenter.start()
 
         initUI()
@@ -119,8 +121,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         progressDialog.dismiss()
     }
 
-    override fun returnSuccessfulResult() {
-        setResult(LOGIN_SUCCESSED)
+    override fun returnSuccessfulResult(token: Token) {
+        val resultData = Intent()
+        resultData.putExtra(IntentKeys.loginActivityTokenReturn, token.value)
+
+        setResult(LOGIN_SUCCESSED, resultData)
         finish()
     }
 }
