@@ -8,11 +8,13 @@ import com.google.gson.Gson
 import com.simprints.id.controllers.Setup
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
-import com.simprints.id.data.db.analytics.AnalyticsManager
-import com.simprints.id.data.db.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
-import com.simprints.id.data.db.remote.FirebaseRtdbManager
+import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.network.ApiManagerImpl
@@ -129,11 +131,15 @@ class Application : MultiDexApplication() {
     }
 
     private val localDbManager: LocalDbManager by lazy {
-        RealmDbManager()
+        RealmDbManager(this)
     }
 
     private val remoteDbManager: RemoteDbManager by lazy {
-        FirebaseRtdbManager()
+        FirebaseManager(this)
+    }
+
+    private val dbManager: DbManager by lazy {
+        DbManagerImpl(localDbManager, remoteDbManager)
     }
 
     private val apiManager: ApiManager by lazy {
@@ -160,7 +166,7 @@ class Application : MultiDexApplication() {
     }
 
     val dataManager: DataManager by lazy {
-        DataManagerImpl(this, preferencesManager, localDbManager, remoteDbManager,
+        DataManagerImpl(this, preferencesManager, dbManager,
                 apiManager, analyticsManager, secureDataManager)
     }
 
