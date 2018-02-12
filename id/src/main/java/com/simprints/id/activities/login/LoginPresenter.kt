@@ -22,7 +22,7 @@ class LoginPresenter(val view: LoginContract.View,
         view.openScanQRApp()
     }
 
-    override fun userDidWantToSignIn(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String) {
+    override fun userDidWantToSignIn(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String, possibleLegacyApiKey: String?) {
 
         if (!possibleProjectId.isEmpty() && !possibleProjectSecret.isEmpty() && !possibleUserId.isEmpty()) {
             view.showProgressDialog(R.string.progress_title, R.string.login_progress_message)
@@ -32,6 +32,7 @@ class LoginPresenter(val view: LoginContract.View,
                 possibleProjectSecret)
                 .subscribe(
                     { token ->
+                        secureDataManager.storeProjectIdWithLegacyApiKeyPair(possibleProjectId, possibleLegacyApiKey)
                         secureDataManager.signedInProjectId = possibleProjectId
                         view.dismissProgressDialog()
                         view.returnSuccessfulResult(token)

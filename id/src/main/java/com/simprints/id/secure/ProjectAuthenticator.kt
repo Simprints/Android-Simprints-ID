@@ -65,10 +65,10 @@ class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
 
     private fun Single<out Token>.initFirebase(projectId: String): Single<Token> =
         flatMap { token ->
-            if(!dataManager.isDbInitialised()) {
+            if (!dataManager.isDbInitialised(projectId)) {
                 dataManager.initialiseDb(projectId)
             }
-            dataManager.signIn(token)
+            dataManager.signIn(projectId, token)
             SingleJust(token)
         }
 

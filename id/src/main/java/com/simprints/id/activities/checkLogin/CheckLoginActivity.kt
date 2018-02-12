@@ -94,5 +94,4 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
             finish()
         }
     }
-
 }
