@@ -41,7 +41,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         setContentView(R.layout.activity_login)
 
         val app = application as Application
-        viewPresenter = LoginPresenter(this, app.secureDataManager, ProjectAuthenticator(app.secureDataManager, app.dataManager), SafetyNet.getClient(this))
+        var projectAuthenticator = ProjectAuthenticator(app.secureDataManager, app.dataManager, SafetyNet.getClient(this))
+        viewPresenter = LoginPresenter(this, app.secureDataManager, projectAuthenticator)
         viewPresenter.start()
 
         initUI()
