@@ -6,22 +6,14 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.Tokens
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.internal.operators.single.SingleJust
 import io.reactivex.schedulers.Schedulers
 
-/**      CALLER
-ProjectAuthenticator(secureDataManager).authenticateWithExistingCredentials(nonceScope) **OR**
-ProjectAuthenticator(secureDataManager).authenticateWithNewCredentials(nonceScope, projectId, encryptedProjectSecret)
-.subscribe(
-{ token -> print("we got it!!! $token") },
-{ e -> handleException(e) }
-)
- */
-class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
+class ProjectAuthenticator(secureDataManager: SecureDataManager,
                            private val dataManager: DbManager,
                            apiClient: ApiServiceInterface = ApiService().api) {
 
@@ -31,10 +23,10 @@ class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
     private val authManager = AuthManager(apiClient)
     var attestationManager = AttestationManager()
 
-    fun authenticateWithNewCredentials(safetyNetClient: SafetyNetClient, nonceScope: NonceScope, projectSecret: String): Single<Token> =
+    fun authenticateWithNewCredentials(safetyNetClient: SafetyNetClient, nonceScope: NonceScope, projectSecret: String): Single<Tokens> =
         authenticate(safetyNetClient, nonceScope, getEncryptedProjectSecret(projectSecret))
 
-    private fun authenticate(safetyNetClient: SafetyNetClient, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<Token> =
+    private fun authenticate(safetyNetClient: SafetyNetClient, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<Tokens> =
         combineProjectSecretAndGoogleAttestationObservables(safetyNetClient, nonceScope, encryptedProjectSecret)
             .makeAuthRequest()
             .initFirebase(nonceScope.projectId)
@@ -63,16 +55,18 @@ class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
             AuthRequest(encryptedProjectSecret, projectId, userId, attestation)
         }
 
-    private fun Single<out Token>.initFirebase(projectId: String): Single<Token> =
-        flatMap { token ->
+    private fun Single<out Tokens>.initFirebase(projectId: String): Single<Tokens> =
+        flatMap { tokens ->
             if (!dataManager.isDbInitialised(projectId)) {
                 dataManager.initialiseDb(projectId)
             }
-            dataManager.signIn(projectId, token)
-            SingleJust(token)
+
+            //TODO: Fix it when we implement the 2 firebase apps in FirebaseManager
+            dataManager.signIn(projectId, tokens)
+            SingleJust(tokens)
         }
 
-    private fun Single<out AuthRequest>.makeAuthRequest(): Single<Token> =
+    private fun Single<out AuthRequest>.makeAuthRequest(): Single<Tokens> =
         flatMap { authRequest ->
             authManager
             .requestAuthToken(authRequest)

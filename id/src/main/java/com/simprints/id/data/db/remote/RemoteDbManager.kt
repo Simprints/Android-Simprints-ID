@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.remote
 
 import com.simprints.id.data.models.Session
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libdata.AuthListener
 import com.simprints.libdata.ConnectionListener
@@ -19,7 +19,7 @@ interface RemoteDbManager {
     // Lifecycle
     fun initialiseRemoteDb(projectId: String)
 
-    fun signInToRemoteDb(projectId: String, token: Token)
+    fun signInToRemoteDb(projectId: String, token: Tokens)
     fun signOutOfRemoteDb(projectId: String)
 
     fun isRemoteDbInitialized(projectId: String): Boolean

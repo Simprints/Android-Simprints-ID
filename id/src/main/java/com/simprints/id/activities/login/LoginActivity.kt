@@ -12,7 +12,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.Tokens
 import com.simprints.id.tools.extensions.scannerAppIntent
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.indeterminateProgressDialog
@@ -122,9 +122,10 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         progressDialog.dismiss()
     }
 
-    override fun returnSuccessfulResult(token: Token) {
+    override fun returnSuccessfulResult(token: Tokens) {
         val resultData = Intent()
-        resultData.putExtra(IntentKeys.loginActivityTokenReturn, token.value)
+        //TODO: Fix it when we will full implemented the logic for the 2 tokens
+        resultData.putExtra(IntentKeys.loginActivityTokenReturn, token.legacyToken)
 
         setResult(LOGIN_SUCCESSED, resultData)
         finish()
