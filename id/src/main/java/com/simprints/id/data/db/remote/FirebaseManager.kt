@@ -15,6 +15,7 @@ import com.google.firebase.storage.UploadTask
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
+import com.simprints.id.exceptions.safe.DifferentProjectSignedInException
 import com.simprints.id.exceptions.unsafe.FirebaseUninitialisedError
 import com.simprints.id.secure.models.Token
 import com.simprints.libcommon.Person
@@ -39,45 +40,67 @@ import java.io.IOException
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
-class FirebaseManager(private val appContext: Context) : RemoteDbManager {
+class FirebaseManager(private val appContext: Context,
+                      remoteDbAuthListenerManager: RemoteDbAuthListenerManager) :
+    RemoteDbManager,
+    RemoteDbAuthListenerManager by remoteDbAuthListenerManager {
+
+    private lateinit var legacyFirebaseAppName: String
+    private lateinit var firestoreFirebaseAppName: String
 
     // Firebase
-    private var firebaseApp: FirebaseApp? = null
+    private lateinit var legacyFirebaseApp: FirebaseApp
+    private lateinit var firestoreFirebaseApp: FirebaseApp
     private lateinit var projectRef: DatabaseReference
 
     // Connection listener
     @Volatile
-    private var isRemoteConnected: Boolean = false
+    private var isRemoteConnected = false
     private lateinit var connectionDbRef: DatabaseReference
     private lateinit var connectionDispatcher: ValueEventListener
     private var connectionListeners = mutableSetOf<ConnectionListener>()
 
     // Authentication listener
-    @Volatile
-    private var signedIn = false
-    private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var authDispatcher: FirebaseAuth.AuthStateListener
-    private var authListeners = mutableSetOf<AuthListener>()
+    private lateinit var legacyFirebaseAuth: FirebaseAuth
+    private lateinit var firestoreFirebaseAuth: FirebaseAuth
+
 
     // Lifecycle
     override fun initialiseRemoteDb(projectId: String) {
-        firebaseApp =
-            try {
-                Timber.d("Trying to initialiseDb Firebase app")
-                FirebaseApp.initializeApp(appContext, FirebaseOptions.fromResource(appContext), projectId)
-            } catch (stateException: IllegalStateException) {
-                Timber.d("Firebase app already initialized")
-                FirebaseApp.getInstance(projectId)
-            }
-                .also {
-                    firebaseAuth = FirebaseAuth.getInstance(it)
-                }
+        initialiseLegacyFirebaseApp(projectId)
+        initialiseFirestoreFirebaseApp(projectId)
+        applyConnectionListeners(legacyFirebaseApp)
+        applyAuthListeners(legacyFirebaseAuth, legacyFirebaseAppName)
+    }
 
-        Utils.forceSync(firebaseApp)
-        projectRef = projectRef(firebaseApp, projectId)
+    private fun initialiseLegacyFirebaseApp(projectId: String) {
+        legacyFirebaseAppName = getLegacyAppNameFromProjectId(projectId)
+        legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName)
+        legacyFirebaseAuth = initialiseFirebaseAuth(legacyFirebaseApp)
 
-        // Initialize connection listener
-        connectionListeners = mutableSetOf()
+        Utils.forceSync(legacyFirebaseApp)
+        projectRef = projectRef(legacyFirebaseApp, projectId)
+    }
+
+    private fun initialiseFirestoreFirebaseApp(projectId: String) {
+        firestoreFirebaseAppName = getFirestoreAppNameFromProjectId(projectId)
+        firestoreFirebaseApp = initialiseFirebaseApp(firestoreFirebaseAppName)
+        firestoreFirebaseAuth = initialiseFirebaseAuth(firestoreFirebaseApp)
+    }
+
+    private fun initialiseFirebaseApp(appName: String): FirebaseApp =
+        try {
+            Timber.d("Trying to initialise Firebase app: $appName")
+            FirebaseApp.initializeApp(appContext, FirebaseOptions.fromResource(appContext), appName)
+        } catch (stateException: IllegalStateException) {
+            Timber.d("Firebase app: $appName already initialized")
+            FirebaseApp.getInstance(appName)
+        }
+
+    private fun initialiseFirebaseAuth(firebaseApp: FirebaseApp): FirebaseAuth =
+        FirebaseAuth.getInstance(firebaseApp)
+
+    private fun applyConnectionListeners(firebaseApp: FirebaseApp) {
         connectionDispatcher = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val connected = dataSnapshot.getValue(Boolean::class.java)!!
@@ -102,42 +125,11 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
         connectionDbRef = Utils.getDatabase(firebaseApp).getReference(".info/connected")
         connectionDbRef.addValueEventListener(connectionDispatcher)
         Timber.d("Connection listener set")
-
-        // Initialize auth listener
-        authListeners = mutableSetOf()
-        authDispatcher = FirebaseAuth.AuthStateListener { firebaseAuth ->
-            val fbUser = firebaseAuth.currentUser
-            if (fbUser != null) {
-                //New user != signed in user
-                if (fbUser.uid != projectId) {
-                    Timber.d("Signed out by other user")
-                    firebaseAuth.signOut()
-                    signedIn = false
-                } else {
-                    Timber.d("Signed in")
-                    synchronized(authListeners) {
-                        for (authListener in authListeners)
-                            authListener.onSignIn()
-                    }
-                    // setSync()
-                } //User is signed in
-            } else {
-                Timber.d("Signed out")
-                synchronized(authListeners) {
-                    for (authListener in authListeners)
-                        authListener.onSignOut()
-                }
-                signedIn = false
-            } //User is signed out
-        }
-        firebaseAuth.addAuthStateListener(authDispatcher)
-        Timber.d("Auth state listener set")
     }
 
     override fun signInToRemoteDb(projectId: String, token: Token) {
         // TODO : turn into an RxJava Single Observable
-        signedIn = true
-        firebaseAuth.signInWithCustomToken(token.value).addOnCompleteListener { task ->
+        legacyFirebaseAuth.signInWithCustomToken(token.value).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 //emitter.onSuccess(token)
                 Timber.d("Firebase Auth signInWithCustomToken successful")
@@ -149,10 +141,11 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
     }
 
     override fun signOutOfRemoteDb(projectId: String) {
-        firebaseAuth.signOut()
+        legacyFirebaseAuth.signOut()
+        firestoreFirebaseAuth.signOut()
 
         // Unregister listeners
-        firebaseAuth.removeAuthStateListener(authDispatcher)
+        removeAuthListeners(legacyFirebaseAuth)
         connectionDbRef.removeEventListener(connectionDispatcher)
     }
 
@@ -160,23 +153,24 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun isSignedIn(projectId: String): Boolean =
-        signedIn
+    @Throws(DifferentProjectSignedInException::class)
+    override fun isSignedIn(projectId: String): Boolean {
+        return if (isSignedIn) {
+            isSignedInUserSameAsProjectId(projectId)
+        } else false
+    }
+
+    private fun isSignedInUserSameAsProjectId(projectId: String): Boolean {
+        val firebaseUser = legacyFirebaseAuth.currentUser
+        firebaseUser?.let {
+            if (it.uid == getLegacyAppNameFromProjectId(projectId)) {
+                return true
+            } else throw DifferentProjectSignedInException()
+        } ?: return false
+    }
 
     override fun isRemoteConnected(): Boolean =
         isRemoteConnected
-
-    override fun registerRemoteAuthListener(authListener: AuthListener) {
-        return synchronized(authListeners) {
-            authListeners.add(authListener)
-        }
-    }
-
-    override fun unregisterRemoteAuthListener(authListener: AuthListener) {
-        return synchronized(authListeners) {
-            authListeners.remove(authListener)
-        }
-    }
 
     override fun registerRemoteConnectionListener(connectionListener: ConnectionListener) {
         synchronized(connectionListeners) {
@@ -201,7 +195,7 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
         val updates = HashMap<String, Any>()
         updates[patientNode(fbPerson.patientId)] = fbPerson.toMap()
 
-        userRef(firebaseApp, projectId, fbPerson.userId).addListenerForSingleValueEvent(object : ValueEventListener {
+        userRef(legacyFirebaseApp, projectId, fbPerson.userId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val user = dataSnapshot.getValue<fb_User>(fb_User::class.java)
                 if (user == null) {
@@ -238,7 +232,7 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
     }
 
     override fun saveIdentificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
-        idEventRef(firebaseApp, projectId).push().setValue(fb_IdEvent(probe, userId, androidId, moduleId, matchSize, matches, sessionId))
+        idEventRef(legacyFirebaseApp, projectId).push().setValue(fb_IdEvent(probe, userId, androidId, moduleId, matchSize, matches, sessionId))
     }
 
     override fun updateIdentificationInRemote(projectId: String, selectedGuid: String, deviceId: String, sessionId: String) {
@@ -246,23 +240,20 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
     }
 
     override fun saveVerificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
-        vfEventRef(firebaseApp, projectId).push().setValue(fb_VfEvent(probe, userId, androidId, moduleId, patientId, match, sessionId, guidExistsResult))
+        vfEventRef(legacyFirebaseApp, projectId).push().setValue(fb_VfEvent(probe, userId, androidId, moduleId, patientId, match, sessionId, guidExistsResult))
     }
 
     override fun saveRefusalFormInRemote(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String) {
-        refusalRef(firebaseApp).push().setValue(fb_RefusalForm(refusalForm, projectId, userId, sessionId))
+        refusalRef(legacyFirebaseApp).push().setValue(fb_RefusalForm(refusalForm, projectId, userId, sessionId))
     }
 
     override fun saveSessionInRemote(session: Session) {
-        val task = sessionRef(firebaseApp).push().setValue(session.toFirebaseSession())
+        val task = sessionRef(legacyFirebaseApp).push().setValue(session.toFirebaseSession())
         Tasks.await(task)
     }
 
-    override fun getSyncManager(projectId: String): NaiveSyncManager {
-        firebaseApp?.let { firebaseApp ->
-            return NaiveSyncManager(firebaseApp, projectId)
-        } ?: throw FirebaseUninitialisedError()
-    }
+    override fun getSyncManager(projectId: String): NaiveSyncManager =
+        NaiveSyncManager(legacyFirebaseApp, projectId)
 
     override fun recoverLocalDbSendToRemote(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
         // TODO : factor into a class
@@ -324,7 +315,7 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
         })
 
         // Get a reference to [bucket]/recovered-realm-dbs/[projectKey]/[userId]/[db-name].json
-        firebaseApp?.let { firebaseApp ->
+        legacyFirebaseApp.let { firebaseApp ->
             val storage = FirebaseStorage.getInstance(firebaseApp)
             val rootRef = storage.getReferenceFromUrl(storageBucketUrl)
             val recoveredRealmDbsRef = rootRef.child("recovered-realm-dbs")
@@ -364,5 +355,13 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
                     Timber.d("Realm DB upload progress: ${taskSnapshot.bytesTransferred}")
                 }
         } ?: throw FirebaseUninitialisedError()
+    }
+
+    companion object {
+        fun getLegacyAppNameFromProjectId(projectId: String): String =
+            projectId
+
+        fun getFirestoreAppNameFromProjectId(projectId: String): String =
+            projectId + "-fs"
     }
 }

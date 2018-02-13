@@ -87,10 +87,10 @@ class DataManagerImpl(private val context: Context,
         dbManager.initialiseDb(projectId)
     }
 
-    override fun signOut() {
+    override fun signOut(projectId: String) {
         dbManager.unregisterRemoteConnectionListener(connectionStateLogger)
         dbManager.unregisterRemoteAuthListener(authStateLogger)
-        dbManager.signOut()
+        dbManager.signOut(projectId)
     }
 
     private val connectionStateLogger = object : ConnectionListener {
