@@ -9,7 +9,6 @@ import com.simprints.libdata.DataCallback
 import com.simprints.libdata.NaiveSyncManager
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.libdata.models.firebase.fb_Person
-import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
@@ -43,6 +42,4 @@ interface RemoteDbManager: RemoteDbConnectionListenerManager, RemoteDbAuthListen
     fun saveSessionInRemote(session: Session)
 
     fun getSyncManager(projectId: String): NaiveSyncManager
-
-    fun recoverLocalDbSendToRemote(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback)
 }
