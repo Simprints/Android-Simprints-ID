@@ -58,7 +58,7 @@ class LoginActivityTest {
         val controller = createRoboLoginActivity().start().resume().visible()
         val loginAct = controller.get()
         val projectAuthenticator = mock(ProjectAuthenticator::class.java)
-        doReturn(SingleJust(Tokens("firestore_token", "legacy_token"))).`when`(projectAuthenticator).authenticateWithNewCredentials(anyNotNull(), anyNotNull(), anyNotNull())
+        doReturn(SingleJust(Tokens("firestore_token", "legacy_token"))).`when`(projectAuthenticator).authenticateWithNewCredentials(anyNotNull(), anyNotNull())
         loginAct.viewPresenter.projectAuthenticator = projectAuthenticator
         loginAct.loginEditTextUserId.setText("some_user_id")
         loginAct.loginEditTextProjectId.setText("some_project_id")

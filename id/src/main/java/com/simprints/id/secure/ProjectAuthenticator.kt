@@ -15,24 +15,25 @@ import io.reactivex.schedulers.Schedulers
 
 class ProjectAuthenticator(secureDataManager: SecureDataManager,
                            private val dataManager: DbManager,
-                           apiClient: ApiServiceInterface = ApiService().api) {
+                           private val safetyNetClient: SafetyNetClient,
+                           apiClient: ApiServiceInterface = ApiService().api,
+                           private val attestationManager: AttestationManager = AttestationManager()) {
 
     private val projectSecretManager = ProjectSecretManager(secureDataManager)
     private val publicKeyManager = PublicKeyManager(apiClient)
     private val nonceManager = NonceManager(apiClient)
     private val authManager = AuthManager(apiClient)
-    var attestationManager = AttestationManager()
 
-    fun authenticateWithNewCredentials(safetyNetClient: SafetyNetClient, nonceScope: NonceScope, projectSecret: String): Single<Tokens> =
-        authenticate(safetyNetClient, nonceScope, getEncryptedProjectSecret(projectSecret))
+    fun authenticateWithNewCredentials(nonceScope: NonceScope, projectSecret: String): Single<Tokens> =
+        authenticate(nonceScope, getEncryptedProjectSecret(projectSecret))
 
-    private fun authenticate(safetyNetClient: SafetyNetClient, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<Tokens> =
-        combineProjectSecretAndGoogleAttestationObservables(safetyNetClient, nonceScope, encryptedProjectSecret)
+    private fun authenticate(nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<Tokens> =
+        combineProjectSecretAndGoogleAttestationObservables(nonceScope, encryptedProjectSecret)
             .makeAuthRequest()
             .initFirebase(nonceScope.projectId)
             .observeOn(AndroidSchedulers.mainThread())
 
-    private fun combineProjectSecretAndGoogleAttestationObservables(safetyNetClient: SafetyNetClient, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<AuthRequest> =
+    private fun combineProjectSecretAndGoogleAttestationObservables(nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<AuthRequest> =
         Single.zip(
             encryptedProjectSecret.subscribeOn(Schedulers.io()),
             getGoogleAttestation(safetyNetClient, nonceScope).subscribeOn(Schedulers.io()),

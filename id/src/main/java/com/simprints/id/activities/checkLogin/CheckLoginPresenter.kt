@@ -83,7 +83,7 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
 
     private fun isUserSignedIn(): Boolean {
         val encProjectSecret = dataManager.getEncryptedProjectSecretOrEmpty()
-        var storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
+        val storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
         //val isFirebaseTokenValid = dataManager.isSignedIn(storedProjectId)
         val isFirebaseTokenValid = true
 
