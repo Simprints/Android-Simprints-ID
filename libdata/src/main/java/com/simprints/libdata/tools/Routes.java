@@ -18,24 +18,29 @@ public class Routes {
     private static String vfEventRef = "vf-events";
     private static String refusalRef = "refusal-forms";
 
-    public static DatabaseReference projectRef(FirebaseApp app, String apiKey) {
-        return Utils.getDatabase(app).getReference().child(projectRef).child(apiKey);
+    // TODO : Migrate to Firestore
+    public static DatabaseReference projectRef(FirebaseApp app, String projectId) {
+        return Utils.getDatabase(app).getReference().child(projectRef).child(projectId);
     }
 
     public static DatabaseReference sessionRef(FirebaseApp app) {
         return Utils.getDatabase(app).getReference().child(sessionRef);
     }
 
-    public static DatabaseReference idEventRef(FirebaseApp app, String apiKey) {
-        return Utils.getDatabase(app).getReference().child(idEventRef).child(apiKey);
+    public static DatabaseReference userRef(FirebaseApp app, String projectId, String userId) {
+        return Utils.getDatabase(app).getReference(String.format("/projects/%s%s", projectId, userNode(userId)));
     }
 
-    public static DatabaseReference idUpdateRef(String apiKey) {
-        return Utils.getDatabase(null).getReference().child(idUpdateRef).child(apiKey);
+    public static DatabaseReference idEventRef(FirebaseApp app, String projectId) {
+        return Utils.getDatabase(app).getReference().child(idEventRef).child(projectId);
     }
 
-    public static DatabaseReference vfEventRef(FirebaseApp app, String apiKey) {
-        return FirebaseDatabase.getInstance(app).getReference().child(vfEventRef).child(apiKey);
+    public static DatabaseReference idUpdateRef(String projectId) {
+        return Utils.getDatabase(null).getReference().child(idUpdateRef).child(projectId);
+    }
+
+    public static DatabaseReference vfEventRef(FirebaseApp app, String projectId) {
+        return FirebaseDatabase.getInstance(app).getReference().child(vfEventRef).child(projectId);
     }
 
     public static DatabaseReference refusalRef(FirebaseApp app) {

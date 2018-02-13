@@ -257,7 +257,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                             return;
                         }
 
-                        // finish
+                        // signOut
                         int tier1Or2Matches = 0;
                         int tier3Matches = 0;
                         int tier4Matches = 0;
@@ -308,7 +308,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                             return;
                         }
 
-                        // finish
+                        // signOut
                         Intent resultData;
                         resultData = new Intent(com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_INTENT);
                         FormatResult.put(resultData, verification, dataManager.getResultFormat());

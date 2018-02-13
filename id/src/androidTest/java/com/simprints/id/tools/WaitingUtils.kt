@@ -9,12 +9,12 @@ import java.util.concurrent.TimeUnit
 
 object WaitingUtils {
 
-    fun tryOnUiUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Unit) {
+    fun tryOnUiUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Any?) {
         changeUiTimeoutPolicyIfNeeded(timeout)
         tryUntilTimeout(timeout, pollingInterval, snippet, ::waitOnUi)
     }
 
-    fun tryOnSystemUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Unit) {
+    fun tryOnSystemUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Any?) {
         tryUntilTimeout(timeout, pollingInterval, snippet, ::waitOnSystem)
     }
 

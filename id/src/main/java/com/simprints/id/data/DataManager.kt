@@ -1,16 +1,13 @@
 package com.simprints.id.data
 
-import com.simprints.id.data.db.analytics.AnalyticsManager
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Progress
-import com.simprints.libdata.AuthListener
-import com.simprints.libdata.ConnectionListener
 import com.simprints.libdata.DataCallback
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.libdata.tools.Constants
@@ -19,8 +16,7 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Emitter
 
-
-interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, ApiManager,
+interface DataManager : PreferencesManager, DbManager, ApiManager,
         AnalyticsManager, SecureDataManager {
 
     val androidSdkVersion: Int
@@ -37,42 +33,27 @@ interface DataManager : PreferencesManager, LocalDbManager, RemoteDbManager, Api
     fun logConnectionStateChange(connected: Boolean)
     fun logAuthStateChange(authenticated: Boolean)
 
-    // Remote only
-    fun isConnected(): Boolean
+    // DbManager call interception for populating arguments
+    // Lifecycle
+    override fun initialiseDb(projectId: String)
+    override fun signOut(projectId: String)
 
-    fun registerAuthListener(authListener: AuthListener)
-    fun registerConnectionListener(connectionListener: ConnectionListener)
-    fun unregisterAuthListener(authListener: AuthListener)
-    fun unregisterConnectionListener(connectionListener: ConnectionListener)
-    fun updateIdentification(apiKey: String, selectedGuid: String)
-    fun saveSession()
-
-    // Local only
+    // Data transfer
+    fun savePerson(person: Person)
+    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
     fun getPeopleCount(group: Constants.GROUP): Long
 
-    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP,
-                   callback: DataCallback?)
+    fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
+    fun updateIdentification(projectId: String, selectedGuid: String)
 
-    // Local + remote which need to be split into smaller bits
-    fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback)
+    fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
 
-    fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>): Boolean
-    fun savePerson(person: Person): Boolean
-    fun saveRefusalForm(refusalForm: RefusalForm): Boolean
-    fun saveVerification(probe: Person, match: Verification?,
-                         guidExistsResult: VERIFY_GUID_EXISTS_RESULT): Boolean
+    fun saveRefusalForm(refusalForm: RefusalForm)
 
-    fun loadPerson(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
+    fun saveSession()
 
-    // Local + remote + api which need to be split into smaller bits
-    fun isInitialized(): Boolean
-
-    fun initialize(callback: DataCallback)
-    fun signIn(callback: DataCallback?)
     fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
-    fun syncUser(userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
-    fun finish()
+    fun syncUser(isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
 
-    // Secure data
-    fun getApiKeyOrEmpty(): String
+    fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback)
 }

@@ -1,5 +1,6 @@
 package com.simprints.id.di
 
+import android.content.Context
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
@@ -7,15 +8,18 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.controllers.Setup
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
-import com.simprints.id.data.db.analytics.AnalyticsManager
-import com.simprints.id.data.db.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
-import com.simprints.id.data.db.remote.FirebaseRtdbManager
+import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.network.ApiManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.tools.AppState
@@ -34,9 +38,12 @@ import javax.inject.Singleton
 open class AppModule(val app: Application) {
 
     @Provides @Singleton fun provideApplication(): Application = app
+    @Provides @Singleton fun provideContext(): Context = app
 
-    @Provides @Singleton fun provideLocalDbManager(): LocalDbManager = RealmDbManager()
-    @Provides @Singleton fun provideRemoteDbManager(): RemoteDbManager = FirebaseRtdbManager()
+    @Provides @Singleton fun provideLocalDbManager(ctx: Context): LocalDbManager = RealmDbManager(ctx)
+    @Provides @Singleton fun provideRemoteDbManager(ctx: Context): RemoteDbManager = FirebaseManager(ctx)
+    @Provides @Singleton fun provideDbManager(localDbManager: LocalDbManager, remoteDbManager: RemoteDbManager): DbManager = DbManagerImpl(localDbManager, remoteDbManager)
+
     @Provides @Singleton fun provideApiManager(): ApiManager = ApiManagerImpl()
     @Provides @Singleton fun provideFabric(app: Application): Fabric = Fabric.Builder(app).kits(Crashlytics()).debuggable(BuildConfig.DEBUG).build()
     @Provides @Singleton fun provideFirebaseAnalytics(app: Application): FirebaseAnalytics =
@@ -46,16 +53,14 @@ open class AppModule(val app: Application) {
         }
 
     @Provides @Singleton fun provideAnalyticsManager(firebaseAnalytics: FirebaseAnalytics): AnalyticsManager = FirebaseAnalyticsManager(firebaseAnalytics)
-    @Provides @Singleton fun provideSecureDataManager(): SecureDataManager = SecureDataManagerImpl()
+    @Provides @Singleton fun provideSecureDataManager(improvedSharedPreferences: ImprovedSharedPreferences): SecureDataManager = SecureDataManagerImpl(improvedSharedPreferences)
     @Provides @Singleton fun provideDataManager(app: Application,
                                                 preferencesManager: PreferencesManager,
-                                                localDbManager: LocalDbManager,
-                                                remoteDbManager: RemoteDbManager,
+                                                dbManager: DbManager,
                                                 apiManager: ApiManager,
                                                 analyticsManager: AnalyticsManager,
                                                 secureDataManager: SecureDataManager): DataManager =
-        DataManagerImpl(app, preferencesManager, localDbManager, remoteDbManager,
-            apiManager, analyticsManager, secureDataManager)
+        DataManagerImpl(app, preferencesManager, dbManager, apiManager, analyticsManager, secureDataManager)
 
 
     @Provides @Singleton fun provideAppState(): AppState = AppState()

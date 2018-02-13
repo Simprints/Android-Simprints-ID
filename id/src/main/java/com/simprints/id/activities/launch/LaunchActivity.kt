@@ -10,8 +10,6 @@ import android.view.View
 import android.view.WindowManager
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.AlertActivity
-import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.MainActivity
 import com.simprints.id.activities.RefusalActivity
 import com.simprints.id.controllers.Setup
@@ -26,6 +24,7 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.Vibrate.vibrate
+import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
@@ -37,7 +36,7 @@ import java.util.*
 import javax.inject.Inject
 
 @SuppressLint("HardwareIds")
-class LaunchActivity : AppCompatActivity() {
+open class LaunchActivity : AppCompatActivity() {
 
     // Scanner button callback
     private val scannerButton = ButtonListener {
@@ -61,21 +60,12 @@ class LaunchActivity : AppCompatActivity() {
     @Inject lateinit var appState: AppState
     @Inject lateinit var setup: Setup
     @Inject lateinit var timeHelper:TimeHelper
-    @Inject lateinit var sessionParametersExtractor: SessionParametersExtractor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injectDependencies()
-        initSession()
         initView()
         RemoteConfig.init()
-        val callout = parseCallout()
-        try {
-            extractSessionParameters(callout)
-        } catch (exception: InvalidCalloutError) {
-            launchAlert(exception.alertType)
-            return
-        }
         positionTracker.start()
         setup.start(this, getSetupCallback())
     }
@@ -92,30 +82,8 @@ class LaunchActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
-    private fun initSession() {
-        dataManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
-    }
-
-    private fun newSessionId(): String {
-        return UUID.randomUUID().toString()
-    }
-
-    private fun parseCallout(): Callout =
-        intent.toCallout()
-            .apply {
-                dataManager.logCallout(this)
-            }
-
-    private fun extractSessionParameters(callout: Callout) {
-        val sessionParameters = sessionParametersExtractor.extractFrom(callout)
-        dataManager.sessionParameters = sessionParameters
-        dataManager.apiKey = sessionParameters.apiKey
-        dataManager.appKey = sessionParameters.apiKey.substring(0, 8)
-        dataManager.logUserProperties()
-    }
-
     // Setup callback
-    private fun getSetupCallback() : SetupCallback =
+    private fun getSetupCallback(): SetupCallback =
         object : SetupCallback {
             override fun onSuccess() {
                 dataManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
@@ -144,25 +112,18 @@ class LaunchActivity : AppCompatActivity() {
             }
 
             override fun onAlert(alertType: ALERT_TYPE) {
-                launchAlert(alertType)
+                launchAlertAndStopSetup(alertType)
             }
         }
 
-    /**
-     * Start alert activity
-     */
-    private fun launchAlert(alertType: ALERT_TYPE) {
+    fun launchAlertAndStopSetup(alertType: ALERT_TYPE) {
         if (launchOutOfFocus)
             return
 
         launchOutOfFocus = true
         setup.stop()
-        val intent = Intent(this, AlertActivity::class.java)
-        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType)
-        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST)
+        launchAlert(alertType)
     }
-
-
 
     private fun tryAgain() {
         launchOutOfFocus = false
@@ -215,19 +176,22 @@ class LaunchActivity : AppCompatActivity() {
         setResult(resultCode, resultData)
         dataManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
         async(UI) {
-            bg { dataManager.saveSession() }.await()
+            try {
+                bg { dataManager.saveSession() }.await()
+            } catch (exception: Throwable) {
+                Log.d(this@LaunchActivity, exception.message ?: "")
+            }
             finish()
         }
     }
 
     override fun onDestroy() {
-        if (dataManager.isInitialized()) {
+        if (dataManager.isDbInitialised(dataManager.signedInProjectId)) {
             try {
-                dataManager.finish()
+                dataManager.signOut(dataManager.signedInProjectId)
             } catch (error: UninitializedDataManagerError) {
                 dataManager.logError(error)
             }
-
         }
 
         positionTracker.finish()
@@ -256,5 +220,4 @@ class LaunchActivity : AppCompatActivity() {
         startActivityForResult(Intent(this@LaunchActivity, MainActivity::class.java), MAIN_ACTIVITY_REQUEST)
         launchLayout.visibility = View.INVISIBLE
     }
-
 }
