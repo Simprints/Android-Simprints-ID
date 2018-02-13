@@ -11,11 +11,11 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.FirebaseAnalyticsManager
-import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.tools.roboletric.createRoboCheckLoginViewActivity
 import com.simprints.id.tools.roboletric.getRoboSharedPreferences
+import com.simprints.id.tools.roboletric.mockLocalDbManager
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -40,7 +40,8 @@ class CheckLoginTestActivity {
         analyticsManagerMock = mock(FirebaseAnalyticsManager::class.java)
         app = (RuntimeEnvironment.application as Application)
         app.analyticsManager = analyticsManagerMock
-        app.localDbManager = mock(RealmDbManager::class.java)
+
+        mockLocalDbManager(app)
     }
 
     @Test

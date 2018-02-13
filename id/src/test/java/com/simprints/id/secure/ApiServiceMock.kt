@@ -2,7 +2,7 @@ package com.simprints.id.secure
 
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.Tokens
 import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.Response
@@ -11,7 +11,7 @@ import retrofit2.http.Query
 import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.Calls
 
-// It's required to use NetworkBehavior, even if response is not used in the tests (e.g failing responses due to no connectivity)
+// It's required to use NetworkBehavior, even if response is not used in the tests (e.g failing responses due to no connectivity).
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class ApiServiceMock(private val delegate: BehaviorDelegate<ApiServiceInterface>) : ApiServiceInterface {
 
@@ -25,9 +25,9 @@ class ApiServiceMock(private val delegate: BehaviorDelegate<ApiServiceInterface>
         return delegate.returning(buildSuccessResponseWith(nonceResponse)).nonce(headers, key)
     }
 
-    override fun auth(@HeaderMap headers: Map<String, String>, @Query("key") key: String): Single<Token> {
-        val token = Token("custom_token")
-        return delegate.returning(buildSuccessResponseWith(token)).auth(headers)
+    override fun auth(@HeaderMap headers: Map<String, String>, @Query("key") key: String): Single<Tokens> {
+        val tokens = Tokens("firestore_token", "legacy_token")
+        return delegate.returning(buildSuccessResponseWith(tokens)).auth(headers)
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {

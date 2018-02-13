@@ -20,7 +20,10 @@ class AttestationManager {
                }
                .addOnFailureListener { e ->
                    print(e)
-                   emitter.onError(e)
+
+                   // We go ahead with the auth flow, the server will reject the request.
+                   // So we can turn off the Safity check on the server if we need.
+                   emitter.onSuccess(AttestToken(""))
                }
        }
    }

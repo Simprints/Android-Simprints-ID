@@ -16,7 +16,7 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
 import com.simprints.id.exceptions.unsafe.FirebaseUninitialisedError
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libdata.*
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
@@ -134,10 +134,10 @@ class FirebaseManager(private val appContext: Context) : RemoteDbManager {
         Timber.d("Auth state listener set")
     }
 
-    override fun signInToRemoteDb(projectId: String, token: Token) {
+    override fun signInToRemoteDb(projectId: String, token: Tokens) {
         // TODO : turn into an RxJava Single Observable
         signedIn = true
-        firebaseAuth.signInWithCustomToken(token.value).addOnCompleteListener { task ->
+        firebaseAuth.signInWithCustomToken(token.legacyToken).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 //emitter.onSuccess(token)
                 Timber.d("Firebase Auth signInWithCustomToken successful")

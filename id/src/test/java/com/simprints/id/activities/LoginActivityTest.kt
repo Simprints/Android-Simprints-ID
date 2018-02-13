@@ -3,17 +3,19 @@ package com.simprints.id.activities
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.Tokens
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.tools.roboletric.createRoboLoginActivity
 import com.simprints.id.tools.roboletric.injectHowToResolveScannerAppIntent
+import com.simprints.id.tools.roboletric.mockLocalDbManager
 import io.reactivex.internal.operators.single.SingleJust
-import junit.framework.Assert.*
+import junit.framework.Assert.assertNotNull
+import junit.framework.Assert.assertTrue
 import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,7 +36,7 @@ class LoginActivityTest {
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
-        app.localDbManager = mock(RealmDbManager::class.java)
+        mockLocalDbManager(app)
     }
 
     @Test
@@ -56,7 +58,7 @@ class LoginActivityTest {
         val controller = createRoboLoginActivity().start().resume().visible()
         val loginAct = controller.get()
         val projectAuthenticator = mock(ProjectAuthenticator::class.java)
-        doReturn(SingleJust(Token("token"))).`when`(projectAuthenticator).authenticateWithNewCredentials(anyNotNull(), anyNotNull(), anyNotNull())
+        doReturn(SingleJust(Tokens("firestore_token", "legacy_token"))).`when`(projectAuthenticator).authenticateWithNewCredentials(anyNotNull(), anyNotNull(), anyNotNull())
         loginAct.viewPresenter.projectAuthenticator = projectAuthenticator
         loginAct.loginEditTextUserId.setText("some_user_id")
         loginAct.loginEditTextProjectId.setText("some_project_id")
@@ -85,7 +87,7 @@ class LoginActivityTest {
         assertNotNull(nextActivity)
 
         val isIntentForGooglePlay: Boolean = nextActivity.dataString.contains("play.google.com")
-        assert(isIntentForGooglePlay)
+        assertTrue(isIntentForGooglePlay)
     }
 
     @Test

@@ -4,16 +4,15 @@ import com.google.android.gms.safetynet.SafetyNet
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.db.local.RealmDbManager
-import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.createMockService
 import com.simprints.id.tools.retrofit.createMockServiceToFailRequests
+import com.simprints.id.tools.roboletric.mockLocalDbManager
+import com.simprints.id.tools.roboletric.mockRemoteDbManager
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -29,8 +28,8 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
-        app.localDbManager = Mockito.mock(RealmDbManager::class.java)
-        app.remoteDbManager = Mockito.mock(FirebaseManager::class.java)
+        mockRemoteDbManager(app)
+        mockLocalDbManager(app)
     }
 
     @Test
