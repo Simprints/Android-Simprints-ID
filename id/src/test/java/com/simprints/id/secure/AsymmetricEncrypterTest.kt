@@ -3,7 +3,8 @@ package com.simprints.id.secure
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.cryptography.AsymmetricEncrypter
 import com.simprints.id.secure.models.PublicKeyString
-import org.junit.Assert.*
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -21,15 +22,6 @@ class AsymmetricEncrypterTest {
         val encryptedString = AsymmetricEncrypter(publicKeyString).encrypt(string)
         assertNotNull(encryptedString)
         assert(encryptedString.isEmpty())
-    }
-
-    @Test
-    fun testEncryptingTheSameStringGivesTheSameResult() {
-        val string1 = "this is some string"
-        val string2 = "this is some string"
-        val encryptedString1 = AsymmetricEncrypter(publicKeyString).encrypt(string1)
-        val encryptedString2 = AsymmetricEncrypter(publicKeyString).encrypt(string2)
-        assertEquals(encryptedString1, encryptedString2)
     }
 
     @Test

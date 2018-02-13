@@ -11,6 +11,7 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.tools.roboletric.createRoboCheckLoginViewActivity
@@ -39,6 +40,7 @@ class CheckLoginTestActivity {
         analyticsManagerMock = mock(FirebaseAnalyticsManager::class.java)
         app = (RuntimeEnvironment.application as Application)
         app.analyticsManager = analyticsManagerMock
+        app.localDbManager = mock(RealmDbManager::class.java)
     }
 
     @Test
@@ -73,12 +75,15 @@ class CheckLoginTestActivity {
         intent.putExtra("projectId", "some_project")
         intent.putExtra("apiKey", "some_apiKey")
         intent.putExtra("userId", "some_userId")
+        intent.putExtra("moduleId", "some_module")
 
-        createRoboCheckLoginViewActivity(intent).start().resume().visible()
+        val controller = createRoboCheckLoginViewActivity(intent).start()
+        val activity = controller.get() as CheckLoginActivity
+        activity.viewPresenter.wasAppOpenedByIntent = true
+        controller.resume().visible()
 
-        Assert.assertEquals(app.dataManager.projectId, "some_project")
-        Assert.assertEquals(app.dataManager.apiKey, "some_apiKey")
-        Assert.assertEquals(app.dataManager.userId, "some_userId")
+        Assert.assertEquals("some_project", app.dataManager.projectId)
+        Assert.assertEquals("some_userId", app.dataManager.userId)
     }
 
     @Test

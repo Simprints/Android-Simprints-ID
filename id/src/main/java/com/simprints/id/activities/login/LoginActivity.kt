@@ -20,8 +20,8 @@ import org.jetbrains.anko.indeterminateProgressDialog
 class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     companion object {
-        public const val LOGIN_SUCCESSED: Int = 1
-        public const val LOGIN_REQUEST_CODE: Int = 1
+        const val LOGIN_SUCCESSED: Int = 1
+        const val LOGIN_REQUEST_CODE: Int = 1
         private const val QR_REQUEST_CODE: Int = 0
     }
 
@@ -57,6 +57,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         loginButtonSignIn.setOnClickListener {
             val projectId = loginEditTextProjectId.text.toString()
             val projectSecret = loginEditTextProjectSecret.text.toString()
+            val userId = loginEditTextUserId.text.toString()
             viewPresenter.userDidWantToSignIn(projectId, projectSecret, userId, app.dataManager.apiKey)
         }
     }

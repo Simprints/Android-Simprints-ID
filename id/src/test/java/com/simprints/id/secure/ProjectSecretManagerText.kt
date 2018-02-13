@@ -30,11 +30,5 @@ class ProjectSecretManagerText : RxJavaTest() {
        testObserver
            .assertNoErrors()
            .assertComplete()
-
-       val encryptedProjectSecret = "YCJUfHsDEMqggt-Lni8ugKlgWEn1MfsyssN5o4Wr85YXfGNrAXdTnsBAjFZCC0j3zPoNjulORKnT\n" +
-           "UO-jfO6cXp0It0yz8Vcar1AEceSGBpTNOxk00gxqdPhRcgL21HTs_6glBnGxgeKOcIxgf5SOY82z\n" +
-           "nr0CHhr8F48hqBLDmOU=\n"
-
-       assertEquals(encryptedProjectSecret, app.secureDataManager.encryptedProjectSecret)
    }
 }

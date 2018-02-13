@@ -134,7 +134,7 @@ class Application : MultiDexApplication() {
         RealmDbManager(this)
     }
 
-    private val remoteDbManager: RemoteDbManager by lazy {
+    var remoteDbManager: RemoteDbManager by lazyVar {
         FirebaseManager(this)
     }
 

@@ -32,7 +32,6 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
 
         app = application as Application
         dataManager = app.dataManager
-        dataManager.callingPackage = getCallingPackageName()
 
         viewPresenter = CheckLoginPresenter(this, dataManager, app.sessionParametersExtractor, wasAppOpenedByIntent, timeHelper)
     }
@@ -50,6 +49,7 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
         intent.toCallout()
 
     override fun checkCallingApp() {
+        dataManager.callingPackage = getCallingPackageName()
         if (app.packageManager.isCallingAppFromUnknownSource(dataManager.callingPackage)) {
             dataManager.logSafeException(CallingAppFromUnknownSourceException())
         }
