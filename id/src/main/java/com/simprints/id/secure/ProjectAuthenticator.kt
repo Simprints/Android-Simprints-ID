@@ -29,7 +29,7 @@ class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
     private val publicKeyManager = PublicKeyManager(apiClient)
     private val nonceManager = NonceManager(apiClient)
     private val authManager = AuthManager(apiClient)
-    private var attestationManager = AttestationManager()
+    var attestationManager = AttestationManager()
 
     fun authenticateWithNewCredentials(safetyNetClient: SafetyNetClient, nonceScope: NonceScope, projectSecret: String): Single<Token> =
         authenticate(safetyNetClient, nonceScope, getEncryptedProjectSecret(projectSecret))
