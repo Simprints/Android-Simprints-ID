@@ -15,6 +15,7 @@ import com.google.firebase.storage.UploadTask
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
+import com.simprints.id.exceptions.safe.DifferentProjectInitialisedException
 import com.simprints.id.exceptions.safe.DifferentProjectSignedInException
 import com.simprints.id.exceptions.unsafe.FirebaseUninitialisedError
 import com.simprints.id.secure.models.Token
@@ -41,29 +42,28 @@ import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class FirebaseManager(private val appContext: Context,
-                      remoteDbAuthListenerManager: RemoteDbAuthListenerManager) :
+                      firebaseConnectionListenerManager: RemoteDbConnectionListenerManager,
+                      firebaseAuthListenerManager: RemoteDbAuthListenerManager) :
     RemoteDbManager,
-    RemoteDbAuthListenerManager by remoteDbAuthListenerManager {
+    RemoteDbConnectionListenerManager by firebaseConnectionListenerManager,
+    RemoteDbAuthListenerManager by firebaseAuthListenerManager {
 
+    private var isInitialised = false
+
+    // FirebaseApp Names
     private lateinit var legacyFirebaseAppName: String
     private lateinit var firestoreFirebaseAppName: String
 
-    // Firebase
+    // FirebaseApp
     private lateinit var legacyFirebaseApp: FirebaseApp
     private lateinit var firestoreFirebaseApp: FirebaseApp
-    private lateinit var projectRef: DatabaseReference
 
-    // Connection listener
-    @Volatile
-    private var isRemoteConnected = false
-    private lateinit var connectionDbRef: DatabaseReference
-    private lateinit var connectionDispatcher: ValueEventListener
-    private var connectionListeners = mutableSetOf<ConnectionListener>()
-
-    // Authentication listener
+    // FirebaseAuth
     private lateinit var legacyFirebaseAuth: FirebaseAuth
     private lateinit var firestoreFirebaseAuth: FirebaseAuth
 
+    // Routes
+    private lateinit var projectRef: DatabaseReference
 
     // Lifecycle
     override fun initialiseRemoteDb(projectId: String) {
@@ -71,6 +71,7 @@ class FirebaseManager(private val appContext: Context,
         initialiseFirestoreFirebaseApp(projectId)
         applyConnectionListeners(legacyFirebaseApp)
         applyAuthListeners(legacyFirebaseAuth, legacyFirebaseAppName)
+        isInitialised = true
     }
 
     private fun initialiseLegacyFirebaseApp(projectId: String) {
@@ -100,33 +101,6 @@ class FirebaseManager(private val appContext: Context,
     private fun initialiseFirebaseAuth(firebaseApp: FirebaseApp): FirebaseAuth =
         FirebaseAuth.getInstance(firebaseApp)
 
-    private fun applyConnectionListeners(firebaseApp: FirebaseApp) {
-        connectionDispatcher = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val connected = dataSnapshot.getValue(Boolean::class.java)!!
-
-                synchronized(connectionListeners) {
-                    if (connected) {
-                        Timber.d("Connected")
-                        isRemoteConnected = true
-                        for (listener in connectionListeners)
-                            listener.onConnection()
-                    } else {
-                        Timber.d("Disconnected")
-                        isRemoteConnected = false
-                        for (listener in connectionListeners)
-                            listener.onDisconnection()
-                    }
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {}
-        }
-        connectionDbRef = Utils.getDatabase(firebaseApp).getReference(".info/connected")
-        connectionDbRef.addValueEventListener(connectionDispatcher)
-        Timber.d("Connection listener set")
-    }
-
     override fun signInToRemoteDb(projectId: String, token: Token) {
         // TODO : turn into an RxJava Single Observable
         legacyFirebaseAuth.signInWithCustomToken(token.value).addOnCompleteListener { task ->
@@ -134,7 +108,7 @@ class FirebaseManager(private val appContext: Context,
                 //emitter.onSuccess(token)
                 Timber.d("Firebase Auth signInWithCustomToken successful")
             } else {
-                //emitter.onError(FirebaseSigninInWithCustomTokenFailed())
+                //emitter.onError(FirebaseSignInInWithCustomTokenFailed())
                 Timber.d("Firebase Auth signInWithCustomToken failed: ${task.exception}")
             }
         }
@@ -144,13 +118,18 @@ class FirebaseManager(private val appContext: Context,
         legacyFirebaseAuth.signOut()
         firestoreFirebaseAuth.signOut()
 
-        // Unregister listeners
+        removeConnectionListeners(legacyFirebaseApp)
         removeAuthListeners(legacyFirebaseAuth)
-        connectionDbRef.removeEventListener(connectionDispatcher)
     }
 
+    @Throws(DifferentProjectInitialisedException::class)
     override fun isRemoteDbInitialized(projectId: String): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return if (isInitialised) {
+            if (legacyFirebaseApp.name == getLegacyAppNameFromProjectId(projectId))
+                true
+            else
+                throw DifferentProjectInitialisedException()
+        } else false
     }
 
     @Throws(DifferentProjectSignedInException::class)
@@ -167,21 +146,6 @@ class FirebaseManager(private val appContext: Context,
                 return true
             } else throw DifferentProjectSignedInException()
         } ?: return false
-    }
-
-    override fun isRemoteConnected(): Boolean =
-        isRemoteConnected
-
-    override fun registerRemoteConnectionListener(connectionListener: ConnectionListener) {
-        synchronized(connectionListeners) {
-            connectionListeners.add(connectionListener)
-        }
-    }
-
-    override fun unregisterRemoteConnectionListener(connectionListener: ConnectionListener) {
-        synchronized(connectionListeners) {
-            connectionListeners.remove(connectionListener)
-        }
     }
 
     // Data transfer

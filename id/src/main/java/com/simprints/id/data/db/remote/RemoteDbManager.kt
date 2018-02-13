@@ -1,11 +1,10 @@
 package com.simprints.id.data.db.remote
 
 import com.simprints.id.data.models.Session
+import com.simprints.id.exceptions.safe.DifferentProjectInitialisedException
 import com.simprints.id.exceptions.safe.DifferentProjectSignedInException
 import com.simprints.id.secure.models.Token
 import com.simprints.libcommon.Person
-import com.simprints.libdata.AuthListener
-import com.simprints.libdata.ConnectionListener
 import com.simprints.libdata.DataCallback
 import com.simprints.libdata.NaiveSyncManager
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
@@ -15,7 +14,7 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 
-interface RemoteDbManager {
+interface RemoteDbManager: RemoteDbConnectionListenerManager, RemoteDbAuthListenerManager {
 
     // Lifecycle
     fun initialiseRemoteDb(projectId: String)
@@ -23,13 +22,10 @@ interface RemoteDbManager {
     fun signInToRemoteDb(projectId: String, token: Token)
     fun signOutOfRemoteDb(projectId: String)
 
+    @Throws(DifferentProjectInitialisedException::class)
     fun isRemoteDbInitialized(projectId: String): Boolean
-    fun isRemoteConnected(): Boolean
     @Throws(DifferentProjectSignedInException::class)
     fun isSignedIn(projectId: String): Boolean
-
-    fun registerRemoteConnectionListener(connectionListener: ConnectionListener)
-    fun unregisterRemoteConnectionListener(connectionListener: ConnectionListener)
 
     // Data transfer
     fun getLocalDbKeyFromRemote(): String
