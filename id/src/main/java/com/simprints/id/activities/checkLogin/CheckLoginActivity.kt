@@ -33,7 +33,12 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
         app = application as Application
         dataManager = app.dataManager
 
-        viewPresenter = CheckLoginPresenter(this, dataManager, app.sessionParametersExtractor, wasAppOpenedByIntent, timeHelper)
+        viewPresenter = CheckLoginPresenter(
+            this,
+            dataManager,
+            app.sessionParametersExtractor,
+            wasAppOpenedByIntent,
+            timeHelper)
     }
 
     override fun onResume() {
@@ -73,13 +78,9 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
         finish()
     }
 
-    override fun startActivity(nextActivityClassAfterLogin: Class<out Any>) {
-        try {
-            val nextIntent = Intent(this, nextActivityClassAfterLogin)
-            startActivityForResult(nextIntent, MAIN_ACTIVITY_REQUEST)
-        } catch (t: Throwable) {
-            t.printStackTrace()
-        }
+    override fun <T> startActivity(nextActivityClassAfterLogin: Class<T>) {
+        val nextIntent = Intent(this, nextActivityClassAfterLogin)
+        startActivityForResult(nextIntent, MAIN_ACTIVITY_REQUEST)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

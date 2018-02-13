@@ -11,7 +11,7 @@ interface CheckLoginContract {
         fun launchAlertForError(alertType: ALERT_TYPE)
         fun openLoginActivity()
         fun openRequestLoginActivity()
-        fun startActivity(nextActivityClassAfterLogin: Class<out Any>)
+        fun <T> startActivity(nextActivityClassAfterLogin: Class<T>)
         fun checkCallingApp()
         fun parseCallout(): Callout
     }
