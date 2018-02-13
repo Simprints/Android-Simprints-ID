@@ -10,36 +10,25 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageMetadata
-import com.google.firebase.storage.UploadTask
-import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
 import com.simprints.id.exceptions.safe.DifferentProjectInitialisedException
 import com.simprints.id.exceptions.safe.DifferentProjectSignedInException
-import com.simprints.id.exceptions.unsafe.FirebaseUninitialisedError
 import com.simprints.id.secure.models.Token
 import com.simprints.libcommon.Person
-import com.simprints.libdata.*
+import com.simprints.libdata.DATA_ERROR
+import com.simprints.libdata.DataCallback
+import com.simprints.libdata.NaiveSyncManager
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.libdata.models.firebase.*
-import com.simprints.libdata.models.realm.RealmConfig
 import com.simprints.libdata.models.realm.rl_Person
-import com.simprints.libdata.tools.Constants
 import com.simprints.libdata.tools.Routes.*
 import com.simprints.libdata.tools.Utils
 import com.simprints.libdata.tools.Utils.wrapCallback
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
-import io.realm.Realm
-import io.realm.RealmChangeListener
-import io.realm.RealmResults
-import org.json.JSONException
 import timber.log.Timber
-import java.io.IOException
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
 
 class FirebaseManager(private val appContext: Context,
                       firebaseConnectionListenerManager: RemoteDbConnectionListenerManager,
@@ -219,107 +208,7 @@ class FirebaseManager(private val appContext: Context,
     override fun getSyncManager(projectId: String): NaiveSyncManager =
         NaiveSyncManager(legacyFirebaseApp, projectId)
 
-    override fun recoverLocalDbSendToRemote(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
-        // TODO : factor into a class
-        Timber.d("FirebaseManager.recoverRealmDb()")
-        val wrappedCallback = wrapCallback("FirebaseManager.recoverRealmDb", callback)
-
-        val storageBucketUrl = "gs://${BuildConfig.GCP_PROJECT}-firebase-storage/"
-
-        // Create a new Realm instance - needed since this should rn on a background thread
-        val mRealm = Realm.getInstance(RealmConfig.get(projectId))
-
-        val request = when (group) {
-            Constants.GROUP.GLOBAL -> mRealm.where(rl_Person::class.java).findAllAsync()
-            Constants.GROUP.USER -> mRealm.where(rl_Person::class.java).equalTo("userId", userId).findAllAsync()
-            Constants.GROUP.MODULE -> mRealm.where(rl_Person::class.java).equalTo("moduleId", moduleId).findAllAsync()
-        }
-
-        // Prepare and connect the streams
-        val realmDbInputStream = PipedInputStream()
-        val realmDbOutputStream = PipedOutputStream()
-
-        try {
-            realmDbOutputStream.connect(realmDbInputStream)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
-        // Once the realm request is processed
-        request.addChangeListener(object : RealmChangeListener<RealmResults<rl_Person>> {
-            override fun onChange(results: RealmResults<rl_Person>) {
-                try {
-                    request.removeChangeListener(this)
-                    // Write the JSON people and make sure it's valid JSON
-                    realmDbOutputStream.write("{".toByteArray())
-                    for ((count, person) in results.withIndex()) {
-                        val personJson = person.jsonPerson
-                        var commaString = ","
-                        // We need commas before all entries except the first
-                        if (count == 0) {
-                            commaString = ""
-                        }
-                        val nodeString = "\"" + personJson.get("patientId").toString() + "\"" + ":"
-                        val personJsonString = commaString + nodeString + person.jsonPerson.toString()
-                        // Send the JSON person to the Output stream
-                        realmDbOutputStream.write(personJsonString.toByteArray())
-                    }
-                    realmDbOutputStream.write("}".toByteArray())
-                    // Once we're finished writing to the output stream we can close it & the realm reference
-                    realmDbOutputStream.close()
-                    mRealm.close()
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    wrappedCallback.onFailure(DATA_ERROR.JSON_ERROR)
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                    wrappedCallback.onFailure(DATA_ERROR.IO_BUFFER_WRITE_ERROR)
-                }
-            }
-        })
-
-        // Get a reference to [bucket]/recovered-realm-dbs/[projectKey]/[userId]/[db-name].json
-        legacyFirebaseApp.let { firebaseApp ->
-            val storage = FirebaseStorage.getInstance(firebaseApp)
-            val rootRef = storage.getReferenceFromUrl(storageBucketUrl)
-            val recoveredRealmDbsRef = rootRef.child("recovered-realm-dbs")
-            val projectPathRef = recoveredRealmDbsRef.child(projectId)
-            val userPathRef = projectPathRef.child(userId)
-            val fileReference = userPathRef.child("recovered-realm-db")
-
-            // Create some metadata to add to the JSON file
-            val metadata = StorageMetadata.Builder()
-                .setCustomMetadata("projectId", projectId)
-                .setCustomMetadata("userId", userId)
-                .setCustomMetadata("androidId", androidId)
-                .build()
-
-            // Begin the upload task to the reference using the input stream & metadata
-            val uploadTask = fileReference.putStream(realmDbInputStream, metadata)
-            uploadTask.addOnFailureListener { e: Exception ->
-                // Try to close the stream and send the onFailure callback
-                e.printStackTrace()
-                try {
-                    realmDbInputStream.close()
-                } catch (e1: IOException) {
-                    e1.printStackTrace()
-                }
-
-                wrappedCallback.onFailure(DATA_ERROR.FAILED_TO_UPLOAD)
-            }.addOnSuccessListener {
-                    // Try to close the stream and send the onSuccess callback
-                    try {
-                        realmDbInputStream.close()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-
-                    wrappedCallback.onSuccess()
-                }.addOnProgressListener { taskSnapshot: UploadTask.TaskSnapshot ->
-                    Timber.d("Realm DB upload progress: ${taskSnapshot.bytesTransferred}")
-                }
-        } ?: throw FirebaseUninitialisedError()
-    }
+    fun getFirebaseStorageInstance() = FirebaseStorage.getInstance(legacyFirebaseApp)
 
     companion object {
         fun getLegacyAppNameFromProjectId(projectId: String): String =
