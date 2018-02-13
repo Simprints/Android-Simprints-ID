@@ -65,6 +65,13 @@ class SerializerModule {
     @Provides @Singleton @Named("ApiKeyReader") fun provideApiKeyReader(@Named("MissingApiKeyError") missingApiKeyError: Error, @Named("InvalidApiKeyError") invalidApiKeyError: Error): Reader<String> =
         MandatoryParameterReader(com.simprints.libsimprints.Constants.SIMPRINTS_API_KEY, String::class, missingApiKeyError, invalidApiKeyError)
 
+    //ProjectId
+    @Provides @Singleton @Named("InvalidProjectIdError") fun provideInvalidProjectIdError(): Error = InvalidCalloutError(ALERT_TYPE.INVALID_API_KEY)
+    @Provides @Singleton @Named("ProjectIdValidator") fun provideProjectIdValidator(@Named("InvalidProjectIdError") invalidProjectIdError: Error): Validator<String> = NoOpValidator()
+    @Provides @Singleton @Named("ProjectIdExtractor") fun provideProjectIdExtractor(@Named("ProjectIdReader") projectIdReader: Reader<String>, @Named("ProjectIdValidator") projectIdValidator: Validator<String>): Extractor<String> = ParameterExtractor(projectIdReader, projectIdValidator)
+    @Provides @Singleton @Named("ProjectIdReader") fun provideProjectIdReader(@Named("InvalidProjectIdError") invalidProjectIdError: Error): Reader<String> =
+        OptionalParameterReader(SIMPRINTS_PROJECT_ID, "", invalidProjectIdError)
+
     //UserId
     @Provides @Singleton @Named("InvalidUserIdError") fun provideInvalidUserIdError(): Error = InvalidCalloutError(ALERT_TYPE.INVALID_USER_ID)
     @Provides @Singleton @Named("MissingUserIdError") fun provideMissingUserIdError(): Error = InvalidCalloutError(ALERT_TYPE.MISSING_USER_ID)
@@ -135,6 +142,7 @@ class SerializerModule {
 
     @Provides @Singleton fun provideSessionParametersExtractor(@Named("ActionExtractor") actionExtractor: Extractor<CalloutAction>,
                                                                @Named("ApiKeyExtractor") apiKeyExtractor: Extractor<String>,
+                                                               @Named("ProjectIdExtractor") projectIdExtractor: Extractor<String>,
                                                                @Named("ModuleIdExtractor") moduleIdExtractor: Extractor<String>,
                                                                @Named("UserIdExtractor") userIdExtractor: Extractor<String>,
                                                                @Named("PatientIdExtractor") patientIdExtractor: Extractor<String>,
@@ -142,7 +150,7 @@ class SerializerModule {
                                                                @Named("MetadataExtractor") metadataExtractor: Extractor<String>,
                                                                @Named("ResultFormatExtractor") resultFormatExtractor: Extractor<String>,
                                                                @Named("UnexpectedParametersExtractor") unexpectedParametersExtractor: Extractor<Set<CalloutParameter>>): SessionParametersExtractor =
-    SessionParametersExtractor(actionExtractor, apiKeyExtractor, moduleIdExtractor,
+    SessionParametersExtractor(actionExtractor, apiKeyExtractor, projectIdExtractor, moduleIdExtractor,
         userIdExtractor, patientIdExtractor, callingPackageExtractor, metadataExtractor,
         resultFormatExtractor, unexpectedParametersExtractor)
 

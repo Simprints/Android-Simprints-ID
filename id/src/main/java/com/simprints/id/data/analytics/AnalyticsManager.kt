@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.analytics
+package com.simprints.id.data.analytics
 
 import com.simprints.id.data.models.Session
 import com.simprints.id.domain.callout.Callout

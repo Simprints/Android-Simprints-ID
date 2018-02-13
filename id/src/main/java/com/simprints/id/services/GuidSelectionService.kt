@@ -2,13 +2,11 @@ package com.simprints.id.services
 
 import android.app.IntentService
 import android.content.Intent
-
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.libsimprints.Constants.*
 import javax.inject.Inject
-
 
 class GuidSelectionService : IntentService("GuidSelectionService") {
 
@@ -23,7 +21,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         if (intent != null) {
             onHandleNonNullIntent(intent)
         } else {
-            dataManager.logGuidSelectionService("","", "", false)
+            dataManager.logGuidSelectionService("", "", "", false)
         }
     }
 
@@ -64,7 +62,14 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     }
 
     private fun checkApiKey(apiKey: String) {
-        if (apiKey.isEmpty() || apiKey != dataManager.getApiKeyOr(apiKey)) {
+
+        var signed = false
+        if (!apiKey.isEmpty()) {
+            val projectId = dataManager.projectIdForLegacyApiKeyOrEmpty(apiKey)
+            signed = dataManager.isProjectIdSignedIn(projectId)
+        }
+
+        if (!signed) {
             throw InvalidCalloutParameterError.forParameter(SIMPRINTS_API_KEY)
         }
     }
@@ -73,5 +78,4 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     private fun checkSelectedGuid(selectedGuid: String) {
         // For now, any selected guid is valid
     }
-
 }

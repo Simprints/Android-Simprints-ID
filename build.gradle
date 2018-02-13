@@ -9,13 +9,15 @@ buildscript {
     ext.google_version = "11.8.0"
     ext.gradle_version = "3.0.0"
     ext.junit_version = "4.12"
-    ext.kotlin_version = "1.2.10"
+    ext.kotlin_version = "1.2.20"
     ext.libsimprints_version = "1.0.12"
     ext.mockito_version = "2.8.9"
     ext.rxandroid_version = "2.0.1"
     ext.rxjava_version = "2.1.7"
     ext.support_version = "27.0.2"
     ext.volley_version = "1.0.0"
+    ext.retrofit_version = "2.4.0-SNAPSHOT"
+    ext.okhttp_version = "3.9.1"
 
     repositories {
         jcenter()
@@ -35,7 +37,7 @@ buildscript {
         classpath "io.realm:realm-gradle-plugin:3.0.0"
         classpath "com.google.firebase:firebase-plugins:1.1.4"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.fabric.tools:gradle:1.25.0"
+        classpath "io.fabric.tools:gradle:1.25.1"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
@@ -58,3 +60,4 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+apply plugin: "android-reporting"

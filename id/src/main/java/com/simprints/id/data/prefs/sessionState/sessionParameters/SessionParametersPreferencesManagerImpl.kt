@@ -16,8 +16,11 @@ class SessionParametersPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private val CALLOUT_ACTION_KEY = "CalloutAction"
         private val CALLOUT_ACTION_DEFAULT = CalloutAction.MISSING
 
-        private val APP_KEY_KEY = "AppKey"
-        private val APP_KEY_DEFAULT = ""
+        private val API_KEY = "ApiKey"
+        private val API_KEY_DEFAULT = ""
+
+        private val PROJECT_ID_KEY = "ProjectId"
+        private val PROJECT_ID_DEFAULT = ""
 
         private val MODULE_ID_KEY = "ModuleId"
         private val MODULE_ID_DEFAULT = ""
@@ -43,9 +46,13 @@ class SessionParametersPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var calloutAction: CalloutAction
         by ComplexPreference(prefs, CALLOUT_ACTION_KEY, CALLOUT_ACTION_DEFAULT, calloutActionSerializer)
 
-    // App Key
-    override var appKey: String
-        by PrimitivePreference(prefs, APP_KEY_KEY, APP_KEY_DEFAULT)
+    // Project Id
+    override var apiKey: String
+        by PrimitivePreference(prefs, API_KEY, API_KEY_DEFAULT)
+
+    // Project Id
+    override var projectId: String
+        by PrimitivePreference(prefs, PROJECT_ID_KEY, PROJECT_ID_DEFAULT)
 
     // Module ID of the current session
     override var moduleId: String

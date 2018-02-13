@@ -8,6 +8,7 @@ class ExpectedParametersListerImpl: ExpectedParametersLister {
 
     private val commonParameterKeys = arrayOf(
         Constants.SIMPRINTS_API_KEY,
+        Constants.SIMPRINTS_PROJECT_ID,
         Constants.SIMPRINTS_MODULE_ID,
         Constants.SIMPRINTS_USER_ID,
         Constants.SIMPRINTS_CALLING_PACKAGE,
