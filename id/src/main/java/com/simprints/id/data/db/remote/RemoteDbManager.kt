@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.remote
 
 import com.simprints.id.data.models.Session
+import com.simprints.id.exceptions.safe.DifferentProjectSignedInException
 import com.simprints.id.secure.models.Token
 import com.simprints.libcommon.Person
 import com.simprints.libdata.AuthListener
@@ -23,11 +24,10 @@ interface RemoteDbManager {
     fun signOutOfRemoteDb(projectId: String)
 
     fun isRemoteDbInitialized(projectId: String): Boolean
-    fun isSignedIn(projectId: String): Boolean
     fun isRemoteConnected(): Boolean
+    @Throws(DifferentProjectSignedInException::class)
+    fun isSignedIn(projectId: String): Boolean
 
-    fun registerRemoteAuthListener(authListener: AuthListener)
-    fun unregisterRemoteAuthListener(authListener: AuthListener)
     fun registerRemoteConnectionListener(connectionListener: ConnectionListener)
     fun unregisterRemoteConnectionListener(connectionListener: ConnectionListener)
 

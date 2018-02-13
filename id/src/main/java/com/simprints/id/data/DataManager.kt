@@ -37,7 +37,7 @@ interface DataManager : PreferencesManager, DbManager, ApiManager,
     // DbManager call interception for populating arguments
     // Lifecycle
     override fun initialiseDb(projectId: String)
-    override fun signOut()
+    override fun signOut(projectId: String)
     // Data transfer
     fun savePerson(person: Person)
     fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
