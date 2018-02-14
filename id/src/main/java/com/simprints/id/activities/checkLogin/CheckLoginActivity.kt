@@ -15,6 +15,8 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants.MAIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
+import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.startActivityForResult
 
 open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
 
@@ -69,12 +71,11 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
     }
 
     override fun openLoginActivity() {
-        val nextIntent = Intent(this, LoginActivity::class.java)
-        startActivityForResult(nextIntent, LoginActivity.LOGIN_REQUEST_CODE)
+        startActivityForResult<LoginActivity>(LoginActivity.LOGIN_REQUEST_CODE)
     }
 
     override fun openRequestLoginActivity() {
-        startActivity(Intent(this, RequestLoginActivity::class.java))
+        startActivity<RequestLoginActivity>()
         finish()
     }
 

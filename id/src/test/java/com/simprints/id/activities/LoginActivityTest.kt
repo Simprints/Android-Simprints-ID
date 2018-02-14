@@ -56,14 +56,15 @@ class LoginActivityTest {
     fun loginSuccesses_shouldReturnSuccessResultCode() {
 
         val controller = createRoboLoginActivity().start().resume().visible()
-        val loginAct = controller.get()
         val projectAuthenticator = mock(ProjectAuthenticator::class.java)
         doReturn(SingleJust(Tokens("firestore_token", "legacy_token"))).`when`(projectAuthenticator).authenticateWithNewCredentials(anyNotNull(), anyNotNull())
-        loginAct.viewPresenter.projectAuthenticator = projectAuthenticator
-        loginAct.loginEditTextUserId.setText("some_user_id")
-        loginAct.loginEditTextProjectId.setText("some_project_id")
-        loginAct.loginEditTextProjectSecret.setText("some_project_secret")
-        loginAct.loginButtonSignIn.performClick()
+        val loginAct = controller.get().apply {
+            viewPresenter.projectAuthenticator = projectAuthenticator
+            loginEditTextUserId.setText("some_user_id")
+            loginEditTextProjectId.setText("some_project_id")
+            loginEditTextProjectSecret.setText("some_project_secret")
+            loginButtonSignIn.performClick()
+        }
 
         val shadowLoginAct = shadowOf(loginAct)
 

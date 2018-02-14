@@ -92,11 +92,13 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
         }
 
         return if (wasAppOpenedByIntent) {
-            var projectIdFromIntent = dataManager.projectId
-            if (projectIdFromIntent.isEmpty()) { //Legacy App with ApiKey
-                projectIdFromIntent = findProjectIdForApiKey(dataManager.apiKey)
+            return dataManager.projectId.let {
+                if(it.isNotEmpty()) {
+                    it == storedProjectId
+                } else {
+                    findProjectIdForApiKey(dataManager.apiKey) == storedProjectId
+                }
             }
-            projectIdFromIntent == storedProjectId
         } else {
             true
         }

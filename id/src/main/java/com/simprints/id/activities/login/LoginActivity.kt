@@ -30,6 +30,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     val app by lazy {
         application as Application
     }
+
     val userId by lazy {
         app.dataManager.userId
     }
@@ -40,7 +41,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val app = application as Application
         var projectAuthenticator = ProjectAuthenticator(app.secureDataManager, app.dataManager, SafetyNet.getClient(this))
         viewPresenter = LoginPresenter(this, app.secureDataManager, projectAuthenticator)
         viewPresenter.start()
@@ -75,8 +75,9 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QR_REQUEST_CODE) {
-            if (data == null) return
-            handleScannerAppResult(resultCode, data)
+            data?.let {
+                handleScannerAppResult(resultCode, it)
+            }
         }
     }
 
