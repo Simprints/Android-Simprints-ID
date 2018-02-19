@@ -8,6 +8,11 @@ import javax.crypto.Cipher
 
 class AsymmetricEncryptionHelper {
 
+    companion object {
+        private const val RSA_TRANSFORMATION = "RSA/ECB/PKCS1Padding"
+        private const val RSA_ALGORITHM = "RSA"
+    }
+
     fun getPublicKeyFromBase64String(publicKeyString: String): PublicKey {
         val publicKeyByteArray = BaseEncoding.base64().decode(publicKeyString)
         val keyFactory = KeyFactory.getInstance(RSA_ALGORITHM)
@@ -16,11 +21,5 @@ class AsymmetricEncryptionHelper {
 
     fun getCipher(): Cipher {
         return Cipher.getInstance(RSA_TRANSFORMATION)
-    }
-
-    companion object {
-
-        private const val RSA_TRANSFORMATION = "RSA/ECB/PKCS1Padding"
-        private const val RSA_ALGORITHM = "RSA"
     }
 }

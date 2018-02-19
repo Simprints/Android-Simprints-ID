@@ -22,7 +22,7 @@ class AttestationManager {
                    print(e)
 
                    // We go ahead with the auth flow, the server will reject the request.
-                   // So we can turn off the Safity check on the server if we need.
+                   // So we can turn off the Safety check on the server if we need.
                    emitter.onSuccess(AttestToken(""))
                }
        }
