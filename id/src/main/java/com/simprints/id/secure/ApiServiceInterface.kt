@@ -18,11 +18,13 @@ interface ApiServiceInterface {
     }
 
     @GET("/nonces")
-    fun nonce(@HeaderMap headers: Map<String, String>, @Query("key") key: String = ApiServiceInterface.apiKey): Single<Nonce>
+    fun nonce(@HeaderMap headers: Map<String, String>,
+              @Query("key") key: String = ApiServiceInterface.apiKey): Single<Nonce>
 
     @GET("/public-key")
     fun publicKey(@Query("key") key: String = ApiServiceInterface.apiKey): Single<PublicKeyString>
 
     @GET("/tokens")
-    fun auth(@HeaderMap headers: Map<String, String>, @Query("key") key: String = ApiServiceInterface.apiKey): Single<Tokens>
+    fun auth(@HeaderMap headers: Map<String, String>,
+             @Query("key") key: String = ApiServiceInterface.apiKey): Single<Tokens>
 }

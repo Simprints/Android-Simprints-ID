@@ -42,7 +42,7 @@ class ProjectAuthenticator(secureDataManager: SecureDataManager,
 
     private fun getEncryptedProjectSecret(projectSecret: String): Single<String> =
         publicKeyManager.requestPublicKey()
-            .flatMap { publicKey -> projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey) }
+            .flatMap { publicKey -> SingleJust(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey)) }
 
     private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, noneScope: NonceScope): Single<AttestToken> =
         nonceManager.requestNonce(noneScope).flatMap { nonce ->

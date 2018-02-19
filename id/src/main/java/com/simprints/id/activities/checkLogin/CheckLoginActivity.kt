@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.dashboard.DashboardActivity
+import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
@@ -79,9 +81,14 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
         finish()
     }
 
-    override fun <T> startActivity(nextActivityClassAfterLogin: Class<T>) {
-        val nextIntent = Intent(this, nextActivityClassAfterLogin)
+    override fun openLaunchActivity() {
+        val nextIntent = Intent(this, LaunchActivity::class.java)
         startActivityForResult(nextIntent, MAIN_ACTIVITY_REQUEST)
+    }
+
+    override fun openDashboardActivity() {
+        val dashIntent = Intent(this, DashboardActivity::class.java)
+        startActivity(dashIntent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
