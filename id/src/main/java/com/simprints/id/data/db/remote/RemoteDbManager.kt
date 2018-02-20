@@ -3,7 +3,7 @@ package com.simprints.id.data.db.remote
 import com.simprints.id.data.models.Session
 import com.simprints.id.exceptions.safe.DifferentProjectInitialisedException
 import com.simprints.id.exceptions.safe.DifferentProjectSignedInException
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libdata.DataCallback
 import com.simprints.libdata.NaiveSyncManager
@@ -18,7 +18,7 @@ interface RemoteDbManager: RemoteDbConnectionListenerManager, RemoteDbAuthListen
     // Lifecycle
     fun initialiseRemoteDb(projectId: String)
 
-    fun signInToRemoteDb(projectId: String, token: Tokens)
+    fun signInToRemoteDb(projectId: String, tokens: Tokens)
     fun signOutOfRemoteDb(projectId: String)
 
     @Throws(DifferentProjectInitialisedException::class)
