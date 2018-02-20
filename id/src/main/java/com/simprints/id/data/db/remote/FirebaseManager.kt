@@ -91,13 +91,27 @@ class FirebaseManager(private val appContext: Context,
         FirebaseAuth.getInstance(firebaseApp)
 
     override fun signInToRemoteDb(projectId: String, tokens: Tokens) {
-        // TODO : turn into an RxJava Single Observable
-        legacyFirebaseAuth.signInWithCustomToken(tokens.legacyToken).addOnCompleteListener { task ->
+        signInToLegacyDb(projectId, tokens.legacyToken)
+        signInToFirestoreDb(projectId, tokens.firestoreToken)
+    }
+
+    private fun signInToLegacyDb(projectId: String, legacyToken: String) {
+        legacyFirebaseAuth.signInWithCustomToken(legacyToken).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                //emitter.onSuccess(token)
                 Timber.d("Firebase Auth signInWithCustomToken successful")
             } else {
-                //emitter.onError(FirebaseSignInInWithCustomTokenFailed())
+                Timber.d(legacyToken)
+                Timber.d("Firebase Auth signInWithCustomToken failed: ${task.exception}")
+            }
+        }
+    }
+
+    private fun signInToFirestoreDb(projectId: String, firestoreToken: String) {
+        firestoreFirebaseAuth.signInWithCustomToken(firestoreToken).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Timber.d("Firebase Auth signInWithCustomToken successful")
+            } else {
+                Timber.d(firestoreToken)
                 Timber.d("Firebase Auth signInWithCustomToken failed: ${task.exception}")
             }
         }
