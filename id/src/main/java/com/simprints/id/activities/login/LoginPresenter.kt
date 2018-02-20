@@ -9,6 +9,11 @@ import com.simprints.id.secure.models.NonceScope
 class LoginPresenter(val view: LoginContract.View,
                      private val secureDataManager: SecureDataManager,
                      override var projectAuthenticator: ProjectAuthenticator) : LoginContract.Presenter {
+
+    companion object {
+        private const val SCANNED_TEXT_TAG_PROJECT_ID = "id:"
+        private const val SCANNED_TEXT_TAG_PROJECT_SECRET = "secret:"
+    }
     init {
         view.setPresenter(this)
     }
@@ -45,10 +50,19 @@ class LoginPresenter(val view: LoginContract.View,
         }
     }
 
+    /** Valid Scanned Text Format:
+     * id:someProjectId\n
+     * secret:someSecret
+     **/
     override fun processQRScannerAppResponse(scannedText: String) {
-        val potentialProjectId = scannedText.substring(scannedText.indexOf("id:") + "id:".length, scannedText.indexOf("\n"))
-        val nextParam = scannedText.substring(scannedText.indexOf("\n") + 1)
-        val potentialProjectSecret = nextParam.substring(nextParam.indexOf("secret:") + "secret:".length)
+
+        val beginProjectId = scannedText.indexOf(SCANNED_TEXT_TAG_PROJECT_ID) + SCANNED_TEXT_TAG_PROJECT_ID.length
+        val endProjectId = scannedText.indexOf("\n")
+        val potentialProjectId = scannedText.substring(beginProjectId, endProjectId)
+
+        val nextParamRow = scannedText.substring(scannedText.indexOf("\n") + 1)
+        val beginProjectSecret = nextParamRow.indexOf(SCANNED_TEXT_TAG_PROJECT_SECRET) + SCANNED_TEXT_TAG_PROJECT_SECRET.length
+        val potentialProjectSecret = nextParamRow.substring(beginProjectSecret)
 
         view.updateProjectIdInTextView(potentialProjectId)
         view.updateProjectSecretInTextView(potentialProjectSecret)
