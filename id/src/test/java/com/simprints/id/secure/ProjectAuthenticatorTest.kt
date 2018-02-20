@@ -43,7 +43,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
             getMockAttestationManager())
 
         val testObserver = authenticator
-            .authenticateWithNewCredentials(NonceScope("project_id", "user_id"), "encrypted_project_secret")
+            .authenticate(NonceScope("project_id", "user_id"), "encrypted_project_secret")
             .test()
 
         testObserver.awaitTerminalEvent()
@@ -64,7 +64,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(ApiService().retrofit))
 
-            .authenticateWithNewCredentials(nonceScope, "encrypted_project_secret")
+            .authenticate(nonceScope, "encrypted_project_secret")
             .test()
 
         testObserver.awaitTerminalEvent()

@@ -5,6 +5,7 @@ import com.google.common.io.BaseEncoding
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 
 class AttestationManager {
 
@@ -25,6 +26,6 @@ class AttestationManager {
                    // So we can turn off the Safety check on the server if we need.
                    emitter.onSuccess(AttestToken(""))
                }
-       }
+       }.subscribeOn(Schedulers.io())
    }
 }
