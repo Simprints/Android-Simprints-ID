@@ -4,23 +4,23 @@ import android.content.Intent
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
-import com.simprints.id.activities.checkLogin.CheckLoginActivity
-import com.simprints.id.activities.dashboard.DashboardActivity
+import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
-import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
-import com.simprints.id.tools.roboletric.createRoboCheckLoginViewActivity
+import com.simprints.id.tools.roboletric.createRoboCheckLoginFromIntentViewActivity
 import com.simprints.id.tools.roboletric.getRoboSharedPreferences
-import com.simprints.id.tools.roboletric.mockLocalDbManager
+import com.simprints.id.tools.roboletric.mockDbManagers
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.doReturn
 import org.mockito.Mockito.mock
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
@@ -29,7 +29,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class)
-class CheckLoginTestActivity {
+class CheckLoginFromIntentActivityTest {
 
     private lateinit var analyticsManagerMock: AnalyticsManager
     private lateinit var app: Application
@@ -41,13 +41,13 @@ class CheckLoginTestActivity {
         app = (RuntimeEnvironment.application as Application)
         app.analyticsManager = analyticsManagerMock
 
-        mockLocalDbManager(app)
+        mockDbManagers(app)
     }
 
     @Test
     @Throws(Exception::class)
     fun unknownCallingAppSource_shouldLogEvent() {
-        var controller = Robolectric.buildActivity(CheckLoginActivityFromBadCallingMock::class.java).create()
+        val controller = Robolectric.buildActivity(CheckLoginActivityFromBadCallingMock::class.java).create()
         controller.start().resume().visible()
         verifyALogSafeExceptionWasThrown(1)
     }
@@ -58,7 +58,7 @@ class CheckLoginTestActivity {
         val pm = app.packageManager
         pm.setInstallerPackageName("com.app.installed.from.playstore", "com.android.vending")
 
-        var controller = Robolectric.buildActivity(CheckLoginActivityFromGoodCallingAppMock::class.java).create()
+        val controller = Robolectric.buildActivity(CheckLoginActivityFromGoodCallingAppMock::class.java).create()
         controller.start().resume().visible()
         verifyALogSafeExceptionWasThrown(0)
     }
@@ -69,7 +69,7 @@ class CheckLoginTestActivity {
 
     @Test
     @Throws(Exception::class)
-    fun byIntent_extractLoginParams() {
+    fun validIntentParams_extractLoginOnes() {
 
         val intent = Intent().apply {
             action = "com.simprints.id.REGISTER"
@@ -79,9 +79,7 @@ class CheckLoginTestActivity {
             putExtra("moduleId", "some_module")
         }
 
-        val controller = createRoboCheckLoginViewActivity(intent).start()
-        val activity = controller.get() as CheckLoginActivity
-        activity.viewPresenter.wasAppOpenedByIntent = true
+        val controller = createRoboCheckLoginFromIntentViewActivity(intent).start()
         controller.resume().visible()
 
         Assert.assertEquals("some_project", app.dataManager.projectId)
@@ -90,11 +88,10 @@ class CheckLoginTestActivity {
 
     @Test
     @Throws(Exception::class)
-    fun byIntent_invalidParams_shouldAlertActComeUp() {
+    fun invalidParams_shouldAlertActComeUp() {
 
-        val controller = createRoboCheckLoginViewActivity().start()
-        val activity = controller.get() as CheckLoginActivity
-        activity.viewPresenter.wasAppOpenedByIntent = true
+        val controller = createRoboCheckLoginFromIntentViewActivity().start()
+        val activity = controller.get() as CheckLoginFromIntentActivity
         controller.resume().visible()
 
         assertActivityStarted(AlertActivity::class.java, activity)
@@ -102,40 +99,25 @@ class CheckLoginTestActivity {
 
     @Test
     @Throws(Exception::class)
-    fun byIntent_userIsLogged_shouldLaunchActComeUp() {
+    fun userIsLogged_shouldLaunchActComeUp() {
 
-        val activity = startCheckLoginActivity("com.simprints.id.REGISTER", "some_projectId", true, true)
+        val activity = startCheckLoginActivity("com.simprints.id.REGISTER", "some_projectId", true)
         assertActivityStarted(LaunchActivity::class.java, activity)
     }
 
     @Test
     @Throws(Exception::class)
-    fun byIntent_userIsNotLogged_shouldLoginActComeUp() {
+    fun userIsNotLogged_shouldLoginActComeUp() {
 
-        val activity = startCheckLoginActivity("com.simprints.id.REGISTER", "some_projectId", false, true)
+        val activity = startCheckLoginActivity("com.simprints.id.REGISTER", "some_projectId", false)
         assertActivityStarted(LoginActivity::class.java, activity)
     }
 
-    @Test
-    @Throws(Exception::class)
-    fun byHomeButton_userIsNotLogged_shouldRequestLoginActComeUp() {
-
-        val activity = startCheckLoginActivity("com.simprints.id.REGISTER", "some_projectId", false, false)
-        assertActivityStarted(RequestLoginActivity::class.java, activity)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun byHomeButton_userIsLogged_shouldDashboardActComeUp() {
-
-        val activity = startCheckLoginActivity("com.simprints.id.REGISTER", "some_projectId", true, false)
-        assertActivityStarted(DashboardActivity::class.java, activity)
-    }
-
-    private fun startCheckLoginActivity(actionString: String, projectId: String, logged: Boolean, openedByIntent: Boolean): CheckLoginActivity {
+    private fun startCheckLoginActivity(actionString: String, projectId: String, logged: Boolean): CheckLoginFromIntentActivity {
         val sharedPreferences = getRoboSharedPreferences()
-        sharedPreferences.edit().putString("ENCRYPTED_PROJECT_SECRET", if (logged) "some_secret" else "").commit()
-        sharedPreferences.edit().putString("PROJECT_ID", if (logged) projectId else "$projectId false").commit()
+        sharedPreferences.edit().putString(SecureDataManagerImpl.ENCRYPTED_PROJECT_SECRET, if (logged) "some_secret" else "").commit()
+        sharedPreferences.edit().putString(SecureDataManagerImpl.PROJECT_ID, if (logged) projectId else "$projectId false").commit()
+        doReturn(logged).`when`(app.remoteDbManager).isSignedIn(anyNotNull())
 
         val intent = Intent().apply {
             action = actionString
@@ -144,22 +126,21 @@ class CheckLoginTestActivity {
             putExtra("moduleId", "")
         }
 
-        val controller = createRoboCheckLoginViewActivity(intent).start()
-        val activity = controller.get() as CheckLoginActivity
-        activity.viewPresenter.wasAppOpenedByIntent = openedByIntent
+        val controller = createRoboCheckLoginFromIntentViewActivity(intent).start()
+        val activity = controller.get() as CheckLoginFromIntentActivity
         controller.resume().visible()
         return activity
     }
 }
 
-class CheckLoginActivityFromBadCallingMock : CheckLoginActivity() {
+class CheckLoginActivityFromBadCallingMock : CheckLoginFromIntentActivity() {
 
     override fun getCallingPackageName(): String {
         return "com.app.installed.manually"
     }
 }
 
-class CheckLoginActivityFromGoodCallingAppMock : CheckLoginActivity() {
+class CheckLoginActivityFromGoodCallingAppMock : CheckLoginFromIntentActivity() {
 
     override fun getCallingPackageName(): String {
         return "com.app.installed.from.playstore" //Any available app.

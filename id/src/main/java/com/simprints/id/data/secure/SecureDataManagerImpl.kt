@@ -6,9 +6,9 @@ import com.simprints.id.exceptions.safe.ProjectCredentialsMissingException
 class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
 
     companion object {
-        private const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
-        private const val PROJECT_ID: String = "PROJECT_ID"
-        private const val PROJECT_SECRET_AND_ID_DEFAULT: String = ""
+         const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
+         const val PROJECT_ID: String = "PROJECT_ID"
+         private const val PROJECT_SECRET_AND_ID_DEFAULT: String = ""
     }
 
     override var encryptedProjectSecret: String = ""

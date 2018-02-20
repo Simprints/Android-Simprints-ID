@@ -33,7 +33,7 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".activities.checkLogin.CheckLoginActivity"
+            android:name="com.simprints.id.activities.checkLogin.openedByHomeButton.CheckLoginFromHomeAppActivity"
             android:label="@string/title_activity_front"
             android:launchMode="standard"
             android:screenOrientation="portrait">
@@ -41,6 +41,12 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
+            android:label="@string/title_activity_front"
+            android:launchMode="standard"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.simprints.id.REGISTER" />
                 <action android:name="com.simprints.id.IDENTIFY" />

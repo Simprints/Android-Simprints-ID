@@ -17,12 +17,13 @@ import com.simprints.id.tools.extensions.scannerAppIntent
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.indeterminateProgressDialog
 
+
 class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     companion object {
         const val LOGIN_SUCCESSED: Int = 1
         const val LOGIN_REQUEST_CODE: Int = 1
-        private const val QR_REQUEST_CODE: Int = 0
+        const val QR_REQUEST_CODE: Int = 0
     }
 
     lateinit var viewPresenter: LoginContract.Presenter
@@ -41,7 +42,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        var projectAuthenticator = ProjectAuthenticator(app.secureDataManager, app.dataManager, SafetyNet.getClient(this))
+        val projectAuthenticator = ProjectAuthenticator(app.secureDataManager, app.dataManager, SafetyNet.getClient(this))
         viewPresenter = LoginPresenter(this, app.secureDataManager, projectAuthenticator)
         viewPresenter.start()
 
@@ -81,7 +82,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         }
     }
 
-    private fun handleScannerAppResult(resultCode: Int, data: Intent) {
+    fun handleScannerAppResult(resultCode: Int, data: Intent) {
 
         runOnUiThread {
             try {
@@ -124,11 +125,9 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         progressDialog.dismiss()
     }
 
-    override fun returnSuccessfulResult(token: Tokens) {
+    override fun returnSuccessfulResult(tokens: Tokens) {
         val resultData = Intent()
-        //TODO: Fix it when we will full implemented the logic for the 2 tokens
-        resultData.putExtra(IntentKeys.loginActivityTokenReturn, token.legacyToken)
-
+        resultData.putExtra(IntentKeys.loginActivityTokenReturn, tokens)
         setResult(LOGIN_SUCCESSED, resultData)
         finish()
     }

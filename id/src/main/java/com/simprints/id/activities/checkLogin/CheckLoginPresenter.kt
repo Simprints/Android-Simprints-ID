@@ -1,52 +1,29 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.id.data.DataManager
-import com.simprints.id.domain.sessionParameters.SessionParameters
-import com.simprints.id.domain.sessionParameters.extractors.Extractor
-import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
-import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.TimeHelper
 import java.util.*
 
-class CheckLoginPresenter(val view: CheckLoginContract.View,
-                          val dataManager: DataManager,
-                          private val sessionParametersExtractor: Extractor<SessionParameters>,
-                          override var wasAppOpenedByIntent: Boolean,
-                          private val timeHelper: TimeHelper) : CheckLoginContract.Presenter {
+open class CheckLoginPresenter (
+    private val dataManager: DataManager,
+    private val timeHelper: TimeHelper) {
 
-    private var started: Boolean = false
-
-    init {
-        view.setPresenter(this)
-    }
-
-    override fun start() {
-        if (!started) {
-            started = true
-            initSession()
-
-            // If app was launched by intent, we extract the sessions Params (if not done before)
-            if (wasAppOpenedByIntent) {
-                try {
-                    extractSessionParameters()
-                } catch (exception: InvalidCalloutError) {
-                    view.launchAlertForError(exception.alertType)
-                    return
-                }
-            }
-            view.checkCallingApp()
-            checkIfUserIsLoggedIn()
-        }
-    }
-
-    override fun checkIfUserIsLoggedIn() {
+    fun openNextActivity() {
         if (isUserSignedIn()) {
-            initDbContext(dataManager.signedInProjectId)
-            startNormalFlow()
-        } else /* FUTURE: && calloutAction != LOGIN */ {
-            redirectUserForLogin()
+            initDbContext(dataManager.getSignedInProjectIdOrEmpty())
+            openActivityForUserSignedIn()
+        } else {
+            openActivityForUserNotSignedIn()
         }
+    }
+
+    protected open fun openActivityForUserNotSignedIn() {
+        throw Exception("Not overridden")
+    }
+
+    protected open fun openActivityForUserSignedIn() {
+        throw Exception("Not overridden")
     }
 
     private fun initDbContext(projectId: String) {
@@ -55,66 +32,32 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
                 dataManager.initialiseDb(projectId)
             } catch (error: UninitializedDataManagerError) {
                 dataManager.logError(error)
-                view.launchAlertForError(ALERT_TYPE.UNEXPECTED_ERROR)
+                dbInitFailed()
             }
         }
     }
 
-    private fun extractSessionParameters() {
-        val callout = view.parseCallout()
-        callout.apply {
-            dataManager.logCallout(this)
-        }
-        val sessionParameters = sessionParametersExtractor.extractFrom(callout)
-        dataManager.sessionParameters = sessionParameters
-        dataManager.calloutAction = sessionParameters.calloutAction
-        dataManager.logUserProperties()
+    protected open fun dbInitFailed() {
+        throw Exception("Not overridden")
     }
 
     private fun isUserSignedIn(): Boolean {
         val encProjectSecret = dataManager.getEncryptedProjectSecretOrEmpty()
         val storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
-        //val isFirebaseTokenValid = dataManager.isSignedIn(storedProjectId)
-        val isFirebaseTokenValid = true
+        val isFirebaseTokenValid = dataManager.isSignedIn(storedProjectId) || true //TODO:Remove it once isSignedIn is done
 
-        if (encProjectSecret.isEmpty() || storedProjectId.isEmpty() || !isFirebaseTokenValid) {
-            return false
-        }
-
-        return if (wasAppOpenedByIntent) {
-            return dataManager.projectId.let {
-                if (it.isNotEmpty()) {
-                    it == storedProjectId
-                } else {
-                    findProjectIdForApiKey(dataManager.apiKey) == storedProjectId
-                }
-            }
+        return if (encProjectSecret.isEmpty() || storedProjectId.isEmpty() || !isFirebaseTokenValid) {
+            false
         } else {
-            true
+            isUserSignedInForStoredProjectId()
         }
     }
 
-    private fun findProjectIdForApiKey(legacyApiKey: String): String {
-        return dataManager.projectIdForLegacyApiKeyOrEmpty(legacyApiKey)
+    protected open fun isUserSignedInForStoredProjectId(): Boolean {
+        throw Exception("Not overridden")
     }
 
-    private fun startNormalFlow() {
-        if (wasAppOpenedByIntent) {
-            view.openLaunchActivity()
-        } else {
-            view.openDashboardActivity()
-        }
-    }
-
-    private fun redirectUserForLogin() {
-        if (wasAppOpenedByIntent) {
-            view.openLoginActivity()
-        } else {
-            view.openRequestLoginActivity()
-        }
-    }
-
-    private fun initSession() {
+    protected fun initSession() {
         dataManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
     }
 
@@ -122,3 +65,4 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
         return UUID.randomUUID().toString()
     }
 }
+
