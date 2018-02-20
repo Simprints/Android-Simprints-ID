@@ -24,7 +24,7 @@ class LoginPresenter(val view: LoginContract.View,
 
         if (!possibleProjectId.isEmpty() && !possibleProjectSecret.isEmpty() && !possibleUserId.isEmpty()) {
             view.showProgressDialog(R.string.progress_title, R.string.login_progress_message)
-            projectAuthenticator.authenticateWithNewCredentials(
+            projectAuthenticator.authenticate(
                 NonceScope(possibleProjectId, possibleUserId),
                 possibleProjectSecret)
                 .subscribe(

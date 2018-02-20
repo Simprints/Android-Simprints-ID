@@ -9,9 +9,8 @@ import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.Tokens
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.BiFunction
 import io.reactivex.internal.operators.single.SingleJust
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxkotlin.Singles
 
 class ProjectAuthenticator(secureDataManager: SecureDataManager,
                            private val dataManager: DbManager,
@@ -24,36 +23,34 @@ class ProjectAuthenticator(secureDataManager: SecureDataManager,
     private val nonceManager = NonceManager(apiClient)
     private val authManager = AuthManager(apiClient)
 
-    fun authenticateWithNewCredentials(nonceScope: NonceScope, projectSecret: String): Single<Tokens> =
-        authenticate(nonceScope, getEncryptedProjectSecret(projectSecret))
-
-    private fun authenticate(nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<Tokens> =
-        combineProjectSecretAndGoogleAttestationObservables(nonceScope, encryptedProjectSecret)
+    fun authenticate(nonceScope: NonceScope, projectSecret: String): Single<Tokens> =
+        prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
             .initFirebase(nonceScope.projectId)
             .observeOn(AndroidSchedulers.mainThread())
 
-    private fun combineProjectSecretAndGoogleAttestationObservables(nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<AuthRequest> =
-        Single.zip(
-            encryptedProjectSecret.subscribeOn(Schedulers.io()),
-            getGoogleAttestation(safetyNetClient, nonceScope).subscribeOn(Schedulers.io()),
-            combineAuthRequestParameters(nonceScope.projectId, nonceScope.userId)
-        )
+    private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
+        val encryptedProjectSecret = getEncryptedProjectSecret(projectSecret)
+        val googleAttestation = getGoogleAttestation(safetyNetClient, nonceScope)
+        return zipAuthRequestParameters(encryptedProjectSecret, googleAttestation, nonceScope)
+    }
 
     private fun getEncryptedProjectSecret(projectSecret: String): Single<String> =
         publicKeyManager.requestPublicKey()
-            .flatMap { publicKey -> SingleJust(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey)) }
+            .flatMap { publicKey ->
+                SingleJust(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey)) }
 
     private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, noneScope: NonceScope): Single<AttestToken> =
-        nonceManager.requestNonce(noneScope).flatMap { nonce ->
-            attestationManager
-                .requestAttestation(safetyNetClient, nonce)
-                .subscribeOn(Schedulers.io())
+        nonceManager.requestNonce(noneScope)
+            .flatMap { nonce -> attestationManager.requestAttestation(safetyNetClient, nonce)
         }
 
-    private fun combineAuthRequestParameters(projectId: String, userId: String): BiFunction<String, AttestToken, AuthRequest> =
-        BiFunction { encryptedProjectSecret: String, attestation: AttestToken ->
-            AuthRequest(encryptedProjectSecret, projectId, userId, attestation)
+    private fun zipAuthRequestParameters(encryptedProjectSecretSingle: Single<String>,
+                                         googleAttestationSingle: Single<AttestToken>,
+                                         nonceScope: NonceScope): Single<AuthRequest> =
+        Singles.zip(encryptedProjectSecretSingle, googleAttestationSingle) {
+            encryptedProjectSecret: String, googleAttestation: AttestToken ->
+            AuthRequest(encryptedProjectSecret, nonceScope.projectId, nonceScope.userId, googleAttestation)
         }
 
     private fun Single<out Tokens>.initFirebase(projectId: String): Single<Tokens> =
@@ -69,8 +66,6 @@ class ProjectAuthenticator(secureDataManager: SecureDataManager,
 
     private fun Single<out AuthRequest>.makeAuthRequest(): Single<Tokens> =
         flatMap { authRequest ->
-            authManager
-            .requestAuthToken(authRequest)
-            .subscribeOn(Schedulers.io())
+            authManager.requestAuthToken(authRequest)
         }
 }
