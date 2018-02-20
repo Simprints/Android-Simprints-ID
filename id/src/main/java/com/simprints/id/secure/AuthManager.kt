@@ -3,6 +3,7 @@ package com.simprints.id.secure
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.Tokens
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 
 class AuthManager(val client: ApiServiceInterface) {
 
@@ -20,6 +21,6 @@ class AuthManager(val client: ApiServiceInterface) {
             encryptedProjectSecretHeaderKey to authRequest.encryptedProjectSecret,
             attestationResultHeaderKey to authRequest.attestation.value)
 
-        return client.auth(headers)
+        return client.auth(headers).subscribeOn(Schedulers.io())
     }
 }
