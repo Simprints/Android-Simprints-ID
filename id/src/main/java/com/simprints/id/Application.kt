@@ -129,7 +129,7 @@ class Application : MultiDexApplication() {
         PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager)
     }
 
-    private val localDbManager: LocalDbManager by lazy {
+    var localDbManager: LocalDbManager by lazyVar {
         RealmDbManager(this)
     }
 
@@ -141,7 +141,7 @@ class Application : MultiDexApplication() {
         FirebaseAuthListenerManager()
     }
 
-    private val remoteDbManager: RemoteDbManager by lazy {
+    var remoteDbManager: RemoteDbManager by lazyVar {
         FirebaseManager(this, remoteDbConnectionListenerManager, remoteDbAuthListenerManager)
     }
 

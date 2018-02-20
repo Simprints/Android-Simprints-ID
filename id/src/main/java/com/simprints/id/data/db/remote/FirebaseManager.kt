@@ -14,7 +14,7 @@ import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
 import com.simprints.id.exceptions.safe.DifferentProjectInitialisedException
 import com.simprints.id.exceptions.safe.DifferentProjectSignedInException
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libdata.DATA_ERROR
 import com.simprints.libdata.DataCallback
@@ -90,9 +90,9 @@ class FirebaseManager(private val appContext: Context,
     private fun initialiseFirebaseAuth(firebaseApp: FirebaseApp): FirebaseAuth =
         FirebaseAuth.getInstance(firebaseApp)
 
-    override fun signInToRemoteDb(projectId: String, token: Tokens) {
+    override fun signInToRemoteDb(projectId: String, tokens: Tokens) {
         // TODO : turn into an RxJava Single Observable
-        legacyFirebaseAuth.signInWithCustomToken(token.value).addOnCompleteListener { task ->
+        legacyFirebaseAuth.signInWithCustomToken(tokens.legacyToken).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 //emitter.onSuccess(token)
                 Timber.d("Firebase Auth signInWithCustomToken successful")
