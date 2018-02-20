@@ -12,7 +12,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.Tokens
 import com.simprints.id.tools.extensions.scannerAppIntent
 import kotlinx.android.synthetic.main.activity_login.*
 import org.jetbrains.anko.indeterminateProgressDialog
@@ -20,8 +20,8 @@ import org.jetbrains.anko.indeterminateProgressDialog
 class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     companion object {
-        public const val LOGIN_SUCCESSED: Int = 1
-        public const val LOGIN_REQUEST_CODE: Int = 1
+        const val LOGIN_SUCCESSED: Int = 1
+        const val LOGIN_REQUEST_CODE: Int = 1
         private const val QR_REQUEST_CODE: Int = 0
     }
 
@@ -30,6 +30,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     val app by lazy {
         application as Application
     }
+
     val userId by lazy {
         app.dataManager.userId
     }
@@ -40,8 +41,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val app = application as Application
-        viewPresenter = LoginPresenter(this, app.secureDataManager, ProjectAuthenticator(app.secureDataManager, app.dataManager), SafetyNet.getClient(this))
+        var projectAuthenticator = ProjectAuthenticator(app.secureDataManager, app.dataManager, SafetyNet.getClient(this))
+        viewPresenter = LoginPresenter(this, app.secureDataManager, projectAuthenticator)
         viewPresenter.start()
 
         initUI()
@@ -57,7 +58,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         loginButtonSignIn.setOnClickListener {
             val projectId = loginEditTextProjectId.text.toString()
             val projectSecret = loginEditTextProjectSecret.text.toString()
-            viewPresenter.userDidWantToSignIn(projectId, projectSecret, userId)
+            val userId = loginEditTextUserId.text.toString()
+            viewPresenter.userDidWantToSignIn(projectId, projectSecret, userId, app.dataManager.apiKey)
         }
     }
 
@@ -73,8 +75,9 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QR_REQUEST_CODE) {
-            if (data == null) return
-            handleScannerAppResult(resultCode, data)
+            data?.let {
+                handleScannerAppResult(resultCode, it)
+            }
         }
     }
 
@@ -121,9 +124,10 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         progressDialog.dismiss()
     }
 
-    override fun returnSuccessfulResult(token: Token) {
+    override fun returnSuccessfulResult(token: Tokens) {
         val resultData = Intent()
-        resultData.putExtra(IntentKeys.loginActivityTokenReturn, token.value)
+        //TODO: Fix it when we will full implemented the logic for the 2 tokens
+        resultData.putExtra(IntentKeys.loginActivityTokenReturn, token.legacyToken)
 
         setResult(LOGIN_SUCCESSED, resultData)
         finish()

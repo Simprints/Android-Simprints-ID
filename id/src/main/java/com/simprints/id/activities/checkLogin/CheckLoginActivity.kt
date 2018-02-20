@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.dashboard.DashboardActivity
+import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
@@ -15,6 +17,8 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants.MAIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
+import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.startActivityForResult
 
 open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
 
@@ -32,9 +36,13 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
 
         app = application as Application
         dataManager = app.dataManager
-        dataManager.callingPackage = getCallingPackageName()
 
-        viewPresenter = CheckLoginPresenter(this, dataManager, app.sessionParametersExtractor, wasAppOpenedByIntent, timeHelper)
+        viewPresenter = CheckLoginPresenter(
+            this,
+            dataManager,
+            app.sessionParametersExtractor,
+            wasAppOpenedByIntent,
+            timeHelper)
     }
 
     override fun onResume() {
@@ -50,6 +58,7 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
         intent.toCallout()
 
     override fun checkCallingApp() {
+        dataManager.callingPackage = getCallingPackageName()
         if (app.packageManager.isCallingAppFromUnknownSource(dataManager.callingPackage)) {
             dataManager.logSafeException(CallingAppFromUnknownSourceException())
         }
@@ -64,22 +73,22 @@ open class CheckLoginActivity : AppCompatActivity(), CheckLoginContract.View {
     }
 
     override fun openLoginActivity() {
-        val nextIntent = Intent(this, LoginActivity::class.java)
-        startActivityForResult(nextIntent, LoginActivity.LOGIN_REQUEST_CODE)
+        startActivityForResult<LoginActivity>(LoginActivity.LOGIN_REQUEST_CODE)
     }
 
     override fun openRequestLoginActivity() {
-        startActivity(Intent(this, RequestLoginActivity::class.java))
+        startActivity<RequestLoginActivity>()
         finish()
     }
 
-    override fun startActivity(nextActivityClassAfterLogin: Class<out Any>) {
-        try {
-            val nextIntent = Intent(this, nextActivityClassAfterLogin)
-            startActivityForResult(nextIntent, MAIN_ACTIVITY_REQUEST)
-        } catch (t: Throwable) {
-            t.printStackTrace()
-        }
+    override fun openLaunchActivity() {
+        val nextIntent = Intent(this, LaunchActivity::class.java)
+        startActivityForResult(nextIntent, MAIN_ACTIVITY_REQUEST)
+    }
+
+    override fun openDashboardActivity() {
+        val dashIntent = Intent(this, DashboardActivity::class.java)
+        startActivity(dashIntent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -25,33 +25,33 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         Realm.init(appContext)
     }
 
-    override fun signInToLocal(localDbKey: String) {
+    override fun signInToLocal(projectId: String, localDbKey: String) {
         launch(UI) {
-            realm = Realm.getInstance(RealmConfig.get(localDbKey))
+            //TODO: we don't have a localDbKey yet, using projectId temporary
+            realm = Realm.getInstance(RealmConfig.get(projectId))
         }
     }
 
-    override fun signOutOfLocal() {
+    override fun signOutOfLocal(projectId: String) {
         launch(UI) {
-            realm?.close()?: throw RealmUninitialisedError()
+            realm?.close() ?: throw RealmUninitialisedError()
         }
     }
 
-    override fun isLocalDbInitialized(): Boolean =
+    override fun isLocalDbInitialized(projectId: String): Boolean =
         realm != null
-
 
     // Data transfer
 
     override fun savePersonInLocal(fbPerson: fb_Person) {
-        realm?.let {realm ->
+        realm?.let { realm ->
             rl_Person(fbPerson).save(realm)
         } ?: throw RealmUninitialisedError()
     }
 
     override fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback) {
         val wrappedCallback = wrapCallback("DatabaseContext.loadPerson()", callback)
-        realm?.let {realm ->
+        realm?.let { realm ->
             val rlPerson = realm.where(rl_Person::class.java).equalTo("patientId", guid).findFirst()
             if (rlPerson != null) {
                 destinationList.add(rlPerson.libPerson)
@@ -65,7 +65,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
                                      group: Constants.GROUP, userId: String, moduleId: String,
                                      callback: DataCallback?) {
         val wrappedCallback = wrapCallback("RealmDbManager.loadPeopleFromLocal()", callback)
-        realm?.let {realm ->
+        realm?.let { realm ->
             val request: RealmResults<rl_Person> = when (group) {
                 Constants.GROUP.GLOBAL -> realm.where(rl_Person::class.java).findAllAsync()
                 Constants.GROUP.USER -> realm.where(rl_Person::class.java).equalTo("userId", userId).findAllAsync()
@@ -83,7 +83,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
     }
 
     override fun getPeopleCountFromLocal(group: Constants.GROUP, userId: String, moduleId: String): Long {
-        realm?.let {realm ->
+        realm?.let { realm ->
             return rl_Person.count(realm, userId, moduleId, group)
         } ?: throw RealmUninitialisedError()
     }

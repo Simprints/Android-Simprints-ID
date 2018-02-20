@@ -3,7 +3,7 @@ package com.simprints.id.data.db
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.models.Session
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Progress
 import com.simprints.libdata.DataCallback
@@ -19,7 +19,7 @@ interface DbManager : LocalDbManager, RemoteDbManager {
 
     // Lifecycle
     fun initialiseDb(projectId: String)
-    fun signIn(projectId: String, token: Token)
+    fun signIn(projectId: String, token: Tokens)
     fun signOut(projectId: String)
 
     fun isDbInitialised(projectId: String): Boolean

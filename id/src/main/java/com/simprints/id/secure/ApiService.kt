@@ -13,17 +13,17 @@ open class ApiService {
         retrofit.create(ApiServiceInterface::class.java)
     }
 
-    val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BASIC
-        OkHttpClient.Builder().addInterceptor(interceptor)
-    }
-
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(JsonHelper.gson))
             .baseUrl(baseUrl)
             .client(okHttpClientConfig.build()).build()
+    }
+
+    val okHttpClientConfig: OkHttpClient.Builder by lazy {
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.level = HttpLoggingInterceptor.Level.BASIC
+        OkHttpClient.Builder().addInterceptor(interceptor)
     }
 }

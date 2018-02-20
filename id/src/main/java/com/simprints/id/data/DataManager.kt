@@ -16,7 +16,6 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Emitter
 
-
 interface DataManager : PreferencesManager, DbManager, ApiManager,
         AnalyticsManager, SecureDataManager {
 
@@ -38,6 +37,7 @@ interface DataManager : PreferencesManager, DbManager, ApiManager,
     // Lifecycle
     override fun initialiseDb(projectId: String)
     override fun signOut(projectId: String)
+
     // Data transfer
     fun savePerson(person: Person)
     fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
