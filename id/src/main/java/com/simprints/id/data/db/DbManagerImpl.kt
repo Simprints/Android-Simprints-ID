@@ -4,7 +4,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.models.Session
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Progress
 import com.simprints.libdata.DataCallback
@@ -28,7 +28,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.initialiseRemoteDb(projectId)
     }
 
-    override fun signIn(projectId: String, token: Token) {
+    override fun signIn(projectId: String, token: Tokens) {
         // TODO
         remoteDbManager.signInToRemoteDb(projectId, token)
         val localDbKey = remoteDbManager.getLocalDbKeyFromRemote()

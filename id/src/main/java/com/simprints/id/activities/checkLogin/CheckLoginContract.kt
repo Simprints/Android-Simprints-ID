@@ -11,7 +11,9 @@ interface CheckLoginContract {
         fun launchAlertForError(alertType: ALERT_TYPE)
         fun openLoginActivity()
         fun openRequestLoginActivity()
-        fun startActivity(nextActivityClassAfterLogin: Class<out Any>)
+        fun openLaunchActivity()
+        fun openDashboardActivity()
+
         fun checkCallingApp()
         fun parseCallout(): Callout
     }
@@ -21,4 +23,3 @@ interface CheckLoginContract {
         fun checkIfUserIsLoggedIn()
     }
 }
-

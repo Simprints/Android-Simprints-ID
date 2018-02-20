@@ -90,7 +90,7 @@ class FirebaseManager(private val appContext: Context,
     private fun initialiseFirebaseAuth(firebaseApp: FirebaseApp): FirebaseAuth =
         FirebaseAuth.getInstance(firebaseApp)
 
-    override fun signInToRemoteDb(projectId: String, token: Token) {
+    override fun signInToRemoteDb(projectId: String, token: Tokens) {
         // TODO : turn into an RxJava Single Observable
         legacyFirebaseAuth.signInWithCustomToken(token.value).addOnCompleteListener { task ->
             if (task.isSuccessful) {

@@ -1,6 +1,5 @@
 package com.simprints.id.activities.login
 
-import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.R
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.secure.ProjectAuthenticator
@@ -9,8 +8,7 @@ import com.simprints.id.secure.models.NonceScope
 @Suppress("UnnecessaryVariable")
 class LoginPresenter(val view: LoginContract.View,
                      private val secureDataManager: SecureDataManager,
-                     override var projectAuthenticator: ProjectAuthenticator,
-                     private val safetyNetClient: SafetyNetClient) : LoginContract.Presenter {
+                     override var projectAuthenticator: ProjectAuthenticator) : LoginContract.Presenter {
     init {
         view.setPresenter(this)
     }
@@ -27,7 +25,6 @@ class LoginPresenter(val view: LoginContract.View,
         if (!possibleProjectId.isEmpty() && !possibleProjectSecret.isEmpty() && !possibleUserId.isEmpty()) {
             view.showProgressDialog(R.string.progress_title, R.string.login_progress_message)
             projectAuthenticator.authenticateWithNewCredentials(
-                safetyNetClient,
                 NonceScope(possibleProjectId, possibleUserId),
                 possibleProjectSecret)
                 .subscribe(

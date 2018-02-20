@@ -9,7 +9,6 @@ import retrofit2.mock.NetworkBehavior
 import java.util.concurrent.TimeUnit
 
 fun createMockService(retrofit: Retrofit, failurePercent: Int): ApiServiceInterface {
-    // Creating a mockServer with 100% of failure rate.
     val networkBehavior = NetworkBehavior.create()
     givenNetworkFailurePercentIs(networkBehavior, failurePercent)
 

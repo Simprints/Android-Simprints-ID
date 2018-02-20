@@ -15,6 +15,7 @@ import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.tools.roboletric.createRoboCheckLoginViewActivity
 import com.simprints.id.tools.roboletric.getRoboSharedPreferences
+import com.simprints.id.tools.roboletric.mockLocalDbManager
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -39,6 +40,8 @@ class CheckLoginTestActivity {
         analyticsManagerMock = mock(FirebaseAnalyticsManager::class.java)
         app = (RuntimeEnvironment.application as Application)
         app.analyticsManager = analyticsManagerMock
+
+        mockLocalDbManager(app)
     }
 
     @Test
@@ -68,17 +71,21 @@ class CheckLoginTestActivity {
     @Throws(Exception::class)
     fun byIntent_extractLoginParams() {
 
-        val intent = Intent()
-        intent.action = "com.simprints.id.REGISTER"
-        intent.putExtra("projectId", "some_project")
-        intent.putExtra("apiKey", "some_apiKey")
-        intent.putExtra("userId", "some_userId")
+        val intent = Intent().apply {
+            action = "com.simprints.id.REGISTER"
+            putExtra("projectId", "some_project")
+            putExtra("apiKey", "some_apiKey")
+            putExtra("userId", "some_userId")
+            putExtra("moduleId", "some_module")
+        }
 
-        createRoboCheckLoginViewActivity(intent).start().resume().visible()
+        val controller = createRoboCheckLoginViewActivity(intent).start()
+        val activity = controller.get() as CheckLoginActivity
+        activity.viewPresenter.wasAppOpenedByIntent = true
+        controller.resume().visible()
 
-        Assert.assertEquals(app.dataManager.projectId, "some_project")
-        Assert.assertEquals(app.dataManager.apiKey, "some_apiKey")
-        Assert.assertEquals(app.dataManager.userId, "some_userId")
+        Assert.assertEquals("some_project", app.dataManager.projectId)
+        Assert.assertEquals("some_userId", app.dataManager.userId)
     }
 
     @Test
@@ -125,16 +132,17 @@ class CheckLoginTestActivity {
         assertActivityStarted(DashboardActivity::class.java, activity)
     }
 
-    private fun startCheckLoginActivity(action: String, projectId: String, logged: Boolean, openedByIntent: Boolean): CheckLoginActivity {
+    private fun startCheckLoginActivity(actionString: String, projectId: String, logged: Boolean, openedByIntent: Boolean): CheckLoginActivity {
         val sharedPreferences = getRoboSharedPreferences()
         sharedPreferences.edit().putString("ENCRYPTED_PROJECT_SECRET", if (logged) "some_secret" else "").commit()
         sharedPreferences.edit().putString("PROJECT_ID", if (logged) projectId else "$projectId false").commit()
 
-        val intent = Intent()
-        intent.action = action
-        intent.putExtra("projectId", projectId)
-        intent.putExtra("userId", "")
-        intent.putExtra("moduleId", "")
+        val intent = Intent().apply {
+            action = actionString
+            putExtra("projectId", projectId)
+            putExtra("userId", "")
+            putExtra("moduleId", "")
+        }
 
         val controller = createRoboCheckLoginViewActivity(intent).start()
         val activity = controller.get() as CheckLoginActivity

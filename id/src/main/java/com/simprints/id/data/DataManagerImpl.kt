@@ -14,7 +14,9 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Progress
-import com.simprints.libdata.*
+import com.simprints.libdata.AuthListener
+import com.simprints.libdata.ConnectionListener
+import com.simprints.libdata.DataCallback
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.libdata.models.firebase.fb_Person
 import com.simprints.libdata.tools.Constants
@@ -22,7 +24,6 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Emitter
-
 
 class DataManagerImpl(private val context: Context,
                       private val preferencesManager: PreferencesManager,
@@ -77,7 +78,6 @@ class DataManagerImpl(private val context: Context,
 
     override fun logAuthStateChange(authenticated: Boolean) =
         analyticsManager.logAuthStateChange(authenticated, getSignedInProjectIdOrEmpty(), deviceId, sessionId)
-
 
     // DbManager call interception for populating arguments
     // Lifecycle

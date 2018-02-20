@@ -18,7 +18,7 @@ interface RemoteDbManager: RemoteDbConnectionListenerManager, RemoteDbAuthListen
     // Lifecycle
     fun initialiseRemoteDb(projectId: String)
 
-    fun signInToRemoteDb(projectId: String, token: Token)
+    fun signInToRemoteDb(projectId: String, token: Tokens)
     fun signOutOfRemoteDb(projectId: String)
 
     @Throws(DifferentProjectInitialisedException::class)

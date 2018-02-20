@@ -32,4 +32,12 @@ class SecureDataManagerMock : SecureDataManager {
     override fun getEncryptedProjectSecretOrEmpty(): String {
         throw RuntimeException("Not mocked!!!")
     }
+
+    override fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?) {
+        throw RuntimeException("Not mocked!!!")
+    }
+
+    override fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String {
+        throw RuntimeException("Not mocked!!!")
+    }
 }

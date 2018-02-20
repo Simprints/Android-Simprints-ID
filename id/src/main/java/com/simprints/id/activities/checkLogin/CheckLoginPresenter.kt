@@ -1,7 +1,5 @@
 package com.simprints.id.activities.checkLogin
 
-import com.simprints.id.activities.dashboard.DashboardActivity
-import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.sessionParameters.SessionParameters
 import com.simprints.id.domain.sessionParameters.extractors.Extractor
@@ -21,14 +19,6 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
 
     init {
         view.setPresenter(this)
-    }
-
-    private val nextActivityClassAfterLogin by lazy {
-        if (wasAppOpenedByIntent /* FUTURE: && calloutAction != LOGIN */) {
-            LaunchActivity::class.java
-        } else {
-            DashboardActivity::class.java
-        }
     }
 
     override fun start() {
@@ -54,7 +44,7 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
         if (isUserSignedIn()) {
             initDbContext(dataManager.signedInProjectId)
             startNormalFlow()
-        } else {
+        } else /* FUTURE: && calloutAction != LOGIN */ {
             redirectUserForLogin()
         }
     }
@@ -83,19 +73,22 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
 
     private fun isUserSignedIn(): Boolean {
         val encProjectSecret = dataManager.getEncryptedProjectSecretOrEmpty()
-        var storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
-        val isFirebaseTokenValid = dataManager.isSignedIn(storedProjectId)
+        val storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
+        //val isFirebaseTokenValid = dataManager.isSignedIn(storedProjectId)
+        val isFirebaseTokenValid = true
 
         if (encProjectSecret.isEmpty() || storedProjectId.isEmpty() || !isFirebaseTokenValid) {
             return false
         }
 
         return if (wasAppOpenedByIntent) {
-            var projectIdFromIntent = dataManager.projectId
-            if (projectIdFromIntent.isEmpty()) { //Legacy App with ApiKey
-                projectIdFromIntent = findProjectIdForApiKey(dataManager.apiKey)
+            return dataManager.projectId.let {
+                if (it.isNotEmpty()) {
+                    it == storedProjectId
+                } else {
+                    findProjectIdForApiKey(dataManager.apiKey) == storedProjectId
+                }
             }
-            projectIdFromIntent == storedProjectId
         } else {
             true
         }
@@ -106,7 +99,11 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
     }
 
     private fun startNormalFlow() {
-        view.startActivity(nextActivityClassAfterLogin)
+        if (wasAppOpenedByIntent) {
+            view.openLaunchActivity()
+        } else {
+            view.openDashboardActivity()
+        }
     }
 
     private fun redirectUserForLogin() {
