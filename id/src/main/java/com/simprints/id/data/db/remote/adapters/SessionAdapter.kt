@@ -13,7 +13,7 @@ fun Session.toFirebaseSession(): fb_Session =
             appVersionName,
             libVersionName,
             calloutAction,
-            apiKey,
+            projectId,
             moduleId,
             userId,
             patientId,

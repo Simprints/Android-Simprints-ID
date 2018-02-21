@@ -8,12 +8,11 @@ import android.support.annotation.Nullable;
 
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError;
+import com.simprints.id.domain.callout.CalloutAction;
 import com.simprints.id.exceptions.unsafe.NullScannerError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
-import com.simprints.id.domain.callout.CalloutAction;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
@@ -37,7 +36,6 @@ import static com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_
 public class Setup {
 
     private static Setup singleton;
-    public boolean setupCompleted = false;
 
     public synchronized static Setup getInstance(DataManager dataManager, AppState appState) {
         if (singleton == null) {
@@ -96,34 +94,19 @@ public class Setup {
             return;
         }
 
-        // Step 2: extractFrom database context + port db from aa to realm if needed . Only has to be done once.
-        if (!dataManager.isInitialized()) {
-            this.initDbContext(activity);
-            return;
-        }
-
-        // Step 3: check the api key. This only has to be done once.
-        // Note: LibData checks a cached value and callback right away if it is valid
-        // (To make the launch faster).
-        // Then it re-validate the key with the server, resulting in a second callback.
-        if (!apiKeyValidated) {
-            this.validateApiKey(activity);
-            return;
-        }
-
-        // Step 4: extractFrom scanner object.
+        // Step 2: extractFrom scanner object.
         if (appState.getScanner() == null) {
             this.initScanner(activity);
             return;
         }
 
-        // Step 5: connect with scanner. Must be done every time the scanner is not connected
+        // Step 3: connect with scanner. Must be done every time the scanner is not connected
         if (!appState.getScanner().isConnected()) {
             this.connectToScanner(activity);
             return;
         }
 
-        // Step 6: check if it's a verify intent. If it is, check if the person is in the database.
+        // Step 4: check if it's a verify intent. If it is, check if the person is in the database.
         // If they are, check if connected to the internet.
         if (!guidExists) {
             this.checkIfVerifyAndGuidExists(activity);
@@ -131,97 +114,36 @@ public class Setup {
         }
 
 
-        // Step 7: reset the UI. This is necessary for the trigger button to work.
+        // Step 5: reset the UI. This is necessary for the trigger button to work.
         if (!uiResetSinceConnection) {
             this.resetUi(activity);
             return;
         }
 
-        // Step 8: turn on the un20 if needed.
+        // Step 6: turn on the un20 if needed.
         this.wakeUpUn20(activity);
     }
 
     // STEP 1
     private void requestPermissions(@NonNull Activity activity) {
-        onProgress(0, R.string.launch_checking_permissions);
+        onProgress(15, R.string.launch_checking_permissions);
         PermissionManager.requestAllPermissions(activity, dataManager.getCallingPackage());
     }
 
     // STEP 2
     private void initDbContext(@NonNull final Activity activity) {
-        onProgress(10, R.string.updating_database);
-        dataManager.initialize(new DataCallback() {
-            @Override
-            public void onSuccess() {
-                Timber.d("Setup: Database context initialized.");
-                goOn(activity);
-            }
-
-            @Override
-            public void onFailure(DATA_ERROR dataError) {
-                switch (dataError) {
-                    case DATABASE_INIT_RESTART:
-                        goOn(activity);
-                        break;
-                    case NOT_FOUND:
-                        dataManager.logError(new ApiKeyNotFoundError("API Key was null in Setup.initDbContext()"));
-                        onAlert(ALERT_TYPE.MISSING_API_KEY);
-                        break;
-                    default:
-                        dataManager.logError(UnexpectedDataError.forDataError(dataError, "Setup.initDbContext()"));
-                        onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                }
-            }
-        });
-    }
-
-    // STEP 3
-    private void validateApiKey(@NonNull final Activity activity) {
-        onProgress(20, R.string.launch_checking_api_key);
-
+        onProgress(30, R.string.updating_database);
         try {
-            dataManager.signIn(newSignInCallback(activity));
+            dataManager.initialiseDb(dataManager.getProjectId());
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
 
-    private DataCallback newSignInCallback(@NonNull final Activity activity) {
-        return new DataCallback() {
-            @Override
-            public void onSuccess() {
-                if (!apiKeyValidated) {
-                    apiKeyValidated = true;
-                    Timber.d("Setup: Api key validated.");
-                    goOn(activity);
-                }
-            }
-
-            @Override
-            public void onFailure(DATA_ERROR dataError) {
-                switch (dataError) {
-                    case UNVERIFIED_API_KEY:
-                        apiKeyValidated = false;
-                        paused = true;
-                        callback.onAlert(ALERT_TYPE.UNVERIFIED_API_KEY);
-                        break;
-                    case INVALID_API_KEY:
-                        apiKeyValidated = false;
-                        paused = true;
-                        callback.onAlert(ALERT_TYPE.INVALID_API_KEY);
-                        break;
-                    default:
-                        dataManager.logError(UnexpectedDataError.forDataError(dataError, "Setup.validateApiKey()"));
-                        onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                }
-            }
-        };
-    }
-
-    // STEP 4
+    // STEP 3
     private void initScanner(@NonNull final Activity activity) {
-        callback.onProgress(40, R.string.launch_bt_connect);
+        callback.onProgress(45, R.string.launch_bt_connect);
         List<String> pairedScanners = ScannerUtils.getPairedScanners();
         if (pairedScanners.size() == 0) {
             onAlert(ALERT_TYPE.NOT_PAIRED);
@@ -239,9 +161,9 @@ public class Setup {
         goOn(activity);
     }
 
-    // STEP 5
+    // STEP 4
     private void connectToScanner(@NonNull final Activity activity) {
-        callback.onProgress(50, R.string.launch_bt_connect);
+        callback.onProgress(60, R.string.launch_bt_connect);
 
         appState.getScanner().connect(new ScannerCallback() {
             @Override
@@ -286,7 +208,7 @@ public class Setup {
         });
     }
 
-    // STEP 6
+    // STEP 5
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
         if (dataManager.getCalloutAction() != CalloutAction.VERIFY) {
             guidExists = true;
@@ -294,7 +216,7 @@ public class Setup {
             return;
         }
 
-        callback.onProgress(60, R.string.launch_checking_person_in_db);
+        callback.onProgress(70, R.string.launch_checking_person_in_db);
 
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = dataManager.getPatientId();
@@ -336,7 +258,7 @@ public class Setup {
     }
 
     private void saveNotFoundVerification(Person probe) {
-        if (dataManager.isConnected()) {
+        if (dataManager.isRemoteConnected()) {
             // We've synced with the online db and they're not in the db
             dataManager.saveVerification(probe, null, GUID_NOT_FOUND_ONLINE);
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
@@ -347,9 +269,9 @@ public class Setup {
         }
     }
 
-    // STEP 7
+    // STEP 6
     private void resetUi(@NonNull final Activity activity) {
-        callback.onProgress(70, R.string.launch_setup);
+        callback.onProgress(80, R.string.launch_setup);
 
         appState.getScanner().resetUI(new ScannerCallback() {
             @Override
@@ -373,9 +295,9 @@ public class Setup {
         });
     }
 
-    // STEP 8
+    // STEP 7
     private void wakeUpUn20(@NonNull final Activity activity) {
-        callback.onProgress(85, R.string.launch_wake_un20);
+        callback.onProgress(90, R.string.launch_wake_un20);
 
         appState.getScanner().un20Wakeup(new ScannerCallback() {
             @Override
@@ -426,13 +348,8 @@ public class Setup {
 
     private void onSuccess() {
         paused = true;
-        setupCompleted = true;
         if (callback != null)
             callback.onSuccess();
-    }
-
-    public boolean isOnGoing() {
-        return setupCompleted == false;
     }
 
     private void onProgress(int progress, int detailsId) {

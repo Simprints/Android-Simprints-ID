@@ -22,7 +22,7 @@
     <string name="privacy_label">محرمیت</string>
 
 
-    <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
+    <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
 
 
     <!-- SetupActivity : the loading screen -->

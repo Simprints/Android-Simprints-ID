@@ -1,81 +1,80 @@
 package com.simprints.id.data.secure
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError
-import com.simprints.id.exceptions.unsafe.ProjectCredentialsNonValidError
-
+import com.simprints.id.exceptions.safe.ProjectCredentialsMissingException
 
 class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
 
     companion object {
-        private const val PROJECT_SECRET: String = "PROJECT_SECRET"
-        private const val PROJECT_ID: String = "PROJECT_SECRET"
+        private const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
+        private const val PROJECT_ID: String = "PROJECT_ID"
         private const val PROJECT_SECRET_AND_ID_DEFAULT: String = ""
     }
 
-    override var projectSecret: String = ""
+    override var encryptedProjectSecret: String = ""
         get() {
-            val value = prefs.getPrimitive(PROJECT_SECRET, PROJECT_SECRET_AND_ID_DEFAULT)
+            val value = prefs.getPrimitive(ENCRYPTED_PROJECT_SECRET, PROJECT_SECRET_AND_ID_DEFAULT)
             if (value.isBlank()) {
-                throw ProjectCredentialsNonValidError()
+                throw ProjectCredentialsMissingException()
             }
             return value
         }
         set(value) {
             field = value
-            prefs.edit().putPrimitive(PROJECT_SECRET, field).commit()
+            prefs.edit().putPrimitive(ENCRYPTED_PROJECT_SECRET, field).commit()
         }
 
-    override fun getProjectSecretOrEmpty(): String =
-        try {
-            projectSecret
-        } catch (e: Error) {
-            ""
-        }
-
-    override var projectId: String = ""
+    override var signedInProjectId: String = ""
         get() {
             val value = prefs.getPrimitive(PROJECT_ID, PROJECT_SECRET_AND_ID_DEFAULT)
             if (value.isBlank()) {
-                throw ProjectCredentialsNonValidError()
+                throw ProjectCredentialsMissingException()
             }
             return value
         }
         set(value) {
             field = value
-            prefs.edit().putPrimitive(PROJECT_SECRET, field).commit()
+            prefs.edit().putPrimitive(PROJECT_ID, field).commit()
         }
 
-    override fun getProjectIdOrEmpty(): String =
+    override fun getEncryptedProjectSecretOrEmpty(): String =
         try {
-            projectId
-        } catch (e: Error) {
+            encryptedProjectSecret
+        } catch (e: ProjectCredentialsMissingException) {
             ""
         }
 
-    override fun areProjectCredentialsMissing(): Boolean {
-        return getProjectIdOrEmpty() == "" || getProjectSecretOrEmpty() != ""
+    override fun getSignedInProjectIdOrEmpty(): String =
+        try {
+            signedInProjectId
+        } catch (e: ProjectCredentialsMissingException) {
+            ""
+        }
+
+    override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
+        !getSignedInProjectIdOrEmpty().isEmpty() && getSignedInProjectIdOrEmpty() == possibleProjectId && !getEncryptedProjectSecretOrEmpty().isEmpty()
+
+    override fun cleanCredentials() {
+
+        //TODO: SecureDataManager doesn't support multiple projects signed in.
+        val possibleLegacyApiKey = prefs.getPrimitive(signedInProjectId, "")
+        prefs.edit().putPrimitive(signedInProjectId, "").commit()
+        prefs.edit().putPrimitive(possibleLegacyApiKey, "").commit()
+
+        encryptedProjectSecret = ""
+        signedInProjectId = ""
     }
 
-    /*TODO: Legacy stuff to refactor */
-    private var apiKeyBackingField: String = ""
+    override fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?) {
+        if (legacyApiKey != null && legacyApiKey.isNotEmpty()) {
 
-
-    override var apiKey: String
-        get() {
-            if (apiKeyBackingField.isBlank()) {
-                throw ApiKeyNotFoundError()
-            }
-            return apiKeyBackingField
+            //TODO: to be refactored when SecureDataManager will support multiple projects
+            prefs.edit().putPrimitive(legacyApiKey, projectId).commit()
+            prefs.edit().putPrimitive(projectId, legacyApiKey).commit()
         }
-        set(value) {
-            apiKeyBackingField = value
-        }
+    }
 
-    override fun getApiKeyOr(default: String): String =
-            if (apiKeyBackingField.isBlank()) {
-                default
-            } else {
-                apiKeyBackingField
-            }
+    override fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String {
+        return prefs.getString(legacyApiKey, "")
+    }
 }

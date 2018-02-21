@@ -1,7 +1,7 @@
 package com.simprints.id.testUtils
 
 import android.app.Activity
-import com.simprints.id.activities.front.FrontActivity
+import android.support.v7.app.AppCompatActivity
 import junit.framework.AssertionFailedError
 import org.hamcrest.CoreMatchers
 import org.junit.Assert
@@ -57,7 +57,7 @@ inline fun <reified T : Throwable> assertThrows(throwable: T, executable: () -> 
     return thrown
 }
 
-inline fun assertActivityStarted(clazz: Class<out Activity>, activity: FrontActivity) {
+inline fun assertActivityStarted(clazz: Class<out Activity>, activity: AppCompatActivity) {
     val shadowActivity = Shadows.shadowOf(activity)
     val startedIntent = shadowActivity.nextStartedActivity
     Assert.assertThat(startedIntent.component.className,

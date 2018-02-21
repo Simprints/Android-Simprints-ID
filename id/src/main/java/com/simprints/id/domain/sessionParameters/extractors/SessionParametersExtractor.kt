@@ -8,6 +8,7 @@ import com.simprints.id.domain.sessionParameters.SessionParameters
 
 class SessionParametersExtractor(private val actionExtractor: Extractor<CalloutAction>,
                                  private val apiKeyExtractor: Extractor<String>,
+                                 private val projectIdExtractor: Extractor<String>,
                                  private val moduleIdExtractor: Extractor<String>,
                                  private val userIdExtractor: Extractor<String>,
                                  private val patientIdExtractor: Extractor<String>,
@@ -19,7 +20,11 @@ class SessionParametersExtractor(private val actionExtractor: Extractor<CalloutA
 
     override fun extractFrom(callout: Callout): SessionParameters {
         val action = actionExtractor.extractFrom(callout)
-        val apiKey = apiKeyExtractor.extractFrom(callout)
+        val projectId = projectIdExtractor.extractFrom(callout)
+        var apiKey = ""
+        if(projectId.isEmpty()) {
+            apiKey = apiKeyExtractor.extractFrom(callout)
+        }
         val moduleId = moduleIdExtractor.extractFrom(callout)
         val userId = userIdExtractor.extractFrom(callout)
         val patientId = patientIdExtractor.extractFrom(callout)
@@ -28,7 +33,7 @@ class SessionParametersExtractor(private val actionExtractor: Extractor<CalloutA
         val resultFormat = resultFormatExtractor.extractFrom(callout)
         unexpectedParametersExtractor.extractFrom(callout)
 
-        return SessionParameters(action, apiKey, moduleId, userId, patientId, callingPackage,
+        return SessionParameters(action, apiKey, projectId, moduleId, userId, patientId, callingPackage,
             metadata, resultFormat)
     }
 

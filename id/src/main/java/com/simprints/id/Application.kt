@@ -8,11 +8,13 @@ import com.google.gson.Gson
 import com.simprints.id.controllers.Setup
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
-import com.simprints.id.data.db.analytics.AnalyticsManager
-import com.simprints.id.data.db.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
-import com.simprints.id.data.db.remote.FirebaseRtdbManager
+import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.network.ApiManagerImpl
@@ -128,12 +130,16 @@ class Application : MultiDexApplication() {
         PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager)
     }
 
-    private val localDbManager: LocalDbManager by lazy {
-        RealmDbManager()
+    var localDbManager: LocalDbManager by lazyVar {
+        RealmDbManager(this)
     }
 
-    private val remoteDbManager: RemoteDbManager by lazy {
-        FirebaseRtdbManager()
+    var remoteDbManager: RemoteDbManager by lazyVar {
+        FirebaseManager(this)
+    }
+
+    private val dbManager: DbManager by lazy {
+        DbManagerImpl(localDbManager, remoteDbManager)
     }
 
     private val apiManager: ApiManager by lazy {
@@ -160,7 +166,7 @@ class Application : MultiDexApplication() {
     }
 
     val dataManager: DataManager by lazy {
-        DataManagerImpl(this, preferencesManager, localDbManager, remoteDbManager,
+        DataManagerImpl(this, preferencesManager, dbManager,
                 apiManager, analyticsManager, secureDataManager)
     }
 
@@ -190,13 +196,8 @@ class Application : MultiDexApplication() {
         InvalidCalloutError(ALERT_TYPE.INVALID_API_KEY)
     }
 
-    private val missingApiKeyError: Error by lazy {
-        InvalidCalloutError(ALERT_TYPE.MISSING_API_KEY)
-    }
-
     private val apiKeyReader: Reader<String> by lazy {
-        MandatoryParameterReader(SIMPRINTS_API_KEY, String::class,
-            missingApiKeyError, invalidApiKeyError)
+        OptionalParameterReader(SIMPRINTS_API_KEY, "", invalidApiKeyError)
     }
 
     private val apiKeyValidator: Validator<String> by lazy {
@@ -205,6 +206,22 @@ class Application : MultiDexApplication() {
 
     private val apiKeyExtractor: Extractor<String> by lazy {
         ParameterExtractor(apiKeyReader, apiKeyValidator)
+    }
+
+    private val invalidProjectIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.INVALID_PROJECT_ID)
+    }
+
+    private val projectIdReader: Reader<String> by lazy {
+        OptionalParameterReader(SIMPRINTS_PROJECT_ID, "", invalidProjectIdError)
+    }
+
+    private val projectIdValidator: Validator<String> by lazy {
+        NoOpValidator<String>()
+    }
+
+    private val projectIdExtractor: Extractor<String> by lazy {
+        ParameterExtractor(projectIdReader, projectIdValidator)
     }
 
     private val invalidModuleIdError: Error by lazy {
@@ -375,7 +392,7 @@ class Application : MultiDexApplication() {
     }
 
     val sessionParametersExtractor: Extractor<SessionParameters> by lazy {
-        SessionParametersExtractor(actionExtractor, apiKeyExtractor, moduleIdExtractor,
+        SessionParametersExtractor(actionExtractor, apiKeyExtractor, projectIdExtractor, moduleIdExtractor,
             userIdExtractor, patientIdExtractor, callingPackageExtractor, metadataExtractor,
             resultFormatExtractor, unexpectedParametersExtractor)
     }

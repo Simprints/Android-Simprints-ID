@@ -245,14 +245,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void startListeners() {
-        dataManager.registerAuthListener(authListener);
-        dataManager.registerConnectionListener(connectionListener);
+        dataManager.registerRemoteAuthListener(authListener);
+        dataManager.registerRemoteConnectionListener(connectionListener);
         updateConnectionState();
         syncClient.startListening(newSyncObserver());
     }
 
     private void updateConnectionState() {
-        if (dataManager.isConnected()) {
+        if (dataManager.isRemoteConnected()) {
             connectionListener.onConnection();
         } else {
             connectionListener.onDisconnection();
@@ -833,8 +833,8 @@ public class MainActivity extends AppCompatActivity implements
     private void stopListeners() {
         try {
             syncClient.stopListening();
-            dataManager.unregisterAuthListener(authListener);
-            dataManager.unregisterConnectionListener(connectionListener);
+            dataManager.unregisterRemoteAuthListener(authListener);
+            dataManager.unregisterRemoteConnectionListener(connectionListener);
         } catch (UninitializedDataManagerError error) {
             handleUnexpectedError(error);
         }
@@ -854,10 +854,10 @@ public class MainActivity extends AppCompatActivity implements
         SyncTaskParameters syncParameters;
         switch (dataManager.getSyncGroup()) {
             case GLOBAL:
-                syncParameters = new GlobalSyncTaskParameters(dataManager.getAppKey());
+                syncParameters = new GlobalSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty());
                 break;
             case USER:
-                syncParameters = new UserSyncTaskParameters(dataManager.getAppKey(), dataManager.getUserId());
+                syncParameters = new UserSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getUserId());
                 break;
             default:
                 handleUnexpectedError(new InvalidSyncGroupError());
