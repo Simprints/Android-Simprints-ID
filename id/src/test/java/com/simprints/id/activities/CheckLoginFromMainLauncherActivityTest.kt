@@ -9,7 +9,7 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
-import com.simprints.id.tools.roboletric.createRoboCheckLoginFromHomeAppActivity
+import com.simprints.id.tools.roboletric.createRoboCheckLoginMainLauncherAppActivity
 import com.simprints.id.tools.roboletric.getRoboSharedPreferences
 import com.simprints.id.tools.roboletric.mockDbManagers
 import org.junit.Before
@@ -22,7 +22,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class)
-class CheckLoginFromHomeAppActivityTest {
+class CheckLoginFromMainLauncherActivityTest {
 
     private lateinit var app: Application
 
@@ -62,7 +62,7 @@ class CheckLoginFromHomeAppActivityTest {
     }
 
     private fun startCheckLoginAndCheckNextActivity(clazzNextActivity: Class<out Activity>) {
-        val controller = createRoboCheckLoginFromHomeAppActivity()
+        val controller = createRoboCheckLoginMainLauncherAppActivity()
         val activity = controller.get()
         controller.resume().visible()
         assertActivityStarted(clazzNextActivity, activity)
