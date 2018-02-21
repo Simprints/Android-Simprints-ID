@@ -14,8 +14,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
-import com.simprints.id.data.db.remote.FirebaseManager
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.*
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.network.ApiManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -134,8 +133,16 @@ class Application : MultiDexApplication() {
         RealmDbManager(this)
     }
 
+    private val remoteDbConnectionListenerManager: RemoteDbConnectionListenerManager by lazy {
+        FirebaseConnectionListenerManager()
+    }
+
+    private val remoteDbAuthListenerManager: RemoteDbAuthListenerManager by lazy {
+        FirebaseAuthListenerManager()
+    }
+
     var remoteDbManager: RemoteDbManager by lazyVar {
-        FirebaseManager(this)
+        FirebaseManager(this, remoteDbConnectionListenerManager, remoteDbAuthListenerManager)
     }
 
     private val dbManager: DbManager by lazy {
@@ -391,10 +398,18 @@ class Application : MultiDexApplication() {
         ParameterExtractor(unexpectedParametersReader, unexpectedParametersValidator)
     }
 
+    private val missingApiKeyOrProjectIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.MISSING_PROJECT_ID_OR_API_KEY)
+    }
+
+    private val sessionParametersValidator: Set<Validator<SessionParameters>> by lazy {
+        setOf(ProjectIdOrApiKeyValidator(missingApiKeyOrProjectIdError))
+    }
+
     val sessionParametersExtractor: Extractor<SessionParameters> by lazy {
         SessionParametersExtractor(actionExtractor, apiKeyExtractor, projectIdExtractor, moduleIdExtractor,
             userIdExtractor, patientIdExtractor, callingPackageExtractor, metadataExtractor,
-            resultFormatExtractor, unexpectedParametersExtractor)
+            resultFormatExtractor, unexpectedParametersExtractor, sessionParametersValidator)
     }
 
     val timeHelper: TimeHelper by lazy {

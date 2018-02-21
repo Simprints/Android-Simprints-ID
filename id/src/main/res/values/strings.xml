@@ -149,8 +149,10 @@
     <string name="low_battery_title">LOW BATTERY</string>
     <string name="alert_api_key_verify_failed">Failed to verify API key</string>
     <!-- Error Message Text -->
-    <string name="missing_apikey_message">A configuration error has occurred (missing API key), please contact your system administrator</string>
     <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
+    <string name="invalid_projectId_message">A configuration error has occurred (Project Id), please contact your system administrator</string>
+    <string name="missing_projectId_or_apiKey_message">A configuration error has occurred (no project ID/Api Key), please contact your system administrator</string>
+
     <string name="invalid_intentAction_message">A configuration error has occurred (invalid intent action), please contact your system administrator</string>
     <string name="unexpected_parameter_message">A configuration error has occurred (unexpected parameter), please contact your system administrator</string>
     <string name="invalid_metadata_message">A configuration error has occurred (invalid metadata), please contact your system administrator</string>
@@ -300,7 +302,7 @@
     <string name="sync_complete_notification_content">Sync completed.</string>
 
 
-    <!-- ApiKeyActivity -->
+    <!-- LoginActivity -->
     <!-- TODO: what about translation? -->
     <string name="empty" translatable="false" />
     <string name="simprints_logo">Simprints Logo</string>
@@ -309,19 +311,19 @@
     <string name="enter">Enter</string>
     <string name="login_id_hint">Project id</string>
     <string name="login_secret_hint">Project key</string>
-    <string name="login_invalidCredentials">Invalid Login. Check Project\'s id or key</string>
+    <string name="login_user_id_hint">User Id</string>
 
+    <string name="login_invalidCredentials">Invalid Login. Check Project\'s id or key</string>
     <string name="login_title">Request Project credentials</string>
     <string name="login_type_project_details">Type manually</string>
     <string name="login_invalidQrCode">The scanned QR code is invalid.</string>
-    <string name="progress_title">Signing in</string>
-    <string name="login_progress_message">Please wait ...</string>
-    <string name="check_login_label">Check login</string>
-    <string name="dashboard_label">Dashboad</string>
     <string name="requestLogin_message">You need to login in. Please use your client App to open Simprints ID and log in.</string>
     <string name="requestLogin_title">Login Required</string>
     <string name="login">Login</string>
-    <string name="invalid_projectId_message">A configuration error has occurred (Project Id), please contact your system administrator</string>
     <string name="login_missing_credentials">Missing credentials. Please check user id, project\'s id and key again.</string>
+
+    <!-- Dashboard Activity -->
+    <string name="dashboard_label">Dashboard</string>
+    <string name="logout">Logout</string>
 
 </resources>

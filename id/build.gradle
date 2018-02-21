@@ -240,18 +240,3 @@ crashlytics {
     androidNdkOut "src/main/obj"
     androidNdkLibsOut "src/main/libs"
 }
-
-task copyDevGoogleServicesJson(type: Copy) {
-    def jsonName = "${getDevProjectId()}-google-services.json"
-    from "${project.rootDir}/id/src/debug/googleServicesJsons/${jsonName}"
-    into "${project.rootDir}/id/src/debug/"
-    rename { filename -> "google-services.json" }
-}
-
-tasks.whenTaskAdded { task ->
-    if (task.name == 'preDebugBuild') {
-        preDebugBuild.dependsOn(copyDevGoogleServicesJson)
-    }
-}
-
-apply plugin: "com.google.gms.google-services"
