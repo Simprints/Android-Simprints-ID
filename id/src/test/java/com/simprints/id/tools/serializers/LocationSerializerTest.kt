@@ -16,5 +16,4 @@ class LocationSerializerTest {
         val deserializedLocation= locationSerializer.deserialize(serializedLocation)
         Assert.assertEquals(originalLocation, deserializedLocation)
     }
-
 }

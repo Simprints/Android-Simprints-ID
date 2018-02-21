@@ -25,6 +25,13 @@ public class fb_User {
         this.androidId = androidId;
     }
 
+    public fb_User(String userId, String androidId, String firstPatientId) {
+        this.userId = userId;
+        this.androidId = androidId;
+        this.patientList = new HashMap<>();
+        this.patientList.put(firstPatientId, true);
+    }
+
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();

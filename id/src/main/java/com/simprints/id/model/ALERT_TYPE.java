@@ -14,6 +14,11 @@ public enum ALERT_TYPE {
             R.drawable.error_icon, R.drawable.error_hint_key, R.string.close, R.string.empty,
             false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_API_KEY),
 
+    INVALID_PROJECT_ID(R.string.configuration_error_title, R.string.invalid_projectId_message,
+        R.drawable.error_icon, R.drawable.error_hint_key, R.string.close, R.string.empty,
+        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_PROJECT_ID),
+
+
     INVALID_INTENT_ACTION(R.string.configuration_error_title, R.string.invalid_intentAction_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
             false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_METADATA),

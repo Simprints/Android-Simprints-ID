@@ -11,7 +11,7 @@ data class Session(
     val libVersionName: String,
 
     val calloutAction: String,
-    val apiKey: String,
+    val projectId: String,
     val moduleId: String,
     val userId: String,
     val patientId: String,
