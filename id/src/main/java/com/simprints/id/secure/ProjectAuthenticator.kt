@@ -55,8 +55,8 @@ class ProjectAuthenticator(secureDataManager: SecureDataManager,
 
     private fun Single<out Tokens>.initFirebase(projectId: String): Single<Tokens> =
         flatMap { tokens ->
-            if (!dataManager.isDbInitialised(projectId)) {
-                dataManager.initialiseDb(projectId)
+            if (!dataManager.isDbInitialised()) {
+                dataManager.initialiseDb()
             }
 
             //TODO: Fix it when we implement the 2 firebase apps in FirebaseManager

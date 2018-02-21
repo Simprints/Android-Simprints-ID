@@ -183,9 +183,9 @@ open class LaunchActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        if (dataManager.isDbInitialised(dataManager.signedInProjectId)) {
+        if (dataManager.isDbInitialised()) {
             try {
-                dataManager.signOut(dataManager.signedInProjectId)
+                dataManager.signOut()
             } catch (error: UninitializedDataManagerError) {
                 dataManager.logError(error)
             }

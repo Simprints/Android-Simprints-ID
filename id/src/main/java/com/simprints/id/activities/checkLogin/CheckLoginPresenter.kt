@@ -42,17 +42,17 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
 
     override fun checkIfUserIsLoggedIn() {
         if (isUserSignedIn()) {
-            initDbContext(dataManager.signedInProjectId)
+            initDbContext()
             startNormalFlow()
         } else /* FUTURE: && calloutAction != LOGIN */ {
             redirectUserForLogin()
         }
     }
 
-    private fun initDbContext(projectId: String) {
-        if (!dataManager.isDbInitialised(projectId)) {
+    private fun initDbContext() {
+        if (!dataManager.isDbInitialised()) {
             try {
-                dataManager.initialiseDb(projectId)
+                dataManager.initialiseDb()
             } catch (error: UninitializedDataManagerError) {
                 dataManager.logError(error)
                 view.launchAlertForError(ALERT_TYPE.UNEXPECTED_ERROR)

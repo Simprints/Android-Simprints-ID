@@ -97,7 +97,7 @@ class Application : MultiDexApplication() {
         this.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
     }
 
-    public val prefs: ImprovedSharedPreferences by lazy {
+    val prefs: ImprovedSharedPreferences by lazy {
         ImprovedSharedPreferencesImpl(basePrefs)
     }
 
@@ -424,5 +424,6 @@ class Application : MultiDexApplication() {
             Timber.plant(Timber.DebugTree())
         }
         Fabric.with(fabric)
+        dataManager.initialiseDb()
     }
 }
