@@ -319,10 +319,14 @@
     <string name="progress_title">Signing in</string>
     <string name="login_progress_message">Please wait ...</string>
     <string name="check_login_label">Check login</string>
-    <string name="dashboard_label">Dashboad</string>
     <string name="requestLogin_message">You need to login in. Please use your client App to open Simprints ID and log in.</string>
     <string name="requestLogin_title">Login Required</string>
     <string name="login">Login</string>
     <string name="login_missing_credentials">Missing credentials. Please check user id, project\'s id and key again.</string>
+
+    <!-- Dashboard Activity -->
+    <string name="dashboard_label">Dashboard</string>
+    <string name="logout">Logout</string>
+    <string name="login_user_id_hint">User Id</string>
 
 </resources>
