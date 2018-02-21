@@ -12,17 +12,17 @@ open class CheckLoginPresenter (
     fun openNextActivity() {
         if (isUserSignedIn()) {
             initDbContext(dataManager.getSignedInProjectIdOrEmpty())
-            openActivityForUserSignedIn()
+            openActivityForSignedInUser()
         } else {
-            openActivityForUserNotSignedIn()
+            openActivityForNotSignedInUser()
         }
     }
 
-    protected open fun openActivityForUserNotSignedIn() {
+    protected open fun openActivityForNotSignedInUser() {
         throw Exception("Not overridden")
     }
 
-    protected open fun openActivityForUserSignedIn() {
+    protected open fun openActivityForSignedInUser() {
         throw Exception("Not overridden")
     }
 
