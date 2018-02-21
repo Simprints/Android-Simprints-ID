@@ -1,6 +1,7 @@
 package com.simprints.id.data.db
 
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.models.Session
 import com.simprints.id.secure.models.Tokens
@@ -89,7 +90,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     }
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
-        // TODO
-        remoteDbManager.recoverLocalDbSendToRemote(projectId, userId, androidId, moduleId, group, callback)
+        val firebaseManager = remoteDbManager as FirebaseManager
+        LocalDbRecovererImpl(firebaseManager, projectId, userId, androidId, moduleId, group, callback)
     }
 }

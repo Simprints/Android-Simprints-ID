@@ -37,8 +37,7 @@
                 android:textSize="15sp"
                 android:inputType="text"
                 android:enabled="false"
-                android:text="asdasd"
-                android:hint="User id"
+                android:hint="@string/login_user_id_hint"
                 android:textColor="@color/simprints_white"/>
         </android.support.design.widget.TextInputLayout>
 

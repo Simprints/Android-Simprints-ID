@@ -3,7 +3,6 @@ package com.simprints.id.data.prefs.sessionState.sessionParameters
 import com.simprints.id.domain.callout.CalloutAction
 import com.simprints.id.domain.sessionParameters.SessionParameters
 
-
 interface SessionParametersPreferencesManager {
 
     var calloutAction: CalloutAction
@@ -19,8 +18,8 @@ interface SessionParametersPreferencesManager {
     var sessionParameters: SessionParameters
         set(value) {
             calloutAction = value.calloutAction
-            apiKey = value.apiKey ?: ""
-            projectId = value.projectId ?: ""
+            apiKey = value.apiKey
+            projectId = value.projectId
             moduleId = value.moduleId
             userId = value.userId
             patientId = value.patientId
@@ -33,5 +32,4 @@ interface SessionParametersPreferencesManager {
         }
 
     fun resetSessionParameters()
-
 }

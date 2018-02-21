@@ -6,9 +6,9 @@ import com.simprints.id.exceptions.safe.ProjectCredentialsMissingException
 class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
 
     companion object {
-        private const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
-        private const val PROJECT_ID: String = "PROJECT_ID"
-        private const val PROJECT_SECRET_AND_ID_DEFAULT: String = ""
+         const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
+         const val PROJECT_ID: String = "PROJECT_ID"
+         private const val PROJECT_SECRET_AND_ID_DEFAULT: String = ""
     }
 
     override var encryptedProjectSecret: String = ""
@@ -52,11 +52,12 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
         }
 
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
-        !getSignedInProjectIdOrEmpty().isEmpty() && getSignedInProjectIdOrEmpty() == possibleProjectId && !getEncryptedProjectSecretOrEmpty().isEmpty()
+        getSignedInProjectIdOrEmpty().isNotEmpty() &&
+            getSignedInProjectIdOrEmpty() == possibleProjectId &&
+            getEncryptedProjectSecretOrEmpty().isNotEmpty()
 
     override fun cleanCredentials() {
 
-        //TODO: SecureDataManager doesn't support multiple projects signed in.
         val possibleLegacyApiKey = prefs.getPrimitive(signedInProjectId, "")
         prefs.edit().putPrimitive(signedInProjectId, "").commit()
         prefs.edit().putPrimitive(possibleLegacyApiKey, "").commit()
