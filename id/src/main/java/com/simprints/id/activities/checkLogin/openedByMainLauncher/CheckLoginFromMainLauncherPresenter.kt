@@ -24,11 +24,11 @@ class CheckLoginFromMainLauncherPresenter(
         }
     }
 
-    override fun openActivityForUserNotSignedIn() {
+    override fun openActivityForNotSignedInUser() {
         view.openRequestLoginActivity()
     }
 
-    override fun openActivityForUserSignedIn() {
+    override fun openActivityForSignedInUser() {
         view.openDashboardActivity()
     }
 

@@ -48,11 +48,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         dataManager.logUserProperties()
     }
 
-    override fun openActivityForUserNotSignedIn() {
+    override fun openActivityForNotSignedInUser() {
         view.openLoginActivity()
     }
 
-    override fun openActivityForUserSignedIn() {
+    override fun openActivityForSignedInUser() {
         view.openLaunchActivity()
     }
 
