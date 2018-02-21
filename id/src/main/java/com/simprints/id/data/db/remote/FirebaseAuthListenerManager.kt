@@ -26,8 +26,8 @@ class FirebaseAuthListenerManager : RemoteDbAuthListenerManager {
         }
     }
 
-    override fun applyAuthListeners(firebaseAuth: FirebaseAuth, appName: String) {
-        authDispatcher = createAuthStateListener(appName)
+    override fun applyAuthListeners(firebaseAuth: FirebaseAuth) {
+        authDispatcher = createAuthStateListener()
         firebaseAuth.addAuthStateListener(authDispatcher)
         Timber.d("Auth state listener set")
     }
@@ -36,22 +36,15 @@ class FirebaseAuthListenerManager : RemoteDbAuthListenerManager {
         firebaseAuth.removeAuthStateListener(authDispatcher)
     }
 
-    private fun createAuthStateListener(appName: String) =
+    private fun createAuthStateListener() =
         FirebaseAuth.AuthStateListener {
             val firebaseUser = it.currentUser
             if (firebaseUser != null) {
-                if (isFirebaseUserSameAsProjectId(firebaseUser, appName)) {
-                    handleAuthStateSignedIn()
-                } else {
-                    handleAuthStateSignedOutByOtherUser(it)
-                }
+                handleAuthStateSignedIn()
             } else {
                 handleAuthStateSignedOut()
             }
         }
-
-    private fun isFirebaseUserSameAsProjectId(firebaseUser: FirebaseUser, appName: String): Boolean =
-        firebaseUser.uid == appName
 
     private fun handleAuthStateSignedIn() {
         Timber.d("Signed in")
@@ -68,12 +61,6 @@ class FirebaseAuthListenerManager : RemoteDbAuthListenerManager {
             for (authListener in authListeners)
                 authListener.onSignOut()
         }
-        isSignedIn = false
-    }
-
-    private fun handleAuthStateSignedOutByOtherUser(firebaseAuth: FirebaseAuth) {
-        Timber.d("Signed out by other user")
-        firebaseAuth.signOut()
         isSignedIn = false
     }
 }

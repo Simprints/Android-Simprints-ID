@@ -18,15 +18,15 @@ import io.reactivex.Emitter
 interface DbManager : LocalDbManager, RemoteDbManager {
 
     // Lifecycle
-    fun initialiseDb(projectId: String)
+    fun initialiseDb()
     fun signIn(projectId: String, token: Tokens)
-    fun signOut(projectId: String)
+    fun signOut()
 
-    fun isDbInitialised(projectId: String): Boolean
+    fun isDbInitialised(): Boolean
 
     // Data transfer
     fun savePerson(fbPerson: fb_Person, projectId: String)
-    fun loadPerson(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
+    fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
     fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
     fun getPeopleCount(group: Constants.GROUP, userId: String, moduleId: String): Long
 
