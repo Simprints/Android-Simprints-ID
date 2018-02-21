@@ -69,12 +69,11 @@ class CheckLoginFromIntentActivityTest {
 
     @Test
     @Throws(Exception::class)
-    fun validIntentParams_extractLoginOnes() {
+    fun validIntentParams_extractParamsForLogin() {
 
         val intent = Intent().apply {
             action = "com.simprints.id.REGISTER"
             putExtra("projectId", "some_project")
-            putExtra("apiKey", "some_apiKey")
             putExtra("userId", "some_userId")
             putExtra("moduleId", "some_module")
         }

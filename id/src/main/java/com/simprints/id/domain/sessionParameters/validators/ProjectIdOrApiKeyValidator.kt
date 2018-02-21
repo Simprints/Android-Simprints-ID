@@ -6,7 +6,7 @@ class ProjectIdOrApiKeyValidator(private val errorWhenInvalid: Error) : Validato
 
     override fun validate(value: SessionParameters) {
         // One between ApiKey and Project Id has to have a value
-        if (value.apiKey.isEmpty() && value.projectId.isEmpty()) {
+        if (value.apiKey.isNullOrEmpty() && value.projectId.isNullOrEmpty()) {
             throw errorWhenInvalid
         }
     }
