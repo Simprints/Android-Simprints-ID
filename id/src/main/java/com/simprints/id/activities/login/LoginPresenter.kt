@@ -14,6 +14,7 @@ class LoginPresenter(val view: LoginContract.View,
         private const val SCANNED_TEXT_TAG_PROJECT_ID = "id:"
         private const val SCANNED_TEXT_TAG_PROJECT_SECRET = "secret:"
     }
+
     init {
         view.setPresenter(this)
     }
@@ -25,10 +26,16 @@ class LoginPresenter(val view: LoginContract.View,
         view.openScanQRApp()
     }
 
-    override fun userDidWantToSignIn(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String, possibleLegacyApiKey: String?) {
+    override fun userDidWantToSignIn(possibleProjectId: String,
+                                     possibleProjectSecret: String,
+                                     possibleUserId: String,
+                                     possibleLegacyApiKey: String?) {
 
-        if (!possibleProjectId.isEmpty() && !possibleProjectSecret.isEmpty() && !possibleUserId.isEmpty()) {
-            view.showProgressDialog(R.string.progress_title, R.string.login_progress_message)
+        if (possibleProjectId.isNotEmpty() &&
+            possibleProjectSecret.isNotEmpty() &&
+            possibleUserId.isNotEmpty()) {
+
+            view.showProgressDialog()
             projectAuthenticator.authenticate(
                 NonceScope(possibleProjectId, possibleUserId),
                 possibleProjectSecret)
@@ -50,7 +57,8 @@ class LoginPresenter(val view: LoginContract.View,
         }
     }
 
-    /** Valid Scanned Text Format:
+    /**
+     * Valid Scanned Text Format:
      * id:someProjectId\n
      * secret:someSecret
      **/
