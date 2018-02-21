@@ -1,4 +1,4 @@
-package com.simprints.id.activities.checkLogin.openedByHomeButton
+package com.simprints.id.activities.checkLogin.openedByMainLauncher
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,9 +13,9 @@ import com.simprints.id.tools.extensions.launchAlert
 import org.jetbrains.anko.startActivity
 
 // App launched when user open SimprintsID using the Home button
-open class CheckLoginFromHomeAppActivity : AppCompatActivity(), CheckLoginFromHomeAppContract.View {
+open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginFromMainLauncherContract.View {
 
-    lateinit var viewPresenter: CheckLoginFromHomeAppContract.Presenter
+    lateinit var viewPresenter: CheckLoginFromMainLauncherContract.Presenter
     private val app: Application by lazy { application as Application }
     private val dataManager: DataManager by lazy { app.dataManager }
     private val timeHelper by lazy { app.timeHelper }
@@ -24,13 +24,13 @@ open class CheckLoginFromHomeAppActivity : AppCompatActivity(), CheckLoginFromHo
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_login)
 
-        viewPresenter = CheckLoginFromHomeAppPresenter(
+        viewPresenter = CheckLoginFromMainLauncherPresenter(
             this,
             dataManager,
             timeHelper)
     }
 
-    override fun setPresenter(presenter: CheckLoginFromHomeAppContract.Presenter) {
+    override fun setPresenter(presenter: CheckLoginFromMainLauncherContract.Presenter) {
         viewPresenter = presenter
     }
 

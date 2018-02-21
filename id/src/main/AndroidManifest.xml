@@ -33,7 +33,7 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name="com.simprints.id.activities.checkLogin.openedByHomeButton.CheckLoginFromHomeAppActivity"
+            android:name="com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
             android:label="@string/title_activity_front"
             android:launchMode="standard"
             android:screenOrientation="portrait">
