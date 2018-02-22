@@ -12,7 +12,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
-import com.simprints.id.exceptions.safe.DifferentProjectSignedInException
+import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
 import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libdata.DATA_ERROR
@@ -127,19 +127,16 @@ class FirebaseManager(private val appContext: Context,
 
     override fun isRemoteDbInitialized(): Boolean = isInitialised
 
-    @Throws(DifferentProjectSignedInException::class)
-    override fun isSignedIn(projectId: String, userId: String): Boolean {
-        return if (isSignedIn) {
-            isSignedInUserAsExpected(projectId, userId)
-        } else false
-    }
+    @Throws(DifferentCredentialsSignedInException::class)
+    override fun isSignedIn(projectId: String, userId: String): Boolean =
+        isSignedInUserAsExpected(projectId, userId)
 
     private fun isSignedInUserAsExpected(projectId: String, userId: String): Boolean {
         val firebaseUser = legacyFirebaseAuth.currentUser
         firebaseUser?.let {
             if (isFirebaseUserAsExpected(it, projectId, userId)) {
                 return true
-            } else throw DifferentProjectSignedInException()
+            } else throw DifferentCredentialsSignedInException()
         } ?: return false
     }
 
