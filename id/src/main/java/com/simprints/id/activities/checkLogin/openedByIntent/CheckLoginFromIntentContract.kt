@@ -14,6 +14,7 @@ interface CheckLoginFromIntentContract {
 
         fun checkCallingApp()
         fun parseCallout(): Callout
+        fun finishAct()
     }
 
     interface Presenter : BasePresenter {

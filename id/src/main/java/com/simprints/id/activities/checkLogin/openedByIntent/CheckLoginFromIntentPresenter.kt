@@ -14,27 +14,24 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     timeHelper: TimeHelper) :
     CheckLoginPresenter(dataManager, timeHelper), CheckLoginFromIntentContract.Presenter {
 
-    private var started: Boolean = false
+    private var loginAlreadyTried: Boolean = false
 
     init {
         view.setPresenter(this)
+
+        initSession()
+        view.checkCallingApp()
+
+        // extracts the sessions Params (if not done before)
+        try {
+            extractSessionParameters()
+        } catch (exception: InvalidCalloutError) {
+            view.launchAlertForError(exception.alertType)
+        }
     }
 
     override fun start() {
-        if (!started) {
-            started = true
-            initSession()
-            view.checkCallingApp()
-
-            // extracts the sessions Params (if not done before)
-            try {
-                extractSessionParameters()
-            } catch (exception: InvalidCalloutError) {
-                view.launchAlertForError(exception.alertType)
-                return
-            }
-            openNextActivity()
-        }
+        openNextActivity()
     }
 
     private fun extractSessionParameters() {
@@ -48,15 +45,20 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         dataManager.logUserProperties()
     }
 
-    override fun openActivityForNotSignedInUser() {
-        view.openLoginActivity()
+    override fun handleNotSignedInUser() {
+        if (!loginAlreadyTried) {
+            loginAlreadyTried = true
+            view.openLoginActivity()
+        } else {
+            view.finishAct()
+        }
     }
 
-    override fun openActivityForSignedInUser() {
+    override fun handleSignedInUser() {
         view.openLaunchActivity()
     }
 
-    override fun dbInitFailed(){
+    override fun dbInitFailed() {
         view.launchAlertForError(ALERT_TYPE.UNEXPECTED_ERROR)
     }
 

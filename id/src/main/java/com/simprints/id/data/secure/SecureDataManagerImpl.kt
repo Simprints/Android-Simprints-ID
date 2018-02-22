@@ -58,8 +58,9 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
 
     override fun cleanCredentials() {
 
-        val possibleLegacyApiKey = prefs.getPrimitive(signedInProjectId, "")
-        prefs.edit().putPrimitive(signedInProjectId, "").commit()
+        val projectid = getSignedInProjectIdOrEmpty()
+        val possibleLegacyApiKey = prefs.getPrimitive(projectid, "")
+        prefs.edit().putPrimitive(projectid, "").commit()
         prefs.edit().putPrimitive(possibleLegacyApiKey, "").commit()
 
         encryptedProjectSecret = ""

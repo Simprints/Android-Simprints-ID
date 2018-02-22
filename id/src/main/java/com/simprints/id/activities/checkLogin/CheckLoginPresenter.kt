@@ -12,17 +12,17 @@ open class CheckLoginPresenter (
     fun openNextActivity() {
         if (isUserSignedIn()) {
             initDbContext(dataManager.getSignedInProjectIdOrEmpty())
-            openActivityForSignedInUser()
+            handleSignedInUser()
         } else {
-            openActivityForNotSignedInUser()
+            handleNotSignedInUser()
         }
     }
 
-    protected open fun openActivityForNotSignedInUser() {
+    protected open fun handleNotSignedInUser() {
         throw Exception("Not overridden")
     }
 
-    protected open fun openActivityForSignedInUser() {
+    protected open fun handleSignedInUser() {
         throw Exception("Not overridden")
     }
 
@@ -65,4 +65,3 @@ open class CheckLoginPresenter (
         return UUID.randomUUID().toString()
     }
 }
-
