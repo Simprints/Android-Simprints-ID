@@ -1,7 +1,6 @@
 package com.simprints.id.activities.login
 
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -13,16 +12,19 @@ import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.scannerAppIntent
 import kotlinx.android.synthetic.main.activity_login.*
-import org.jetbrains.anko.indeterminateProgressDialog
 
 class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     companion object {
-        const val LOGIN_SUCCESSED: Int = 1
+        const val LOGIN_SUCCEED: Int = 1
         const val LOGIN_REQUEST_CODE: Int = 1
-        private const val QR_REQUEST_CODE: Int = 0
+        const val QR_REQUEST_CODE: Int = 0
+        const val QR_RESULT_KEY = "SCAN_RESULT"
+        const val GOOGLE_PLAY_LINK_FOR_QR_APP =
+            "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
     }
 
     lateinit var viewPresenter: LoginContract.Presenter
@@ -31,17 +33,13 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         application as Application
     }
 
-    val userId by lazy {
-        app.dataManager.userId
-    }
-
-    private lateinit var progressDialog: ProgressDialog
+    private lateinit var progressDialog: SimProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        var projectAuthenticator = ProjectAuthenticator(app.secureDataManager, app.dataManager, SafetyNet.getClient(this))
+        val projectAuthenticator = ProjectAuthenticator(app.secureDataManager, app.dataManager, SafetyNet.getClient(this))
         viewPresenter = LoginPresenter(this, app.secureDataManager, projectAuthenticator)
         viewPresenter.start()
 
@@ -53,7 +51,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     private fun initUI() {
-        loginEditTextUserId.setText(userId)
+        progressDialog = SimProgressDialog(this)
+        loginEditTextUserId.setText(app.dataManager.userId)
         loginButtonScanQr.setOnClickListener { viewPresenter.userDidWantToOpenScanQRApp() }
         loginButtonSignIn.setOnClickListener {
             val projectId = loginEditTextProjectId.text.toString()
@@ -69,7 +68,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
             startActivityForResult(intent, QR_REQUEST_CODE)
         } else {
             startActivity(Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://play.google.com/store/apps/details?id=com.google.zxing.client.android")))
+                Uri.parse(GOOGLE_PLAY_LINK_FOR_QR_APP)))
         }
     }
 
@@ -81,14 +80,13 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         }
     }
 
-    private fun handleScannerAppResult(resultCode: Int, data: Intent) {
+    fun handleScannerAppResult(resultCode: Int, data: Intent) {
 
         runOnUiThread {
             try {
-                val scannedText = data.getStringExtra("SCAN_RESULT")
-                val isResultValid = resultCode == Activity.RESULT_OK && scannedText != null
+                val scannedText = data.getStringExtra(QR_RESULT_KEY)
 
-                if (isResultValid) {
+                if (resultCode == Activity.RESULT_OK) {
                     viewPresenter.processQRScannerAppResponse(scannedText)
                 } else {
                     throw Exception("Invalid result from the QRCode app")
@@ -115,8 +113,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         Toast.makeText(this, stringRes, Toast.LENGTH_SHORT).show()
     }
 
-    override fun showProgressDialog(title: Int, message: Int) {
-        progressDialog = indeterminateProgressDialog(title, message)
+    override fun showProgressDialog() {
         progressDialog.show()
     }
 
@@ -124,12 +121,10 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         progressDialog.dismiss()
     }
 
-    override fun returnSuccessfulResult(token: Tokens) {
+    override fun returnSuccessfulResult(tokens: Tokens) {
         val resultData = Intent()
-        //TODO: Fix it when we will full implemented the logic for the 2 tokens
-        resultData.putExtra(IntentKeys.loginActivityTokenReturn, token.legacyToken)
-
-        setResult(LOGIN_SUCCESSED, resultData)
+        resultData.putExtra(IntentKeys.loginActivityTokenReturn, tokens)
+        setResult(LOGIN_SUCCEED, resultData)
         finish()
     }
 }

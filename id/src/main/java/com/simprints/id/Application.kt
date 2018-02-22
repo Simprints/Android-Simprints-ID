@@ -398,10 +398,18 @@ class Application : MultiDexApplication() {
         ParameterExtractor(unexpectedParametersReader, unexpectedParametersValidator)
     }
 
+    private val missingApiKeyOrProjectIdError: Error by lazy {
+        InvalidCalloutError(ALERT_TYPE.MISSING_PROJECT_ID_OR_API_KEY)
+    }
+
+    private val sessionParametersValidator: Set<Validator<SessionParameters>> by lazy {
+        setOf(ProjectIdOrApiKeyValidator(missingApiKeyOrProjectIdError))
+    }
+
     val sessionParametersExtractor: Extractor<SessionParameters> by lazy {
         SessionParametersExtractor(actionExtractor, apiKeyExtractor, projectIdExtractor, moduleIdExtractor,
             userIdExtractor, patientIdExtractor, callingPackageExtractor, metadataExtractor,
-            resultFormatExtractor, unexpectedParametersExtractor)
+            resultFormatExtractor, unexpectedParametersExtractor, sessionParametersValidator)
     }
 
     val timeHelper: TimeHelper by lazy {

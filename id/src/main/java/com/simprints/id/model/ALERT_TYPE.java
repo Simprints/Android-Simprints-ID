@@ -19,6 +19,10 @@ public enum ALERT_TYPE {
         false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_PROJECT_ID),
 
 
+    MISSING_PROJECT_ID_OR_API_KEY(R.string.configuration_error_title, R.string.missing_projectId_or_apiKey_message,
+        R.drawable.error_icon, R.drawable.error_hint_key, R.string.close, R.string.empty,
+        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_PROJECT_ID_OR_API_KEY),
+
     INVALID_INTENT_ACTION(R.string.configuration_error_title, R.string.invalid_intentAction_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
             false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_METADATA),
@@ -26,10 +30,6 @@ public enum ALERT_TYPE {
     INVALID_METADATA(R.string.configuration_error_title, R.string.invalid_metadata_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
             false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_INTENT_ACTION),
-
-    MISSING_API_KEY(R.string.configuration_error_title, R.string.missing_apikey_message,
-            R.drawable.error_icon, R.drawable.error_hint_key, R.string.close, R.string.empty,
-            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_API_KEY),
 
     MISSING_USER_ID(R.string.configuration_error_title, R.string.missing_userId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.close, R.string.empty,
