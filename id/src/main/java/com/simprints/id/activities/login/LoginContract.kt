@@ -12,9 +12,9 @@ interface LoginContract {
         fun updateProjectSecretInTextView(projectSecret: String)
         fun updateProjectIdInTextView(projectId: String)
         fun showToast(stringRes: Int)
-        fun showProgressDialog(title: Int, message: Int)
+        fun showProgressDialog()
         fun dismissProgressDialog()
-        fun returnSuccessfulResult(token: Tokens)
+        fun returnSuccessfulResult(tokens: Tokens)
     }
 
     interface Presenter : BasePresenter {

@@ -1,8 +1,12 @@
 package com.simprints.id.activities
 
+import android.app.Activity
+import android.content.Intent
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
+import com.simprints.id.R
+import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.testUtils.anyNotNull
@@ -14,17 +18,18 @@ import io.reactivex.internal.operators.single.SingleJust
 import junit.framework.Assert.assertNotNull
 import junit.framework.Assert.assertTrue
 import kotlinx.android.synthetic.main.activity_login.*
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 import org.mockito.Mockito.doReturn
 import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowToast
 
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class)
@@ -40,7 +45,6 @@ class LoginActivityTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun shouldUserIdPreFilled() {
         val userId = "some_user_id"
         app.dataManager.userId = userId
@@ -52,12 +56,13 @@ class LoginActivityTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun loginSuccesses_shouldReturnSuccessResultCode() {
 
         val controller = createRoboLoginActivity().start().resume().visible()
         val projectAuthenticator = mock(ProjectAuthenticator::class.java)
-        doReturn(SingleJust(Tokens("firestore_token", "legacy_token"))).`when`(projectAuthenticator).authenticate(anyNotNull(), anyNotNull())
+        doReturn(SingleJust(Tokens("firestore_token", "legacy_token")))
+            .`when`(projectAuthenticator).authenticate(anyNotNull(), anyNotNull())
+
         val loginAct = controller.get().apply {
             viewPresenter.projectAuthenticator = projectAuthenticator
             loginEditTextUserId.setText("some_user_id")
@@ -73,7 +78,6 @@ class LoginActivityTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun qrScanPressedAndScannerAppNotAvailable_shouldOpenPlayStore() {
 
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
@@ -92,7 +96,6 @@ class LoginActivityTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun qrScanPressedAndScannerAppIsAvailable_shouldOpenScannerApp() {
 
         val app = RuntimeEnvironment.application as Application
@@ -116,9 +119,59 @@ class LoginActivityTest {
     }
 
     @Test
-    @Throws(Exception::class)
-    fun enterButtonPressed_doSomething() {
+    fun invalidScannedText_shouldOpenErrorAlert() {
+        val controller = createRoboLoginActivity()
+        controller.start().resume().visible()
+        val act = controller.get()
+        act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "project_id:validProject\nproject_secret_wrong:some_value"))
 
-        Assert.fail("Not implemented yet!")
+        assertEquals(app.getString(R.string.login_invalidQrCode), ShadowToast.getTextOfLatestToast())
+    }
+
+    @Test
+    fun validScannedText_shouldHaveProjectIdAndSecretInEditTexts() {
+        val controller = createRoboLoginActivity().start().resume().visible()
+        val act = controller.get()
+        assertTrue(act.loginEditTextProjectId.text.isEmpty())
+        assertTrue(act.loginEditTextProjectSecret.text.isEmpty())
+
+        val projectId = "55KAiL2YmsjeuNNPnSDO"
+        val projectSecret = "GMoqI_4-UToujbPrIHrNMS9_0EpCbXveTLCvvN7nasVDCNcyhuu7c8u2zrfkuVdL7t3Uxt-Rjo8sDvBi3bkpUB"
+
+        act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "project_id:$projectId\nproject_secret:$projectSecret"))
+
+        assertEquals(projectId, act.loginEditTextProjectId.text.toString())
+        assertEquals(projectSecret, act.loginEditTextProjectSecret.text.toString())
+    }
+
+    @Test
+    fun loginPressed_shouldLoginInOnlyWithValidCredentials() {
+        val controller = createRoboLoginActivity().start().resume().visible()
+        val act = controller.get()
+        act.loginEditTextUserId.setText("")
+        act.loginEditTextProjectId.setText("")
+        act.loginEditTextProjectSecret.setText("")
+
+        act.loginButtonSignIn.performClick()
+        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+
+        act.loginEditTextProjectSecret.setText("some_project_secret")
+        act.loginButtonSignIn.performClick()
+        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+
+        act.loginEditTextProjectId.setText("some_project_id")
+        act.loginButtonSignIn.performClick()
+        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+
+        act.viewPresenter = mock(LoginPresenter::class.java)
+
+        act.loginEditTextUserId.setText("some_user_id")
+        act.loginButtonSignIn.performClick()
+        Mockito.verify(act.viewPresenter, Mockito.times(1))
+            .userDidWantToSignIn(
+                "some_project_id",
+                "some_project_secret",
+                "some_user_id",
+                "")
     }
 }

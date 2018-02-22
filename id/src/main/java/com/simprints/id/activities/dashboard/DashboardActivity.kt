@@ -22,6 +22,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
         dashboardButtonLogout.setOnClickListener {
             app.secureDataManager.cleanCredentials()
+            app.dataManager.signOut()
             startActivity(Intent(this, RequestLoginActivity::class.java))
             finish()
         }
