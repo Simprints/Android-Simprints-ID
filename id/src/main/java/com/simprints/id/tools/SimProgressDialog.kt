@@ -56,8 +56,7 @@ class SimProgressDialog(private val act: Activity, private val dismissibleByUser
             progressBar.visibility = View.GONE
 
             if (!dismissibleByUser) {
-                act.window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                act.window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             }
         }
     }
