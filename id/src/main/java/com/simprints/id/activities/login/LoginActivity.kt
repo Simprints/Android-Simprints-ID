@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     companion object {
-        const val LOGIN_SUCCESSED: Int = 1
+        const val LOGIN_SUCCEED: Int = 1
         const val LOGIN_REQUEST_CODE: Int = 1
         const val QR_REQUEST_CODE: Int = 0
         const val QR_RESULT_KEY = "SCAN_RESULT"
@@ -124,7 +124,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun returnSuccessfulResult(tokens: Tokens) {
         val resultData = Intent()
         resultData.putExtra(IntentKeys.loginActivityTokenReturn, tokens)
-        setResult(LOGIN_SUCCESSED, resultData)
+        setResult(LOGIN_SUCCEED, resultData)
         finish()
     }
 }
