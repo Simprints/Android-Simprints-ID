@@ -165,7 +165,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
     private void onVerifyStart() {
         final String guid = dataManager.getPatientId();
         try {
-            dataManager.loadPerson(candidates, guid, newOnLoadPersonCallback());
+            dataManager.loadPerson(candidates, dataManager.getSignedInProjectId(), guid, newOnLoadPersonCallback());
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);

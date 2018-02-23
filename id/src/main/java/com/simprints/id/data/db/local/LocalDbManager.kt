@@ -9,7 +9,7 @@ interface LocalDbManager {
 
     // Lifecycle
     fun signInToLocal(projectId: String, localDbKey: String)
-    fun signOutOfLocal(projectId: String)
+    fun signOutOfLocal()
     fun isLocalDbInitialized(projectId: String): Boolean
 
     // Data transfer

@@ -11,7 +11,7 @@ open abstract class CheckLoginPresenter (
 
     fun openNextActivity() {
         if (isUserSignedIn()) {
-            initDbContext(dataManager.getSignedInProjectIdOrEmpty())
+            initDbContext()
             handleSignedInUser()
         } else {
             handleNotSignedInUser()
@@ -21,10 +21,10 @@ open abstract class CheckLoginPresenter (
     abstract fun handleNotSignedInUser()
     abstract fun handleSignedInUser()
 
-    private fun initDbContext(projectId: String) {
-        if (!dataManager.isDbInitialised(projectId)) {
+    private fun initDbContext() {
+        if (!dataManager.isDbInitialised()) {
             try {
-                dataManager.initialiseDb(projectId)
+                dataManager.initialiseDb()
             } catch (error: UninitializedDataManagerError) {
                 dataManager.logError(error)
                 dbInitFailed()
@@ -37,8 +37,9 @@ open abstract class CheckLoginPresenter (
     private fun isUserSignedIn(): Boolean {
         val encProjectSecret = dataManager.getEncryptedProjectSecretOrEmpty()
         val storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
-        val isFirebaseTokenValid = dataManager.isSignedIn(storedProjectId) || true //TODO:Remove it once isSignedIn is done
-
+        val userId = getUserId()
+        val isFirebaseTokenValid = dataManager.isSignedIn(storedProjectId, userId) //TODO:Remove it once isSignedIn is done
+    
         return if (encProjectSecret.isEmpty() || storedProjectId.isEmpty() || !isFirebaseTokenValid) {
             false
         } else {
@@ -47,6 +48,7 @@ open abstract class CheckLoginPresenter (
     }
 
     abstract fun isUserSignedInForStoredProjectId(): Boolean
+    abstract fun getUserId(): String
 
     protected fun initSession() {
         dataManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())

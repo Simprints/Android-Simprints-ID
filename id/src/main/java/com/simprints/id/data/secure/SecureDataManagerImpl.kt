@@ -1,21 +1,22 @@
 package com.simprints.id.data.secure
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.exceptions.safe.ProjectCredentialsMissingException
+import com.simprints.id.exceptions.safe.CredentialMissingException
 
 class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
 
     companion object {
          const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
          const val PROJECT_ID: String = "PROJECT_ID"
-         private const val PROJECT_SECRET_AND_ID_DEFAULT: String = ""
+         const val USER_ID: String = "USER_ID"
+         private const val DEFAULT_VALUE: String = ""
     }
 
     override var encryptedProjectSecret: String = ""
         get() {
-            val value = prefs.getPrimitive(ENCRYPTED_PROJECT_SECRET, PROJECT_SECRET_AND_ID_DEFAULT)
+            val value = prefs.getPrimitive(ENCRYPTED_PROJECT_SECRET, DEFAULT_VALUE)
             if (value.isBlank()) {
-                throw ProjectCredentialsMissingException()
+                throw CredentialMissingException()
             }
             return value
         }
@@ -26,9 +27,9 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
 
     override var signedInProjectId: String = ""
         get() {
-            val value = prefs.getPrimitive(PROJECT_ID, PROJECT_SECRET_AND_ID_DEFAULT)
+            val value = prefs.getPrimitive(PROJECT_ID, DEFAULT_VALUE)
             if (value.isBlank()) {
-                throw ProjectCredentialsMissingException()
+                throw CredentialMissingException()
             }
             return value
         }
@@ -37,17 +38,37 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             prefs.edit().putPrimitive(PROJECT_ID, field).commit()
         }
 
+    override var signedInUserId: String = ""
+        get() {
+            val value = prefs.getPrimitive(USER_ID, DEFAULT_VALUE)
+            if (value.isBlank()) {
+                throw CredentialMissingException()
+            }
+            return value
+        }
+        set(value) {
+            field = value
+            prefs.edit().putPrimitive(USER_ID, field).commit()
+        }
+
     override fun getEncryptedProjectSecretOrEmpty(): String =
         try {
             encryptedProjectSecret
-        } catch (e: ProjectCredentialsMissingException) {
+        } catch (e: CredentialMissingException) {
             ""
         }
 
     override fun getSignedInProjectIdOrEmpty(): String =
         try {
             signedInProjectId
-        } catch (e: ProjectCredentialsMissingException) {
+        } catch (e: CredentialMissingException) {
+            ""
+        }
+
+    override fun getSignedInUserIdOrEmpty(): String =
+        try {
+            signedInUserId
+        } catch (e: CredentialMissingException) {
             ""
         }
 
@@ -58,13 +79,14 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
 
     override fun cleanCredentials() {
 
-        val projectid = getSignedInProjectIdOrEmpty()
-        val possibleLegacyApiKey = prefs.getPrimitive(projectid, "")
-        prefs.edit().putPrimitive(projectid, "").commit()
+        val projectId = getSignedInProjectIdOrEmpty()
+        val possibleLegacyApiKey = prefs.getPrimitive(projectId, "") // FIXME
+        prefs.edit().putPrimitive(projectId, "").commit()
         prefs.edit().putPrimitive(possibleLegacyApiKey, "").commit()
 
         encryptedProjectSecret = ""
         signedInProjectId = ""
+        signedInUserId = ""
     }
 
     override fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?) {

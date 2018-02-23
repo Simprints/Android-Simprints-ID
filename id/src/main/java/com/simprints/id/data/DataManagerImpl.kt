@@ -1,3 +1,4 @@
+
 package com.simprints.id.data
 
 import android.content.Context
@@ -81,16 +82,16 @@ class DataManagerImpl(private val context: Context,
 
     // DbManager call interception for populating arguments
     // Lifecycle
-    override fun initialiseDb(projectId: String) {
+    override fun initialiseDb() {
         dbManager.registerRemoteConnectionListener(connectionStateLogger)
         dbManager.registerRemoteAuthListener(authStateLogger)
-        dbManager.initialiseDb(projectId)
+        dbManager.initialiseDb()
     }
 
-    override fun signOut(projectId: String) {
+    override fun signOut() {
         dbManager.unregisterRemoteConnectionListener(connectionStateLogger)
         dbManager.unregisterRemoteAuthListener(authStateLogger)
-        dbManager.signOut(projectId)
+        dbManager.signOut()
     }
 
     private val connectionStateLogger = object : ConnectionListener {

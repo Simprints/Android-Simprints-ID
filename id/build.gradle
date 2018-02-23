@@ -236,8 +236,23 @@ dependencies {
     androidTestImplementation "joda-time:joda-time:2.9.9"
 }
 
+def copyGoogleServicesJsonTask(variantName, gcpProject) {
+    return tasks.create("copyGoogleServicesJson${variantName.capitalize()}", Copy) {
+        def jsonName = "${gcpProject}-google-services.json".replaceAll("-", "_")
+        from "${project.rootDir}/id/src/${variantName}/res/raw/${jsonName}"
+        into "${project.rootDir}/id/src/${variantName}/"
+        rename { filename -> "google-services.json" }
+    }
+}
+
+copyGoogleServicesJsonTask("debug", "simprints-dev")
+copyGoogleServicesJsonTask("release", "simprints-152315")
+copyGoogleServicesJsonTask("endToEndTesting", "simprints-test")
+
 crashlytics {
     enableNdk true
     androidNdkOut "src/main/obj"
     androidNdkLibsOut "src/main/libs"
 }
+
+apply plugin: "com.google.gms.google-services"

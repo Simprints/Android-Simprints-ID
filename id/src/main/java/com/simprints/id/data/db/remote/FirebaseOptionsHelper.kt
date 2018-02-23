@@ -70,45 +70,45 @@ class FirebaseOptionsHelper(private val context: Context) {
     }
 
     private fun populateApiKey() {
-        val apiKey = getSafelyFromJson {
+        val apiKey = getFromJsonOrThrow {
             clientNode.getJSONArray("api_key").getJSONObject(0).getString("current_key")
-        } as String?
-        if (apiKey != null) builder.setApiKey(apiKey)
+        } as String
+        builder.setApiKey(apiKey)
     }
 
     private fun populateApplicationId() {
-        val appId = getSafelyFromJson {
+        val appId = getFromJsonOrThrow {
             clientNode.getJSONObject("client_info").getString("mobilesdk_app_id")
-        } as String?
-        if (appId != null) builder.setApplicationId(appId)
+        } as String
+        builder.setApplicationId(appId)
     }
 
     private fun populateDatabaseUrl() {
-        val databaseUrl = getSafelyFromJson {
+        val databaseUrl = getFromJsonOrThrow {
             json.getJSONObject("project_info").getString("firebase_url")
-        } as String?
-        if (databaseUrl != null) builder.setDatabaseUrl(databaseUrl)
+        } as String
+        builder.setDatabaseUrl(databaseUrl)
     }
 
     private fun populateGcmSenderId() {
-        val gcmSenderId = getSafelyFromJson {
+        val gcmSenderId = getFromJsonOrThrow {
             json.getJSONObject("project_info").getString("project_number")
-        } as String?
-        if (gcmSenderId != null) builder.setGcmSenderId(gcmSenderId)
+        } as String
+        builder.setGcmSenderId(gcmSenderId)
     }
 
     private fun populateProjectId() {
-        val projectId = getSafelyFromJson {
+        val projectId = getFromJsonOrThrow {
             json.getJSONObject("project_info").getString("project_id")
-        } as String?
-        if (projectId != null) builder.setProjectId(projectId)
+        } as String
+        builder.setProjectId(projectId)
     }
 
     private fun populateStorageBucket() {
-        val storageBucket = getSafelyFromJson {
+        val storageBucket = getFromJsonOrThrow {
             json.getJSONObject("project_info").getString("storage_bucket")
-        } as String?
-        if (storageBucket != null) builder.setStorageBucket(storageBucket)
+        } as String
+        builder.setStorageBucket(storageBucket)
     }
 
     private fun getFromJsonOrThrow(f: () -> Any): Any {
@@ -116,14 +116,6 @@ class FirebaseOptionsHelper(private val context: Context) {
             f()
         } catch (e: JSONException) {
             throw GoogleServicesJsonInvalidError()
-        }
-    }
-
-    private fun getSafelyFromJson(f: () -> Any?): Any? {
-        return try {
-            return f()
-        } catch (e: JSONException) {
-            null
         }
     }
 

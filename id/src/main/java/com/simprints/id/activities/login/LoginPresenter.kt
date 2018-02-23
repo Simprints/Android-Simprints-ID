@@ -43,6 +43,7 @@ class LoginPresenter(val view: LoginContract.View,
                     { token ->
                         secureDataManager.storeProjectIdWithLegacyApiKeyPair(possibleProjectId, possibleLegacyApiKey)
                         secureDataManager.signedInProjectId = possibleProjectId
+                        secureDataManager.signedInUserId = possibleUserId
                         view.dismissProgressDialog()
                         view.returnSuccessfulResult(token)
                     },
