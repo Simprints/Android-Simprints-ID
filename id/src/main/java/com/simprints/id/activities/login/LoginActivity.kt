@@ -121,10 +121,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         progressDialog.dismiss()
     }
 
-    override fun returnSuccessfulResult(tokens: Tokens) {
-        val resultData = Intent()
-        resultData.putExtra(IntentKeys.loginActivityTokenReturn, tokens)
-        setResult(LOGIN_SUCCEED, resultData)
+    override fun returnSuccessfulResult() {
+        setResult(LOGIN_SUCCEED)
         finish()
     }
 }

@@ -7,13 +7,14 @@ import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.Tokens
+import com.simprints.libdata.AuthListener
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.internal.operators.single.SingleJust
 import io.reactivex.rxkotlin.Singles
 
 class ProjectAuthenticator(secureDataManager: SecureDataManager,
-                           private val dataManager: DbManager,
+                           private val dbManager: DbManager,
                            private val safetyNetClient: SafetyNetClient,
                            apiClient: ApiServiceInterface = ApiService().api,
                            private val attestationManager: AttestationManager = AttestationManager()) {
@@ -23,10 +24,10 @@ class ProjectAuthenticator(secureDataManager: SecureDataManager,
     private val nonceManager = NonceManager(apiClient)
     private val authManager = AuthManager(apiClient)
 
-    fun authenticate(nonceScope: NonceScope, projectSecret: String): Single<Tokens> =
+    fun authenticate(nonceScope: NonceScope, projectSecret: String): Single<Unit> =
         prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
-            .initFirebase(nonceScope.projectId)
+            .signIn(nonceScope.projectId)
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
@@ -53,15 +54,20 @@ class ProjectAuthenticator(secureDataManager: SecureDataManager,
             AuthRequest(encryptedProjectSecret, nonceScope.projectId, nonceScope.userId, googleAttestation)
         }
 
-    private fun Single<out Tokens>.initFirebase(projectId: String): Single<Tokens> =
+    private fun Single<out Tokens>.signIn(projectId: String): Single<Unit> =
         flatMap { tokens ->
-            if (!dataManager.isDbInitialised()) {
-                dataManager.initialiseDb()
-            }
+            Single.create<Unit> { emitter ->
 
-            //TODO: Fix it when we implement the 2 firebase apps in FirebaseManager
-            dataManager.signIn(projectId, tokens)
-            SingleJust(tokens)
+                val signInAuthListener = object : AuthListener {
+                    override fun onSignIn() {
+                        dbManager.unregisterRemoteAuthListener(this)
+                        emitter.onSuccess(Unit)
+                    }
+                    override fun onSignOut() {}
+                }
+                dbManager.registerRemoteAuthListener(signInAuthListener)
+                dbManager.signIn(projectId, tokens)
+            }
         }
 
     private fun Single<out AuthRequest>.makeAuthRequest(): Single<Tokens> =
