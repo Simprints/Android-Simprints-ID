@@ -4,6 +4,7 @@ import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.tools.base.RxJavaTest
+import com.simprints.id.tools.roboletric.TestApplication
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
 import org.junit.Test
@@ -13,8 +14,8 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class)
-class ProjectSecretManagerText : RxJavaTest() {
+@Config(constants = BuildConfig::class, application = TestApplication::class)
+class ProjectSecretManagerTest : RxJavaTest() {
 
    @Test
     fun validPublicKeyAndProjectSecret_shouldEncryptAndStoreIt() {

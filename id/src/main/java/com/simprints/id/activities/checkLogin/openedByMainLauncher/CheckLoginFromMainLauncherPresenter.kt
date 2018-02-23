@@ -34,4 +34,8 @@ class CheckLoginFromMainLauncherPresenter(
     override fun isUserSignedInForStoredProjectId(): Boolean {
         return true
     }
+
+    override fun getUserId(): String {
+        return dataManager.getSignedInUserIdOrEmpty() // FIXME
+    }
 }

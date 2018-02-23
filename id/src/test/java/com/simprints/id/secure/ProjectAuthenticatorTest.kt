@@ -8,6 +8,7 @@ import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.createMockService
 import com.simprints.id.tools.retrofit.createMockServiceToFailRequests
+import com.simprints.id.tools.roboletric.TestApplication
 import com.simprints.id.tools.roboletric.mockLocalDbManager
 import com.simprints.id.tools.roboletric.mockRemoteDbManager
 import org.junit.Before
@@ -19,7 +20,7 @@ import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class)
+@Config(constants = BuildConfig::class, application = TestApplication::class)
 class ProjectAuthenticatorTest : RxJavaTest() {
 
     private lateinit var app: Application

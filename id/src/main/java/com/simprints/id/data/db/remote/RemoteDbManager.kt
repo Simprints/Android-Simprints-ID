@@ -1,8 +1,7 @@
 package com.simprints.id.data.db.remote
 
 import com.simprints.id.data.models.Session
-import com.simprints.id.exceptions.safe.DifferentProjectInitialisedException
-import com.simprints.id.exceptions.safe.DifferentProjectSignedInException
+import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
 import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libdata.DataCallback
@@ -16,21 +15,20 @@ import com.simprints.libsimprints.Verification
 interface RemoteDbManager: RemoteDbConnectionListenerManager, RemoteDbAuthListenerManager {
 
     // Lifecycle
-    fun initialiseRemoteDb(projectId: String)
+    fun initialiseRemoteDb()
 
-    fun signInToRemoteDb(projectId: String, tokens: Tokens)
-    fun signOutOfRemoteDb(projectId: String)
+    fun signInToRemoteDb(tokens: Tokens)
+    fun signOutOfRemoteDb()
 
-    @Throws(DifferentProjectInitialisedException::class)
-    fun isRemoteDbInitialized(projectId: String): Boolean
-    @Throws(DifferentProjectSignedInException::class)
-    fun isSignedIn(projectId: String): Boolean
+    fun isRemoteDbInitialized(): Boolean
+    @Throws(DifferentCredentialsSignedInException::class)
+    fun isSignedIn(projectId: String, userId: String): Boolean
 
     // Data transfer
     fun getLocalDbKeyFromRemote(): String
 
     fun savePersonInRemote(fbPerson: fb_Person, projectId: String)
-    fun loadPersonFromRemote(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
+    fun loadPersonFromRemote(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
 
     fun saveIdentificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
     fun updateIdentificationInRemote(projectId: String, selectedGuid: String, deviceId: String, sessionId: String)

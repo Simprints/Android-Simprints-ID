@@ -5,15 +5,14 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
-import com.simprints.id.exceptions.safe.DifferentProjectInitialisedException
-import com.simprints.id.exceptions.safe.DifferentProjectSignedInException
+import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
 import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libdata.DATA_ERROR
@@ -56,30 +55,26 @@ class FirebaseManager(private val appContext: Context,
     private lateinit var legacyFirebaseAuth: FirebaseAuth
     private lateinit var firestoreFirebaseAuth: FirebaseAuth
 
-    // Routes
-    private lateinit var projectRef: DatabaseReference
-
     // Lifecycle
-    override fun initialiseRemoteDb(projectId: String) {
-        initialiseLegacyFirebaseProject(projectId)
-        initialiseFirestoreFirebaseProject(projectId)
+    override fun initialiseRemoteDb() {
+        initialiseLegacyFirebaseProject()
+        initialiseFirestoreFirebaseProject()
         applyConnectionListeners(legacyFirebaseApp)
-        applyAuthListeners(legacyFirebaseAuth, legacyFirebaseAppName)
+        applyAuthListeners(legacyFirebaseAuth)
         isInitialised = true
     }
 
-    private fun initialiseLegacyFirebaseProject(projectId: String) {
-        legacyFirebaseAppName = getLegacyAppNameFromProjectId(projectId)
+    private fun initialiseLegacyFirebaseProject() {
+        legacyFirebaseAppName = getLegacyAppName()
         legacyFirebaseOptions = firebaseOptionsHelper.getLegacyFirebaseOptions()
         legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName, legacyFirebaseOptions)
         legacyFirebaseAuth = initialiseFirebaseAuth(legacyFirebaseApp)
 
         Utils.forceSync(legacyFirebaseApp)
-        projectRef = projectRef(legacyFirebaseApp, projectId)
     }
 
-    private fun initialiseFirestoreFirebaseProject(projectId: String) {
-        firestoreFirebaseAppName = getFirestoreAppNameFromProjectId(projectId)
+    private fun initialiseFirestoreFirebaseProject() {
+        firestoreFirebaseAppName = getFirestoreAppName()
         firestoreFirebaseOptions = firebaseOptionsHelper.getFirestoreFirebaseOptions()
         firestoreFirebaseApp = initialiseFirebaseApp(firestoreFirebaseAppName, firestoreFirebaseOptions)
         firestoreFirebaseAuth = initialiseFirebaseAuth(firestoreFirebaseApp)
@@ -97,36 +92,32 @@ class FirebaseManager(private val appContext: Context,
     private fun initialiseFirebaseAuth(firebaseApp: FirebaseApp): FirebaseAuth =
         FirebaseAuth.getInstance(firebaseApp)
 
-    override fun signInToRemoteDb(projectId: String, tokens: Tokens) {
-        signInToLegacyDb(projectId, tokens.legacyToken)
-        signInToFirestoreDb(projectId, tokens.firestoreToken)
+    override fun signInToRemoteDb(tokens: Tokens) {
+        signInToLegacyDb(tokens.legacyToken)
+        signInToFirestoreDb(tokens.firestoreToken)
     }
 
-    private fun signInToLegacyDb(projectId: String, legacyToken: String) {
+    private fun signInToLegacyDb(legacyToken: String) {
         legacyFirebaseAuth.signInWithCustomToken(legacyToken).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Timber.d("Firebase Auth signInWithCustomToken successful")
             } else {
                 Timber.d("Firebase Auth signInWithCustomToken failed: ${task.exception}")
             }
-        }.addOnFailureListener {exception ->
-                Timber.d("Firebase Auth signInWithCustomToken failed to complete: $exception")
-            }
+        }
     }
 
-    private fun signInToFirestoreDb(projectId: String, firestoreToken: String) {
+    private fun signInToFirestoreDb(firestoreToken: String) {
         firestoreFirebaseAuth.signInWithCustomToken(firestoreToken).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Timber.d("Firebase Auth signInWithCustomToken successful")
             } else {
                 Timber.d("Firebase Auth signInWithCustomToken failed: ${task.exception}")
             }
-        }.addOnFailureListener {exception ->
-                Timber.d("Firebase Auth signInWithCustomToken failed to complete: $exception")
-            }
+        }
     }
 
-    override fun signOutOfRemoteDb(projectId: String) {
+    override fun signOutOfRemoteDb() {
         legacyFirebaseAuth.signOut()
         firestoreFirebaseAuth.signOut()
 
@@ -134,29 +125,18 @@ class FirebaseManager(private val appContext: Context,
         removeAuthListeners(legacyFirebaseAuth)
     }
 
-    @Throws(DifferentProjectInitialisedException::class)
-    override fun isRemoteDbInitialized(projectId: String): Boolean {
-        return if (isInitialised) {
-            if (legacyFirebaseApp.name == getLegacyAppNameFromProjectId(projectId))
-                true
-            else
-                throw DifferentProjectInitialisedException()
-        } else false
-    }
+    override fun isRemoteDbInitialized(): Boolean = isInitialised
 
-    @Throws(DifferentProjectSignedInException::class)
-    override fun isSignedIn(projectId: String): Boolean {
-        return if (isSignedIn) {
-            isSignedInUserSameAsProjectId(projectId)
-        } else false
-    }
+    @Throws(DifferentCredentialsSignedInException::class)
+    override fun isSignedIn(projectId: String, userId: String): Boolean =
+        isSignedInUserAsExpected(projectId, userId)
 
-    private fun isSignedInUserSameAsProjectId(projectId: String): Boolean {
+    private fun isSignedInUserAsExpected(projectId: String, userId: String): Boolean {
         val firebaseUser = legacyFirebaseAuth.currentUser
         firebaseUser?.let {
-            if (it.uid == getLegacyAppNameFromProjectId(projectId)) {
+            if (isFirebaseUserAsExpected(it, projectId, userId)) {
                 return true
-            } else throw DifferentProjectSignedInException()
+            } else throw DifferentCredentialsSignedInException()
         } ?: return false
     }
 
@@ -179,17 +159,17 @@ class FirebaseManager(private val appContext: Context,
                 } else {
                     updates[userPatientListNode(fbPerson.userId, fbPerson.patientId)] = true
                 }
-                projectRef.updateChildren(updates)
+                projectRef(legacyFirebaseApp, projectId).updateChildren(updates)
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
     }
 
-    override fun loadPersonFromRemote(destinationList: MutableList<Person>, guid: String, callback: DataCallback) {
+    override fun loadPersonFromRemote(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
         val wrappedCallback = wrapCallback("FirebaseManager.loadPerson()", callback)
 
-        projectRef.child(patientNode(guid)).addListenerForSingleValueEvent(object : ValueEventListener {
+        projectRef(legacyFirebaseApp, projectId).child(patientNode(guid)).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val fbPerson = dataSnapshot.getValue(fb_Person::class.java)
 
@@ -234,10 +214,17 @@ class FirebaseManager(private val appContext: Context,
     fun getFirebaseStorageInstance() = FirebaseStorage.getInstance(legacyFirebaseApp)
 
     companion object {
-        fun getLegacyAppNameFromProjectId(projectId: String): String =
-            projectId
 
-        fun getFirestoreAppNameFromProjectId(projectId: String): String =
-            projectId + "-fs"
+        fun getLegacyAppName(): String =
+            FirebaseApp.DEFAULT_APP_NAME
+
+        fun getFirestoreAppName(): String =
+            "firestore"
+
+        fun isFirebaseUserAsExpected(firebaseUser: FirebaseUser, projectId: String, userId: String): Boolean =
+            firebaseUser.uid == getFirebaseUid(projectId, userId)
+
+        private fun getFirebaseUid(projectId: String, userId: String): String =
+            "$projectId.$userId"
     }
 }

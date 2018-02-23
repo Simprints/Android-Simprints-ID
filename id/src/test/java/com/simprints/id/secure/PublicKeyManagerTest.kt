@@ -5,6 +5,7 @@ import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.FakeResponseInterceptor
 import com.simprints.id.tools.retrofit.givenNetworkFailurePercentIs
+import com.simprints.id.tools.roboletric.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -20,7 +21,7 @@ import retrofit2.mock.NetworkBehavior
 import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class)
+@Config(constants = BuildConfig::class, application = TestApplication::class)
 class PublicKeyManagerTest : RxJavaTest() {
 
     private val validPublicKeyJsonResponse = "{\"value\":\"public_key_from_server\"}"

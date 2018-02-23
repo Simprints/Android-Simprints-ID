@@ -11,6 +11,7 @@ import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.tools.extensions.scannerAppIntent
+import com.simprints.id.tools.roboletric.TestApplication
 import com.simprints.id.tools.roboletric.createRoboLoginActivity
 import com.simprints.id.tools.roboletric.injectHowToResolveScannerAppIntent
 import com.simprints.id.tools.roboletric.mockLocalDbManager
@@ -32,7 +33,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowToast
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class)
+@Config(constants = BuildConfig::class, application = TestApplication::class)
 class LoginActivityTest {
 
     private lateinit var app: Application

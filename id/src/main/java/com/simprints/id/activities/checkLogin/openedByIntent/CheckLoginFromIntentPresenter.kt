@@ -73,6 +73,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
+    override fun getUserId(): String =
+        dataManager.userId // FIXME
+
     private fun findProjectIdForApiKey(legacyApiKey: String): String {
         return dataManager.projectIdForLegacyApiKeyOrEmpty(legacyApiKey)
     }

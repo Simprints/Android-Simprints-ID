@@ -134,7 +134,7 @@ public class Setup {
     private void initDbContext(@NonNull final Activity activity) {
         onProgress(30, R.string.updating_database);
         try {
-            dataManager.initialiseDb(dataManager.getProjectId());
+            dataManager.initialiseDb();
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
@@ -221,7 +221,7 @@ public class Setup {
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = dataManager.getPatientId();
         try {
-            dataManager.loadPerson(loadedPerson, guid, newLoadPersonCallback(activity, guid));
+            dataManager.loadPerson(loadedPerson, dataManager.getSignedInProjectId(), guid, newLoadPersonCallback(activity, guid));
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);

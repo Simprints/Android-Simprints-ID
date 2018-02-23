@@ -32,7 +32,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         }
     }
 
-    override fun signOutOfLocal(projectId: String) {
+    override fun signOutOfLocal() {
         launch(UI) {
             realm?.close() ?: throw RealmUninitialisedError()
         }

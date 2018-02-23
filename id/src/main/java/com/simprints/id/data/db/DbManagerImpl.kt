@@ -17,34 +17,33 @@ import com.simprints.libsimprints.Verification
 import io.reactivex.Emitter
 
 class DbManagerImpl(private val localDbManager: LocalDbManager,
-                    private val remoteDbManager: RemoteDbManager) :
+                    var remoteDbManager: RemoteDbManager) :
     DbManager,
     LocalDbManager by localDbManager,
     RemoteDbManager by remoteDbManager {
 
     // Lifecycle
 
-    override fun initialiseDb(projectId: String) {
-        remoteDbManager.initialiseRemoteDb(projectId)
+    override fun initialiseDb() {
+        remoteDbManager.initialiseRemoteDb()
     }
 
     override fun signIn(projectId: String, token: Tokens) {
         // TODO
-        remoteDbManager.signInToRemoteDb(projectId, token)
+        remoteDbManager.signInToRemoteDb(token)
         val localDbKey = remoteDbManager.getLocalDbKeyFromRemote()
         localDbManager.signInToLocal(projectId, localDbKey)
     }
 
-    override fun signOut(projectId: String) {
+    override fun signOut() {
         // TODO
-        localDbManager.signOutOfLocal(projectId)
-        remoteDbManager.signOutOfRemoteDb(projectId)
+        localDbManager.signOutOfLocal()
+        remoteDbManager.signOutOfRemoteDb()
     }
 
-    override fun isDbInitialised(projectId: String): Boolean =
+    override fun isDbInitialised(): Boolean =
         // TODO
-        localDbManager.isLocalDbInitialized(projectId) &&
-            remoteDbManager.isRemoteDbInitialized(projectId)
+        remoteDbManager.isRemoteDbInitialized()
 
     // Data transfer
 
@@ -53,9 +52,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.savePersonInRemote(fbPerson, projectId)
     }
 
-    override fun loadPerson(destinationList: MutableList<Person>, guid: String, callback: DataCallback) {
+    override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
         localDbManager.loadPersonFromLocal(destinationList, guid, callback)
-        if (destinationList.size == 0) remoteDbManager.loadPersonFromRemote(destinationList, guid, callback)
+        if (destinationList.size == 0) remoteDbManager.loadPersonFromRemote(destinationList, projectId, guid, callback)
     }
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
