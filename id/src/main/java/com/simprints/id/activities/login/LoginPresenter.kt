@@ -11,8 +11,8 @@ class LoginPresenter(val view: LoginContract.View,
                      override var projectAuthenticator: ProjectAuthenticator) : LoginContract.Presenter {
 
     companion object {
-        private const val SCANNED_TEXT_TAG_PROJECT_ID = "id:"
-        private const val SCANNED_TEXT_TAG_PROJECT_SECRET = "secret:"
+        private const val SCANNED_TEXT_TAG_PROJECT_ID = "project_id:"
+        private const val SCANNED_TEXT_TAG_PROJECT_SECRET = "project_secret:"
     }
 
     init {
@@ -59,20 +59,21 @@ class LoginPresenter(val view: LoginContract.View,
 
     /**
      * Valid Scanned Text Format:
-     * id:someProjectId\n
-     * secret:someSecret
+     * project_id:someProjectId\n
+     * project_secret:someSecret
      **/
     override fun processQRScannerAppResponse(scannedText: String) {
 
-        val beginProjectId = scannedText.indexOf(SCANNED_TEXT_TAG_PROJECT_ID) + SCANNED_TEXT_TAG_PROJECT_ID.length
-        val endProjectId = scannedText.indexOf("\n")
-        val potentialProjectId = scannedText.substring(beginProjectId, endProjectId)
+        val potentialProjectId = Regex(pattern = "(?<=$SCANNED_TEXT_TAG_PROJECT_ID)(.*)").find(scannedText)?.value
+        val potentialProjectSecret = Regex(pattern = "(?<=$SCANNED_TEXT_TAG_PROJECT_SECRET)(.*)").find(scannedText)?.value
 
-        val nextParamRow = scannedText.substring(scannedText.indexOf("\n") + 1)
-        val beginProjectSecret = nextParamRow.indexOf(SCANNED_TEXT_TAG_PROJECT_SECRET) + SCANNED_TEXT_TAG_PROJECT_SECRET.length
-        val potentialProjectSecret = nextParamRow.substring(beginProjectSecret)
+        if (potentialProjectId != null && potentialProjectId.isNotEmpty() &&
+            potentialProjectSecret != null && potentialProjectSecret.isNotEmpty() ) {
 
-        view.updateProjectIdInTextView(potentialProjectId)
-        view.updateProjectSecretInTextView(potentialProjectSecret)
+            view.updateProjectIdInTextView(potentialProjectId)
+            view.updateProjectSecretInTextView(potentialProjectSecret)
+        } else {
+            throw Exception("Invalid scanned text")
+        }
     }
 }

@@ -52,13 +52,15 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
         }
 
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
-        !getSignedInProjectIdOrEmpty().isEmpty() && getSignedInProjectIdOrEmpty() == possibleProjectId && !getEncryptedProjectSecretOrEmpty().isEmpty()
+        getSignedInProjectIdOrEmpty().isNotEmpty() &&
+            getSignedInProjectIdOrEmpty() == possibleProjectId &&
+            getEncryptedProjectSecretOrEmpty().isNotEmpty()
 
     override fun cleanCredentials() {
 
-        //TODO: SecureDataManager doesn't support multiple projects signed in.
-        val possibleLegacyApiKey = prefs.getPrimitive(signedInProjectId, "")
-        prefs.edit().putPrimitive(signedInProjectId, "").commit()
+        val projectid = getSignedInProjectIdOrEmpty()
+        val possibleLegacyApiKey = prefs.getPrimitive(projectid, "")
+        prefs.edit().putPrimitive(projectid, "").commit()
         prefs.edit().putPrimitive(possibleLegacyApiKey, "").commit()
 
         encryptedProjectSecret = ""

@@ -216,8 +216,9 @@ dependencies {
     testImplementation("junit:junit:$junit_version") {
         exclude group: "com.android.support"
     }
-    testImplementation 'org.robolectric:robolectric:3.6.1'
-    testImplementation "org.robolectric:shadows-multidex:3.6.1"
+    testImplementation 'org.robolectric:robolectric:3.7.1'
+    testImplementation 'org.robolectric:shadows-multidex:3.7.1'
+    testImplementation 'com.android.support.test:monitor:1.0.2-alpha1'
 
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"
@@ -240,18 +241,3 @@ crashlytics {
     androidNdkOut "src/main/obj"
     androidNdkLibsOut "src/main/libs"
 }
-
-task copyDevGoogleServicesJson(type: Copy) {
-    def jsonName = "${getDevProjectId()}-google-services.json"
-    from "${project.rootDir}/id/src/debug/googleServicesJsons/${jsonName}"
-    into "${project.rootDir}/id/src/debug/"
-    rename { filename -> "google-services.json" }
-}
-
-tasks.whenTaskAdded { task ->
-    if (task.name == 'preDebugBuild') {
-        preDebugBuild.dependsOn(copyDevGoogleServicesJson)
-    }
-}
-
-apply plugin: "com.google.gms.google-services"

@@ -59,7 +59,8 @@ open class LaunchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         injectDependencies()
         initView()
-        RemoteConfig.init()
+        // FIXME : RemoteConfig should be in DataManager, as calls before Firebase has been initialised will fail
+        // RemoteConfig.init()
         positionTracker.start()
         setup.start(this, getSetupCallback())
     }

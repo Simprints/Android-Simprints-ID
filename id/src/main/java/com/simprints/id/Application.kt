@@ -402,14 +402,14 @@ class Application : MultiDexApplication() {
         InvalidCalloutError(ALERT_TYPE.MISSING_PROJECT_ID_OR_API_KEY)
     }
 
-    private val globalSessionParametersValidator: Set<Validator<SessionParameters>> by lazy {
+    private val sessionParametersValidator: Set<Validator<SessionParameters>> by lazy {
         setOf(ProjectIdOrApiKeyValidator(missingApiKeyOrProjectIdError))
     }
 
     val sessionParametersExtractor: Extractor<SessionParameters> by lazy {
         SessionParametersExtractor(actionExtractor, apiKeyExtractor, projectIdExtractor, moduleIdExtractor,
             userIdExtractor, patientIdExtractor, callingPackageExtractor, metadataExtractor,
-            resultFormatExtractor, unexpectedParametersExtractor, globalSessionParametersValidator)
+            resultFormatExtractor, unexpectedParametersExtractor, sessionParametersValidator)
     }
 
     val timeHelper: TimeHelper by lazy {

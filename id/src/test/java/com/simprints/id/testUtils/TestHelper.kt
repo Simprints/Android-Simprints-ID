@@ -1,6 +1,7 @@
 package com.simprints.id.testUtils
 
 import android.app.Activity
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import junit.framework.AssertionFailedError
 import org.hamcrest.CoreMatchers
@@ -9,6 +10,7 @@ import org.junit.Assert.assertEquals
 import org.mockito.Mockito
 import org.mockito.stubbing.OngoingStubbing
 import org.robolectric.Shadows
+import org.robolectric.shadows.ShadowActivity
 
 inline fun <reified T> mock(): T =
         Mockito.mock(T::class.java)
@@ -59,7 +61,15 @@ inline fun <reified T : Throwable> assertThrows(throwable: T, executable: () -> 
 
 inline fun assertActivityStarted(clazz: Class<out Activity>, activity: AppCompatActivity) {
     val shadowActivity = Shadows.shadowOf(activity)
+    assertActivityStarted(clazz, shadowActivity)
+}
+
+inline fun assertActivityStarted(clazz: Class<out Activity>, shadowActivity: ShadowActivity) {
     val startedIntent = shadowActivity.nextStartedActivity
-    Assert.assertThat(startedIntent.component.className,
+    assertActivityStarted(clazz, startedIntent)
+}
+
+inline fun assertActivityStarted(clazz: Class<out Activity>, intent: Intent) {
+    Assert.assertThat(intent.component.className,
         CoreMatchers.equalTo(clazz.name))
 }

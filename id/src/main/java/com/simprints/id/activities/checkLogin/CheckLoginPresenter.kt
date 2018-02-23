@@ -5,26 +5,21 @@ import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.tools.TimeHelper
 import java.util.*
 
-open class CheckLoginPresenter (
+open abstract class CheckLoginPresenter (
     private val dataManager: DataManager,
     private val timeHelper: TimeHelper) {
 
     fun openNextActivity() {
         if (isUserSignedIn()) {
             initDbContext(dataManager.getSignedInProjectIdOrEmpty())
-            openActivityForUserSignedIn()
+            handleSignedInUser()
         } else {
-            openActivityForUserNotSignedIn()
+            handleNotSignedInUser()
         }
     }
 
-    protected open fun openActivityForUserNotSignedIn() {
-        throw Exception("Not overridden")
-    }
-
-    protected open fun openActivityForUserSignedIn() {
-        throw Exception("Not overridden")
-    }
+    abstract fun handleNotSignedInUser()
+    abstract fun handleSignedInUser()
 
     private fun initDbContext(projectId: String) {
         if (!dataManager.isDbInitialised(projectId)) {
@@ -37,9 +32,7 @@ open class CheckLoginPresenter (
         }
     }
 
-    protected open fun dbInitFailed() {
-        throw Exception("Not overridden")
-    }
+    abstract fun dbInitFailed()
 
     private fun isUserSignedIn(): Boolean {
         val encProjectSecret = dataManager.getEncryptedProjectSecretOrEmpty()
@@ -53,9 +46,7 @@ open class CheckLoginPresenter (
         }
     }
 
-    protected open fun isUserSignedInForStoredProjectId(): Boolean {
-        throw Exception("Not overridden")
-    }
+    abstract fun isUserSignedInForStoredProjectId(): Boolean
 
     protected fun initSession() {
         dataManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
@@ -65,4 +56,3 @@ open class CheckLoginPresenter (
         return UUID.randomUUID().toString()
     }
 }
-

@@ -8,31 +8,26 @@ import com.simprints.id.tools.TimeHelper
 class CheckLoginFromMainLauncherPresenter(
     val view: CheckLoginFromMainLauncherContract.View,
     val dataManager: DataManager,
-    timeHelper: TimeHelper): CheckLoginPresenter(dataManager, timeHelper), CheckLoginFromMainLauncherContract.Presenter {
-
-    private var started: Boolean = false
+    timeHelper: TimeHelper) : CheckLoginPresenter(dataManager, timeHelper), CheckLoginFromMainLauncherContract.Presenter {
 
     init {
         view.setPresenter(this)
+        initSession()
     }
 
     override fun start() {
-        if (!started) {
-            started = true
-            initSession()
-            openNextActivity()
-        }
+        openNextActivity()
     }
 
-    override fun openActivityForUserNotSignedIn() {
+    override fun handleNotSignedInUser() {
         view.openRequestLoginActivity()
     }
 
-    override fun openActivityForUserSignedIn() {
+    override fun handleSignedInUser() {
         view.openDashboardActivity()
     }
 
-    override fun dbInitFailed(){
+    override fun dbInitFailed() {
         view.launchAlertForError(ALERT_TYPE.UNEXPECTED_ERROR)
     }
 

@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import org.robolectric.RuntimeEnvironment
 
-
 inline fun getRoboSharedPreferences(fileName: String = PreferencesManagerImpl.PREF_FILE_NAME): SharedPreferences {
-    return RuntimeEnvironment.application.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, Context.MODE_PRIVATE)
+    return RuntimeEnvironment.application.getSharedPreferences(fileName, Context.MODE_PRIVATE)
 }

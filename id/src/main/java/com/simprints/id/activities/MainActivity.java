@@ -604,11 +604,12 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 registrationResult = new Registration(dataManager.getPatientId());
-                if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES)) {
-                    for (Fingerprint fp : fingerprints) {
-                        registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
-                    }
-                }
+                // FIXME : Re-route RemoteConfig calls to DataManager
+//                if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES)) {
+//                    for (Fingerprint fp : fingerprints) {
+//                        registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
+//                    }
+//                }
 
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
                 FormatResult.put(resultData, registrationResult, dataManager.getResultFormat());
