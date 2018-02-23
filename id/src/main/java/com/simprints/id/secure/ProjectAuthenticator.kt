@@ -53,13 +53,13 @@ class ProjectAuthenticator(secureDataManager: SecureDataManager,
             AuthRequest(encryptedProjectSecret, nonceScope.projectId, nonceScope.userId, googleAttestation)
         }
 
-    private fun Single<out Tokens>.signIn(projectId: String): Single<Unit> =
-        flatMap { tokens ->
-            dbManager.signIn(projectId, tokens)
-        }
-
     private fun Single<out AuthRequest>.makeAuthRequest(): Single<Tokens> =
         flatMap { authRequest ->
             authManager.requestAuthToken(authRequest)
+        }
+
+    private fun Single<out Tokens>.signIn(projectId: String): Single<Unit> =
+        flatMap { tokens ->
+            dbManager.signIn(projectId, tokens)
         }
 }
