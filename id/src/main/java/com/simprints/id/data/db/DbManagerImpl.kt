@@ -17,7 +17,7 @@ import com.simprints.libsimprints.Verification
 import io.reactivex.Emitter
 
 class DbManagerImpl(private val localDbManager: LocalDbManager,
-                    private val remoteDbManager: RemoteDbManager) :
+                    var remoteDbManager: RemoteDbManager) :
     DbManager,
     LocalDbManager by localDbManager,
     RemoteDbManager by remoteDbManager {

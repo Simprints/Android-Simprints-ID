@@ -17,6 +17,10 @@ class SecureDataManagerMock : SecureDataManager {
         throw RuntimeException("Not mocked!!!")
     }
 
+    override fun getSignedInUserIdOrEmpty(): String {
+        throw RuntimeException("Not mocked!!!")
+    }
+
     override var encryptedProjectSecret: String
         get() = "encrypted_project_secret"
         set(value) {}
@@ -28,6 +32,11 @@ class SecureDataManagerMock : SecureDataManager {
     override var prefs: ImprovedSharedPreferences
         get() = throw RuntimeException("Not mocked!!!")
         set(value) {}
+
+    override var signedInUserId: String
+        get() = "user_id"
+        set(value) {}
+
 
     override fun getEncryptedProjectSecretOrEmpty(): String {
         throw RuntimeException("Not mocked!!!")

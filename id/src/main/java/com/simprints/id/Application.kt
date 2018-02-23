@@ -61,7 +61,7 @@ import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 import java.util.*
 
-class Application : MultiDexApplication() {
+open class Application : MultiDexApplication() {
 
     // TODO: dependency injection with Dagger 2!
 
@@ -172,7 +172,7 @@ class Application : MultiDexApplication() {
         SecureDataManagerImpl(prefs)
     }
 
-    val dataManager: DataManager by lazy {
+    val dataManager: DataManager by lazyVar {
         DataManagerImpl(this, preferencesManager, dbManager,
                 apiManager, analyticsManager, secureDataManager)
     }
@@ -427,7 +427,10 @@ class Application : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
+        initModules()
+    }
 
+    open fun initModules(){
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
