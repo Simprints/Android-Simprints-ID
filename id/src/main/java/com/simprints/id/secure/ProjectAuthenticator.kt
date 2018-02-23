@@ -7,7 +7,6 @@ import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.Tokens
-import com.simprints.libdata.AuthListener
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.internal.operators.single.SingleJust
@@ -56,18 +55,7 @@ class ProjectAuthenticator(secureDataManager: SecureDataManager,
 
     private fun Single<out Tokens>.signIn(projectId: String): Single<Unit> =
         flatMap { tokens ->
-            Single.create<Unit> { emitter ->
-
-                val signInAuthListener = object : AuthListener {
-                    override fun onSignIn() {
-                        dbManager.unregisterRemoteAuthListener(this)
-                        emitter.onSuccess(Unit)
-                    }
-                    override fun onSignOut() {}
-                }
-                dbManager.registerRemoteAuthListener(signInAuthListener)
-                dbManager.signIn(projectId, tokens)
-            }
+            dbManager.signIn(projectId, tokens)
         }
 
     private fun Single<out AuthRequest>.makeAuthRequest(): Single<Tokens> =

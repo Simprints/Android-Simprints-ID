@@ -1,6 +1,7 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.id.data.DataManager
+import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.tools.TimeHelper
 import java.util.*
@@ -45,7 +46,7 @@ open class CheckLoginPresenter (
         val encProjectSecret = dataManager.getEncryptedProjectSecretOrEmpty()
         val storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
         val userId = getUserId()
-        val isFirebaseTokenValid = dataManager.isSignedIn(storedProjectId, userId) //TODO:Remove it once isSignedIn is done
+        val isFirebaseTokenValid = try { dataManager.isSignedIn(storedProjectId, userId) } catch (e: DifferentCredentialsSignedInException) { false }
     
         return if (encProjectSecret.isEmpty() || storedProjectId.isEmpty() || !isFirebaseTokenValid) {
             false

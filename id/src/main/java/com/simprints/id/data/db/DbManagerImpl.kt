@@ -15,6 +15,7 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Emitter
+import io.reactivex.Single
 
 class DbManagerImpl(private val localDbManager: LocalDbManager,
                     var remoteDbManager: RemoteDbManager) :
@@ -28,11 +29,17 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.initialiseRemoteDb()
     }
 
-    override fun signIn(projectId: String, token: Tokens) {
-        // TODO
-        remoteDbManager.signInToRemoteDb(token)
-        val localDbKey = remoteDbManager.getLocalDbKeyFromRemote()
-        localDbManager.signInToLocal(projectId, localDbKey)
+    override fun signIn(projectId: String, token: Tokens): Single<Unit> {
+        return Single.create<Unit> { emitter ->
+            remoteDbManager.signInToRemoteDb(token).subscribe ({
+                remoteDbManager.getLocalDbKeyFromRemote(projectId).subscribe { key ->
+                    localDbManager.signInToLocal(projectId, key)
+                    emitter.onSuccess(Unit)
+                }
+            }, {
+                emitter.onError(it)
+            })
+        }
     }
 
     override fun signOut() {
