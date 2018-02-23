@@ -14,12 +14,14 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Emitter
+import io.reactivex.Single
 
 interface DbManager : LocalDbManager, RemoteDbManager {
 
     // Lifecycle
     fun initialiseDb()
-    fun signIn(projectId: String, token: Tokens)
+    fun signIn(projectId: String, token: Tokens): Single<Unit>
+
     fun signOut()
 
     fun isDbInitialised(): Boolean
