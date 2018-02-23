@@ -14,7 +14,7 @@ interface LoginContract {
         fun showToast(stringRes: Int)
         fun showProgressDialog()
         fun dismissProgressDialog()
-        fun returnSuccessfulResult(tokens: Tokens)
+        fun returnSuccessfulResult()
     }
 
     interface Presenter : BasePresenter {
