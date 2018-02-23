@@ -156,14 +156,16 @@ class FirebaseManager(private val appContext: Context,
     // Data transfer
 
     override fun getLocalDbKeyFromRemote(projectId: String): Single<String> =
-        Single.create<String> {
+        Single.create<String> { resultEmit ->
             val db = FirebaseFirestore.getInstance(firestoreFirebaseApp)
-            val docRef = db.collection(COLLECTION_LOCAL_DB_KEYS).document(projectId)
-            docRef.get().addOnSuccessListener({ documentSnapshot ->
-                val value = documentSnapshot["value"] as String
-                it.onSuccess(value)
-            }).addOnFailureListener { e ->
-               it.onError(e as Throwable)
+            val docRef = db.collection(COLLECTION_LOCAL_DB_KEYS)
+                .whereEqualTo(PROJECT_ID_FIELD, projectId).get().addOnCompleteListener {
+                if (it.isSuccessful && it.result.size() > 1) {
+                    val document = it.result.first()
+                    resultEmit.onSuccess(document[REALM_KEY_FIELD] as String)
+                } else {
+                    resultEmit.onError(it as Throwable)
+                }
             }
         }
 
@@ -235,6 +237,8 @@ class FirebaseManager(private val appContext: Context,
 
     companion object {
         private const val COLLECTION_LOCAL_DB_KEYS: String = "localDbKeys"
+        private const val PROJECT_ID_FIELD: String = "projectId"
+        private const val REALM_KEY_FIELD: String = "value"
 
         fun getLegacyAppName(): String =
             FirebaseApp.DEFAULT_APP_NAME
