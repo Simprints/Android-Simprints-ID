@@ -140,13 +140,13 @@ class FirebaseManager(private val appContext: Context,
     override fun getLocalDbKeyFromRemote(projectId: String): Single<String> =
         Single.create<String> { resultEmit ->
             val db = FirebaseFirestore.getInstance(firestoreFirebaseApp)
-            val docRef = db.collection(COLLECTION_LOCAL_DB_KEYS)
+            db.collection(COLLECTION_LOCAL_DB_KEYS)
                 .whereEqualTo(PROJECT_ID_FIELD, projectId).get().addOnCompleteListener {
-                if (it.isSuccessful && it.result.size() > 1) {
+                if (it.isSuccessful) {
                     val document = it.result.first()
                     resultEmit.onSuccess(document[REALM_KEY_FIELD] as String)
                 } else {
-                    resultEmit.onError(it as Throwable)
+                    resultEmit.onError(it.exception as Throwable)
                 }
             }
         }
