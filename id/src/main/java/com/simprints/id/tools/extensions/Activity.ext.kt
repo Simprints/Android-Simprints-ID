@@ -16,9 +16,14 @@ val Activity.activityName: String
             "Class activityName not found"
         }
 
-
 fun Activity.launchAlert(alertType: ALERT_TYPE) {
     val intent = Intent(this, AlertActivity::class.java)
     intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType)
     startActivityForResult(intent, InternalConstants.ALERT_ACTIVITY_REQUEST)
+}
+
+fun Activity.ifStillRunning(block: () -> Unit) {
+    if (!isFinishing) {
+        block()
+    }
 }

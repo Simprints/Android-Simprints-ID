@@ -20,7 +20,7 @@ import org.jetbrains.anko.startActivityForResult
 // App launched when user open SimprintsID using a client app (by intent)
 open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
 
-    lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
+    private lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
     private val app: Application by lazy { application as Application }
     private val dataManager: DataManager by lazy { app.dataManager }
     private val timeHelper by lazy { app.timeHelper }
@@ -67,19 +67,18 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         startActivityForResult<LoginActivity>(LoginActivity.LOGIN_REQUEST_CODE)
     }
 
+    override fun finishAct() {
+        finish()
+    }
+
     override fun openLaunchActivity() {
         val nextIntent = Intent(this, LaunchActivity::class.java)
         startActivityForResult(nextIntent, MAIN_ACTIVITY_REQUEST)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == LoginActivity.LOGIN_REQUEST_CODE) {
-            if (resultCode == LoginActivity.LOGIN_SUCCESSED) {
-                viewPresenter.openNextActivity()
-            } else {
-                finish()
-            }
-        } else {
+        //If it's a LOGIN_REQUEST_CODE, it will be handled in the onResume
+        if (requestCode != LoginActivity.LOGIN_REQUEST_CODE) {
             setResult(resultCode, data)
             finish()
         }

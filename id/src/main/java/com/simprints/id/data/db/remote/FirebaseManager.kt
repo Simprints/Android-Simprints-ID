@@ -32,7 +32,8 @@ import timber.log.Timber
 
 class FirebaseManager(private val appContext: Context,
                       firebaseConnectionListenerManager: RemoteDbConnectionListenerManager,
-                      firebaseAuthListenerManager: RemoteDbAuthListenerManager) :
+                      firebaseAuthListenerManager: RemoteDbAuthListenerManager,
+                      private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
     RemoteDbManager,
     RemoteDbConnectionListenerManager by firebaseConnectionListenerManager,
     RemoteDbAuthListenerManager by firebaseAuthListenerManager {
@@ -42,6 +43,10 @@ class FirebaseManager(private val appContext: Context,
     // FirebaseApp Names
     private lateinit var legacyFirebaseAppName: String
     private lateinit var firestoreFirebaseAppName: String
+
+    // FirebaseOptions
+    private lateinit var legacyFirebaseOptions: FirebaseOptions
+    private lateinit var firestoreFirebaseOptions: FirebaseOptions
 
     // FirebaseApp
     private lateinit var legacyFirebaseApp: FirebaseApp
@@ -56,32 +61,34 @@ class FirebaseManager(private val appContext: Context,
 
     // Lifecycle
     override fun initialiseRemoteDb(projectId: String) {
-        initialiseLegacyFirebaseApp(projectId)
-        initialiseFirestoreFirebaseApp(projectId)
+        initialiseLegacyFirebaseProject(projectId)
+        initialiseFirestoreFirebaseProject(projectId)
         applyConnectionListeners(legacyFirebaseApp)
         applyAuthListeners(legacyFirebaseAuth, legacyFirebaseAppName)
         isInitialised = true
     }
 
-    private fun initialiseLegacyFirebaseApp(projectId: String) {
+    private fun initialiseLegacyFirebaseProject(projectId: String) {
         legacyFirebaseAppName = getLegacyAppNameFromProjectId(projectId)
-        legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName)
+        legacyFirebaseOptions = firebaseOptionsHelper.getLegacyFirebaseOptions()
+        legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName, legacyFirebaseOptions)
         legacyFirebaseAuth = initialiseFirebaseAuth(legacyFirebaseApp)
 
         Utils.forceSync(legacyFirebaseApp)
         projectRef = projectRef(legacyFirebaseApp, projectId)
     }
 
-    private fun initialiseFirestoreFirebaseApp(projectId: String) {
+    private fun initialiseFirestoreFirebaseProject(projectId: String) {
         firestoreFirebaseAppName = getFirestoreAppNameFromProjectId(projectId)
-        firestoreFirebaseApp = initialiseFirebaseApp(firestoreFirebaseAppName)
+        firestoreFirebaseOptions = firebaseOptionsHelper.getFirestoreFirebaseOptions()
+        firestoreFirebaseApp = initialiseFirebaseApp(firestoreFirebaseAppName, firestoreFirebaseOptions)
         firestoreFirebaseAuth = initialiseFirebaseAuth(firestoreFirebaseApp)
     }
 
-    private fun initialiseFirebaseApp(appName: String): FirebaseApp =
+    private fun initialiseFirebaseApp(appName: String, firebaseOptions: FirebaseOptions): FirebaseApp =
         try {
             Timber.d("Trying to initialise Firebase app: $appName")
-            FirebaseApp.initializeApp(appContext, FirebaseOptions.fromResource(appContext), appName)
+            FirebaseApp.initializeApp(appContext, firebaseOptions, appName)
         } catch (stateException: IllegalStateException) {
             Timber.d("Firebase app: $appName already initialized")
             FirebaseApp.getInstance(appName)
@@ -91,16 +98,32 @@ class FirebaseManager(private val appContext: Context,
         FirebaseAuth.getInstance(firebaseApp)
 
     override fun signInToRemoteDb(projectId: String, tokens: Tokens) {
-        // TODO : turn into an RxJava Single Observable
-        legacyFirebaseAuth.signInWithCustomToken(tokens.legacyToken).addOnCompleteListener { task ->
+        signInToLegacyDb(projectId, tokens.legacyToken)
+        signInToFirestoreDb(projectId, tokens.firestoreToken)
+    }
+
+    private fun signInToLegacyDb(projectId: String, legacyToken: String) {
+        legacyFirebaseAuth.signInWithCustomToken(legacyToken).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                //emitter.onSuccess(token)
                 Timber.d("Firebase Auth signInWithCustomToken successful")
             } else {
-                //emitter.onError(FirebaseSignInInWithCustomTokenFailed())
                 Timber.d("Firebase Auth signInWithCustomToken failed: ${task.exception}")
             }
-        }
+        }.addOnFailureListener {exception ->
+                Timber.d("Firebase Auth signInWithCustomToken failed to complete: $exception")
+            }
+    }
+
+    private fun signInToFirestoreDb(projectId: String, firestoreToken: String) {
+        firestoreFirebaseAuth.signInWithCustomToken(firestoreToken).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Timber.d("Firebase Auth signInWithCustomToken successful")
+            } else {
+                Timber.d("Firebase Auth signInWithCustomToken failed: ${task.exception}")
+            }
+        }.addOnFailureListener {exception ->
+                Timber.d("Firebase Auth signInWithCustomToken failed to complete: $exception")
+            }
     }
 
     override fun signOutOfRemoteDb(projectId: String) {

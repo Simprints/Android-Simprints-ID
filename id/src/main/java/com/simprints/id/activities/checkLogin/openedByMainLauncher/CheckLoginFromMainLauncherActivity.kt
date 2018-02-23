@@ -15,7 +15,7 @@ import org.jetbrains.anko.startActivity
 // App launched when user open SimprintsID using the Home button
 open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginFromMainLauncherContract.View {
 
-    lateinit var viewPresenter: CheckLoginFromMainLauncherContract.Presenter
+    private lateinit var viewPresenter: CheckLoginFromMainLauncherContract.Presenter
     private val app: Application by lazy { application as Application }
     private val dataManager: DataManager by lazy { app.dataManager }
     private val timeHelper by lazy { app.timeHelper }
@@ -51,5 +51,6 @@ open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginF
     override fun openDashboardActivity() {
         val dashIntent = Intent(this, DashboardActivity::class.java)
         startActivity(dashIntent)
+        finish()
     }
 }

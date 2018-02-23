@@ -31,7 +31,6 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowToast
 
-
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class)
 class LoginActivityTest {
@@ -124,7 +123,7 @@ class LoginActivityTest {
         val controller = createRoboLoginActivity()
         controller.start().resume().visible()
         val act = controller.get()
-        act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "not_valid_scanned_text"))
+        act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "project_id:validProject\nproject_secret_wrong:some_value"))
 
         assertEquals(app.getString(R.string.login_invalidQrCode), ShadowToast.getTextOfLatestToast())
     }
@@ -136,24 +135,38 @@ class LoginActivityTest {
         assertTrue(act.loginEditTextProjectId.text.isEmpty())
         assertTrue(act.loginEditTextProjectSecret.text.isEmpty())
 
-        act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "id:some_project_id\nsecret:some_project_secret"))
+        val projectId = "55KAiL2YmsjeuNNPnSDO"
+        val projectSecret = "GMoqI_4-UToujbPrIHrNMS9_0EpCbXveTLCvvN7nasVDCNcyhuu7c8u2zrfkuVdL7t3Uxt-Rjo8sDvBi3bkpUB"
 
-        assertTrue(act.loginEditTextProjectId.text.isNotEmpty())
-        assertTrue(act.loginEditTextProjectSecret.text.isNotEmpty())
+        act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "project_id:$projectId\nproject_secret:$projectSecret"))
+
+        assertEquals(projectId, act.loginEditTextProjectId.text.toString())
+        assertEquals(projectSecret, act.loginEditTextProjectSecret.text.toString())
     }
 
     @Test
-    @Throws(Exception::class)
-    fun enterButtonPressed_tryToLoginIn() {
+    fun loginPressed_shouldLoginInOnlyWithValidCredentials() {
         val controller = createRoboLoginActivity().start().resume().visible()
         val act = controller.get()
-        act.viewPresenter = mock(LoginPresenter::class.java)
-        act.loginEditTextUserId.setText("some_user_id")
-        act.loginEditTextProjectId.setText("some_project_id")
-        act.loginEditTextProjectSecret.setText("some_project_secret")
+        act.loginEditTextUserId.setText("")
+        act.loginEditTextProjectId.setText("")
+        act.loginEditTextProjectSecret.setText("")
 
         act.loginButtonSignIn.performClick()
+        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
 
+        act.loginEditTextProjectSecret.setText("some_project_secret")
+        act.loginButtonSignIn.performClick()
+        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+
+        act.loginEditTextProjectId.setText("some_project_id")
+        act.loginButtonSignIn.performClick()
+        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+
+        act.viewPresenter = mock(LoginPresenter::class.java)
+
+        act.loginEditTextUserId.setText("some_user_id")
+        act.loginButtonSignIn.performClick()
         Mockito.verify(act.viewPresenter, Mockito.times(1))
             .userDidWantToSignIn(
                 "some_project_id",

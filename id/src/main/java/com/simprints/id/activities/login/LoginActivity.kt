@@ -12,15 +12,14 @@ import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.tools.SimProgressBar
+import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.scannerAppIntent
 import kotlinx.android.synthetic.main.activity_login.*
-
 
 class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     companion object {
-        const val LOGIN_SUCCESSED: Int = 1
+        const val LOGIN_SUCCEED: Int = 1
         const val LOGIN_REQUEST_CODE: Int = 1
         const val QR_REQUEST_CODE: Int = 0
         const val QR_RESULT_KEY = "SCAN_RESULT"
@@ -34,7 +33,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         application as Application
     }
 
-    private lateinit var progressDialog: SimProgressBar
+    private lateinit var progressDialog: SimProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +51,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     private fun initUI() {
+        progressDialog = SimProgressDialog(this)
         loginEditTextUserId.setText(app.dataManager.userId)
         loginButtonScanQr.setOnClickListener { viewPresenter.userDidWantToOpenScanQRApp() }
         loginButtonSignIn.setOnClickListener {
@@ -124,7 +124,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun returnSuccessfulResult(tokens: Tokens) {
         val resultData = Intent()
         resultData.putExtra(IntentKeys.loginActivityTokenReturn, tokens)
-        setResult(LOGIN_SUCCESSED, resultData)
+        setResult(LOGIN_SUCCEED, resultData)
         finish()
     }
 }
