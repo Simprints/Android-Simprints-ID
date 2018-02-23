@@ -18,7 +18,7 @@ import io.reactivex.Emitter
 import io.reactivex.Single
 
 class DbManagerImpl(private val localDbManager: LocalDbManager,
-                    var remoteDbManager: RemoteDbManager) :
+                    private var remoteDbManager: RemoteDbManager) :
     DbManager,
     LocalDbManager by localDbManager,
     RemoteDbManager by remoteDbManager {
@@ -29,18 +29,21 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.initialiseRemoteDb()
     }
 
-    override fun signIn(projectId: String, token: Tokens): Single<Unit> {
-        return Single.create<Unit> { emitter ->
-            remoteDbManager.signInToRemoteDb(token).subscribe ({
-                remoteDbManager.getLocalDbKeyFromRemote(projectId).subscribe { key ->
-                    localDbManager.signInToLocal(projectId, key)
-                    emitter.onSuccess(Unit)
-                }
-            }, {
-                emitter.onError(it)
-            })
+    override fun signIn(projectId: String, token: Tokens): Single<Unit> =
+        remoteDbManager
+            .signInToRemoteDb(token)
+            .getLocalDbKeyFromRemote(projectId)
+            .signInToLocal(projectId)
+
+    private fun Single<out Unit>.getLocalDbKeyFromRemote(projectId: String): Single<String> =
+        flatMap {
+            remoteDbManager.getLocalDbKeyFromRemote(projectId)
         }
-    }
+
+    private fun Single<out String>.signInToLocal(projectId: String): Single<Unit> =
+        flatMap { key ->
+            localDbManager.signInToLocal(projectId, key)
+        }
 
     override fun signOut() {
         // TODO
