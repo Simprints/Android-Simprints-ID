@@ -21,6 +21,7 @@ interface DbManager : LocalDbManager, RemoteDbManager {
     // Lifecycle
     fun initialiseDb()
     fun signIn(projectId: String, token: Tokens): Single<Unit>
+    fun getLocalKeyAndSignInToLocal(projectId: String): Single<Unit>
 
     fun signOut()
 
