@@ -179,6 +179,7 @@ dependencies {
     implementation "com.google.firebase:firebase-storage:$google_version"
     implementation "com.google.firebase:firebase-auth:$google_version"
     implementation "com.google.firebase:firebase-config:$google_version"
+    implementation "com.google.firebase:firebase-firestore:$google_version"
 
     // Analytics
     implementation("com.crashlytics.sdk.android:crashlytics:$crashlytics_version@aar") {

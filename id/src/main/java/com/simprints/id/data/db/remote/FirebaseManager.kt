@@ -9,7 +9,9 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
 import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
@@ -27,6 +29,8 @@ import com.simprints.libdata.tools.Utils.wrapCallback
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import timber.log.Timber
 
 class FirebaseManager(private val appContext: Context,
@@ -51,16 +55,12 @@ class FirebaseManager(private val appContext: Context,
     private lateinit var legacyFirebaseApp: FirebaseApp
     private lateinit var firestoreFirebaseApp: FirebaseApp
 
-    // FirebaseAuth
-    private lateinit var legacyFirebaseAuth: FirebaseAuth
-    private lateinit var firestoreFirebaseAuth: FirebaseAuth
-
     // Lifecycle
     override fun initialiseRemoteDb() {
         initialiseLegacyFirebaseProject()
         initialiseFirestoreFirebaseProject()
         applyConnectionListeners(legacyFirebaseApp)
-        applyAuthListeners(legacyFirebaseAuth)
+        applyAuthListeners(getFirebaseAuth(legacyFirebaseApp))
         isInitialised = true
     }
 
@@ -68,7 +68,6 @@ class FirebaseManager(private val appContext: Context,
         legacyFirebaseAppName = getLegacyAppName()
         legacyFirebaseOptions = firebaseOptionsHelper.getLegacyFirebaseOptions()
         legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName, legacyFirebaseOptions)
-        legacyFirebaseAuth = initialiseFirebaseAuth(legacyFirebaseApp)
 
         Utils.forceSync(legacyFirebaseApp)
     }
@@ -77,7 +76,6 @@ class FirebaseManager(private val appContext: Context,
         firestoreFirebaseAppName = getFirestoreAppName()
         firestoreFirebaseOptions = firebaseOptionsHelper.getFirestoreFirebaseOptions()
         firestoreFirebaseApp = initialiseFirebaseApp(firestoreFirebaseAppName, firestoreFirebaseOptions)
-        firestoreFirebaseAuth = initialiseFirebaseAuth(firestoreFirebaseApp)
     }
 
     private fun initialiseFirebaseApp(appName: String, firebaseOptions: FirebaseOptions): FirebaseApp =
@@ -89,40 +87,38 @@ class FirebaseManager(private val appContext: Context,
             FirebaseApp.getInstance(appName)
         }
 
-    private fun initialiseFirebaseAuth(firebaseApp: FirebaseApp): FirebaseAuth =
+    private fun getFirebaseAuth(firebaseApp: FirebaseApp): FirebaseAuth =
         FirebaseAuth.getInstance(firebaseApp)
 
-    override fun signInToRemoteDb(tokens: Tokens) {
-        signInToLegacyDb(tokens.legacyToken)
-        signInToFirestoreDb(tokens.firestoreToken)
-    }
+    override fun signInToRemoteDb(tokens: Tokens): Single<Unit> =
+        Single.create<Unit> { e ->
+            Singles.zip(signInToDb(legacyFirebaseApp, tokens.legacyToken), signInToDb(firestoreFirebaseApp, tokens.firestoreToken))
+                .subscribe({
+                    e.onSuccess(Unit)
+                }, {
+                    e.onError(it)
+                })
+        }
 
-    private fun signInToLegacyDb(legacyToken: String) {
-        legacyFirebaseAuth.signInWithCustomToken(legacyToken).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Timber.d("Firebase Auth signInWithCustomToken successful")
-            } else {
-                Timber.d("Firebase Auth signInWithCustomToken failed: ${task.exception}")
+    private fun signInToDb(firebaseApp: FirebaseApp, token: String): Single<Unit> =
+        Single.create<Unit> {
+            getFirebaseAuth(firebaseApp).signInWithCustomToken(token).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Timber.d("Firebase Auth signInWithCustomToken for ${firebaseApp.name} successful")
+                    it.onSuccess(Unit)
+                } else {
+                    Timber.d("Firebase Auth signInWithCustomToken for ${firebaseApp.name} failed: ${task.exception}")
+                    it.onError(task.exception as Throwable)
+                }
             }
         }
-    }
-
-    private fun signInToFirestoreDb(firestoreToken: String) {
-        firestoreFirebaseAuth.signInWithCustomToken(firestoreToken).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Timber.d("Firebase Auth signInWithCustomToken successful")
-            } else {
-                Timber.d("Firebase Auth signInWithCustomToken failed: ${task.exception}")
-            }
-        }
-    }
 
     override fun signOutOfRemoteDb() {
-        legacyFirebaseAuth.signOut()
-        firestoreFirebaseAuth.signOut()
+        getFirebaseAuth(legacyFirebaseApp).signOut()
+        getFirebaseAuth(firestoreFirebaseApp).signOut()
 
         removeConnectionListeners(legacyFirebaseApp)
-        removeAuthListeners(legacyFirebaseAuth)
+        removeAuthListeners(getFirebaseAuth(legacyFirebaseApp))
     }
 
     override fun isRemoteDbInitialized(): Boolean = isInitialised
@@ -132,7 +128,7 @@ class FirebaseManager(private val appContext: Context,
         isSignedInUserAsExpected(projectId, userId)
 
     private fun isSignedInUserAsExpected(projectId: String, userId: String): Boolean {
-        val firebaseUser = legacyFirebaseAuth.currentUser
+        val firebaseUser = getFirebaseAuth(legacyFirebaseApp).currentUser
         firebaseUser?.let {
             if (isFirebaseUserAsExpected(it, projectId, userId)) {
                 return true
@@ -142,10 +138,19 @@ class FirebaseManager(private val appContext: Context,
 
     // Data transfer
 
-    override fun getLocalDbKeyFromRemote(): String {
-        // TODO("not implemented")
-        return ""
-    }
+    override fun getLocalDbKeyFromRemote(projectId: String): Single<String> =
+        Single.create<String> { resultEmit ->
+            val db = FirebaseFirestore.getInstance(firestoreFirebaseApp)
+            db.collection(COLLECTION_LOCAL_DB_KEYS)
+                .whereEqualTo(PROJECT_ID_FIELD, projectId).get().addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val document = it.result.first().toObject(LocalDbKey::class.java)
+                    resultEmit.onSuccess(document.value)
+                } else {
+                    resultEmit.onError(it.exception as Throwable)
+                }
+            }
+        }
 
     override fun savePersonInRemote(fbPerson: fb_Person, projectId: String) {
         val updates = HashMap<String, Any>()
@@ -214,6 +219,8 @@ class FirebaseManager(private val appContext: Context,
     fun getFirebaseStorageInstance() = FirebaseStorage.getInstance(legacyFirebaseApp)
 
     companion object {
+        private const val COLLECTION_LOCAL_DB_KEYS: String = "localDbKeys"
+        private const val PROJECT_ID_FIELD: String = "projectId"
 
         fun getLegacyAppName(): String =
             FirebaseApp.DEFAULT_APP_NAME
@@ -222,9 +229,6 @@ class FirebaseManager(private val appContext: Context,
             "firestore"
 
         fun isFirebaseUserAsExpected(firebaseUser: FirebaseUser, projectId: String, userId: String): Boolean =
-            firebaseUser.uid == getFirebaseUid(projectId, userId)
-
-        private fun getFirebaseUid(projectId: String, userId: String): String =
-            "$projectId.$userId"
+            firebaseUser.uid == userId
     }
 }
