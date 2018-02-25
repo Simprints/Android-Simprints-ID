@@ -137,7 +137,7 @@ class LoginActivityTest {
         assertTrue(act.loginEditTextProjectSecret.text.isEmpty())
 
         val projectId = "55KAiL2YmsjeuNNPnSDO"
-        val projectSecret = "GMoqI_4-UToujbPrIHrNMS9_0EpCbXveTLCvvN7nasVDCNcyhuu7c8u2zrfkuVdL7t3Uxt-Rjo8sDvBi3bkpUB"
+        val projectSecret = "GMoqI_4-UToujbPrIHrNMS9_0EpCbXveTLCvvN7nasVDCNcyhuu7c8u2zrfkuVdL7t3Uxt-Rjo8sDvBi3bkpUA"
 
         act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "project_id:$projectId\nproject_secret:$projectSecret"))
 

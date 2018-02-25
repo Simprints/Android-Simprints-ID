@@ -29,6 +29,11 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.initialiseRemoteDb()
     }
 
+    override fun getLocalKeyAndSignInToLocal(projectId: String): Single<Unit> =
+        remoteDbManager
+            .getLocalDbKeyFromRemote(projectId)
+            .signInToLocal(projectId)
+
     override fun signIn(projectId: String, token: Tokens): Single<Unit> =
         remoteDbManager
             .signInToRemoteDb(token)

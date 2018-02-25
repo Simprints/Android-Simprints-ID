@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
 import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
@@ -143,8 +144,8 @@ class FirebaseManager(private val appContext: Context,
             db.collection(COLLECTION_LOCAL_DB_KEYS)
                 .whereEqualTo(PROJECT_ID_FIELD, projectId).get().addOnCompleteListener {
                 if (it.isSuccessful) {
-                    val document = it.result.first()
-                    resultEmit.onSuccess(document[REALM_KEY_FIELD] as String)
+                    val document = it.result.first().toObject(LocalDbKey::class.java)
+                    resultEmit.onSuccess(document.value)
                 } else {
                     resultEmit.onError(it.exception as Throwable)
                 }
@@ -220,7 +221,6 @@ class FirebaseManager(private val appContext: Context,
     companion object {
         private const val COLLECTION_LOCAL_DB_KEYS: String = "localDbKeys"
         private const val PROJECT_ID_FIELD: String = "projectId"
-        private const val REALM_KEY_FIELD: String = "value"
 
         fun getLegacyAppName(): String =
             FirebaseApp.DEFAULT_APP_NAME
@@ -229,9 +229,6 @@ class FirebaseManager(private val appContext: Context,
             "firestore"
 
         fun isFirebaseUserAsExpected(firebaseUser: FirebaseUser, projectId: String, userId: String): Boolean =
-            firebaseUser.uid == getFirebaseUid(projectId, userId)
-
-        private fun getFirebaseUid(projectId: String, userId: String): String =
-            "$projectId.$userId"
+            firebaseUser.uid == userId
     }
 }

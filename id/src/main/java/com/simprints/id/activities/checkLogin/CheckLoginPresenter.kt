@@ -2,7 +2,6 @@ package com.simprints.id.activities.checkLogin
 
 import com.simprints.id.data.DataManager
 import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.tools.TimeHelper
 import java.util.*
 
@@ -12,7 +11,6 @@ open class CheckLoginPresenter (
 
     fun openNextActivity() {
         if (isUserSignedIn()) {
-            initDbContext()
             handleSignedInUser()
         } else {
             handleNotSignedInUser()
@@ -27,17 +25,6 @@ open class CheckLoginPresenter (
         throw Exception("Not overridden")
     }
 
-    private fun initDbContext() {
-        if (!dataManager.isDbInitialised()) {
-            try {
-                dataManager.initialiseDb()
-            } catch (error: UninitializedDataManagerError) {
-                dataManager.logError(error)
-                dbInitFailed()
-            }
-        }
-    }
-
     protected open fun dbInitFailed() {
         throw Exception("Not overridden")
     }
@@ -46,9 +33,9 @@ open class CheckLoginPresenter (
         val encProjectSecret = dataManager.getEncryptedProjectSecretOrEmpty()
         val storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
         val userId = getUserId()
-        val isFirebaseTokenValid = try { dataManager.isSignedIn(storedProjectId, userId) } catch (e: DifferentCredentialsSignedInException) { false }
-    
-        return if (encProjectSecret.isEmpty() || storedProjectId.isEmpty() || !isFirebaseTokenValid) {
+        val isUserSignedInToDbs = try { dataManager.isSignedIn(storedProjectId, userId) } catch (e: DifferentCredentialsSignedInException) { false }
+
+        return if (encProjectSecret.isEmpty() || storedProjectId.isEmpty() || !isUserSignedInToDbs) {
             false
         } else {
             isUserSignedInForStoredProjectId()

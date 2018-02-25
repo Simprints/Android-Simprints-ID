@@ -430,11 +430,15 @@ open class Application : MultiDexApplication() {
         initModules()
     }
 
-    open fun initModules(){
+    open fun initModules() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
         Fabric.with(fabric)
         dataManager.initialiseDb()
+
+        if (dataManager.getSignedInProjectIdOrEmpty().isNotEmpty()) {
+            dataManager.getLocalKeyAndSignInToLocal(dataManager.getSignedInProjectIdOrEmpty())
+        }
     }
 }
