@@ -11,13 +11,14 @@ import com.simprints.libdata.models.firebase.fb_Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Single
 
-interface RemoteDbManager: RemoteDbConnectionListenerManager, RemoteDbAuthListenerManager {
+interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListenerManager {
 
     // Lifecycle
     fun initialiseRemoteDb()
 
-    fun signInToRemoteDb(tokens: Tokens)
+    fun signInToRemoteDb(tokens: Tokens): Single<Unit>
     fun signOutOfRemoteDb()
 
     fun isRemoteDbInitialized(): Boolean
@@ -25,7 +26,7 @@ interface RemoteDbManager: RemoteDbConnectionListenerManager, RemoteDbAuthListen
     fun isSignedIn(projectId: String, userId: String): Boolean
 
     // Data transfer
-    fun getLocalDbKeyFromRemote(): String
+    fun getLocalDbKeyFromRemote(projectId: String): Single<String>
 
     fun savePersonInRemote(fbPerson: fb_Person, projectId: String)
     fun loadPersonFromRemote(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)

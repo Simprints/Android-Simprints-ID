@@ -9,9 +9,7 @@ import android.widget.Toast
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.IntentKeys
 import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.models.Tokens
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.scannerAppIntent
 import kotlinx.android.synthetic.main.activity_login.*
@@ -51,7 +49,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     private fun initUI() {
-        progressDialog = SimProgressDialog(this)
+        progressDialog = SimProgressDialog(this, true)
         loginEditTextUserId.setText(app.dataManager.userId)
         loginButtonScanQr.setOnClickListener { viewPresenter.userDidWantToOpenScanQRApp() }
         loginButtonSignIn.setOnClickListener {
@@ -121,10 +119,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         progressDialog.dismiss()
     }
 
-    override fun returnSuccessfulResult(tokens: Tokens) {
-        val resultData = Intent()
-        resultData.putExtra(IntentKeys.loginActivityTokenReturn, tokens)
-        setResult(LOGIN_SUCCEED, resultData)
+    override fun returnSuccessfulResult() {
+        setResult(LOGIN_SUCCEED)
         finish()
     }
 }

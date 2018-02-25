@@ -40,12 +40,12 @@ class LoginPresenter(val view: LoginContract.View,
                 NonceScope(possibleProjectId, possibleUserId),
                 possibleProjectSecret)
                 .subscribe(
-                    { token ->
+                    {
                         secureDataManager.storeProjectIdWithLegacyApiKeyPair(possibleProjectId, possibleLegacyApiKey)
                         secureDataManager.signedInProjectId = possibleProjectId
                         secureDataManager.signedInUserId = possibleUserId
                         view.dismissProgressDialog()
-                        view.returnSuccessfulResult(token)
+                        view.returnSuccessfulResult()
                     },
                     { e ->
                         e.printStackTrace()

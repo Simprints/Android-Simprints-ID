@@ -44,7 +44,11 @@ class SimProgressDialog(private val act: Activity, private val dismissibleByUser
     fun show() {
         act.ifStillRunning {
             progressBar.visibility = View.VISIBLE
-            if (!dismissibleByUser) {
+            if (dismissibleByUser) {
+                progressBar.setOnClickListener {
+                    this.dismiss()
+                }
+            } else {
                 act.window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                     WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             }

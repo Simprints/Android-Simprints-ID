@@ -13,7 +13,7 @@ import io.reactivex.internal.operators.single.SingleJust
 import io.reactivex.rxkotlin.Singles
 
 class ProjectAuthenticator(secureDataManager: SecureDataManager,
-                           private val dataManager: DbManager,
+                           private val dbManager: DbManager,
                            private val safetyNetClient: SafetyNetClient,
                            apiClient: ApiServiceInterface = ApiService().api,
                            private val attestationManager: AttestationManager = AttestationManager()) {
@@ -23,10 +23,10 @@ class ProjectAuthenticator(secureDataManager: SecureDataManager,
     private val nonceManager = NonceManager(apiClient)
     private val authManager = AuthManager(apiClient)
 
-    fun authenticate(nonceScope: NonceScope, projectSecret: String): Single<Tokens> =
+    fun authenticate(nonceScope: NonceScope, projectSecret: String): Single<Unit> =
         prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
-            .initFirebase(nonceScope.projectId)
+            .signIn(nonceScope.projectId)
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
@@ -53,19 +53,13 @@ class ProjectAuthenticator(secureDataManager: SecureDataManager,
             AuthRequest(encryptedProjectSecret, nonceScope.projectId, nonceScope.userId, googleAttestation)
         }
 
-    private fun Single<out Tokens>.initFirebase(projectId: String): Single<Tokens> =
-        flatMap { tokens ->
-            if (!dataManager.isDbInitialised()) {
-                dataManager.initialiseDb()
-            }
-
-            //TODO: Fix it when we implement the 2 firebase apps in FirebaseManager
-            dataManager.signIn(projectId, tokens)
-            SingleJust(tokens)
-        }
-
     private fun Single<out AuthRequest>.makeAuthRequest(): Single<Tokens> =
         flatMap { authRequest ->
             authManager.requestAuthToken(authRequest)
+        }
+
+    private fun Single<out Tokens>.signIn(projectId: String): Single<Unit> =
+        flatMap { tokens ->
+            dbManager.signIn(projectId, tokens)
         }
 }

@@ -3,7 +3,6 @@ package com.simprints.id.activities.login
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.models.Tokens
 
 interface LoginContract {
 
@@ -14,7 +13,7 @@ interface LoginContract {
         fun showToast(stringRes: Int)
         fun showProgressDialog()
         fun dismissProgressDialog()
-        fun returnSuccessfulResult(tokens: Tokens)
+        fun returnSuccessfulResult()
     }
 
     interface Presenter : BasePresenter {

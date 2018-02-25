@@ -9,11 +9,13 @@ import com.simprints.libdata.models.realm.RealmConfig
 import com.simprints.libdata.models.realm.rl_Person
 import com.simprints.libdata.tools.Constants
 import com.simprints.libdata.tools.Utils.wrapCallback
+import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmChangeListener
 import io.realm.RealmResults
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
+import timber.log.Timber
 
 class RealmDbManager(appContext: Context) : LocalDbManager {
 
@@ -25,12 +27,14 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         Realm.init(appContext)
     }
 
-    override fun signInToLocal(projectId: String, localDbKey: String) {
-        launch(UI) {
-            //TODO: we don't have a localDbKey yet, using projectId temporary
-            realm = Realm.getInstance(RealmConfig.get(projectId))
+    override fun signInToLocal(projectId: String, localDbKey: String): Single<Unit> =
+        Single.create<Unit> {
+            launch(UI) {
+                Timber.d("Signing to Realm project $projectId")
+                realm = Realm.getInstance(RealmConfig.get(projectId))
+                it.onSuccess(Unit)
+            }
         }
-    }
 
     override fun signOutOfLocal() {
         launch(UI) {
