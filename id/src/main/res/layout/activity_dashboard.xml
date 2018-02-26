@@ -32,12 +32,25 @@
                 android:layout_marginLeft="5dp"/>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/dashboardButtonSync"
+        <LinearLayout
+            android:id="@+id/dashboardLayerSync"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:text="@string/nav_sync" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <ImageView
+                android:id="@+id/dashboardLayerSyncIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/dashboardLayerSyncText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"/>
+        </LinearLayout>
 
         <Button
             android:id="@+id/dashboardButtonLogout"

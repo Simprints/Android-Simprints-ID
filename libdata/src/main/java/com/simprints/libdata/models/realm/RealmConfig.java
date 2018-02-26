@@ -8,10 +8,10 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
 public class RealmConfig {
-    public static RealmConfiguration get(@NonNull String apiKey) {
-        String dbName = String.format("%s.realm", apiKey.substring(0, 8));
+    public static RealmConfiguration get(@NonNull String localDbKey) {
+        String dbName = String.format("%s.realm", localDbKey);
 
-        byte[] key = Arrays.copyOf(apiKey.getBytes(), 64);
+        byte[] key = Arrays.copyOf(localDbKey.getBytes(), 64);
 
         return new RealmConfiguration.Builder()
                 .name(dbName)

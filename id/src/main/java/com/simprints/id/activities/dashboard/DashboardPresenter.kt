@@ -40,7 +40,7 @@ class DashboardPresenter(val view: DashboardContract.View,
     override fun sync() {
         val syncParameters = when (dataManager.syncGroup) {
             GROUP.GLOBAL -> SyncTaskParameters.GlobalSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty())
-            GROUP.USER -> SyncTaskParameters.UserSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.userId)
+            GROUP.USER -> SyncTaskParameters.UserSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
             else -> {
                 handleUnexpectedError(InvalidSyncGroupError())
                 return
@@ -54,8 +54,6 @@ class DashboardPresenter(val view: DashboardContract.View,
             view.showToast(R.string.wait_for_current_sync_to_finish)
         })
     }
-
-
 
     private fun stopListeners() {
         try {
@@ -84,13 +82,11 @@ class DashboardPresenter(val view: DashboardContract.View,
 
     private val authListener = object : AuthListener {
         override fun onSignIn() {
-
         }
 
         override fun onSignOut() {
             setOfflineSyncItem()
         }
-
     }
 
     private val connectionListener = object : ConnectionListener {
@@ -144,8 +140,7 @@ class DashboardPresenter(val view: DashboardContract.View,
             view.setSyncItem(false,
                 view.getStringWithParams(R.string.syncing_calculating),
                 R.drawable.ic_syncing)
-        else
-            view.setSyncItem(false,
+        else view.setSyncItem(false,
                 view.getStringWithParams(R.string.syncing_with_progress, progress.currentValue, progress.maxValue),
                 R.drawable.ic_syncing)
     }

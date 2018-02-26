@@ -2,15 +2,15 @@ package com.simprints.libdata
 
 import com.google.firebase.FirebaseApp
 import com.simprints.libcommon.Progress
-import com.simprints.libdata.models.realm.RealmConfig
 import com.simprints.libdata.tools.Utils
 import io.reactivex.Emitter
+import io.realm.RealmConfiguration
 
 class NaiveSyncManager(firebaseApp: FirebaseApp,
-                       private val apiKey: String) {
+                       private val legacyKey: String,
+                       private val realmConfig: RealmConfiguration) {
 
     private val db = Utils.getDatabase(firebaseApp)
-    private val realmConfig = RealmConfig.get(apiKey)
 
     fun syncUser(userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
             sync(userId, isInterrupted, emitter)
@@ -28,12 +28,11 @@ class NaiveSyncManager(firebaseApp: FirebaseApp,
                     getPatientsRef()).sync()
 
     private fun getProjRef() =
-            db.getReference("projects/$apiKey")
+            db.getReference("projects/$legacyKey")
 
     private fun getUsersRef() =
-            db.getReference("projects/$apiKey/users")
+            db.getReference("projects/$legacyKey/users")
 
     private fun getPatientsRef() =
-            db.getReference("projects/$apiKey/patients")
-
+            db.getReference("projects/$legacyKey/patients")
 }

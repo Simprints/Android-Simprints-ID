@@ -9,7 +9,6 @@ import com.simprints.libcommon.Progress
 import io.reactivex.Emitter
 import kotlin.concurrent.thread
 
-
 class SyncTask(private val dataManager: DataManager,
                private val parameters: SyncTaskParameters) : ProgressTask {
 
@@ -27,11 +26,13 @@ class SyncTask(private val dataManager: DataManager,
 
     private fun sync(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
         when (parameters) {
-            is UserSyncTaskParameters ->
-                dataManager.syncUser(dataManager.projectId ,parameters.userId, isInterrupted, emitter)
+            is UserSyncTaskParameters -> {
+                val projectId = dataManager.getSignedInProjectIdOrEmpty()
+                val legacyKey = dataManager.legacyApiKeyForProjectIdOrEmpty(projectId)
+                dataManager.syncUser(legacyKey, parameters.userId, isInterrupted, emitter)
+            }
             is GlobalSyncTaskParameters ->
                 dataManager.syncGlobal(isInterrupted, emitter)
         }
     }
-
 }

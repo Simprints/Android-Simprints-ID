@@ -5,8 +5,11 @@ import com.simprints.libdata.DataCallback
 import com.simprints.libdata.models.firebase.fb_Person
 import com.simprints.libdata.tools.Constants
 import io.reactivex.Single
+import io.realm.RealmConfiguration
 
 interface LocalDbManager {
+
+    var realmConfig: RealmConfiguration?
 
     // Lifecycle
     fun signInToLocal(projectId: String, localDbKey: String): Single<Unit>

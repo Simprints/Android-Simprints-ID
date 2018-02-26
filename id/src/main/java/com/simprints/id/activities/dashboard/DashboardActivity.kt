@@ -30,7 +30,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         initUI()
     }
 
-    override fun onResume(){
+    override fun onResume() {
         super.onResume()
         viewPresenter.start()
     }
@@ -48,10 +48,8 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
             finish()
         }
 
-        dashboardButtonSync.setOnClickListener {
-            app.secureDataManager.cleanCredentials()
-            startActivity(Intent(this, RequestLoginActivity::class.java))
-            finish()
+        dashboardLayerSync.setOnClickListener {
+            viewPresenter.sync()
         }
     }
 
@@ -70,13 +68,12 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     override fun setSyncItem(enabled: Boolean, string: String, icon: Int) {
-        dashboardButtonSync.isEnabled = enabled
-        dashboardSyncState.text = string
-        dashboardSyncStateIcon.setImageDrawable(ContextCompat.getDrawable(this, icon))
+        dashboardLayerSync.isEnabled = enabled
+        dashboardLayerSyncText.text = string
+        dashboardLayerSyncIcon.setImageDrawable(ContextCompat.getDrawable(this, icon))
     }
 
     override fun launchAlertView(error: ALERT_TYPE) {
         this.launchAlert(error)
     }
-
 }

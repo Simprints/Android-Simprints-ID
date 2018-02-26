@@ -21,19 +21,18 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.ArrayList
 
 class NaiveSync(
-        private val isInterrupted: () -> Boolean,
-        private val emitter: Emitter<Progress>,
-        private val userId: String = "",
-        private val realmConfig: RealmConfiguration,
-        private val projectRef: DatabaseReference,
-        private val usersRef: DatabaseReference,
-        private val patientsRef: DatabaseReference,
-        private val batchSize: Int = 50) {
+    private val isInterrupted: () -> Boolean,
+    private val emitter: Emitter<Progress>,
+    private val userId: String = "",
+    private val realmConfig: RealmConfiguration,
+    private val projectRef: DatabaseReference,
+    private val usersRef: DatabaseReference,
+    private val patientsRef: DatabaseReference,
+    private val batchSize: Int = 50) {
 
     private var patientsToDownload: ArrayList<String> = ArrayList()
     private var patientsToSave: ArrayList<rl_Person> = ArrayList()
     private var downloadingCount = 0
-    private lateinit var realm: Realm
 
     private val currentProgress = AtomicInteger(0)
     private val maxProgress = AtomicInteger(0)
@@ -46,7 +45,6 @@ class NaiveSync(
         // All firebase callbacks are executed on the ui thread, so we initialize the realm on
         // this thread and make sure that it will only be used on this thread.
         async(UI) {
-            realm = Realm.getInstance(realmConfig)
 
             // Get the query
             val query: Query = if (userId.isBlank()) {
@@ -83,15 +81,15 @@ class NaiveSync(
 
         // TODO Take out using threads. From now on threading will be handled by the caller, not the callee.
         doAsync {
-            val bgRealm = Realm.getInstance(realmConfig)
 
+            val realm = Realm.getInstance(realmConfig)
             dataSnapshot.children.forEach {
                 val user = it.getValue(fb_User::class.java) ?: return@forEach
 
                 val remoteList = ArrayList(user.patientList.keys)
                 remoteList.sort()
 
-                val localList: List<String> = bgRealm.where(rl_Person::class.java)
+                val localList: List<String> = realm.where(rl_Person::class.java)
                         .equalTo("userId", user.userId)
                         .findAllSorted("patientId")
                         .mapNotNull { rl_Person ->
@@ -99,17 +97,16 @@ class NaiveSync(
                         }
 
                 patientsToDownload.addAll(remoteList.minus(localList))
-                localList.minus(remoteList).forEach { realmToFirebase(bgRealm, it, user) }
+                localList.minus(remoteList).forEach { realmToFirebase(realm, it, user) }
             }
 
-            bgRealm.close()
+            realm.close()
 
             maxProgress.set(patientsToDownload.size)
             emitProgress()
 
             clearPatientList()
         }
-
     }
 
     /**
@@ -155,7 +152,6 @@ class NaiveSync(
                             clearPatientList()
                             Timber.d("LOAD FAILED")
                         }
-
                     })
         }
 
@@ -164,7 +160,6 @@ class NaiveSync(
         if (patientsToSave.size >= batchSize) {
             saveBatch()
         }
-
     }
 
     private fun saveBatch() {
@@ -176,7 +171,7 @@ class NaiveSync(
             iterator.remove()
         }
 
-        realm.executeTransactionAsync { realm ->
+        Realm.getInstance(realmConfig).executeTransactionAsync { realm ->
             realm.copyToRealmOrUpdate(batch)
             currentProgress.set(maxProgress.get() - patientsToDownload.size)
             emitProgress()
@@ -200,5 +195,4 @@ class NaiveSync(
             emitter.onComplete()
         }
     }
-
 }

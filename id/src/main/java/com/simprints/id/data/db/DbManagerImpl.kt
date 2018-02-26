@@ -8,6 +8,7 @@ import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Progress
 import com.simprints.libdata.DataCallback
+import com.simprints.libdata.NaiveSyncManager
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.libdata.models.firebase.fb_Person
 import com.simprints.libdata.tools.Constants
@@ -95,13 +96,18 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.saveRefusalFormInRemote(refusalForm, projectId, userId, sessionId)
     }
 
-    override fun syncGlobal(projectId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        remoteDbManager.getSyncManager(projectId).syncGlobal(isInterrupted, emitter)
+    override fun syncGlobal(legacyKey: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        getSyncManager(legacyKey).syncGlobal(isInterrupted, emitter)
     }
 
-    override fun syncUser(projectId: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        remoteDbManager.getSyncManager(projectId).syncUser(userId, isInterrupted, emitter)
+    override fun syncUser(legacyKey: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        getSyncManager(legacyKey).syncUser(userId, isInterrupted, emitter)
     }
+
+    fun getSyncManager(legacyKey: String): NaiveSyncManager =
+        // if localDbManager.realmConfig is null, the user is not signed in and we should not be here,
+        // TODO: that is temporary, we will fix in the migration firestore
+        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), legacyKey, localDbManager.realmConfig!!)
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
         val firebaseManager = remoteDbManager as FirebaseManager
