@@ -26,8 +26,14 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     // Lifecycle
 
-    override fun initialiseDb() {
+    override fun initialiseDb(projectId: String): Single<Unit> {
         remoteDbManager.initialiseRemoteDb()
+
+        return if (projectId.isNotEmpty()) {
+            getLocalKeyAndSignInToLocal(projectId)
+        } else {
+            Single.just(Unit)
+        }
     }
 
     override fun getLocalKeyAndSignInToLocal(projectId: String): Single<Unit> =
@@ -96,18 +102,18 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.saveRefusalFormInRemote(refusalForm, projectId, userId, sessionId)
     }
 
-    override fun syncGlobal(legacyKey: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        getSyncManager(legacyKey).syncGlobal(isInterrupted, emitter)
+    override fun syncGlobal(legacyApiKey: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        getSyncManager(legacyApiKey).syncGlobal(isInterrupted, emitter)
     }
 
-    override fun syncUser(legacyKey: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        getSyncManager(legacyKey).syncUser(userId, isInterrupted, emitter)
+    override fun syncUser(legacyApiKey: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        getSyncManager(legacyApiKey).syncUser(userId, isInterrupted, emitter)
     }
 
-    fun getSyncManager(legacyKey: String): NaiveSyncManager =
+    fun getSyncManager(legacyApiKey: String): NaiveSyncManager =
         // if localDbManager.realmConfig is null, the user is not signed in and we should not be here,
         // TODO: that is temporary, we will fix in the migration firestore
-        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), legacyKey, localDbManager.realmConfig!!)
+        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), legacyApiKey, localDbManager.realmConfig!!)
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
         val firebaseManager = remoteDbManager as FirebaseManager

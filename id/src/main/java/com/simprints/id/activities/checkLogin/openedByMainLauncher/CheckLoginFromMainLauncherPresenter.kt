@@ -25,11 +25,5 @@ class CheckLoginFromMainLauncherPresenter(
         view.openDashboardActivity()
     }
 
-    override fun isUserSignedInForStoredProjectId(): Boolean {
-        return true
-    }
-
-    override fun getUserId(): String {
-        return dataManager.getSignedInUserIdOrEmpty() // FIXME
-    }
+    override fun getUserId(): String = dataManager.getSignedInUserIdOrEmpty()
 }

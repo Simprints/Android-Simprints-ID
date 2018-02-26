@@ -15,28 +15,26 @@ abstract class CheckLoginPresenter (
     }
 
     protected fun checkSignedInStateAndMoveOn() {
-        if (isUserSignedIn()) {
-            handleSignedInUser()
-        } else {
-            handleNotSignedInUser()
-        }
+        dataManager.initialiseDb().subscribe({
+            if (isUserSignedIn()) {
+                handleSignedInUser()
+            } else {
+                handleNotSignedInUser()
+            }
+        }, {
+            view.launchAlertForError(ALERT_TYPE.UNEXPECTED_ERROR)
+         })
     }
 
     abstract fun handleSignedInUser()
     abstract fun handleNotSignedInUser()
 
-    private fun dbInitFailed() {
-        view.launchAlertForError(ALERT_TYPE.UNEXPECTED_ERROR)
-    }
-
-    private fun isUserSignedIn(): Boolean =
-        isEncryptedProjectSecretPresent() && isProjectIdStored() && isFirebaseTokenValid() && isUserSignedInForStoredProjectId()
-
     private fun isEncryptedProjectSecretPresent(): Boolean = dataManager.getEncryptedProjectSecretOrEmpty().isNotEmpty()
     private fun isProjectIdStored(): Boolean = dataManager.getSignedInProjectIdOrEmpty().isNotEmpty()
-    private fun isFirebaseTokenValid(): Boolean = dataManager.isSignedIn(dataManager.getSignedInProjectIdOrEmpty(), getUserId()) || true
+    private fun isFirebaseTokenValid(): Boolean = dataManager.isSignedIn(dataManager.getSignedInProjectIdOrEmpty(), getUserId())
+    private fun isUserSignedIn(): Boolean =
+        isEncryptedProjectSecretPresent() && isProjectIdStored() && isFirebaseTokenValid()
 
-    abstract fun isUserSignedInForStoredProjectId(): Boolean
     abstract fun getUserId(): String
 
     private fun initSession() {

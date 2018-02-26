@@ -6,10 +6,10 @@ import com.simprints.id.exceptions.safe.CredentialMissingException
 class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
 
     companion object {
-         const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
-         const val PROJECT_ID: String = "PROJECT_ID"
-         const val USER_ID: String = "USER_ID"
-         private const val DEFAULT_VALUE: String = ""
+        const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
+        const val PROJECT_ID: String = "PROJECT_ID"
+        const val USER_ID: String = "USER_ID"
+        private const val DEFAULT_VALUE: String = ""
     }
 
     override var encryptedProjectSecret: String = ""
@@ -98,6 +98,6 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
         }
     }
 
-    override fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String = prefs.getString(legacyApiKey, "")
     override fun legacyApiKeyForProjectIdOrEmpty(projectId: String): String = prefs.getString(projectId, "")
+    override fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String = prefs.getString(legacyApiKey, "")
 }

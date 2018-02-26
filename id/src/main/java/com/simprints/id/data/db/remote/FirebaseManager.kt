@@ -5,16 +5,15 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.simprints.id.Application
 import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
-import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
 import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libdata.DATA_ERROR
@@ -122,21 +121,28 @@ class FirebaseManager(private val appContext: Context,
 
     override fun isRemoteDbInitialized(): Boolean = isInitialised
 
-    @Throws(DifferentCredentialsSignedInException::class)
     override fun isSignedIn(projectId: String, userId: String): Boolean =
-        isSignedInUserAsExpected(projectId, userId)
+        isFirestoreSignedInUserAsExpected(projectId, userId) &&
+        isFirebaseSignedInUserAsExpected(projectId)
 
-    private fun isSignedInUserAsExpected(projectId: String, userId: String): Boolean {
-        val firebaseUser = getFirebaseAuth(legacyFirebaseApp).currentUser
-        firebaseUser?.let {
-            if (isFirebaseUserAsExpected(it, projectId, userId)) {
-                return true
-            } else throw DifferentCredentialsSignedInException()
-        } ?: return false
+    private fun isFirestoreSignedInUserAsExpected (projectId: String, userId: String): Boolean {
+        val firestoreUser = getFirebaseAuth(firestoreFirebaseApp).currentUser ?: return false
+        return firestoreUser.uid == "$projectId.$userId"
+    }
+
+    private fun isFirebaseSignedInUserAsExpected (projectId: String): Boolean {
+        val firebaseUser = getFirebaseAuth(legacyFirebaseApp).currentUser ?: return false
+
+        // For legacy reason, the firebase user has the projectId(for new projects) or legacyApiKey
+        // (for old projects) as uid. Because the legacyApiKey soon will disappear, we try to map it immediately (CheckLogin)
+        // to a projectId and use it for any task. In this case, we need the legacyApiKey
+        // so we grab through the Application to avoid injecting it through all methods, so it will be easier
+        // to get rid of it.
+        val legacyApiKey = (appContext as Application).secureDataManager.legacyApiKeyForProjectIdOrEmpty(projectId)
+        return firebaseUser.uid == if (legacyApiKey.isNotEmpty()) legacyApiKey else projectId
     }
 
     // Data transfer
-
     override fun getLocalDbKeyFromRemote(projectId: String): Single<String> =
         Single.create<String> { resultEmit ->
             val db = FirebaseFirestore.getInstance(firestoreFirebaseApp)
@@ -224,8 +230,5 @@ class FirebaseManager(private val appContext: Context,
 
         fun getFirestoreAppName(): String =
             "firestore"
-
-        fun isFirebaseUserAsExpected(firebaseUser: FirebaseUser, projectId: String, userId: String): Boolean =
-            firebaseUser.uid == userId
     }
 }

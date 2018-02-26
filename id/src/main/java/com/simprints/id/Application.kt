@@ -168,7 +168,7 @@ open class Application : MultiDexApplication() {
         FirebaseAnalyticsManager(firebaseAnalytics)
     }
 
-    val secureDataManager: SecureDataManager by lazy {
+    public val secureDataManager: SecureDataManager by lazy {
         SecureDataManagerImpl(prefs)
     }
 
@@ -435,14 +435,5 @@ open class Application : MultiDexApplication() {
             Timber.plant(Timber.DebugTree())
         }
         Fabric.with(fabric)
-        dataManager.initialiseDb()
-
-        if (dataManager.getSignedInProjectIdOrEmpty().isNotEmpty()) {
-            dataManager.getLocalKeyAndSignInToLocal(dataManager.getSignedInProjectIdOrEmpty()).subscribe({
-                print("Init done")
-            }, {
-                print("Init error")
-            })
-        }
     }
 }

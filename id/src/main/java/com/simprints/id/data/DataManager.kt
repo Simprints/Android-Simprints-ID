@@ -15,6 +15,7 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Emitter
+import io.reactivex.Single
 
 interface DataManager : PreferencesManager, DbManager, ApiManager,
         AnalyticsManager, SecureDataManager {
@@ -35,7 +36,7 @@ interface DataManager : PreferencesManager, DbManager, ApiManager,
 
     // DbManager call interception for populating arguments
     // Lifecycle
-    override fun initialiseDb()
+    fun initialiseDb(): Single<Unit>
     override fun signOut()
 
     // Data transfer

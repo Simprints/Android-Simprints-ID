@@ -28,8 +28,8 @@ class SyncTask(private val dataManager: DataManager,
         when (parameters) {
             is UserSyncTaskParameters -> {
                 val projectId = dataManager.getSignedInProjectIdOrEmpty()
-                val legacyKey = dataManager.legacyApiKeyForProjectIdOrEmpty(projectId)
-                dataManager.syncUser(legacyKey, parameters.userId, isInterrupted, emitter)
+                val legacyApiKey = dataManager.legacyApiKeyForProjectIdOrEmpty(projectId)
+                dataManager.syncUser(legacyApiKey, parameters.userId, isInterrupted, emitter)
             }
             is GlobalSyncTaskParameters ->
                 dataManager.syncGlobal(isInterrupted, emitter)
