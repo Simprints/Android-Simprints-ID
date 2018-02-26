@@ -34,6 +34,8 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
             dataManager,
             app.sessionParametersExtractor,
             timeHelper)
+
+        viewPresenter.setup()
     }
 
     override fun onResume() {
