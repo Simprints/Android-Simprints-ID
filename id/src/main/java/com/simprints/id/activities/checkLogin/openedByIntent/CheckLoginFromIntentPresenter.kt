@@ -5,21 +5,21 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.domain.sessionParameters.SessionParameters
 import com.simprints.id.domain.sessionParameters.extractors.Extractor
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
-import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.TimeHelper
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     val dataManager: DataManager,
                                     private val sessionParametersExtractor: Extractor<SessionParameters>,
                                     timeHelper: TimeHelper) :
-    CheckLoginPresenter(dataManager, timeHelper), CheckLoginFromIntentContract.Presenter {
+    CheckLoginPresenter(view, dataManager, timeHelper), CheckLoginFromIntentContract.Presenter {
 
     private var loginAlreadyTried: Boolean = false
 
     init {
         view.setPresenter(this)
+    }
 
-        initSession()
+    override fun setup() {
         view.checkCallingApp()
 
         // extracts the sessions Params (if not done before)
@@ -31,17 +31,14 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     override fun start() {
-        openNextActivity()
+        checkSignedInStateAndMoveOn()
     }
 
     private fun extractSessionParameters() {
         val callout = view.parseCallout()
-        callout.apply {
-            dataManager.logCallout(this)
-        }
+        dataManager.logCallout(callout)
         val sessionParameters = sessionParametersExtractor.extractFrom(callout)
         dataManager.sessionParameters = sessionParameters
-        dataManager.calloutAction = sessionParameters.calloutAction
         dataManager.logUserProperties()
     }
 
@@ -58,25 +55,14 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         view.openLaunchActivity()
     }
 
-    override fun dbInitFailed() {
-        view.launchAlertForError(ALERT_TYPE.UNEXPECTED_ERROR)
-    }
-
     override fun isUserSignedInForStoredProjectId(): Boolean {
         val storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
         return dataManager.projectId.let {
             if (it.isNotEmpty()) {
                 it == storedProjectId
             } else {
-                findProjectIdForApiKey(dataManager.apiKey) == storedProjectId
+                dataManager.projectIdForLegacyApiKeyOrEmpty(dataManager.apiKey) == storedProjectId
             }
         }
-    }
-
-    override fun getUserId(): String =
-        dataManager.userId // FIXME
-
-    private fun findProjectIdForApiKey(legacyApiKey: String): String {
-        return dataManager.projectIdForLegacyApiKeyOrEmpty(legacyApiKey)
     }
 }
