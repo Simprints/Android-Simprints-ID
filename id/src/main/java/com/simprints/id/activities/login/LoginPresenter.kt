@@ -64,8 +64,11 @@ class LoginPresenter(val view: LoginContract.View,
      **/
     override fun processQRScannerAppResponse(scannedText: String) {
 
-        val potentialProjectId = Regex(pattern = "(?<=$SCANNED_TEXT_TAG_PROJECT_ID)(.*)").find(scannedText)?.value
-        val potentialProjectSecret = Regex(pattern = "(?<=$SCANNED_TEXT_TAG_PROJECT_SECRET)(.*)").find(scannedText)?.value
+        val projectIdRegex = "(?<=$SCANNED_TEXT_TAG_PROJECT_ID)(.*)"
+        val projectSecretRegex = "(?<=$SCANNED_TEXT_TAG_PROJECT_SECRET)(.*)"
+
+        val potentialProjectId = Regex(pattern = projectIdRegex).find(scannedText)?.value
+        val potentialProjectSecret = Regex(pattern = projectSecretRegex).find(scannedText)?.value
 
         if (potentialProjectId != null && potentialProjectId.isNotEmpty() &&
             potentialProjectSecret != null && potentialProjectSecret.isNotEmpty() ) {
