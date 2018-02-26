@@ -12,6 +12,7 @@ import com.simprints.id.domain.callout.Callout
 import com.simprints.id.domain.callout.Callout.Companion.toCallout
 import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
 import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.InternalConstants.MAIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
@@ -79,8 +80,9 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        //If it's a LOGIN_REQUEST_CODE, it will be handled in the onResume
-        if (requestCode != LoginActivity.LOGIN_REQUEST_CODE) {
+        //If it's a LOGIN_REQUEST_CODE or tryAgainAfter error, they will be handled in the onResume
+        val isTryAgainAfterError = requestCode == InternalConstants.ALERT_ACTIVITY_REQUEST && resultCode == InternalConstants.RESULT_TRY_AGAIN
+        if (requestCode != LoginActivity.LOGIN_REQUEST_CODE || !isTryAgainAfterError) {
             setResult(resultCode, data)
             finish()
         }

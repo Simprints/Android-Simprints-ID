@@ -51,18 +51,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
+    override fun getUserId(): String = dataManager.userId
+
     override fun handleSignedInUser() {
         view.openLaunchActivity()
-    }
-
-    override fun isUserSignedInForStoredProjectId(): Boolean {
-        val storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
-        return dataManager.projectId.let {
-            if (it.isNotEmpty()) {
-                it == storedProjectId
-            } else {
-                dataManager.projectIdForLegacyApiKeyOrEmpty(dataManager.apiKey) == storedProjectId
-            }
-        }
     }
 }

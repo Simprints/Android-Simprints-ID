@@ -25,6 +25,7 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Emitter
+import io.reactivex.Single
 
 class DataManagerImpl(private val context: Context,
                       private val preferencesManager: PreferencesManager,
@@ -82,10 +83,10 @@ class DataManagerImpl(private val context: Context,
 
     // DbManager call interception for populating arguments
     // Lifecycle
-    override fun initialiseDb() {
+    override fun initialiseDb(): Single<Unit> {
         dbManager.registerRemoteConnectionListener(connectionStateLogger)
         dbManager.registerRemoteAuthListener(authStateLogger)
-        dbManager.initialiseDb()
+        return dbManager.initialiseDb(signedInProjectId)
     }
 
     override fun signOut() {

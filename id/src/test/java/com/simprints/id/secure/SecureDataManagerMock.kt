@@ -37,6 +37,9 @@ class SecureDataManagerMock : SecureDataManager {
         get() = "user_id"
         set(value) {}
 
+    override fun legacyApiKeyForProjectIdOrEmpty(projectId: String): String {
+        throw RuntimeException("Not mocked!!!")
+    }
 
     override fun getEncryptedProjectSecretOrEmpty(): String {
         throw RuntimeException("Not mocked!!!")

@@ -7,7 +7,7 @@ import io.reactivex.Emitter
 import io.realm.RealmConfiguration
 
 class NaiveSyncManager(firebaseApp: FirebaseApp,
-                       private val legacyKey: String,
+                       private val legacyApiKey: String,
                        private val realmConfig: RealmConfiguration) {
 
     private val db = Utils.getDatabase(firebaseApp)
@@ -28,11 +28,11 @@ class NaiveSyncManager(firebaseApp: FirebaseApp,
                     getPatientsRef()).sync()
 
     private fun getProjRef() =
-            db.getReference("projects/$legacyKey")
+            db.getReference("projects/$legacyApiKey")
 
     private fun getUsersRef() =
-            db.getReference("projects/$legacyKey/users")
+            db.getReference("projects/$legacyApiKey/users")
 
     private fun getPatientsRef() =
-            db.getReference("projects/$legacyKey/patients")
+            db.getReference("projects/$legacyApiKey/patients")
 }
