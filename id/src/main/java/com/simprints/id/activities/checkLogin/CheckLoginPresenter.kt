@@ -2,16 +2,21 @@ package com.simprints.id.activities.checkLogin
 
 import com.simprints.id.data.DataManager
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
+import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.TimeHelper
-import java.util.*
+import com.simprints.id.tools.utils.StringsUtils
 
-open abstract class CheckLoginPresenter (
+abstract class CheckLoginPresenter (
+    private val view: CheckLoginContract.View,
     private val dataManager: DataManager,
     private val timeHelper: TimeHelper) {
 
-    fun openNextActivity() {
+    init {
+        initSession()
+    }
+
+    protected fun checkSignedInStateAndMoveOn() {
         if (isUserSignedIn()) {
-            initDbContext(dataManager.getSignedInProjectIdOrEmpty())
             handleSignedInUser()
         } else {
             handleNotSignedInUser()
@@ -19,9 +24,12 @@ open abstract class CheckLoginPresenter (
     }
 
     abstract fun handleNotSignedInUser()
-    abstract fun handleSignedInUser()
 
-    private fun initDbContext(projectId: String) {
+    open fun handleSignedInUser() {
+        initDbManager(dataManager.getSignedInProjectIdOrEmpty())
+    }
+
+    private fun initDbManager(projectId: String) {
         if (!dataManager.isDbInitialised(projectId)) {
             try {
                 dataManager.initialiseDb(projectId)
@@ -32,27 +40,24 @@ open abstract class CheckLoginPresenter (
         }
     }
 
-    abstract fun dbInitFailed()
-
-    private fun isUserSignedIn(): Boolean {
-        val encProjectSecret = dataManager.getEncryptedProjectSecretOrEmpty()
-        val storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
-        val isFirebaseTokenValid = dataManager.isSignedIn(storedProjectId) || true //TODO:Remove it once isSignedIn is done
-
-        return if (encProjectSecret.isEmpty() || storedProjectId.isEmpty() || !isFirebaseTokenValid) {
-            false
-        } else {
-            isUserSignedInForStoredProjectId()
-        }
+    private fun dbInitFailed() {
+        view.launchAlertForError(ALERT_TYPE.UNEXPECTED_ERROR)
     }
+
+    private fun isUserSignedIn(): Boolean =
+        isEncryptedProjectSecretPresent() && isProjectIdStored() && isFirebaseTokenValid() && isUserSignedInForStoredProjectId()
+
+    private fun isEncryptedProjectSecretPresent(): Boolean = dataManager.getEncryptedProjectSecretOrEmpty().isNotEmpty()
+    private fun isProjectIdStored(): Boolean = dataManager.getSignedInProjectIdOrEmpty().isNotEmpty()
+    private fun isFirebaseTokenValid(): Boolean = dataManager.isSignedIn(dataManager.getSignedInProjectIdOrEmpty()) || true
 
     abstract fun isUserSignedInForStoredProjectId(): Boolean
 
-    protected fun initSession() {
+    private fun initSession() {
         dataManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
     }
 
     private fun newSessionId(): String {
-        return UUID.randomUUID().toString()
+        return StringsUtils.randomUUID()
     }
 }
