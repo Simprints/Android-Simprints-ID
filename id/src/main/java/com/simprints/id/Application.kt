@@ -438,7 +438,11 @@ open class Application : MultiDexApplication() {
         dataManager.initialiseDb()
 
         if (dataManager.getSignedInProjectIdOrEmpty().isNotEmpty()) {
-            dataManager.getLocalKeyAndSignInToLocal(dataManager.getSignedInProjectIdOrEmpty())
+            dataManager.getLocalKeyAndSignInToLocal(dataManager.getSignedInProjectIdOrEmpty()).subscribe({
+                print("Init done")
+            }, {
+                print("Init error")
+            })
         }
     }
 }

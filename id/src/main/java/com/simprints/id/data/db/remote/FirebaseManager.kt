@@ -19,7 +19,6 @@ import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libdata.DATA_ERROR
 import com.simprints.libdata.DataCallback
-import com.simprints.libdata.NaiveSyncManager
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.libdata.models.firebase.*
 import com.simprints.libdata.models.realm.rl_Person
@@ -213,10 +212,8 @@ class FirebaseManager(private val appContext: Context,
         Tasks.await(task)
     }
 
-    override fun getSyncManager(projectId: String): NaiveSyncManager =
-        NaiveSyncManager(legacyFirebaseApp, projectId)
-
     fun getFirebaseStorageInstance() = FirebaseStorage.getInstance(legacyFirebaseApp)
+    override fun getFirebaseLegacyApp(): FirebaseApp = legacyFirebaseApp
 
     companion object {
         private const val COLLECTION_LOCAL_DB_KEYS: String = "localDbKeys"

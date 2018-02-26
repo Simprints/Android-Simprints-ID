@@ -98,7 +98,6 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
         }
     }
 
-    override fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String {
-        return prefs.getString(legacyApiKey, "")
-    }
+    override fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String = prefs.getString(legacyApiKey, "")
+    override fun legacyApiKeyForProjectIdOrEmpty(projectId: String): String = prefs.getString(projectId, "")
 }
