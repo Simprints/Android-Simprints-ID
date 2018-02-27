@@ -44,13 +44,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     override fun signIn(projectId: String, token: Tokens): Single<Unit> =
         remoteDbManager
             .signInToRemoteDb(token)
-            .getLocalDbKeyFromRemote(projectId)
-            .signInToLocal(projectId)
-
-    private fun Single<out Unit>.getLocalDbKeyFromRemote(projectId: String): Single<String> =
-        flatMap {
-            remoteDbManager.getLocalDbKeyFromRemote(projectId)
-        }
+            .flatMap {
+                getLocalKeyAndSignInToLocal(projectId)
+            }
 
     private fun Single<out String>.signInToLocal(projectId: String): Single<Unit> =
         flatMap { key ->
