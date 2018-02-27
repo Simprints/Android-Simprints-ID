@@ -9,6 +9,7 @@ import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.createMockService
 import com.simprints.id.tools.retrofit.createMockServiceToFailRequests
 import com.simprints.id.tools.roboletric.TestApplication
+import com.simprints.id.tools.roboletric.mockDbManager
 import com.simprints.id.tools.roboletric.mockLocalDbManager
 import com.simprints.id.tools.roboletric.mockRemoteDbManager
 import org.junit.Before
@@ -31,6 +32,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
         app = (RuntimeEnvironment.application as Application)
         mockRemoteDbManager(app)
         mockLocalDbManager(app)
+        mockDbManager(app)
     }
 
     @Test
