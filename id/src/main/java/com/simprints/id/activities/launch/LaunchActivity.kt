@@ -15,7 +15,6 @@ import com.simprints.id.activities.RefusalActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.AppState
 import com.simprints.id.tools.InternalConstants.*
@@ -184,14 +183,6 @@ open class LaunchActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        if (dataManager.isDbInitialised()) {
-            try {
-//                dataManager.signOut()
-            } catch (error: UninitializedDataManagerError) {
-                dataManager.logError(error)
-            }
-        }
-
         positionTracker.finish()
 
         if (appState.scanner != null) {

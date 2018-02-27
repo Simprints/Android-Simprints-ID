@@ -52,9 +52,6 @@ public class Setup {
 
     private SetupCallback callback;
 
-    // True iff the api key was validated successfully
-    private boolean apiKeyValidated = false;
-
     // True iff it is not a verify intent || or the GUID in the verify intent was found
     private boolean guidExists = false;
 
@@ -131,17 +128,6 @@ public class Setup {
     }
 
     // STEP 2
-    private void initDbContext(@NonNull final Activity activity) {
-        onProgress(30, R.string.updating_database);
-        try {
-            dataManager.initialiseDb();
-        } catch (UninitializedDataManagerError error) {
-            dataManager.logError(error);
-            onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-        }
-    }
-
-    // STEP 3
     private void initScanner(@NonNull final Activity activity) {
         callback.onProgress(45, R.string.launch_bt_connect);
         List<String> pairedScanners = ScannerUtils.getPairedScanners();
@@ -161,7 +147,7 @@ public class Setup {
         goOn(activity);
     }
 
-    // STEP 4
+    // STEP 3
     private void connectToScanner(@NonNull final Activity activity) {
         callback.onProgress(60, R.string.launch_bt_connect);
 
@@ -208,7 +194,7 @@ public class Setup {
         });
     }
 
-    // STEP 5
+    // STEP 4
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
         if (dataManager.getCalloutAction() != CalloutAction.VERIFY) {
             guidExists = true;
@@ -269,7 +255,7 @@ public class Setup {
         }
     }
 
-    // STEP 6
+    // STEP 5
     private void resetUi(@NonNull final Activity activity) {
         callback.onProgress(80, R.string.launch_setup);
 
@@ -295,7 +281,7 @@ public class Setup {
         });
     }
 
-    // STEP 7
+    // STEP 6
     private void wakeUpUn20(@NonNull final Activity activity) {
         callback.onProgress(90, R.string.launch_wake_un20);
 
