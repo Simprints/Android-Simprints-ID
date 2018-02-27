@@ -145,7 +145,7 @@ open class Application : MultiDexApplication() {
         FirebaseManager(this, remoteDbConnectionListenerManager, remoteDbAuthListenerManager)
     }
 
-    private val dbManager: DbManager by lazy {
+    var dbManager: DbManager by lazyVar {
         DbManagerImpl(localDbManager, remoteDbManager)
     }
 

@@ -13,6 +13,7 @@ import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
+import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.roboletric.*
 import junit.framework.Assert.*
 import org.junit.Assert
@@ -29,11 +30,9 @@ import org.robolectric.Shadows.shadowOf
 import org.robolectric.android.controller.ActivityController
 import org.robolectric.annotation.Config
 
-
-
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class, application = TestApplication::class)
-class CheckLoginFromIntentActivityTest {
+class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
     companion object {
         const val DEFAULT_ACTION = "com.simprints.id.REGISTER"
@@ -51,10 +50,11 @@ class CheckLoginFromIntentActivityTest {
         app = RuntimeEnvironment.application as TestApplication
         sharedPreferences = getRoboSharedPreferences()
 
-        mockCheckFirebaseTokenMock(app, sharedPreferences)
+        mockLocalDbManager(app)
+        mockRemoteDbManager(app)
+        mockIsSignedIn(app, sharedPreferences)
+        mockDbManager(app)
         mockAnalyticsMock()
-
-        app.dataManager.initialiseDb()
     }
 
     private fun mockAnalyticsMock() {
@@ -67,7 +67,7 @@ class CheckLoginFromIntentActivityTest {
         val controller = Robolectric.buildActivity(CheckLoginFromIntentActivity::class.java).create()
         val spyAct = spy(controller.get())
         doReturn("com.app.installed.manually").`when`(spyAct).getCallingPackageName()
-        replaceComponentInActivityController(controller, spyAct)
+        replaceActivityInController(controller, spyAct)
 
         controller.start().resume().visible()
         verifyALogSafeExceptionWasThrown(1)
@@ -82,7 +82,7 @@ class CheckLoginFromIntentActivityTest {
 
         val spyAct = spy(controller.get())
         doReturn("com.app.installed.from.playstore").`when`(spyAct).getCallingPackageName()
-        replaceComponentInActivityController(controller, spyAct)
+        replaceActivityInController(controller, spyAct)
         controller.create().start().resume().visible()
         verifyALogSafeExceptionWasThrown(0)
     }
@@ -166,7 +166,6 @@ class CheckLoginFromIntentActivityTest {
 
         controller.resume()
         assertActivityStarted(LaunchActivity::class.java, sActivity)
-        assertFalse(activity.isFinishing)
     }
 
     @Test

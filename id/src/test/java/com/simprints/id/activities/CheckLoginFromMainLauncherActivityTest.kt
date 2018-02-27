@@ -9,10 +9,7 @@ import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.testUtils.assertActivityStarted
-import com.simprints.id.tools.roboletric.TestApplication
-import com.simprints.id.tools.roboletric.createRoboCheckLoginMainLauncherAppActivity
-import com.simprints.id.tools.roboletric.getRoboSharedPreferences
-import com.simprints.id.tools.roboletric.mockCheckFirebaseTokenMock
+import com.simprints.id.tools.roboletric.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,13 +29,15 @@ class CheckLoginFromMainLauncherActivityTest {
         app = (RuntimeEnvironment.application as Application)
 
         sharedPrefs = getRoboSharedPreferences()
-        mockCheckFirebaseTokenMock(app, sharedPrefs)
+
+        mockLocalDbManager(app)
+        mockRemoteDbManager(app)
+        mockIsSignedIn(app, sharedPrefs)
+        mockDbManager(app)
 
         sharedPrefs.edit().putString(SecureDataManagerImpl.ENCRYPTED_PROJECT_SECRET, "encrypted_project_secret").commit()
         sharedPrefs.edit().putString(SecureDataManagerImpl.PROJECT_ID, "projectId").commit()
         sharedPrefs.edit().putBoolean("IS_FIREBASE_TOKEN_VALID", true).commit()
-
-        app.dataManager.initialiseDb()
     }
 
     @Test

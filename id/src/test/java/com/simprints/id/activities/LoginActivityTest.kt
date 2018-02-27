@@ -8,13 +8,10 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.models.Tokens
 import com.simprints.id.testUtils.anyNotNull
+import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.extensions.scannerAppIntent
-import com.simprints.id.tools.roboletric.TestApplication
-import com.simprints.id.tools.roboletric.createRoboLoginActivity
-import com.simprints.id.tools.roboletric.injectHowToResolveScannerAppIntent
-import com.simprints.id.tools.roboletric.mockLocalDbManager
+import com.simprints.id.tools.roboletric.*
 import io.reactivex.internal.operators.single.SingleJust
 import junit.framework.Assert.assertNotNull
 import junit.framework.Assert.assertTrue
@@ -24,7 +21,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.Mockito.doReturn
 import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
@@ -43,6 +39,7 @@ class LoginActivityTest {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
         mockLocalDbManager(app)
+        mockDbManager(app)
     }
 
     @Test
@@ -61,8 +58,7 @@ class LoginActivityTest {
 
         val controller = createRoboLoginActivity().start().resume().visible()
         val projectAuthenticator = mock(ProjectAuthenticator::class.java)
-        doReturn(SingleJust(Tokens("firestore_token", "legacy_token")))
-            .`when`(projectAuthenticator).authenticate(anyNotNull(), anyNotNull())
+        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull())).thenReturn(SingleJust(Unit))
 
         val loginAct = controller.get().apply {
             viewPresenter.projectAuthenticator = projectAuthenticator
