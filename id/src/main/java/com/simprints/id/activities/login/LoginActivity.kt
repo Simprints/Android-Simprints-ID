@@ -36,12 +36,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        initUI()
 
         val projectAuthenticator = ProjectAuthenticator(app.secureDataManager, app.dataManager, SafetyNet.getClient(this))
         viewPresenter = LoginPresenter(this, app.secureDataManager, projectAuthenticator)
         viewPresenter.start()
-
-        initUI()
     }
 
     override fun setPresenter(presenter: LoginContract.Presenter) {
@@ -49,7 +48,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     private fun initUI() {
-        progressDialog = SimProgressDialog(this, true)
+        progressDialog = SimProgressDialog(this)
         loginEditTextUserId.setText(app.dataManager.userId)
         loginButtonScanQr.setOnClickListener { viewPresenter.userDidWantToOpenScanQRApp() }
         loginButtonSignIn.setOnClickListener {

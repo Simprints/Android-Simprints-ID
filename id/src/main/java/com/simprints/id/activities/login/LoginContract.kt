@@ -20,7 +20,11 @@ interface LoginContract {
         var projectAuthenticator: ProjectAuthenticator
 
         fun userDidWantToOpenScanQRApp()
-        fun userDidWantToSignIn(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String, possibleLegacyApiKey: String? = null)
+        fun userDidWantToSignIn(possibleProjectId: String,
+                                possibleProjectSecret: String,
+                                possibleUserId: String,
+                                possibleLegacyApiKey: String? = null)
+
         fun processQRScannerAppResponse(scannedText: String)
     }
 }
