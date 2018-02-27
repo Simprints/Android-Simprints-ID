@@ -57,7 +57,6 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.Log;
-import com.simprints.id.tools.RemoteConfig;
 import com.simprints.id.tools.TimeHelper;
 import com.simprints.id.tools.TimeoutBar;
 import com.simprints.id.tools.Vibrate;
@@ -604,12 +603,6 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 registrationResult = new Registration(dataManager.getPatientId());
-                // FIXME : Re-route RemoteConfig calls to DataManager
-//                if (RemoteConfig.get().getBoolean(RemoteConfig.ENABLE_RETURNING_TEMPLATES)) {
-//                    for (Fingerprint fp : fingerprints) {
-//                        registrationResult.setTemplate(fp.getFingerId(), fp.getTemplateBytes());
-//                    }
-//                }
 
                 Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
                 FormatResult.put(resultData, registrationResult, dataManager.getResultFormat());
