@@ -14,6 +14,14 @@ abstract class CheckLoginPresenter (
         initSession()
     }
 
+    private fun initSession() {
+        dataManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
+    }
+
+    private fun newSessionId(): String {
+        return StringsUtils.randomUUID()
+    }
+
     protected fun checkSignedInStateAndMoveOn() {
         dataManager.initialiseDb().subscribe({
             if (isUserSignedIn()) {
@@ -32,16 +40,8 @@ abstract class CheckLoginPresenter (
     private fun isEncryptedProjectSecretPresent(): Boolean = dataManager.getEncryptedProjectSecretOrEmpty().isNotEmpty()
     private fun isProjectIdStored(): Boolean = dataManager.getSignedInProjectIdOrEmpty().isNotEmpty()
     private fun isFirebaseTokenValid(): Boolean = dataManager.isSignedIn(dataManager.getSignedInProjectIdOrEmpty(), getUserId())
-    private fun isUserSignedIn(): Boolean =
-        isEncryptedProjectSecretPresent() && isProjectIdStored() && isFirebaseTokenValid()
-
     abstract fun getUserId(): String
 
-    private fun initSession() {
-        dataManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
-    }
-
-    private fun newSessionId(): String {
-        return StringsUtils.randomUUID()
-    }
+    private fun isUserSignedIn(): Boolean =
+        isEncryptedProjectSecretPresent() && isProjectIdStored() && isFirebaseTokenValid()
 }

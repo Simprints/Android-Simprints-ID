@@ -22,7 +22,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     override fun setup() {
         view.checkCallingApp()
 
-        // extracts the sessions Params (if not done before)
         try {
             extractSessionParameters()
         } catch (exception: InvalidCalloutError) {

@@ -17,8 +17,11 @@ import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.model.ALERT_TYPE
-import com.simprints.id.tools.*
+import com.simprints.id.tools.AppState
 import com.simprints.id.tools.InternalConstants.*
+import com.simprints.id.tools.LanguageHelper
+import com.simprints.id.tools.Log
+import com.simprints.id.tools.PositionTracker
 import com.simprints.id.tools.Vibrate.vibrate
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.libscanner.ButtonListener
@@ -59,8 +62,6 @@ open class LaunchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         injectDependencies()
         initView()
-        // FIXME : RemoteConfig should be in DataManager, as calls before Firebase has been initialised will fail
-        // RemoteConfig.init()
         positionTracker.start()
         setup.start(this, getSetupCallback())
     }
