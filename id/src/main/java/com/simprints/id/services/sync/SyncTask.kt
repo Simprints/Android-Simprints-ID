@@ -27,12 +27,10 @@ class SyncTask(private val dataManager: DataManager,
     private fun sync(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
         when (parameters) {
             is UserSyncTaskParameters -> {
-                val projectId = dataManager.getSignedInProjectIdOrEmpty()
-                val legacyApiKey = dataManager.legacyApiKeyForProjectIdOrEmpty(projectId)
-                dataManager.syncUser(legacyApiKey, parameters.userId, isInterrupted, emitter)
+                dataManager.syncUser(parameters.legacyApiKey, parameters.userId, isInterrupted, emitter)
             }
             is GlobalSyncTaskParameters ->
-                dataManager.syncGlobal(isInterrupted, emitter)
+                dataManager.syncGlobal(parameters.legacyApiKey, isInterrupted, emitter)
         }
     }
 }
