@@ -58,6 +58,14 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             ""
         }
 
+    override fun getSignedInLegacyApiKeyOrEmpty(): String =
+        try {
+            val projectId = getSignedInProjectIdOrEmpty()
+            legacyApiKeyForProjectIdOrEmpty(projectId)
+        } catch (e: CredentialMissingException) {
+            ""
+        }
+
     override fun getSignedInProjectIdOrEmpty(): String =
         try {
             signedInProjectId
