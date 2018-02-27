@@ -89,14 +89,7 @@ class FirebaseManager(private val appContext: Context,
         FirebaseAuth.getInstance(firebaseApp)
 
     override fun signInToRemoteDb(tokens: Tokens): Single<Unit> =
-        Single.create<Unit> { e ->
-            Singles.zip(signInToDb(legacyFirebaseApp, tokens.legacyToken), signInToDb(firestoreFirebaseApp, tokens.firestoreToken))
-                .subscribe({
-                    e.onSuccess(Unit)
-                }, {
-                    e.onError(it)
-                })
-        }
+        Singles.zip(signInToDb(legacyFirebaseApp, tokens.legacyToken), signInToDb(firestoreFirebaseApp, tokens.firestoreToken)).map { Unit }
 
     private fun signInToDb(firebaseApp: FirebaseApp, token: String): Single<Unit> =
         Single.create<Unit> {

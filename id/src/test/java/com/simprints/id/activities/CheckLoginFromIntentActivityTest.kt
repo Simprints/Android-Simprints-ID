@@ -166,6 +166,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
         controller.resume()
         assertActivityStarted(LaunchActivity::class.java, sActivity)
+        assertFalse(sActivity.isFinishing)
     }
 
     @Test

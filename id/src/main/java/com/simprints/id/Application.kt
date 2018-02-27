@@ -97,7 +97,7 @@ open class Application : MultiDexApplication() {
         this.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
     }
 
-    val prefs: ImprovedSharedPreferences by lazy {
+    private val prefs: ImprovedSharedPreferences by lazy {
         ImprovedSharedPreferencesImpl(basePrefs)
     }
 
@@ -168,7 +168,7 @@ open class Application : MultiDexApplication() {
         FirebaseAnalyticsManager(firebaseAnalytics)
     }
 
-    public val secureDataManager: SecureDataManager by lazy {
+    val secureDataManager: SecureDataManager by lazy {
         SecureDataManagerImpl(prefs)
     }
 
