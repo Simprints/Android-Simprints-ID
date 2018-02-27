@@ -4,6 +4,9 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.secure.SecureDataManager
 
 class SecureDataManagerMock : SecureDataManager {
+    override fun getSignedInLegacyApiKeyOrEmpty(): String {
+        throw RuntimeException("Not mocked!!!")
+    }
 
     override fun getSignedInProjectIdOrEmpty(): String {
         throw RuntimeException("Not mocked!!!")

@@ -81,9 +81,13 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        //If it's a LOGIN_REQUEST_CODE or tryAgainAfter error, they will be handled in the onResume
-        val isAlertErrorResultForCloseButton = requestCode == InternalConstants.ALERT_ACTIVITY_REQUEST && resultCode == Activity.RESULT_CANCELED
-        if (requestCode != LoginActivity.LOGIN_REQUEST_CODE || isAlertErrorResultForCloseButton) {
+        // We need to call setResult and finish when the either MainActivity returns a result
+        // that needs to be forward back to the calling app or the user tapped on "close" button (RESULT_CANCELED)
+        // in a error screen.
+        // If the activity doesn't finish, then we check again the SignedInState in onResume.
+        if (requestCode == MAIN_ACTIVITY_REQUEST ||
+            requestCode == InternalConstants.ALERT_ACTIVITY_REQUEST && resultCode == Activity.RESULT_CANCELED) {
+
             setResult(resultCode, data)
             finish()
         }
