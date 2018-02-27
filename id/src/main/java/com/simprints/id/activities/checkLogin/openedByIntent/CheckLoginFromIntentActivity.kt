@@ -1,5 +1,6 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -81,8 +82,8 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         //If it's a LOGIN_REQUEST_CODE or tryAgainAfter error, they will be handled in the onResume
-        val isTryAgainAfterError = requestCode == InternalConstants.ALERT_ACTIVITY_REQUEST && resultCode == InternalConstants.RESULT_TRY_AGAIN
-        if (requestCode != LoginActivity.LOGIN_REQUEST_CODE || !isTryAgainAfterError) {
+        val isAlertErrorResultForCloseButton = requestCode == InternalConstants.ALERT_ACTIVITY_REQUEST && resultCode == Activity.RESULT_CANCELED
+        if (requestCode != LoginActivity.LOGIN_REQUEST_CODE || isAlertErrorResultForCloseButton) {
             setResult(resultCode, data)
             finish()
         }

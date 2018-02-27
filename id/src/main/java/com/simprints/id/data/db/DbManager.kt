@@ -41,8 +41,8 @@ interface DbManager : LocalDbManager, RemoteDbManager {
 
     fun saveRefusalForm(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String)
 
-    fun syncGlobal(projectId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
-    fun syncUser(projectId: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
+    fun syncGlobal(legacyApiKey: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
+    fun syncUser(legacyApiKey: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
 
     fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback)
 }
