@@ -246,7 +246,7 @@ def copyGoogleServicesJsonTask(variantName, gcpProject) {
     }
 }
 
-copyGoogleServicesJsonTask("debug", "simprints-dev")
+copyGoogleServicesJsonTask("debug", getDevProjectId())
 copyGoogleServicesJsonTask("release", "simprints-152315")
 copyGoogleServicesJsonTask("endToEndTesting", "simprints-test")
 
