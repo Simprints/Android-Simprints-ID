@@ -272,6 +272,9 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             case 4:
                 dataManager.setLanguage("fa-rAF");
                 dataManager.setLanguagePosition(4);
+            case 5:
+                dataManager.setLanguage("so");
+                dataManager.setLanguagePosition(5);
         }
     }
 
