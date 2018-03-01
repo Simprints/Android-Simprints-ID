@@ -39,7 +39,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     fun successfulResponse_userShouldSignIn() {
 
         val authenticator = ProjectAuthenticator(
-            SecureDataManagerMock(),
+            mockSecureDataManager(),
             app.dataManager,
             SafetyNet.getClient(app),
             createMockService(ApiService().retrofit, 0),
@@ -62,7 +62,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
         val nonceScope = NonceScope("project_id", "user_id")
 
         val testObserver = ProjectAuthenticator(
-            SecureDataManagerMock(),
+            mockSecureDataManager(),
             app.dataManager,
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(ApiService().retrofit))

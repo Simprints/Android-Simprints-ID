@@ -16,7 +16,6 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
-import org.jetbrains.anko.startActivityForResult
 
 // App launched when user open SimprintsID using a client app (by intent)
 open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
@@ -69,8 +68,10 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         launchAlert(alertType)
     }
 
-    override fun openLoginActivity() {
-        startActivityForResult<LoginActivity>(LOGIN_REQUEST_CODE)
+    override fun openLoginActivity(legacyApiKey: String) {
+        val loginIntent = Intent(this, LoginActivity::class.java)
+        loginIntent.putExtra(LoginActivity.LEGACY_API_KEY_PARAM, legacyApiKey)
+        startActivityForResult(loginIntent, LOGIN_REQUEST_CODE)
     }
 
     override fun finishCheckLoginFromIntentActivity() {

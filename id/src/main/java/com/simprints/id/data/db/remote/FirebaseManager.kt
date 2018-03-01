@@ -15,6 +15,7 @@ import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.tools.extensions.md5
 import com.simprints.libcommon.Person
 import com.simprints.libdata.DATA_ERROR
 import com.simprints.libdata.DataCallback
@@ -131,8 +132,12 @@ class FirebaseManager(private val appContext: Context,
         // to a projectId and use it for any task. In this case, we need the legacyApiKey
         // so we grab through the Application to avoid injecting it through all methods, so it will be easier
         // to get rid of it.
-        val legacyApiKey = (appContext as Application).secureDataManager.legacyApiKeyForProjectIdOrEmpty(projectId)
-        return firebaseUser.uid == if (legacyApiKey.isNotEmpty()) legacyApiKey else projectId
+        val md5LegacyApiKey = (appContext as Application).secureDataManager.getMd5LegacyApiKeyForProjectIdOrEmpty(projectId)
+        return if (md5LegacyApiKey.isNotEmpty()) {
+            firebaseUser.uid.md5() == md5LegacyApiKey
+        } else {
+            firebaseUser.uid == projectId
+        }
     }
 
     // Data transfer

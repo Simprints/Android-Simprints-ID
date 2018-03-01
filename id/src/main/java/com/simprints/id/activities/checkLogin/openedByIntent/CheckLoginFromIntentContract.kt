@@ -8,7 +8,7 @@ import com.simprints.id.domain.callout.Callout
 interface CheckLoginFromIntentContract {
 
     interface View : BaseView<Presenter>, CheckLoginContract.View {
-        fun openLoginActivity()
+        fun openLoginActivity(legacyApiKey: String)
         fun openLaunchActivity()
 
         fun checkCallingAppIsFromKnownSource()

@@ -2,6 +2,7 @@ package com.simprints.id.data.secure
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.safe.CredentialMissingException
+import com.simprints.id.tools.extensions.md5
 
 class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
 
@@ -58,13 +59,7 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             ""
         }
 
-    override fun getSignedInLegacyApiKeyOrEmpty(): String =
-        try {
-            val projectId = getSignedInProjectIdOrEmpty()
-            legacyApiKeyForProjectIdOrEmpty(projectId)
-        } catch (e: CredentialMissingException) {
-            ""
-        }
+    override fun getSignedInMd5LegacyApiKeyOrEmpty(): String = getMd5LegacyApiKeyForProjectIdOrEmpty(getSignedInProjectIdOrEmpty())
 
     override fun getSignedInProjectIdOrEmpty(): String =
         try {
@@ -88,9 +83,9 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
     override fun cleanCredentials() {
 
         val projectId = getSignedInProjectIdOrEmpty()
-        val possibleLegacyApiKey = prefs.getPrimitive(projectId, "") // FIXME
+        val possibleMd5LegacyApiKey = prefs.getPrimitive(projectId, "")
         prefs.edit().putPrimitive(projectId, "").commit()
-        prefs.edit().putPrimitive(possibleLegacyApiKey, "").commit()
+        prefs.edit().putPrimitive(possibleMd5LegacyApiKey, "").commit()
 
         encryptedProjectSecret = ""
         signedInProjectId = ""
@@ -99,13 +94,12 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
 
     override fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?) {
         if (legacyApiKey != null && legacyApiKey.isNotEmpty()) {
-
-            //TODO: to be refactored when SecureDataManager will support multiple projects
-            prefs.edit().putPrimitive(legacyApiKey, projectId).commit()
-            prefs.edit().putPrimitive(projectId, legacyApiKey).commit()
+            val md5LegacyApiKey = legacyApiKey.md5()
+            prefs.edit().putPrimitive(md5LegacyApiKey, projectId).commit()
+            prefs.edit().putPrimitive(projectId, md5LegacyApiKey).commit()
         }
     }
 
-    override fun legacyApiKeyForProjectIdOrEmpty(projectId: String): String = prefs.getString(projectId, "")
-    override fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String = prefs.getString(legacyApiKey, "")
+    override fun getMd5LegacyApiKeyForProjectIdOrEmpty(projectId: String): String = prefs.getString(projectId, "")
+    override fun getProjectIdForMd5LegacyApiKeyOrEmpty(md5LegacyApiKey: String): String = prefs.getString(md5LegacyApiKey, "")
 }

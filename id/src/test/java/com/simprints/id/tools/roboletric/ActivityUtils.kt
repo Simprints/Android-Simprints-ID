@@ -16,8 +16,8 @@ inline fun createRoboCheckLoginMainLauncherAppActivity(): ActivityController<Che
     return Robolectric.buildActivity(CheckLoginFromMainLauncherActivity::class.java).create()
 }
 
-inline fun createRoboLoginActivity(): ActivityController<LoginActivity> {
-    return Robolectric.buildActivity(LoginActivity::class.java).create()
+inline fun createRoboLoginActivity(startIntent: Intent = Intent()): ActivityController<LoginActivity> {
+    return Robolectric.buildActivity(LoginActivity::class.java, startIntent).create()
 }
 
 inline fun createRoboLaunchActivity(): ActivityController<LaunchActivity> {

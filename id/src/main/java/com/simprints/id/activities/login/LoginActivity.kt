@@ -19,6 +19,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     companion object {
         const val LOGIN_SUCCEED: Int = 1
         const val QR_REQUEST_CODE: Int = 0
+        const val LEGACY_API_KEY_PARAM = "legacyApiKey"
         const val QR_RESULT_KEY = "SCAN_RESULT"
         const val GOOGLE_PLAY_LINK_FOR_QR_APP =
             "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
@@ -26,6 +27,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override lateinit var viewPresenter: LoginContract.Presenter
 
+    private var possibleLegacyApiKey: String? = null
     val app by lazy {
         application as Application
     }
@@ -36,6 +38,12 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         initUI()
+
+        intent.getStringExtra(LEGACY_API_KEY_PARAM)?.let {
+            if (it.isNotEmpty()) {
+                possibleLegacyApiKey = it
+            }
+        }
 
         val projectAuthenticator = ProjectAuthenticator(app.secureDataManager, app.dataManager, SafetyNet.getClient(this))
         viewPresenter = LoginPresenter(this, app.secureDataManager, projectAuthenticator)
@@ -50,7 +58,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
             val projectId = loginEditTextProjectId.text.toString()
             val projectSecret = loginEditTextProjectSecret.text.toString()
             val userId = loginEditTextUserId.text.toString()
-            viewPresenter.userDidWantToSignIn(projectId, projectSecret, userId, app.dataManager.apiKey)
+            viewPresenter.userDidWantToSignIn(projectId, projectSecret, userId, possibleLegacyApiKey)
         }
     }
 

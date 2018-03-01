@@ -28,7 +28,6 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
-import org.robolectric.android.controller.ActivityController
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
@@ -40,6 +39,8 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         const val DEFAULT_PROJECT_ID = "some_project_id"
         const val DEFAULT_PROJECT_SECRET = "some_project_secret"
         const val DEFAULT_USER_ID = "some_user_id"
+        const val DEFAULT_MODULE_ID = "some_module_id"
+        const val DEFAULT_LEGACY_API_KEY = "96307ff9-873b-45e0-8ef0-b2efd5bef12d"
     }
 
     private lateinit var analyticsManagerMock: AnalyticsManager
@@ -95,13 +96,13 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
     @Test
     fun validIntentParams_extractParamsForLogin() {
 
-        val intent = createACallingAppIntent("com.simprints.id.REGISTER", "some_projectId", "some_userId")
+        val intent = createACallingAppIntentWithProjectId()
 
         val controller = createRoboCheckLoginFromIntentViewActivity(intent).start()
         controller.resume().visible()
 
-        Assert.assertEquals("some_projectId", app.dataManager.projectId)
-        Assert.assertEquals("some_userId", app.dataManager.userId)
+        Assert.assertEquals(DEFAULT_PROJECT_ID, app.dataManager.projectId)
+        Assert.assertEquals(DEFAULT_USER_ID, app.dataManager.userId)
     }
 
     @Test
@@ -117,20 +118,40 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
     @Test
     fun userIsLogged_shouldLaunchActComeUp() {
 
-        val activity = startCheckLoginActivity(true)
+        setUserLogInState(true)
+        val checkLoginIntent = createACallingAppIntentWithLegacyApiKey()
+        val activity = startCheckLoginFromIntentActivity(checkLoginIntent)
+
         assertActivityStarted(LaunchActivity::class.java, activity)
     }
 
     @Test
     fun userIsNotLogged_shouldLoginActComeUp() {
 
-        val activity = startCheckLoginActivity(false)
+        setUserLogInState(false)
+        val checkLoginIntent = createACallingAppIntentWithProjectId()
+        val activity = startCheckLoginFromIntentActivity(checkLoginIntent)
+
         assertActivityStarted(LoginActivity::class.java, activity)
     }
 
     @Test
+    fun userIsNotLoggedAndCallingAppUsesApiLegacyKey_shouldLoginActWithLegacyApiKeyComeUp() {
+
+        setUserLogInState(false)
+        val checkLoginIntent = createACallingAppIntentWithLegacyApiKey()
+        val activity = startCheckLoginFromIntentActivity(checkLoginIntent)
+        val sActivity = shadowOf(activity)
+        val intent = sActivity.nextStartedActivity
+        assertActivityStarted(LoginActivity::class.java, intent)
+        assertEquals(DEFAULT_LEGACY_API_KEY, intent.getStringExtra(LoginActivity.LEGACY_API_KEY_PARAM))
+    }
+
+    @Test
     fun normalFlowReturnsAResult_shouldForwardItBackToCallingApp() {
-        val activity = startCheckLoginActivity(true)
+        setUserLogInState(true)
+        val loginIntent = createACallingAppIntentWithProjectId()
+        val activity = startCheckLoginFromIntentActivity(loginIntent)
         val sActivity = shadowOf(activity)
 
         assertFalse(sActivity.isFinishing)
@@ -149,7 +170,9 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
     @Test
     fun loginSucceed_shouldOpenLaunchActivity() {
-        val controller = createCheckLoginController(false)
+        setUserLogInState(false)
+        val loginIntent = createACallingAppIntentWithProjectId()
+        val controller = createRoboCheckLoginFromIntentViewActivity(loginIntent).start()
         val activity = controller.get() as CheckLoginFromIntentActivity
         controller.resume().visible()
         val sActivity = shadowOf(activity)
@@ -172,7 +195,9 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
     @Test
     fun loginFailed_shouldCloseApp() {
-        val controller = createCheckLoginController(false)
+        setUserLogInState(false)
+        val loginIntent = createACallingAppIntentWithProjectId()
+        val controller = createRoboCheckLoginFromIntentViewActivity(loginIntent).start()
         val activity = controller.get() as CheckLoginFromIntentActivity
         controller.resume().visible()
         val sActivity = shadowOf(activity)
@@ -190,27 +215,12 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         assertTrue(activity.isFinishing)
     }
 
-    // if logged is true, it sets the login credentials in the shared prefs and creates an intent
-    // with the same values to start the login activity.
-    private fun startCheckLoginActivity(logged: Boolean,
-                                        actionString: String = DEFAULT_ACTION,
-                                        projectId: String = DEFAULT_PROJECT_ID,
-                                        userId: String = DEFAULT_USER_ID): CheckLoginFromIntentActivity {
+    private fun startCheckLoginFromIntentActivity(intent: Intent): CheckLoginFromIntentActivity {
 
-        val controller = createCheckLoginController(logged, actionString, projectId, userId)
+        val controller = createRoboCheckLoginFromIntentViewActivity(intent).start()
         val activity = controller.get() as CheckLoginFromIntentActivity
         controller.resume().visible()
         return activity
-    }
-
-    private fun createCheckLoginController(logged: Boolean,
-                                           actionString: String = DEFAULT_ACTION,
-                                           projectId: String = DEFAULT_PROJECT_ID,
-                                           userId: String = DEFAULT_USER_ID): ActivityController<CheckLoginFromIntentActivity> {
-
-        setUserLogInState(logged, projectId, userId)
-        val intent = createACallingAppIntent(actionString, projectId, userId)
-        return createRoboCheckLoginFromIntentViewActivity(intent).start()
     }
 
     private fun setUserLogInState(logged: Boolean,
@@ -225,10 +235,28 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         editor.putBoolean("IS_FIREBASE_TOKEN_VALID", logged).apply()
     }
 
-    private fun createACallingAppIntent(actionString: String, projectId: String = "", userId: String = "", moduleId: String = ""): Intent {
+    private fun createACallingAppIntentWithLegacyApiKey(actionString: String = DEFAULT_ACTION,
+                                        legacyApiKey: String = DEFAULT_LEGACY_API_KEY,
+                                        userId: String = DEFAULT_USER_ID,
+                                        moduleId: String = DEFAULT_MODULE_ID): Intent {
+
+        return createACallingAppIntent(actionString, userId, moduleId).also { it.putExtra("apiKey", legacyApiKey) }
+    }
+
+    private fun createACallingAppIntentWithProjectId(actionString: String = DEFAULT_ACTION,
+                                        projectId: String = DEFAULT_PROJECT_ID,
+                                        userId: String = DEFAULT_USER_ID,
+                                        moduleId: String = DEFAULT_MODULE_ID): Intent {
+
+        return createACallingAppIntent(actionString, userId, moduleId).also { it.putExtra("projectId", projectId) }
+    }
+
+    private fun createACallingAppIntent(actionString: String,
+                                        userId: String = "",
+                                        moduleId: String = ""): Intent {
+
         return Intent().apply {
             action = actionString
-            putExtra("projectId", projectId)
             putExtra("userId", userId)
             putExtra("moduleId", moduleId)
         }
