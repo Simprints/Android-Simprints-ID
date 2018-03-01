@@ -32,12 +32,15 @@ class LoginPresenter(val view: LoginContract.View,
             possibleUserId.isNotEmpty()) {
 
             view.showProgressDialog()
+            secureDataManager.cleanCredentials()
             projectAuthenticator.authenticate(
                 NonceScope(possibleProjectId, possibleUserId),
                 possibleProjectSecret)
                 .subscribe(
                     {
-                        secureDataManager.storeProjectIdWithLegacyApiKeyPair(possibleProjectId, possibleLegacyApiKey)
+                        if (possibleLegacyApiKey != null) {
+                            secureDataManager.storeProjectIdWithLegacyApiKeyPair(possibleProjectId, possibleLegacyApiKey)
+                        }
                         secureDataManager.signedInProjectId = possibleProjectId
                         secureDataManager.signedInUserId = possibleUserId
                         view.dismissProgressDialog()
@@ -47,7 +50,6 @@ class LoginPresenter(val view: LoginContract.View,
                         e.printStackTrace()
                         view.dismissProgressDialog()
                         view.showToast(R.string.login_invalidCredentials)
-                        secureDataManager.cleanCredentials()
                     })
         } else {
             view.showToast(R.string.login_missing_credentials)

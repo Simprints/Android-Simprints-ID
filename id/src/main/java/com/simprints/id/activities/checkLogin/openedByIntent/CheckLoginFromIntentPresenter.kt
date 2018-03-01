@@ -14,6 +14,8 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     CheckLoginPresenter(view, dataManager, timeHelper), CheckLoginFromIntentContract.Presenter {
 
     private var loginAlreadyTried: Boolean = false
+    private var possibleLegacyApiKey: String = ""
+    private var setupFailed: Boolean = false
 
     override fun setup() {
         view.checkCallingAppIsFromKnownSource()
@@ -22,17 +24,21 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             extractSessionParameters()
         } catch (exception: InvalidCalloutError) {
             view.openAlertActivityForError(exception.alertType)
+            setupFailed = true
         }
     }
 
     override fun start() {
-        checkSignedInStateAndMoveOn()
+        if (!setupFailed) {
+            checkSignedInStateAndMoveOn()
+        }
     }
 
     private fun extractSessionParameters() {
         val callout = view.parseCallout()
         dataManager.logCallout(callout)
         val sessionParameters = sessionParametersExtractor.extractFrom(callout)
+        possibleLegacyApiKey = sessionParameters.apiKey
         dataManager.sessionParameters = sessionParameters
         dataManager.logUserProperties()
     }
@@ -40,7 +46,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     override fun handleNotSignedInUser() {
         if (!loginAlreadyTried) {
             loginAlreadyTried = true
-            view.openLoginActivity()
+            view.openLoginActivity(possibleLegacyApiKey)
         } else {
             view.finishCheckLoginFromIntentActivity()
         }

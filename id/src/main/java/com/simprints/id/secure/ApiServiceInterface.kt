@@ -14,7 +14,7 @@ interface ApiServiceInterface {
     companion object {
         private const val apiVersion = "2018-1-0-dev5"
         const val baseUrl = "https://$apiVersion-dot-project-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
-        const val apiKey: String = "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s"
+        private const val apiKey: String = "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s"
     }
 
     @GET("/nonces")

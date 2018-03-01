@@ -5,6 +5,7 @@ import android.content.Intent
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
+import com.simprints.id.tools.extensions.md5
 import com.simprints.libsimprints.Constants.*
 
 class GuidSelectionService : IntentService("GuidSelectionService") {
@@ -65,7 +66,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
         var signed = false
         if (!apiKey.isEmpty()) {
-            val projectId = dataManager.projectIdForLegacyApiKeyOrEmpty(apiKey)
+            val projectId = dataManager.getProjectIdForMd5LegacyApiKeyOrEmpty(apiKey.md5())
             signed = dataManager.isProjectIdSignedIn(projectId)
         }
 

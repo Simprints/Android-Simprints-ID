@@ -6,6 +6,7 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
+import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.testUtils.anyNotNull
@@ -31,6 +32,12 @@ import org.robolectric.shadows.ShadowToast
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class, application = TestApplication::class)
 class LoginActivityTest {
+
+    companion object {
+        const val DEFAULT_PROJECT_ID = "some_project_id"
+        const val DEFAULT_PROJECT_SECRET = "some_project_secret"
+        const val DEFAULT_USER_ID = "some_user_id"
+    }
 
     private lateinit var app: Application
 
@@ -169,6 +176,27 @@ class LoginActivityTest {
                 "some_project_id",
                 "some_project_secret",
                 "some_user_id",
-                "")
+                null)
+    }
+
+    @Test
+    fun passedLegacyApiKey_shouldLoginInAndStoreIt() {
+        val intent = Intent()
+        intent.putExtra(LoginActivity.LEGACY_API_KEY_PARAM, "some_legacy_api_key")
+        val controller = createRoboLoginActivity(intent).start().resume().visible()
+        val act = controller.get()
+        act.loginEditTextUserId.setText(DEFAULT_USER_ID)
+        act.loginEditTextProjectId.setText(DEFAULT_PROJECT_ID)
+        act.loginEditTextProjectSecret.setText(DEFAULT_PROJECT_SECRET)
+        act.viewPresenter = mock(LoginPresenter::class.java)
+
+        act.loginButtonSignIn.performClick()
+
+        Mockito.verify(act.viewPresenter, Mockito.times(1))
+            .userDidWantToSignIn(
+                DEFAULT_PROJECT_ID,
+                DEFAULT_PROJECT_SECRET,
+                DEFAULT_USER_ID,
+                "some_legacy_api_key")
     }
 }
