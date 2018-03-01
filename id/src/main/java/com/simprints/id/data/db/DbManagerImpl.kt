@@ -26,14 +26,8 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     // Lifecycle
 
-    override fun initialiseDb(projectId: String): Single<Unit> {
+    override fun initialiseDb(projectId: String) {
         remoteDbManager.initialiseRemoteDb()
-
-        return if (projectId.isNotEmpty()) {
-            getLocalKeyAndSignInToLocal(projectId)
-        } else {
-            Single.just(Unit)
-        }
     }
 
     override fun getLocalKeyAndSignInToLocal(projectId: String): Single<Unit> =
@@ -109,7 +103,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     fun getSyncManager(legacyApiKey: String): NaiveSyncManager =
         // if localDbManager.realmConfig is null, the user is not signed in and we should not be here,
         // TODO: that is temporary, we will fix in the migration firestore
-        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), legacyApiKey, localDbManager.realmConfig!!)
+        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), legacyApiKey, localDbManager.getValidRealmConfig())
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
         val firebaseManager = remoteDbManager as FirebaseManager

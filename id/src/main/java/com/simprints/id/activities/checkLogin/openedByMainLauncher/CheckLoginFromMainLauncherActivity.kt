@@ -15,7 +15,7 @@ import org.jetbrains.anko.startActivity
 // App launched when user open SimprintsID using the Home button
 open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginFromMainLauncherContract.View {
 
-    private lateinit var viewPresenter: CheckLoginFromMainLauncherContract.Presenter
+    override lateinit var viewPresenter: CheckLoginFromMainLauncherContract.Presenter
     private val app: Application by lazy { application as Application }
     private val dataManager: DataManager by lazy { app.dataManager }
     private val timeHelper by lazy { app.timeHelper }
@@ -30,16 +30,12 @@ open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginF
             timeHelper)
     }
 
-    override fun setPresenter(presenter: CheckLoginFromMainLauncherContract.Presenter) {
-        viewPresenter = presenter
-    }
-
     override fun onResume() {
         super.onResume()
         viewPresenter.start()
     }
 
-    override fun launchAlertForError(alertType: ALERT_TYPE) {
+    override fun openAlertActivityForError(alertType: ALERT_TYPE) {
         launchAlert(alertType)
     }
 

@@ -11,9 +11,9 @@ interface CheckLoginFromIntentContract {
         fun openLoginActivity()
         fun openLaunchActivity()
 
-        fun checkCallingApp()
+        fun checkCallingAppIsFromKnownSource()
         fun parseCallout(): Callout
-        fun finishAct()
+        fun finishCheckLoginFromIntentActivity()
     }
 
     interface Presenter : BasePresenter {

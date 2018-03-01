@@ -11,17 +11,19 @@ import com.simprints.libdata.tools.Constants
 import com.simprints.libdata.tools.Utils.wrapCallback
 import io.reactivex.Single
 import io.realm.Realm
-import io.realm.RealmChangeListener
 import io.realm.RealmConfiguration
 import io.realm.RealmResults
 import timber.log.Timber
 
 class RealmDbManager(appContext: Context) : LocalDbManager {
 
-    var realm: Realm? = null
-    override var realmConfig: RealmConfiguration? = null
+    companion object {
+        private const val USER_ID_FIELD = "userId"
+        private const val PATIENT_ID_FIELD = "patientId"
+        private const val MODULE_ID_FIELD = "moduleId"
+    }
 
-    // Lifecycle
+    var realmConfig: RealmConfiguration? = null
 
     init {
         Realm.init(appContext)
@@ -31,7 +33,8 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         Single.create<Unit> {
             Timber.d("Signing to Realm project $projectId with key: $localDbKey")
             realmConfig = RealmConfig.get(localDbKey)
-            realm = Realm.getInstance(realmConfig)
+            val realm = getRealmInstance()
+            realm.close()
             it.onSuccess(Unit)
         }
 
@@ -43,22 +46,21 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         realmConfig != null
 
     // Data transfer
-
     override fun savePersonInLocal(fbPerson: fb_Person) {
-        realm?.let { realm ->
-            rl_Person(fbPerson).save(realm)
-        } ?: throw RealmUninitialisedError()
+        val realm = getRealmInstance()
+        rl_Person(fbPerson).save(realm)
+        realm.close()
     }
 
     override fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback) {
         val wrappedCallback = wrapCallback("DatabaseContext.loadPerson()", callback)
-        val realm = Realm.getInstance(realmConfig)
 
-        val rlPerson = realm.where(rl_Person::class.java).equalTo("patientId", guid).findFirst()
+        val realm = getRealmInstance()
+        val rlPerson = realm.where(rl_Person::class.java).equalTo(PATIENT_ID_FIELD, guid).findFirst()
+        realm.close()
         if (rlPerson != null) {
             destinationList.add(rlPerson.libPerson)
             wrappedCallback.onSuccess()
-            return
         }
     }
 
@@ -66,24 +68,33 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
                                      group: Constants.GROUP, userId: String, moduleId: String,
                                      callback: DataCallback?) {
         val wrappedCallback = wrapCallback("RealmDbManager.loadPeopleFromLocal()", callback)
-        val realm = Realm.getInstance(realmConfig)
+
+        val realm = getRealmInstance()
         val request: RealmResults<rl_Person> = when (group) {
             Constants.GROUP.GLOBAL -> realm.where(rl_Person::class.java).findAllAsync()
-            Constants.GROUP.USER -> realm.where(rl_Person::class.java).equalTo("userId", userId).findAllAsync()
-            Constants.GROUP.MODULE -> realm.where(rl_Person::class.java).equalTo("moduleId", moduleId).findAllAsync()
+            Constants.GROUP.USER -> realm.where(rl_Person::class.java).equalTo(USER_ID_FIELD, userId).findAllAsync()
+            Constants.GROUP.MODULE -> realm.where(rl_Person::class.java).equalTo(MODULE_ID_FIELD, moduleId).findAllAsync()
         }
-        request.addChangeListener(object : RealmChangeListener<RealmResults<rl_Person>> {
-            override fun onChange(results: RealmResults<rl_Person>) {
-                request.removeChangeListener(this)
-                results.mapTo(destinationList) { it.libPerson }
-                realm.close()
-                wrappedCallback.onSuccess()
-            }
+        request.addChangeListener({ results: RealmResults<rl_Person> ->
+            request.removeAllChangeListeners()
+            results.mapTo(destinationList) { it.libPerson }
+            realm.close()
+            wrappedCallback.onSuccess()
         })
     }
 
     override fun getPeopleCountFromLocal(group: Constants.GROUP, userId: String, moduleId: String): Long {
-        val realm = Realm.getInstance(realmConfig)
-        return rl_Person.count(realm, userId, moduleId, group)
+        val realm = getRealmInstance()
+        val count = rl_Person.count(realm, userId, moduleId, group)
+        realm.close()
+        return count
+    }
+
+    private fun getRealmInstance(): Realm {
+        return Realm.getInstance(realmConfig) ?: throw RealmUninitialisedError()
+    }
+
+    override fun getValidRealmConfig(): RealmConfiguration {
+        return realmConfig ?: throw RealmUninitialisedError()
     }
 }

@@ -14,7 +14,6 @@ import com.simprints.id.domain.callout.Callout.Companion.toCallout
 import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants
-import com.simprints.id.tools.InternalConstants.MAIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
 import org.jetbrains.anko.startActivityForResult
@@ -22,7 +21,14 @@ import org.jetbrains.anko.startActivityForResult
 // App launched when user open SimprintsID using a client app (by intent)
 open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
 
-    private lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
+    companion object {
+        const val LOGIN_REQUEST_CODE: Int = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 1
+        private const val LAUNCH_ACTIVITY_REQUEST_CODE = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 2
+        private const val ALERT_ACTIVITY_REQUEST_CODE = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 3
+    }
+
+    override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
+
     private val app: Application by lazy { application as Application }
     private val dataManager: DataManager by lazy { app.dataManager }
     private val timeHelper by lazy { app.timeHelper }
@@ -45,48 +51,45 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         viewPresenter.start()
     }
 
-    override fun setPresenter(presenter: CheckLoginFromIntentContract.Presenter) {
-        viewPresenter = presenter
-    }
-
     override fun parseCallout(): Callout =
         intent.toCallout()
 
-    override fun checkCallingApp() {
+    override fun checkCallingAppIsFromKnownSource() {
         dataManager.callingPackage = getCallingPackageName()
         if (app.packageManager.isCallingAppFromUnknownSource(dataManager.callingPackage)) {
             dataManager.logSafeException(CallingAppFromUnknownSourceException())
         }
     }
 
-    open fun getCallingPackageName(): String {
+    fun getCallingPackageName(): String {
         return callingPackage ?: ""
     }
 
-    override fun launchAlertForError(alertType: ALERT_TYPE) {
+    override fun openAlertActivityForError(alertType: ALERT_TYPE) {
         launchAlert(alertType)
     }
 
     override fun openLoginActivity() {
-        startActivityForResult<LoginActivity>(LoginActivity.LOGIN_REQUEST_CODE)
+        startActivityForResult<LoginActivity>(LOGIN_REQUEST_CODE)
     }
 
-    override fun finishAct() {
+    override fun finishCheckLoginFromIntentActivity() {
         finish()
     }
 
     override fun openLaunchActivity() {
         val nextIntent = Intent(this, LaunchActivity::class.java)
-        startActivityForResult(nextIntent, MAIN_ACTIVITY_REQUEST)
+        startActivityForResult(nextIntent, LAUNCH_ACTIVITY_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
         // We need to call setResult and finish when the either MainActivity returns a result
         // that needs to be forward back to the calling app or the user tapped on "close" button (RESULT_CANCELED)
         // in a error screen.
         // If the activity doesn't finish, then we check again the SignedInState in onResume.
-        if (requestCode == MAIN_ACTIVITY_REQUEST ||
-            requestCode == InternalConstants.ALERT_ACTIVITY_REQUEST && resultCode == Activity.RESULT_CANCELED) {
+        if (requestCode == LAUNCH_ACTIVITY_REQUEST_CODE ||
+            requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED) {
 
             setResult(resultCode, data)
             finish()

@@ -19,7 +19,7 @@ import io.reactivex.Single
 interface DbManager : LocalDbManager, RemoteDbManager {
 
     // Lifecycle
-    fun initialiseDb(projectId: String): Single<Unit>
+    fun initialiseDb(projectId: String)
     fun signIn(projectId: String, token: Tokens): Single<Unit>
     fun getLocalKeyAndSignInToLocal(projectId: String): Single<Unit>
 

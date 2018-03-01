@@ -9,10 +9,6 @@ class CheckLoginFromMainLauncherPresenter(
     val dataManager: DataManager,
     timeHelper: TimeHelper) : CheckLoginPresenter(view, dataManager, timeHelper), CheckLoginFromMainLauncherContract.Presenter {
 
-    init {
-        view.setPresenter(this)
-    }
-
     override fun start() {
         checkSignedInStateAndMoveOn()
     }

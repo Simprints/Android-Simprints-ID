@@ -1,10 +1,8 @@
 package com.simprints.id.data.db.remote
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.simprints.libdata.AuthListener
 import timber.log.Timber
-
 
 class FirebaseAuthListenerManager : RemoteDbAuthListenerManager {
 

@@ -9,7 +9,7 @@ import io.realm.RealmConfiguration
 
 interface LocalDbManager {
 
-    var realmConfig: RealmConfiguration?
+    fun getValidRealmConfig(): RealmConfiguration
 
     // Lifecycle
     fun signInToLocal(projectId: String, localDbKey: String): Single<Unit>

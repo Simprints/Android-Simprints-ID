@@ -20,8 +20,9 @@ fun mockRemoteDbManager(app: Application) {
 
 fun mockDbManager(app: Application) {
     val spy = Mockito.spy(app.dbManager)
-    Mockito.doReturn(SingleJust(Unit)).`when`(spy).initialiseDb(anyNotNull())
+    Mockito.doNothing().`when`(spy).initialiseDb(anyNotNull())
     Mockito.doReturn(SingleJust(Unit)).`when`(spy).signIn(anyNotNull(), anyNotNull())
+    Mockito.doReturn(SingleJust(Unit)).`when`(spy).getLocalKeyAndSignInToLocal(anyNotNull())
     app.dbManager = spy
 }
 

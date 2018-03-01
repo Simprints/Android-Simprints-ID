@@ -33,7 +33,6 @@ class AboutPresenter implements AboutContract.Presenter {
     AboutPresenter(@NonNull AboutContract.View view, DataManager dataManager, AlertLauncher alertLauncher) {
         this.dataManager = dataManager;
         aboutView = view;
-        aboutView.setPresenter(this);
         this.alertLauncher = alertLauncher;
     }
 

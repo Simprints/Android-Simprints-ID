@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.activity_dashboard.*
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
-    private lateinit var viewPresenter: DashboardContract.Presenter
+    override lateinit var viewPresenter: DashboardContract.Presenter
     private val app: Application by lazy { application as Application }
     private val dataManager: DataManager by lazy { app.dataManager }
 
@@ -57,10 +57,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         Toast.makeText(this,
             messageRes,
             Toast.LENGTH_LONG).show()
-    }
-
-    override fun setPresenter(presenter: DashboardContract.Presenter) {
-        viewPresenter = presenter
     }
 
     override fun getStringWithParams(stringRes: Int, currentValue: Int, maxValue: Int): String {

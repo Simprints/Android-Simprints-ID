@@ -18,14 +18,13 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     companion object {
         const val LOGIN_SUCCEED: Int = 1
-        const val LOGIN_REQUEST_CODE: Int = 1
         const val QR_REQUEST_CODE: Int = 0
         const val QR_RESULT_KEY = "SCAN_RESULT"
         const val GOOGLE_PLAY_LINK_FOR_QR_APP =
             "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
     }
 
-    lateinit var viewPresenter: LoginContract.Presenter
+    override lateinit var viewPresenter: LoginContract.Presenter
 
     val app by lazy {
         application as Application
@@ -41,10 +40,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         val projectAuthenticator = ProjectAuthenticator(app.secureDataManager, app.dataManager, SafetyNet.getClient(this))
         viewPresenter = LoginPresenter(this, app.secureDataManager, projectAuthenticator)
         viewPresenter.start()
-    }
-
-    override fun setPresenter(presenter: LoginContract.Presenter) {
-        viewPresenter = presenter
     }
 
     private fun initUI() {

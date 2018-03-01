@@ -5,6 +5,6 @@ import com.simprints.id.model.ALERT_TYPE
 interface CheckLoginContract {
 
     interface View {
-        fun launchAlertForError(alertType: ALERT_TYPE)
+        fun openAlertActivityForError(alertType: ALERT_TYPE)
     }
 }

@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,7 +22,7 @@ import com.simprints.id.tools.LanguageHelper;
 
 public class AboutActivity extends AppCompatActivity implements AboutContract.View {
 
-    private AboutContract.Presenter aboutPresenter;
+    private AboutContract.Presenter viewPresenter;
 
     TextView tv_appVersion;
     TextView tv_libsimprintsVersion;
@@ -73,7 +72,7 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
             public void onClick(View view) {
                 setRecoverDbUnavailable();
                 setStartRecovering();
-                aboutPresenter.recoverDb();
+                viewPresenter.recoverDb();
             }
         });
 
@@ -101,19 +100,14 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
                 }).create();
 
         // Create the presenter and pass it the information it needs
-        aboutPresenter = new AboutPresenter(this, dataManager, new AlertLauncher(this));
-    }
-
-    @Override
-    public void setPresenter(@NonNull AboutContract.Presenter presenter) {
-        aboutPresenter = presenter;
+        viewPresenter = new AboutPresenter(this, dataManager, new AlertLauncher(this));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         // Tell the Presenter to do what it needs when the Activity is loaded
-        aboutPresenter.start();
+        viewPresenter.start();
     }
 
     @Override
@@ -168,5 +162,15 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
         recoveryDialog.cancel();
         if (errorMessage != null) errorDialog.setMessage(errorMessage);
         errorDialog.show();
+    }
+
+    @Override
+    public AboutContract.Presenter getViewPresenter() {
+        return viewPresenter;
+    }
+
+    @Override
+    public void setViewPresenter(AboutContract.Presenter presenter) {
+        viewPresenter = presenter;
     }
 }
