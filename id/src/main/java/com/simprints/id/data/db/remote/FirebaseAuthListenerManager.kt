@@ -24,14 +24,15 @@ class FirebaseAuthListenerManager : RemoteDbAuthListenerManager {
         }
     }
 
-    override fun applyAuthListeners(firebaseAuth: FirebaseAuth) {
+    override fun attachAuthListeners(firebaseAuth: FirebaseAuth) {
         authDispatcher = createAuthStateListener()
         firebaseAuth.addAuthStateListener(authDispatcher)
-        Timber.d("Auth state listener set")
+        Timber.d("Auth state listener attached")
     }
 
-    override fun removeAuthListeners(firebaseAuth: FirebaseAuth) {
+    override fun detachAuthListeners(firebaseAuth: FirebaseAuth) {
         firebaseAuth.removeAuthStateListener(authDispatcher)
+        Timber.d("Auth state listener detached")
     }
 
     private fun createAuthStateListener() =
