@@ -85,7 +85,7 @@ class DataManagerImpl(private val context: Context,
     override fun initialiseDb() {
         dbManager.registerRemoteConnectionListener(connectionStateLogger)
         dbManager.registerRemoteAuthListener(authStateLogger)
-        dbManager.initialiseDb(getSignedInProjectIdOrEmpty())
+        dbManager.initialiseDb()
     }
 
     override fun signOut() {

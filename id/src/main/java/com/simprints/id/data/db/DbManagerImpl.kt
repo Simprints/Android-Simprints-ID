@@ -27,7 +27,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     // Lifecycle
 
-    override fun initialiseDb(projectId: String) {
+    override fun initialiseDb() {
         remoteDbManager.initialiseRemoteDb()
     }
 
@@ -36,9 +36,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
             .getLocalDbKeyFromRemote(projectId)
             .signInToLocal(projectId)
 
-    override fun signIn(projectId: String, token: Tokens): Single<Unit> =
+    override fun signIn(projectId: String, tokens: Tokens): Single<Unit> =
         remoteDbManager
-            .signInToRemoteDb(token)
+            .signInToRemoteDb(tokens)
             .flatMap {
                 getLocalKeyAndSignInToLocal(projectId)
             }
