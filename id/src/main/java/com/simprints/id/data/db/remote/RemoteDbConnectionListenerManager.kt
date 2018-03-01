@@ -10,6 +10,6 @@ interface RemoteDbConnectionListenerManager {
 
     fun registerRemoteConnectionListener(connectionListener: ConnectionListener)
     fun unregisterRemoteConnectionListener(connectionListener: ConnectionListener)
-    fun applyConnectionListeners(firebaseApp: FirebaseApp)
-    fun removeConnectionListeners(firebaseApp: FirebaseApp)
+    fun attachConnectionListeners(firebaseApp: FirebaseApp)
+    fun detachConnectionListeners(firebaseApp: FirebaseApp)
 }
