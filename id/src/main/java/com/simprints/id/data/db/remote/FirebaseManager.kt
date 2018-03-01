@@ -14,6 +14,7 @@ import com.simprints.id.Application
 import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
+import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.tools.extensions.md5
 import com.simprints.libcommon.Person
@@ -52,6 +53,7 @@ class FirebaseManager(private val appContext: Context,
 
     // Lifecycle
     override fun initialiseRemoteDb() {
+        if (isInitialised) throw DbAlreadyInitialisedError()
         initialiseLegacyFirebaseProject()
         initialiseFirestoreFirebaseProject()
         attachConnectionListeners(legacyFirebaseApp)
