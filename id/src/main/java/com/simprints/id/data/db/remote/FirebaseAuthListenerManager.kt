@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.remote
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.simprints.libdata.AuthListener
 import timber.log.Timber
 
@@ -37,29 +38,32 @@ class FirebaseAuthListenerManager : RemoteDbAuthListenerManager {
 
     private fun createAuthStateListener() =
         FirebaseAuth.AuthStateListener {
-            val firebaseUser = it.currentUser
-            if (firebaseUser != null) {
+            if (isFirebaseUserSignedIn(it.currentUser)) {
                 handleAuthStateSignedIn()
             } else {
                 handleAuthStateSignedOut()
             }
         }
 
+    private fun isFirebaseUserSignedIn(firebaseUser: FirebaseUser?) =
+        firebaseUser != null
+
     private fun handleAuthStateSignedIn() {
         Timber.d("Signed in")
-        synchronized(authListeners) {
-            for (authListener in authListeners)
-                authListener.onSignIn()
-        }
+        applyToAuthListeners { onSignIn() }
         isSignedIn = true
     }
 
     private fun handleAuthStateSignedOut() {
         Timber.d("Signed out")
+        applyToAuthListeners { onSignOut() }
+        isSignedIn = false
+    }
+
+    private fun applyToAuthListeners(operation: AuthListener.() -> Unit) {
         synchronized(authListeners) {
             for (authListener in authListeners)
-                authListener.onSignOut()
+                authListener.operation()
         }
-        isSignedIn = false
     }
 }
