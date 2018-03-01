@@ -12,10 +12,6 @@ import org.json.JSONObject
 
 class FirebaseOptionsHelper(private val context: Context) {
 
-    private lateinit var json: JSONObject
-    private lateinit var clientNode: JSONObject
-    private val builder = FirebaseOptions.Builder()
-
     fun getLegacyFirebaseOptions(): FirebaseOptions =
         getFirebaseOptionsFromGoogleServicesJson(legacyGoogleServicesJsonName)
 
@@ -23,14 +19,15 @@ class FirebaseOptionsHelper(private val context: Context) {
         getFirebaseOptionsFromGoogleServicesJson(firestoreGoogleServicesJsonName)
 
     private fun getFirebaseOptionsFromGoogleServicesJson(jsonName: String): FirebaseOptions {
-        json = getJsonFromGoogleServicesFile(jsonName)
-        clientNode = getClientNode(json)
-        populateFirebaseOptions()
+        val json = getJsonFromGoogleServicesFile(jsonName)
+        val clientNode = getClientNode(json)
+        val builder = FirebaseOptions.Builder()
+        populateFirebaseOptions(builder, json, clientNode)
         return builder.build()
     }
 
     private fun getJsonFromGoogleServicesFile(jsonName: String): JSONObject {
-        val id = context.resources.getIdentifier(jsonName, "raw", context.packageName)
+        val id = context.resources.getIdentifier(jsonName, rawResourcesName, context.packageName)
         if (isResourceIdMissing(id)) {
             throw GoogleServicesJsonNotFoundError.forFile(jsonName)
         }
@@ -41,83 +38,89 @@ class FirebaseOptionsHelper(private val context: Context) {
     private fun isResourceIdMissing(id: Int) = id == 0
 
     private fun getClientNode(json: JSONObject): JSONObject {
-        val clientArray = getFromJsonOrThrow {
-            json.getJSONArray("client")
-        } as JSONArray
-
+        val clientArray = json.doOrThrow {
+            getJSONArray(clientNode)
+        }
         return findClientNodeOrThrow(clientArray)
     }
 
-    private fun findClientNodeOrThrow(clientArray: JSONArray): JSONObject {
-        (0 until (clientArray.length()))
-                .map { clientArray.getJSONObject(it) }
-                .forEach {
-                    val possibleClientPackageName = getFromJsonOrThrow {
-                        it.getJSONObject("client_info").getJSONObject("android_client_info").getString("package_name")
-                    } as String
-                    if (possibleClientPackageName == context.packageName) return it
-                }
-        throw GoogleServicesJsonInvalidError()
+    private fun findClientNodeOrThrow(clientArray: JSONArray): JSONObject =
+        try {
+            clientArray
+                .iterateOnObjects()
+                .single { it.hasPackageName(context.packageName) }
+        } catch (e: Throwable) {
+            throw GoogleServicesJsonInvalidError()
+        }
+
+    private fun JSONArray.iterateOnObjects(): List<JSONObject> =
+        (0 until length())
+            .map { index -> getJSONObject(index) }
+
+    private fun JSONObject.hasPackageName(packageName: String): Boolean {
+        val clientPackageName = this.doOrThrow {
+            getJSONObject(clientInfoNode).getJSONObject(androidClientInfoNode).getString(packageNameNode)
+        }
+        return clientPackageName == packageName
     }
 
-    private fun populateFirebaseOptions() {
-        populateApiKey()
-        populateApplicationId()
-        populateDatabaseUrl()
-        populateGcmSenderId()
-        populateProjectId()
-        populateStorageBucket()
+    private fun populateFirebaseOptions(builder: FirebaseOptions.Builder, json: JSONObject, clientNode: JSONObject) {
+        populateApiKey(builder, clientNode)
+        populateApplicationId(builder, clientNode)
+        populateDatabaseUrl(builder, json)
+        populateGcmSenderId(builder, json)
+        populateProjectId(builder, json)
+        populateStorageBucket(builder, json)
     }
 
-    private fun populateApiKey() {
-        val apiKey = getFromJsonOrThrow {
-            clientNode.getJSONArray("api_key").getJSONObject(0).getString("current_key")
-        } as String
+    private fun populateApiKey(builder: FirebaseOptions.Builder, clientNode: JSONObject) {
+        val apiKey = clientNode.doOrThrow {
+            getJSONArray(apiKeyNode).getJSONObject(0).getString(currentApiKeyNode)
+        }
         builder.setApiKey(apiKey)
     }
 
-    private fun populateApplicationId() {
-        val appId = getFromJsonOrThrow {
-            clientNode.getJSONObject("client_info").getString("mobilesdk_app_id")
-        } as String
+    private fun populateApplicationId(builder: FirebaseOptions.Builder, clientNode: JSONObject) {
+        val appId = clientNode.doOrThrow {
+            getJSONObject(clientInfoNode).getString(applicationIdNode)
+        }
         builder.setApplicationId(appId)
     }
 
-    private fun populateDatabaseUrl() {
-        val databaseUrl = getFromJsonOrThrow {
-            json.getJSONObject("project_info").getString("firebase_url")
-        } as String
+    private fun populateDatabaseUrl(builder: FirebaseOptions.Builder, json: JSONObject) {
+        val databaseUrl = json.doOrThrow {
+            getJSONObject(projectInfoNode).getString(firebaseUrlNode)
+        }
         builder.setDatabaseUrl(databaseUrl)
     }
 
-    private fun populateGcmSenderId() {
-        val gcmSenderId = getFromJsonOrThrow {
-            json.getJSONObject("project_info").getString("project_number")
-        } as String
+    private fun populateGcmSenderId(builder: FirebaseOptions.Builder, json: JSONObject) {
+        val gcmSenderId = json.doOrThrow {
+            getJSONObject(projectInfoNode).getString(projectNumberNode)
+        }
         builder.setGcmSenderId(gcmSenderId)
     }
 
-    private fun populateProjectId() {
-        val projectId = getFromJsonOrThrow {
-            json.getJSONObject("project_info").getString("project_id")
-        } as String
+    private fun populateProjectId(builder: FirebaseOptions.Builder, json: JSONObject) {
+        val projectId = json.doOrThrow {
+            getJSONObject(projectInfoNode).getString(projectIdNode)
+        }
         builder.setProjectId(projectId)
     }
 
-    private fun populateStorageBucket() {
-        val storageBucket = getFromJsonOrThrow {
-            json.getJSONObject("project_info").getString("storage_bucket")
-        } as String
+    private fun populateStorageBucket(builder: FirebaseOptions.Builder, json: JSONObject) {
+        val storageBucket = json.doOrThrow {
+            getJSONObject(projectInfoNode).getString(storageBucketNode)
+        }
         builder.setStorageBucket(storageBucket)
     }
 
-    private fun getFromJsonOrThrow(f: () -> Any): Any {
-        return try {
-            f()
+    private fun <T : Any> JSONObject.doOrThrow(operation: JSONObject.() -> T): T =
+        try {
+            this.operation()
         } catch (e: JSONException) {
             throw GoogleServicesJsonInvalidError()
         }
-    }
 
     companion object {
 
@@ -126,5 +129,22 @@ class FirebaseOptionsHelper(private val context: Context) {
 
         private val firestoreGoogleServicesJsonName =
             "${BuildConfig.GCP_PROJECT}-fs-google-services".replace("-", "_")
+
+        private const val rawResourcesName = "raw"
+
+        private const val projectInfoNode = "project_info"
+        private const val firebaseUrlNode = "firebase_url"
+        private const val projectNumberNode = "project_number"
+        private const val projectIdNode = "project_id"
+        private const val storageBucketNode = "storage_bucket"
+
+        private const val clientNode = "client"
+        private const val clientInfoNode = "client_info"
+        private const val androidClientInfoNode = "android_client_info"
+        private const val packageNameNode = "package_name"
+        private const val applicationIdNode = "mobilesdk_app_id"
+        private const val apiKeyNode = "api_key"
+        private const val currentApiKeyNode = "current_key"
+
     }
 }
