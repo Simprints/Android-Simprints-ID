@@ -30,14 +30,14 @@ class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
         }
     }
 
-    override fun applyConnectionListeners(firebaseApp: FirebaseApp) {
+    override fun attachConnectionListeners(firebaseApp: FirebaseApp) {
         connectionDispatcher = connectionEventListener
         connectionDbRef = Utils.getDatabase(firebaseApp).getReference(".info/connected")
         connectionDbRef.addValueEventListener(connectionDispatcher)
         Timber.d("Connection listener set")
     }
 
-    override fun removeConnectionListeners(firebaseApp: FirebaseApp) {
+    override fun detachConnectionListeners(firebaseApp: FirebaseApp) {
         connectionDbRef.removeEventListener(connectionDispatcher)
     }
 
