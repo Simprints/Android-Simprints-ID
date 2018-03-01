@@ -9,12 +9,15 @@ import com.simprints.id.exceptions.unsafe.RemoteConnectionListenersAlreadyAttach
 import com.simprints.libdata.ConnectionListener
 import com.simprints.libdata.tools.Utils
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
 
-    @Volatile
-    override var isRemoteConnected = false
+    override val isRemoteConnected: Boolean
+        get() = isRemoteConnectedBackingField.get()
+    private val isRemoteConnectedBackingField: AtomicBoolean = AtomicBoolean(false)
+
     private lateinit var connectionDbRef: DatabaseReference
     private lateinit var connectionDispatcher: ValueEventListener
     private var connectionListeners = mutableSetOf<ConnectionListener>()
@@ -68,13 +71,13 @@ class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
     private fun handleConnected() {
         Timber.d("Connected")
         applyToConnectionListeners { onConnection() }
-        isRemoteConnected = true
+        isRemoteConnectedBackingField.set(true)
     }
 
     private fun handleDisconnected() {
         Timber.d("Disconnected")
         applyToConnectionListeners { onDisconnection() }
-        isRemoteConnected = false
+        isRemoteConnectedBackingField.set(false)
     }
 
     private fun applyToConnectionListeners(operation: ConnectionListener.() -> Unit) {
