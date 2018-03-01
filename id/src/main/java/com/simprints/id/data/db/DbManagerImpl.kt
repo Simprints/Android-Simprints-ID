@@ -1,6 +1,7 @@
 package com.simprints.id.data.db
 
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.models.Session
@@ -100,13 +101,14 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         getSyncManager(legacyApiKey).syncUser(userId, isInterrupted, emitter)
     }
 
-    fun getSyncManager(legacyApiKey: String): NaiveSyncManager =
+    private fun getSyncManager(legacyApiKey: String): NaiveSyncManager =
         // if localDbManager.realmConfig is null, the user is not signed in and we should not be here,
         // TODO: that is temporary, we will fix in the migration firestore
         NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), legacyApiKey, localDbManager.getValidRealmConfig())
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
         val firebaseManager = remoteDbManager as FirebaseManager
-        LocalDbRecovererImpl(firebaseManager, projectId, userId, androidId, moduleId, group, callback)
+        val realmManager = localDbManager as RealmDbManager
+        LocalDbRecovererImpl(realmManager, firebaseManager, projectId, userId, androidId, moduleId, group, callback).recoverDb()
     }
 }

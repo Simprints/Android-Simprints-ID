@@ -23,7 +23,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         private const val MODULE_ID_FIELD = "moduleId"
     }
 
-    var realmConfig: RealmConfiguration? = null
+    private var realmConfig: RealmConfiguration? = null
 
     init {
         Realm.init(appContext)
@@ -90,8 +90,10 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         return count
     }
 
-    private fun getRealmInstance(): Realm {
-        return Realm.getInstance(realmConfig) ?: throw RealmUninitialisedError()
+    override fun getRealmInstance(): Realm {
+        realmConfig?.let {
+            return Realm.getInstance(it) ?: throw RealmUninitialisedError()
+        } ?: throw RealmUninitialisedError()
     }
 
     override fun getValidRealmConfig(): RealmConfiguration {

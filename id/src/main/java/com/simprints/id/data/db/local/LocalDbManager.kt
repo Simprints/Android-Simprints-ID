@@ -5,11 +5,10 @@ import com.simprints.libdata.DataCallback
 import com.simprints.libdata.models.firebase.fb_Person
 import com.simprints.libdata.tools.Constants
 import io.reactivex.Single
+import io.realm.Realm
 import io.realm.RealmConfiguration
 
 interface LocalDbManager {
-
-    fun getValidRealmConfig(): RealmConfiguration
 
     // Lifecycle
     fun signInToLocal(projectId: String, localDbKey: String): Single<Unit>
@@ -21,4 +20,8 @@ interface LocalDbManager {
     fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
     fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
     fun getPeopleCountFromLocal(group: Constants.GROUP, userId: String, moduleId: String): Long
+
+    // Database instances
+    fun getValidRealmConfig(): RealmConfiguration
+    fun getRealmInstance(): Realm
 }
