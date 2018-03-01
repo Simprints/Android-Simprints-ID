@@ -12,7 +12,6 @@ abstract class CheckLoginPresenter (
 
     init {
         initSession()
-        dataManager.initialiseDb()
     }
 
     private fun initSession() {

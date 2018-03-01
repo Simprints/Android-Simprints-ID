@@ -6,10 +6,10 @@ import com.simprints.libdata.AuthListener
 
 interface RemoteDbAuthListenerManager {
 
-    var isSignedIn: Boolean
+    val isSignedIn: Boolean
 
     fun registerRemoteAuthListener(authListener: AuthListener)
     fun unregisterRemoteAuthListener(authListener: AuthListener)
-    fun applyAuthListeners(firebaseAuth: FirebaseAuth)
-    fun removeAuthListeners(firebaseAuth: FirebaseAuth)
+    fun attachAuthListeners(firebaseAuth: FirebaseAuth)
+    fun detachAuthListeners(firebaseAuth: FirebaseAuth)
 }

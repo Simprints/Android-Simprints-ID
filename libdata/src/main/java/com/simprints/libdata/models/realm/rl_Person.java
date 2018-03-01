@@ -1,15 +1,12 @@
 package com.simprints.libdata.models.realm;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
-import com.simprints.libdata.models.Key;
 import com.simprints.libdata.models.firebase.fb_Fingerprint;
 import com.simprints.libdata.models.firebase.fb_Person;
 import com.simprints.libdata.tools.Constants;
-import com.simprints.libdata.tools.Utils;
 import com.simprints.libsimprints.FingerIdentifier;
 
 import org.json.JSONArray;
@@ -23,6 +20,8 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+import timber.log.Timber;
+
 
 @SuppressWarnings({"WeakerAccess", "SynchronizationOnLocalVariableOrMethodParameter"})
 public class rl_Person extends RealmObject {
@@ -55,26 +54,13 @@ public class rl_Person extends RealmObject {
         }
     }
 
-    public rl_Person(Person person, Key key) {
-        this.patientId = person.getGuid();
-        this.userId = key.userId;
-        this.createdAt = Utils.now().getTime();
-        this.androidId = key.androidId;
-
-        this.fingerprints = new RealmList<>();
-        for (Fingerprint print : person.getFingerprints()) {
-            fingerprints.add(new rl_Fingerprint(print, this));
-        }
-    }
-
-
     public Person getLibPerson() {
         List<Fingerprint> prints = new ArrayList<>();
         for (rl_Fingerprint print : fingerprints) {
             try {
                 prints.add(new Fingerprint(FingerIdentifier.values()[print.fingerId], print.template));
             } catch (IllegalArgumentException arg) {
-                Log.d("FINGERPRINT", "FAILED");
+                Timber.tag("FINGERPRINT").d("FAILED");
             }
         }
         return new Person(patientId, prints);

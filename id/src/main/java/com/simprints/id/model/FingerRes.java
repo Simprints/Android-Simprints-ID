@@ -33,8 +33,8 @@ public class FingerRes {
         return fingerRes[finger.getId().ordinal()];
     }
 
-    public static void setFingerRes(int color){
-        switch (color) {
+    public static void setFingerRes(){
+        switch (4) {
             case 2:
                 fingerRes = new FingerRes[]{
                         new FingerRes(R.drawable.hand_bb_r5_c2, R.string.r_5_finger_name),

@@ -45,7 +45,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_margin="10dp"
-            android:layout_weight="1" />
+            tools:ignore="NestedWeights"
+            android:layout_weight="1"
+            android:contentDescription="@string/hint_graphic"/>
 
         <TextView
             android:id="@+id/message"
@@ -75,6 +77,7 @@
             android:layout_marginEnd="1dp"
             android:layout_marginRight="1dp"
             android:layout_marginTop="2dp"
+            tools:ignore="NestedWeights"
             android:layout_weight="1"
             android:gravity="center"
             android:textColor="@color/simprints_white"

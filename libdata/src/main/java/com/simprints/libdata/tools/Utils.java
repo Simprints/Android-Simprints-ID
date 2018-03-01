@@ -4,7 +4,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseException;
@@ -19,6 +18,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+
+import timber.log.Timber;
+
 
 public final class Utils {
 
@@ -42,7 +44,7 @@ public final class Utils {
             try {
                 fbDb.setPersistenceEnabled(false);
             } catch (DatabaseException ignored) {
-                Log.d("DatabaseException", "PERSISTENCE FAILED");
+                Timber.tag("DatabaseException").d("PERSISTENCE FAILED");
             }
             firebaseDatabases.put(firebaseApp, fbDb);
         }
@@ -70,7 +72,7 @@ public final class Utils {
     }
 
     public static void log(String s) {
-        Log.d("libdata", s);
+        Timber.tag("libdata").d(s);
     }
 
     public static DataCallback wrapCallback(@NonNull final String callDescription, @Nullable final DataCallback callback) {

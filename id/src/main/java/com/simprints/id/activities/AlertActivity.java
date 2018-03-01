@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -18,7 +17,6 @@ import com.simprints.id.tools.AppState;
 
 public class AlertActivity extends AppCompatActivity {
 
-    DataManager dataManager;
     ALERT_TYPE alertType;
 
     // Singletons
@@ -31,7 +29,7 @@ public class AlertActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         Application app = ((Application) getApplication());
-        dataManager = app.getDataManager();
+        DataManager dataManager = app.getDataManager();
         appState = app.getAppState();
 
         Bundle extras = getIntent().getExtras();

@@ -96,7 +96,7 @@ open class LaunchActivity : AppCompatActivity() {
                     loadingInfoTextView.visibility = View.INVISIBLE
                     waitingForConfirmation = true
                     appState.scanner.registerButtonListener(scannerButton)
-                    vibrate(this@LaunchActivity, dataManager.vibrateMode, 100)
+                    vibrate(this@LaunchActivity, dataManager.vibrateMode)
                 } else {
                     finishLaunch()
                 }
@@ -108,8 +108,8 @@ open class LaunchActivity : AppCompatActivity() {
                 loadingInfoTextView.setText(detailsId)
             }
 
-            override fun onError(resultCode: Int, resultData: Intent) {
-                finishWith(resultCode, resultData)
+            override fun onError(resultCode: Int) {
+                finishWith(resultCode, null)
             }
 
             override fun onAlert(alertType: ALERT_TYPE) {

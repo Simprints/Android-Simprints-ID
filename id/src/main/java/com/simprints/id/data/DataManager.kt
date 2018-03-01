@@ -35,7 +35,7 @@ interface DataManager : PreferencesManager, DbManager, ApiManager,
 
     // DbManager call interception for populating arguments
     // Lifecycle
-    fun initialiseDb()
+    override fun initialiseDb()
     override fun signOut()
 
     // Data transfer

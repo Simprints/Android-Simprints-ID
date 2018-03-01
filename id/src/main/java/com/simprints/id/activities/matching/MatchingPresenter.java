@@ -12,7 +12,6 @@ import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
-import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.TimeHelper;
@@ -77,7 +76,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                     }
                 };
 
-                onMatchStartHandlerThread = new OnMatchStartHandlerThread("onMatchStartHandlerThread");
+                onMatchStartHandlerThread = new OnMatchStartHandlerThread();
                 onMatchStartHandlerThread.start();
                 onMatchStartHandlerThread.prepareHandler();
                 onMatchStartHandlerThread.postTask(onMatchStartRunnable);
@@ -89,7 +88,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 break;
             default:
                 dataManager.logError(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
-                matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                matchingView.launchAlert();
         }
     }
 
@@ -97,8 +96,8 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
         Handler handler;
 
-        OnMatchStartHandlerThread(String name) {
-            super(name);
+        OnMatchStartHandlerThread() {
+            super("onMatchStartHandlerThread");
         }
 
         void postTask(Runnable task) {
@@ -116,7 +115,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
             dataManager.loadPeople(candidates, matchGroup, newOnLoadPeopleCallback());
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
-            matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+            matchingView.launchAlert();
         }
     }
 
@@ -156,7 +155,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
             @Override
             public void onFailure(DATA_ERROR data_error) {
                 dataManager.logError(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
-                matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                matchingView.launchAlert();
             }
         };
     }
@@ -167,7 +166,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
             dataManager.loadPerson(candidates, dataManager.getSignedInProjectId(), guid, newOnLoadPersonCallback());
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
-            matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+            matchingView.launchAlert();
         }
     }
 
@@ -206,7 +205,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
             @Override
             public void onFailure(DATA_ERROR dataError) {
                 dataManager.logError(UnexpectedDataError.forDataError(dataError,"MatchingActivity.onVerifyStart()"));
-                matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                matchingView.launchAlert();
             }
         };
     }
@@ -252,7 +251,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                             dataManager.saveIdentification(probe, candidates.size(), topCandidates);
                         } catch (UninitializedDataManagerError error) {
                             dataManager.logError(error);
-                            matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                            matchingView.launchAlert();
                             return;
                         }
 
@@ -303,7 +302,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                             dataManager.saveVerification(probe, verification, guidExistsResult);
                         } catch (UninitializedDataManagerError error) {
                             dataManager.logError(error);
-                            matchingView.launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+                            matchingView.launchAlert();
                             return;
                         }
 
