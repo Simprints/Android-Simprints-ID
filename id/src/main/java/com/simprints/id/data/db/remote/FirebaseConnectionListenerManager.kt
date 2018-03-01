@@ -5,6 +5,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.simprints.id.exceptions.unsafe.RemoteConnectionListenersAlreadyAttachedError
 import com.simprints.libdata.ConnectionListener
 import com.simprints.libdata.tools.Utils
 import timber.log.Timber
@@ -31,6 +32,7 @@ class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
     }
 
     override fun attachConnectionListeners(firebaseApp: FirebaseApp) {
+        checkIfConnectionDispatcherHasBeenCreatedAlready()
         connectionDispatcher = connectionEventListener
         connectionDbRef = Utils.getDatabase(firebaseApp).getReference(".info/connected")
         connectionDbRef.addValueEventListener(connectionDispatcher)
@@ -55,6 +57,12 @@ class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
         }
 
         override fun onCancelled(databaseError: DatabaseError) {}
+    }
+
+    private fun checkIfConnectionDispatcherHasBeenCreatedAlready() {
+        if (::connectionDispatcher.isInitialized) {
+            throw RemoteConnectionListenersAlreadyAttachedError()
+        }
     }
 
     private fun handleConnected() {

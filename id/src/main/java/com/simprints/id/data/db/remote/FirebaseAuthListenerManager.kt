@@ -2,6 +2,7 @@ package com.simprints.id.data.db.remote
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.simprints.id.exceptions.unsafe.RemoteAuthListenersAlreadyAttachedError
 import com.simprints.libdata.AuthListener
 import timber.log.Timber
 
@@ -26,6 +27,7 @@ class FirebaseAuthListenerManager : RemoteDbAuthListenerManager {
     }
 
     override fun attachAuthListeners(firebaseAuth: FirebaseAuth) {
+        checkIfAuthDispatcherHasBeenCreatedAlready()
         authDispatcher = createAuthStateListener()
         firebaseAuth.addAuthStateListener(authDispatcher)
         Timber.d("Auth state listener attached")
@@ -34,6 +36,12 @@ class FirebaseAuthListenerManager : RemoteDbAuthListenerManager {
     override fun detachAuthListeners(firebaseAuth: FirebaseAuth) {
         firebaseAuth.removeAuthStateListener(authDispatcher)
         Timber.d("Auth state listener detached")
+    }
+
+    private fun checkIfAuthDispatcherHasBeenCreatedAlready() {
+        if (::authDispatcher.isInitialized) {
+            throw RemoteAuthListenersAlreadyAttachedError()
+        }
     }
 
     private fun createAuthStateListener() =
