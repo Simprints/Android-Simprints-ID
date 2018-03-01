@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
+import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -161,7 +162,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
         sActivity.receiveResult(
             intent,
-            LoginActivity.LOGIN_REQUEST_CODE,
+            LOGIN_REQUEST_CODE,
             Intent())
 
         controller.resume()
@@ -182,7 +183,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
         sActivity.receiveResult(
             intent,
-            LoginActivity.LOGIN_REQUEST_CODE,
+            LOGIN_REQUEST_CODE,
             Intent())
 
         controller.resume()

@@ -15,10 +15,6 @@ class LoginPresenter(val view: LoginContract.View,
         private const val SCANNED_TEXT_TAG_PROJECT_SECRET = "project_secret:"
     }
 
-    init {
-        view.setPresenter(this)
-    }
-
     override fun start() {
     }
 

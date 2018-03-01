@@ -34,6 +34,10 @@ import org.jetbrains.anko.coroutines.experimental.bg
 @SuppressLint("HardwareIds")
 open class LaunchActivity : AppCompatActivity() {
 
+    companion object {
+        const val MAIN_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1
+    }
+
     // Scanner button callback
     private val scannerButton = ButtonListener {
         if (!launchOutOfFocus) {
@@ -144,7 +148,7 @@ open class LaunchActivity : AppCompatActivity() {
 
         when (requestCode) {
             RESOLUTION_REQUEST, GOOGLE_SERVICE_UPDATE_REQUEST -> positionTracker.onActivityResult(requestCode, resultCode, data)
-            MAIN_ACTIVITY_REQUEST -> when (resultCode) {
+            MAIN_ACTIVITY_REQUEST_CODE -> when (resultCode) {
                 RESULT_TRY_AGAIN -> tryAgain()
 
                 Activity.RESULT_CANCELED, Activity.RESULT_OK -> finishWith(resultCode, data)
@@ -206,7 +210,7 @@ open class LaunchActivity : AppCompatActivity() {
         consentConfirmed = true
         waitingForConfirmation = false
         appState.scanner.unregisterButtonListener(scannerButton)
-        startActivityForResult(Intent(this@LaunchActivity, MainActivity::class.java), MAIN_ACTIVITY_REQUEST)
+        startActivityForResult(Intent(this@LaunchActivity, MainActivity::class.java), MAIN_ACTIVITY_REQUEST_CODE)
         launchLayout.visibility = View.INVISIBLE
     }
 }

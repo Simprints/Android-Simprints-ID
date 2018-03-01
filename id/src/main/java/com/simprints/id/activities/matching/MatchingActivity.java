@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -24,11 +23,11 @@ import com.simprints.libcommon.Person;
 
 import static com.simprints.id.tools.ResourceHelper.getStringPlural;
 
-public class MatchingActivity extends AppCompatActivity implements MatchingContract.View{
+public class MatchingActivity extends AppCompatActivity implements MatchingContract.View {
 
     private final static int ALERT_ACTIVITY_REQUEST_CODE = 0;
 
-    private MatchingContract.Presenter matchingPresenter;
+    private MatchingContract.Presenter viewPresenter;
 
     private ProgressBar progressBar;
     private TextView progressText1;
@@ -64,7 +63,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
             return;
         }
         Person probe = extras.getParcelable(IntentKeys.matchingActivityProbePersonKey);
-        matchingPresenter = new MatchingPresenter(
+        viewPresenter = new MatchingPresenter(
                 this,
                 dataManager,
                 app.getTimeHelper(),
@@ -75,12 +74,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     @Override
     protected void onResume() {
         super.onResume();
-        matchingPresenter.start();
-    }
-
-    @Override
-    public void setPresenter(@NonNull MatchingContract.Presenter presenter) {
-        matchingPresenter = presenter;
+        viewPresenter.start();
     }
 
     @Override
@@ -165,5 +159,15 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     @Override
     public void doFinish() {
         finish();
+    }
+
+    @Override
+    public MatchingContract.Presenter getViewPresenter() {
+        return viewPresenter;
+    }
+
+    @Override
+    public void setViewPresenter(MatchingContract.Presenter presenter) {
+        viewPresenter = presenter;
     }
 }

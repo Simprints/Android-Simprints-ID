@@ -62,7 +62,6 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
         this.dataManager = dataManager;
         this.timeHelper = timeHelper;
         this.probe = probe;
-        this.matchingView.setPresenter(this);
     }
 
     @Override

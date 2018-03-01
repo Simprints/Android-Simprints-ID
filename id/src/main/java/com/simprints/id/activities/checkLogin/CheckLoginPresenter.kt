@@ -12,6 +12,7 @@ abstract class CheckLoginPresenter (
 
     init {
         initSession()
+        dataManager.initialiseDb()
     }
 
     private fun initSession() {
@@ -23,15 +24,16 @@ abstract class CheckLoginPresenter (
     }
 
     protected fun checkSignedInStateAndMoveOn() {
-        dataManager.initialiseDb().subscribe({
-            if (isUserSignedIn()) {
+        if (isUserSignedIn()) {
+            val projectId = dataManager.getSignedInProjectIdOrEmpty()
+            dataManager.getLocalKeyAndSignInToLocal(projectId).subscribe({
                 handleSignedInUser()
-            } else {
-                handleNotSignedInUser()
-            }
-        }, {
-            view.launchAlertForError(ALERT_TYPE.UNEXPECTED_ERROR)
-         })
+            }, {
+                view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
+            })
+        } else {
+            handleNotSignedInUser()
+        }
     }
 
     abstract fun handleSignedInUser()

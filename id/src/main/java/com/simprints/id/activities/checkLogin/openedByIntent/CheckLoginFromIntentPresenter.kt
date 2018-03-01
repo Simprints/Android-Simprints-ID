@@ -15,17 +15,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private var loginAlreadyTried: Boolean = false
 
-    init {
-        view.setPresenter(this)
-    }
-
     override fun setup() {
-        view.checkCallingApp()
+        view.checkCallingAppIsFromKnownSource()
 
         try {
             extractSessionParameters()
         } catch (exception: InvalidCalloutError) {
-            view.launchAlertForError(exception.alertType)
+            view.openAlertActivityForError(exception.alertType)
         }
     }
 
@@ -46,7 +42,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             loginAlreadyTried = true
             view.openLoginActivity()
         } else {
-            view.finishAct()
+            view.finishCheckLoginFromIntentActivity()
         }
     }
 

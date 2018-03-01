@@ -22,10 +22,6 @@ class DashboardPresenter(val view: DashboardContract.View,
 
     private var started: Boolean = false
 
-    init {
-        view.setPresenter(this)
-    }
-
     override fun start() {
         if (!started) {
             started = true
