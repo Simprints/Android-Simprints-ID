@@ -435,5 +435,6 @@ open class Application : MultiDexApplication() {
             Timber.plant(Timber.DebugTree())
         }
         Fabric.with(fabric)
+        dbManager.initialiseDb()
     }
 }
