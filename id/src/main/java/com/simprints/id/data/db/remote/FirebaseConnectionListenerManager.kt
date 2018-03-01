@@ -59,15 +59,20 @@ class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
 
     private fun handleConnected() {
         Timber.d("Connected")
+        applyToConnectionListeners { onConnection() }
         isRemoteConnected = true
-        for (listener in connectionListeners)
-            listener.onConnection()
     }
 
     private fun handleDisconnected() {
         Timber.d("Disconnected")
+        applyToConnectionListeners { onDisconnection() }
         isRemoteConnected = false
-        for (listener in connectionListeners)
-            listener.onDisconnection()
+    }
+
+    private fun applyToConnectionListeners(operation: ConnectionListener.() -> Unit) {
+        synchronized(connectionListeners) {
+            for (listener in connectionListeners)
+                listener.operation()
+        }
     }
 }
