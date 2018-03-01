@@ -6,7 +6,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
-import com.simprints.libdata.models.Key;
 import com.simprints.libdata.models.realm.rl_Person;
 import com.simprints.libdata.tools.Utils;
 

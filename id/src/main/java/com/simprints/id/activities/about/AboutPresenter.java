@@ -77,7 +77,7 @@ class AboutPresenter implements AboutContract.Presenter {
     @Override
     public void recoverDb() {
         recoveryRunning = true;
-        recoverDbHandlerThread = new RecoverDbHandlerThread("recoverDbHandlerThread");
+        recoverDbHandlerThread = new RecoverDbHandlerThread();
         recoverDbHandlerThread.start();
         recoverDbHandlerThread.prepareHandler();
         recoverDbHandlerThread.postTask(new Runnable() {
@@ -129,8 +129,8 @@ class AboutPresenter implements AboutContract.Presenter {
 
         Handler handler;
 
-        RecoverDbHandlerThread(String name) {
-            super(name);
+        RecoverDbHandlerThread() {
+            super("recoverDbHandlerThread");
         }
 
         void postTask(Runnable task) {

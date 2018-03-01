@@ -1,7 +1,6 @@
 package com.simprints.id.controllers;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,7 +28,6 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static android.app.Activity.RESULT_CANCELED;
 import static com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE;
 import static com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE;
 
@@ -129,7 +127,7 @@ public class Setup {
 
     // STEP 2
     private void initScanner(@NonNull final Activity activity) {
-        callback.onProgress(45, R.string.launch_bt_connect);
+        onProgress(45, R.string.launch_bt_connect);
         List<String> pairedScanners = ScannerUtils.getPairedScanners();
         if (pairedScanners.size() == 0) {
             onAlert(ALERT_TYPE.NOT_PAIRED);
@@ -149,7 +147,7 @@ public class Setup {
 
     // STEP 3
     private void connectToScanner(@NonNull final Activity activity) {
-        callback.onProgress(60, R.string.launch_bt_connect);
+        onProgress(60, R.string.launch_bt_connect);
 
         appState.getScanner().connect(new ScannerCallback() {
             @Override
@@ -202,7 +200,7 @@ public class Setup {
             return;
         }
 
-        callback.onProgress(70, R.string.launch_checking_person_in_db);
+        onProgress(70, R.string.launch_checking_person_in_db);
 
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = dataManager.getPatientId();
@@ -257,7 +255,7 @@ public class Setup {
 
     // STEP 5
     private void resetUi(@NonNull final Activity activity) {
-        callback.onProgress(80, R.string.launch_setup);
+        onProgress(80, R.string.launch_setup);
 
         appState.getScanner().resetUI(new ScannerCallback() {
             @Override
@@ -283,7 +281,7 @@ public class Setup {
 
     // STEP 6
     private void wakeUpUn20(@NonNull final Activity activity) {
-        callback.onProgress(90, R.string.launch_wake_un20);
+        onProgress(90, R.string.launch_wake_un20);
 
         appState.getScanner().un20Wakeup(new ScannerCallback() {
             @Override
@@ -323,7 +321,7 @@ public class Setup {
         if (requestCode == InternalConstants.ALL_PERMISSIONS_REQUEST) {
             for (int i = 0; i < permissions.length; i++) {
                 if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                    onError(RESULT_CANCELED, null);
+                    onError();
                     return;
                 }
             }
@@ -343,10 +341,10 @@ public class Setup {
             callback.onProgress(progress, detailsId);
     }
 
-    private void onError(int resultCode, Intent resultData) {
+    private void onError() {
         paused = true;
         if (callback != null)
-            callback.onError(resultCode, resultData);
+            callback.onError(Activity.RESULT_CANCELED);
     }
 
     private void onAlert(@NonNull ALERT_TYPE alertType) {

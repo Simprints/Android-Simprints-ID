@@ -35,16 +35,15 @@ public class Finger implements Parcelable, Comparable<Finger>{
      * Constructor for the Finger class
      * @param id            The ISO number of the finger (0-9)
      * @param isActive      Whether the finger is the current finger
-     * @param isLastFinger  Whether the finger is the last finger in the workflow
      * @param priority      The order in which fingers get auto-added (based on research) (0-9)
      * @param order         The order in which fingers appear in the list and the workflow (0-9)
      */
-    public Finger(@NonNull FingerIdentifier id, boolean isActive, boolean isLastFinger, int priority, int order) {
+    public Finger(@NonNull FingerIdentifier id, boolean isActive, int priority, int order) {
         this.id = id;
         this.isActive = isActive;
         this.status = Status.NOT_COLLECTED;
         this.template = null;
-        this.lastFinger = isLastFinger;
+        this.lastFinger = false;
         this.priority = priority;
         this.order = order;
     }
@@ -141,20 +140,20 @@ public class Finger implements Parcelable, Comparable<Finger>{
 
     public enum Status {
         NOT_COLLECTED(R.drawable.ic_blank_selected, R.drawable.ic_blank_deselected,
-                R.string.scan_label, Color.WHITE, Color.GRAY, R.string.empty, Color.WHITE,
-                R.string.please_scan, Color.GRAY),
+                R.string.scan_label, Color.GRAY, R.string.empty, Color.WHITE,
+                R.string.please_scan),
         COLLECTING(R.drawable.ic_blank_selected, R.drawable.ic_blank_deselected,
-                R.string.cancel_button, Color.WHITE, Color.BLUE, R.string.empty, Color.WHITE,
-                R.string.scanning, Color.GRAY),
+                R.string.cancel_button, Color.BLUE, R.string.empty, Color.WHITE,
+                R.string.scanning),
         GOOD_SCAN(R.drawable.ic_ok_selected, R.drawable.ic_ok_deselected,
-                R.string.good_scan_message, Color.WHITE, Color.argb(255, 0, 204, 0),
-                R.string.good_scan_message, Color.GREEN, R.string.good_scan_direction, Color.GRAY),
+                R.string.good_scan_message, Color.argb(255, 0, 204, 0),
+                R.string.good_scan_message, Color.GREEN, R.string.good_scan_direction),
         RESCAN_GOOD_SCAN(R.drawable.ic_ok_selected, R.drawable.ic_ok_deselected,
-                R.string.rescan_label_question, Color.WHITE, Color.argb(255, 0, 204, 0),
-                R.string.good_scan_message, Color.GREEN, R.string.good_scan_direction, Color.GRAY),
+                R.string.rescan_label_question, Color.argb(255, 0, 204, 0),
+                R.string.good_scan_message, Color.GREEN, R.string.good_scan_direction),
         BAD_SCAN(R.drawable.ic_alert_selected, R.drawable.ic_alert_deselected,
-                R.string.rescan_label, Color.WHITE, Color.argb(255, 204, 0, 0),
-                R.string.poor_scan_message, Color.RED, R.string.poor_scan_direction, Color.GRAY);
+                R.string.rescan_label, Color.argb(255, 204, 0, 0),
+                R.string.poor_scan_message, Color.RED, R.string.poor_scan_direction);
 
         private int dotSelectedDrawableId;
         private int dotDeselectedDrawableId;
@@ -167,17 +166,16 @@ public class Finger implements Parcelable, Comparable<Finger>{
         private int textDirectionColor;
 
         Status(int selectedDrawableId, int deselectedDrawableId, int textId,
-               int textColor, int bgColor, int result, int resultColor, int direction,
-               int directionColor) {
+               int bgColor, int result, int resultColor, int direction) {
             this.dotSelectedDrawableId = selectedDrawableId;
             this.dotDeselectedDrawableId = deselectedDrawableId;
             this.buttonTextId = textId;
-            this.buttonTextColor = textColor;
+            this.buttonTextColor = Color.WHITE;
             this.buttonBgColor = bgColor;
             this.textResult = result;
             this.textResultColor = resultColor;
             this.textDirection = direction;
-            this.textDirectionColor = directionColor;
+            this.textDirectionColor = Color.GRAY;
         }
 
         public int getDrawableId(boolean selected) {
