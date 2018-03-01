@@ -58,7 +58,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         final Bundle extras = getIntent().getExtras();
         if (extras == null) {
             dataManager.logError(new NoIntentExtrasError("Null extras passed to MatchingActivity"));
-            launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+            launchAlert();
             finish();
             return;
         }
@@ -140,9 +140,9 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     }
 
     @Override
-    public void launchAlert(ALERT_TYPE alertType) {
+    public void launchAlert() {
         Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType);
+        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, ALERT_TYPE.UNEXPECTED_ERROR);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 

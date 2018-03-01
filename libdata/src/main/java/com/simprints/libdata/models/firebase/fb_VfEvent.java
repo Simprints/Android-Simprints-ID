@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 
 import com.google.firebase.database.ServerValue;
 import com.simprints.libcommon.Person;
-import com.simprints.libdata.models.Key;
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.libdata.tools.Utils;
 import com.simprints.libsimprints.Verification;

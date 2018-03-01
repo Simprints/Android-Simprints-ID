@@ -18,7 +18,8 @@
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
         android:layout_weight=".1"
-        android:src="@drawable/simprints_logo" />
+        android:src="@drawable/simprints_logo"
+        android:contentDescription="@string/navbar_simprints_logo" />
 
     <TextView
         android:layout_width="wrap_content"

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/simprints_blue"
@@ -18,18 +19,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            tools:ignore="UseCompoundDrawables">
 
             <ImageView
                 android:id="@+id/dashboardSyncStateIcon"
                 android:layout_width="wrap_content"
-                android:layout_height="20dp"/>
+                android:layout_height="20dp"
+                android:contentDescription="@string/dashboard_sync_status_icon" />
 
             <TextView
                 android:id="@+id/dashboardSyncState"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"/>
+                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -38,11 +42,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            tools:ignore="UseCompoundDrawables">
             <ImageView
                 android:id="@+id/dashboardLayerSyncIcon"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/dashboard_sync_icon" />
 
             <TextView
                 android:id="@+id/dashboardLayerSyncText"
