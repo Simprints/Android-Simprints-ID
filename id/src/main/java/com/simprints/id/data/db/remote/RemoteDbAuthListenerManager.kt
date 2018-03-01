@@ -10,6 +10,6 @@ interface RemoteDbAuthListenerManager {
 
     fun registerRemoteAuthListener(authListener: AuthListener)
     fun unregisterRemoteAuthListener(authListener: AuthListener)
-    fun applyAuthListeners(firebaseAuth: FirebaseAuth)
-    fun removeAuthListeners(firebaseAuth: FirebaseAuth)
+    fun attachAuthListeners(firebaseAuth: FirebaseAuth)
+    fun detachAuthListeners(firebaseAuth: FirebaseAuth)
 }

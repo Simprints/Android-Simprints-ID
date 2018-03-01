@@ -57,8 +57,8 @@ class FirebaseManager(private val appContext: Context,
     override fun initialiseRemoteDb() {
         initialiseLegacyFirebaseProject()
         initialiseFirestoreFirebaseProject()
-        applyConnectionListeners(legacyFirebaseApp)
-        applyAuthListeners(getFirebaseAuth(legacyFirebaseApp))
+        attachConnectionListeners(legacyFirebaseApp)
+        attachAuthListeners(getFirebaseAuth(legacyFirebaseApp))
         isInitialised = true
     }
 
@@ -108,8 +108,8 @@ class FirebaseManager(private val appContext: Context,
         getFirebaseAuth(legacyFirebaseApp).signOut()
         getFirebaseAuth(firestoreFirebaseApp).signOut()
 
-        removeConnectionListeners(legacyFirebaseApp)
-        removeAuthListeners(getFirebaseAuth(legacyFirebaseApp))
+        detachConnectionListeners(legacyFirebaseApp)
+        detachAuthListeners(getFirebaseAuth(legacyFirebaseApp))
     }
 
     override fun isRemoteDbInitialized(): Boolean = isInitialised
