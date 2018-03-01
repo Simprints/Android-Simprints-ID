@@ -110,7 +110,8 @@
     <string name="r_3_finger_name">RIGHT THIRD FINGER</string>
     <string name="r_4_finger_name">RIGHT FOURTH FINGER</string>
     <string name="r_5_finger_name">RIGHT FIFTH FINGER</string>
-
+    <!-- Content descriptions -->
+    <string name="navbar_simprints_logo">Simprints logo</string>
 
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
@@ -326,5 +327,8 @@
     <!-- Dashboard Activity -->
     <string name="dashboard_label">Dashboard</string>
     <string name="logout">Logout</string>
+    <string name="hint_graphic">Hint graphic</string>
+    <string name="dashboard_sync_status_icon">Synchronisation status icon</string>
+    <string name="dashboard_sync_icon">Synchronisation icon</string>
 
 </resources>

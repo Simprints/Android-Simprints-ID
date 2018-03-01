@@ -1,5 +1,6 @@
 package com.simprints.id.activities;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -172,8 +173,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private AlertLauncher alertLauncher;
 
-    private TimeHelper timeHelper;
-
     // Singletons
     private AppState appState;
     private Setup setup;
@@ -188,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements
         setup = app.getSetup();
         syncClient = SyncService.Companion.getClient(this);
         alertLauncher = new AlertLauncher(this);
-        timeHelper = app.getTimeHelper();
+        TimeHelper timeHelper = app.getTimeHelper();
 
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -285,12 +284,12 @@ public class MainActivity extends AppCompatActivity implements
             Map<FingerIdentifier, Boolean> fingerStatus = dataManager.getFingerStatus();
             for (int i = 0; i < NB_OF_FINGERS; i++) {
                 FingerIdentifier id = fingerIdentifiers[i];
-                fingers[i] = new Finger(id, fingerStatus.get(id), false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
+                fingers[i] = new Finger(id, fingerStatus.get(id), DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
             }
         } else {
             for (int i = 0; i < NB_OF_FINGERS; i++) {
                 FingerIdentifier id = fingerIdentifiers[i];
-                fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, false, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
+                fingers[i] = new Finger(id, DEFAULT_CONFIG.get(id) == FingerConfig.REQUIRED, DEFAULT_CONFIG.getPriority(id), DEFAULT_CONFIG.getOrder(id));
             }
         }
 
@@ -420,6 +419,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void initViewPager() {
         // If the layout is from right to left, we need to reverse the scrolling direction
         rightToLeft = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 &&
@@ -1001,7 +1001,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void forceCaptureNotPossible() {
         activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
-        Vibrate.vibrate(MainActivity.this, dataManager.getVibrateMode(), 100);
+        Vibrate.vibrate(MainActivity.this, dataManager.getVibrateMode());
         refreshDisplay();
     }
 
@@ -1040,7 +1040,7 @@ public class MainActivity extends AppCompatActivity implements
             activeFingers.get(currentActiveFingerNo).setStatus(Status.BAD_SCAN);
         }
 
-        Vibrate.vibrate(MainActivity.this, dataManager.getVibrateMode(), 100);
+        Vibrate.vibrate(MainActivity.this, dataManager.getVibrateMode());
         refreshDisplay();
     }
 
@@ -1108,7 +1108,7 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             @Override
-            public void onError(int resultCode, Intent resultData) {
+            public void onError(int resultCode) {
                 Log.INSTANCE.d(MainActivity.this, "reconnect.onError()");
                 un20WakeupDialog.dismiss();
                 launchAlert(ALERT_TYPE.DISCONNECTED);

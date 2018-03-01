@@ -5,15 +5,19 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
+import com.simprints.id.exceptions.unsafe.RemoteConnectionListenersAlreadyAttachedError
 import com.simprints.libdata.ConnectionListener
 import com.simprints.libdata.tools.Utils
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
 
-    @Volatile
-    override var isRemoteConnected = false
+    override val isRemoteConnected: Boolean
+        get() = isRemoteConnectedBackingField.get()
+    private val isRemoteConnectedBackingField: AtomicBoolean = AtomicBoolean(false)
+
     private lateinit var connectionDbRef: DatabaseReference
     private lateinit var connectionDispatcher: ValueEventListener
     private var connectionListeners = mutableSetOf<ConnectionListener>()
@@ -30,14 +34,15 @@ class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
         }
     }
 
-    override fun applyConnectionListeners(firebaseApp: FirebaseApp) {
+    override fun attachConnectionListeners(firebaseApp: FirebaseApp) {
+        checkIfConnectionDispatcherHasBeenCreatedAlready()
         connectionDispatcher = connectionEventListener
         connectionDbRef = Utils.getDatabase(firebaseApp).getReference(".info/connected")
         connectionDbRef.addValueEventListener(connectionDispatcher)
         Timber.d("Connection listener set")
     }
 
-    override fun removeConnectionListeners(firebaseApp: FirebaseApp) {
+    override fun detachConnectionListeners(firebaseApp: FirebaseApp) {
         connectionDbRef.removeEventListener(connectionDispatcher)
     }
 
@@ -57,17 +62,28 @@ class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
         override fun onCancelled(databaseError: DatabaseError) {}
     }
 
+    private fun checkIfConnectionDispatcherHasBeenCreatedAlready() {
+        if (::connectionDispatcher.isInitialized) {
+            throw RemoteConnectionListenersAlreadyAttachedError()
+        }
+    }
+
     private fun handleConnected() {
         Timber.d("Connected")
-        isRemoteConnected = true
-        for (listener in connectionListeners)
-            listener.onConnection()
+        applyToConnectionListeners { onConnection() }
+        isRemoteConnectedBackingField.set(true)
     }
 
     private fun handleDisconnected() {
         Timber.d("Disconnected")
-        isRemoteConnected = false
-        for (listener in connectionListeners)
-            listener.onDisconnection()
+        applyToConnectionListeners { onDisconnection() }
+        isRemoteConnectedBackingField.set(false)
+    }
+
+    private fun applyToConnectionListeners(operation: ConnectionListener.() -> Unit) {
+        synchronized(connectionListeners) {
+            for (listener in connectionListeners)
+                listener.operation()
+        }
     }
 }

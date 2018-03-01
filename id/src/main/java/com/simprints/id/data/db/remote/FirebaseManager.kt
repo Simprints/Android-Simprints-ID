@@ -46,10 +46,6 @@ class FirebaseManager(private val appContext: Context,
     private lateinit var legacyFirebaseAppName: String
     private lateinit var firestoreFirebaseAppName: String
 
-    // FirebaseOptions
-    private lateinit var legacyFirebaseOptions: FirebaseOptions
-    private lateinit var firestoreFirebaseOptions: FirebaseOptions
-
     // FirebaseApp
     private lateinit var legacyFirebaseApp: FirebaseApp
     private lateinit var firestoreFirebaseApp: FirebaseApp
@@ -58,14 +54,14 @@ class FirebaseManager(private val appContext: Context,
     override fun initialiseRemoteDb() {
         initialiseLegacyFirebaseProject()
         initialiseFirestoreFirebaseProject()
-        applyConnectionListeners(legacyFirebaseApp)
-        applyAuthListeners(getFirebaseAuth(legacyFirebaseApp))
+        attachConnectionListeners(legacyFirebaseApp)
+        attachAuthListeners(getFirebaseAuth(legacyFirebaseApp))
         isInitialised = true
     }
 
     private fun initialiseLegacyFirebaseProject() {
         legacyFirebaseAppName = getLegacyAppName()
-        legacyFirebaseOptions = firebaseOptionsHelper.getLegacyFirebaseOptions()
+        val legacyFirebaseOptions = firebaseOptionsHelper.getLegacyFirebaseOptions()
         legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName, legacyFirebaseOptions)
 
         Utils.forceSync(legacyFirebaseApp)
@@ -73,7 +69,7 @@ class FirebaseManager(private val appContext: Context,
 
     private fun initialiseFirestoreFirebaseProject() {
         firestoreFirebaseAppName = getFirestoreAppName()
-        firestoreFirebaseOptions = firebaseOptionsHelper.getFirestoreFirebaseOptions()
+        val firestoreFirebaseOptions = firebaseOptionsHelper.getFirestoreFirebaseOptions()
         firestoreFirebaseApp = initialiseFirebaseApp(firestoreFirebaseAppName, firestoreFirebaseOptions)
     }
 
@@ -109,8 +105,8 @@ class FirebaseManager(private val appContext: Context,
         getFirebaseAuth(legacyFirebaseApp).signOut()
         getFirebaseAuth(firestoreFirebaseApp).signOut()
 
-        removeConnectionListeners(legacyFirebaseApp)
-        removeAuthListeners(getFirebaseAuth(legacyFirebaseApp))
+        detachConnectionListeners(legacyFirebaseApp)
+        detachAuthListeners(getFirebaseAuth(legacyFirebaseApp))
     }
 
     override fun isRemoteDbInitialized(): Boolean = isInitialised

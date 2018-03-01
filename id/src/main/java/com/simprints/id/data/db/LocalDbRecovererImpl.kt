@@ -4,10 +4,10 @@ import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.simprints.id.BuildConfig
+import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.libdata.DATA_ERROR
 import com.simprints.libdata.DataCallback
-import com.simprints.libdata.models.realm.RealmConfig
 import com.simprints.libdata.models.realm.rl_Person
 import com.simprints.libdata.tools.Constants
 import com.simprints.libdata.tools.Utils
@@ -20,7 +20,8 @@ import java.io.IOException
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
-class LocalDbRecovererImpl(private val firebaseManager: FirebaseManager,
+class LocalDbRecovererImpl(realmManager: RealmDbManager,
+                           private val firebaseManager: FirebaseManager,
                            private val projectId: String,
                            private val userId: String,
                            private val androidId: String,
@@ -31,7 +32,7 @@ class LocalDbRecovererImpl(private val firebaseManager: FirebaseManager,
 
     private val wrappedCallback = Utils.wrapCallback("FirebaseManager.recoverRealmDb", callback)
 
-    private lateinit var realm: Realm
+    private val realm = realmManager.getRealmInstance()
     private lateinit var request: RealmResults<rl_Person>
 
     private val realmDbInputStream = PipedInputStream()
@@ -45,15 +46,9 @@ class LocalDbRecovererImpl(private val firebaseManager: FirebaseManager,
     }
 
     private fun initialiseRealmAndWriteToOutputStream() {
-        getRealmInstance()
         request = getRealmRequest()
         connectTheStreams()
         request.addChangeListener(realmChangeListener)
-    }
-
-    private fun getRealmInstance() {
-        // Create a new Realm instance - needed since this should rn on a background thread
-        realm = Realm.getInstance(RealmConfig.get(projectId))
     }
 
     private fun getRealmRequest(): RealmResults<rl_Person> {
@@ -88,36 +83,23 @@ class LocalDbRecovererImpl(private val firebaseManager: FirebaseManager,
     }
 
     private fun writeAllPeopleToOutputStream(results: RealmResults<rl_Person>) {
-        writeStartOfOutputStream()
-        results
-            .mapIndexed { count, person -> convertPersonToJsonString(person, count) }
-            .forEach { writePersonToOutputStream(it) }
-        writeEndOfOutputStream()
+        realmDbOutputStream.write("{")
+        results.mapIndexed { count, person -> convertPersonToJsonString(person, count) }
+            .forEach { realmDbOutputStream.write(it) }
+        realmDbOutputStream.write("}")
         closeRealmAndOutputStream()
     }
 
     private fun convertPersonToJsonString(person: rl_Person, count: Int): String {
-        val personJson = person.jsonPerson
-        var commaString = ","
         // We need commas before all entries except the first
-        if (count == 0) {
-            commaString = ""
-        }
-        val nodeString = "\"" + personJson.get("patientId").toString() + "\"" + ":"
-        return commaString + nodeString + person.jsonPerson.toString()
+        val commaString = if (count == 0) "" else ","
+        val patientId = person.jsonPerson.get("patientId").toString()
+        val patientValue = person.jsonPerson.toString()
+        return "$commaString\"$patientId\":$patientValue"
     }
 
-    private fun writeStartOfOutputStream() {
-        realmDbOutputStream.write("{".toByteArray())
-    }
-
-    private fun writeEndOfOutputStream() {
-        realmDbOutputStream.write("}".toByteArray())
-    }
-
-    private fun writePersonToOutputStream(personJsonString: String) {
-        realmDbOutputStream.write(personJsonString.toByteArray())
-    }
+    private fun PipedOutputStream.write(string: String) =
+        write(string.toByteArray())
 
     private fun closeRealmAndOutputStream() {
         realmDbOutputStream.close()
@@ -155,24 +137,22 @@ class LocalDbRecovererImpl(private val firebaseManager: FirebaseManager,
     }
 
     private fun handleUploadTaskSuccess() {
-        try {
-            realmDbInputStream.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
+        closeInputStream()
         wrappedCallback.onSuccess()
     }
 
     private fun handleUploadTaskFailure(e: Exception) {
         e.printStackTrace()
+        closeInputStream()
+        wrappedCallback.onFailure(DATA_ERROR.FAILED_TO_UPLOAD)
+    }
+
+    private fun closeInputStream() {
         try {
             realmDbInputStream.close()
-        } catch (e1: IOException) {
-            e1.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
-
-        wrappedCallback.onFailure(DATA_ERROR.FAILED_TO_UPLOAD)
     }
 
     companion object {
