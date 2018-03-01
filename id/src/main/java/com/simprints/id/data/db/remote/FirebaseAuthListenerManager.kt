@@ -5,14 +5,16 @@ import com.google.firebase.auth.FirebaseUser
 import com.simprints.id.exceptions.unsafe.RemoteAuthListenersAlreadyAttachedError
 import com.simprints.libdata.AuthListener
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicBoolean
 
 class FirebaseAuthListenerManager : RemoteDbAuthListenerManager {
 
+    override val isSignedIn: Boolean
+        get() = isSignedInBackingField.get()
+    private val isSignedInBackingField: AtomicBoolean = AtomicBoolean(false)
+
     private lateinit var authDispatcher: FirebaseAuth.AuthStateListener
     private var authListeners = mutableSetOf<AuthListener>()
-
-    @Volatile
-    override var isSignedIn = false
 
     override fun registerRemoteAuthListener(authListener: AuthListener) {
         synchronized(authListeners) {
@@ -59,13 +61,13 @@ class FirebaseAuthListenerManager : RemoteDbAuthListenerManager {
     private fun handleAuthStateSignedIn() {
         Timber.d("Signed in")
         applyToAuthListeners { onSignIn() }
-        isSignedIn = true
+        isSignedInBackingField.set(true)
     }
 
     private fun handleAuthStateSignedOut() {
         Timber.d("Signed out")
         applyToAuthListeners { onSignOut() }
-        isSignedIn = false
+        isSignedInBackingField.set(false)
     }
 
     private fun applyToAuthListeners(operation: AuthListener.() -> Unit) {
