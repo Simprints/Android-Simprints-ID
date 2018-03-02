@@ -53,7 +53,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
     }
 
     override fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback) {
-        val wrappedCallback = wrapCallback("DatabaseContext.loadPerson()", callback)
+        val wrappedCallback = wrapCallback("RealmDbManager.loadPerson()", callback)
 
         val realm = getRealmInstance()
         val rlPerson = realm.where(rl_Person::class.java).equalTo(PATIENT_ID_FIELD, guid).findFirst()

@@ -13,6 +13,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
 import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
+import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
+import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.models.Session
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.secure.models.Tokens
@@ -154,12 +156,11 @@ class FirebaseManager(private val appContext: Context,
         }
 
     override fun savePersonInRemote(fbPerson: fb_Person, projectId: String) {
-        val updates = HashMap<String, Any>()
-        updates[patientNode(fbPerson.patientId)] = fbPerson.toMap()
+        val updates = mutableMapOf<String, Any>(patientNode(fbPerson.patientId) to fbPerson.toMap())
 
         userRef(legacyFirebaseApp, projectId, fbPerson.userId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val user = dataSnapshot.getValue<fb_User>(fb_User::class.java)
+                val user = dataSnapshot.getValue(fb_User::class.java)
                 if (user == null) {
                     updates[userNode(fbPerson.userId)] = fb_User(fbPerson.userId, fbPerson.androidId, fbPerson.patientId)
                 } else {
