@@ -4,15 +4,15 @@ import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import com.simprints.id.R
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.db.remote.authListener.AuthListener
+import com.simprints.id.data.db.remote.connectionListener.ConnectionListener
 import com.simprints.id.exceptions.unsafe.InvalidSyncGroupError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
+import com.simprints.id.libdata.tools.Constants.GROUP
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Progress
-import com.simprints.id.libdata.AuthListener
-import com.simprints.id.libdata.ConnectionListener
-import com.simprints.id.libdata.tools.Constants.GROUP
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 

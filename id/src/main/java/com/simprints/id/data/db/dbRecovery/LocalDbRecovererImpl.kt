@@ -1,4 +1,4 @@
-package com.simprints.id.data.db
+package com.simprints.id.data.db.dbRecovery
 
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
@@ -9,8 +9,6 @@ import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.libdata.DATA_ERROR
 import com.simprints.id.libdata.DataCallback
 import com.simprints.id.libdata.models.realm.rl_Person
-import com.simprints.id.libdata.tools.Constants
-import com.simprints.id.libdata.tools.Utils
 import io.realm.RealmChangeListener
 import io.realm.RealmResults
 import org.json.JSONException

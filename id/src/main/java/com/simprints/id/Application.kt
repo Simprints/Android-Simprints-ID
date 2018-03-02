@@ -15,6 +15,10 @@ import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.remote.*
+import com.simprints.id.data.db.remote.authListener.FirebaseAuthListenerManager
+import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
+import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
+import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.network.ApiManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager

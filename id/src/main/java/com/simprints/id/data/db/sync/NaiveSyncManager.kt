@@ -1,4 +1,4 @@
-package com.simprints.id.libdata
+package com.simprints.id.data.db.sync
 
 import com.google.firebase.FirebaseApp
 import com.simprints.libcommon.Progress
@@ -10,7 +10,7 @@ class NaiveSyncManager(firebaseApp: FirebaseApp,
                        private val legacyApiKey: String,
                        private val realmConfig: RealmConfiguration) {
 
-    private val db = com.simprints.id.libdata.tools.Utils.getDatabase(firebaseApp)
+    private val db = Utils.getDatabase(firebaseApp)
 
     fun syncUser(userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
             sync(userId, isInterrupted, emitter)
