@@ -15,8 +15,8 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Progress
-import com.simprints.libdata.AuthListener
-import com.simprints.libdata.ConnectionListener
+import com.simprints.id.data.db.remote.authListener.AuthListener
+import com.simprints.id.data.db.remote.connectionListener.ConnectionListener
 import com.simprints.libdata.DataCallback
 import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.libdata.models.firebase.fb_Person

@@ -1,4 +1,4 @@
-package com.simprints.libdata
+package com.simprints.id.data.db.sync
 
 import com.google.firebase.FirebaseApp
 import com.simprints.libcommon.Progress
@@ -20,12 +20,12 @@ class NaiveSyncManager(firebaseApp: FirebaseApp,
 
     private fun sync(userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
             NaiveSync(isInterrupted,
-                    emitter,
-                    userId,
-                    realmConfig,
-                    getProjRef(),
-                    getUsersRef(),
-                    getPatientsRef()).sync()
+                emitter,
+                userId,
+                realmConfig,
+                getProjRef(),
+                getUsersRef(),
+                getPatientsRef()).sync()
 
     private fun getProjRef() =
             db.getReference("projects/$legacyApiKey")

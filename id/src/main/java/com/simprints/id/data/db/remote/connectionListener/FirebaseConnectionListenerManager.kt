@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.remote
+package com.simprints.id.data.db.remote.connectionListener
 
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DataSnapshot
@@ -6,7 +6,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.simprints.id.exceptions.unsafe.RemoteConnectionListenersAlreadyAttachedError
-import com.simprints.libdata.ConnectionListener
 import com.simprints.libdata.tools.Utils
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -37,7 +36,7 @@ class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
     override fun attachConnectionListeners(firebaseApp: FirebaseApp) {
         checkIfConnectionDispatcherHasBeenCreatedAlready()
         connectionDispatcher = connectionEventListener
-        connectionDbRef = Utils.getDatabase(firebaseApp).getReference(".info/connected")
+        connectionDbRef = Utils.getDatabase(firebaseApp).getReference(connectedNode)
         connectionDbRef.addValueEventListener(connectionDispatcher)
         Timber.d("Connection listener set")
     }
@@ -49,7 +48,7 @@ class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
     private val connectionEventListener = object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
 
-            val connected = dataSnapshot.getValue(Boolean::class.java)!!
+            val connected = dataSnapshot.getValue(Boolean::class.java)?: false
             synchronized(connectionListeners) {
                 if (connected) {
                     handleConnected()
@@ -85,5 +84,9 @@ class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
             for (listener in connectionListeners)
                 listener.operation()
         }
+    }
+
+    companion object {
+        private const val connectedNode = ".info/connected"
     }
 }

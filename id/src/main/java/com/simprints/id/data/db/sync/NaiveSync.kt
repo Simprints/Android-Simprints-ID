@@ -1,9 +1,9 @@
-package com.simprints.libdata
+package com.simprints.id.data.db.sync
 
 import com.google.firebase.database.*
 import com.simprints.libcommon.Progress
-import com.simprints.libdata.exceptions.safe.InterruptedSyncException
-import com.simprints.libdata.exceptions.unsafe.UnexpectedSyncError
+import com.simprints.id.exceptions.safe.InterruptedSyncException
+import com.simprints.id.exceptions.unsafe.UnexpectedSyncError
 import com.simprints.libdata.models.firebase.fb_Person
 import com.simprints.libdata.models.firebase.fb_User
 import com.simprints.libdata.models.realm.rl_Person

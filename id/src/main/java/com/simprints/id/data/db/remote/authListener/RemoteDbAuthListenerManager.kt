@@ -1,7 +1,6 @@
-package com.simprints.id.data.db.remote
+package com.simprints.id.data.db.remote.authListener
 
 import com.google.firebase.auth.FirebaseAuth
-import com.simprints.libdata.AuthListener
 
 
 interface RemoteDbAuthListenerManager {

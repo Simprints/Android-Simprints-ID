@@ -10,8 +10,8 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Progress
-import com.simprints.libdata.AuthListener
-import com.simprints.libdata.ConnectionListener
+import com.simprints.id.data.db.remote.authListener.AuthListener
+import com.simprints.id.data.db.remote.connectionListener.ConnectionListener
 import com.simprints.libdata.tools.Constants.GROUP
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber

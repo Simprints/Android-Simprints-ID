@@ -1,7 +1,6 @@
-package com.simprints.id.data.db.remote
+package com.simprints.id.data.db.remote.connectionListener
 
 import com.google.firebase.FirebaseApp
-import com.simprints.libdata.ConnectionListener
 
 
 interface RemoteDbConnectionListenerManager {
