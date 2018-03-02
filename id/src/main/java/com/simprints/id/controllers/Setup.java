@@ -16,8 +16,8 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.libcommon.Person;
-import com.simprints.libdata.DATA_ERROR;
-import com.simprints.libdata.DataCallback;
+import com.simprints.id.libdata.DATA_ERROR;
+import com.simprints.id.libdata.DataCallback;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
@@ -28,8 +28,8 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE;
-import static com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE;
+import static com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE;
+import static com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE;
 
 public class Setup {
 
