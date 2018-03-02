@@ -3,11 +3,11 @@ package com.simprints.id.data.db.remote
 import com.google.firebase.FirebaseApp
 import com.simprints.id.data.models.Session
 import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
+import com.simprints.id.libdata.DataCallback
+import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.libdata.models.firebase.fb_Person
 import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
-import com.simprints.libdata.DataCallback
-import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.libdata.models.firebase.fb_Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification

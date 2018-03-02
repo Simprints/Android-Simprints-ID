@@ -6,8 +6,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.simprints.id.exceptions.unsafe.RemoteConnectionListenersAlreadyAttachedError
-import com.simprints.libdata.ConnectionListener
-import com.simprints.libdata.tools.Utils
+import com.simprints.id.libdata.ConnectionListener
+import com.simprints.id.libdata.tools.Utils
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -37,7 +37,7 @@ class FirebaseConnectionListenerManager : RemoteDbConnectionListenerManager {
     override fun attachConnectionListeners(firebaseApp: FirebaseApp) {
         checkIfConnectionDispatcherHasBeenCreatedAlready()
         connectionDispatcher = connectionEventListener
-        connectionDbRef = Utils.getDatabase(firebaseApp).getReference(".info/connected")
+        connectionDbRef = com.simprints.id.libdata.tools.Utils.getDatabase(firebaseApp).getReference(".info/connected")
         connectionDbRef.addValueEventListener(connectionDispatcher)
         Timber.d("Connection listener set")
     }

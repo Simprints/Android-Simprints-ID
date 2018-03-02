@@ -15,12 +15,12 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Progress
-import com.simprints.libdata.AuthListener
-import com.simprints.libdata.ConnectionListener
-import com.simprints.libdata.DataCallback
-import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.libdata.models.firebase.fb_Person
-import com.simprints.libdata.tools.Constants
+import com.simprints.id.libdata.AuthListener
+import com.simprints.id.libdata.ConnectionListener
+import com.simprints.id.libdata.DataCallback
+import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.libdata.models.firebase.fb_Person
+import com.simprints.id.libdata.tools.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
@@ -109,11 +109,11 @@ class DataManagerImpl(private val context: Context,
         dbManager.savePerson(fb_Person(person, userId, deviceId, moduleId), projectId)
     }
 
-    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
+    override fun loadPeople(destinationList: MutableList<Person>, group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback?) {
         dbManager.loadPeople(destinationList, group, userId, moduleId, callback)
     }
 
-    override fun getPeopleCount(group: Constants.GROUP): Long =
+    override fun getPeopleCount(group: com.simprints.id.libdata.tools.Constants.GROUP): Long =
         dbManager.getPeopleCount(group, userId, moduleId)
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
@@ -151,7 +151,7 @@ class DataManagerImpl(private val context: Context,
         dbManager.syncUser(projectId, userId, isInterrupted, emitter)
     }
 
-    override fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback) {
+    override fun recoverRealmDb(group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback) {
         dbManager.recoverLocalDb(deviceId, userId, deviceId, moduleId, group, callback)
     }
 }

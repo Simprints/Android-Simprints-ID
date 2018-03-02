@@ -18,14 +18,13 @@ import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.tools.extensions.md5
 import com.simprints.libcommon.Person
-import com.simprints.libdata.DATA_ERROR
-import com.simprints.libdata.DataCallback
-import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.libdata.models.firebase.*
-import com.simprints.libdata.models.realm.rl_Person
-import com.simprints.libdata.tools.Routes.*
-import com.simprints.libdata.tools.Utils
-import com.simprints.libdata.tools.Utils.wrapCallback
+import com.simprints.id.libdata.DATA_ERROR
+import com.simprints.id.libdata.DataCallback
+import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.libdata.models.firebase.*
+import com.simprints.id.libdata.models.realm.rl_Person
+import com.simprints.id.libdata.tools.Routes.*
+import com.simprints.id.libdata.tools.Utils.wrapCallback
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
@@ -66,7 +65,7 @@ class FirebaseManager(private val appContext: Context,
         val legacyFirebaseOptions = firebaseOptionsHelper.getLegacyFirebaseOptions()
         legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName, legacyFirebaseOptions)
 
-        Utils.forceSync(legacyFirebaseApp)
+        com.simprints.id.libdata.tools.Utils.forceSync(legacyFirebaseApp)
     }
 
     private fun initialiseFirestoreFirebaseProject() {

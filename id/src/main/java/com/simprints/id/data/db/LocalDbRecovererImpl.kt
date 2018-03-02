@@ -6,12 +6,11 @@ import com.google.firebase.storage.UploadTask
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.remote.FirebaseManager
-import com.simprints.libdata.DATA_ERROR
-import com.simprints.libdata.DataCallback
-import com.simprints.libdata.models.realm.rl_Person
-import com.simprints.libdata.tools.Constants
-import com.simprints.libdata.tools.Utils
-import io.realm.Realm
+import com.simprints.id.libdata.DATA_ERROR
+import com.simprints.id.libdata.DataCallback
+import com.simprints.id.libdata.models.realm.rl_Person
+import com.simprints.id.libdata.tools.Constants
+import com.simprints.id.libdata.tools.Utils
 import io.realm.RealmChangeListener
 import io.realm.RealmResults
 import org.json.JSONException
@@ -26,11 +25,11 @@ class LocalDbRecovererImpl(realmManager: RealmDbManager,
                            private val userId: String,
                            private val androidId: String,
                            private val moduleId: String,
-                           private val group: Constants.GROUP,
+                           private val group: com.simprints.id.libdata.tools.Constants.GROUP,
                            callback: DataCallback) :
     LocalDbRecoverer {
 
-    private val wrappedCallback = Utils.wrapCallback("FirebaseManager.recoverRealmDb", callback)
+    private val wrappedCallback = com.simprints.id.libdata.tools.Utils.wrapCallback("FirebaseManager.recoverRealmDb", callback)
 
     private val realm = realmManager.getRealmInstance()
     private lateinit var request: RealmResults<rl_Person>
@@ -53,9 +52,9 @@ class LocalDbRecovererImpl(realmManager: RealmDbManager,
 
     private fun getRealmRequest(): RealmResults<rl_Person> {
         return when (group) {
-            Constants.GROUP.GLOBAL -> realm.where(rl_Person::class.java).findAllAsync()
-            Constants.GROUP.USER -> realm.where(rl_Person::class.java).equalTo("userId", userId).findAllAsync()
-            Constants.GROUP.MODULE -> realm.where(rl_Person::class.java).equalTo("moduleId", moduleId).findAllAsync()
+            com.simprints.id.libdata.tools.Constants.GROUP.GLOBAL -> realm.where(rl_Person::class.java).findAllAsync()
+            com.simprints.id.libdata.tools.Constants.GROUP.USER -> realm.where(rl_Person::class.java).equalTo("userId", userId).findAllAsync()
+            com.simprints.id.libdata.tools.Constants.GROUP.MODULE -> realm.where(rl_Person::class.java).equalTo("moduleId", moduleId).findAllAsync()
         }
     }
 

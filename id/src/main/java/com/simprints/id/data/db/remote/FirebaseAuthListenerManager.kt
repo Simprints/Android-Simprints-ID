@@ -3,7 +3,7 @@ package com.simprints.id.data.db.remote
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.simprints.id.exceptions.unsafe.RemoteAuthListenersAlreadyAttachedError
-import com.simprints.libdata.AuthListener
+import com.simprints.id.libdata.AuthListener
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 
