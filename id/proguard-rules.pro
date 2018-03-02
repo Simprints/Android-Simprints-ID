@@ -18,7 +18,7 @@
 
 #Firebase rules
 -keepattributes Signature
--keepclassmembers class com.simprints.libdata.models.firebase** {
+-keepclassmembers class com.simprints.id.libdata.models.firebase** {
     *;
 }
 
@@ -27,7 +27,7 @@
 -keep class com.activeandroid.** {
     *;
 }
--keepclassmembers class com.simprints.libdata.models.sql_OLD** {
+-keepclassmembers class com.simprints.id.libdata.models.sql_OLD** {
     *;
 }
 
