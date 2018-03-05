@@ -27,7 +27,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         Realm.init(appContext)
     }
 
-    override fun signInToLocal(projectId: String, localDbKey: String): Single<Unit> =
+    override fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Single<Unit> =
         Single.create<Unit> {
             Timber.d("Signing to Realm project $projectId with key: $localDbKey")
             realmConfig = RealmConfig.get(projectId, localDbKey)

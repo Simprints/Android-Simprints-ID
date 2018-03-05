@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.remote
 
 import com.google.firebase.FirebaseApp
+import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.models.Session
@@ -28,7 +29,7 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
     fun isSignedIn(projectId: String, userId: String): Boolean
 
     // Data transfer
-    fun getLocalDbKeyFromRemote(projectId: String): Single<String>
+    fun getLocalDbKeyFromRemote(projectId: String): Single<LocalDbKey>
 
     fun savePersonInRemote(fbPerson: fb_Person, projectId: String)
     fun loadPersonFromRemote(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
