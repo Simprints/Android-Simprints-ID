@@ -4,7 +4,6 @@ import android.content.Context
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.libdata.DataCallback
 import com.simprints.id.libdata.models.firebase.fb_Person
-import com.simprints.id.libdata.models.realm.RealmConfig
 import com.simprints.id.libdata.models.realm.rl_Person
 import com.simprints.id.libdata.tools.Utils.wrapCallback
 import com.simprints.libcommon.Person
@@ -31,7 +30,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
     override fun signInToLocal(projectId: String, localDbKey: String): Single<Unit> =
         Single.create<Unit> {
             Timber.d("Signing to Realm project $projectId with key: $localDbKey")
-            realmConfig = RealmConfig.get(localDbKey)
+            realmConfig = RealmConfig.get(projectId, localDbKey)
             val realm = getRealmInstance()
             realm.close()
             it.onSuccess(Unit)
