@@ -1,6 +1,6 @@
 package com.simprints.id.exceptions.unsafe
 
-import com.simprints.libdata.DATA_ERROR
+import com.simprints.id.libdata.DATA_ERROR
 
 
 class UnexpectedDataError(message: String = "UnexpectedDataError") : Error(message) {

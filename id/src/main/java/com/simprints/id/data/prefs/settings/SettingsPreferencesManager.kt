@@ -1,6 +1,6 @@
 package com.simprints.id.data.prefs.settings
 
-import com.simprints.libdata.tools.Constants
+import com.simprints.id.libdata.tools.Constants
 import com.simprints.libsimprints.FingerIdentifier
 
 
@@ -14,8 +14,8 @@ interface SettingsPreferencesManager {
     var languagePosition: Int
     var matcherType: Int
     var timeoutS: Int
-    var syncGroup: Constants.GROUP
-    var matchGroup: Constants.GROUP
+    var syncGroup: com.simprints.id.libdata.tools.Constants.GROUP
+    var matchGroup: com.simprints.id.libdata.tools.Constants.GROUP
     var vibrateMode: Boolean
     var matchingEndWaitTimeSeconds: Int
     var fingerStatusPersist: Boolean

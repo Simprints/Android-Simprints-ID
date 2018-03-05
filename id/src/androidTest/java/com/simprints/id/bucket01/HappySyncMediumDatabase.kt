@@ -13,7 +13,7 @@ import com.simprints.id.tools.CalloutCredentials
 import com.simprints.id.tools.RemoteAdminUtils
 import com.simprints.id.tools.SyncParameters
 import com.simprints.id.tools.log
-import com.simprints.libdata.models.realm.RealmConfig
+import com.simprints.id.libdata.models.realm.RealmConfig
 import com.simprints.remoteadminclient.ApiException
 import io.realm.Realm
 import io.realm.RealmConfiguration
