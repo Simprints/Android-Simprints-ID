@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.remote
 
 import android.content.Context
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
@@ -9,6 +10,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
 import com.simprints.id.data.db.local.LocalDbKey
@@ -16,6 +18,7 @@ import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.models.Session
+import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.tools.extensions.md5
@@ -31,6 +34,7 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Single
+import io.reactivex.SingleEmitter
 import io.reactivex.rxkotlin.Singles
 import timber.log.Timber
 
@@ -116,14 +120,14 @@ class FirebaseManager(private val appContext: Context,
 
     override fun isSignedIn(projectId: String, userId: String): Boolean =
         isFirestoreSignedInUserAsExpected(projectId, userId) &&
-        isFirebaseSignedInUserAsExpected(projectId)
+            isLegacySignedInUserAsExpected(projectId)
 
-    private fun isFirestoreSignedInUserAsExpected (projectId: String, userId: String): Boolean {
+    private fun isFirestoreSignedInUserAsExpected(projectId: String, userId: String): Boolean {
         val firestoreUser = getFirebaseAuth(firestoreFirebaseApp).currentUser ?: return false
         return firestoreUser.uid == "$projectId.$userId"
     }
 
-    private fun isFirebaseSignedInUserAsExpected (projectId: String): Boolean {
+    private fun isLegacySignedInUserAsExpected(projectId: String): Boolean {
         val firebaseUser = getFirebaseAuth(legacyFirebaseApp).currentUser ?: return false
 
         // For legacy reason, the firebase user has the projectId(for new projects) or legacyApiKey
@@ -140,19 +144,25 @@ class FirebaseManager(private val appContext: Context,
     }
 
     // Data transfer
-    override fun getLocalDbKeyFromRemote(projectId: String): Single<String> =
-        Single.create<String> { resultEmit ->
+    override fun getLocalDbKeyFromRemote(projectId: String): Single<LocalDbKey> =
+        Single.create<LocalDbKey> { result ->
             val db = FirebaseFirestore.getInstance(firestoreFirebaseApp)
             db.collection(COLLECTION_LOCAL_DB_KEYS)
-                .whereEqualTo(PROJECT_ID_FIELD, projectId).get().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    val document = it.result.first().toObject(LocalDbKey::class.java)
-                    resultEmit.onSuccess(document.value)
-                } else {
-                    resultEmit.onError(it.exception as Throwable)
+                .whereEqualTo(PROJECT_ID_FIELD, projectId)
+                .get()
+                .addOnCompleteListener {
+                    handleGetLocalDbKeyTaskComplete(it, result)
                 }
-            }
         }
+
+    private fun handleGetLocalDbKeyTaskComplete(task: Task<QuerySnapshot>, result: SingleEmitter<LocalDbKey>) {
+        if (task.isSuccessful) {
+            val localDbKeyValue = task.result.first().getBlob(LOCAL_DB_KEY_VALUE_NAME).toBytes()
+            result.onSuccess(LocalDbKey(localDbKeyValue))
+        } else {
+            result.onError(CouldNotRetrieveLocalDbKeyError.withException(task.exception))
+        }
+    }
 
     override fun savePersonInRemote(fbPerson: fb_Person, projectId: String) {
         val updates = mutableMapOf<String, Any>(patientNode(fbPerson.patientId) to fbPerson.toMap())
@@ -218,8 +228,10 @@ class FirebaseManager(private val appContext: Context,
     override fun getFirebaseLegacyApp(): FirebaseApp = legacyFirebaseApp
 
     companion object {
-        private const val COLLECTION_LOCAL_DB_KEYS: String = "localDbKeys"
-        private const val PROJECT_ID_FIELD: String = "projectId"
+        private const val COLLECTION_LOCAL_DB_KEYS = "localDbKeys"
+        private const val PROJECT_ID_FIELD = "projectId"
+
+        private const val LOCAL_DB_KEY_VALUE_NAME = "value"
 
         fun getLegacyAppName(): String =
             FirebaseApp.DEFAULT_APP_NAME

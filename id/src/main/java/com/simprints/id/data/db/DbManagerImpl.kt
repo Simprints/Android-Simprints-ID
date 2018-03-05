@@ -1,6 +1,7 @@
 package com.simprints.id.data.db
 
 import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
+import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.remote.FirebaseManager
@@ -43,7 +44,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                 getLocalKeyAndSignInToLocal(projectId)
             }
 
-    private fun Single<out String>.signInToLocal(projectId: String): Single<Unit> =
+    private fun Single<out LocalDbKey>.signInToLocal(projectId: String): Single<Unit> =
         flatMap { key ->
             localDbManager.signInToLocal(projectId, key)
         }
