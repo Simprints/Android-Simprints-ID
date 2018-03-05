@@ -58,7 +58,7 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.serializers.*
-import com.simprints.libdata.tools.Constants
+import com.simprints.id.libdata.tools.Constants
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
@@ -85,8 +85,8 @@ open class Application : MultiDexApplication() {
         EnumSerializer(CalloutAction::class.java)
     }
 
-    private val groupSerializer: Serializer<Constants.GROUP> by lazy {
-        EnumSerializer(Constants.GROUP::class.java)
+    private val groupSerializer: Serializer<com.simprints.id.libdata.tools.Constants.GROUP> by lazy {
+        EnumSerializer(com.simprints.id.libdata.tools.Constants.GROUP::class.java)
     }
 
     private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>> by lazy {
