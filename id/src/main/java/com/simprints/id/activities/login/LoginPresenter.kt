@@ -2,13 +2,15 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.R
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.exceptions.safe.InvalidLegacyProjectIdReceivedFromIntentException
+import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
+import timber.log.Timber
 
 @Suppress("UnnecessaryVariable")
 class LoginPresenter(val view: LoginContract.View,
                      private val secureDataManager: SecureDataManager,
-                     override var projectAuthenticator: ProjectAuthenticator) : LoginContract.Presenter {
+                     override var projectAuthenticator: LegacyCompatibleProjectAuthenticator) : LoginContract.Presenter {
 
     companion object {
         private const val SCANNED_TEXT_TAG_PROJECT_ID = "project_id:"
@@ -35,7 +37,8 @@ class LoginPresenter(val view: LoginContract.View,
             secureDataManager.cleanCredentials()
             projectAuthenticator.authenticate(
                 NonceScope(possibleProjectId, possibleUserId),
-                possibleProjectSecret)
+                possibleProjectSecret,
+                possibleLegacyApiKey)
                 .subscribe(
                     {
                         if (possibleLegacyApiKey != null) {
@@ -48,6 +51,9 @@ class LoginPresenter(val view: LoginContract.View,
                     },
                     { e ->
                         e.printStackTrace()
+                        if (e is InvalidLegacyProjectIdReceivedFromIntentException) {
+                            Timber.d("Http Exception")
+                        }
                         view.dismissProgressDialog()
                         view.showToast(R.string.login_invalidCredentials)
                     })
