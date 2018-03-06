@@ -2,9 +2,11 @@ package com.simprints.id.secure
 
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.Nonce
+import com.simprints.id.secure.models.ProjectId
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.secure.models.Tokens
 import io.reactivex.Single
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.HeaderMap
 import retrofit2.http.Query
@@ -16,6 +18,10 @@ interface ApiServiceInterface {
         const val baseUrl = "https://$apiVersion-dot-project-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
         private const val apiKey: String = "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s"
     }
+
+    @GET("/project-ids")
+    fun projectId(@HeaderMap headers: Map<String, String>,
+                  @Query("key") key: String = ApiServiceInterface.apiKey): Single<Response<ProjectId>>
 
     @GET("/nonces")
     fun nonce(@HeaderMap headers: Map<String, String>,

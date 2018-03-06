@@ -48,10 +48,6 @@ class FirebaseManager(private val appContext: Context,
 
     private var isInitialised = false
 
-    // FirebaseApp Names
-    private lateinit var legacyFirebaseAppName: String
-    private lateinit var firestoreFirebaseAppName: String
-
     // FirebaseApp
     private lateinit var legacyFirebaseApp: FirebaseApp
     private lateinit var firestoreFirebaseApp: FirebaseApp
@@ -67,7 +63,7 @@ class FirebaseManager(private val appContext: Context,
     }
 
     private fun initialiseLegacyFirebaseProject() {
-        legacyFirebaseAppName = getLegacyAppName()
+        val legacyFirebaseAppName = getLegacyAppName()
         val legacyFirebaseOptions = firebaseOptionsHelper.getLegacyFirebaseOptions()
         legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName, legacyFirebaseOptions)
 
@@ -75,7 +71,7 @@ class FirebaseManager(private val appContext: Context,
     }
 
     private fun initialiseFirestoreFirebaseProject() {
-        firestoreFirebaseAppName = getFirestoreAppName()
+        val firestoreFirebaseAppName = getFirestoreAppName()
         val firestoreFirebaseOptions = firebaseOptionsHelper.getFirestoreFirebaseOptions()
         firestoreFirebaseApp = initialiseFirebaseApp(firestoreFirebaseAppName, firestoreFirebaseOptions)
     }

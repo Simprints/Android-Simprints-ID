@@ -9,14 +9,13 @@ import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.Tokens
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.internal.operators.single.SingleJust
 import io.reactivex.rxkotlin.Singles
 
-class ProjectAuthenticator(secureDataManager: SecureDataManager,
-                           private val dbManager: DbManager,
-                           private val safetyNetClient: SafetyNetClient,
-                           apiClient: ApiServiceInterface = ApiService().api,
-                           private val attestationManager: AttestationManager = AttestationManager()) {
+open class ProjectAuthenticator(secureDataManager: SecureDataManager,
+                                private val dbManager: DbManager,
+                                private val safetyNetClient: SafetyNetClient,
+                                apiClient: ApiServiceInterface = ApiService().api,
+                                private val attestationManager: AttestationManager = AttestationManager()) {
 
     private val projectSecretManager = ProjectSecretManager(secureDataManager)
     private val publicKeyManager = PublicKeyManager(apiClient)
@@ -38,7 +37,7 @@ class ProjectAuthenticator(secureDataManager: SecureDataManager,
     private fun getEncryptedProjectSecret(projectSecret: String): Single<String> =
         publicKeyManager.requestPublicKey()
             .flatMap { publicKey ->
-                SingleJust(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey)) }
+                Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey)) }
 
     private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, noneScope: NonceScope): Single<AttestToken> =
         nonceManager.requestNonce(noneScope)

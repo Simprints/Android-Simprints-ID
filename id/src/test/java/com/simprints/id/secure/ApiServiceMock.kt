@@ -1,6 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.secure.models.Nonce
+import com.simprints.id.secure.models.ProjectId
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.secure.models.Tokens
 import io.reactivex.Single
@@ -14,6 +15,10 @@ import retrofit2.mock.Calls
 // It's required to use NetworkBehavior, even if response is not used in the tests (e.g failing responses due to no connectivity).
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class ApiServiceMock(private val delegate: BehaviorDelegate<ApiServiceInterface>) : ApiServiceInterface {
+    override fun projectId(headers: Map<String, String>, key: String): Single<ProjectId> {
+        val projectIdResponse = ProjectId("project_id")
+        return delegate.returning(buildSuccessResponseWith(projectIdResponse)).projectId(headers, key)
+    }
 
     override fun publicKey(@Query("key") key: String): Single<PublicKeyString> {
         val publicKeyResponse = PublicKeyString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB")
