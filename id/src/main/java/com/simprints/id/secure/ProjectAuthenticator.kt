@@ -3,6 +3,9 @@ package com.simprints.id.secure
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
+import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
+import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.NonceScope
@@ -22,6 +25,10 @@ open class ProjectAuthenticator(secureDataManager: SecureDataManager,
     private val nonceManager = NonceManager(apiClient)
     private val authManager = AuthManager(apiClient)
 
+    @Throws(
+        DifferentProjectIdReceivedFromIntentException::class,
+        AuthRequestInvalidCredentialsException::class,
+        SimprintsInternalServerException::class)
     fun authenticate(nonceScope: NonceScope, projectSecret: String): Single<Unit> =
         prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()

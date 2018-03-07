@@ -2,7 +2,10 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.R
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.safe.InvalidLegacyProjectIdReceivedFromIntentException
+import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
+import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
+import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
+import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
 import io.reactivex.rxkotlin.subscribeBy
@@ -45,12 +48,8 @@ class LoginPresenter(val view: LoginContract.View,
             possibleProjectSecret,
             possibleLegacyApiKey)
             .subscribeBy(
-                onSuccess = {
-                    handleSignInSuccess(possibleLegacyApiKey, possibleProjectId, possibleUserId)
-                },
-                onError = { e ->
-                    handleSignInError(e)
-                })
+                onSuccess = { handleSignInSuccess(possibleLegacyApiKey, possibleProjectId, possibleUserId) },
+                onError = { e -> handleSignInError(e) })
     }
 
     private fun handleSignInSuccess(possibleLegacyApiKey: String?, possibleProjectId: String, possibleUserId: String) {
@@ -63,8 +62,11 @@ class LoginPresenter(val view: LoginContract.View,
 
     private fun handleSignInError(e: Throwable) {
         when (e) {
+            is DifferentProjectIdReceivedFromIntentException -> Timber.d(e)
             is InvalidLegacyProjectIdReceivedFromIntentException -> Timber.d(e)
-            else -> Timber.d(e)
+            is AuthRequestInvalidCredentialsException -> Timber.d(e)
+            is SimprintsInternalServerException -> Timber.d(e)
+            else -> throw e
         }
         view.dismissProgressDialog()
         view.showToast(R.string.login_invalidCredentials)

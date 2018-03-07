@@ -1,4 +1,4 @@
-package com.simprints.id.exceptions.safe
+package com.simprints.id.exceptions.safe.secure
 
 
 class InvalidLegacyProjectIdReceivedFromIntentException(message: String = "InvalidLegacyProjectIdReceivedFromIntentException")
