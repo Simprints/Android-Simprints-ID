@@ -30,37 +30,44 @@ class LoginPresenter(val view: LoginContract.View,
                                      possibleUserId: String,
                                      possibleLegacyApiKey: String?) {
 
-        if (possibleProjectId.isNotEmpty() &&
-            possibleProjectSecret.isNotEmpty() &&
-            possibleUserId.isNotEmpty()) {
-
+        if (possibleProjectId.isNotEmpty() && possibleProjectSecret.isNotEmpty() && possibleUserId.isNotEmpty()) {
             view.showProgressDialog()
-            secureDataManager.cleanCredentials()
-            projectAuthenticator.authenticate(
-                NonceScope(possibleProjectId, possibleUserId),
-                possibleProjectSecret,
-                possibleLegacyApiKey)
-                .subscribeBy(
-                    onSuccess = {
-                        if (possibleLegacyApiKey != null) {
-                            secureDataManager.storeProjectIdWithLegacyApiKeyPair(possibleProjectId, possibleLegacyApiKey)
-                        }
-                        secureDataManager.signedInProjectId = possibleProjectId
-                        secureDataManager.signedInUserId = possibleUserId
-                        view.dismissProgressDialog()
-                        view.returnSuccessfulResult()
-                    },
-                    onError = { e ->
-                        when(e) {
-                            is InvalidLegacyProjectIdReceivedFromIntentException -> Timber.d(e)
-                            else -> Timber.d(e)
-                        }
-                        view.dismissProgressDialog()
-                        view.showToast(R.string.login_invalidCredentials)
-                    })
+            doAuthenticate(possibleProjectId, possibleUserId, possibleProjectSecret, possibleLegacyApiKey)
         } else {
             view.showToast(R.string.login_missing_credentials)
         }
+    }
+
+    private fun doAuthenticate(possibleProjectId: String, possibleUserId: String, possibleProjectSecret: String, possibleLegacyApiKey: String?) {
+        secureDataManager.cleanCredentials()
+        projectAuthenticator.authenticate(
+            NonceScope(possibleProjectId, possibleUserId),
+            possibleProjectSecret,
+            possibleLegacyApiKey)
+            .subscribeBy(
+                onSuccess = {
+                    handleSignInSuccess(possibleLegacyApiKey, possibleProjectId, possibleUserId)
+                },
+                onError = { e ->
+                    handleSignInError(e)
+                })
+    }
+
+    private fun handleSignInSuccess(possibleLegacyApiKey: String?, possibleProjectId: String, possibleUserId: String) {
+        secureDataManager.storeProjectIdWithLegacyApiKeyPair(possibleProjectId, possibleLegacyApiKey)
+        secureDataManager.signedInProjectId = possibleProjectId
+        secureDataManager.signedInUserId = possibleUserId
+        view.dismissProgressDialog()
+        view.returnSuccessfulResult()
+    }
+
+    private fun handleSignInError(e: Throwable) {
+        when (e) {
+            is InvalidLegacyProjectIdReceivedFromIntentException -> Timber.d(e)
+            else -> Timber.d(e)
+        }
+        view.dismissProgressDialog()
+        view.showToast(R.string.login_invalidCredentials)
     }
 
     /**
@@ -77,7 +84,7 @@ class LoginPresenter(val view: LoginContract.View,
         val potentialProjectSecret = Regex(pattern = projectSecretRegex).find(scannedText)?.value
 
         if (potentialProjectId != null && potentialProjectId.isNotEmpty() &&
-            potentialProjectSecret != null && potentialProjectSecret.isNotEmpty() ) {
+            potentialProjectSecret != null && potentialProjectSecret.isNotEmpty()) {
 
             view.updateProjectIdInTextView(potentialProjectId)
             view.updateProjectSecretInTextView(potentialProjectSecret)

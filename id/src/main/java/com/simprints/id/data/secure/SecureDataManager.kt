@@ -17,6 +17,6 @@ interface SecureDataManager {
     fun cleanCredentials()
     fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?)
 
-    fun getMd5LegacyApiKeyForProjectIdOrEmpty(projectId: String): String
-    fun getProjectIdForMd5LegacyApiKeyOrEmpty(md5LegacyApiKey: String): String
+    fun getHashedLegacyApiKeyForProjectIdOrEmpty(projectId: String): String
+    fun getProjectIdForHashedLegacyApiKeyOrEmpty(hashedLegacyApiKey: String): String
 }

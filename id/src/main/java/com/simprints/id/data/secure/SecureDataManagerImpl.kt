@@ -2,7 +2,7 @@ package com.simprints.id.data.secure
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.safe.CredentialMissingException
-import com.simprints.id.tools.extensions.md5
+import com.simprints.id.secure.cryptography.Hasher
 
 class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
 
@@ -59,7 +59,7 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             ""
         }
 
-    override fun getSignedInMd5LegacyApiKeyOrEmpty(): String = getMd5LegacyApiKeyForProjectIdOrEmpty(getSignedInProjectIdOrEmpty())
+    override fun getSignedInMd5LegacyApiKeyOrEmpty(): String = getHashedLegacyApiKeyForProjectIdOrEmpty(getSignedInProjectIdOrEmpty())
 
     override fun getSignedInProjectIdOrEmpty(): String =
         try {
@@ -94,12 +94,12 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
 
     override fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?) {
         if (legacyApiKey != null && legacyApiKey.isNotEmpty()) {
-            val md5LegacyApiKey = legacyApiKey.md5()
-            prefs.edit().putPrimitive(md5LegacyApiKey, projectId).commit()
-            prefs.edit().putPrimitive(projectId, md5LegacyApiKey).commit()
+            val hashedLegacyApiKey = Hasher.hash(legacyApiKey)
+            prefs.edit().putPrimitive(hashedLegacyApiKey, projectId).commit()
+            prefs.edit().putPrimitive(projectId, hashedLegacyApiKey).commit()
         }
     }
 
-    override fun getMd5LegacyApiKeyForProjectIdOrEmpty(projectId: String): String = prefs.getString(projectId, "")
-    override fun getProjectIdForMd5LegacyApiKeyOrEmpty(md5LegacyApiKey: String): String = prefs.getString(md5LegacyApiKey, "")
+    override fun getHashedLegacyApiKeyForProjectIdOrEmpty(projectId: String): String = prefs.getString(projectId, "")
+    override fun getProjectIdForHashedLegacyApiKeyOrEmpty(hashedLegacyApiKey: String): String = prefs.getString(hashedLegacyApiKey, "")
 }
