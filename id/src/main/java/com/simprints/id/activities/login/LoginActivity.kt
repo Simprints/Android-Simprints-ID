@@ -110,7 +110,9 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     override fun showToast(stringRes: Int) {
-        Toast.makeText(this, stringRes, Toast.LENGTH_SHORT).show()
+        runOnUiThread {
+            Toast.makeText(this, stringRes, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun showProgressDialog() {
