@@ -1,4 +1,4 @@
-package com.simprints.id.exceptions.safe
+package com.simprints.id.exceptions.safe.secure
 
 
 class DifferentProjectIdReceivedFromIntentException(message: String = "DifferentProjectIdReceivedFromIntentException")
