@@ -14,7 +14,7 @@ import retrofit2.http.Query
 interface ApiServiceInterface {
 
     companion object {
-        private const val apiVersion = "2018-1-0-dev5"
+        private const val apiVersion = "2018-1-0-dev6"
         const val baseUrl = "https://$apiVersion-dot-project-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
         private const val apiKey: String = "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s"
     }
