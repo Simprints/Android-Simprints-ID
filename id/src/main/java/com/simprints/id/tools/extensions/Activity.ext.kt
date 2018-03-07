@@ -24,6 +24,6 @@ fun Activity.launchAlert(alertType: ALERT_TYPE) {
 
 fun Activity.ifStillRunning(block: () -> Unit) {
     if (!isFinishing) {
-        block()
+        this.runOnUiThread { block() }
     }
 }

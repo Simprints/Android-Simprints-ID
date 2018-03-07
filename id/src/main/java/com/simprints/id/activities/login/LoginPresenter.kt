@@ -5,6 +5,7 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.InvalidLegacyProjectIdReceivedFromIntentException
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
+import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 
 @Suppress("UnnecessaryVariable")
@@ -39,8 +40,8 @@ class LoginPresenter(val view: LoginContract.View,
                 NonceScope(possibleProjectId, possibleUserId),
                 possibleProjectSecret,
                 possibleLegacyApiKey)
-                .subscribe(
-                    {
+                .subscribeBy(
+                    onSuccess = {
                         if (possibleLegacyApiKey != null) {
                             secureDataManager.storeProjectIdWithLegacyApiKeyPair(possibleProjectId, possibleLegacyApiKey)
                         }
@@ -49,10 +50,10 @@ class LoginPresenter(val view: LoginContract.View,
                         view.dismissProgressDialog()
                         view.returnSuccessfulResult()
                     },
-                    { e ->
-                        e.printStackTrace()
-                        if (e is InvalidLegacyProjectIdReceivedFromIntentException) {
-                            Timber.d("Http Exception")
+                    onError = { e ->
+                        when(e) {
+                            is InvalidLegacyProjectIdReceivedFromIntentException -> Timber.d(e)
+                            else -> Timber.d(e)
                         }
                         view.dismissProgressDialog()
                         view.showToast(R.string.login_invalidCredentials)
