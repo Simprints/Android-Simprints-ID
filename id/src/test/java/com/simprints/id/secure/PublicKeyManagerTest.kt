@@ -1,6 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.BuildConfig
+import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.FakeResponseInterceptor
@@ -57,7 +58,7 @@ class PublicKeyManagerTest : RxJavaTest() {
         val testObserver = makeTestRequestPublicKey(apiService.api)
         testObserver.awaitTerminalEvent()
 
-        testObserver.assertError(HttpException::class.java)
+        testObserver.assertError(SimprintsInternalServerException::class.java)
     }
 
     private fun forceOkHttpToReturnSuccessfulResponse(okHttpClientConfig: OkHttpClient.Builder) {

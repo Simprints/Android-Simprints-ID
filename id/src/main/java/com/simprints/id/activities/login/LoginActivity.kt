@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.IntentKeys
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.scannerAppIntent
@@ -19,7 +20,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     companion object {
         const val LOGIN_SUCCEED: Int = 1
         const val QR_REQUEST_CODE: Int = 0
-        const val LEGACY_API_KEY_PARAM = "legacyApiKey"
         const val QR_RESULT_KEY = "SCAN_RESULT"
         const val GOOGLE_PLAY_LINK_FOR_QR_APP =
             "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
@@ -39,7 +39,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         setContentView(R.layout.activity_login)
         initUI()
 
-        intent.getStringExtra(LEGACY_API_KEY_PARAM)?.let {
+        intent.getStringExtra(IntentKeys.loginActivityLegacyProjectIdKey)?.let {
             if (it.isNotEmpty()) {
                 possibleLegacyApiKey = it
             }
