@@ -9,7 +9,7 @@ interface SecureDataManager {
     var signedInUserId: String
     var prefs: ImprovedSharedPreferences
     fun getEncryptedProjectSecretOrEmpty(): String
-    fun getSignedInMd5LegacyApiKeyOrEmpty(): String
+    fun getSignedInHashedLegacyApiKeyOrEmpty(): String
 
     fun getSignedInProjectIdOrEmpty(): String
     fun getSignedInUserIdOrEmpty(): String
