@@ -2,14 +2,13 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.R
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.secure.*
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
+import io.reactivex.exceptions.CompositeException
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
+import java.io.IOException
 
 @Suppress("UnnecessaryVariable")
 class LoginPresenter(val view: LoginContract.View,
@@ -62,6 +61,7 @@ class LoginPresenter(val view: LoginContract.View,
 
     private fun handleSignInError(e: Throwable) {
         when (e) {
+            is IOException -> Timber.d(e)
             is DifferentProjectIdReceivedFromIntentException -> Timber.d(e)
             is InvalidLegacyProjectIdReceivedFromIntentException -> Timber.d(e)
             is AuthRequestInvalidCredentialsException -> Timber.d(e)
