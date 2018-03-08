@@ -59,7 +59,7 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             ""
         }
 
-    override fun getSignedInMd5LegacyApiKeyOrEmpty(): String = getHashedLegacyApiKeyForProjectIdOrEmpty(getSignedInProjectIdOrEmpty())
+    override fun getSignedInHashedLegacyApiKeyOrEmpty(): String = getHashedLegacyApiKeyForProjectIdOrEmpty(getSignedInProjectIdOrEmpty())
 
     override fun getSignedInProjectIdOrEmpty(): String =
         try {
