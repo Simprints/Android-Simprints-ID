@@ -144,7 +144,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         val sActivity = shadowOf(activity)
         val intent = sActivity.nextStartedActivity
         assertActivityStarted(LoginActivity::class.java, intent)
-        assertEquals(DEFAULT_LEGACY_API_KEY, intent.getStringExtra(LoginActivity.LEGACY_API_KEY_PARAM))
+        assertEquals(DEFAULT_LEGACY_API_KEY, intent.getStringExtra(IntentKeys.loginActivityLegacyProjectIdKey))
     }
 
     @Test
