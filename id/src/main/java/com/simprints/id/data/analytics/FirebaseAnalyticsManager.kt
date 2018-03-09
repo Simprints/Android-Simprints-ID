@@ -46,6 +46,18 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         firebaseAnalytics.logEvent("alert", bundle)
     }
 
+    override fun logThrowable(e: Throwable) =
+        when (e) {
+            is Error -> logError(e)
+            is RuntimeException -> logSafeException(e)
+            else -> logUnknownThrowable(e)
+        }
+
+    private fun logUnknownThrowable(e: Throwable) {
+        Timber.d("FirebaseAnalyticsManager.logUnknownThrowable(throwable=$e)")
+        Crashlytics.logException(e)
+    }
+
     override fun logError(error: Error) {
         Timber.d("FirebaseAnalyticsManager.logError(throwable=$error)")
         Crashlytics.logException(error)

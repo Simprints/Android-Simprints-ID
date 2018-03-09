@@ -129,7 +129,7 @@ class LoginActivityTest {
         val act = controller.get()
         act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "project_id:validProject\nproject_secret_wrong:some_value"))
 
-        assertEquals(app.getString(R.string.login_invalidQrCode), ShadowToast.getTextOfLatestToast())
+        assertEquals(app.getString(R.string.login_invalid_qr_code), ShadowToast.getTextOfLatestToast())
     }
 
     @Test
@@ -172,10 +172,10 @@ class LoginActivityTest {
         act.loginEditTextUserId.setText("some_user_id")
         act.loginButtonSignIn.performClick()
         Mockito.verify(act.viewPresenter, Mockito.times(1))
-            .userDidWantToSignIn(
+            .signIn(
+                "some_user_id",
                 "some_project_id",
                 "some_project_secret",
-                "some_user_id",
                 null)
     }
 
@@ -193,10 +193,10 @@ class LoginActivityTest {
         act.loginButtonSignIn.performClick()
 
         Mockito.verify(act.viewPresenter, Mockito.times(1))
-            .userDidWantToSignIn(
+            .signIn(
+                DEFAULT_USER_ID,
                 DEFAULT_PROJECT_ID,
                 DEFAULT_PROJECT_SECRET,
-                DEFAULT_USER_ID,
                 "some_legacy_api_key")
     }
 }
