@@ -10,9 +10,9 @@ import com.simprints.id.data.DataManager;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AlertLauncher;
-import com.simprints.libdata.DATA_ERROR;
-import com.simprints.libdata.DataCallback;
-import com.simprints.libdata.tools.Constants;
+import com.simprints.id.libdata.DATA_ERROR;
+import com.simprints.id.libdata.DataCallback;
+import com.simprints.id.libdata.tools.Constants;
 
 class AboutPresenter implements AboutContract.Presenter {
 

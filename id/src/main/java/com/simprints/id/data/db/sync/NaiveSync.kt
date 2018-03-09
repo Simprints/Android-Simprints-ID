@@ -4,11 +4,11 @@ import com.google.firebase.database.*
 import com.simprints.libcommon.Progress
 import com.simprints.id.exceptions.safe.InterruptedSyncException
 import com.simprints.id.exceptions.unsafe.UnexpectedSyncError
-import com.simprints.libdata.models.firebase.fb_Person
-import com.simprints.libdata.models.firebase.fb_User
-import com.simprints.libdata.models.realm.rl_Person
-import com.simprints.libdata.tools.Routes.patientNode
-import com.simprints.libdata.tools.Routes.userPatientListNode
+import com.simprints.id.libdata.models.firebase.fb_Person
+import com.simprints.id.libdata.models.firebase.fb_User
+import com.simprints.id.libdata.models.realm.rl_Person
+import com.simprints.id.libdata.tools.Routes.patientNode
+import com.simprints.id.libdata.tools.Routes.userPatientListNode
 import io.reactivex.Emitter
 import io.realm.Realm
 import io.realm.RealmConfiguration

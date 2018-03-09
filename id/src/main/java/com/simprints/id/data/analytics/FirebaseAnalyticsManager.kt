@@ -7,7 +7,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.models.Session
 import com.simprints.id.domain.callout.Callout
-import com.simprints.libdata.models.firebase.fb_Session
+import com.simprints.id.libdata.models.firebase.fb_Session
 import timber.log.Timber
 import kotlin.reflect.full.memberProperties
 

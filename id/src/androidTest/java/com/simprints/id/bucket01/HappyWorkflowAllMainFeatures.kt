@@ -14,7 +14,7 @@ import com.simprints.id.testHappyWorkflowIdentification
 import com.simprints.id.testHappyWorkflowVerification
 import com.simprints.id.tools.CalloutCredentials
 import com.simprints.id.tools.log
-import com.simprints.libdata.models.realm.RealmConfig
+import com.simprints.id.data.db.local.RealmConfig
 import com.simprints.remoteadminclient.ApiException
 import io.realm.Realm
 import io.realm.RealmConfiguration
