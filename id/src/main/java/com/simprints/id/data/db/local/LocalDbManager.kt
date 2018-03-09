@@ -10,7 +10,7 @@ import io.realm.RealmConfiguration
 interface LocalDbManager {
 
     // Lifecycle
-    fun signInToLocal(projectId: String, localDbKey: String): Single<Unit>
+    fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Single<Unit>
     fun signOutOfLocal()
     fun isLocalDbInitialized(projectId: String): Boolean
 
