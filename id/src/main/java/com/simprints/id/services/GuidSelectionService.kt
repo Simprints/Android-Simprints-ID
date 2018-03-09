@@ -66,7 +66,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
         var signed = false
         if (!apiKey.isEmpty()) {
-            val projectId = dataManager.getProjectIdForHashedLegacyApiKeyOrEmpty(Hasher.hash(apiKey))
+            val projectId = dataManager.getProjectIdForHashedLegacyProjectIdOrEmpty(Hasher.hash(apiKey))
             signed = dataManager.isProjectIdSignedIn(projectId)
         }
 

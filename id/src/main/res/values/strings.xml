@@ -307,22 +307,26 @@
     <!-- TODO: what about translation? -->
     <string name="empty" translatable="false" />
     <string name="simprints_logo">Simprints Logo</string>
-    <string name="login_enter_project_secret_id">Enter your project\'s id and key</string>
+    <string name="login_enter_project_secret_id">Enter your Project ID and key</string>
     <string name="scan_qr">Scan QR</string>
     <string name="enter">Enter</string>
-    <string name="login_id_hint">Project id</string>
+    <string name="login_id_hint">Project ID</string>
     <string name="login_secret_hint">Project key</string>
-    <string name="login_user_id_hint">User Id</string>
-
-    <string name="login_invalidCredentials">Invalid Login. Check Project\'s id or key</string>
+    <string name="login_user_id_hint">User ID</string>
     <string name="login_title">Request Project credentials</string>
     <string name="login_type_project_details">Type manually</string>
-    <string name="login_invalidQrCode">The scanned QR code is invalid.</string>
-
-    <string name="requestLogin_message">You need to login in. Please use your client App to open Simprints ID and log in.</string>
+    <string name="requestLogin_message">You need to login in. Please use your client app to open Simprints ID and log in.</string>
     <string name="requestLogin_title">Login Required</string>
     <string name="login">Login</string>
-    <string name="login_missing_credentials">Missing credentials. Please check user id, project\'s id and key again.</string>
+    <!-- QR code scanning messages -->
+    <string name="login_qr_code_scanning_problem">A problem occurred while scanning the QR code</string>
+    <string name="login_invalid_qr_code">The scanned QR code is invalid.</string>
+    <!-- sign-in toast messages -->
+    <string name="login_missing_credentials">Missing credentials. Please check the User ID, Project ID, and key, and try again.</string>
+    <string name="login_invalid_credentials">Invalid credentials. Please check the Project ID and key</string>
+    <string name="login_no_network">Currently offline. Please check your internet connection.</string>
+    <string name="login_server_error">A problem occurred trying to contact the server. Please try again later.</string>
+
 
     <!-- Dashboard Activity -->
     <string name="dashboard_label">Dashboard</string>

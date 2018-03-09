@@ -131,7 +131,7 @@ class FirebaseManager(private val appContext: Context,
         // to a projectId and use it for any task. In this case, we need the legacyApiKey
         // so we grab through the Application to avoid injecting it through all methods, so it will be easier
         // to get rid of it.
-        val hashedLegacyApiKey = (appContext as Application).secureDataManager.getHashedLegacyApiKeyForProjectIdOrEmpty(projectId)
+        val hashedLegacyApiKey = (appContext as Application).secureDataManager.getHashedLegacyProjectIdForProjectIdOrEmpty(projectId)
         return if (hashedLegacyApiKey.isNotEmpty()) {
             Hasher.hash(firebaseUser.uid) == hashedLegacyApiKey
         } else {

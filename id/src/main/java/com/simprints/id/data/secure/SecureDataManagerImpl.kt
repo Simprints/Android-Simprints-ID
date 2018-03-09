@@ -59,7 +59,7 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             ""
         }
 
-    override fun getSignedInHashedLegacyApiKeyOrEmpty(): String = getHashedLegacyApiKeyForProjectIdOrEmpty(getSignedInProjectIdOrEmpty())
+    override fun getSignedInHashedLegacyApiKeyOrEmpty(): String = getHashedLegacyProjectIdForProjectIdOrEmpty(getSignedInProjectIdOrEmpty())
 
     override fun getSignedInProjectIdOrEmpty(): String =
         try {
@@ -92,14 +92,14 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
         signedInUserId = ""
     }
 
-    override fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?) {
-        if (legacyApiKey != null && legacyApiKey.isNotEmpty()) {
-            val hashedLegacyApiKey = Hasher.hash(legacyApiKey)
+    override fun storeProjectIdWithLegacyProjectIdPair(projectId: String, legacyProjectId: String?) {
+        if (legacyProjectId != null && legacyProjectId.isNotEmpty()) {
+            val hashedLegacyApiKey = Hasher.hash(legacyProjectId)
             prefs.edit().putPrimitive(hashedLegacyApiKey, projectId).commit()
             prefs.edit().putPrimitive(projectId, hashedLegacyApiKey).commit()
         }
     }
 
-    override fun getHashedLegacyApiKeyForProjectIdOrEmpty(projectId: String): String = prefs.getString(projectId, "")
-    override fun getProjectIdForHashedLegacyApiKeyOrEmpty(hashedLegacyApiKey: String): String = prefs.getString(hashedLegacyApiKey, "")
+    override fun getHashedLegacyProjectIdForProjectIdOrEmpty(projectId: String): String = prefs.getString(projectId, "")
+    override fun getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey: String): String = prefs.getString(hashedLegacyApiKey, "")
 }
