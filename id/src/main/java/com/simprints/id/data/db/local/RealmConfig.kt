@@ -1,21 +1,17 @@
 package com.simprints.id.data.db.local
 
-import java.util.Arrays
-
 import io.realm.Realm
 import io.realm.RealmConfiguration
 
 object RealmConfig {
-    fun get(projectId: String, localDbKey: String): RealmConfiguration {
+    fun get(projectId: String, localDbKey: LocalDbKey): RealmConfiguration {
         val dbName = String.format("%s.realm", projectId)
-
-        val key = Arrays.copyOf(localDbKey.toByteArray(), 64)
 
         return RealmConfiguration.Builder()
             .name(dbName)
             .schemaVersion(1)
             .migration(Migration())
-            .encryptionKey(key)
+            .encryptionKey(localDbKey.value)
             .addModulesIfNotNull()
             .build()
     }
