@@ -2,13 +2,11 @@ package com.simprints.id.data.db.local
 
 import android.content.Context
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
+import com.simprints.id.libdata.DataCallback
+import com.simprints.id.libdata.models.firebase.fb_Person
+import com.simprints.id.libdata.models.realm.rl_Person
+import com.simprints.id.libdata.tools.Utils.wrapCallback
 import com.simprints.libcommon.Person
-import com.simprints.libdata.DataCallback
-import com.simprints.libdata.models.firebase.fb_Person
-import com.simprints.libdata.models.realm.RealmConfig
-import com.simprints.libdata.models.realm.rl_Person
-import com.simprints.libdata.tools.Constants
-import com.simprints.libdata.tools.Utils.wrapCallback
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -32,7 +30,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
     override fun signInToLocal(projectId: String, localDbKey: String): Single<Unit> =
         Single.create<Unit> {
             Timber.d("Signing to Realm project $projectId with key: $localDbKey")
-            realmConfig = RealmConfig.get(localDbKey)
+            realmConfig = RealmConfig.get(projectId, localDbKey)
             val realm = getRealmInstance()
             realm.close()
             it.onSuccess(Unit)
@@ -65,15 +63,15 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
     }
 
     override fun loadPeopleFromLocal(destinationList: MutableList<Person>,
-                                     group: Constants.GROUP, userId: String, moduleId: String,
+                                     group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String,
                                      callback: DataCallback?) {
         val wrappedCallback = wrapCallback("RealmDbManager.loadPeopleFromLocal()", callback)
 
         val realm = getRealmInstance()
         val request: RealmResults<rl_Person> = when (group) {
-            Constants.GROUP.GLOBAL -> realm.where(rl_Person::class.java).findAllAsync()
-            Constants.GROUP.USER -> realm.where(rl_Person::class.java).equalTo(USER_ID_FIELD, userId).findAllAsync()
-            Constants.GROUP.MODULE -> realm.where(rl_Person::class.java).equalTo(MODULE_ID_FIELD, moduleId).findAllAsync()
+            com.simprints.id.libdata.tools.Constants.GROUP.GLOBAL -> realm.where(rl_Person::class.java).findAllAsync()
+            com.simprints.id.libdata.tools.Constants.GROUP.USER -> realm.where(rl_Person::class.java).equalTo(USER_ID_FIELD, userId).findAllAsync()
+            com.simprints.id.libdata.tools.Constants.GROUP.MODULE -> realm.where(rl_Person::class.java).equalTo(MODULE_ID_FIELD, moduleId).findAllAsync()
         }
         request.addChangeListener({ results: RealmResults<rl_Person> ->
             request.removeAllChangeListeners()
@@ -83,7 +81,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         })
     }
 
-    override fun getPeopleCountFromLocal(group: Constants.GROUP, userId: String, moduleId: String): Long {
+    override fun getPeopleCountFromLocal(group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String): Long {
         val realm = getRealmInstance()
         val count = rl_Person.count(realm, userId, moduleId, group)
         realm.close()

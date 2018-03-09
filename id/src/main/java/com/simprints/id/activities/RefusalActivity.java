@@ -21,7 +21,7 @@ import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.InternalConstants;
-import com.simprints.libdata.models.enums.REFUSAL_FORM_REASON;
+import com.simprints.id.libdata.models.enums.REFUSAL_FORM_REASON;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.RefusalForm;
 
