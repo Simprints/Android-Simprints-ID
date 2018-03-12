@@ -11,6 +11,7 @@ interface LoginContract {
 
         // QR code scanning
 
+        fun handleOpenScanQRApp()
         fun handleMissingCredentials()
         fun updateProjectSecretInTextView(projectSecret: String)
         fun updateProjectIdInTextView(projectId: String)
@@ -32,6 +33,8 @@ interface LoginContract {
                    possibleProjectId: String,
                    possibleProjectSecret: String,
                    possibleLegacyProjectId: String? = null)
+
+        fun openScanQRApp()
 
         @Throws(InvalidScannedQRCodeText::class)
         fun processQRScannerAppResponse(scannedText: String)

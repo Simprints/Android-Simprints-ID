@@ -56,11 +56,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     private fun initUI() {
         progressDialog = SimProgressDialog(this)
         loginEditTextUserId.setText(app.dataManager.userId)
-        loginButtonScanQr.setOnClickListener { openScanQRApp() }
+        loginButtonScanQr.setOnClickListener { viewPresenter.openScanQRApp() }
         loginButtonSignIn.setOnClickListener { handleSignInStart() }
     }
 
-    private fun openScanQRApp() {
+    override fun handleOpenScanQRApp() {
         val intent = packageManager.scannerAppIntent()
         if (intent.resolveActivity(packageManager) != null) {
             startActivityForResult(intent, QR_REQUEST_CODE)
