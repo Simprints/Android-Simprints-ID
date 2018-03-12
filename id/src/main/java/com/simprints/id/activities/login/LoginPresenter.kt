@@ -74,6 +74,10 @@ class LoginPresenter(val view: LoginContract.View,
         }
     }
 
+    override fun openScanQRApp() {
+        view.handleOpenScanQRApp()
+    }
+
     /**
      * Valid Scanned Text Format:
      * project_id:someProjectId\n
