@@ -29,6 +29,9 @@ class SyncTask(private val dataManager: DataManager,
             }
             is SyncTaskParameters.GlobalSyncTaskParameters ->
                 dataManager.syncGlobal(parameters.projectId, isInterrupted, emitter)
+
+            is SyncTaskParameters.ModuleIdSyncTaskParameters ->
+                dataManager.syncModule(parameters.projectId, parameters.moduleId, isInterrupted, emitter)
         }
     }
 }

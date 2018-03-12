@@ -2,9 +2,11 @@ package com.simprints.id.services.sync
 
 import com.simprints.id.services.progress.service.ProgressTaskParameters
 
-sealed class SyncTaskParameters : ProgressTaskParameters {
+sealed class SyncTaskParameters(open val projectId: String) : ProgressTaskParameters {
 
-    data class UserSyncTaskParameters(val projectId: String, val userId: String) : SyncTaskParameters()
+    data class UserSyncTaskParameters(override val projectId: String, val userId: String) : SyncTaskParameters(projectId)
 
-    data class GlobalSyncTaskParameters(val projectId: String) : SyncTaskParameters()
+    data class ModuleIdSyncTaskParameters(override val projectId: String, val moduleId: String) : SyncTaskParameters(projectId)
+
+    data class GlobalSyncTaskParameters(override val projectId: String) : SyncTaskParameters(projectId)
 }
