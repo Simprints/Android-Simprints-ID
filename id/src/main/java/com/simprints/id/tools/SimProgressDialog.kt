@@ -4,7 +4,7 @@ import android.app.Activity
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.simprints.id.R
-import com.simprints.id.tools.extensions.ifStillRunning
+import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 
 // Custom UI for standard ProgressDialog (deprecated: https://developer.android.com/reference/android/app/ProgressDialog.html)
 class SimProgressDialog(private val act: Activity, private val dismissibleByUser: Boolean = false) {
@@ -13,7 +13,7 @@ class SimProgressDialog(private val act: Activity, private val dismissibleByUser
     private lateinit var background: RelativeLayout
 
     init {
-        act.ifStillRunning {
+        act.runOnUiThreadIfStillRunning {
             val actLayout = act.findViewById(android.R.id.content) as ViewGroup
 
             rootLayout = actLayout.getChildAt(0) as? RelativeLayout
@@ -29,14 +29,14 @@ class SimProgressDialog(private val act: Activity, private val dismissibleByUser
     }
 
     fun show() {
-        act.ifStillRunning {
+        act.runOnUiThreadIfStillRunning {
             dismiss()
             rootLayout.addView(background)
         }
     }
 
     fun dismiss() {
-        act.ifStillRunning {
+        act.runOnUiThreadIfStillRunning {
             rootLayout.removeView(background)
         }
     }
