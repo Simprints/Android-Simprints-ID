@@ -3,10 +3,7 @@ package com.simprints.id.activities.login
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.activities.InvalidScannedQRCodeText
-import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.secure.*
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
 import io.reactivex.rxkotlin.subscribeBy
@@ -63,7 +60,7 @@ class LoginPresenter(val view: LoginContract.View,
     }
 
     private fun handleSignInError(e: Throwable) {
-        analyticsManager.logThrowable(e)
+        logSignInError(e)
         when (e) {
             is IOException -> view.handleSignInFailedNoConnection()
             is DifferentProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch()
@@ -71,6 +68,13 @@ class LoginPresenter(val view: LoginContract.View,
             is AuthRequestInvalidCredentialsException -> view.handleSignInFailedInvalidCredentials()
             is SimprintsInternalServerException -> view.handleSignInFailedServerError()
             else -> view.handleSignInFailedUnknownReason()
+        }
+    }
+
+    private fun logSignInError(e: Throwable) {
+        when(e) {
+            is Error -> analyticsManager.logError(e)
+            else -> analyticsManager.logSafeException(AuthException(cause=e))
         }
     }
 
