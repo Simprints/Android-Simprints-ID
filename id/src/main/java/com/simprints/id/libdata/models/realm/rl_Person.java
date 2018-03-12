@@ -29,7 +29,6 @@ public class rl_Person extends RealmObject {
     @PrimaryKey
     public String patientId;
     public String userId;
-    public String androidId;
     public String moduleId;
     public Date createdAt;
     public boolean toSync;
@@ -42,26 +41,40 @@ public class rl_Person extends RealmObject {
         this.patientId = person.getPatientId();
         this.userId = person.getUserId();
         this.createdAt = person.getCreatedAt();
-        this.androidId = person.getAndroidId();
         this.moduleId = person.getModuleId();
         this.fingerprints = new RealmList<>();
         this.toSync = false;
 
-        if (person.getFingerprints() != null) {
-            for (fb_Fingerprint print : person.getFingerprints()) {
-                rl_Fingerprint rlPrint = new rl_Fingerprint(print, this);
+        for (fb_Fingerprint print : person.getAllFingerprints()) {
+            rl_Fingerprint rlPrint = new rl_Fingerprint(print);
 
-                if (rlPrint.template != null)
-                    fingerprints.add(rlPrint);
-            }
+            if (rlPrint.getTemplate() != null)
+                fingerprints.add(rlPrint);
         }
+    }
+
+    public static long count(@NonNull Realm realm, @NonNull String userId, @NonNull String moduleId, @NonNull final Constants.GROUP group) {
+        switch (group) {
+            case GLOBAL:
+                return realm.where(rl_Person.class).count();
+            case USER:
+                return realm.where(rl_Person.class).equalTo("userId", userId).count();
+            case MODULE:
+                return realm.where(rl_Person.class).equalTo("moduleId", moduleId).count();
+            default:
+                throw new RuntimeException();
+        }
+    }
+
+    public static rl_Person get(@NonNull Realm realm, @NonNull String patientId) {
+        return realm.where(rl_Person.class).equalTo("patientId", patientId).findFirst();
     }
 
     public Person getLibPerson() {
         List<Fingerprint> prints = new ArrayList<>();
         for (rl_Fingerprint print : fingerprints) {
             try {
-                prints.add(new Fingerprint(FingerIdentifier.values()[print.fingerId], print.template));
+                prints.add(new Fingerprint(FingerIdentifier.values()[print.getFingerId()], print.getTemplate()));
             } catch (IllegalArgumentException arg) {
                 Timber.tag("FINGERPRINT").d("FAILED");
             }
@@ -69,12 +82,11 @@ public class rl_Person extends RealmObject {
         return new Person(patientId, prints);
     }
 
-
     public JSONObject getJsonPerson() throws JSONException {
         JSONArray jsonArrayPrints = new JSONArray();
         for (rl_Fingerprint print : fingerprints) {
 
-            int fingerIdInt = print.fingerId;
+            int fingerIdInt = print.getFingerId();
             String fingerIdString = null;
             switch (fingerIdInt) {
                 case 0:
@@ -112,15 +124,14 @@ public class rl_Person extends RealmObject {
 
             JSONObject jsonPrint = new JSONObject();
             jsonPrint.put("fingerId", fingerIdString);
-            jsonPrint.put("qualityScore", print.qualityScore);
-            jsonPrint.put("template", com.simprints.libcommon.Utils.byteArrayToBase64(print.template));
+            jsonPrint.put("qualityScore", print.getQualityScore());
+            jsonPrint.put("template", com.simprints.libcommon.Utils.byteArrayToBase64(print.getTemplate()));
 
             jsonArrayPrints.put(jsonPrint);
         }
 
         JSONObject jsonPerson = new JSONObject();
 
-        jsonPerson.put("androidId", androidId);
         jsonPerson.put("createdAt", createdAt);
         jsonPerson.put("fingerprints", jsonArrayPrints);
         jsonPerson.put("moduleId", moduleId);
@@ -138,22 +149,5 @@ public class rl_Person extends RealmObject {
                 realm.copyToRealmOrUpdate(rl_Person.this);
             }
         });
-    }
-
-    public static long count(@NonNull Realm realm, @NonNull String userId, @NonNull String moduleId, @NonNull final Constants.GROUP group) {
-        switch (group) {
-            case GLOBAL:
-                return realm.where(rl_Person.class).count();
-            case USER:
-                return realm.where(rl_Person.class).equalTo("userId", userId).count();
-            case MODULE:
-                return realm.where(rl_Person.class).equalTo("moduleId", moduleId).count();
-            default:
-                throw new RuntimeException();
-        }
-    }
-
-    public static rl_Person get(@NonNull Realm realm, @NonNull String patientId) {
-        return realm.where(rl_Person.class).equalTo("patientId", patientId).findFirst();
     }
 }

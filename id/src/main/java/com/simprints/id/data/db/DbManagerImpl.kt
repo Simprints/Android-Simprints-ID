@@ -77,11 +77,11 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         localDbManager.getPeopleCountFromLocal(group, userId, moduleId)
 
     override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
-        remoteDbManager.saveIdentificationInRemote(probe, projectId, userId, androidId, moduleId, matchSize, matches, sessionId)
+        remoteDbManager.saveIdentificationInRemote(probe, projectId, userId, moduleId, androidId, matchSize, matches, sessionId)
     }
 
     override fun saveVerification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
-        remoteDbManager.saveVerificationInRemote(probe, projectId, userId, androidId, moduleId, patientId, match, sessionId, guidExistsResult)
+        remoteDbManager.saveVerificationInRemote(probe, projectId, userId, moduleId, androidId, patientId, match, sessionId, guidExistsResult)
     }
 
     override fun saveSession(session: Session) {
@@ -92,18 +92,16 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.saveRefusalFormInRemote(refusalForm, projectId, userId, sessionId)
     }
 
-    override fun syncGlobal(legacyApiKey: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        getSyncManager(legacyApiKey).syncGlobal(isInterrupted, emitter)
+    override fun syncGlobal(projectId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        getSyncManager(projectId).syncGlobal(isInterrupted, emitter)
     }
 
-    override fun syncUser(legacyApiKey: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        getSyncManager(legacyApiKey).syncUser(userId, isInterrupted, emitter)
+    override fun syncUser(projectId: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        getSyncManager(projectId).syncUser(userId, isInterrupted, emitter)
     }
 
-    private fun getSyncManager(legacyApiKey: String): NaiveSyncManager =
-        // if localDbManager.realmConfig is null, the user is not signed in and we should not be here,
-        // TODO: that is temporary, we will fix in the migration firestore
-        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), legacyApiKey, localDbManager.getValidRealmConfig())
+    private fun getSyncManager(projectId: String): NaiveSyncManager =
+        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), projectId, localDbManager.getValidRealmConfig())
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback) {
         val firebaseManager = remoteDbManager as FirebaseManager

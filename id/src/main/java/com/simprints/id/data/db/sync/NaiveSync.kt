@@ -1,197 +1,129 @@
 package com.simprints.id.data.db.sync
 
-import com.google.firebase.database.*
-import com.simprints.libcommon.Progress
+import com.google.gson.stream.JsonReader
 import com.simprints.id.exceptions.safe.InterruptedSyncException
-import com.simprints.id.exceptions.unsafe.UnexpectedSyncError
 import com.simprints.id.libdata.models.firebase.fb_Person
-import com.simprints.id.libdata.models.firebase.fb_User
 import com.simprints.id.libdata.models.realm.rl_Person
-import com.simprints.id.libdata.tools.Routes.patientNode
-import com.simprints.id.libdata.tools.Routes.userPatientListNode
+import com.simprints.id.sync.models.RealmSyncInfo
+import com.simprints.id.tools.JsonHelper
+import com.simprints.libcommon.Progress
 import io.reactivex.Emitter
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import org.jetbrains.anko.doAsync
+import okhttp3.HttpUrl
 import timber.log.Timber
-import java.util.HashMap
-import java.util.concurrent.atomic.AtomicInteger
-import kotlin.collections.ArrayList
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.Reader
+import java.net.HttpURLConnection
+import java.util.zip.GZIPInputStream
 
-class NaiveSync(
-    private val isInterrupted: () -> Boolean,
-    private val emitter: Emitter<Progress>,
-    private val userId: String = "",
-    private val realmConfig: RealmConfiguration,
-    private val projectRef: DatabaseReference,
-    private val usersRef: DatabaseReference,
-    private val patientsRef: DatabaseReference,
-    private val batchSize: Int = 50) {
+class NaiveSync(private val isInterrupted: () -> Boolean,
+                private val emitter: Emitter<Progress>,
+                val projectId: String,
+                val moduleId: String?,
+                val userId: String?,
+                private val realmConfig: RealmConfiguration) {
 
-    private var patientsToDownload: ArrayList<String> = ArrayList()
-    private var patientsToSave: ArrayList<rl_Person> = ArrayList()
-    private var downloadingCount = 0
+    private val urlForDownload by lazy {
+        val builder = HttpUrl.Builder()
+            .scheme("https")
+            .host("sync-manager-dot-simprints-dev.appspot.com")
+            .addPathSegment("patients-sync")
+            .addQueryParameter("key", "AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0")
+            .addQueryParameter("projectId", "testProjectWith100kPatients")
+            .addQueryParameter("batchSize", 5000.toString())
 
-    private val currentProgress = AtomicInteger(0)
-    private val maxProgress = AtomicInteger(0)
+        moduleId?.let {
+            builder.addQueryParameter("moduleId", it)
+        }
+        userId?.let {
+            builder.addQueryParameter("userId", it)
+        }
+        builder.build().url()
+    }
 
-    /**
-     * This method starts the sync by downloading all of the required users and calling
-     * setPatientList()
-     */
     fun sync() {
-        // All firebase callbacks are executed on the ui thread, so we initialize the realm on
-        // this thread and make sure that it will only be used on this thread.
-        async(UI) {
+        downloadNewPatients()
+    }
 
-            // Get the query
-            val query: Query = if (userId.isBlank()) {
-                usersRef
-            } else {
-                usersRef.orderByChild(userId).limitToFirst(1)
-            }
+    private fun downloadNewPatients() {
+        Timber.d("Url: $")
+        val conn: HttpURLConnection = urlForDownload.openConnection() as HttpURLConnection
+        conn.setRequestProperty("Accept-Encoding", "gzip, deflate")
+        conn.connectTimeout = 40 * 1000
+        conn.readTimeout = 40 * 1000
+        val stream = if ("gzip" == conn.contentEncoding) {
+            GZIPInputStream(conn.inputStream)
+        } else {
+            conn.inputStream
+        }
+        return downloadNewPatientsFromStream(stream)
+    }
 
-            // Set the user return listener
-            query.addListenerForSingleValueEvent(object : ValueEventListener {
+    private fun downloadNewPatientsFromStream(input: InputStream) {
+        val reader = JsonReader(InputStreamReader(input) as Reader?)
+        val realm = Realm.getInstance(realmConfig)
 
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
+        try {
+            val gson = JsonHelper.create()
 
-                    if (dataSnapshot.childrenCount <= 0) {
-                        emitter.onComplete()
-                        return
+            val sizeBatch = 10000
+            val sizeBatchToLog = 100
+
+            reader.beginArray()
+            var totalDownloaded = 0
+            var counterToLog = 0
+
+            while (reader.hasNext()) {
+                realm.executeTransaction { r ->
+                    var counterToSave = 0
+                    while (reader.hasNext()) {
+
+                        counterToSave++
+                        counterToLog++
+                        totalDownloaded++
+
+                        val person = gson.fromJson<fb_Person>(reader, fb_Person::class.java)
+                        r.insertOrUpdate(rl_Person(person))
+                        r.insertOrUpdate(RealmSyncInfo(person.updatedAt))
+
+                        if (counterToLog == sizeBatchToLog) {
+                            counterToLog = 0
+                            emitter.onNext(Progress(totalDownloaded, -1))
+                        }
+                        if (counterToSave == sizeBatch || isInterrupted()) {
+                            break
+                        }
                     }
-
-                    setDownloadListAndUpload(dataSnapshot)
                 }
 
-                override fun onCancelled(error: DatabaseError) {
-                    emitter.onError(UnexpectedSyncError(error.toException()))
+                if (isInterrupted()) {
+                    break
                 }
-            })
-        }
-    }
-
-    /**
-     * This functions adds patients to download to the list and uploads patients that need to be
-     * saved to remote. When the download list is complete it calls clearPatientList()
-     */
-    private fun setDownloadListAndUpload(dataSnapshot: DataSnapshot) {
-
-        // TODO Take out using threads. From now on threading will be handled by the caller, not the callee.
-        doAsync {
-
-            val realm = Realm.getInstance(realmConfig)
-            dataSnapshot.children.forEach {
-                val user = it.getValue(fb_User::class.java) ?: return@forEach
-
-                val remoteList = ArrayList(user.patientList.keys)
-                remoteList.sort()
-
-                val localList: List<String> = realm.where(rl_Person::class.java)
-                        .equalTo("userId", user.userId)
-                        .findAllSorted("patientId")
-                        .mapNotNull { rl_Person ->
-                            rl_Person.patientId
-                        }
-
-                patientsToDownload.addAll(remoteList.minus(localList))
-                localList.minus(remoteList).forEach { realmToFirebase(realm, it, user) }
             }
 
-            realm.close()
-
-            maxProgress.set(patientsToDownload.size)
-            emitProgress()
-
-            clearPatientList()
+            finishDownload(reader, realm, emitter, if (isInterrupted()) InterruptedSyncException() else null)
+        } catch (e: Exception) {
+            finishDownload(reader, realm, emitter, e)
         }
     }
 
-    /**
-     * This function calls itself recursively until all patients are downloaded
-     */
-    private fun clearPatientList() {
+    private fun finishDownload(reader: JsonReader,
+                               realm: Realm,
+                               emitter: Emitter<Progress>,
+                               error: Throwable? = null) {
 
-        if (isInterrupted()) {
-            emitter.onError(InterruptedSyncException())
-            return
+        if (realm.isInTransaction) {
+            realm.commitTransaction()
         }
 
-        if (patientsToDownload.isEmpty() && downloadingCount <= 0) {
-            if (!patientsToSave.isEmpty())
-                saveBatch()
-            return
-        }
-
-        while (downloadingCount < batchSize) {
-
-            if (patientsToDownload.isEmpty())
-                return
-
-            downloadingCount++
-
-            val iterator = patientsToDownload.iterator()
-            val nextPatientId = iterator.next()
-            iterator.remove()
-
-            patientsRef.child(nextPatientId)
-                    .addListenerForSingleValueEvent(object : ValueEventListener {
-
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            downloadingCount--
-
-                            val person = dataSnapshot.getValue(fb_Person::class.java) ?: return
-                            patientsToSave.add(rl_Person(person))
-                            clearPatientList()
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            downloadingCount--
-                            clearPatientList()
-                            Timber.d("LOAD FAILED")
-                        }
-                    })
-        }
-
-        // Note, this is checked after every call to clearPatientList()
-        // irrespective to the addListenerForSingleValueEvent() callbacks
-        if (patientsToSave.size >= batchSize) {
-            saveBatch()
-        }
-    }
-
-    private fun saveBatch() {
-        val batch: ArrayList<rl_Person> = ArrayList()
-
-        val iterator = patientsToSave.iterator()
-        while (iterator.hasNext()) {
-            batch.add(iterator.next())
-            iterator.remove()
-        }
-
-        Realm.getInstance(realmConfig).executeTransactionAsync { realm ->
-            realm.copyToRealmOrUpdate(batch)
-            currentProgress.set(maxProgress.get() - patientsToDownload.size)
-            emitProgress()
-        }
-    }
-
-    private fun realmToFirebase(realm: Realm, personId: String, user: fb_User) {
-        val person = realm.where(rl_Person::class.java)
-                .equalTo("patientId", personId)
-                .findFirst() ?: return
-
-        val updates = HashMap<String, Any>()
-        updates.put(patientNode(person.patientId), fb_Person(person).toMap())
-        updates.put(userPatientListNode(user.userId, person.patientId), true)
-        projectRef.updateChildren(updates)
-    }
-
-    private fun emitProgress() {
-        emitter.onNext(Progress(currentProgress.get(), maxProgress.get()))
-        if (patientsToDownload.isEmpty() && patientsToSave.isEmpty()) {
+        realm.close()
+        reader.endArray()
+        reader.close()
+        if (error != null) {
+            emitter.onError(error)
+        } else {
             emitter.onComplete()
         }
     }

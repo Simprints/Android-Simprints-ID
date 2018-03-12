@@ -4,21 +4,22 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.database.Exclude
 import com.google.firebase.database.Query
 import com.google.firebase.firestore.FieldValue
+import com.google.gson.annotations.SerializedName
 import com.simprints.id.libdata.models.realm.rl_Person
 import com.simprints.id.libdata.tools.Routes.patientsNode
 import com.simprints.id.libdata.tools.Routes.projectRef
 import com.simprints.id.libdata.tools.Utils
 import com.simprints.libcommon.Person
+import com.simprints.libsimprints.FingerIdentifier
 import java.util.*
 
-data class fb_Person( var patientId: String,
-                      var userId: String = "",
-                      var androidId: String = "",
-                      var moduleId: String = "",
-                      var createdAt: Date = Date(0),
-                      var syncTime: Date = Date(0)) {
-
-    lateinit var fingerprints: MutableList<fb_Fingerprint>
+data class fb_Person(@SerializedName("id") var patientId: String = "",
+                     var userId: String = "",
+                     var moduleId: String = "",
+                     var androidId: String = "",
+                     var createdAt: Date = Utils.now(),
+                     var updatedAt: Date = Utils.now(),
+                     var fingerprints: HashMap<FingerIdentifier, ArrayList<fb_Fingerprint>> = hashMapOf()) {
 
     constructor (person: Person,
                  userId: String,
@@ -27,26 +28,36 @@ data class fb_Person( var patientId: String,
         patientId = person.guid,
         userId = userId,
         androidId = androidId,
-        moduleId = moduleId,
-        createdAt = Utils.now()) {
+        moduleId = moduleId) {
 
-        this.fingerprints = ArrayList()
         person.fingerprints
             .map { fb_Fingerprint(it) }
-            .forEach { fingerprints.add(it) }
+            .forEach {
+                var listOfFingerprints = fingerprints[it.fingerId]
+                if (listOfFingerprints == null) {
+                    listOfFingerprints = arrayListOf()
+                }
+
+                listOfFingerprints.add(it)
+            }
     }
 
     constructor (realmPerson: rl_Person) : this (
         patientId = realmPerson.patientId,
         userId = realmPerson.userId,
-        androidId = realmPerson.androidId,
         moduleId = realmPerson.moduleId,
         createdAt = realmPerson.createdAt) {
 
-        this.fingerprints = ArrayList()
         realmPerson.libPerson.fingerprints
             .map { fb_Fingerprint(it) }
-            .forEach { fingerprints.add(it) }
+            .forEach {
+                var listOfFingerprints = fingerprints[it.fingerId]
+                if (listOfFingerprints == null) {
+                    listOfFingerprints = arrayListOf()
+                }
+
+                listOfFingerprints.add(it)
+            }
     }
 
     @Exclude
@@ -55,10 +66,13 @@ data class fb_Person( var patientId: String,
             "patientId" to patientId,
             "userId" to userId,
             "moduleId" to moduleId,
-            "androidId" to androidId,
             "createdAt" to createdAt,
             "syncTime" to FieldValue.serverTimestamp(),
             "fingerprints" to fingerprints)
+    }
+
+    fun getAllFingerprints(): ArrayList<fb_Fingerprint> {
+        return ArrayList(fingerprints.flatMap { t -> t.value })
     }
 
     companion object {

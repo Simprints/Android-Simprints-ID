@@ -196,6 +196,7 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
 
     // Network - Gson
     implementation "com.google.code.gson:gson:2.8.2"
@@ -233,7 +234,6 @@ dependencies {
 
     androidTestImplementation "com.simprints:cerberus-library:2018.1.1-dev-1"
     androidTestImplementation "com.simprints:remote-admin-client:2017.4.0-dev-5"
-    androidTestImplementation "com.squareup.okhttp:okhttp:2.7.5" // TODO : Update to okhttp3 in remote-admin-client
     androidTestImplementation "joda-time:joda-time:2.9.9"
 }
 

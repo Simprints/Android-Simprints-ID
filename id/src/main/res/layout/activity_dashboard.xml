@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -41,8 +42,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             tools:ignore="UseCompoundDrawables">
             <ImageView
                 android:id="@+id/dashboardLayerSyncIcon"
@@ -64,5 +65,19 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/logout" />
+
+
+        <TextView
+            android:id="@+id/textAddPersonRealm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp" />
+
+        <Button
+            android:id="@+id/buttonAddPersonRealm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Add to realm" />
     </LinearLayout>
 </RelativeLayout>
