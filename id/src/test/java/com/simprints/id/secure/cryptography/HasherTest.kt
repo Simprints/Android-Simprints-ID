@@ -16,7 +16,7 @@ class HasherTest {
     @Test
     fun testCanEncryptString() {
         val string = "this is some string"
-        val hashedString = Hasher.hash(string)
+        val hashedString = Hasher().hash(string)
         Assert.assertNotNull(hashedString)
         assert(hashedString.isEmpty())
     }
@@ -25,8 +25,8 @@ class HasherTest {
     fun testHashingDifferentStringsGivesDifferentResults() {
         val string1 = "this is some string"
         val string2 = "this is another string"
-        val hashedString1 = Hasher.hash(string1)
-        val hashedString2 = Hasher.hash(string2)
+        val hashedString1 = Hasher().hash(string1)
+        val hashedString2 = Hasher().hash(string2)
         Assert.assertNotEquals(hashedString1, hashedString2)
     }
 
@@ -34,8 +34,8 @@ class HasherTest {
     fun testHashingSameStringsGivesSameResults() {
         val string1 = "this is some string"
         val string2 = "this is some string"
-        val hashedString1 = Hasher.hash(string1)
-        val hashedString2 = Hasher.hash(string2)
+        val hashedString1 = Hasher().hash(string1)
+        val hashedString2 = Hasher().hash(string2)
         Assert.assertEquals(hashedString1, hashedString2)
     }
 }

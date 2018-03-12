@@ -6,13 +6,10 @@ import java.security.MessageDigest
 
 class Hasher {
 
-    companion object {
-
-        fun hash(string: String): String {
-            val m = MessageDigest.getInstance("MD5")
-            m.update(string.toByteArray(), 0, string.length)
-            val i = BigInteger(1, m.digest())
-            return String.format("%1$032x", i)
-        }
+    fun hash(string: String): String {
+        val m = MessageDigest.getInstance("MD5")
+        m.update(string.toByteArray(), 0, string.length)
+        val i = BigInteger(1, m.digest())
+        return String.format("%1$032x", i)
     }
 }
