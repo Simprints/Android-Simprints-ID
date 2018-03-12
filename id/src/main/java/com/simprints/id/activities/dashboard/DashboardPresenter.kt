@@ -4,10 +4,10 @@ import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import com.simprints.id.R
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.remote.authListener.AuthListener
-import com.simprints.id.data.db.remote.connectionListener.ConnectionListener
 import com.simprints.id.exceptions.unsafe.InvalidSyncGroupError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
+import com.simprints.id.libdata.models.realm.rl_Person
+import com.simprints.id.libdata.tools.Constants
 import com.simprints.id.libdata.tools.Constants.GROUP
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.services.sync.SyncClient
@@ -25,6 +25,13 @@ class DashboardPresenter(val view: DashboardContract.View,
     override fun start() {
         if (!started) {
             started = true
+
+            dataManager.syncGroup = Constants.GROUP.GLOBAL
+            val realm = dataManager.getRealmInstance()
+            realm.executeTransaction {
+                it.where(rl_Person::class.java).findAll().deleteAllFromRealm()
+            }
+
             startListeners()
         }
     }
@@ -35,8 +42,8 @@ class DashboardPresenter(val view: DashboardContract.View,
 
     override fun sync() {
         val syncParameters = when (dataManager.syncGroup) {
-            GROUP.GLOBAL -> SyncTaskParameters.GlobalSyncTaskParameters(dataManager.getSignedInMd5LegacyApiKeyOrEmpty())
-            GROUP.USER -> SyncTaskParameters.UserSyncTaskParameters(dataManager.getSignedInMd5LegacyApiKeyOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
+            GROUP.GLOBAL -> SyncTaskParameters.GlobalSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty())
+            GROUP.USER -> SyncTaskParameters.UserSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
             else -> {
                 handleUnexpectedError(InvalidSyncGroupError())
                 return
@@ -54,48 +61,17 @@ class DashboardPresenter(val view: DashboardContract.View,
     private fun stopListeners() {
         try {
             syncClient.stopListening()
-            dataManager.unregisterRemoteAuthListener(authListener)
-            dataManager.unregisterRemoteConnectionListener(connectionListener)
         } catch (error: UninitializedDataManagerError) {
             handleUnexpectedError(error)
         }
     }
 
     private fun startListeners() {
-        dataManager.registerRemoteAuthListener(authListener)
-        dataManager.registerRemoteConnectionListener(connectionListener)
-        updateConnectionState()
         syncClient.startListening(newSyncObserver())
     }
 
-    private fun updateConnectionState() {
-        if (dataManager.isRemoteConnected) {
-            connectionListener.onConnection()
-        } else {
-            connectionListener.onDisconnection()
-        }
-    }
-
-    private val authListener = object : AuthListener {
-        override fun onSignIn() {
-        }
-
-        override fun onSignOut() {
-            setOfflineSyncItem()
-        }
-    }
-
-    private val connectionListener = object : ConnectionListener {
-        override fun onConnection() {
-            setReadySyncItem()
-        }
-
-        override fun onDisconnection() {
-            setOfflineSyncItem()
-        }
-    }
-
     private fun newSyncObserver(): DisposableObserver<Progress> {
+        val start = System.currentTimeMillis()
         return object : DisposableObserver<Progress>() {
 
             override fun onNext(progress: Progress) {
@@ -105,6 +81,12 @@ class DashboardPresenter(val view: DashboardContract.View,
 
             override fun onComplete() {
                 Timber.d("onComplete")
+
+                val ms = System.currentTimeMillis() - start
+                val realm = dataManager.getRealmInstance()
+                val count = realm.where(rl_Person::class.java).findAll().count()
+                Timber.d("Syncer - $count Persons loaded in $ms ms (${ms / 1000})")
+
                 setCompleteSyncItem()
                 syncClient.stopListening()
             }
@@ -143,14 +125,6 @@ class DashboardPresenter(val view: DashboardContract.View,
 
     private fun setCompleteSyncItem() {
         setSyncItem(true, R.string.nav_sync_complete, R.drawable.ic_sync_success)
-    }
-
-    private fun setReadySyncItem() {
-        setSyncItem(true, R.string.nav_sync, R.drawable.ic_menu_sync_ready)
-    }
-
-    private fun setOfflineSyncItem() {
-        setSyncItem(false, R.string.not_signed_in, R.drawable.ic_menu_sync_off)
     }
 
     private fun setSyncItem(enabled: Boolean, @StringRes title: Int, @DrawableRes icon: Int) {
