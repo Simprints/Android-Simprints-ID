@@ -16,18 +16,15 @@ import java.util.*
 data class fb_Person(@SerializedName("id") var patientId: String = "",
                      var userId: String = "",
                      var moduleId: String = "",
-                     var androidId: String = "",
                      var createdAt: Date = Utils.now(),
                      var updatedAt: Date = Utils.now(),
                      var fingerprints: HashMap<FingerIdentifier, ArrayList<fb_Fingerprint>> = hashMapOf()) {
 
     constructor (person: Person,
                  userId: String,
-                 androidId: String,
                  moduleId: String) : this (
         patientId = person.guid,
         userId = userId,
-        androidId = androidId,
         moduleId = moduleId) {
 
         person.fingerprints

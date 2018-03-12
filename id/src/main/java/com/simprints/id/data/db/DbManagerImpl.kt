@@ -96,6 +96,10 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         getSyncManager(projectId).syncGlobal(isInterrupted, emitter)
     }
 
+    override fun syncModule(projectId: String, moduleId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
+        getSyncManager(projectId).syncModule(moduleId, isInterrupted, emitter)
+    }
+
     override fun syncUser(projectId: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
         getSyncManager(projectId).syncUser(userId, isInterrupted, emitter)
     }

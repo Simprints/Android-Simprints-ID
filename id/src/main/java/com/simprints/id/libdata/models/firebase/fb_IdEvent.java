@@ -23,7 +23,7 @@ public class fb_IdEvent {
     }
 
     public fb_IdEvent(Person probe, String userId, String androidId, String moduleId, int matchSize, List<Identification> identifications, String sessionId) {
-        this.ProbePerson = new fb_Person(probe, userId, androidId, moduleId);
+        this.ProbePerson = new fb_Person(probe, userId, moduleId);
         this.userId = userId;
         this.matchSize = matchSize;
         this.date = Utils.now().getTime();

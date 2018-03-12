@@ -15,6 +15,9 @@ class NaiveSyncManager(firebaseApp: FirebaseApp,
     fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
         sync(null, null, isInterrupted, emitter)
 
+    fun syncModule(moduleId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
+        sync(moduleId, null, isInterrupted, emitter)
+
     private fun sync(moduleId: String?,
                      userId: String?, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
         NaiveSync(isInterrupted,

@@ -20,9 +20,6 @@ import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionList
 import com.simprints.id.data.models.Session
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
-import com.simprints.id.secure.models.Tokens
-import com.simprints.id.tools.extensions.md5
-import com.simprints.libcommon.Person
 import com.simprints.id.libdata.DATA_ERROR
 import com.simprints.id.libdata.DataCallback
 import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
@@ -30,6 +27,10 @@ import com.simprints.id.libdata.models.firebase.*
 import com.simprints.id.libdata.models.realm.rl_Person
 import com.simprints.id.libdata.tools.Routes.*
 import com.simprints.id.libdata.tools.Utils.wrapCallback
+import com.simprints.id.secure.models.Tokens
+import com.simprints.id.tools.extensions.deviceId
+import com.simprints.id.tools.extensions.md5
+import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
@@ -171,7 +172,7 @@ class FirebaseManager(private val appContext: Context,
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val user = dataSnapshot.getValue(fb_User::class.java)
                 if (user == null) {
-                    updates[userNode(fbPerson.userId)] = fb_User(fbPerson.userId, fbPerson.androidId, fbPerson.patientId)
+                    updates[userNode(fbPerson.userId)] = fb_User(fbPerson.userId, appContext.deviceId, fbPerson.patientId)
                 } else {
                     updates[userPatientListNode(fbPerson.userId, fbPerson.patientId)] = true
                 }
