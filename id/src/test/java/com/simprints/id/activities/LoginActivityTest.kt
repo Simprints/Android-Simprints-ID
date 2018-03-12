@@ -12,7 +12,7 @@ import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.tools.roboletric.*
-import io.reactivex.internal.operators.single.SingleJust
+import io.reactivex.Completable
 import junit.framework.Assert.assertNotNull
 import junit.framework.Assert.assertTrue
 import kotlinx.android.synthetic.main.activity_login.*
@@ -65,7 +65,7 @@ class LoginActivityTest {
 
         val controller = createRoboLoginActivity().start().resume().visible()
         val projectAuthenticator = mock(LegacyCompatibleProjectAuthenticator::class.java)
-        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull(), any())).thenReturn(SingleJust(Unit))
+        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull(), any())).thenReturn(Completable.complete())
 
         val loginAct = controller.get().apply {
             viewPresenter.projectAuthenticator = projectAuthenticator

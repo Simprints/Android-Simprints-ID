@@ -5,11 +5,11 @@ import com.simprints.id.Application
 import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.testUtils.anyNotNull
-import io.reactivex.internal.operators.single.SingleJust
+import io.reactivex.Completable
 import org.mockito.Mockito
 import org.mockito.stubbing.Answer
 
-//Because Roboletric doesn't work with Realm, we need to mock the localManager to run tests with Roboeletric.
+//Because Roboletric doesn't work with Realm, we need to mock the localManager to run tests with Roboletric.
 fun mockLocalDbManager(app: Application) {
     app.localDbManager = Mockito.mock(RealmDbManager::class.java)
 }
@@ -21,8 +21,8 @@ fun mockRemoteDbManager(app: Application) {
 fun mockDbManager(app: Application) {
     val spy = Mockito.spy(app.dbManager)
     Mockito.doNothing().`when`(spy).initialiseDb()
-    Mockito.doReturn(SingleJust(Unit)).`when`(spy).signIn(anyNotNull(), anyNotNull())
-    Mockito.doReturn(SingleJust(Unit)).`when`(spy).getLocalKeyAndSignInToLocal(anyNotNull())
+    Mockito.doReturn(Completable.complete()).`when`(spy).signIn(anyNotNull(), anyNotNull())
+    Mockito.doReturn(Completable.complete()).`when`(spy).getLocalKeyAndSignInToLocal(anyNotNull())
     app.dbManager = spy
 }
 
