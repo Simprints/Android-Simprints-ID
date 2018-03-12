@@ -2,7 +2,7 @@ package com.simprints.id.exceptions.safe.secure
 
 
 class DifferentProjectIdReceivedFromIntentException(message: String = "DifferentProjectIdReceivedFromIntentException")
-    : Error(message) {
+    : RuntimeException(message) {
 
     companion object {
         fun withProjectIds(expected: String, received: String) = DifferentProjectIdReceivedFromIntentException(
