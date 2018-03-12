@@ -133,7 +133,7 @@ class FirebaseManager(private val appContext: Context,
         // to get rid of it.
         val hashedLegacyApiKey = (appContext as Application).secureDataManager.getHashedLegacyProjectIdForProjectIdOrEmpty(projectId)
         return if (hashedLegacyApiKey.isNotEmpty()) {
-            Hasher.hash(firebaseUser.uid) == hashedLegacyApiKey
+            Hasher().hash(firebaseUser.uid) == hashedLegacyApiKey
         } else {
             firebaseUser.uid == projectId
         }

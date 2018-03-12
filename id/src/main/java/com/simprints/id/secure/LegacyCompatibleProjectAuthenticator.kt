@@ -38,7 +38,7 @@ class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
             .doAuthenticate(nonceScope, projectSecret)
 
     private fun checkLegacyProjectIdMatchesProjectId(expectedProjectId: String, legacyProjectId: String): Single<Unit> {
-        val hashedLegacyProjectId = Hasher.hash(legacyProjectId)
+        val hashedLegacyProjectId = Hasher().hash(legacyProjectId)
         return legacyProjectIdManager.requestProjectId(hashedLegacyProjectId)
             .checkReceivedProjectIdIsAsExpected(expectedProjectId)
     }
