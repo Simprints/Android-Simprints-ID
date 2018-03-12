@@ -30,13 +30,10 @@ class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
         SimprintsInternalServerException::class)
     fun authenticate(nonceScope: NonceScope, projectSecret: String, legacyProjectId: String?): Completable =
         if (legacyProjectId != null)
-            checkLegacyProjectIdAndAuthenticate(nonceScope, projectSecret, legacyProjectId)
+            checkLegacyProjectIdMatchesProjectId(nonceScope.projectId, legacyProjectId)
+                .andThen(authenticate(nonceScope, projectSecret))
         else
             authenticate(nonceScope, projectSecret)
-
-    private fun checkLegacyProjectIdAndAuthenticate(nonceScope: NonceScope, projectSecret: String, legacyProjectId: String): Completable =
-        checkLegacyProjectIdMatchesProjectId(nonceScope.projectId, legacyProjectId)
-            .doAuthenticate(nonceScope, projectSecret)
 
     private fun checkLegacyProjectIdMatchesProjectId(expectedProjectId: String, legacyProjectId: String): Completable {
         val hashedLegacyProjectId = Hasher.hash(legacyProjectId)
@@ -50,10 +47,5 @@ class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
             if (receivedProjectId != expectedProjectId)
                 throw DifferentProjectIdReceivedFromIntentException.withProjectIds(expectedProjectId, receivedProjectId)
             Completable.complete()
-        }
-
-    private fun Completable.doAuthenticate(nonceScope: NonceScope, projectSecret: String): Completable =
-        andThen {
-            authenticate(nonceScope, projectSecret)
         }
 }
