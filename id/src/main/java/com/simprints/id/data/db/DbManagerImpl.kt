@@ -17,6 +17,7 @@ import com.simprints.libcommon.Progress
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Completable
 import io.reactivex.Emitter
 import io.reactivex.Single
 
@@ -32,20 +33,20 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.initialiseRemoteDb()
     }
 
-    override fun getLocalKeyAndSignInToLocal(projectId: String): Single<Unit> =
+    override fun getLocalKeyAndSignInToLocal(projectId: String): Completable =
         remoteDbManager
             .getLocalDbKeyFromRemote(projectId)
             .signInToLocal(projectId)
 
-    override fun signIn(projectId: String, tokens: Tokens): Single<Unit> =
+    override fun signIn(projectId: String, tokens: Tokens): Completable =
         remoteDbManager
             .signInToRemoteDb(tokens)
-            .flatMap {
+            .andThen {
                 getLocalKeyAndSignInToLocal(projectId)
             }
 
-    private fun Single<out LocalDbKey>.signInToLocal(projectId: String): Single<Unit> =
-        flatMap { key ->
+    private fun Single<out LocalDbKey>.signInToLocal(projectId: String): Completable =
+        flatMapCompletable { key ->
             localDbManager.signInToLocal(projectId, key)
         }
 

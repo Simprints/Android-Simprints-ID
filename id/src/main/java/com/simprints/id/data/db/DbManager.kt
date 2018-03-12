@@ -12,15 +12,15 @@ import com.simprints.libcommon.Progress
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Completable
 import io.reactivex.Emitter
-import io.reactivex.Single
 
 interface DbManager : LocalDbManager, RemoteDbManager {
 
     // Lifecycle
     fun initialiseDb()
-    fun signIn(projectId: String, tokens: Tokens): Single<Unit>
-    fun getLocalKeyAndSignInToLocal(projectId: String): Single<Unit>
+    fun signIn(projectId: String, tokens: Tokens): Completable
+    fun getLocalKeyAndSignInToLocal(projectId: String): Completable
 
     fun signOut()
 

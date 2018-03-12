@@ -14,6 +14,7 @@ import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Completable
 import io.reactivex.Single
 
 interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListenerManager {
@@ -21,7 +22,7 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
     // Lifecycle
     fun initialiseRemoteDb()
 
-    fun signInToRemoteDb(tokens: Tokens): Single<Unit>
+    fun signInToRemoteDb(tokens: Tokens): Completable
     fun signOutOfRemoteDb()
 
     fun isRemoteDbInitialized(): Boolean
