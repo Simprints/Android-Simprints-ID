@@ -5,4 +5,4 @@ import io.realm.annotations.PrimaryKey
 import java.util.*
 
 open class RealmSyncInfo(@field:PrimaryKey var id: Int = 0,
-                    var lastSyncTime: Date = Date(0)) : RealmObject()
+                         var lastSyncTime: Date = Date(0)) : RealmObject()

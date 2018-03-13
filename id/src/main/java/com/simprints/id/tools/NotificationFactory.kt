@@ -72,7 +72,7 @@ class NotificationFactory(private val context: Context) {
             isProgressZero(progress) ->
                 context.getString(R.string.syncing_calculating)
             else -> context.getString(R.string.sync_progress_download_notification_content,
-                    progress.currentValue, progress.maxValue)
+                progress.currentValue, progress.maxValue)
         }
 
     private fun isProgressZero(progress: Progress): Boolean =
