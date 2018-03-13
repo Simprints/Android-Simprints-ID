@@ -70,6 +70,14 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         }
     }
 
+    private fun handleSignInStart() {
+        progressDialog.show()
+        val userId = loginEditTextUserId.text.toString()
+        val projectId = loginEditTextProjectId.text.toString()
+        val projectSecret = loginEditTextProjectSecret.text.toString()
+        viewPresenter.signIn(userId, projectId, projectSecret, possibleLegacyProjectId)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == QR_REQUEST_CODE) {
             data?.let {
@@ -107,14 +115,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun updateProjectIdInTextView(projectId: String) {
         loginEditTextProjectId.setText(projectId)
-    }
-
-    private fun handleSignInStart() {
-        progressDialog.show()
-        val userId = loginEditTextUserId.text.toString()
-        val projectId = loginEditTextProjectId.text.toString()
-        val projectSecret = loginEditTextProjectSecret.text.toString()
-        viewPresenter.signIn(userId, projectId, projectSecret, possibleLegacyProjectId)
     }
 
     override fun handleMissingCredentials() {
