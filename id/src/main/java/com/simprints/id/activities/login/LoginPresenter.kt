@@ -2,7 +2,6 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.safe.activities.InvalidScannedQRCodeText
 import com.simprints.id.exceptions.safe.secure.*
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
@@ -87,7 +86,6 @@ class LoginPresenter(val view: LoginContract.View,
      * project_id:someProjectId\n
      * project_secret:someSecret
      **/
-    @Throws(InvalidScannedQRCodeText::class)
     override fun processQRScannerAppResponse(scannedText: String) {
 
         val projectIdRegex = "(?<=$SCANNED_TEXT_TAG_PROJECT_ID)(.*)"
@@ -102,7 +100,7 @@ class LoginPresenter(val view: LoginContract.View,
             view.updateProjectIdInTextView(potentialProjectId)
             view.updateProjectSecretInTextView(potentialProjectSecret)
         } else {
-            throw InvalidScannedQRCodeText()
+            view.showErrorForInvalidQRCode()
         }
     }
 }
