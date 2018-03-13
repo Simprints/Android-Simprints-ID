@@ -1,4 +1,4 @@
-package com.simprints.id.sync.models
+package com.simprints.id.data.db.local
 
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey

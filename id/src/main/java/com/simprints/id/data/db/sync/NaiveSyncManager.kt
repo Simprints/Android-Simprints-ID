@@ -9,10 +9,6 @@ import io.realm.RealmConfiguration
 class NaiveSyncManager(firebaseApp: FirebaseApp,
                        private val realmConfig: RealmConfiguration) {
 
-    fun sync(paramenters: SyncTaskParameters, isInterrupted: () -> Boolean): Observable<Progress> =
-        NaiveSync(
-            isInterrupted,
-            paramenters.toGroup(),
-            NaiveSyncConnectorImp(paramenters),
-            realmConfig).sync()
+    fun sync(syncParams: SyncTaskParameters, isInterrupted: () -> Boolean): Observable<Progress> =
+        NaiveSync(NaiveSyncConnectorImpl(""), realmConfig).sync(isInterrupted, syncParams)
 }
