@@ -7,12 +7,13 @@ import com.simprints.id.libdata.DataCallback
 import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.libdata.models.firebase.fb_Person
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Progress
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
-import io.reactivex.Emitter
+import io.reactivex.Observable
 import io.reactivex.Single
 
 interface DbManager : LocalDbManager, RemoteDbManager {
@@ -40,9 +41,7 @@ interface DbManager : LocalDbManager, RemoteDbManager {
 
     fun saveRefusalForm(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String)
 
-    fun syncGlobal(projectId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
-    fun syncModule(projectId: String, moduleId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
-    fun syncUser(legacyApiKey: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
+    fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress>
 
     fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback)
 }

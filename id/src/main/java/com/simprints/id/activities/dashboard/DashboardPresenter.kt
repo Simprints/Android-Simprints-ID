@@ -4,10 +4,8 @@ import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import com.simprints.id.R
 import com.simprints.id.data.DataManager
-import com.simprints.id.exceptions.unsafe.InvalidSyncGroupError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.libdata.models.realm.rl_Person
-import com.simprints.id.libdata.tools.Constants
 import com.simprints.id.libdata.tools.Constants.GROUP
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.services.sync.SyncClient
@@ -26,7 +24,6 @@ class DashboardPresenter(val view: DashboardContract.View,
         if (!started) {
             started = true
 
-            dataManager.syncGroup = Constants.GROUP.GLOBAL
             val realm = dataManager.getRealmInstance()
             realm.executeTransaction {
                 it.where(rl_Person::class.java).findAll().deleteAllFromRealm()
@@ -40,14 +37,12 @@ class DashboardPresenter(val view: DashboardContract.View,
         stopListeners()
     }
 
-    override fun sync() {
-        val syncParameters = when (dataManager.syncGroup) {
+    override fun didUserWantToSyncBy(user: GROUP) {
+        dataManager.syncGroup = user
+        val syncParameters = when (user) {
             GROUP.GLOBAL -> SyncTaskParameters.GlobalSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty())
             GROUP.USER -> SyncTaskParameters.UserSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
-            else -> {
-                handleUnexpectedError(InvalidSyncGroupError())
-                return
-            }
+            GROUP.MODULE -> SyncTaskParameters.ModuleIdSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.moduleId)
         }
 
         syncClient.sync(syncParameters, {

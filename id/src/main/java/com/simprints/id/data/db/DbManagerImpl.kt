@@ -12,12 +12,13 @@ import com.simprints.id.libdata.DataCallback
 import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.libdata.models.firebase.fb_Person
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Progress
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
-import io.reactivex.Emitter
+import io.reactivex.Observable
 import io.reactivex.Single
 
 class DbManagerImpl(private val localDbManager: LocalDbManager,
@@ -92,20 +93,11 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.saveRefusalFormInRemote(refusalForm, projectId, userId, sessionId)
     }
 
-    override fun syncGlobal(projectId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        getSyncManager(projectId).syncGlobal(isInterrupted, emitter)
-    }
+    override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
+        getSyncManager().sync(parameters, interrupted)
 
-    override fun syncModule(projectId: String, moduleId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        getSyncManager(projectId).syncModule(moduleId, isInterrupted, emitter)
-    }
-
-    override fun syncUser(projectId: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        getSyncManager(projectId).syncUser(userId, isInterrupted, emitter)
-    }
-
-    private fun getSyncManager(projectId: String): NaiveSyncManager =
-        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), projectId, localDbManager.getValidRealmConfig())
+    private fun getSyncManager(): NaiveSyncManager =
+        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), localDbManager.getValidRealmConfig())
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback) {
         val firebaseManager = remoteDbManager as FirebaseManager

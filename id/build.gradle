@@ -235,6 +235,9 @@ dependencies {
     androidTestImplementation "com.simprints:cerberus-library:2018.1.1-dev-1"
     androidTestImplementation "com.simprints:remote-admin-client:2017.4.0-dev-5"
     androidTestImplementation "joda-time:joda-time:2.9.9"
+
+    //UI
+    compile 'com.github.michael-rapp:android-material-dialog:4.3.3'
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {

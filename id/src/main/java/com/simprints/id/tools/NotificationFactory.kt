@@ -68,16 +68,12 @@ class NotificationFactory(private val context: Context) {
                         formatProgressContent(progress) })
 
     private fun formatProgressContent(progress: Progress): String =
-            if (isProgressZero(progress))
+        when {
+            isProgressZero(progress) ->
                 context.getString(R.string.syncing_calculating)
-            else if (progress.maxValue > 0) {
-                context.getString(R.string.sync_progress_notification_content,
-                    progress.currentValue,
-                    progress.maxValue)
-            } else {
-                context.getString(R.string.sync_progress_without_max_notification_content,
-                    progress.currentValue)
-            }
+            else -> context.getString(R.string.sync_progress_download_notification_content,
+                    progress.currentValue, progress.maxValue)
+        }
 
     private fun isProgressZero(progress: Progress): Boolean =
             progress.currentValue == 0 && progress.maxValue == 0
