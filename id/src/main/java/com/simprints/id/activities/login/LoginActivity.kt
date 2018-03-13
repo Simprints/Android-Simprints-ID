@@ -10,7 +10,6 @@ import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
-import com.simprints.id.exceptions.safe.activities.InvalidScannedQRCodeText
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.tools.SimProgressDialog
@@ -88,16 +87,12 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     fun handleScannerAppResult(resultCode: Int, data: Intent) =
         runOnUiThread {
-            try {
-                val scannedText = data.getStringExtra(QR_RESULT_KEY)
+            val scannedText = data.getStringExtra(QR_RESULT_KEY)
 
-                if (resultCode == Activity.RESULT_OK) {
-                    viewPresenter.processQRScannerAppResponse(scannedText)
-                } else {
-                    showErrorForQRCodeFailed()
-                }
-            } catch (e: InvalidScannedQRCodeText) {
-                showErrorForInvalidQRCode()
+            if (resultCode == Activity.RESULT_OK) {
+                viewPresenter.processQRScannerAppResponse(scannedText)
+            } else {
+                showErrorForQRCodeFailed()
             }
         }
 
@@ -105,7 +100,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         showToast(R.string.login_qr_code_scanning_problem)
     }
 
-    private fun showErrorForInvalidQRCode() {
+    override fun showErrorForInvalidQRCode() {
         showToast(R.string.login_invalid_qr_code)
     }
 
