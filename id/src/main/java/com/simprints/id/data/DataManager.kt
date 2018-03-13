@@ -5,16 +5,13 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.network.ApiManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.model.ALERT_TYPE
-import com.simprints.libcommon.Person
-import com.simprints.libcommon.Progress
 import com.simprints.id.libdata.DataCallback
 import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.libdata.tools.Constants
+import com.simprints.id.model.ALERT_TYPE
+import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
-import io.reactivex.Emitter
 
 interface DataManager : PreferencesManager, DbManager, ApiManager,
         AnalyticsManager, SecureDataManager {
@@ -51,9 +48,6 @@ interface DataManager : PreferencesManager, DbManager, ApiManager,
     fun saveRefusalForm(refusalForm: RefusalForm)
 
     fun saveSession()
-
-    fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
-    fun syncUser(isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
 
     fun recoverRealmDb(group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback)
 }

@@ -19,11 +19,9 @@ import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
-import com.simprints.libcommon.Progress
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
-import io.reactivex.Emitter
 
 class DataManagerImpl(private val context: Context,
                       private val preferencesManager: PreferencesManager,
@@ -140,14 +138,6 @@ class DataManagerImpl(private val context: Context,
             msSinceBootOnMatchStart, msSinceBootOnSessionEnd)
         dbManager.saveSessionInRemote(session)
         analyticsManager.logSession(session)
-    }
-
-    override fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        dbManager.syncGlobal(projectId, isInterrupted, emitter)
-    }
-
-    override fun syncUser(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        dbManager.syncUser(projectId, userId, isInterrupted, emitter)
     }
 
     override fun recoverRealmDb(group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback) {

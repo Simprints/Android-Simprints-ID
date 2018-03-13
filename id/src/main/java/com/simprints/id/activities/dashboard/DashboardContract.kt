@@ -14,8 +14,7 @@ interface DashboardContract {
     }
 
     interface Presenter : BasePresenter {
-        fun sync()
         fun pause()
+        fun didUserWantToSyncBy(user: com.simprints.id.libdata.tools.Constants.GROUP)
     }
 }
-

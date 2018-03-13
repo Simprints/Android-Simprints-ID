@@ -5,16 +5,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.Toast
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
 import com.simprints.id.libdata.models.realm.rl_Person
+import com.simprints.id.libdata.tools.Constants
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.utils.FirestoreMigationUtils
+import de.mrapp.android.dialog.MaterialDialog
 import kotlinx.android.synthetic.main.activity_dashboard.*
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
@@ -52,8 +55,8 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
             finish()
         }
 
-        dashboardLayerSync.setOnClickListener {
-            viewPresenter.sync()
+        dashboardButtonSync.setOnClickListener {
+            showSyncOptions()
         }
 
         buttonAddPersonRealm.setOnClickListener {
@@ -63,6 +66,32 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
                 textAddPersonRealm.text = "Count: ${results.count()}"
             }
         }
+    }
+
+    private fun showSyncOptions() {
+
+        var choice = Constants.GROUP.USER
+        val builder = MaterialDialog.Builder(this@DashboardActivity)
+        builder.setTitle("Sync")
+        builder.setMessage("All your local patients will be upload. Which patients do you want to download?")
+        builder.setSingleChoiceItems(
+            arrayOf("All patients I enrolled", "All patients in my module", "All patients in the project"),
+            0,
+            { _, item ->
+                when (item) {
+                    0 -> choice = Constants.GROUP.USER
+                    1 -> choice = Constants.GROUP.MODULE
+                    2 -> choice = Constants.GROUP.GLOBAL
+                }
+            })
+
+        builder.setPositiveButton("Sync") { d, _ ->
+            viewPresenter.didUserWantToSyncBy(choice)
+            d.dismiss()
+        }
+
+        builder.setNegativeButton("Cancel") { d, _ -> d.dismiss() }
+        builder.show()
     }
 
     override fun showToast(messageRes: Int) {
@@ -76,9 +105,10 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     override fun setSyncItem(enabled: Boolean, string: String, icon: Int) {
-        dashboardLayerSync.isEnabled = enabled
-        dashboardLayerSyncText.text = string
-        dashboardLayerSyncIcon.setImageDrawable(ContextCompat.getDrawable(this, icon))
+        dashboardButtonSync.visibility = View.GONE
+        dashboardSyncState.isEnabled = enabled
+        dashboardSyncStateText.text = string
+        dashboardSyncStateIcon.setImageDrawable(ContextCompat.getDrawable(this, icon))
     }
 
     override fun launchAlertView(error: ALERT_TYPE) {
