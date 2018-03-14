@@ -81,6 +81,11 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         })
     }
 
+    override fun getPatientsToUpSync(): ArrayList<rl_Person> =
+        getRealmInstance().let {
+            ArrayList(it.where(rl_Person::class.java).equalTo("toSync", false).findAll())
+        }
+
     override fun getPeopleCountFromLocal(group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String): Long {
         val realm = getRealmInstance()
         val count = rl_Person.count(realm, userId, moduleId, group)

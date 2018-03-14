@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.sync
 
 import com.google.gson.stream.JsonReader
+import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmSyncInfo
 import com.simprints.id.exceptions.safe.InterruptedSyncException
 import com.simprints.id.libdata.models.firebase.fb_Person
@@ -19,17 +20,13 @@ import java.io.InputStreamReader
 import java.io.Reader
 import java.util.*
 
-class NaiveSync(private val connector: NaiveSyncConnector,
-                private val realmConfig: RealmConfiguration) {
+class NaiveSync(private val api: SimApiInterface,
+                private val realmConfig: RealmConfiguration,
+                private val localDbManager: LocalDbManager) {
 
     companion object {
         private const val LOCAL_DB_BATCH_SIZE = 10000
         private const val UPDATE_UI_BATCH_SIZE = 100
-    }
-
-    fun uploadPatientAndSaveIntoRealm(patientId: String): Single<rl_Person> {
-        // TODO: Implement
-        return Single.just(rl_Person())
     }
 
     fun sync(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
@@ -39,28 +36,38 @@ class NaiveSync(private val connector: NaiveSyncConnector,
     }
 
     private fun uploadNewPatients(isInterrupted: () -> Boolean): Observable<Progress> {
-        // TODO: Implement
-        val patientsToUpload = arrayListOf<rl_Person>()
-        return makeUploadRequest(patientsToUpload)
+        val patientsToUpload = localDbManager.getPatientsToUpSync()
+        return makeUploadRequest(isInterrupted, patientsToUpload)
     }
 
-    private fun makeUploadRequest(patientsToUpload: ArrayList<rl_Person>): Observable<Progress> =
-        Observable.create<Progress> {
-            //Make Post Request
-            // TODO: Implement
-        }
-
+    private fun makeUploadRequest(isInterrupted: () -> Boolean, patientsToUpload: ArrayList<rl_Person>): Observable<Progress> {
+        return Observable.just(Progress(0, 0))
+    }
+//        subGroupOfPatients ->
+//            val gson = JsonHelper.create()
+//            val fbPatients = arrayListOf<fb_Person>()
+//            subGroupOfPatients.forEach { fbPatients.add(fb_Person(it)) }
+//            val patientsJson = gson.toJson(mapOf("patients" to fbPatients))
+//            api.upSync(patientsJson)
+//        }
+//    }
 
     private fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
         return getNumberOfPatientsForDownloadQuery(syncParams).flatMapObservable { nPatientsForDownSyncQuery ->
             val nPatientsToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery)
             val lastSyncTime = Date(0)//LastSyncTime
-            downloadNewPatientsFromStream(
-                isInterrupted,
-                syncParams,
-                connector.getInputStreamForDownSyncingRequest(syncParams, lastSyncTime))
-                .map {
-                    DownloadProgress(it, nPatientsToDownload)
+
+            api.downSync(
+                "AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0",
+                lastSyncTime,
+                syncParams.projectId).flatMapObservable {
+                    downloadNewPatientsFromStream(
+                        isInterrupted,
+                        syncParams,
+                        it.byteStream())
+                        .map {
+                            DownloadProgress(it, nPatientsToDownload)
+                        }
                 }
         }
     }
@@ -107,7 +114,8 @@ class NaiveSync(private val connector: NaiveSyncConnector,
                                 it.onNext(totalDownloaded)
                             }
 
-                            if (totalDownloaded % LOCAL_DB_BATCH_SIZE == 0 || isInterrupted()) {
+                            val shouldCloseTransaction = totalDownloaded % LOCAL_DB_BATCH_SIZE == 0
+                            if (shouldCloseTransaction || isInterrupted()) {
                                 break
                             }
                         }

@@ -2,6 +2,7 @@ package com.simprints.id.libdata.models.realm;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.annotations.SerializedName;
 import com.simprints.id.libdata.models.firebase.fb_Fingerprint;
 import com.simprints.id.libdata.models.firebase.fb_Person;
 import com.simprints.id.libdata.tools.Constants;
@@ -27,10 +28,12 @@ import timber.log.Timber;
 @SuppressWarnings({"WeakerAccess", "SynchronizationOnLocalVariableOrMethodParameter"})
 public class rl_Person extends RealmObject {
     @PrimaryKey
+    @SerializedName("id")
     public String patientId;
     public String userId;
     public String moduleId;
     public Date createdAt;
+    public Date updatedAt;
     public boolean toSync;
     public RealmList<rl_Fingerprint> fingerprints;
 
@@ -53,7 +56,12 @@ public class rl_Person extends RealmObject {
         }
     }
 
-    public static long count(@NonNull Realm realm, @NonNull String userId, @NonNull String moduleId, @NonNull final Constants.GROUP group) {
+    public static long count(
+        @NonNull Realm realm,
+        @NonNull String userId,
+        @NonNull String moduleId,
+        @NonNull final Constants.GROUP group) {
+
         switch (group) {
             case GLOBAL:
                 return realm.where(rl_Person.class).count();
