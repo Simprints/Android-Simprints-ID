@@ -97,7 +97,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         getSyncManager().sync(parameters, interrupted)
 
     private fun getSyncManager(): NaiveSyncManager =
-        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), localDbManager.getValidRealmConfig())
+        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), localDbManager.getValidRealmConfig(), localDbManager)
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback) {
         val firebaseManager = remoteDbManager as FirebaseManager
