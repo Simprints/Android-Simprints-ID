@@ -18,7 +18,9 @@ import io.realm.RealmConfiguration
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
+import java.lang.Math.min
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 class NaiveSync(private val api: SimApiInterface,
                 private val realmConfig: RealmConfiguration,
@@ -36,47 +38,56 @@ class NaiveSync(private val api: SimApiInterface,
     }
 
     private fun uploadNewPatients(isInterrupted: () -> Boolean): Observable<Progress> {
-        val patientsToUpload = localDbManager.getPatientsToUpSync()
-        return makeUploadRequest(isInterrupted, patientsToUpload)
-    }
-
-    private fun makeUploadRequest(isInterrupted: () -> Boolean, patientsToUpload: ArrayList<rl_Person>): Observable<Progress> {
-        return Observable.just(Progress(0, 0))
-    }
-//        subGroupOfPatients ->
-//            val gson = JsonHelper.create()
-//            val fbPatients = arrayListOf<fb_Person>()
-//            subGroupOfPatients.forEach { fbPatients.add(fb_Person(it)) }
-//            val patientsJson = gson.toJson(mapOf("patients" to fbPatients))
-//            api.upSync(patientsJson)
-//        }
-//    }
-
-    private fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
-        return getNumberOfPatientsForDownloadQuery(syncParams).flatMapObservable { nPatientsForDownSyncQuery ->
-            val nPatientsToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery)
-            val lastSyncTime = Date(0)//LastSyncTime
-
-            api.downSync(
-                "AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0",
-                lastSyncTime,
-                syncParams.projectId).flatMapObservable {
-                    downloadNewPatientsFromStream(
-                        isInterrupted,
-                        syncParams,
-                        it.byteStream())
-                        .map {
-                            DownloadProgress(it, nPatientsToDownload)
-                        }
-                }
+        val patientsToUpload = localDbManager.getPeopleToUpSync()
+        val batchSize = 10
+        return makeUploadRequest(isInterrupted, patientsToUpload, batchSize).map {
+            DownloadProgress(it, patientsToUpload.size / batchSize)
         }
     }
 
-    private fun calculateNPatientsToDownload(nPatientsForDownSyncQuery: Int): Int {
-        // TODO: Implement
-        // The patients we download is equal to #patientsForQuery - #patientsForQueryInDbSinceTimeStamp
-        val nPatientsForDownSyncQueryInRealm = 0 // Realm.findAll.with(syncParams)
-        return nPatientsForDownSyncQuery - nPatientsForDownSyncQueryInRealm
+    private fun makeUploadRequest(isInterrupted: () -> Boolean,
+                                  patientsToUpload: ArrayList<rl_Person>,
+                                  batchSize: Int = 2000): Observable<Int> {
+
+        val counterBatch = AtomicInteger()
+        val gson = JsonHelper.create()
+
+        return Observable.fromIterable(patientsToUpload)
+            .takeUntil { !isInterrupted() }
+            .map { fb_Person(it) }
+            .buffer(batchSize)
+            .map { subGroup ->
+                val body = gson.toJson(mapOf("patients" to subGroup))
+                api.upSync(body).retry(5)
+            }.map {
+                counterBatch.addAndGet(min(patientsToUpload.size, batchSize))
+            }
+    }
+
+    private fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
+        return getNumberOfPatientsForSyncParams(syncParams).flatMapObservable { nPatientsForDownSyncQuery ->
+            val nPatientsToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery, syncParams)
+            val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup())
+
+            api.downSync(
+                "AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0",
+                realmSyncInfo?.lastSyncTime ?: Date(0),
+                syncParams.toMap()).flatMapObservable {
+                downloadNewPatientsFromStream(
+                    isInterrupted,
+                    syncParams,
+                    it.byteStream()).retry(5)
+                    .map {
+                        DownloadProgress(it, nPatientsToDownload)
+                    }
+            }
+        }
+    }
+
+    private fun calculateNPatientsToDownload(nPatientsForDownSyncQuery: Int, syncParams: SyncTaskParameters): Int {
+
+        val nPatientsForDownSyncParamsInRealm = localDbManager.getPeopleFor(syncParams).count()
+        return nPatientsForDownSyncQuery - nPatientsForDownSyncParamsInRealm
     }
 
     /**
@@ -85,9 +96,8 @@ class NaiveSync(private val api: SimApiInterface,
      *
      * The number comes from HEAD request against connector.inputStreamForDownload
      */
-    private fun getNumberOfPatientsForDownloadQuery(syncParams: SyncTaskParameters): Single<Int> {
-        // TODO: Implement
-        return Single.just(0)
+    private fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> {
+        return api.patientsCount("AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0", syncParams.toMap())
     }
 
     private fun downloadNewPatientsFromStream(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters, input: InputStream): Observable<Int> =
