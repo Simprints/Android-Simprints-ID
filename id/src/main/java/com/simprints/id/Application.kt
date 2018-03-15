@@ -14,13 +14,12 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
-import com.simprints.id.data.db.remote.*
+import com.simprints.id.data.db.remote.FirebaseManager
+import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.authListener.FirebaseAuthListenerManager
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
-import com.simprints.id.data.network.ApiManager
-import com.simprints.id.data.network.ApiManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -37,28 +36,28 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
-import com.simprints.id.domain.callout.CalloutAction
-import com.simprints.id.domain.callout.CalloutParameter
-import com.simprints.id.domain.sessionParameters.SessionParameters
-import com.simprints.id.domain.sessionParameters.extractors.ActionDependentExtractor
-import com.simprints.id.domain.sessionParameters.extractors.Extractor
-import com.simprints.id.domain.sessionParameters.extractors.ParameterExtractor
-import com.simprints.id.domain.sessionParameters.extractors.SessionParametersExtractor
-import com.simprints.id.domain.sessionParameters.readers.*
-import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.ExpectedParametersLister
-import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.ExpectedParametersListerImpl
-import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.UnexpectedParametersReader
-import com.simprints.id.domain.sessionParameters.validators.*
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.session.callout.CalloutParameter
+import com.simprints.id.session.sessionParameters.SessionParameters
+import com.simprints.id.session.sessionParameters.extractors.ActionDependentExtractor
+import com.simprints.id.session.sessionParameters.extractors.Extractor
+import com.simprints.id.session.sessionParameters.extractors.ParameterExtractor
+import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractor
+import com.simprints.id.session.sessionParameters.readers.*
+import com.simprints.id.session.sessionParameters.readers.unexpectedParameters.ExpectedParametersLister
+import com.simprints.id.session.sessionParameters.readers.unexpectedParameters.ExpectedParametersListerImpl
+import com.simprints.id.session.sessionParameters.readers.unexpectedParameters.UnexpectedParametersReader
+import com.simprints.id.session.sessionParameters.validators.*
 import com.simprints.id.tools.AppState
 import com.simprints.id.tools.NotificationFactory
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.serializers.*
-import com.simprints.id.libdata.tools.Constants
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
@@ -85,8 +84,8 @@ open class Application : MultiDexApplication() {
         EnumSerializer(CalloutAction::class.java)
     }
 
-    private val groupSerializer: Serializer<com.simprints.id.libdata.tools.Constants.GROUP> by lazy {
-        EnumSerializer(com.simprints.id.libdata.tools.Constants.GROUP::class.java)
+    private val groupSerializer: Serializer<Constants.GROUP> by lazy {
+        EnumSerializer(Constants.GROUP::class.java)
     }
 
     private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>> by lazy {
@@ -153,10 +152,6 @@ open class Application : MultiDexApplication() {
         DbManagerImpl(localDbManager, remoteDbManager)
     }
 
-    private val apiManager: ApiManager by lazy {
-        ApiManagerImpl()
-    }
-
     private val fabric: Fabric by lazy {
         Fabric.Builder(this).kits(Crashlytics()).debuggable(BuildConfig.DEBUG).build()
     }
@@ -177,8 +172,7 @@ open class Application : MultiDexApplication() {
     }
 
     val dataManager: DataManager by lazyVar {
-        DataManagerImpl(this, preferencesManager, dbManager,
-                apiManager, analyticsManager, secureDataManager)
+        DataManagerImpl(this, preferencesManager, dbManager, analyticsManager, secureDataManager)
     }
 
     val notificationFactory: NotificationFactory by lazy {

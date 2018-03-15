@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.local
 
-import com.simprints.id.libdata.DataCallback
-import com.simprints.id.libdata.models.firebase.fb_Person
-import com.simprints.id.libdata.models.realm.rl_Person
-import com.simprints.id.libdata.tools.Constants
+import com.simprints.id.data.db.DataCallback
+import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.domain.Constants
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.Single
@@ -20,8 +20,8 @@ interface LocalDbManager {
     // Data transfer
     fun savePersonInLocal(fbPerson: fb_Person)
     fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
-    fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
-    fun getPeopleCountFromLocal(group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String): Long
+    fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
+    fun getPeopleCountFromLocal(group: Constants.GROUP, userId: String, moduleId: String): Long
     fun getPeopleToUpSync(): ArrayList<rl_Person>
     fun getPeopleFor(syncParams: SyncTaskParameters): ArrayList<rl_Person>
 

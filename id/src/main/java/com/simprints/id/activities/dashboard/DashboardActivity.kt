@@ -11,9 +11,9 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
-import com.simprints.id.libdata.models.realm.rl_Person
-import com.simprints.id.libdata.tools.Constants
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.domain.Constants
+import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.utils.FirestoreMigationUtils

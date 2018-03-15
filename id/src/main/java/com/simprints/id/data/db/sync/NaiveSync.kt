@@ -4,8 +4,8 @@ import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmSyncInfo
 import com.simprints.id.exceptions.safe.InterruptedSyncException
-import com.simprints.id.libdata.models.firebase.fb_Person
-import com.simprints.id.libdata.models.realm.rl_Person
+import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.JsonHelper
 import com.simprints.libcommon.DownloadProgress
