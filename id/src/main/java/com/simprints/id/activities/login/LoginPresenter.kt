@@ -1,59 +1,84 @@
 package com.simprints.id.activities.login
 
-import com.simprints.id.R
+import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.exceptions.safe.secure.*
+import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
+import io.reactivex.rxkotlin.subscribeBy
+import java.io.IOException
 
-@Suppress("UnnecessaryVariable")
 class LoginPresenter(val view: LoginContract.View,
                      private val secureDataManager: SecureDataManager,
-                     override var projectAuthenticator: ProjectAuthenticator) : LoginContract.Presenter {
+                     private val analyticsManager: AnalyticsManager,
+                     override var projectAuthenticator: LegacyCompatibleProjectAuthenticator) : LoginContract.Presenter {
 
     companion object {
         private const val SCANNED_TEXT_TAG_PROJECT_ID = "project_id:"
         private const val SCANNED_TEXT_TAG_PROJECT_SECRET = "project_secret:"
     }
 
-    override fun start() {
+    override fun start() {}
+
+    override fun signIn(possibleUserId: String,
+                        possibleProjectId: String,
+                        possibleProjectSecret: String,
+                        possibleLegacyProjectId: String?) =
+        if (areMandatoryCredentialsPresent(possibleProjectId, possibleProjectSecret, possibleUserId))
+            doAuthenticate(
+                possibleProjectId,
+                possibleUserId,
+                possibleProjectSecret,
+                possibleLegacyProjectId)
+        else
+            view.handleMissingCredentials()
+
+    private fun areMandatoryCredentialsPresent(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String) =
+        possibleProjectId.isNotEmpty() && possibleProjectSecret.isNotEmpty() && possibleUserId.isNotEmpty()
+
+    private fun doAuthenticate(possibleProjectId: String, possibleUserId: String, possibleProjectSecret: String, possibleLegacyApiKey: String?) {
+        secureDataManager.cleanCredentials()
+        projectAuthenticator.authenticate(
+            NonceScope(possibleProjectId, possibleUserId),
+            possibleProjectSecret,
+            possibleLegacyApiKey)
+            .subscribeBy(
+                onSuccess = { handleSignInSuccess(possibleLegacyApiKey, possibleProjectId, possibleUserId) },
+                onError = { e -> handleSignInError(e) })
     }
 
-    override fun userDidWantToOpenScanQRApp() {
-        view.openScanQRApp()
+    private fun handleSignInSuccess(possibleLegacyProjectId: String?, possibleProjectId: String, possibleUserId: String) {
+        storeSignedInCredentials(possibleProjectId, possibleLegacyProjectId, possibleUserId)
+        view.handleSignInSuccess()
     }
 
-    override fun userDidWantToSignIn(possibleProjectId: String,
-                                     possibleProjectSecret: String,
-                                     possibleUserId: String,
-                                     possibleLegacyApiKey: String?) {
+    private fun storeSignedInCredentials(possibleProjectId: String, possibleLegacyProjectId: String?, possibleUserId: String) {
+        secureDataManager.storeProjectIdWithLegacyProjectIdPair(possibleProjectId, possibleLegacyProjectId)
+        secureDataManager.signedInProjectId = possibleProjectId
+        secureDataManager.signedInUserId = possibleUserId
+    }
 
-        if (possibleProjectId.isNotEmpty() &&
-            possibleProjectSecret.isNotEmpty() &&
-            possibleUserId.isNotEmpty()) {
-
-            view.showProgressDialog()
-            secureDataManager.cleanCredentials()
-            projectAuthenticator.authenticate(
-                NonceScope(possibleProjectId, possibleUserId),
-                possibleProjectSecret)
-                .subscribe(
-                    {
-                        if (possibleLegacyApiKey != null) {
-                            secureDataManager.storeProjectIdWithLegacyApiKeyPair(possibleProjectId, possibleLegacyApiKey)
-                        }
-                        secureDataManager.signedInProjectId = possibleProjectId
-                        secureDataManager.signedInUserId = possibleUserId
-                        view.dismissProgressDialog()
-                        view.returnSuccessfulResult()
-                    },
-                    { e ->
-                        e.printStackTrace()
-                        view.dismissProgressDialog()
-                        view.showToast(R.string.login_invalidCredentials)
-                    })
-        } else {
-            view.showToast(R.string.login_missing_credentials)
+    private fun handleSignInError(e: Throwable) {
+        logSignInError(e)
+        when (e) {
+            is IOException -> view.handleSignInFailedNoConnection()
+            is DifferentProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch()
+            is InvalidLegacyProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch()
+            is AuthRequestInvalidCredentialsException -> view.handleSignInFailedInvalidCredentials()
+            is SimprintsInternalServerException -> view.handleSignInFailedServerError()
+            else -> view.handleSignInFailedUnknownReason()
         }
+    }
+
+    private fun logSignInError(e: Throwable) {
+        when(e) {
+            is Error -> analyticsManager.logError(e)
+            else -> analyticsManager.logSafeException(AuthException(cause=e))
+        }
+    }
+
+    override fun openScanQRApp() {
+        view.handleOpenScanQRApp()
     }
 
     /**
@@ -70,12 +95,12 @@ class LoginPresenter(val view: LoginContract.View,
         val potentialProjectSecret = Regex(pattern = projectSecretRegex).find(scannedText)?.value
 
         if (potentialProjectId != null && potentialProjectId.isNotEmpty() &&
-            potentialProjectSecret != null && potentialProjectSecret.isNotEmpty() ) {
+            potentialProjectSecret != null && potentialProjectSecret.isNotEmpty()) {
 
             view.updateProjectIdInTextView(potentialProjectId)
             view.updateProjectSecretInTextView(potentialProjectSecret)
         } else {
-            throw Exception("Invalid scanned text")
+            view.showErrorForInvalidQRCode()
         }
     }
 }

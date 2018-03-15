@@ -6,9 +6,8 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
-import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
-import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.extensions.scannerAppIntent
@@ -21,6 +20,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
@@ -64,8 +64,8 @@ class LoginActivityTest {
     fun loginSuccesses_shouldReturnSuccessResultCode() {
 
         val controller = createRoboLoginActivity().start().resume().visible()
-        val projectAuthenticator = mock(ProjectAuthenticator::class.java)
-        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull())).thenReturn(SingleJust(Unit))
+        val projectAuthenticator = mock(LegacyCompatibleProjectAuthenticator::class.java)
+        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull(), any())).thenReturn(SingleJust(Unit))
 
         val loginAct = controller.get().apply {
             viewPresenter.projectAuthenticator = projectAuthenticator
@@ -129,7 +129,7 @@ class LoginActivityTest {
         val act = controller.get()
         act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "project_id:validProject\nproject_secret_wrong:some_value"))
 
-        assertEquals(app.getString(R.string.login_invalidQrCode), ShadowToast.getTextOfLatestToast())
+        assertEquals(app.getString(R.string.login_invalid_qr_code), ShadowToast.getTextOfLatestToast())
     }
 
     @Test
@@ -172,17 +172,17 @@ class LoginActivityTest {
         act.loginEditTextUserId.setText("some_user_id")
         act.loginButtonSignIn.performClick()
         Mockito.verify(act.viewPresenter, Mockito.times(1))
-            .userDidWantToSignIn(
+            .signIn(
+                "some_user_id",
                 "some_project_id",
                 "some_project_secret",
-                "some_user_id",
                 null)
     }
 
     @Test
     fun passedLegacyApiKey_shouldLoginInAndStoreIt() {
         val intent = Intent()
-        intent.putExtra(LoginActivity.LEGACY_API_KEY_PARAM, "some_legacy_api_key")
+        intent.putExtra(IntentKeys.loginActivityLegacyProjectIdKey, "some_legacy_api_key")
         val controller = createRoboLoginActivity(intent).start().resume().visible()
         val act = controller.get()
         act.loginEditTextUserId.setText(DEFAULT_USER_ID)
@@ -193,10 +193,10 @@ class LoginActivityTest {
         act.loginButtonSignIn.performClick()
 
         Mockito.verify(act.viewPresenter, Mockito.times(1))
-            .userDidWantToSignIn(
+            .signIn(
+                DEFAULT_USER_ID,
                 DEFAULT_PROJECT_ID,
                 DEFAULT_PROJECT_SECRET,
-                DEFAULT_USER_ID,
                 "some_legacy_api_key")
     }
 }

@@ -35,8 +35,8 @@ class DashboardPresenter(val view: DashboardContract.View,
 
     override fun sync() {
         val syncParameters = when (dataManager.syncGroup) {
-            GROUP.GLOBAL -> SyncTaskParameters.GlobalSyncTaskParameters(dataManager.getSignedInMd5LegacyApiKeyOrEmpty())
-            GROUP.USER -> SyncTaskParameters.UserSyncTaskParameters(dataManager.getSignedInMd5LegacyApiKeyOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
+            GROUP.GLOBAL -> SyncTaskParameters.GlobalSyncTaskParameters(dataManager.getSignedInHashedLegacyApiKeyOrEmpty())
+            GROUP.USER -> SyncTaskParameters.UserSyncTaskParameters(dataManager.getSignedInHashedLegacyApiKeyOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
             else -> {
                 handleUnexpectedError(InvalidSyncGroupError())
                 return
