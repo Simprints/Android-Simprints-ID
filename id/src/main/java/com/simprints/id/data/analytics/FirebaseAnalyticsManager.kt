@@ -52,7 +52,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
     }
 
     override fun logSafeException(exception: RuntimeException) {
-        Timber.d("FirebaseAnalyticsManager.logSafeException(description=$exception")
+        Timber.d("FirebaseAnalyticsManager.logSafeException(description=$exception)")
         val bundle = Bundle()
         bundle.putString("exception", exception.toString())
         bundle.putString("description", exception.message)
