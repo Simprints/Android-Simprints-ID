@@ -9,14 +9,14 @@ interface SecureDataManager {
     var signedInUserId: String
     var prefs: ImprovedSharedPreferences
     fun getEncryptedProjectSecretOrEmpty(): String
-    fun getSignedInMd5LegacyApiKeyOrEmpty(): String
+    fun getSignedInHashedLegacyApiKeyOrEmpty(): String
 
     fun getSignedInProjectIdOrEmpty(): String
     fun getSignedInUserIdOrEmpty(): String
     fun isProjectIdSignedIn(possibleProjectId: String): Boolean
     fun cleanCredentials()
-    fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?)
+    fun storeProjectIdWithLegacyProjectIdPair(projectId: String, legacyProjectId: String?)
 
-    fun getMd5LegacyApiKeyForProjectIdOrEmpty(projectId: String): String
-    fun getProjectIdForMd5LegacyApiKeyOrEmpty(md5LegacyApiKey: String): String
+    fun getHashedLegacyProjectIdForProjectIdOrEmpty(projectId: String): String
+    fun getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey: String): String
 }

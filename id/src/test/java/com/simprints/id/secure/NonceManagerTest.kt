@@ -1,6 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.BuildConfig
+import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.base.RxJavaTest
@@ -56,7 +57,7 @@ class NonceManagerTest : RxJavaTest() {
         val testObserver = makeTestRequestNonce(apiService.api)
         testObserver.awaitTerminalEvent()
 
-        testObserver.assertError(HttpException::class.java)
+        testObserver.assertError(SimprintsInternalServerException::class.java)
     }
 
     private fun forceOkHttpToReturnSuccessfulResponse(okHttpClientConfig: OkHttpClient.Builder) {

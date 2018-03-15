@@ -20,6 +20,8 @@ import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionList
 import com.simprints.id.data.models.Session
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
+import com.simprints.id.secure.models.Tokens
+import com.simprints.libcommon.Person
 import com.simprints.id.libdata.DATA_ERROR
 import com.simprints.id.libdata.DataCallback
 import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
@@ -27,10 +29,8 @@ import com.simprints.id.libdata.models.firebase.*
 import com.simprints.id.libdata.models.realm.rl_Person
 import com.simprints.id.libdata.tools.Routes.*
 import com.simprints.id.libdata.tools.Utils.wrapCallback
-import com.simprints.id.secure.models.Tokens
+import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.extensions.md5
-import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
@@ -49,10 +49,6 @@ class FirebaseManager(private val appContext: Context,
 
     private var isInitialised = false
 
-    // FirebaseApp Names
-    private lateinit var legacyFirebaseAppName: String
-    private lateinit var firestoreFirebaseAppName: String
-
     // FirebaseApp
     private lateinit var legacyFirebaseApp: FirebaseApp
     private lateinit var firestoreFirebaseApp: FirebaseApp
@@ -68,7 +64,7 @@ class FirebaseManager(private val appContext: Context,
     }
 
     private fun initialiseLegacyFirebaseProject() {
-        legacyFirebaseAppName = getLegacyAppName()
+        val legacyFirebaseAppName = getLegacyAppName()
         val legacyFirebaseOptions = firebaseOptionsHelper.getLegacyFirebaseOptions()
         legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName, legacyFirebaseOptions)
 
@@ -76,7 +72,7 @@ class FirebaseManager(private val appContext: Context,
     }
 
     private fun initialiseFirestoreFirebaseProject() {
-        firestoreFirebaseAppName = getFirestoreAppName()
+        val firestoreFirebaseAppName = getFirestoreAppName()
         val firestoreFirebaseOptions = firebaseOptionsHelper.getFirestoreFirebaseOptions()
         firestoreFirebaseApp = initialiseFirebaseApp(firestoreFirebaseAppName, firestoreFirebaseOptions)
     }
@@ -136,9 +132,9 @@ class FirebaseManager(private val appContext: Context,
         // to a projectId and use it for any task. In this case, we need the legacyApiKey
         // so we grab through the Application to avoid injecting it through all methods, so it will be easier
         // to get rid of it.
-        val md5LegacyApiKey = (appContext as Application).secureDataManager.getMd5LegacyApiKeyForProjectIdOrEmpty(projectId)
-        return if (md5LegacyApiKey.isNotEmpty()) {
-            firebaseUser.uid.md5() == md5LegacyApiKey
+        val hashedLegacyApiKey = (appContext as Application).secureDataManager.getHashedLegacyProjectIdForProjectIdOrEmpty(projectId)
+        return if (hashedLegacyApiKey.isNotEmpty()) {
+            Hasher().hash(firebaseUser.uid) == hashedLegacyApiKey
         } else {
             firebaseUser.uid == projectId
         }
