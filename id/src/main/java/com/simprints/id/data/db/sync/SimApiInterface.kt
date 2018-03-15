@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.sync
 
 import com.simprints.id.libdata.models.firebase.fb_Person
+import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.http.*
@@ -13,13 +14,11 @@ interface SimApiInterface {
     fun downSync(
         @Query("key") key: String,
         @Query("lastSync") date: Date,
-        @Query("projectId") projectId: String,
-        @Query("moduleId") moduleId: String? = null,
-        @Query("userId") userId: String? = null,
+        @QueryMap(encoded = true) syncParams: Map<String, String>,
         @Query("batchSize") batchSize: Int = 5000): Single<ResponseBody>
 
     @POST("/patients")
-    fun upSync(@Body patientsJson: String): Single<Unit>
+    fun upSync(@Body patientsJson: String): Completable
 
     @GET("/patients")
     fun getPatient(
@@ -29,7 +28,5 @@ interface SimApiInterface {
     @GET("/patient-counts")
     fun patientsCount(
         @Query("key") key: String,
-        @Query("projectId") project: String,
-        @Query("moduleId") moduleId: String? = null,
-        @Query("userId") userId: String? = null): Single<Int>
+        @QueryMap(encoded = true) syncParams: Map<String, String>): Single<Int>
 }

@@ -5,7 +5,9 @@ import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.libdata.DataCallback
 import com.simprints.id.libdata.models.firebase.fb_Person
 import com.simprints.id.libdata.models.realm.rl_Person
+import com.simprints.id.libdata.tools.Constants
 import com.simprints.id.libdata.tools.Utils.wrapCallback
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.Single
 import io.realm.Realm
@@ -81,7 +83,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         })
     }
 
-    override fun getPatientsToUpSync(): ArrayList<rl_Person> =
+    override fun getPeopleToUpSync(): ArrayList<rl_Person> =
         getRealmInstance().let {
             ArrayList(it.where(rl_Person::class.java).equalTo("toSync", false).findAll())
         }
@@ -93,6 +95,15 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         return count
     }
 
+    override fun getPeopleFor(syncParams: SyncTaskParameters): ArrayList<rl_Person> {
+        val query = Realm.getInstance(realmConfig).where(rl_Person::class.java)
+            .equalTo("sync", false)
+            .equalTo("projectId", syncParams.projectId)
+        syncParams.userId?.let { query.equalTo("userId", it) }
+        syncParams.moduleId?.let { query.equalTo("moduleId", it) }
+        return ArrayList(query.findAll())
+    }
+
     override fun getRealmInstance(): Realm {
         realmConfig?.let {
             return Realm.getInstance(it) ?: throw RealmUninitialisedError()
@@ -101,5 +112,9 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
 
     override fun getValidRealmConfig(): RealmConfiguration {
         return realmConfig ?: throw RealmUninitialisedError()
+    }
+
+    override fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo? {
+        return getRealmInstance().where(RealmSyncInfo::class.java).equalTo("id", typeSync.ordinal).findFirst()
     }
 }
