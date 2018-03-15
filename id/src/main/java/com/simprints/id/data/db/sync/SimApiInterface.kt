@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.sync
 
-import com.simprints.id.libdata.models.firebase.fb_Person
+import com.simprints.id.data.db.remote.models.fb_Person
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.ResponseBody
