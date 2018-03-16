@@ -5,7 +5,6 @@ import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.FakeResponseInterceptor
-import com.simprints.id.tools.retrofit.createMockServiceToFailRequests
 import com.simprints.id.tools.roboletric.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver

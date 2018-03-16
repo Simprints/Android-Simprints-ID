@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.sync
 
+import com.simprints.id.data.db.sync.SimApiInterface.Companion.baseUrl
 import com.simprints.id.secure.JsonHelper
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -10,15 +11,11 @@ import java.util.concurrent.TimeUnit
 
 open class SimApi {
 
-    companion object {
-        private const val baseUrl = "https://sync-manager-dot-simprints-dev.appspot.com"
-    }
-
     val api: SimApiInterface by lazy {
         retrofit.create(SimApiInterface::class.java)
     }
 
-    private val retrofit: Retrofit by lazy {
+    val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(JsonHelper.gson))

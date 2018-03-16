@@ -3,9 +3,11 @@ package com.simprints.id.secure
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.tools.retrofit.createMockBehaviorService
 import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.Response
+import retrofit2.Retrofit
 import retrofit2.http.HeaderMap
 import retrofit2.http.Query
 import retrofit2.mock.BehaviorDelegate
@@ -33,4 +35,8 @@ class ApiServiceMock(private val delegate: BehaviorDelegate<ApiServiceInterface>
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {
         return Calls.response(Response.success(body))
     }
+}
+
+fun createMockServiceToFailRequests(retrofit: Retrofit): ApiServiceInterface {
+    return ApiServiceMock(createMockBehaviorService(retrofit, 100, ApiServiceInterface::class.java))
 }

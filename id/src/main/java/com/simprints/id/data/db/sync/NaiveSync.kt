@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.sync
 
+import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmSyncInfo
@@ -10,6 +11,7 @@ import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.JsonHelper
 import com.simprints.libcommon.DownloadProgress
 import com.simprints.libcommon.Progress
+import com.simprints.libcommon.UploadProgress
 import io.reactivex.Emitter
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -18,13 +20,14 @@ import io.realm.RealmConfiguration
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
-import java.lang.Math.min
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.collections.ArrayList
 
-class NaiveSync(private val api: SimApiInterface,
-                private val realmConfig: RealmConfiguration,
-                private val localDbManager: LocalDbManager) {
+open class NaiveSync(private val api: SimApiInterface,
+                     private val realmConfig: RealmConfiguration?,
+                     private val localDbManager: LocalDbManager,
+                     private val gson: Gson) {
 
     companion object {
         private const val LOCAL_DB_BATCH_SIZE = 10000
@@ -37,31 +40,28 @@ class NaiveSync(private val api: SimApiInterface,
             downloadNewPatients(isInterrupted, syncParams))
     }
 
-    private fun uploadNewPatients(isInterrupted: () -> Boolean): Observable<Progress> {
+    protected open fun uploadNewPatients(isInterrupted: () -> Boolean, batchSize: Int = 10): Observable<Progress> {
         val patientsToUpload = localDbManager.getPeopleToUpSync()
-        val batchSize = 10
-        return makeUploadRequest(isInterrupted, patientsToUpload, batchSize).map {
-            DownloadProgress(it, patientsToUpload.size / batchSize)
-        }
-    }
-
-    private fun makeUploadRequest(isInterrupted: () -> Boolean,
-                                  patientsToUpload: ArrayList<rl_Person>,
-                                  batchSize: Int = 2000): Observable<Int> {
-
-        val counterBatch = AtomicInteger()
-        val gson = JsonHelper.create()
+        val counter = AtomicInteger(0)
 
         return Observable.fromIterable(patientsToUpload)
-            .takeUntil { !isInterrupted() }
+            .takeUntil { isInterrupted() }
             .map { fb_Person(it) }
             .buffer(batchSize)
-            .map { subGroup ->
-                val body = gson.toJson(mapOf("patients" to subGroup))
-                api.upSync(body).retry(5)
+            .flatMap { patientsBatch ->
+                //val fbPatientsBatch = patientsBatch.map { fb_Person(it) }
+                makeUploadRequest(ArrayList(patientsBatch)).toObservable()
             }.map {
-                counterBatch.addAndGet(min(patientsToUpload.size, batchSize))
+                UploadProgress(counter.addAndGet(it), patientsToUpload.size)
             }
+    }
+
+    protected open fun makeUploadRequest(patientsToUpload: ArrayList<fb_Person>): Single<Int> {
+
+        val body = gson.toJson(mapOf("patients" to patientsToUpload))
+        return api.upSync("AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0", body)
+            .retry(5)
+            .toSingleDefault(patientsToUpload.size)
     }
 
     private fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
@@ -72,15 +72,16 @@ class NaiveSync(private val api: SimApiInterface,
             api.downSync(
                 "AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0",
                 realmSyncInfo?.lastSyncTime ?: Date(0),
-                syncParams.toMap()).flatMapObservable {
-                downloadNewPatientsFromStream(
-                    isInterrupted,
-                    syncParams,
-                    it.byteStream()).retry(5)
-                    .map {
-                        DownloadProgress(it, nPatientsToDownload)
-                    }
-            }
+                syncParams.toMap())
+                .flatMapObservable {
+                    downloadNewPatientsFromStream(
+                        isInterrupted,
+                        syncParams,
+                        it.byteStream()).retry(5)
+                        .map {
+                            DownloadProgress(it, nPatientsToDownload)
+                        }
+                }
         }
     }
 
