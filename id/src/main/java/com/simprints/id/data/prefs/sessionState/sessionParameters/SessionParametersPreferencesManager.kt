@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.sessionState.sessionParameters
 
-import com.simprints.id.domain.callout.CalloutAction
-import com.simprints.id.domain.sessionParameters.SessionParameters
+import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.session.sessionParameters.SessionParameters
 
 interface SessionParametersPreferencesManager {
 

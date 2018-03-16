@@ -7,10 +7,10 @@ import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.sync.NaiveSyncManager
-import com.simprints.id.data.models.Session
-import com.simprints.id.libdata.DataCallback
-import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.libdata.models.firebase.fb_Person
+import com.simprints.id.session.Session
+import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.domain.Constants
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
@@ -70,11 +70,11 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         if (destinationList.size == 0) remoteDbManager.loadPersonFromRemote(destinationList, projectId, guid, callback)
     }
 
-    override fun loadPeople(destinationList: MutableList<Person>, group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
+    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
         localDbManager.loadPeopleFromLocal(destinationList, group, userId, moduleId, callback)
     }
 
-    override fun getPeopleCount(group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String): Long =
+    override fun getPeopleCount(group: Constants.GROUP, userId: String, moduleId: String): Long =
         localDbManager.getPeopleCountFromLocal(group, userId, moduleId)
 
     override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
@@ -99,7 +99,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     private fun getSyncManager(): NaiveSyncManager =
         NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), localDbManager.getValidRealmConfig(), localDbManager)
 
-    override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback) {
+    override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
         val firebaseManager = remoteDbManager as FirebaseManager
         val realmManager = localDbManager as RealmDbManager
         LocalDbRecovererImpl(realmManager, firebaseManager, projectId, userId, androidId, moduleId, group, callback).recoverDb()

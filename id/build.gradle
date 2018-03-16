@@ -151,7 +151,6 @@ android {
 
 dependencies {
     implementation fileTree(include: ["*.jar"], dir: "libs")
-    //implementation project(":libdata")
     implementation project(":libcommon")
     implementation project(":libsimprints")
 

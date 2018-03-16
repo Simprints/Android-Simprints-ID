@@ -5,9 +5,9 @@ import com.crashlytics.android.Crashlytics
 import com.google.common.base.CaseFormat
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
-import com.simprints.id.data.models.Session
-import com.simprints.id.domain.callout.Callout
-import com.simprints.id.libdata.models.firebase.fb_Session
+import com.simprints.id.session.Session
+import com.simprints.id.session.callout.Callout
+import com.simprints.id.data.db.remote.models.fb_Session
 import timber.log.Timber
 import kotlin.reflect.full.memberProperties
 
@@ -52,7 +52,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
     }
 
     override fun logSafeException(exception: RuntimeException) {
-        Timber.d("FirebaseAnalyticsManager.logSafeException(description=$exception")
+        Timber.d("FirebaseAnalyticsManager.logSafeException(description=$exception)")
         val bundle = Bundle()
         bundle.putString("exception", exception.toString())
         bundle.putString("description", exception.message)

@@ -4,11 +4,11 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
-import com.simprints.id.data.models.Session
+import com.simprints.id.session.Session
 import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
-import com.simprints.id.libdata.DataCallback
-import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.libdata.models.firebase.fb_Person
+import com.simprints.id.data.db.DataCallback
+import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.secure.models.Tokens
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification

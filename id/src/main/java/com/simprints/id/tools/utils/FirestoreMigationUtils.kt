@@ -2,9 +2,9 @@ package com.simprints.id.tools.utils
 
 import com.google.gson.GsonBuilder
 import com.google.gson.stream.JsonReader
-import com.simprints.id.libdata.models.firebase.fb_Person
-import com.simprints.id.libdata.models.realm.rl_Fingerprint
-import com.simprints.id.libdata.models.realm.rl_Person
+import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.local.models.rl_Fingerprint
+import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.libcommon.Fingerprint
 import io.realm.Realm
 import io.realm.RealmList

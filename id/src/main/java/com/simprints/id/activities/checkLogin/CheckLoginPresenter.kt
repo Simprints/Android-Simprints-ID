@@ -1,7 +1,7 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.id.data.DataManager
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.StringsUtils
 
