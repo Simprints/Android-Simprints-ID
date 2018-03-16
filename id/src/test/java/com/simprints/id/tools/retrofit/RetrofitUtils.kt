@@ -1,25 +1,20 @@
 package com.simprints.id.tools.retrofit
 
-import com.simprints.id.secure.ApiServiceInterface
-import com.simprints.id.secure.ApiServiceMock
 import okhttp3.*
 import retrofit2.Retrofit
+import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 import java.util.concurrent.TimeUnit
 
-fun createMockService(retrofit: Retrofit, failurePercent: Int): ApiServiceInterface {
+fun <T> createMockBehaviorService(retrofit: Retrofit, failurePercent: Int, service: Class<T>): BehaviorDelegate<T> {
     val networkBehavior = NetworkBehavior.create()
     givenNetworkFailurePercentIs(networkBehavior, failurePercent)
 
     val mockRetrofit = MockRetrofit.Builder(retrofit)
         .networkBehavior(networkBehavior)
         .build()
-    return ApiServiceMock(mockRetrofit.create(ApiServiceInterface::class.java))
-}
-
-fun createMockServiceToFailRequests(retrofit: Retrofit): ApiServiceInterface {
-    return createMockService(retrofit, 100)
+    return mockRetrofit.create(service)
 }
 
 fun getBuilderResponse(statusCode: Int, body: String = "", contentType: String = "\"text/plain\""): Response.Builder {

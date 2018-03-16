@@ -6,8 +6,7 @@ import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.base.RxJavaTest
-import com.simprints.id.tools.retrofit.createMockService
-import com.simprints.id.tools.retrofit.createMockServiceToFailRequests
+import com.simprints.id.tools.retrofit.createMockBehaviorService
 import com.simprints.id.tools.roboletric.TestApplication
 import com.simprints.id.tools.roboletric.mockDbManager
 import com.simprints.id.tools.roboletric.mockLocalDbManager
@@ -42,7 +41,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
             mockSecureDataManager(),
             app.dataManager,
             SafetyNet.getClient(app),
-            createMockService(ApiService().retrofit, 0),
+            ApiServiceMock(createMockBehaviorService(ApiService().retrofit, 0, ApiServiceInterface::class.java)),
             getMockAttestationManager())
 
         val testObserver = authenticator

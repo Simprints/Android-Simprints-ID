@@ -9,6 +9,12 @@ import java.util.*
 
 interface SimApiInterface {
 
+    companion object {
+        private const val apiVersion = "2018-1-0-dev6"
+        const val baseUrl = "https://sync-manager-dot-simprints-dev.appspot.com"
+        private const val apiKey: String = "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s"
+    }
+
     @GET("/patients")
     @Streaming
     fun downSync(
@@ -18,7 +24,7 @@ interface SimApiInterface {
         @Query("batchSize") batchSize: Int = 5000): Single<ResponseBody>
 
     @POST("/patients")
-    fun upSync(@Body patientsJson: String): Completable
+    fun upSync(@Query("key") key: String, @Body patientsJson: String): Completable
 
     @GET("/patients")
     fun getPatient(

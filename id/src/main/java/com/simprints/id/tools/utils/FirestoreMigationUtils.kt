@@ -16,6 +16,14 @@ import java.util.*
 
 object FirestoreMigationUtils {
 
+    fun getRandomPeople(numberOfPeople: Int): ArrayList<rl_Person> {
+        return arrayListOf<rl_Person>().also { list ->
+            (0 until numberOfPeople).forEach {
+                list.add(getRandomPerson())
+            }
+        }
+    }
+
     fun getRandomPerson(): rl_Person {
 
         val prints: RealmList<rl_Fingerprint> = RealmList()
