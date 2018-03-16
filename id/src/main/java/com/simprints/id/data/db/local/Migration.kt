@@ -1,11 +1,9 @@
 package com.simprints.id.data.db.local
 
-import com.simprints.id.libdata.tools.Constants
+import com.simprints.id.domain.Constants
 
 import io.realm.DynamicRealm
-import io.realm.DynamicRealmObject
 import io.realm.RealmMigration
-import io.realm.RealmObjectSchema
 import io.realm.RealmSchema
 
 

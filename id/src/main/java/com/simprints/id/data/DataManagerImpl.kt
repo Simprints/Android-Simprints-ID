@@ -7,15 +7,15 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.authListener.AuthListener
 import com.simprints.id.data.db.remote.connectionListener.ConnectionListener
-import com.simprints.id.data.models.Session
-import com.simprints.id.data.network.ApiManager
+import com.simprints.id.session.Session
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.domain.sessionParameters.SessionParameters
-import com.simprints.id.libdata.DataCallback
-import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.libdata.models.firebase.fb_Person
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.session.sessionParameters.SessionParameters
+import com.simprints.id.data.db.DataCallback
+import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.domain.Constants
+import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
@@ -26,14 +26,12 @@ import com.simprints.libsimprints.Verification
 class DataManagerImpl(private val context: Context,
                       private val preferencesManager: PreferencesManager,
                       private val dbManager: DbManager,
-                      private val apiManager: ApiManager,
                       private val analyticsManager: AnalyticsManager,
                       private val secureDataManager: SecureDataManager)
     : DataManager,
     PreferencesManager by preferencesManager,
     AnalyticsManager by analyticsManager,
     DbManager by dbManager,
-    ApiManager by apiManager,
     SecureDataManager by secureDataManager {
 
     override val androidSdkVersion: Int
@@ -106,11 +104,11 @@ class DataManagerImpl(private val context: Context,
         dbManager.savePerson(fb_Person(person, userId, moduleId), projectId)
     }
 
-    override fun loadPeople(destinationList: MutableList<Person>, group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback?) {
+    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
         dbManager.loadPeople(destinationList, group, userId, moduleId, callback)
     }
 
-    override fun getPeopleCount(group: com.simprints.id.libdata.tools.Constants.GROUP): Long =
+    override fun getPeopleCount(group: Constants.GROUP): Long =
         dbManager.getPeopleCount(group, userId, moduleId)
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
@@ -140,7 +138,7 @@ class DataManagerImpl(private val context: Context,
         analyticsManager.logSession(session)
     }
 
-    override fun recoverRealmDb(group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback) {
+    override fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback) {
         dbManager.recoverLocalDb(deviceId, userId, deviceId, moduleId, group, callback)
     }
 }

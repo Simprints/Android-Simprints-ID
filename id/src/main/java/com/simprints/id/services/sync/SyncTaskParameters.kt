@@ -1,6 +1,6 @@
 package com.simprints.id.services.sync
 
-import com.simprints.id.libdata.tools.Constants
+import com.simprints.id.domain.Constants
 import com.simprints.id.services.progress.service.ProgressTaskParameters
 
 sealed class SyncTaskParameters(open val projectId: String, open val moduleId: String?, open val userId: String?) : ProgressTaskParameters {

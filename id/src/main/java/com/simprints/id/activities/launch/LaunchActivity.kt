@@ -10,12 +10,12 @@ import android.view.View
 import android.view.WindowManager
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.MainActivity
+import com.simprints.id.activities.main.MainActivity
 import com.simprints.id.activities.RefusalActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.AppState
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper

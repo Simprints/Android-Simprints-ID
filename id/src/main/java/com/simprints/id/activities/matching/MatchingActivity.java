@@ -17,7 +17,7 @@ import com.simprints.id.activities.AlertActivity;
 import com.simprints.id.activities.IntentKeys;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
-import com.simprints.id.model.ALERT_TYPE;
+import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.libcommon.Person;
 

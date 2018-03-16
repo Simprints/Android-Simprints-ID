@@ -6,13 +6,14 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.DataManager
-import com.simprints.id.domain.callout.Callout
-import com.simprints.id.domain.callout.Callout.Companion.toCallout
+import com.simprints.id.session.callout.Callout
+import com.simprints.id.session.callout.Callout.Companion.toCallout
 import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
@@ -70,7 +71,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     override fun openLoginActivity(legacyApiKey: String) {
         val loginIntent = Intent(this, LoginActivity::class.java)
-        loginIntent.putExtra(LoginActivity.LEGACY_API_KEY_PARAM, legacyApiKey)
+        loginIntent.putExtra(IntentKeys.loginActivityLegacyProjectIdKey, legacyApiKey)
         startActivityForResult(loginIntent, LOGIN_REQUEST_CODE)
     }
 
