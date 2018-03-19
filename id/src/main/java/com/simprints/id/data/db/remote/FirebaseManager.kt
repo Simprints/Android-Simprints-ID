@@ -25,13 +25,13 @@ import com.simprints.id.data.db.remote.models.*
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.data.db.remote.tools.Utils.wrapCallback
-import com.simprints.id.session.Session
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
-import com.simprints.id.secure.models.Tokens
-import com.simprints.libcommon.Person
 import com.simprints.id.secure.cryptography.Hasher
+import com.simprints.id.secure.models.Tokens
+import com.simprints.id.session.Session
 import com.simprints.id.tools.extensions.deviceId
+import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
@@ -202,7 +202,7 @@ class FirebaseManager(private val appContext: Context,
     }
 
     override fun saveIdentificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
-        idEventRef(legacyFirebaseApp, projectId).push().setValue(fb_IdEvent(probe, userId, androidId, moduleId, matchSize, matches, sessionId))
+        idEventRef(legacyFirebaseApp, projectId).push().setValue(fb_IdEvent(probe, projectId, userId, androidId, moduleId, matchSize, matches, sessionId))
     }
 
     override fun updateIdentificationInRemote(projectId: String, selectedGuid: String, deviceId: String, sessionId: String) {
@@ -210,7 +210,7 @@ class FirebaseManager(private val appContext: Context,
     }
 
     override fun saveVerificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
-        vfEventRef(legacyFirebaseApp, projectId).push().setValue(fb_VfEvent(probe, userId, androidId, moduleId, patientId, match, sessionId, guidExistsResult))
+        vfEventRef(legacyFirebaseApp, projectId).push().setValue(fb_VfEvent(probe, projectId, userId, androidId, moduleId, patientId, match, sessionId, guidExistsResult))
     }
 
     override fun saveRefusalFormInRemote(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String) {

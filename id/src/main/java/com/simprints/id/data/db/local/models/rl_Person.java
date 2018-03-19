@@ -30,6 +30,7 @@ public class rl_Person extends RealmObject {
     @PrimaryKey
     @SerializedName("id")
     public String patientId;
+    public String projectId;
     public String userId;
     public String moduleId;
     public Date createdAt;
@@ -45,6 +46,7 @@ public class rl_Person extends RealmObject {
         this.userId = person.getUserId();
         this.createdAt = person.getCreatedAt();
         this.moduleId = person.getModuleId();
+        this.projectId = person.getModuleId();
         this.fingerprints = new RealmList<>();
         this.toSync = false;
 
@@ -143,6 +145,7 @@ public class rl_Person extends RealmObject {
         jsonPerson.put("createdAt", createdAt);
         jsonPerson.put("fingerprints", jsonArrayPrints);
         jsonPerson.put("moduleId", moduleId);
+        jsonPerson.put("projectId", projectId);
         jsonPerson.put("patientId", patientId);
         jsonPerson.put("userId", userId);
 

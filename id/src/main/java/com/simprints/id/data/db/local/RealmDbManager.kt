@@ -1,12 +1,14 @@
 package com.simprints.id.data.db.local
 
 import android.content.Context
-import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
+import com.google.gson.Gson
+import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.DataCallback
-import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.local.models.rl_Person
-import com.simprints.id.domain.Constants
+import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.tools.Utils.wrapCallback
+import com.simprints.id.domain.Constants
+import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.Single
@@ -49,6 +51,21 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
     override fun savePersonInLocal(fbPerson: fb_Person) {
         val realm = getRealmInstance()
         rl_Person(fbPerson).save(realm)
+        realm.close()
+    }
+
+    override fun savePeopleFromStream(reader: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: () -> Boolean) {
+        val realm = getRealmInstance()
+        realm.executeTransaction { r ->
+            while (reader.hasNext()) {
+                val person = gson.fromJson<fb_Person>(reader, fb_Person::class.java)
+                r.insertOrUpdate(rl_Person(person))
+                r.insertOrUpdate(RealmSyncInfo(groupSync.ordinal, person.updatedAt))
+                if (shouldStop()) {
+                    break
+                }
+            }
+        }
         realm.close()
     }
 
@@ -97,7 +114,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
 
     override fun getPeopleFor(syncParams: SyncTaskParameters): ArrayList<rl_Person> {
         val query = Realm.getInstance(realmConfig).where(rl_Person::class.java)
-            .equalTo("sync", false)
+            .equalTo("toSync", false)
             .equalTo("projectId", syncParams.projectId)
         syncParams.userId?.let { query.equalTo("userId", it) }
         syncParams.moduleId?.let { query.equalTo("moduleId", it) }

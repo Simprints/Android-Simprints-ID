@@ -1,30 +1,28 @@
 package com.simprints.id.tools.utils
 
-import com.google.gson.GsonBuilder
-import com.google.gson.stream.JsonReader
-import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.local.models.rl_Fingerprint
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.libcommon.Fingerprint
-import io.realm.Realm
 import io.realm.RealmList
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.text.DateFormat
 import java.util.*
 
 object FirestoreMigationUtils {
 
-    fun getRandomPeople(numberOfPeople: Int): ArrayList<rl_Person> {
+    fun getRandomPeople(numberOfPeople: Int,
+                        projectId: String = UUID.randomUUID().toString(),
+                        userId: String = UUID.randomUUID().toString(),
+                        moduleId: String = UUID.randomUUID().toString()): ArrayList<rl_Person> {
+
         return arrayListOf<rl_Person>().also { list ->
             (0 until numberOfPeople).forEach {
-                list.add(getRandomPerson())
+                list.add(getRandomPerson(projectId, userId, moduleId))
             }
         }
     }
 
-    fun getRandomPerson(): rl_Person {
+    fun getRandomPerson(projectId: String = UUID.randomUUID().toString(),
+                        userId: String = UUID.randomUUID().toString(),
+                        moduleId: String = UUID.randomUUID().toString()): rl_Person {
 
         val prints: RealmList<rl_Fingerprint> = RealmList()
         prints.add(getRandomFingerprint())
@@ -32,8 +30,9 @@ object FirestoreMigationUtils {
 
         return rl_Person().apply {
             patientId = UUID.randomUUID().toString()
-            userId = UUID.randomUUID().toString()
-            moduleId = UUID.randomUUID().toString()
+            this.projectId = projectId
+            this.userId = userId
+            this.moduleId = moduleId
             createdAt = Calendar.getInstance().time
             toSync = true
             fingerprints = prints
@@ -49,33 +48,4 @@ object FirestoreMigationUtils {
 
         return print
     }
-}
-
-@Throws(IOException::class)
-fun readJsonStream(`in`: InputStream, realm: Realm) {
-    val reader = JsonReader(InputStreamReader(`in`))
-    val gson = GsonBuilder()
-        .setDateFormat(DateFormat.FULL, DateFormat.FULL).create()
-
-    reader.beginArray()
-    var counter = 0
-
-    while (reader.hasNext()) {
-        counter++
-
-        if (!realm.isInTransaction) {
-            realm.beginTransaction()
-        }
-
-        val person = gson.fromJson<fb_Person>(reader, fb_Person::class.java)
-        realm.copyToRealmOrUpdate(rl_Person(person))
-        //Log.d("TEST", "Saved a new person: " + counter);
-
-        if (counter % 500 == 0 || !reader.hasNext() && realm.isInTransaction) {
-            realm.commitTransaction()
-        }
-    }
-
-    reader.endArray()
-    reader.close()
 }

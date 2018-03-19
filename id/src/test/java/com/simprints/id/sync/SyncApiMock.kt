@@ -1,7 +1,7 @@
 package com.simprints.id.sync
 
+import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.SimApiInterface
-import com.simprints.id.libdata.models.firebase.fb_Person
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.tools.retrofit.createMockBehaviorService
 import io.reactivex.Completable
@@ -12,7 +12,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.Calls
-import java.util.*
 
 // It's required to use NetworkBehavior, even if response is not used in the tests (e.g failing responses due to no connectivity).
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
@@ -22,7 +21,7 @@ class SimApiMock(private val delegate: BehaviorDelegate<SimApiInterface>) : SimA
         return delegate.returning(buildSuccessResponseWith("")).upSync(anyNotNull(), anyNotNull())
     }
 
-    override fun downSync(key: String, date: Date, syncParams: Map<String, String>, batchSize: Int): Single<ResponseBody> {
+    override fun downSync(key: String, date: Long, syncParams: Map<String, String>, batchSize: Int): Single<ResponseBody> {
         return delegate.returning(buildSuccessResponseWith("")).downSync(anyNotNull(), anyNotNull(), anyNotNull())
     }
 

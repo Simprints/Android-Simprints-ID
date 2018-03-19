@@ -1,6 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.secure.ApiServiceInterface.Companion.baseUrl
+import com.simprints.id.tools.JsonHelper
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
