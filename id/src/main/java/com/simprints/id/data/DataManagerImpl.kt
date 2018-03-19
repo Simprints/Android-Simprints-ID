@@ -109,7 +109,11 @@ class DataManagerImpl(private val context: Context,
     }
 
     override fun getPeopleCount(group: Constants.GROUP): Long =
-        dbManager.getPeopleCount(group, userId, moduleId)
+        when (group) {
+            Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
+            Constants.GROUP.USER -> dbManager.getPeopleCount(userId = userId)
+            Constants.GROUP.MODULE ->dbManager.getPeopleCount(userId = userId, moduleId = moduleId)
+        }
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
         dbManager.saveIdentification(probe, projectId, userId, deviceId, moduleId, matchSize, matches, sessionId)
