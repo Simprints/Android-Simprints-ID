@@ -1,7 +1,7 @@
 package com.simprints.id.sync
 
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.sync.SimApiInterface
+import com.simprints.id.data.db.sync.SyncApiInterface
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.tools.retrofit.createMockBehaviorService
 import io.reactivex.Completable
@@ -15,7 +15,7 @@ import retrofit2.mock.Calls
 
 // It's required to use NetworkBehavior, even if response is not used in the tests (e.g failing responses due to no connectivity).
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
-class SimApiMock(private val delegate: BehaviorDelegate<SimApiInterface>) : SimApiInterface {
+class SimApiMock(private val delegate: BehaviorDelegate<SyncApiInterface>) : SyncApiInterface {
 
     override fun upSync(key: String, patientsJson: String): Completable {
         return delegate.returning(buildSuccessResponseWith("")).upSync(anyNotNull(), anyNotNull())
@@ -38,6 +38,6 @@ class SimApiMock(private val delegate: BehaviorDelegate<SimApiInterface>) : SimA
     }
 }
 
-fun createMockServiceToFailRequests(retrofit: Retrofit): SimApiInterface {
-    return SimApiMock(createMockBehaviorService(retrofit, 0, SimApiInterface::class.java))
+fun createMockServiceToFailRequests(retrofit: Retrofit): SyncApiInterface {
+    return SimApiMock(createMockBehaviorService(retrofit, 0, SyncApiInterface::class.java))
 }

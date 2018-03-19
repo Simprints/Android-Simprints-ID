@@ -16,7 +16,7 @@ import retrofit2.mock.Calls
 
 // It's required to use NetworkBehavior, even if response is not used in the tests (e.g failing responses due to no connectivity).
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
-class ApiServiceMock(private val delegate: BehaviorDelegate<ApiServiceInterface>) : ApiServiceInterface {
+class ApiServiceMock(private val delegate: BehaviorDelegate<SecureApiInterface>) : SecureApiInterface {
     override fun projectId(headers: Map<String, String>, key: String): Single<Response<ProjectId>> {
         val projectIdResponse = ProjectId("project_id")
         return delegate.returning(buildSuccessResponseWith(projectIdResponse)).projectId(headers, key)
@@ -42,6 +42,6 @@ class ApiServiceMock(private val delegate: BehaviorDelegate<ApiServiceInterface>
     }
 }
 
-fun createMockServiceToFailRequests(retrofit: Retrofit): ApiServiceInterface {
-    return ApiServiceMock(createMockBehaviorService(retrofit, 100, ApiServiceInterface::class.java))
+fun createMockServiceToFailRequests(retrofit: Retrofit): SecureApiInterface {
+    return ApiServiceMock(createMockBehaviorService(retrofit, 100, SecureApiInterface::class.java))
 }

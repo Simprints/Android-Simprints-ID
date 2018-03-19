@@ -11,7 +11,7 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import retrofit2.HttpException
 
-class NonceManager(val client: ApiServiceInterface) {
+class NonceManager(val client: SecureApiInterface) {
 
     fun requestNonce(nonceScope: NonceScope): Single<Nonce> {
         val headers = convertNonceScopeIntoMap(nonceScope)
