@@ -6,6 +6,7 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.NonceScope
@@ -17,13 +18,13 @@ import io.reactivex.rxkotlin.Singles
 open class ProjectAuthenticator(secureDataManager: SecureDataManager,
                                 private val dbManager: DbManager,
                                 private val safetyNetClient: SafetyNetClient,
-                                apiClient: ApiServiceInterface = ApiService().api,
+                                secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
                                 private val attestationManager: AttestationManager = AttestationManager()) {
 
     private val projectSecretManager = ProjectSecretManager(secureDataManager)
-    private val publicKeyManager = PublicKeyManager(apiClient)
-    private val nonceManager = NonceManager(apiClient)
-    private val authManager = AuthManager(apiClient)
+    private val publicKeyManager = PublicKeyManager(secureApiClient)
+    private val nonceManager = NonceManager(secureApiClient)
+    private val authManager = AuthManager(secureApiClient)
 
     @Throws(
         DifferentProjectIdReceivedFromIntentException::class,
