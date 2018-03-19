@@ -2,7 +2,6 @@ package com.simprints.id.sync
 
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.SyncApiInterface
-import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.tools.retrofit.createMockBehaviorService
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -18,19 +17,19 @@ import retrofit2.mock.Calls
 class SimApiMock(private val delegate: BehaviorDelegate<SyncApiInterface>) : SyncApiInterface {
 
     override fun upSync(key: String, patientsJson: String): Completable {
-        return delegate.returning(buildSuccessResponseWith("")).upSync(anyNotNull(), anyNotNull())
+        return delegate.returning(buildSuccessResponseWith("")).upSync(key, patientsJson)
     }
 
     override fun downSync(key: String, date: Long, syncParams: Map<String, String>, batchSize: Int): Single<ResponseBody> {
-        return delegate.returning(buildSuccessResponseWith("")).downSync(anyNotNull(), anyNotNull(), anyNotNull())
+        return delegate.returning(buildSuccessResponseWith("")).downSync(key, date, syncParams)
     }
 
     override fun getPatient(key: String, patientId: String): Single<fb_Person> {
-        return delegate.returning(buildSuccessResponseWith("")).getPatient(anyNotNull(), anyNotNull())
+        return delegate.returning(buildSuccessResponseWith("")).getPatient(key, patientId)
     }
 
     override fun patientsCount(key: String, syncParams: Map<String, String>): Single<Int> {
-        return delegate.returning(buildSuccessResponseWith("")).patientsCount(anyNotNull(), mapOf())
+        return delegate.returning(buildSuccessResponseWith("")).patientsCount(key, mapOf())
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {
