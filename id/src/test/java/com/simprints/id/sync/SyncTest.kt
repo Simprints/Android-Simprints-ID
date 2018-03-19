@@ -30,6 +30,8 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyBoolean
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
@@ -55,7 +57,7 @@ class SyncTest : RxJavaTest() {
 
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
         val patientsToUpload = getRandomPeople(35)
-        whenever(localDbManager.getPeopleToUpSync()).thenReturn(patientsToUpload)
+        whenever(localDbManager.getPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
 
         val sync = NaiveSyncTest(
             SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java)),
@@ -80,7 +82,7 @@ class SyncTest : RxJavaTest() {
 
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
         val patientsToUpload = getRandomPeople(35)
-        whenever(localDbManager.getPeopleToUpSync()).thenReturn(patientsToUpload)
+        whenever(localDbManager.getPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
 
         val sync = NaiveSyncTest(
             SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java)),
@@ -185,7 +187,7 @@ class SyncTest : RxJavaTest() {
         mockLocalDbToSavePatientsFromStream(localDbMock)
 
         //Mock app has already patients in localDb
-        `when`(localDbMock.getPeopleFor(anyNotNull())).thenReturn(getRandomPeople(patientsAlreadyInLocalDb))
+        `when`(localDbMock.getPeopleFromLocal(anyString(), anyString(), anyString(), anyString(), anyBoolean())).thenReturn(getRandomPeople(patientsAlreadyInLocalDb))
 
         //Mock app RealmSyncInfo for syncParams
         `when`(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup().ordinal, lastSyncTime))

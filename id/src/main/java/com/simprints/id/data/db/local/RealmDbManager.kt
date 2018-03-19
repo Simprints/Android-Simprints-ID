@@ -9,11 +9,11 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.tools.Utils.wrapCallback
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
-import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.RealmQuery
 import io.realm.RealmResults
 import timber.log.Timber
 
@@ -100,25 +100,40 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         })
     }
 
-    override fun getPeopleToUpSync(): ArrayList<rl_Person> =
-        getRealmInstance().let {
-            ArrayList(it.where(rl_Person::class.java).equalTo("toSync", false).findAll())
-        }
-
-    override fun getPeopleCountFromLocal(group: Constants.GROUP, userId: String, moduleId: String): Long {
+    override fun getPeopleCountFromLocal(personId: String?,
+                                         projectId: String?,
+                                         userId: String?,
+                                         moduleId: String?,
+                                         toSync: Boolean?): Long {
         val realm = getRealmInstance()
-        val count = rl_Person.count(realm, userId, moduleId, group)
-        realm.close()
-        return count
+        val query = buildQueryForPerson(realm, personId, projectId, userId, moduleId, toSync)
+        return query.count().also { realm.close() }
     }
 
-    override fun getPeopleFor(syncParams: SyncTaskParameters): ArrayList<rl_Person> {
-        val query = Realm.getInstance(realmConfig).where(rl_Person::class.java)
-            .equalTo("toSync", false)
-            .equalTo("projectId", syncParams.projectId)
-        syncParams.userId?.let { query.equalTo("userId", it) }
-        syncParams.moduleId?.let { query.equalTo("moduleId", it) }
-        return ArrayList(query.findAll())
+    override fun getPeopleFromLocal(personId: String?,
+                                    projectId: String?,
+                                    userId: String?,
+                                    moduleId: String?,
+                                    toSync: Boolean?): ArrayList<rl_Person> {
+
+        val realm = getRealmInstance()
+        val query = buildQueryForPerson(realm, personId, projectId, userId, moduleId, toSync)
+        return ArrayList(query.findAll()).also { realm.close() }
+    }
+
+    private fun buildQueryForPerson(realm: Realm, projectId: String?,
+                                    personId: String?,
+                                    userId: String?,
+                                    moduleId: String?,
+                                    toSync: Boolean?): RealmQuery<rl_Person> {
+
+        val query = realm.where(rl_Person::class.java)
+        projectId?.let { query.equalTo("projectId", it) }
+        personId?.let { query.equalTo("personId", it) }
+        userId?.let { query.equalTo("userId", it) }
+        moduleId?.let { query.equalTo("moduleId", it) }
+        toSync?.let { query.equalTo("toSync", it) }
+        return query
     }
 
     override fun getRealmInstance(): Realm {
