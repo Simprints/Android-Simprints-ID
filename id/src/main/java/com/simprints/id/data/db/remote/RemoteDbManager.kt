@@ -32,7 +32,7 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
     // Data transfer
     fun getLocalDbKeyFromRemote(projectId: String): Single<LocalDbKey>
 
-    fun savePersonInRemote(fbPerson: fb_Person, projectId: String): Completable
+    fun savePersonInRemote(fbPerson: fb_Person): Completable
     fun getUpdatedPersonFromRemote(projectId: String, guid: String): Single<fb_Person>
     fun loadPersonFromRemote(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
 

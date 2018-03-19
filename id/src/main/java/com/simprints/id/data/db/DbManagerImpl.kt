@@ -63,9 +63,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     // Data transfer
 
-    override fun savePerson(fbPerson: fb_Person, projectId: String): Completable =
+    override fun savePerson(fbPerson: fb_Person): Completable =
         if (remoteDbManager.isRemoteConnected)
-            savePersonInLocalAndRemoteAndUpdateLocal(fbPerson, projectId)
+            savePersonInLocalAndRemoteAndUpdateLocal(fbPerson)
         else
             savePersonInLocalOnly(fbPerson)
 
@@ -74,10 +74,10 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
-    private fun savePersonInLocalAndRemoteAndUpdateLocal(fbPerson: fb_Person, projectId: String): Completable =
+    private fun savePersonInLocalAndRemoteAndUpdateLocal(fbPerson: fb_Person): Completable =
         localDbManager.savePersonInLocal(fbPerson)
-            .andThen(remoteDbManager.savePersonInRemote(fbPerson, projectId))
-            .andThen(remoteDbManager.getUpdatedPersonFromRemote(projectId, fbPerson.patientId))
+            .andThen(remoteDbManager.savePersonInRemote(fbPerson))
+            .andThen(remoteDbManager.getUpdatedPersonFromRemote(fbPerson.projectId, fbPerson.patientId))
             .flatMapCompletable { localDbManager.updatePersonInLocal(it) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
