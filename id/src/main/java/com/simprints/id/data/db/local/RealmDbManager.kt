@@ -53,6 +53,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         val realm = getRealmInstance()
         rl_Person(fbPerson).save(realm)
         realm.close()
+        return Completable.complete()
     }
 
     override fun updatePersonInLocal(fbPerson: fb_Person): Completable {

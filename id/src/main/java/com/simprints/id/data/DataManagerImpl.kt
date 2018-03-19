@@ -101,7 +101,7 @@ class DataManagerImpl(private val context: Context,
 
     // Data transfer
     override fun savePerson(person: Person) {
-        dbManager.savePerson(fb_Person(person, projectId, userId, moduleId), projectId)
+        dbManager.savePerson(fb_Person(person, projectId, userId, moduleId))
     }
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {

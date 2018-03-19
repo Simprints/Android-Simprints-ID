@@ -163,8 +163,9 @@ class FirebaseManager(private val appContext: Context,
         }
     }
 
-    override fun savePersonInRemote(fbPerson: fb_Person, projectId: String): Completable {
+    override fun savePersonInRemote(fbPerson: fb_Person): Completable {
         // TODO : Implement sending the person to our own custom end point
+        val projectId = fbPerson.projectId
         val updates = mutableMapOf<String, Any>(patientNode(fbPerson.patientId) to fbPerson.toMap())
 
         userRef(legacyFirebaseApp, projectId, fbPerson.userId).addListenerForSingleValueEvent(object : ValueEventListener {
@@ -180,6 +181,7 @@ class FirebaseManager(private val appContext: Context,
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+        return Completable.complete()
     }
 
     override fun getUpdatedPersonFromRemote(projectId: String, guid: String): Single<fb_Person> {
