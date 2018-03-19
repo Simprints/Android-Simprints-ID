@@ -111,10 +111,10 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     }
 
     override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
-        getSyncManager().sync(parameters, interrupted)
+        getSyncManager().flatMapObservable { sync(parameters, interrupted) }
 
-    private fun getSyncManager(): NaiveSyncManager =
-        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), localDbManager.getValidRealmConfig(), localDbManager)
+    private fun getSyncManager(): Single<NaiveSyncManager> =
+        remoteDbManager.getCurrentFirestoreToken().map { NaiveSyncManager(it, localDbManager) }
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
         val firebaseManager = remoteDbManager as FirebaseManager

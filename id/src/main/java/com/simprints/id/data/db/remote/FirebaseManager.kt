@@ -27,6 +27,7 @@ import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.data.db.remote.tools.Utils.wrapCallback
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
+import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.session.Session
@@ -232,6 +233,19 @@ class FirebaseManager(private val appContext: Context,
 
     fun getFirebaseStorageInstance() = FirebaseStorage.getInstance(legacyFirebaseApp)
     override fun getFirebaseLegacyApp(): FirebaseApp = legacyFirebaseApp
+
+    override fun getCurrentFirestoreToken(): Single<String> = Single.create {
+        getFirebaseLegacyApp().getToken(false)
+            .addOnSuccessListener { result ->
+                val token = result.token
+                if (token == null) {
+                    throw RemoteDbNotSignedInError()
+                } else {
+                    it.onSuccess(token)
+                }
+            }
+            .addOnFailureListener { e -> it.onError(e) }
+    }
 
     companion object {
         private const val COLLECTION_LOCAL_DB_KEYS = "localDbKeys"

@@ -1,30 +1,33 @@
-package com.simprints.id.secure
+package com.simprints.id.network
 
-import com.simprints.id.secure.ApiServiceInterface.Companion.baseUrl
 import com.simprints.id.tools.JsonHelper
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
-open class ApiService {
+open class SimApiClient<T>(val service: Class<T>, private val endpoint: String) {
 
-    val api: ApiServiceInterface by lazy {
-        retrofit.create(ApiServiceInterface::class.java)
+    val api: T by lazy {
+        retrofit.create(service)
     }
 
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(JsonHelper.gson))
-            .baseUrl(baseUrl)
+            .baseUrl(endpoint)
             .client(okHttpClientConfig.build()).build()
     }
 
     val okHttpClientConfig: OkHttpClient.Builder by lazy {
         val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BASIC
-        OkHttpClient.Builder().addInterceptor(interceptor)
+        interceptor.level = HttpLoggingInterceptor.Level.HEADERS
+        OkHttpClient.Builder()
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor(interceptor)
     }
 }

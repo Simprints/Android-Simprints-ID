@@ -6,12 +6,10 @@ import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.http.*
 
-interface SimApiInterface {
+interface SyncApiInterface {
 
     companion object {
-        private const val apiVersion = "2018-1-0-dev6"
         var baseUrl = "https://sync-manager-dot-simprints-dev.appspot.com"
-        private const val apiKey: String = "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s"
     }
 
     @GET("/patients")
@@ -19,7 +17,7 @@ interface SimApiInterface {
     fun downSync(
         @Query("key") key: String,
         @Query("lastSync") date: Long, //Date in ms
-        @QueryMap(encoded = true) syncParams: Map<String, String>,
+        @QueryMap(encoded = true) syncParams: Map<String, String>, //projectId, userId, moduleId
         @Query("batchSize") batchSize: Int = 5000): Single<ResponseBody>
 
     @POST("/patients")
