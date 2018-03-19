@@ -11,7 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.HeaderMap
 import retrofit2.http.Query
 
-interface ApiServiceInterface {
+interface SecureApiInterface {
 
     companion object {
         private const val apiVersion = "2018-1-0-dev6"
@@ -21,16 +21,16 @@ interface ApiServiceInterface {
 
     @GET("/project-ids")
     fun projectId(@HeaderMap headers: Map<String, String>,
-                  @Query("key") key: String = ApiServiceInterface.apiKey): Single<Response<ProjectId>>
+                  @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<ProjectId>>
 
     @GET("/nonces")
     fun nonce(@HeaderMap headers: Map<String, String>,
-              @Query("key") key: String = ApiServiceInterface.apiKey): Single<Response<Nonce>>
+              @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<Nonce>>
 
     @GET("/public-key")
-    fun publicKey(@Query("key") key: String = ApiServiceInterface.apiKey): Single<Response<PublicKeyString>>
+    fun publicKey(@Query("key") key: String = SecureApiInterface.apiKey): Single<Response<PublicKeyString>>
 
     @GET("/tokens")
     fun auth(@HeaderMap headers: Map<String, String>,
-             @Query("key") key: String = ApiServiceInterface.apiKey): Single<Response<Tokens>>
+             @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<Tokens>>
 }

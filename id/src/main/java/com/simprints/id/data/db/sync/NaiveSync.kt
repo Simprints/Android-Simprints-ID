@@ -19,9 +19,10 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.ArrayList
 
-open class NaiveSync(private val api: SimApiInterface,
+open class NaiveSync(private val api: SyncApiInterface,
                      private val localDbManager: LocalDbManager,
-                     private val gson: Gson) {
+                     private val gson: Gson,
+                     private val firebaseToken: String) {
 
     companion object {
         private const val LOCAL_DB_BATCH_SIZE = 10000

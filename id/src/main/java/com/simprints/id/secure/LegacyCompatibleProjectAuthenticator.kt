@@ -1,5 +1,4 @@
 package com.simprints.id.secure
-
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.secure.SecureDataManager
@@ -7,6 +6,7 @@ import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsExce
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.ProjectId
@@ -16,11 +16,11 @@ import io.reactivex.Single
 class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
                                            dbManager: DbManager,
                                            safetyNetClient: SafetyNetClient,
-                                           apiClient: ApiServiceInterface = ApiService().api,
+                                           secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
                                            attestationManager: AttestationManager = AttestationManager()
-) : ProjectAuthenticator(secureDataManager, dbManager, safetyNetClient, apiClient, attestationManager) {
+) : ProjectAuthenticator(secureDataManager, dbManager, safetyNetClient, secureApiClient, attestationManager) {
 
-    private val legacyProjectIdManager = LegacyProjectIdManager(apiClient)
+    private val legacyProjectIdManager = LegacyProjectIdManager(secureApiClient)
 
     @Throws(
         DifferentProjectIdReceivedFromIntentException::class,
