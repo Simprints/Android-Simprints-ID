@@ -8,6 +8,7 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -20,8 +21,9 @@ interface LocalDbManager {
     fun isLocalDbInitialized(projectId: String): Boolean
 
     // Data transfer
-    fun savePersonInLocal(fbPerson: fb_Person)
+    fun savePersonInLocal(fbPerson: fb_Person): Completable
     fun savePeopleFromStream(reader: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: () -> Boolean)
+    fun updatePersonInLocal(fbPerson: fb_Person): Completable
 
     fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
     fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
