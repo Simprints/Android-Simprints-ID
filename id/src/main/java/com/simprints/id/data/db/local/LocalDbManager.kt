@@ -1,8 +1,10 @@
 package com.simprints.id.data.db.local
 
+import com.google.gson.Gson
+import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.DataCallback
-import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
@@ -19,6 +21,8 @@ interface LocalDbManager {
 
     // Data transfer
     fun savePersonInLocal(fbPerson: fb_Person)
+    fun savePeopleFromStream(reader: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: () -> Boolean)
+
     fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
     fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
     fun getPeopleCountFromLocal(group: Constants.GROUP, userId: String, moduleId: String): Long

@@ -26,6 +26,7 @@ public class fb_VfEvent {
     }
 
     public fb_VfEvent(@NonNull Person probe,
+                      @NonNull String projectId,
                       @NonNull String userId,
                       @NonNull String androidId,
                       @NonNull String moduleId,
@@ -33,7 +34,7 @@ public class fb_VfEvent {
                       @Nullable Verification verification,
                       @NonNull String sessionId,
                       @NonNull VERIFY_GUID_EXISTS_RESULT guidExistsResult) {
-        this.ProbePerson = new fb_Person(probe, userId, moduleId);
+        this.ProbePerson = new fb_Person(probe, projectId, userId, moduleId);
         this.userId = userId;
         this.guid = guid;
         this.date = Utils.now().getTime();

@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.sync
 
 import com.simprints.id.data.db.sync.SimApiInterface.Companion.baseUrl
-import com.simprints.id.secure.JsonHelper
+import com.simprints.id.tools.JsonHelper
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

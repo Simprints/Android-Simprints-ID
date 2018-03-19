@@ -4,18 +4,18 @@ package com.simprints.id.data
 import android.content.Context
 import android.os.Build
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.authListener.AuthListener
 import com.simprints.id.data.db.remote.connectionListener.ConnectionListener
-import com.simprints.id.session.Session
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.session.sessionParameters.SessionParameters
-import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.domain.Constants
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.Constants
+import com.simprints.id.session.Session
+import com.simprints.id.session.sessionParameters.SessionParameters
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
@@ -101,7 +101,7 @@ class DataManagerImpl(private val context: Context,
 
     // Data transfer
     override fun savePerson(person: Person) {
-        dbManager.savePerson(fb_Person(person, userId, moduleId), projectId)
+        dbManager.savePerson(fb_Person(person, projectId, userId, moduleId), projectId)
     }
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
