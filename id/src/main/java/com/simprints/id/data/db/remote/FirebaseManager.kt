@@ -35,6 +35,7 @@ import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.rxkotlin.Singles
@@ -162,7 +163,8 @@ class FirebaseManager(private val appContext: Context,
         }
     }
 
-    override fun savePersonInRemote(fbPerson: fb_Person, projectId: String) {
+    override fun savePersonInRemote(fbPerson: fb_Person, projectId: String): Completable {
+        // TODO : Implement sending the person to our own custom end point
         val updates = mutableMapOf<String, Any>(patientNode(fbPerson.patientId) to fbPerson.toMap())
 
         userRef(legacyFirebaseApp, projectId, fbPerson.userId).addListenerForSingleValueEvent(object : ValueEventListener {
@@ -178,6 +180,10 @@ class FirebaseManager(private val appContext: Context,
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+    }
+
+    override fun getUpdatedPersonFromRemote(projectId: String, guid: String): Single<fb_Person> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun loadPersonFromRemote(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
