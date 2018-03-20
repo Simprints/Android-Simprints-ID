@@ -6,7 +6,6 @@ import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
-import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.Completable
 import io.realm.Realm
@@ -26,14 +25,23 @@ interface LocalDbManager {
 
     fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
     fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
-    fun getPeopleCountFromLocal(group: Constants.GROUP, userId: String, moduleId: String): Long
-    fun getPeopleToUpSync(): ArrayList<rl_Person>
-    fun getPeopleFor(syncParams: SyncTaskParameters): ArrayList<rl_Person>
+    fun getPeopleCountFromLocal(personId: String? = null,
+                                projectId: String? = null,
+                                userId: String? = null,
+                                moduleId: String? = null,
+                                toSync: Boolean? = null): Long
+
+    fun getPeopleFromLocal(personId: String? = null,
+                           projectId: String? = null,
+                           userId: String? = null,
+                           moduleId: String? = null,
+                           toSync: Boolean? = null): ArrayList<rl_Person>
 
     //Sync
     fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo?
 
     // Database instances
     fun getValidRealmConfig(): RealmConfiguration
+
     fun getRealmInstance(): Realm
 }
