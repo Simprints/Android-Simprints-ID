@@ -3,14 +3,14 @@ package com.simprints.id.data.db.local
 import com.simprints.id.libdata.DataCallback
 import com.simprints.id.libdata.models.firebase.fb_Person
 import com.simprints.libcommon.Person
-import io.reactivex.Single
+import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
 
 interface LocalDbManager {
 
     // Lifecycle
-    fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Single<Unit>
+    fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Completable
     fun signOutOfLocal()
     fun isLocalDbInitialized(projectId: String): Boolean
 

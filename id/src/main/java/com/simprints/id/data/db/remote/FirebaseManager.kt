@@ -20,8 +20,6 @@ import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionList
 import com.simprints.id.data.models.Session
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
-import com.simprints.id.secure.models.Tokens
-import com.simprints.libcommon.Person
 import com.simprints.id.libdata.DATA_ERROR
 import com.simprints.id.libdata.DataCallback
 import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
@@ -30,12 +28,14 @@ import com.simprints.id.libdata.models.realm.rl_Person
 import com.simprints.id.libdata.tools.Routes.*
 import com.simprints.id.libdata.tools.Utils.wrapCallback
 import com.simprints.id.secure.cryptography.Hasher
+import com.simprints.id.secure.models.Tokens
+import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
-import io.reactivex.rxkotlin.Singles
 import timber.log.Timber
 
 class FirebaseManager(private val appContext: Context,
@@ -88,15 +88,17 @@ class FirebaseManager(private val appContext: Context,
     private fun getFirebaseAuth(firebaseApp: FirebaseApp): FirebaseAuth =
         FirebaseAuth.getInstance(firebaseApp)
 
-    override fun signInToRemoteDb(tokens: Tokens): Single<Unit> =
-        Singles.zip(signInToDb(legacyFirebaseApp, tokens.legacyToken), signInToDb(firestoreFirebaseApp, tokens.firestoreToken)).map { Unit }
+    override fun signInToRemoteDb(tokens: Tokens): Completable =
+        Completable.mergeArray(
+            signInToDb(legacyFirebaseApp, tokens.legacyToken),
+            signInToDb(firestoreFirebaseApp, tokens.firestoreToken))
 
-    private fun signInToDb(firebaseApp: FirebaseApp, token: String): Single<Unit> =
-        Single.create<Unit> {
+    private fun signInToDb(firebaseApp: FirebaseApp, token: String): Completable =
+        Completable.create {
             getFirebaseAuth(firebaseApp).signInWithCustomToken(token).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Timber.d("Firebase Auth signInWithCustomToken for ${firebaseApp.name} successful")
-                    it.onSuccess(Unit)
+                    it.onComplete()
                 } else {
                     Timber.d("Firebase Auth signInWithCustomToken for ${firebaseApp.name} failed: ${task.exception}")
                     it.onError(task.exception as Throwable)
