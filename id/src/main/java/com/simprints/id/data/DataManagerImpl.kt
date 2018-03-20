@@ -108,7 +108,7 @@ class DataManagerImpl(private val context: Context,
         dbManager.loadPeople(destinationList, group, userId, moduleId, callback)
     }
 
-    override fun getPeopleCount(group: Constants.GROUP): Long =
+    override fun getPeopleCount(group: Constants.GROUP): Int =
         when (group) {
             Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
             Constants.GROUP.USER -> dbManager.getPeopleCount(userId = userId)

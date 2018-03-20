@@ -6,10 +6,10 @@ import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
 import com.simprints.libcommon.Person
-import com.simprints.libcommon.Progress
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
@@ -38,7 +38,7 @@ interface DbManager : LocalDbManager, RemoteDbManager {
                        projectId: String? = null,
                        userId: String? = null,
                        moduleId: String? = null,
-                       toSync: Boolean? = null): Long
+                       toSync: Boolean? = null): Int
 
     fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
 

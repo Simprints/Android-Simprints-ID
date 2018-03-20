@@ -7,11 +7,12 @@ import android.content.Context
 import android.os.Build
 import android.support.v4.app.NotificationCompat
 import com.simprints.id.R
+import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.progress.UploadProgress
 import com.simprints.id.services.progress.notifications.CompleteNotificationBuilder
 import com.simprints.id.services.progress.notifications.ErrorNotificationBuilder
 import com.simprints.id.services.progress.notifications.NotificationBuilder
 import com.simprints.id.services.progress.notifications.ProgressNotificationBuilder
-import com.simprints.libcommon.Progress
 import org.jetbrains.anko.notificationManager
 
 class NotificationFactory(private val context: Context) {
@@ -71,8 +72,15 @@ class NotificationFactory(private val context: Context) {
         when {
             isProgressZero(progress) ->
                 context.getString(R.string.syncing_calculating)
-            else -> context.getString(R.string.sync_progress_download_notification_content,
-                progress.currentValue, progress.maxValue)
+            else -> {
+                val messageRes = if (progress is UploadProgress) {
+                    R.string.sync_progress_upload_notification_content
+                } else {
+                    R.string.sync_progress_download_notification_content
+                }
+
+                context.getString(messageRes, progress.currentValue, progress.maxValue)
+            }
         }
 
     private fun isProgressZero(progress: Progress): Boolean =

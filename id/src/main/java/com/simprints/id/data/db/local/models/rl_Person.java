@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.SerializedName;
 import com.simprints.id.data.db.remote.models.fb_Fingerprint;
 import com.simprints.id.data.db.remote.models.fb_Person;
-import com.simprints.id.domain.Constants;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
 import com.simprints.libsimprints.FingerIdentifier;
@@ -55,24 +54,6 @@ public class rl_Person extends RealmObject {
 
             if (rlPrint.getTemplate() != null)
                 fingerprints.add(rlPrint);
-        }
-    }
-
-    public static long count(
-        @NonNull Realm realm,
-        @NonNull String userId,
-        @NonNull String moduleId,
-        @NonNull final Constants.GROUP group) {
-
-        switch (group) {
-            case GLOBAL:
-                return realm.where(rl_Person.class).count();
-            case USER:
-                return realm.where(rl_Person.class).equalTo("userId", userId).count();
-            case MODULE:
-                return realm.where(rl_Person.class).equalTo("moduleId", moduleId).count();
-            default:
-                throw new RuntimeException();
         }
     }
 

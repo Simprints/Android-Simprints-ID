@@ -298,7 +298,9 @@
     <!--SyncerSync Notifications -->
     <string name="sync_notification_tag">SimprintsID_sync</string>
     <string name="sync_notification_title">Simprints ID Sync</string>
-    <string name="sync_progress_download_notification_content">Syncing… %1$d/%2$d</string>
+    <string name="sync_progress_notification_content">Syncing… %1$d/%2$d</string>
+    <string name="sync_progress_upload_notification_content">Uploading… %1$d/%2$d</string>
+    <string name="sync_progress_download_notification_content">Downloading… %1$d/%2$d</string>
 
     <string name="sync_error_notification_content">Sync failed.</string>
     <string name="sync_complete_notification_content">Sync completed.</string>
