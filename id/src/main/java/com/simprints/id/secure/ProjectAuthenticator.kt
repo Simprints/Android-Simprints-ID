@@ -11,6 +11,7 @@ import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.Tokens
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
@@ -30,7 +31,7 @@ open class ProjectAuthenticator(secureDataManager: SecureDataManager,
         DifferentProjectIdReceivedFromIntentException::class,
         AuthRequestInvalidCredentialsException::class,
         SimprintsInternalServerException::class)
-    fun authenticate(nonceScope: NonceScope, projectSecret: String): Single<Unit> =
+    fun authenticate(nonceScope: NonceScope, projectSecret: String): Completable =
         prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
             .signIn(nonceScope.projectId)
@@ -65,8 +66,8 @@ open class ProjectAuthenticator(secureDataManager: SecureDataManager,
             authManager.requestAuthToken(authRequest)
         }
 
-    private fun Single<out Tokens>.signIn(projectId: String): Single<Unit> =
-        flatMap { tokens ->
+    private fun Single<out Tokens>.signIn(projectId: String): Completable =
+        flatMapCompletable { tokens ->
             dbManager.signIn(projectId, tokens)
         }
 }

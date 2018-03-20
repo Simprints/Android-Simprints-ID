@@ -30,8 +30,7 @@ class LoginPresenter(val view: LoginContract.View,
                 possibleUserId,
                 possibleProjectSecret,
                 possibleLegacyProjectId)
-        else
-            view.handleMissingCredentials()
+        else view.handleMissingCredentials()
 
     private fun areMandatoryCredentialsPresent(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String) =
         possibleProjectId.isNotEmpty() && possibleProjectSecret.isNotEmpty() && possibleUserId.isNotEmpty()
@@ -43,7 +42,7 @@ class LoginPresenter(val view: LoginContract.View,
             possibleProjectSecret,
             possibleLegacyApiKey)
             .subscribeBy(
-                onSuccess = { handleSignInSuccess(possibleLegacyApiKey, possibleProjectId, possibleUserId) },
+                onComplete = { handleSignInSuccess(possibleLegacyApiKey, possibleProjectId, possibleUserId) },
                 onError = { e -> handleSignInError(e) })
     }
 
@@ -71,9 +70,9 @@ class LoginPresenter(val view: LoginContract.View,
     }
 
     private fun logSignInError(e: Throwable) {
-        when(e) {
+        when (e) {
             is Error -> analyticsManager.logError(e)
-            else -> analyticsManager.logSafeException(AuthException(cause=e))
+            else -> analyticsManager.logSafeException(AuthException(cause = e))
         }
     }
 
