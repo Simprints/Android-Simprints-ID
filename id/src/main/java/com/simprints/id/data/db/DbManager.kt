@@ -31,7 +31,12 @@ interface DbManager : LocalDbManager, RemoteDbManager {
     fun savePerson(fbPerson: fb_Person): Completable
     fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
     fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
-    fun getPeopleCount(group: Constants.GROUP, userId: String, moduleId: String): Long
+
+    fun getPeopleCount(personId: String? = null,
+                       projectId: String? = null,
+                       userId: String? = null,
+                       moduleId: String? = null,
+                       toSync: Boolean? = null): Long
 
     fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
 

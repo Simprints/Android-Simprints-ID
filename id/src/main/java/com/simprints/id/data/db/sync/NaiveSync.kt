@@ -3,6 +3,7 @@ package com.simprints.id.data.db.sync
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.exceptions.safe.InterruptedSyncException
 import com.simprints.id.services.sync.SyncTaskParameters
@@ -38,7 +39,7 @@ open class NaiveSync(private val api: SyncApiInterface,
     }
 
     protected open fun uploadNewPatients(isInterrupted: () -> Boolean, batchSize: Int = 10): Observable<Progress> {
-        val patientsToUpload = localDbManager.getPeopleToUpSync()
+        val patientsToUpload = getPeopleToSync()
         val counter = AtomicInteger(0)
 
         return Observable.fromIterable(patientsToUpload)
@@ -50,6 +51,10 @@ open class NaiveSync(private val api: SyncApiInterface,
             }.map {
                 UploadProgress(counter.addAndGet(it), patientsToUpload.size)
             }
+    }
+
+    private fun getPeopleToSync(): ArrayList<rl_Person> {
+        return localDbManager.getPeopleFromLocal(toSync = true)
     }
 
     protected open fun uploadPatientsBatch(patientsToUpload: ArrayList<fb_Person>): Single<Int> {
@@ -83,7 +88,12 @@ open class NaiveSync(private val api: SyncApiInterface,
 
     private fun calculateNPatientsToDownload(nPatientsForDownSyncQuery: Int, syncParams: SyncTaskParameters): Int {
 
-        val nPatientsForDownSyncParamsInRealm = localDbManager.getPeopleFor(syncParams).count()
+        val nPatientsForDownSyncParamsInRealm = localDbManager.getPeopleCountFromLocal(
+            null,
+            syncParams.projectId,
+            syncParams.userId,
+            syncParams.moduleId).toInt()
+
         return nPatientsForDownSyncQuery - nPatientsForDownSyncParamsInRealm
     }
 

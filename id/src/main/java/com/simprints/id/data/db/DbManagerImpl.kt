@@ -89,8 +89,12 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         localDbManager.loadPeopleFromLocal(destinationList, group, userId, moduleId, callback)
     }
 
-    override fun getPeopleCount(group: Constants.GROUP, userId: String, moduleId: String): Long =
-        localDbManager.getPeopleCountFromLocal(group, userId, moduleId)
+    override fun getPeopleCount(personId: String?,
+                                projectId: String?,
+                                userId: String?,
+                                moduleId: String?,
+                                toSync: Boolean?): Long =
+        localDbManager.getPeopleCountFromLocal(projectId, personId, userId, moduleId, toSync)
 
     override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
         remoteDbManager.saveIdentificationInRemote(probe, projectId, userId, moduleId, androidId, matchSize, matches, sessionId)
