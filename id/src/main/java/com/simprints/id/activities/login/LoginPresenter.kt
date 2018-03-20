@@ -43,7 +43,7 @@ class LoginPresenter(val view: LoginContract.View,
             possibleProjectSecret,
             possibleLegacyApiKey)
             .subscribeBy(
-                onSuccess = { handleSignInSuccess(possibleLegacyApiKey, possibleProjectId, possibleUserId) },
+                onComplete = { handleSignInSuccess(possibleLegacyApiKey, possibleProjectId, possibleUserId) },
                 onError = { e -> handleSignInError(e) })
     }
 
