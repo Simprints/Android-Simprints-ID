@@ -2,7 +2,6 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
-import com.simprints.id.exceptions.safe.activities.InvalidScannedQRCodeText
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 
 interface LoginContract {
@@ -11,7 +10,9 @@ interface LoginContract {
 
         // QR code scanning
 
+        fun handleOpenScanQRApp()
         fun handleMissingCredentials()
+        fun showErrorForInvalidQRCode()
         fun updateProjectSecretInTextView(projectSecret: String)
         fun updateProjectIdInTextView(projectId: String)
 
@@ -33,7 +34,7 @@ interface LoginContract {
                    possibleProjectSecret: String,
                    possibleLegacyProjectId: String? = null)
 
-        @Throws(InvalidScannedQRCodeText::class)
+        fun openScanQRApp()
         fun processQRScannerAppResponse(scannedText: String)
     }
 }

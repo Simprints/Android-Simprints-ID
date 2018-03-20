@@ -6,8 +6,6 @@ import com.simprints.id.domain.callout.Callout
 
 interface AnalyticsManager {
 
-    fun logThrowable(e: Throwable)
-
     fun logError(error: Error)
 
     fun logAlert(alertName: String, apiKey: String, moduleId: String, userId: String,

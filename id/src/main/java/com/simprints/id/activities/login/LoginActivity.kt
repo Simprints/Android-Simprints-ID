@@ -10,7 +10,6 @@ import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
-import com.simprints.id.exceptions.safe.activities.InvalidScannedQRCodeText
 import com.simprints.id.model.ALERT_TYPE
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.tools.SimProgressDialog
@@ -56,11 +55,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     private fun initUI() {
         progressDialog = SimProgressDialog(this)
         loginEditTextUserId.setText(app.dataManager.userId)
-        loginButtonScanQr.setOnClickListener { openScanQRApp() }
+        loginButtonScanQr.setOnClickListener { viewPresenter.openScanQRApp() }
         loginButtonSignIn.setOnClickListener { handleSignInStart() }
     }
 
-    private fun openScanQRApp() {
+    override fun handleOpenScanQRApp() {
         val intent = packageManager.scannerAppIntent()
         if (intent.resolveActivity(packageManager) != null) {
             startActivityForResult(intent, QR_REQUEST_CODE)
@@ -68,6 +67,14 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
             startActivity(Intent(Intent.ACTION_VIEW,
                 Uri.parse(GOOGLE_PLAY_LINK_FOR_QR_APP)))
         }
+    }
+
+    private fun handleSignInStart() {
+        progressDialog.show()
+        val userId = loginEditTextUserId.text.toString()
+        val projectId = loginEditTextProjectId.text.toString()
+        val projectSecret = loginEditTextProjectSecret.text.toString()
+        viewPresenter.signIn(userId, projectId, projectSecret, possibleLegacyProjectId)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -80,16 +87,12 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     fun handleScannerAppResult(resultCode: Int, data: Intent) =
         runOnUiThread {
-            try {
-                val scannedText = data.getStringExtra(QR_RESULT_KEY)
+            val scannedText = data.getStringExtra(QR_RESULT_KEY)
 
-                if (resultCode == Activity.RESULT_OK) {
-                    viewPresenter.processQRScannerAppResponse(scannedText)
-                } else {
-                    showErrorForQRCodeFailed()
-                }
-            } catch (e: InvalidScannedQRCodeText) {
-                showErrorForInvalidQRCode()
+            if (resultCode == Activity.RESULT_OK) {
+                viewPresenter.processQRScannerAppResponse(scannedText)
+            } else {
+                showErrorForQRCodeFailed()
             }
         }
 
@@ -97,7 +100,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         showToast(R.string.login_qr_code_scanning_problem)
     }
 
-    private fun showErrorForInvalidQRCode() {
+    override fun showErrorForInvalidQRCode() {
         showToast(R.string.login_invalid_qr_code)
     }
 
@@ -107,14 +110,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun updateProjectIdInTextView(projectId: String) {
         loginEditTextProjectId.setText(projectId)
-    }
-
-    private fun handleSignInStart() {
-        progressDialog.show()
-        val userId = loginEditTextUserId.text.toString()
-        val projectId = loginEditTextProjectId.text.toString()
-        val projectSecret = loginEditTextProjectSecret.text.toString()
-        viewPresenter.signIn(userId, projectId, projectSecret, possibleLegacyProjectId)
     }
 
     override fun handleMissingCredentials() {
