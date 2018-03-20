@@ -10,7 +10,7 @@ import com.simprints.id.data.db.remote.tools.Utils.wrapCallback
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.libcommon.Person
-import io.reactivex.Single
+import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
@@ -31,13 +31,13 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         Realm.init(appContext)
     }
 
-    override fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Single<Unit> =
-        Single.create<Unit> {
+    override fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Completable =
+        Completable.create {
             Timber.d("Signing to Realm project $projectId with key: $localDbKey")
             realmConfig = RealmConfig.get(projectId, localDbKey)
             val realm = getRealmInstance()
             realm.close()
-            it.onSuccess(Unit)
+            it.onComplete()
         }
 
     override fun signOutOfLocal() {
@@ -48,10 +48,15 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         realmConfig != null
 
     // Data transfer
-    override fun savePersonInLocal(fbPerson: fb_Person) {
+    override fun savePersonInLocal(fbPerson: fb_Person): Completable {
         val realm = getRealmInstance()
         rl_Person(fbPerson).save(realm)
         realm.close()
+        return Completable.complete()
+    }
+
+    override fun updatePersonInLocal(fbPerson: fb_Person): Completable {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun savePeopleFromStream(reader: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: () -> Boolean) {

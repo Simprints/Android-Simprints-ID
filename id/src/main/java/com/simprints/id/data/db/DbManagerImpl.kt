@@ -21,8 +21,11 @@ import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 class DbManagerImpl(private val localDbManager: LocalDbManager,
                     private val remoteDbManager: RemoteDbManager) :
@@ -36,20 +39,18 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.initialiseRemoteDb()
     }
 
-    override fun getLocalKeyAndSignInToLocal(projectId: String): Single<Unit> =
+    override fun getLocalKeyAndSignInToLocal(projectId: String): Completable =
         remoteDbManager
             .getLocalDbKeyFromRemote(projectId)
             .signInToLocal(projectId)
 
-    override fun signIn(projectId: String, tokens: Tokens): Single<Unit> =
+    override fun signIn(projectId: String, tokens: Tokens): Completable =
         remoteDbManager
             .signInToRemoteDb(tokens)
-            .flatMap {
-                getLocalKeyAndSignInToLocal(projectId)
-            }
+            .andThen(getLocalKeyAndSignInToLocal(projectId))
 
-    private fun Single<out LocalDbKey>.signInToLocal(projectId: String): Single<Unit> =
-        flatMap { key ->
+    private fun Single<out LocalDbKey>.signInToLocal(projectId: String): Completable =
+        flatMapCompletable { key ->
             localDbManager.signInToLocal(projectId, key)
         }
 
@@ -63,10 +64,23 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     // Data transfer
 
-    override fun savePerson(fbPerson: fb_Person, projectId: String) {
+    override fun savePerson(fbPerson: fb_Person): Completable =
+        if (remoteDbManager.isRemoteConnected)
+            savePersonInLocalAndRemoteAndUpdateLocal(fbPerson)
+        else savePersonInLocalOnly(fbPerson)
+
+    private fun savePersonInLocalOnly(fbPerson: fb_Person): Completable =
         localDbManager.savePersonInLocal(fbPerson)
-        remoteDbManager.savePersonInRemote(fbPerson, projectId)
-    }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+
+    private fun savePersonInLocalAndRemoteAndUpdateLocal(fbPerson: fb_Person): Completable =
+        localDbManager.savePersonInLocal(fbPerson)
+            .andThen(remoteDbManager.savePersonInRemote(fbPerson))
+            .andThen(remoteDbManager.getUpdatedPersonFromRemote(fbPerson.projectId, fbPerson.patientId))
+            .flatMapCompletable { localDbManager.updatePersonInLocal(it) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
 
     override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
         localDbManager.loadPersonFromLocal(destinationList, guid, callback)

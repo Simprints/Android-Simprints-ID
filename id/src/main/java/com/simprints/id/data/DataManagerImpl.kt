@@ -101,7 +101,7 @@ class DataManagerImpl(private val context: Context,
 
     // Data transfer
     override fun savePerson(person: Person) {
-        dbManager.savePerson(fb_Person(person, projectId, userId, moduleId), projectId)
+        dbManager.savePerson(fb_Person(person, projectId, userId, moduleId))
     }
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
@@ -112,7 +112,7 @@ class DataManagerImpl(private val context: Context,
         when (group) {
             Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
             Constants.GROUP.USER -> dbManager.getPeopleCount(userId = userId)
-            Constants.GROUP.MODULE ->dbManager.getPeopleCount(userId = userId, moduleId = moduleId)
+            Constants.GROUP.MODULE -> dbManager.getPeopleCount(userId = userId, moduleId = moduleId)
         }
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {

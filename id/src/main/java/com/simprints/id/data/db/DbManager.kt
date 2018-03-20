@@ -13,24 +13,22 @@ import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
 
 interface DbManager : LocalDbManager, RemoteDbManager {
 
     // Lifecycle
     fun initialiseDb()
-
-    fun signIn(projectId: String, tokens: Tokens): Single<Unit>
-    fun getLocalKeyAndSignInToLocal(projectId: String): Single<Unit>
+    fun signIn(projectId: String, tokens: Tokens): Completable
+    fun getLocalKeyAndSignInToLocal(projectId: String): Completable
 
     fun signOut()
 
     fun isDbInitialised(): Boolean
 
     // Data transfer
-    fun savePerson(fbPerson: fb_Person, projectId: String)
-
+    fun savePerson(fbPerson: fb_Person): Completable
     fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
     fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
 

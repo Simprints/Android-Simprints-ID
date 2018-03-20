@@ -36,9 +36,9 @@ import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
-import io.reactivex.rxkotlin.Singles
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
 
@@ -92,15 +92,17 @@ class FirebaseManager(private val appContext: Context,
     private fun getFirebaseAuth(firebaseApp: FirebaseApp): FirebaseAuth =
         FirebaseAuth.getInstance(firebaseApp)
 
-    override fun signInToRemoteDb(tokens: Tokens): Single<Unit> =
-        Singles.zip(signInToDb(legacyFirebaseApp, tokens.legacyToken), signInToDb(firestoreFirebaseApp, tokens.firestoreToken)).map { Unit }
+    override fun signInToRemoteDb(tokens: Tokens): Completable =
+        Completable.mergeArray(
+            signInToDb(legacyFirebaseApp, tokens.legacyToken),
+            signInToDb(firestoreFirebaseApp, tokens.firestoreToken))
 
-    private fun signInToDb(firebaseApp: FirebaseApp, token: String): Single<Unit> =
-        Single.create<Unit> {
+    private fun signInToDb(firebaseApp: FirebaseApp, token: String): Completable =
+        Completable.create {
             getFirebaseAuth(firebaseApp).signInWithCustomToken(token).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Timber.d("Firebase Auth signInWithCustomToken for ${firebaseApp.name} successful")
-                    it.onSuccess(Unit)
+                    it.onComplete()
                 } else {
                     Timber.d("Firebase Auth signInWithCustomToken for ${firebaseApp.name} failed: ${task.exception}")
                     it.onError(task.exception as Throwable)
@@ -164,7 +166,9 @@ class FirebaseManager(private val appContext: Context,
         }
     }
 
-    override fun savePersonInRemote(fbPerson: fb_Person, projectId: String) {
+    override fun savePersonInRemote(fbPerson: fb_Person): Completable {
+        // TODO : Implement sending the person to our own custom end point
+        val projectId = fbPerson.projectId
         val updates = mutableMapOf<String, Any>(patientNode(fbPerson.patientId) to fbPerson.toMap())
 
         userRef(legacyFirebaseApp, projectId, fbPerson.userId).addListenerForSingleValueEvent(object : ValueEventListener {
@@ -180,6 +184,11 @@ class FirebaseManager(private val appContext: Context,
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+        return Completable.complete()
+    }
+
+    override fun getUpdatedPersonFromRemote(projectId: String, guid: String): Single<fb_Person> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun loadPersonFromRemote(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
