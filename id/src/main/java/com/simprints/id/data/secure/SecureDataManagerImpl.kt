@@ -94,7 +94,7 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
 
     override fun storeProjectIdWithLegacyProjectIdPair(projectId: String, legacyProjectId: String?) {
         if (legacyProjectId != null && legacyProjectId.isNotEmpty()) {
-            val hashedLegacyApiKey = Hasher.hash(legacyProjectId)
+            val hashedLegacyApiKey = Hasher().hash(legacyProjectId)
             prefs.edit().putPrimitive(hashedLegacyApiKey, projectId).commit()
             prefs.edit().putPrimitive(projectId, hashedLegacyApiKey).commit()
         }
