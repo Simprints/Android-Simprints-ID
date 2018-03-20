@@ -9,6 +9,9 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.NaiveSync
 import com.simprints.id.data.db.sync.SyncApiInterface
 import com.simprints.id.network.SimApiClient
+import com.simprints.id.services.progress.DownloadProgress
+import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.progress.UploadProgress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.whenever
@@ -17,9 +20,6 @@ import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.createMockBehaviorService
 import com.simprints.id.tools.roboletric.TestApplication
 import com.simprints.id.tools.utils.FirestoreMigationUtils.getRandomPeople
-import com.simprints.libcommon.DownloadProgress
-import com.simprints.libcommon.Progress
-import com.simprints.libcommon.UploadProgress
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -75,6 +75,25 @@ class SyncTest : RxJavaTest() {
                 UploadProgress(20, patientsToUpload.size),
                 UploadProgress(30, patientsToUpload.size),
                 UploadProgress(35, patientsToUpload.size)))
+    }
+
+    @Test
+    fun downloadPatients_getNumberOfPatientsForSyncParams() {
+
+        val localDbManager = Mockito.mock(LocalDbManager::class.java)
+        val sync = NaiveSyncTest(
+            apiClient.api,
+            localDbManager,
+            JsonHelper.gson)
+
+        val testObserver = sync.getNumberOfPatientsForSyncParams(SyncTaskParameters.GlobalSyncTaskParameters("projectId")).test()
+
+        testObserver.awaitTerminalEvent()
+
+        testObserver
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
     }
 
     @Test
@@ -155,8 +174,8 @@ class SyncTest : RxJavaTest() {
             .assertNoErrors()
             .assertComplete()
             .values().containsAll(arrayListOf(
-                DownloadProgress(NaiveSync.UPDATE_UI_BATCH_SIZE, nPatientsToDownload),
-                DownloadProgress(nPatientsToDownload, nPatientsToDownload)))
+            DownloadProgress(NaiveSync.UPDATE_UI_BATCH_SIZE, nPatientsToDownload),
+            DownloadProgress(nPatientsToDownload, nPatientsToDownload)))
 
         val patientsCountRequest = mockServer.takeRequest()
         Assert.assertEquals(projectIDTest, patientsCountRequest.requestUrl.queryParameter("projectId"))
@@ -233,7 +252,7 @@ class SyncTest : RxJavaTest() {
 
 class NaiveSyncTest(api: SyncApiInterface,
                     localDbManager: LocalDbManager,
-                    gson: Gson) : NaiveSync(api, localDbManager, gson, "") {
+                    gson: Gson) : NaiveSync(api, localDbManager, gson) {
 
     public override fun uploadPatientsBatch(patientsToUpload: ArrayList<fb_Person>): Single<Int> {
         return super.uploadPatientsBatch(patientsToUpload)
@@ -245,5 +264,9 @@ class NaiveSyncTest(api: SyncApiInterface,
 
     public override fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
         return super.downloadNewPatients(isInterrupted, syncParams)
+    }
+
+    public override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> {
+        return super.getNumberOfPatientsForSyncParams(syncParams)
     }
 }

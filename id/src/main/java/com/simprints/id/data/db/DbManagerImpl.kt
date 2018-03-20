@@ -8,13 +8,16 @@ import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.sync.NaiveSyncManager
+import com.simprints.id.data.db.sync.NaiveSync
+import com.simprints.id.data.db.sync.SyncApiInterface
 import com.simprints.id.domain.Constants
+import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
+import com.simprints.id.tools.JsonHelper
 import com.simprints.libcommon.Person
-import com.simprints.libcommon.Progress
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
@@ -78,7 +81,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                                 projectId: String?,
                                 userId: String?,
                                 moduleId: String?,
-                                toSync: Boolean?): Long =
+                                toSync: Boolean?): Int =
         localDbManager.getPeopleCountFromLocal(projectId, personId, userId, moduleId, toSync)
 
     override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
@@ -98,10 +101,12 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     }
 
     override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
-        getSyncManager().flatMapObservable { sync(parameters, interrupted) }
-
-    private fun getSyncManager(): Single<NaiveSyncManager> =
-        remoteDbManager.getCurrentFirestoreToken().map { NaiveSyncManager(it, localDbManager) }
+        remoteDbManager.getCurrentFirestoreToken().flatMapObservable {
+            NaiveSync(
+                SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl, it).api,
+                localDbManager,
+                JsonHelper.gson).sync(interrupted, parameters)
+        }
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
         val firebaseManager = remoteDbManager as FirebaseManager

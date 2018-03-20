@@ -39,6 +39,7 @@ import com.simprints.libsimprints.Verification
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.rxkotlin.Singles
+import org.jetbrains.anko.doAsync
 import timber.log.Timber
 
 class FirebaseManager(private val appContext: Context,
@@ -229,11 +230,15 @@ class FirebaseManager(private val appContext: Context,
     override fun getCurrentFirestoreToken(): Single<String> = Single.create {
         getFirebaseLegacyApp().getToken(false)
             .addOnSuccessListener { result ->
-                val token = result.token
-                if (token == null) {
-                    throw RemoteDbNotSignedInError()
-                } else {
-                    it.onSuccess(token)
+                // Firebase callbacks return on main thread, so the emits
+                // will be in the same thread.
+                doAsync {
+                    val token = result.token
+                    if (token == null) {
+                        throw RemoteDbNotSignedInError()
+                    } else {
+                        it.onSuccess(token)
+                    }
                 }
             }
             .addOnFailureListener { e -> it.onError(e) }
