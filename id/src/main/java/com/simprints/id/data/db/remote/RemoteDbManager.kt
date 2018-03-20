@@ -22,7 +22,7 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
     // Lifecycle
     fun initialiseRemoteDb()
 
-    fun signInToRemoteDb(tokens: Tokens): Single<Unit>
+    fun signInToRemoteDb(tokens: Tokens): Completable
     fun signOutOfRemoteDb()
 
     fun isRemoteDbInitialized(): Boolean

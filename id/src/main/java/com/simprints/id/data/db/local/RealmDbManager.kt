@@ -12,7 +12,6 @@ import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.Completable
-import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmResults
@@ -32,13 +31,13 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         Realm.init(appContext)
     }
 
-    override fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Single<Unit> =
-        Single.create<Unit> {
+    override fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Completable =
+        Completable.create {
             Timber.d("Signing to Realm project $projectId with key: $localDbKey")
             realmConfig = RealmConfig.get(projectId, localDbKey)
             val realm = getRealmInstance()
             realm.close()
-            it.onSuccess(Unit)
+            it.onComplete()
         }
 
     override fun signOutOfLocal() {

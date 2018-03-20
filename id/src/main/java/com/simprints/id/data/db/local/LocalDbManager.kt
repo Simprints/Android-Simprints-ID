@@ -9,14 +9,13 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.Completable
-import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
 
 interface LocalDbManager {
 
     // Lifecycle
-    fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Single<Unit>
+    fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Completable
     fun signOutOfLocal()
     fun isLocalDbInitialized(projectId: String): Boolean
 

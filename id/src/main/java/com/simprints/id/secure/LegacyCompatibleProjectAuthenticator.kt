@@ -10,6 +10,7 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.ProjectId
+import io.reactivex.Completable
 import io.reactivex.Single
 
 
@@ -27,32 +28,24 @@ class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
         InvalidLegacyProjectIdReceivedFromIntentException::class,
         AuthRequestInvalidCredentialsException::class,
         SimprintsInternalServerException::class)
-    fun authenticate(nonceScope: NonceScope, projectSecret: String, legacyProjectId: String?): Single<Unit> =
+    fun authenticate(nonceScope: NonceScope, projectSecret: String, legacyProjectId: String?): Completable =
         if (legacyProjectId != null)
-            checkLegacyProjectIdAndAuthenticate(nonceScope, projectSecret, legacyProjectId)
+            checkLegacyProjectIdMatchesProjectId(nonceScope.projectId, legacyProjectId)
+                .andThen(authenticate(nonceScope, projectSecret))
         else
             authenticate(nonceScope, projectSecret)
 
-    private fun checkLegacyProjectIdAndAuthenticate(nonceScope: NonceScope, projectSecret: String, legacyProjectId: String): Single<Unit> =
-        checkLegacyProjectIdMatchesProjectId(nonceScope.projectId, legacyProjectId)
-            .doAuthenticate(nonceScope, projectSecret)
-
-    private fun checkLegacyProjectIdMatchesProjectId(expectedProjectId: String, legacyProjectId: String): Single<Unit> {
+    private fun checkLegacyProjectIdMatchesProjectId(expectedProjectId: String, legacyProjectId: String): Completable {
         val hashedLegacyProjectId = Hasher().hash(legacyProjectId)
         return legacyProjectIdManager.requestProjectId(hashedLegacyProjectId)
             .checkReceivedProjectIdIsAsExpected(expectedProjectId)
     }
 
-    private fun Single<out ProjectId>.checkReceivedProjectIdIsAsExpected(expectedProjectId: String): Single<Unit> =
-        flatMap { projectId ->
+    private fun Single<out ProjectId>.checkReceivedProjectIdIsAsExpected(expectedProjectId: String): Completable =
+        flatMapCompletable { projectId ->
             val receivedProjectId = projectId.value
             if (receivedProjectId != expectedProjectId)
                 throw DifferentProjectIdReceivedFromIntentException.withProjectIds(expectedProjectId, receivedProjectId)
-            Single.just(Unit)
-        }
-
-    private fun Single<out Unit>.doAuthenticate(nonceScope: NonceScope, projectSecret: String): Single<Unit> =
-        flatMap {
-            authenticate(nonceScope, projectSecret)
+            Completable.complete()
         }
 }
