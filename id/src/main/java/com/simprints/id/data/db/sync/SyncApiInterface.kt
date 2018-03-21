@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.sync
 
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.sync.model.PatientsCount
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.ResponseBody
@@ -9,7 +10,8 @@ import retrofit2.http.*
 interface SyncApiInterface {
 
     companion object {
-        var baseUrl = "https://sync-manager-dot-simprints-dev.appspot.com"
+        private const val apiVersion = "2018-1-0-dev0"
+        var baseUrl = "https://$apiVersion-dot-sync-manager-dot-simprints-dev.appspot.com"
     }
 
     @GET("/patients")
@@ -31,5 +33,5 @@ interface SyncApiInterface {
     @GET("/patient-counts")
     fun patientsCount(
         @Query("key") key: String,
-        @QueryMap(encoded = true) syncParams: Map<String, String>): Single<Int>
+        @QueryMap(encoded = true) syncParams: Map<String, String>): Single<PatientsCount>
 }
