@@ -84,8 +84,6 @@ class LoginActivityTest {
     @Test
     fun qrScanPressedAndScannerAppNotAvailable_shouldOpenPlayStore() {
 
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-
         val controller = createRoboLoginActivity().start().resume().visible()
         val activity = controller.get()
 
