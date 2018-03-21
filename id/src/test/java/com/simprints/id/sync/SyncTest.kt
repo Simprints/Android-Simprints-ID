@@ -30,8 +30,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyBoolean
-import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
@@ -78,25 +77,6 @@ class SyncTest : RxJavaTest() {
     }
 
     @Test
-    fun downloadPatients_getNumberOfPatientsForSyncParams() {
-
-        val localDbManager = Mockito.mock(LocalDbManager::class.java)
-        val sync = NaiveSyncTest(
-            apiClient.api,
-            localDbManager,
-            JsonHelper.gson)
-
-        val testObserver = sync.getNumberOfPatientsForSyncParams(SyncTaskParameters.GlobalSyncTaskParameters("projectId")).test()
-
-        testObserver.awaitTerminalEvent()
-
-        testObserver
-            .assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-    }
-
-    @Test
     fun uploadPeopleGetInterrupted_shouldStopUploading() {
 
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
@@ -128,7 +108,7 @@ class SyncTest : RxJavaTest() {
             JsonHelper.gson)
 
         val patients = getRandomPeople(3)
-        val testObserver = sync.uploadPatientsBatch(ArrayList(patients.map { fb_Person(it) })).test()
+        val testObserver = sync.makeUploadPatientsBatchRequest(ArrayList(patients.map { fb_Person(it) })).test()
         testObserver.awaitTerminalEvent()
         testObserver
             .assertNoErrors()
@@ -145,18 +125,38 @@ class SyncTest : RxJavaTest() {
             JsonHelper.gson)
 
         val patients = getRandomPeople(3)
-        val testObserver = sync.uploadPatientsBatch(ArrayList(patients.map { fb_Person(it) })).test()
+        val testObserver = sync.makeUploadPatientsBatchRequest(ArrayList(patients.map { fb_Person(it) })).test()
         testObserver.awaitTerminalEvent()
         testObserver.assertError { true }
     }
 
     @Test
-    fun downloadPatientsForProjectId_shouldSucceed() {
+    fun downloadPatients_getNumberOfPatientsForSyncParams() {
+
+        val localDbManager = Mockito.mock(LocalDbManager::class.java)
+        val sync = NaiveSyncTest(
+            apiClient.api,
+            localDbManager,
+            JsonHelper.gson)
+        val syncParams = SyncTaskParameters.GlobalSyncTaskParameters("projectId")
+        val testObserver = sync.getNumberOfPatientsForSyncParams(syncParams).test()
+
+        testObserver.awaitTerminalEvent()
+
+        testObserver
+            .assertNoErrors()
+            .assertComplete()
+            .assertValueCount(1)
+    }
+
+    @Test
+    fun downloadPatientsForGlobalSync_shouldSuccess() {
         SyncApiInterface.baseUrl = this.mockServer.url("/").toString()
         val localDbMock = Mockito.mock(LocalDbManager::class.java)
 
         //Params
-        val projectIDTest = "projectIDTest"
+        val projectIdTest = "projectIDTest"
+        val syncParams = SyncTaskParameters.GlobalSyncTaskParameters(projectIdTest)
         val nPatientsToDownload = 22000
         val lastSyncTime = Date()
 
@@ -165,7 +165,7 @@ class SyncTest : RxJavaTest() {
             25000,
             localDbMock,
             3000,
-            SyncTaskParameters.GlobalSyncTaskParameters(projectIDTest),
+            syncParams,
             lastSyncTime
         )
         testObserver.awaitTerminalEvent()
@@ -173,15 +173,96 @@ class SyncTest : RxJavaTest() {
         testObserver
             .assertNoErrors()
             .assertComplete()
-            .values().containsAll(arrayListOf(
+
+        Assert.assertTrue(testObserver.values().containsAll(arrayListOf(
             DownloadProgress(NaiveSync.UPDATE_UI_BATCH_SIZE, nPatientsToDownload),
-            DownloadProgress(nPatientsToDownload, nPatientsToDownload)))
+            DownloadProgress(nPatientsToDownload, nPatientsToDownload))))
+
+        val patientsCountRequest = mockServer.takeRequest().requestUrl
+        Assert.assertEquals(projectIdTest, patientsCountRequest.queryParameter("projectId"))
+
+        val patientsRequest = mockServer.takeRequest().requestUrl
+        Assert.assertEquals(projectIdTest, patientsRequest.queryParameter("projectId"))
+        Assert.assertEquals(lastSyncTime.time, patientsRequest.queryParameter("lastSync")?.toLong())
+    }
+
+    @Test
+    fun downloadPatientsForModuleSync_shouldSuccess() {
+        SyncApiInterface.baseUrl = this.mockServer.url("/").toString()
+        val localDbMock = Mockito.mock(LocalDbManager::class.java)
+
+        //Params
+        val projectIdTest = "projectIdTest"
+        val moduleIdTest = "moduleIdTest"
+        val syncParams = SyncTaskParameters.ModuleIdSyncTaskParameters(projectIdTest, moduleIdTest)
+        val nPatientsToDownload = 22000
+        val lastSyncTime = Date()
+
+        val testObserver = makeFakeDownloadRequest(
+            nPatientsToDownload,
+            25000,
+            localDbMock,
+            3000,
+            syncParams,
+            lastSyncTime
+        )
+        testObserver.awaitTerminalEvent()
+
+        testObserver
+            .assertNoErrors()
+            .assertComplete()
+
+        Assert.assertTrue(testObserver.values().containsAll(arrayListOf(
+            DownloadProgress(NaiveSync.UPDATE_UI_BATCH_SIZE, nPatientsToDownload),
+            DownloadProgress(nPatientsToDownload, nPatientsToDownload))))
 
         val patientsCountRequest = mockServer.takeRequest()
-        Assert.assertEquals(projectIDTest, patientsCountRequest.requestUrl.queryParameter("projectId"))
+        Assert.assertEquals(projectIdTest, patientsCountRequest.requestUrl.queryParameter("projectId"))
+        Assert.assertEquals(moduleIdTest, patientsCountRequest.requestUrl.queryParameter("moduleId"))
 
         val patientsRequest = mockServer.takeRequest()
-        Assert.assertEquals(projectIDTest, patientsRequest.requestUrl.queryParameter("projectId"))
+        Assert.assertEquals(projectIdTest, patientsRequest.requestUrl.queryParameter("projectId"))
+        Assert.assertEquals(moduleIdTest, patientsCountRequest.requestUrl.queryParameter("moduleId"))
+        Assert.assertEquals(lastSyncTime.time, patientsRequest.requestUrl.queryParameter("lastSync")?.toLong())
+    }
+
+    @Test
+    fun downloadPatientsForUserSync_shouldSuccess() {
+        SyncApiInterface.baseUrl = this.mockServer.url("/").toString()
+        val localDbMock = Mockito.mock(LocalDbManager::class.java)
+
+        //Params
+        val projectIdTest = "projectIdTest"
+        val userIdTest = "userIdTest"
+        val syncParams = SyncTaskParameters.UserSyncTaskParameters(projectIdTest, userIdTest)
+        val nPatientsToDownload = 22000
+        val lastSyncTime = Date()
+
+        val testObserver = makeFakeDownloadRequest(
+            nPatientsToDownload,
+            25000,
+            localDbMock,
+            3000,
+            syncParams,
+            lastSyncTime
+        )
+        testObserver.awaitTerminalEvent()
+
+        testObserver
+            .assertNoErrors()
+            .assertComplete()
+
+        Assert.assertTrue(testObserver.values().containsAll(arrayListOf(
+            DownloadProgress(NaiveSync.UPDATE_UI_BATCH_SIZE, nPatientsToDownload),
+            DownloadProgress(nPatientsToDownload, nPatientsToDownload))))
+
+        val patientsCountRequest = mockServer.takeRequest()
+        Assert.assertEquals(projectIdTest, patientsCountRequest.requestUrl.queryParameter("projectId"))
+        Assert.assertEquals(userIdTest, patientsCountRequest.requestUrl.queryParameter("userId"))
+
+        val patientsRequest = mockServer.takeRequest()
+        Assert.assertEquals(projectIdTest, patientsRequest.requestUrl.queryParameter("projectId"))
+        Assert.assertEquals(userIdTest, patientsCountRequest.requestUrl.queryParameter("userId"))
         Assert.assertEquals(lastSyncTime.time, patientsRequest.requestUrl.queryParameter("lastSync")?.toLong())
     }
 
@@ -190,7 +271,7 @@ class SyncTest : RxJavaTest() {
         nPatientsForProjectIdFromServer: Int,
         localDbMock: LocalDbManager,
         patientsAlreadyInLocalDb: Int,
-        syncParams: SyncTaskParameters.GlobalSyncTaskParameters,
+        syncParams: SyncTaskParameters,
         lastSyncTime: Date): TestObserver<Progress> {
 
         //Build fake response for GET patients
@@ -206,7 +287,8 @@ class SyncTest : RxJavaTest() {
         mockLocalDbToSavePatientsFromStream(localDbMock)
 
         //Mock app has already patients in localDb
-        `when`(localDbMock.getPeopleFromLocal(anyString(), anyString(), anyString(), anyString(), anyBoolean())).thenReturn(getRandomPeople(patientsAlreadyInLocalDb))
+        `when`(localDbMock.getPeopleFromLocal(any(), any(), any(), any(), any())).thenReturn(getRandomPeople(patientsAlreadyInLocalDb))
+        `when`(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any(), any())).thenReturn(patientsAlreadyInLocalDb)
 
         //Mock app RealmSyncInfo for syncParams
         `when`(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup().ordinal, lastSyncTime))
@@ -231,7 +313,7 @@ class SyncTest : RxJavaTest() {
     private fun mockResponseForPatientsCount(count: Int): MockResponse? {
         return MockResponse().let {
             it.setResponseCode(200)
-            it.setBody("$count")
+            it.setBody("{\"patientsCount\": $count}")
         }
     }
 
@@ -254,8 +336,8 @@ class NaiveSyncTest(api: SyncApiInterface,
                     localDbManager: LocalDbManager,
                     gson: Gson) : NaiveSync(api, localDbManager, gson) {
 
-    public override fun uploadPatientsBatch(patientsToUpload: ArrayList<fb_Person>): Single<Int> {
-        return super.uploadPatientsBatch(patientsToUpload)
+    public override fun makeUploadPatientsBatchRequest(patientsToUpload: ArrayList<fb_Person>): Single<Int> {
+        return super.makeUploadPatientsBatchRequest(patientsToUpload)
     }
 
     public override fun uploadNewPatients(isInterrupted: () -> Boolean, batchSize: Int): Observable<Progress> {
