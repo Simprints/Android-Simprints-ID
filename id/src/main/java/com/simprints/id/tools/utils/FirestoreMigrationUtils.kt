@@ -6,7 +6,7 @@ import com.simprints.libcommon.Fingerprint
 import io.realm.RealmList
 import java.util.*
 
-object FirestoreMigationUtils {
+object FirestoreMigrationUtils {
 
     fun getRandomPeople(numberOfPeople: Int,
                         projectId: String = UUID.randomUUID().toString(),
