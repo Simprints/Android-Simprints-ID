@@ -9,20 +9,23 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.tools.Utils.wrapCallback
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.Completable
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.RealmQuery
-import io.realm.RealmResults
+import io.realm.*
 import timber.log.Timber
+import java.util.*
+import kotlin.collections.ArrayList
 
 class RealmDbManager(appContext: Context) : LocalDbManager {
 
     companion object {
         private const val USER_ID_FIELD = "userId"
+        private const val PROJECT_ID_FIELD = "projectId"
         private const val PATIENT_ID_FIELD = "patientId"
         private const val MODULE_ID_FIELD = "moduleId"
+        private const val TO_SYNC_FIELD = "toSync"
+        private const val UPDATED_FIELD = "updatedAt"
     }
 
     private var realmConfig: RealmConfiguration? = null
@@ -74,6 +77,21 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         realm.close()
     }
 
+    override fun updateSyncInfo(syncParams: SyncTaskParameters) {
+        val realm = getRealmInstance()
+        realm.executeTransaction { r ->
+            val query = buildQueryForPerson(r,
+                projectId = syncParams.projectId,
+                moduleId = syncParams.moduleId,
+                userId = syncParams.userId,
+                toSync = false)
+
+            val lastTimestamp = query.sort(UPDATED_FIELD, Sort.DESCENDING).findFirst()
+            r.insertOrUpdate(RealmSyncInfo(syncParams.toGroup().ordinal, lastTimestamp?.updatedAt ?: Date(0)))
+        }
+        realm.close()
+    }
+
     override fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback) {
         val wrappedCallback = wrapCallback("RealmDbManager.loadPerson()", callback)
 
@@ -105,40 +123,40 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         })
     }
 
-    override fun getPeopleCountFromLocal(personId: String?,
+    override fun getPeopleCountFromLocal(patientId: String?,
                                          projectId: String?,
                                          userId: String?,
                                          moduleId: String?,
                                          toSync: Boolean?): Int {
         val realm = getRealmInstance()
-        val query = buildQueryForPerson(realm, personId, projectId, userId, moduleId, toSync)
+        val query = buildQueryForPerson(realm, patientId, projectId, userId, moduleId, toSync)
         return query.count().toInt().also { realm.close() }
     }
 
-    override fun getPeopleFromLocal(personId: String?,
+    override fun getPeopleFromLocal(patientId: String?,
                                     projectId: String?,
                                     userId: String?,
                                     moduleId: String?,
                                     toSync: Boolean?): ArrayList<rl_Person> {
 
         val realm = getRealmInstance()
-        val query = buildQueryForPerson(realm, personId, projectId, userId, moduleId, toSync)
+        val query = buildQueryForPerson(realm, patientId, projectId, userId, moduleId, toSync)
         return ArrayList(query.findAll()).also { realm.close() }
     }
 
     private fun buildQueryForPerson(realm: Realm,
-                                    personId: String?,
-                                    projectId: String?,
-                                    userId: String?,
-                                    moduleId: String?,
-                                    toSync: Boolean?): RealmQuery<rl_Person> {
+                                    patientId: String? = null,
+                                    projectId: String? = null,
+                                    userId: String? = null,
+                                    moduleId: String? = null,
+                                    toSync: Boolean? = null): RealmQuery<rl_Person> {
 
         val query = realm.where(rl_Person::class.java)
-        projectId?.let { query.equalTo("projectId", it) }
-        personId?.let { query.equalTo("personId", it) }
-        userId?.let { query.equalTo("userId", it) }
-        moduleId?.let { query.equalTo("moduleId", it) }
-        toSync?.let { query.equalTo("toSync", it) }
+        projectId?.let { query.equalTo(PROJECT_ID_FIELD, it) }
+        patientId?.let { query.equalTo(PATIENT_ID_FIELD, it) }
+        userId?.let { query.equalTo(USER_ID_FIELD, it) }
+        moduleId?.let { query.equalTo(MODULE_ID_FIELD, it) }
+        toSync?.let { query.equalTo(TO_SYNC_FIELD, it) }
         return query
     }
 

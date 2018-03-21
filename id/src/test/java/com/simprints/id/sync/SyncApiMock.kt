@@ -2,6 +2,7 @@ package com.simprints.id.sync
 
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.SyncApiInterface
+import com.simprints.id.data.db.sync.model.PatientsCount
 import com.simprints.id.tools.retrofit.createMockBehaviorService
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -28,8 +29,8 @@ class SimApiMock(private val delegate: BehaviorDelegate<SyncApiInterface>) : Syn
         return delegate.returning(buildSuccessResponseWith("")).getPatient(key, patientId)
     }
 
-    override fun patientsCount(key: String, syncParams: Map<String, String>): Single<Int> {
-        return delegate.returning(buildSuccessResponseWith("")).patientsCount(key, mapOf())
+    override fun patientsCount(key: String, syncParams: Map<String, String>): Single<PatientsCount> {
+        return delegate.returning(buildSuccessResponseWith("{\"patientsCount\": 10}")).patientsCount(key, mapOf())
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {
