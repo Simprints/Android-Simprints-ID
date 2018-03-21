@@ -5,8 +5,8 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import com.simprints.id.exceptions.safe.TaskInProgressException
+import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.notifications.NotificationBuilder
-import com.simprints.libcommon.Progress
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver

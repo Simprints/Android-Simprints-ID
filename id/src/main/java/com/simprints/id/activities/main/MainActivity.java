@@ -42,22 +42,18 @@ import com.simprints.id.activities.matching.MatchingActivity;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.data.db.remote.authListener.AuthListener;
-import com.simprints.id.data.db.remote.connectionListener.ConnectionListener;
-import com.simprints.id.session.callout.CalloutAction;
-import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError;
-import com.simprints.id.exceptions.unsafe.InvalidSyncGroupError;
-import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
-import com.simprints.id.fragments.FingerFragment;
+import com.simprints.id.data.db.sync.NaiveSyncManager;
 import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.domain.Finger;
 import com.simprints.id.domain.FingerRes;
+import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError;
+import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
+import com.simprints.id.fragments.FingerFragment;
+import com.simprints.id.services.progress.Progress;
 import com.simprints.id.services.sync.SyncClient;
 import com.simprints.id.services.sync.SyncService;
-import com.simprints.id.services.sync.SyncTaskParameters;
-import com.simprints.id.services.sync.SyncTaskParameters.GlobalSyncTaskParameters;
-import com.simprints.id.services.sync.SyncTaskParameters.UserSyncTaskParameters;
+import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.FormatResult;
@@ -70,7 +66,6 @@ import com.simprints.id.tools.ViewPagerCustom;
 import com.simprints.libcommon.FingerConfig;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libcommon.Person;
-import com.simprints.libcommon.Progress;
 import com.simprints.libcommon.ScanConfig;
 import com.simprints.libscanner.ButtonListener;
 import com.simprints.libscanner.SCANNER_ERROR;
@@ -87,9 +82,6 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.observers.DisposableObserver;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
-import timber.log.Timber;
 
 import static com.simprints.id.domain.Finger.NB_OF_FINGERS;
 import static com.simprints.id.domain.Finger.Status;
@@ -145,31 +137,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private ProgressDialog un20WakeupDialog;
 
-    private AuthListener authListener = new AuthListener() {
-        @Override
-        public void onSignIn() {
-
-        }
-
-        @Override
-        public void onSignOut() {
-            setOfflineSyncItem();
-        }
-
-    };
-
-    private ConnectionListener connectionListener = new ConnectionListener() {
-        @Override
-        public void onConnection() {
-            setReadySyncItem();
-        }
-
-        @Override
-        public void onDisconnection() {
-            setOfflineSyncItem();
-        }
-    };
-
     private DataManager dataManager;
 
     private SyncClient syncClient;
@@ -179,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements
     // Singletons
     private AppState appState;
     private Setup setup;
+    private NaiveSyncManager syncManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements
                 (ProgressBar) findViewById(R.id.pb_timeout),
                 dataManager.getTimeoutS() * 1000);
 
+        initSyncManager();
         setFingerStatus();
         initActiveFingers();
         initBarAndDrawer();
@@ -237,27 +206,6 @@ public class MainActivity extends AppCompatActivity implements
     public void onResume() {
         super.onResume();
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
-        try {
-            startListeners();
-        } catch (UninitializedDataManagerError error) {
-            dataManager.logError(error);
-            handleUnexpectedError(error);
-        }
-    }
-
-    private void startListeners() {
-        dataManager.registerRemoteAuthListener(authListener);
-        dataManager.registerRemoteConnectionListener(connectionListener);
-        updateConnectionState();
-        syncClient.startListening(newSyncObserver());
-    }
-
-    private void updateConnectionState() {
-        if (dataManager.isRemoteConnected()) {
-            connectionListener.onConnection();
-        } else {
-            connectionListener.onDisconnection();
-        }
     }
 
     private void setFingerStatus() {
@@ -675,7 +623,7 @@ public class MainActivity extends AppCompatActivity implements
                         PRIVACY_ACTIVITY_REQUEST_CODE);
                 break;
             case R.id.nav_sync:
-                sync();
+                syncManager.sync(dataManager.getSyncGroup());
                 return true;
             case R.id.nav_about:
                 startActivityForResult(new Intent(this, AboutActivity.class),
@@ -824,17 +772,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        stopListeners();
-    }
-
-    private void stopListeners() {
-        try {
-            syncClient.stopListening();
-            dataManager.unregisterRemoteAuthListener(authListener);
-            dataManager.unregisterRemoteConnectionListener(connectionListener);
-        } catch (UninitializedDataManagerError error) {
-            handleUnexpectedError(error);
-        }
+        syncManager.stop();
     }
 
     @Override
@@ -846,49 +784,50 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    private void initSyncManager() {
+        syncManager = new NaiveSyncManager(dataManager, syncClient, new DisposableObserver<Progress>() {
 
-    private void sync() {
-        SyncTaskParameters syncParameters;
-        switch (dataManager.getSyncGroup()) {
-            case GLOBAL:
-                syncParameters = new GlobalSyncTaskParameters(dataManager.getSignedInHashedLegacyApiKeyOrEmpty());
-                break;
-            case USER:
-                syncParameters = new UserSyncTaskParameters(dataManager.getSignedInHashedLegacyApiKeyOrEmpty(), dataManager.getUserId());
-                break;
-            default:
-                handleUnexpectedError(new InvalidSyncGroupError());
-                return;
-        }
-        syncClient.sync(syncParameters,
-                new Function0<Unit>() {
-                    @Override
-                    public Unit invoke() {
-                        syncClient.startListening(newSyncObserver());
-                        return null;
-                    }
-                },
-                new Function0<Unit>() {
-                    @Override
-                    public Unit invoke() {
-                        setErrorSyncItem();
-                        Toast.makeText(MainActivity.this,
-                                R.string.wait_for_current_sync_to_finish,
-                                Toast.LENGTH_LONG).show();
-                        return null;
-                    }
-                });
+            @Override public void onStart() {
+                System.out.println("Start!");
+            }
+            @Override public void onNext(Progress progress) {
+                setProgressSyncItem(progress);
+            }
+            @Override public void onError(Throwable t) {
+                setErrorSyncItem();
+            }
+            @Override public void onComplete() {
+                setCompleteSyncItem();
+            }
+        });
+    }
+
+    private void setProgressSyncItem(Progress progress) {
+        if (isProgressZero(progress))
+            setSyncItem(false,
+                getString(R.string.syncing_calculating),
+                R.drawable.ic_syncing);
+        else
+            setSyncItem(false,
+                getString(R.string.syncing_with_progress, progress.getCurrentValue(), progress.getMaxValue()),
+                R.drawable.ic_syncing);
+    }
+
+    private boolean isProgressZero(Progress progress) {
+        return progress.getCurrentValue() == 0 && progress.getMaxValue() == 0;
     }
 
     private void setCompleteSyncItem() {
         setSyncItem(true, R.string.nav_sync_complete, R.drawable.ic_sync_success);
     }
 
+    //FIXME: we need to show the network state?
     private void setReadySyncItem() {
         setSyncItem(true, R.string.nav_sync, R.drawable.ic_menu_sync_ready);
     }
 
-    private void setOfflineSyncItem() {
+    //FIXME: we need to show the network state?
+    private void setErrorSyncItem() {
         setSyncItem(false, R.string.not_signed_in, R.drawable.ic_menu_sync_off);
     }
 
@@ -902,60 +841,6 @@ public class MainActivity extends AppCompatActivity implements
             syncItem.setTitle(title);
             syncItem.setIcon(icon);
         }
-    }
-
-    private void setErrorSyncItem() {
-        setSyncItem(true, R.string.nav_sync_failed, R.drawable.ic_sync_failed);
-    }
-
-    private void setProgressSyncItem(Progress progress) {
-        if (isProgressZero(progress))
-            setSyncItem(false,
-                    getString(R.string.syncing_calculating),
-                    R.drawable.ic_syncing);
-        else
-            setSyncItem(false,
-                    getString(R.string.syncing_with_progress, progress.getCurrentValue(), progress.getMaxValue()),
-                    R.drawable.ic_syncing);
-    }
-
-    private boolean isProgressZero(Progress progress) {
-        return progress.getCurrentValue() == 0 && progress.getMaxValue() == 0;
-    }
-
-    private DisposableObserver<Progress> newSyncObserver() {
-        return new DisposableObserver<Progress>() {
-
-            @Override
-            public void onNext(Progress progress) {
-                Timber.d("onNext");
-                setProgressSyncItem(progress);
-            }
-
-            @Override
-            public void onComplete() {
-                Timber.d("onComplete");
-                setCompleteSyncItem();
-                syncClient.stopListening();
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                Timber.d("onError");
-                setErrorSyncItem();
-                logThrowable(throwable);
-                syncClient.stopListening();
-            }
-
-            private void logThrowable(Throwable throwable) {
-                if (throwable instanceof Error) {
-                    dataManager.logError((Error) throwable);
-                } else if (throwable instanceof RuntimeException) {
-                    dataManager.logSafeException((RuntimeException) throwable);
-                }
-            }
-
-        };
     }
 
     private void startContinuousCapture() {
