@@ -187,10 +187,6 @@ class FirebaseManager(private val appContext: Context,
         return Completable.complete()
     }
 
-    override fun getUpdatedPersonFromRemote(projectId: String, guid: String): Single<fb_Person> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun loadPersonFromRemote(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
         val wrappedCallback = wrapCallback("FirebaseManager.loadPerson()", callback)
 

@@ -17,6 +17,7 @@ import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
 import com.simprints.id.tools.JsonHelper
+import com.simprints.id.tools.JsonHelper.Companion.gson
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -62,6 +63,12 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     override fun isDbInitialised(): Boolean =
         remoteDbManager.isRemoteDbInitialized()
 
+    private fun getSyncApi(): Single<SyncApiInterface> =
+        remoteDbManager.getCurrentFirestoreToken()
+            .flatMap { token: String ->
+                Single.just(SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl, token).api)
+            }
+
     // Data transfer
 
     override fun savePerson(fbPerson: fb_Person): Completable =
@@ -76,11 +83,24 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     private fun savePersonInLocalAndRemoteAndUpdateLocal(fbPerson: fb_Person): Completable =
         localDbManager.savePersonInLocal(fbPerson)
-            .andThen(remoteDbManager.savePersonInRemote(fbPerson))
-            .andThen(remoteDbManager.getUpdatedPersonFromRemote(fbPerson.projectId, fbPerson.patientId))
-            .flatMapCompletable { localDbManager.updatePersonInLocal(it) }
+            .andThen(getSyncApi())
+            .uploadPersonAndDownloadAgain(fbPerson)
+            .updatePersonInLocal()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+
+    private fun Single<out SyncApiInterface>.uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
+    // TODO: Duplicated in NaiveSync.kt
+        flatMap {
+            it.upSync("AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0", gson.toJson(mapOf("patients" to arrayListOf(fbPerson))))
+                .retry(Companion.RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+                .andThen(it.getPatient("AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0", fbPerson.patientId))
+        }
+
+    private fun Single<out fb_Person>.updatePersonInLocal(): Completable =
+        flatMapCompletable {
+            localDbManager.updatePersonInLocal(it)
+        }
 
     override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
         localDbManager.loadPersonFromLocal(destinationList, guid, callback)
@@ -115,9 +135,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     }
 
     override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
-        remoteDbManager.getCurrentFirestoreToken().flatMapObservable {
+        getSyncApi().flatMapObservable {
             NaiveSync(
-                SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl, it).api,
+                it,
                 localDbManager,
                 JsonHelper.gson).sync(interrupted, parameters)
         }
@@ -126,5 +146,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         val firebaseManager = remoteDbManager as FirebaseManager
         val realmManager = localDbManager as RealmDbManager
         LocalDbRecovererImpl(realmManager, firebaseManager, projectId, userId, androidId, moduleId, group, callback).recoverDb()
+    }
+
+    companion object {
+        private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
     }
 }
