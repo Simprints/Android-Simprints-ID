@@ -29,7 +29,7 @@ interface LocalDbManager {
                                 projectId: String? = null,
                                 userId: String? = null,
                                 moduleId: String? = null,
-                                toSync: Boolean? = null): Long
+                                toSync: Boolean? = null): Int
 
     fun getPeopleFromLocal(personId: String? = null,
                            projectId: String? = null,

@@ -2,7 +2,7 @@ package com.simprints.id.services.progress.notifications
 
 import android.app.NotificationManager
 import android.support.v4.app.NotificationCompat
-import com.simprints.libcommon.Progress
+import com.simprints.id.services.progress.Progress
 import io.reactivex.observers.DisposableObserver
 
 

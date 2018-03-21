@@ -2,13 +2,14 @@ package com.simprints.id.services.sync
 
 import android.content.Context
 import com.simprints.id.exceptions.safe.TaskInProgressException
+import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.client.ProgressClientImpl
 import com.simprints.id.services.progress.client.ProgressConnection
-import com.simprints.libcommon.Progress
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableObserver
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import org.jetbrains.anko.coroutines.experimental.bg
@@ -63,6 +64,7 @@ class SyncClient(context: Context)
             if (observable != null) {
                 disposables.add(observable
                         .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
                         .subscribeWith(observer))
             }
         }

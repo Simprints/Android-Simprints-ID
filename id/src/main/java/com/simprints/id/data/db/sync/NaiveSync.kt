@@ -6,10 +6,10 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.exceptions.safe.InterruptedSyncException
+import com.simprints.id.services.progress.DownloadProgress
+import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.progress.UploadProgress
 import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.libcommon.DownloadProgress
-import com.simprints.libcommon.Progress
-import com.simprints.libcommon.UploadProgress
 import io.reactivex.Emitter
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -22,8 +22,8 @@ import kotlin.collections.ArrayList
 
 open class NaiveSync(private val api: SyncApiInterface,
                      private val localDbManager: LocalDbManager,
-                     private val gson: Gson,
-                     private val firebaseToken: String) {
+
+                     private val gson: Gson) {
 
     companion object {
         private const val LOCAL_DB_BATCH_SIZE = 10000
@@ -67,6 +67,7 @@ open class NaiveSync(private val api: SyncApiInterface,
 
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
         return getNumberOfPatientsForSyncParams(syncParams).flatMapObservable { nPatientsForDownSyncQuery ->
+
             val nPatientsToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery, syncParams)
             val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup())
 
@@ -89,10 +90,10 @@ open class NaiveSync(private val api: SyncApiInterface,
     private fun calculateNPatientsToDownload(nPatientsForDownSyncQuery: Int, syncParams: SyncTaskParameters): Int {
 
         val nPatientsForDownSyncParamsInRealm = localDbManager.getPeopleCountFromLocal(
-            null,
-            syncParams.projectId,
-            syncParams.userId,
-            syncParams.moduleId).toInt()
+            projectId = syncParams.projectId,
+            userId = syncParams.userId,
+            moduleId = syncParams.moduleId,
+            toSync = false)
 
         return nPatientsForDownSyncQuery - nPatientsForDownSyncParamsInRealm
     }
@@ -103,12 +104,13 @@ open class NaiveSync(private val api: SyncApiInterface,
      *
      * The number comes from HEAD request against connector.inputStreamForDownload
      */
-    private fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> {
-        return api.patientsCount("AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0", syncParams.toMap()).onErrorReturn { 10 } //FIXME
+    protected open fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> {
+        return api.patientsCount("AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0", syncParams.toMap())
             .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+            .onErrorReturn { 10 }
     }
 
-    protected fun downloadNewPatientsFromStream(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters, input: InputStream): Observable<Int> =
+    protected open fun downloadNewPatientsFromStream(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters, input: InputStream): Observable<Int> =
         Observable.create<Int> {
             val reader = JsonReader(InputStreamReader(input) as Reader?)
 

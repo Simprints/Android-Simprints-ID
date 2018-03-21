@@ -109,10 +109,10 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
                                          projectId: String?,
                                          userId: String?,
                                          moduleId: String?,
-                                         toSync: Boolean?): Long {
+                                         toSync: Boolean?): Int {
         val realm = getRealmInstance()
         val query = buildQueryForPerson(realm, personId, projectId, userId, moduleId, toSync)
-        return query.count().also { realm.close() }
+        return query.count().toInt().also { realm.close() }
     }
 
     override fun getPeopleFromLocal(personId: String?,
@@ -126,8 +126,9 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         return ArrayList(query.findAll()).also { realm.close() }
     }
 
-    private fun buildQueryForPerson(realm: Realm, projectId: String?,
+    private fun buildQueryForPerson(realm: Realm,
                                     personId: String?,
+                                    projectId: String?,
                                     userId: String?,
                                     moduleId: String?,
                                     toSync: Boolean?): RealmQuery<rl_Person> {

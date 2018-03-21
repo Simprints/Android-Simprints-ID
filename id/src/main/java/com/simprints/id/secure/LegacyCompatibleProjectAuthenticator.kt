@@ -13,7 +13,6 @@ import com.simprints.id.secure.models.ProjectId
 import io.reactivex.Completable
 import io.reactivex.Single
 
-
 class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
                                            dbManager: DbManager,
                                            safetyNetClient: SafetyNetClient,
@@ -32,8 +31,7 @@ class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
         if (legacyProjectId != null)
             checkLegacyProjectIdMatchesProjectId(nonceScope.projectId, legacyProjectId)
                 .andThen(authenticate(nonceScope, projectSecret))
-        else
-            authenticate(nonceScope, projectSecret)
+        else authenticate(nonceScope, projectSecret)
 
     private fun checkLegacyProjectIdMatchesProjectId(expectedProjectId: String, legacyProjectId: String): Completable {
         val hashedLegacyProjectId = Hasher().hash(legacyProjectId)
