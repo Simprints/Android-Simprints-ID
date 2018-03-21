@@ -9,7 +9,7 @@ import retrofit2.http.*
 interface SyncApiInterface {
 
     companion object {
-        var baseUrl = "https://sync-manager-dot-simprints-dev.appspot.com"
+        var baseUrl = "https://2018-1-0-dev1-dot-sync-manager-dot-simprints-dev.appspot.com"
     }
 
     @GET("/patients")
