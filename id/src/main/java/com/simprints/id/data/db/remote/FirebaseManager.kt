@@ -32,6 +32,7 @@ import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
 import com.simprints.id.tools.JsonHelper
 import com.simprints.id.tools.extensions.deviceId
@@ -252,10 +253,13 @@ class FirebaseManager(private val appContext: Context,
             .addOnFailureListener { e -> it.onError(e) }
     }
 
+    private fun getApiClient(authToken: String): SyncApiInterface =
+        SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl, authToken).api
+
     override fun getSyncApi(): Single<SyncApiInterface> =
         getCurrentFirestoreToken()
-            .flatMap { token: String ->
-                Single.just(SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl, token).api)
+            .flatMap {
+                Single.just(getApiClient(it))
             }
 
     override fun uploadPeopleBatch(patientsToUpload: ArrayList<fb_Person>): Completable =
@@ -267,6 +271,13 @@ class FirebaseManager(private val appContext: Context,
     override fun downloadPatient(patientId: String): Single<fb_Person> =
         getSyncApi().flatMap {
             it.getPatient(patientId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+        }
+
+    override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
+        getSyncApi().flatMap {
+            it.patientsCount(syncParams.toMap())
+                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+                .map { it.patientsCount }
         }
 
     companion object {

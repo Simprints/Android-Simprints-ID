@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.exceptions.safe.InterruptedSyncException
 import com.simprints.id.services.progress.DownloadProgress
@@ -13,16 +14,14 @@ import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Emitter
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import io.reactivex.Single
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.collections.ArrayList
 
-open class NaiveSync(private val api: SyncApiInterface,
-                     private val localDbManager: LocalDbManager,
+open class NaiveSync(private val localDbManager: LocalDbManager,
+                     private val remoteDbManager: RemoteDbManager,
                      private val gson: Gson) {
 
     companion object {
@@ -32,10 +31,9 @@ open class NaiveSync(private val api: SyncApiInterface,
     }
 
     fun sync(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
-        return downloadNewPatients(isInterrupted, syncParams).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
-//        return Observable.concat( //FIXME
-//            uploadNewPatients(isInterrupted),
-//            downloadNewPatients(isInterrupted, syncParams))
+        return Observable.concat(
+            uploadNewPatients(isInterrupted),
+            downloadNewPatients(isInterrupted, syncParams))
     }
 
     protected open fun uploadNewPatients(isInterrupted: () -> Boolean,
@@ -49,13 +47,14 @@ open class NaiveSync(private val api: SyncApiInterface,
             .updateUploadCounterAndConvertItToProgress(counter, patientsToUpload.size)
     }
 
-    private fun Observable<out MutableList<fb_Person>>.uploadEachBatch(): Observable<Int> =
-        flatMap { patientsBatch ->
-            makeUploadPatientsBatchRequest(ArrayList(patientsBatch)).toObservable()
+     private fun Observable<out MutableList<fb_Person>>.uploadEachBatch(): Observable<Int> =
+        flatMap { batch ->
+            remoteDbManager
+                .uploadPeopleBatch(ArrayList(batch))
+                .andThen(Observable.just(batch.size))
         }
 
-    private fun Observable<out Int>.updateUploadCounterAndConvertItToProgress(counter: AtomicInteger,
-                                                                              maxValueForProgress: Int): Observable<Progress> =
+    private fun Observable<out Int>.updateUploadCounterAndConvertItToProgress(counter: AtomicInteger, maxValueForProgress: Int): Observable<Progress> =
         map {
             UploadProgress(counter.addAndGet(it), maxValueForProgress)
         }
@@ -74,32 +73,26 @@ open class NaiveSync(private val api: SyncApiInterface,
         return localDbManager.getPeopleFromLocal(toSync = true)
     }
 
-    protected open fun makeUploadPatientsBatchRequest(patientsToUpload: ArrayList<fb_Person>): Single<Int> {
-
-        val body = gson.toJson(mapOf("patients" to patientsToUpload))
-        return api.upSync(body)
-            .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
-            .toSingleDefault(patientsToUpload.size)
-    }
-
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
-        return getNumberOfPatientsForSyncParams(syncParams).flatMapObservable { nPatientsForDownSyncQuery ->
+        return remoteDbManager.getNumberOfPatientsForSyncParams(syncParams).flatMapObservable { nPatientsForDownSyncQuery ->
 
             val nPatientsToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery, syncParams)
             val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup())
 
-            api.downSync(
-                realmSyncInfo?.lastSyncTime?.time ?: Date(0).time,
-                mapOf("projectId" to syncParams.projectId)/* syncParams.toMap()*/)
-                .flatMapObservable {
-                    downloadNewPatientsFromStream(
-                        isInterrupted,
-                        syncParams,
-                        it.byteStream()).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
-                        .map {
-                            DownloadProgress(it, nPatientsToDownload)
-                        }
-                }
+            remoteDbManager.getSyncApi().flatMapObservable {
+                it.downSync(
+                    realmSyncInfo?.lastSyncTime?.time ?: Date(0).time,
+                    mapOf("projectId" to syncParams.projectId)/* syncParams.toMap()*/)
+                    .flatMapObservable {
+                        downloadNewPatientsFromStream(
+                            isInterrupted,
+                            syncParams,
+                            it.byteStream()).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+                            .map {
+                                DownloadProgress(it, nPatientsToDownload)
+                            }
+                    }
+            }
         }
     }
 
@@ -112,17 +105,6 @@ open class NaiveSync(private val api: SyncApiInterface,
             toSync = false)
 
         return nPatientsForDownSyncQuery - nPatientsForDownSyncParamsInRealm
-    }
-
-    /**
-     * Returns the total number of patients for a specific syncParams.
-     * #totalPatientToDownload = #TotalPatientsFor(ProjectID, ModuleId, UserId)ComingFromServer - #TotalPatientsFor(ProjectID, ModuleId, UserId)InLocal
-     */
-    protected open fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> {
-        return api.patientsCount(syncParams.toMap())
-            .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
-            .map { it.patientsCount }
-            .onErrorReturn { 10 }
     }
 
     protected open fun downloadNewPatientsFromStream(isInterrupted: () -> Boolean,

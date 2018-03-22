@@ -10,6 +10,7 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.SyncApiInterface
 import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
@@ -51,4 +52,5 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
     fun uploadPeopleBatch(patientsToUpload: ArrayList<fb_Person>): Completable
     fun downloadPatient(patientId: String): Single<fb_Person>
     fun getSyncApi(): Single<SyncApiInterface>
+    fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
 }

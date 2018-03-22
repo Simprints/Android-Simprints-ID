@@ -1,9 +1,15 @@
 package com.simprints.id.sync
 
+import android.content.Context
 import com.google.gson.stream.JsonReader
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmSyncInfo
+import com.simprints.id.data.db.remote.FirebaseManager
+import com.simprints.id.data.db.remote.FirebaseOptionsHelper
+import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
+import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.NaiveSync
 import com.simprints.id.data.db.sync.SyncApiInterface
@@ -19,6 +25,7 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.JsonHelper
 import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople
+import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -29,6 +36,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
+import org.mockito.MockitoAnnotations
+import org.mockito.Spy
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.*
@@ -41,22 +51,33 @@ class SyncTest : RxJavaTest() {
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<SyncApiInterface>
 
+    @Spy
+    private var remoteDbManager: RemoteDbManager = FirebaseManager(mock(Context::class.java),
+        mock(FirebaseConnectionListenerManager::class.java),
+        mock(RemoteDbAuthListenerManager::class.java),
+        mock(FirebaseOptionsHelper::class.java))
+
     @Before
     fun setUp() {
+        MockitoAnnotations.initMocks(this)
+        whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just(""))
+
         mockServer.start()
         apiClient = SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl)
     }
 
     @Test
     fun uploadPeopleInBatches_shouldWorkWithPoorConnection() {
-
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
+
         val patientsToUpload = getRandomPeople(35)
         whenever(localDbManager.getPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
+        val poorNetworkClientMock: SyncApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java))
+        whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
         val sync = NaiveSyncMock(
-            SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java)),
             localDbManager,
+            remoteDbManager,
             JsonHelper.gson)
 
         val testObserver = sync.uploadNewPatients({ false }, 10).test()
@@ -74,69 +95,19 @@ class SyncTest : RxJavaTest() {
 
     @Test
     fun uploadPeopleGetInterrupted_shouldStopUploading() {
-
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
         val patientsToUpload = getRandomPeople(35)
         whenever(localDbManager.getPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
+        val poorNetworkClientMock: SyncApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java))
+        whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
         val sync = NaiveSyncMock(
-            SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java)),
             localDbManager,
+            remoteDbManager,
             JsonHelper.gson)
 
         val count = AtomicInteger(0)
         val testObserver = sync.uploadNewPatients({ count.addAndGet(1) > 2 }, 10).test()
-
-        testObserver.awaitTerminalEvent()
-
-        testObserver
-            .assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
-    }
-
-    @Test
-    fun uploadSingleBatchOfPeople_shouldWorkWithPoorConnection() {
-
-        val sync = NaiveSyncMock(
-            SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java)),
-            Mockito.mock(LocalDbManager::class.java),
-            JsonHelper.gson)
-
-        val patients = getRandomPeople(3)
-        val testObserver = sync.makeUploadPatientsBatchRequest(ArrayList(patients.map { fb_Person(it) })).test()
-        testObserver.awaitTerminalEvent()
-        testObserver
-            .assertNoErrors()
-            .assertComplete()
-            .assertValue { it == patients.size }
-    }
-
-    @Test
-    fun uploadSingleBatchOfPeopleFail_shouldThrowAnError() {
-
-        val sync = NaiveSyncMock(
-            SimApiMock(createMockBehaviorService(apiClient.retrofit, 100, SyncApiInterface::class.java)),
-            Mockito.mock(LocalDbManager::class.java),
-            JsonHelper.gson)
-
-        val patients = getRandomPeople(3)
-        val testObserver = sync.makeUploadPatientsBatchRequest(ArrayList(patients.map { fb_Person(it) })).test()
-        testObserver.awaitTerminalEvent()
-        testObserver.assertError { true }
-    }
-
-    @Test
-    fun downloadPatients_getNumberOfPatientsForSyncParams() {
-
-        val localDbManager = Mockito.mock(LocalDbManager::class.java)
-        val sync = NaiveSyncMock(
-            apiClient.api,
-            localDbManager,
-            JsonHelper.gson)
-
-        val syncParams = SyncTaskParameters.GlobalSyncTaskParameters("projectId")
-        val testObserver = sync.getNumberOfPatientsForSyncParams(syncParams).test()
 
         testObserver.awaitTerminalEvent()
 
@@ -161,6 +132,7 @@ class SyncTest : RxJavaTest() {
             nPatientsToDownload,
             25000,
             localDbMock,
+            remoteDbManager,
             3000,
             syncParams,
             lastSyncTime
@@ -199,6 +171,7 @@ class SyncTest : RxJavaTest() {
             nPatientsToDownload,
             25000,
             localDbMock,
+            remoteDbManager,
             3000,
             syncParams,
             lastSyncTime
@@ -239,6 +212,7 @@ class SyncTest : RxJavaTest() {
             nPatientsToDownload,
             25000,
             localDbMock,
+            remoteDbManager,
             3000,
             syncParams,
             lastSyncTime
@@ -267,6 +241,7 @@ class SyncTest : RxJavaTest() {
         nPatientsToDownload: Int,
         nPatientsForProjectIdFromServer: Int,
         localDbMock: LocalDbManager,
+        remoteDbMock: RemoteDbManager,
         patientsAlreadyInLocalDb: Int,
         syncParams: SyncTaskParameters,
         lastSyncTime: Date): TestObserver<Progress> {
@@ -291,9 +266,9 @@ class SyncTest : RxJavaTest() {
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup().ordinal, lastSyncTime))
 
         val sync = NaiveSyncMock(
-                SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl).api,
-                localDbMock,
-                JsonHelper.gson)
+            localDbMock,
+            remoteDbMock,
+            JsonHelper.gson)
 
         return sync.downloadNewPatients({ false }, syncParams).test()
     }
