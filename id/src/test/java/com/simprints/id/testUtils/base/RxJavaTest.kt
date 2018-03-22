@@ -1,4 +1,4 @@
-package com.simprints.id.tools.base
+package com.simprints.id.testUtils.base
 
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.schedulers.Schedulers

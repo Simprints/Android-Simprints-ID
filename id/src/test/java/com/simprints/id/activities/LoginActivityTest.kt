@@ -11,7 +11,7 @@ import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.extensions.scannerAppIntent
-import com.simprints.id.tools.roboletric.*
+import com.simprints.id.testUtils.roboletric.*
 import io.reactivex.Completable
 import junit.framework.Assert.assertNotNull
 import junit.framework.Assert.assertTrue

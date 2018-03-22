@@ -72,16 +72,6 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     // Data transfer
 
     override fun savePerson(fbPerson: fb_Person): Completable =
-        if (remoteDbManager.isRemoteConnected)
-            savePersonInLocalAndRemoteAndUpdateLocal(fbPerson)
-        else savePersonInLocalOnly(fbPerson)
-
-    private fun savePersonInLocalOnly(fbPerson: fb_Person): Completable =
-        localDbManager.savePersonInLocal(fbPerson)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-
-    private fun savePersonInLocalAndRemoteAndUpdateLocal(fbPerson: fb_Person): Completable =
         localDbManager.savePersonInLocal(fbPerson)
             .andThen(getSyncApi())
             .uploadPersonAndDownloadAgain(fbPerson)
@@ -92,9 +82,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     private fun Single<out SyncApiInterface>.uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
     // TODO: Duplicated in NaiveSync.kt
         flatMap {
-            it.upSync( gson.toJson(mapOf("patients" to arrayListOf(fbPerson))))
-                .retry(Companion.RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
-                .andThen(it.getPatient( fbPerson.patientId))
+            it.upSync(gson.toJson(mapOf("patients" to arrayListOf(fbPerson))))
+                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+                .andThen(it.getPatient(fbPerson.patientId))
         }
 
     private fun Single<out fb_Person>.updatePersonInLocal(): Completable =

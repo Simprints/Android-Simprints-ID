@@ -1,4 +1,4 @@
-package com.simprints.id.tools.roboletric
+package com.simprints.id.testUtils.roboletric
 
 import android.content.SharedPreferences
 import com.simprints.id.Application

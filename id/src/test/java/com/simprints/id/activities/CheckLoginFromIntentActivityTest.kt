@@ -14,8 +14,8 @@ import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
-import com.simprints.id.tools.base.RxJavaTest
-import com.simprints.id.tools.roboletric.*
+import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.id.testUtils.roboletric.*
 import junit.framework.Assert.*
 import org.junit.Assert
 import org.junit.Before

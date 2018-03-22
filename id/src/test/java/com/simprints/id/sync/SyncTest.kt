@@ -1,6 +1,5 @@
 package com.simprints.id.sync
 
-import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.LocalDbManager
@@ -14,14 +13,12 @@ import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.UploadProgress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.testUtils.anyNotNull
+import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.id.testUtils.retrofit.createMockBehaviorService
+import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.JsonHelper
-import com.simprints.id.tools.base.RxJavaTest
-import com.simprints.id.tools.retrofit.createMockBehaviorService
-import com.simprints.id.tools.roboletric.TestApplication
-import com.simprints.id.tools.utils.FirestoreMigrationUtils.getRandomPeople
-import io.reactivex.Observable
-import io.reactivex.Single
+import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople
 import io.reactivex.observers.TestObserver
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -57,7 +54,7 @@ class SyncTest : RxJavaTest() {
         val patientsToUpload = getRandomPeople(35)
         whenever(localDbManager.getPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
 
-        val sync = NaiveSyncTest(
+        val sync = NaiveSyncMock(
             SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java)),
             localDbManager,
             JsonHelper.gson)
@@ -82,7 +79,7 @@ class SyncTest : RxJavaTest() {
         val patientsToUpload = getRandomPeople(35)
         whenever(localDbManager.getPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
 
-        val sync = NaiveSyncTest(
+        val sync = NaiveSyncMock(
             SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java)),
             localDbManager,
             JsonHelper.gson)
@@ -101,7 +98,7 @@ class SyncTest : RxJavaTest() {
     @Test
     fun uploadSingleBatchOfPeople_shouldWorkWithPoorConnection() {
 
-        val sync = NaiveSyncTest(
+        val sync = NaiveSyncMock(
             SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java)),
             Mockito.mock(LocalDbManager::class.java),
             JsonHelper.gson)
@@ -118,7 +115,7 @@ class SyncTest : RxJavaTest() {
     @Test
     fun uploadSingleBatchOfPeopleFail_shouldThrowAnError() {
 
-        val sync = NaiveSyncTest(
+        val sync = NaiveSyncMock(
             SimApiMock(createMockBehaviorService(apiClient.retrofit, 100, SyncApiInterface::class.java)),
             Mockito.mock(LocalDbManager::class.java),
             JsonHelper.gson)
@@ -133,7 +130,7 @@ class SyncTest : RxJavaTest() {
     fun downloadPatients_getNumberOfPatientsForSyncParams() {
 
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
-        val sync = NaiveSyncTest(
+        val sync = NaiveSyncMock(
             apiClient.api,
             localDbManager,
             JsonHelper.gson)
@@ -293,7 +290,7 @@ class SyncTest : RxJavaTest() {
         //Mock app RealmSyncInfo for syncParams
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup().ordinal, lastSyncTime))
 
-        val sync = NaiveSyncTest(
+        val sync = NaiveSyncMock(
                 SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl).api,
                 localDbMock,
                 JsonHelper.gson)
@@ -329,26 +326,5 @@ class SyncTest : RxJavaTest() {
     @After
     @Throws fun tearDown() {
         mockServer.shutdown()
-    }
-}
-
-class NaiveSyncTest(api: SyncApiInterface,
-                    localDbManager: LocalDbManager,
-                    gson: Gson) : NaiveSync(api, localDbManager, gson) {
-
-    public override fun makeUploadPatientsBatchRequest(patientsToUpload: ArrayList<fb_Person>): Single<Int> {
-        return super.makeUploadPatientsBatchRequest(patientsToUpload)
-    }
-
-    public override fun uploadNewPatients(isInterrupted: () -> Boolean, batchSize: Int): Observable<Progress> {
-        return super.uploadNewPatients(isInterrupted, batchSize)
-    }
-
-    public override fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
-        return super.downloadNewPatients(isInterrupted, syncParams)
-    }
-
-    public override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> {
-        return super.getNumberOfPatientsForSyncParams(syncParams)
     }
 }
