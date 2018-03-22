@@ -12,12 +12,10 @@ import com.simprints.id.R
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.db.local.models.rl_Person
-import com.simprints.id.domain.Constants
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.extensions.launchAlert
-import com.simprints.id.tools.utils.FirestoreMigationUtils
-import de.mrapp.android.dialog.MaterialDialog
+import com.simprints.id.tools.utils.FirestoreMigrationUtils
 import kotlinx.android.synthetic.main.activity_dashboard.*
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
@@ -56,42 +54,16 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         }
 
         dashboardButtonSync.setOnClickListener {
-            showSyncOptions()
+            viewPresenter.didUserWantToSyncBy(dataManager.syncGroup)
         }
 
         buttonAddPersonRealm.setOnClickListener {
             app.dbManager.getRealmInstance().executeTransaction { realm ->
-                realm.copyToRealmOrUpdate(FirestoreMigationUtils.getRandomPerson())
+                realm.copyToRealmOrUpdate(FirestoreMigrationUtils.getRandomPerson())
                 val results = realm.where(rl_Person::class.java).findAll()
                 textAddPersonRealm.text = "Count: ${results.count()}"
             }
         }
-    }
-
-    private fun showSyncOptions() {
-
-        var choice = Constants.GROUP.USER
-        val builder = MaterialDialog.Builder(this@DashboardActivity)
-        builder.setTitle("Sync")
-        builder.setMessage("All your local patients will be upload. Which patients do you want to download?")
-        builder.setSingleChoiceItems(
-            arrayOf("All patients I enrolled", "All patients in my module", "All patients in the project"),
-            0,
-            { _, item ->
-                when (item) {
-                    0 -> choice = Constants.GROUP.USER
-                    1 -> choice = Constants.GROUP.MODULE
-                    2 -> choice = Constants.GROUP.GLOBAL
-                }
-            })
-
-        builder.setPositiveButton("Sync") { d, _ ->
-            viewPresenter.didUserWantToSyncBy(choice)
-            d.dismiss()
-        }
-
-        builder.setNegativeButton("Cancel") { d, _ -> d.dismiss() }
-        builder.show()
     }
 
     override fun showToast(messageRes: Int) {

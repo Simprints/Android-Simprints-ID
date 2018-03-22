@@ -92,9 +92,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     private fun Single<out SyncApiInterface>.uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
     // TODO: Duplicated in NaiveSync.kt
         flatMap {
-            it.upSync("AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0", gson.toJson(mapOf("patients" to arrayListOf(fbPerson))))
+            it.upSync( gson.toJson(mapOf("patients" to arrayListOf(fbPerson))))
                 .retry(Companion.RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
-                .andThen(it.getPatient("AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0", fbPerson.patientId))
+                .andThen(it.getPatient( fbPerson.patientId))
         }
 
     private fun Single<out fb_Person>.updatePersonInLocal(): Completable =

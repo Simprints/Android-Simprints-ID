@@ -55,7 +55,7 @@ open class NaiveSync(private val api: SyncApiInterface,
         }
 
     private fun Observable<out Int>.updateUploadCounterAndConvertItToProgress(counter: AtomicInteger,
-                                                                            maxValueForProgress: Int): Observable<Progress> =
+                                                                              maxValueForProgress: Int): Observable<Progress> =
         map {
             UploadProgress(counter.addAndGet(it), maxValueForProgress)
         }
@@ -77,7 +77,7 @@ open class NaiveSync(private val api: SyncApiInterface,
     protected open fun makeUploadPatientsBatchRequest(patientsToUpload: ArrayList<fb_Person>): Single<Int> {
 
         val body = gson.toJson(mapOf("patients" to patientsToUpload))
-        return api.upSync("AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0", body)
+        return api.upSync(body)
             .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
             .toSingleDefault(patientsToUpload.size)
     }
@@ -89,7 +89,6 @@ open class NaiveSync(private val api: SyncApiInterface,
             val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup())
 
             api.downSync(
-                "AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0",
                 realmSyncInfo?.lastSyncTime?.time ?: Date(0).time,
                 mapOf("projectId" to syncParams.projectId)/* syncParams.toMap()*/)
                 .flatMapObservable {
@@ -120,7 +119,7 @@ open class NaiveSync(private val api: SyncApiInterface,
      * #totalPatientToDownload = #TotalPatientsFor(ProjectID, ModuleId, UserId)ComingFromServer - #TotalPatientsFor(ProjectID, ModuleId, UserId)InLocal
      */
     protected open fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> {
-        return api.patientsCount("AIzaSyAoN3AsL8Qc8IdJMeZqAHmqUTipa927Jz0", syncParams.toMap())
+        return api.patientsCount(syncParams.toMap())
             .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
             .map { it.patientsCount }
             .onErrorReturn { 10 }
@@ -158,8 +157,8 @@ open class NaiveSync(private val api: SyncApiInterface,
         }
 
     private fun isCurrentBatchDownloadedOrTaskInterrupted(totalDownloaded: Int,
-                                                        isInterrupted: () -> Boolean,
-                                                        maxPatientsForBatch: Int): Boolean {
+                                                          isInterrupted: () -> Boolean,
+                                                          maxPatientsForBatch: Int): Boolean {
 
         val isCurrentBatchFullyDownloaded = totalDownloaded % maxPatientsForBatch == 0
         return isCurrentBatchFullyDownloaded || isInterrupted()

@@ -6,7 +6,7 @@ import com.simprints.libcommon.Fingerprint
 import io.realm.RealmList
 import java.util.*
 
-object FirestoreMigationUtils {
+object FirestoreMigrationUtils {
 
     fun getRandomPeople(numberOfPeople: Int,
                         projectId: String = UUID.randomUUID().toString(),
@@ -34,6 +34,7 @@ object FirestoreMigationUtils {
             this.userId = userId
             this.moduleId = moduleId
             createdAt = Calendar.getInstance().time
+            updatedAt = Calendar.getInstance().time
             toSync = true
             fingerprints = prints
         }
