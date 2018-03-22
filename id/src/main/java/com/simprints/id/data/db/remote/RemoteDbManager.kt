@@ -7,6 +7,7 @@ import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.sync.SyncApiInterface
 import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.session.Session
@@ -46,4 +47,8 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
 
     fun getFirebaseLegacyApp(): FirebaseApp
     fun getCurrentFirestoreToken(): Single<String>
+
+    fun uploadPeopleBatch(patientsToUpload: ArrayList<fb_Person>): Completable
+    fun downloadPatient(patientId: String): Single<fb_Person>
+    fun getSyncApi(): Single<SyncApiInterface>
 }
