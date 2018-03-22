@@ -31,10 +31,8 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
     fun isSignedIn(projectId: String, userId: String): Boolean
 
     // Data transfer
+    // Firebase
     fun getLocalDbKeyFromRemote(projectId: String): Single<LocalDbKey>
-
-    fun savePersonInRemote(fbPerson: fb_Person): Completable
-    fun loadPersonFromRemote(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
 
     fun saveIdentificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
     fun updateIdentificationInRemote(projectId: String, selectedGuid: String, deviceId: String, sessionId: String)
@@ -48,7 +46,10 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
     fun getFirebaseLegacyApp(): FirebaseApp
     fun getCurrentFirestoreToken(): Single<String>
 
-    fun uploadPeopleBatch(patientsToUpload: ArrayList<fb_Person>): Completable
-    fun downloadPatient(patientId: String): Single<fb_Person>
+    // API
+    fun uploadPerson(fbPerson: fb_Person): Completable
+    fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable
+    fun downloadPerson(patientId: String): Single<fb_Person>
+
     fun getSyncApi(): Single<SyncApiInterface>
 }

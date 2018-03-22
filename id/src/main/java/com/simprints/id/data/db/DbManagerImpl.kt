@@ -62,24 +62,25 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     // Data transfer
     override fun savePerson(fbPerson: fb_Person): Completable =
-        uploadPersonAndDownloadAgain(fbPerson)
+        localDbManager.savePersonInLocal(fbPerson)
+            .andThen(uploadPersonAndDownloadAgain(fbPerson))
             .updatePersonInLocal()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+
+    private fun uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
+        remoteDbManager
+            .uploadPeople(arrayListOf(fbPerson))
+            .andThen(remoteDbManager.downloadPerson(fbPerson.patientId))
 
     private fun Single<out fb_Person>.updatePersonInLocal(): Completable =
         flatMapCompletable {
             localDbManager.updatePersonInLocal(it)
         }
 
-    private fun uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
-        remoteDbManager
-            .uploadPeopleBatch(arrayListOf(fbPerson))
-            .andThen(remoteDbManager.downloadPatient(fbPerson.patientId))
-
     override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
+        // TODO : Rx-ify with new implementation. Check Remote if not in local
         localDbManager.loadPersonFromLocal(destinationList, guid, callback)
-        if (destinationList.size == 0) remoteDbManager.loadPersonFromRemote(destinationList, projectId, guid, callback)
     }
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
@@ -114,7 +115,6 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
             NaiveSync(
                 it,
                 localDbManager,
-                remoteDbManager,
                 JsonHelper.gson).sync(interrupted, parameters)
         }
 
@@ -122,9 +122,5 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         val firebaseManager = remoteDbManager as FirebaseManager
         val realmManager = localDbManager as RealmDbManager
         LocalDbRecovererImpl(realmManager, firebaseManager, projectId, userId, androidId, moduleId, group, callback).recoverDb()
-    }
-
-    companion object {
-        private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
     }
 }
