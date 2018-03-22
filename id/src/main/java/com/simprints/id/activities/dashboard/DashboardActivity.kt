@@ -15,7 +15,7 @@ import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.extensions.launchAlert
-import com.simprints.id.tools.utils.FirestoreMigrationUtils
+import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import kotlinx.android.synthetic.main.activity_dashboard.*
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
@@ -59,7 +59,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
         buttonAddPersonRealm.setOnClickListener {
             app.dbManager.getRealmInstance().executeTransaction { realm ->
-                realm.copyToRealmOrUpdate(FirestoreMigrationUtils.getRandomPerson())
+                realm.copyToRealmOrUpdate(PeopleGeneratorUtils.getRandomPerson())
                 val results = realm.where(rl_Person::class.java).findAll()
                 textAddPersonRealm.text = "Count: ${results.count()}"
             }

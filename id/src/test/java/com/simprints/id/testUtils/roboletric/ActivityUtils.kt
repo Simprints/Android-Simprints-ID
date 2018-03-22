@@ -1,4 +1,4 @@
-package com.simprints.id.tools.roboletric
+package com.simprints.id.testUtils.roboletric
 
 import android.content.Intent
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity

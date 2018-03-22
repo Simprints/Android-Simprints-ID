@@ -1,7 +1,7 @@
 package com.simprints.id.secure.cryptography
 
 import com.simprints.id.BuildConfig
-import com.simprints.id.tools.roboletric.TestApplication
+import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

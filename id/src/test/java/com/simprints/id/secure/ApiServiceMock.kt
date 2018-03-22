@@ -4,7 +4,7 @@ import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.ProjectId
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.tools.retrofit.createMockBehaviorService
+import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.Response

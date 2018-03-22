@@ -1,4 +1,4 @@
-package com.simprints.id.tools.retrofit
+package com.simprints.id.testUtils.retrofit
 
 import okhttp3.*
 import retrofit2.Retrofit

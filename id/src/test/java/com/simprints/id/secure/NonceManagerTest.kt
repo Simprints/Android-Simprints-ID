@@ -5,9 +5,9 @@ import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.tools.base.RxJavaTest
-import com.simprints.id.tools.retrofit.FakeResponseInterceptor
-import com.simprints.id.tools.roboletric.TestApplication
+import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.id.testUtils.retrofit.FakeResponseInterceptor
+import com.simprints.id.testUtils.roboletric.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers

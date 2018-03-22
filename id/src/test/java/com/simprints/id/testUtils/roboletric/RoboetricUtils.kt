@@ -1,4 +1,4 @@
-package com.simprints.id.tools.roboletric
+package com.simprints.id.testUtils.roboletric
 
 import android.app.Activity
 import org.robolectric.android.controller.ActivityController

@@ -9,7 +9,7 @@ import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.testUtils.assertActivityStarted
-import com.simprints.id.tools.roboletric.*
+import com.simprints.id.testUtils.roboletric.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
