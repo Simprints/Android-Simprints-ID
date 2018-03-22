@@ -25,12 +25,15 @@ import com.simprints.id.data.db.remote.models.*
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.data.db.remote.tools.Utils.wrapCallback
+import com.simprints.id.data.db.sync.SyncApiInterface
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
+import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.session.Session
+import com.simprints.id.tools.JsonHelper
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
@@ -249,9 +252,27 @@ class FirebaseManager(private val appContext: Context,
             .addOnFailureListener { e -> it.onError(e) }
     }
 
+    override fun getSyncApi(): Single<SyncApiInterface> =
+        getCurrentFirestoreToken()
+            .flatMap { token: String ->
+                Single.just(SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl, token).api)
+            }
+
+    override fun uploadPeopleBatch(patientsToUpload: ArrayList<fb_Person>): Completable =
+        getSyncApi().flatMapCompletable {
+            it.upSync(JsonHelper.gson.toJson(mapOf("patients" to patientsToUpload)))
+                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+        }
+
+    override fun downloadPatient(patientId: String): Single<fb_Person> =
+        getSyncApi().flatMap {
+            it.getPatient(patientId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+        }
+
     companion object {
         private const val COLLECTION_LOCAL_DB_KEYS = "localDbKeys"
         private const val PROJECT_ID_FIELD = "projectId"
+        private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
 
         private const val LOCAL_DB_KEY_VALUE_NAME = "value"
 
