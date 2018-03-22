@@ -19,7 +19,7 @@ import com.simprints.id.tools.JsonHelper
 import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.createMockBehaviorService
 import com.simprints.id.tools.roboletric.TestApplication
-import com.simprints.id.tools.utils.FirestoreMigationUtils.getRandomPeople
+import com.simprints.id.tools.utils.FirestoreMigrationUtils.getRandomPeople
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -32,7 +32,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.*
@@ -138,6 +137,7 @@ class SyncTest : RxJavaTest() {
             apiClient.api,
             localDbManager,
             JsonHelper.gson)
+
         val syncParams = SyncTaskParameters.GlobalSyncTaskParameters("projectId")
         val testObserver = sync.getNumberOfPatientsForSyncParams(syncParams).test()
 
@@ -287,11 +287,11 @@ class SyncTest : RxJavaTest() {
         mockLocalDbToSavePatientsFromStream(localDbMock)
 
         //Mock app has already patients in localDb
-        `when`(localDbMock.getPeopleFromLocal(any(), any(), any(), any(), any())).thenReturn(getRandomPeople(patientsAlreadyInLocalDb))
-        `when`(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any(), any())).thenReturn(patientsAlreadyInLocalDb)
+        whenever(localDbMock.getPeopleFromLocal(any(), any(), any(), any(), any())).thenReturn(getRandomPeople(patientsAlreadyInLocalDb))
+        whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any(), any())).thenReturn(patientsAlreadyInLocalDb)
 
         //Mock app RealmSyncInfo for syncParams
-        `when`(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup().ordinal, lastSyncTime))
+        whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup().ordinal, lastSyncTime))
 
         val sync = NaiveSyncTest(
                 SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl).api,
@@ -302,7 +302,7 @@ class SyncTest : RxJavaTest() {
     }
 
     private fun mockLocalDbToSavePatientsFromStream(localDbMock: LocalDbManager) {
-        `when`(localDbMock.savePeopleFromStream(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenAnswer({ invocation ->
+        whenever(localDbMock.savePeopleFromStream(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenAnswer({ invocation ->
             val args = invocation.arguments
             (args[0] as JsonReader).skipValue()
             val shouldStop = args[3] as () -> Boolean

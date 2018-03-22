@@ -17,20 +17,20 @@ import retrofit2.mock.Calls
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class SimApiMock(private val delegate: BehaviorDelegate<SyncApiInterface>) : SyncApiInterface {
 
-    override fun upSync(key: String, patientsJson: String): Completable {
-        return delegate.returning(buildSuccessResponseWith("")).upSync(key, patientsJson)
+    override fun upSync(patientsJson: String): Completable {
+        return delegate.returning(buildSuccessResponseWith("")).upSync(patientsJson)
     }
 
-    override fun downSync(key: String, date: Long, syncParams: Map<String, String>, batchSize: Int): Single<ResponseBody> {
-        return delegate.returning(buildSuccessResponseWith("")).downSync(key, date, syncParams)
+    override fun downSync(date: Long, syncParams: Map<String, String>, batchSize: Int): Single<ResponseBody> {
+        return delegate.returning(buildSuccessResponseWith("")).downSync(date, syncParams)
     }
 
-    override fun getPatient(key: String, patientId: String): Single<fb_Person> {
-        return delegate.returning(buildSuccessResponseWith("")).getPatient(key, patientId)
+    override fun getPatient(patientId: String): Single<fb_Person> {
+        return delegate.returning(buildSuccessResponseWith("")).getPatient(patientId)
     }
 
-    override fun patientsCount(key: String, syncParams: Map<String, String>): Single<PatientsCount> {
-        return delegate.returning(buildSuccessResponseWith("{\"patientsCount\": 10}")).patientsCount(key, mapOf())
+    override fun patientsCount(syncParams: Map<String, String>): Single<PatientsCount> {
+        return delegate.returning(buildSuccessResponseWith("{\"patientsCount\": 10}")).patientsCount(mapOf())
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {
