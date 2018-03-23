@@ -59,7 +59,10 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
     }
 
     override fun updatePersonInLocal(fbPerson: fb_Person): Completable {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val realm = getRealmInstance()
+        realm.insertOrUpdate(rl_Person(fbPerson))
+        realm.close()
+        return Completable.complete()
     }
 
     override fun savePeopleFromStream(reader: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: () -> Boolean) {

@@ -22,6 +22,7 @@ import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Completable
 
 class DataManagerImpl(private val context: Context,
                       private val preferencesManager: PreferencesManager,
@@ -100,9 +101,8 @@ class DataManagerImpl(private val context: Context,
     }
 
     // Data transfer
-    override fun savePerson(person: Person) {
+    override fun savePerson(person: Person): Completable =
         dbManager.savePerson(fb_Person(person, projectId, userId, moduleId))
-    }
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
         dbManager.loadPeople(destinationList, group, userId, moduleId, callback)

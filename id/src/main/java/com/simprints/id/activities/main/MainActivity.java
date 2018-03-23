@@ -48,7 +48,6 @@ import com.simprints.id.domain.Finger;
 import com.simprints.id.domain.FingerRes;
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError;
 import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.services.progress.Progress;
 import com.simprints.id.services.sync.SyncClient;
@@ -75,12 +74,15 @@ import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.FingerIdentifier;
 import com.simprints.libsimprints.Registration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
 
 import static com.simprints.id.domain.Finger.NB_OF_FINGERS;
@@ -545,26 +547,44 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             Person person = new Person(dataManager.getPatientId(), fingerprints);
             if (dataManager.getCalloutAction() == CalloutAction.REGISTER || dataManager.getCalloutAction() == CalloutAction.UPDATE) {
-                try {
-                    dataManager.savePerson(person);
-                } catch (UninitializedDataManagerError error) {
-                    dataManager.logError(error);
-                    launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                    return;
-                }
-
-                registrationResult = new Registration(dataManager.getPatientId());
-
-                Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
-                FormatResult.put(resultData, registrationResult, dataManager.getResultFormat());
-                setResult(RESULT_OK, resultData);
-                finish();
+                dataManager.savePerson(person)
+                    .subscribe(new Action() {
+                        @Override
+                        public void run() {
+                            handleRegistrationSuccess();
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) {
+                            if (throwable instanceof IOException) {
+                                handleRegistrationSuccess();
+                            } else {
+                                handleRegistrationFailure(throwable);
+                            }
+                        }
+                    });
             } else {
                 Intent intent = new Intent(this, MatchingActivity.class);
                 intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person);
                 startActivityForResult(intent, MATCHING_ACTIVITY_REQUEST_CODE);
             }
         }
+    }
+
+    private void handleRegistrationSuccess() {
+        registrationResult = new Registration(dataManager.getPatientId());
+
+        Intent resultData = new Intent(Constants.SIMPRINTS_REGISTER_INTENT);
+        FormatResult.put(resultData, registrationResult, dataManager.getResultFormat());
+        setResult(RESULT_OK, resultData);
+        finish();
+    }
+
+    private void handleRegistrationFailure(Throwable throwable) {
+        dataManager.logSafeException(new RuntimeException(throwable));
+        launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+        setResult(RESULT_CANCELED);
+        finish();
     }
 
     @Override
