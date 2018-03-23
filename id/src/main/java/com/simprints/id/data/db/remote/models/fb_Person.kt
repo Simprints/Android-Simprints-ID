@@ -27,16 +27,19 @@ data class fb_Person(@SerializedName("id") var patientId: String = "",
         userId = userId,
         moduleId = moduleId) {
 
-        person.fingerprints
+        fingerprints = HashMap(person.fingerprints
             .map { fb_Fingerprint(it) }
-            .forEach {
-                var listOfFingerprints = fingerprints[it.fingerId]
-                if (listOfFingerprints == null) {
-                    listOfFingerprints = arrayListOf()
-                }
-
-                listOfFingerprints.add(it)
-            }
+            .groupBy { it.fingerId }
+            .mapValues { ArrayList(it.value) })
+//            .forEach {
+//
+////                var listOfFingerprints = fingerprints[it.fingerId]
+////                if (listOfFingerprints == null) {
+////                    listOfFingerprints = arrayListOf()
+////                }
+////
+////                listOfFingerprints.add(it)
+//            }
     }
 
     constructor (realmPerson: rl_Person) : this (

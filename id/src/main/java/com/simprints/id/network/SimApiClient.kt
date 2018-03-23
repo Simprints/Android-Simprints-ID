@@ -38,7 +38,7 @@ open class SimApiClient<T>(val service: Class<T>,
     private val authenticator = Interceptor { chain ->
         val newRequest = chain.request().newBuilder()
         if (!authToken.isNullOrBlank()) {
-            newRequest.addHeader("Authorization", "Bearer " + authToken)
+            // newRequest.addHeader("Authorization", "Bearer " + authToken) // TODO: uncomment once implemented
         }
         chain.proceed(newRequest.build())
     }
