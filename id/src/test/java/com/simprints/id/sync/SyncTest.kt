@@ -37,8 +37,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import org.mockito.MockitoAnnotations
-import org.mockito.Spy
+import org.mockito.Mockito.spy
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.*
@@ -51,15 +50,13 @@ class SyncTest : RxJavaTest() {
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<SyncApiInterface>
 
-    @Spy
-    private var remoteDbManager: RemoteDbManager = FirebaseManager(mock(Context::class.java),
+    private var remoteDbManager: RemoteDbManager = spy(FirebaseManager(mock(Context::class.java),
         mock(FirebaseConnectionListenerManager::class.java),
         mock(RemoteDbAuthListenerManager::class.java),
-        mock(FirebaseOptionsHelper::class.java))
+        mock(FirebaseOptionsHelper::class.java)))
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
         whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just(""))
 
         mockServer.start()

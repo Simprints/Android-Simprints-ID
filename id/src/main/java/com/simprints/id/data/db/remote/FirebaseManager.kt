@@ -6,17 +6,11 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
-import com.simprints.id.data.db.DATA_ERROR
-import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.LocalDbKey
-import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
@@ -24,7 +18,6 @@ import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.data.db.remote.tools.Utils.wrapCallback
 import com.simprints.id.data.db.sync.SyncApiInterface
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
@@ -35,7 +28,6 @@ import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
 import com.simprints.id.tools.JsonHelper
-import com.simprints.id.tools.extensions.deviceId
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -150,6 +142,7 @@ class FirebaseManager(private val appContext: Context,
     }
 
     // Data transfer
+    // Firebase
     override fun getLocalDbKeyFromRemote(projectId: String): Single<LocalDbKey> =
         Single.create<LocalDbKey> { result ->
             val db = FirebaseFirestore.getInstance(firestoreFirebaseApp)
@@ -168,48 +161,6 @@ class FirebaseManager(private val appContext: Context,
         } else {
             result.onError(CouldNotRetrieveLocalDbKeyError.withException(task.exception))
         }
-    }
-
-    override fun savePersonInRemote(fbPerson: fb_Person): Completable {
-        // TODO : Implement sending the person to our own custom end point
-        val projectId = fbPerson.projectId
-        val updates = mutableMapOf<String, Any>(patientNode(fbPerson.patientId) to fbPerson.toMap())
-
-        userRef(legacyFirebaseApp, projectId, fbPerson.userId).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val user = dataSnapshot.getValue(fb_User::class.java)
-                if (user == null) {
-                    updates[userNode(fbPerson.userId)] = fb_User(fbPerson.userId, appContext.deviceId, fbPerson.patientId)
-                } else {
-                    updates[userPatientListNode(fbPerson.userId, fbPerson.patientId)] = true
-                }
-                projectRef(legacyFirebaseApp, projectId).updateChildren(updates)
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {}
-        })
-        return Completable.complete()
-    }
-
-    override fun loadPersonFromRemote(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
-        val wrappedCallback = wrapCallback("FirebaseManager.loadPerson()", callback)
-
-        projectRef(legacyFirebaseApp, projectId).child(patientNode(guid)).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val fbPerson = dataSnapshot.getValue(fb_Person::class.java)
-
-                if (fbPerson == null) {
-                    wrappedCallback.onFailure(DATA_ERROR.NOT_FOUND)
-                } else {
-                    destinationList.add(rl_Person(fbPerson).libPerson)
-                    wrappedCallback.onSuccess()
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                wrappedCallback.onFailure(DATA_ERROR.NOT_FOUND)
-            }
-        })
     }
 
     override fun saveIdentificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
@@ -253,22 +204,18 @@ class FirebaseManager(private val appContext: Context,
             .addOnFailureListener { e -> it.onError(e) }
     }
 
-    private fun getApiClient(authToken: String): SyncApiInterface =
-        SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl, authToken).api
+    // API
 
-    override fun getSyncApi(): Single<SyncApiInterface> =
-        getCurrentFirestoreToken()
-            .flatMap {
-                Single.just(getApiClient(it))
-            }
+   override fun uploadPerson(fbPerson: fb_Person): Completable =
+        uploadPeople(arrayListOf(fbPerson))
 
-    override fun uploadPeopleBatch(patientsToUpload: ArrayList<fb_Person>): Completable =
+    override fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable =
         getSyncApi().flatMapCompletable {
             it.upSync(JsonHelper.gson.toJson(mapOf("patients" to patientsToUpload)))
                 .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
         }
 
-    override fun downloadPatient(patientId: String): Single<fb_Person> =
+    override fun downloadPerson(patientId: String): Single<fb_Person> =
         getSyncApi().flatMap {
             it.getPatient(patientId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
         }
@@ -280,12 +227,21 @@ class FirebaseManager(private val appContext: Context,
                 .map { it.patientsCount }
         }
 
+    override fun getSyncApi(): Single<SyncApiInterface> =
+        getCurrentFirestoreToken()
+            .flatMap {
+                Single.just(getApiClient(it))
+            }
+
+    private fun getApiClient(authToken: String): SyncApiInterface =
+        SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl, authToken).api
+
     companion object {
         private const val COLLECTION_LOCAL_DB_KEYS = "localDbKeys"
         private const val PROJECT_ID_FIELD = "projectId"
-        private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
-
         private const val LOCAL_DB_KEY_VALUE_NAME = "value"
+
+        private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
 
         fun getLegacyAppName(): String =
             FirebaseApp.DEFAULT_APP_NAME
