@@ -70,7 +70,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     private fun uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
         remoteDbManager
-            .uploadPeople(arrayListOf(fbPerson))
+            .uploadPerson(fbPerson)
             .andThen(remoteDbManager.downloadPerson(fbPerson.patientId))
 
     private fun Single<out fb_Person>.updatePersonInLocal(): Completable =

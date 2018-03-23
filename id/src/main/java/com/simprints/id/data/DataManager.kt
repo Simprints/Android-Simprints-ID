@@ -12,6 +12,7 @@ import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
+import io.reactivex.Completable
 
 interface DataManager : PreferencesManager, DbManager,
         AnalyticsManager, SecureDataManager {
@@ -36,7 +37,7 @@ interface DataManager : PreferencesManager, DbManager,
     override fun signOut()
 
     // Data transfer
-    fun savePerson(person: Person)
+    fun savePerson(person: Person): Completable
     fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
     fun getPeopleCount(group: Constants.GROUP): Int
 
