@@ -1,6 +1,7 @@
 package com.simprints.id.tools
 
 import com.google.gson.*
+import com.simprints.libsimprints.FingerIdentifier
 import java.util.*
 
 class JsonHelper {
@@ -12,6 +13,11 @@ class JsonHelper {
             builder.registerTypeAdapter(Date::class.java, JsonSerializer<Date> { src, _, _ ->
                 if (src == null) null else JsonPrimitive(src.time)
             })
+
+            builder.registerTypeAdapter(FingerIdentifier::class.java, JsonSerializer<FingerIdentifier> { src, _, _ ->
+                if (src == null) null else JsonPrimitive(src.name)
+            })
+
             builder.create()
         }
 
