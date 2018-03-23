@@ -50,7 +50,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
      private fun Observable<out MutableList<fb_Person>>.uploadEachBatch(): Observable<Int> =
         flatMap { batch ->
             remoteDbManager
-                .uploadPeopleBatch(ArrayList(batch))
+                .uploadPeople(ArrayList(batch))
                 .andThen(Observable.just(batch.size))
         }
 

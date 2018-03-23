@@ -1,8 +1,12 @@
 package com.simprints.id.data.db
 
+import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.authListener.FirebaseAuthListenerManager
+import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.SyncApiInterface
 import com.simprints.id.network.SimApiClient
@@ -22,6 +26,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
@@ -39,18 +44,12 @@ class DbManagerTest : RxJavaTest() {
 
     @Test
     fun savingPerson_shouldSaveThenUpdatePersonLocally() {
-        SyncApiInterface.baseUrl = this.mockServer.url("/").toString()
-        val mockLocalDbManager = spy(LocalDbManager::class.java)
-        val mockRemoteDbManager = mock(RemoteDbManager::class.java)
-        whenever(mockLocalDbManager.savePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
-        whenever(mockRemoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))
-        whenever(mockLocalDbManager.updatePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
+        val (dbManager, localDbManager, _) = getDbManagerWithMockedLocalAndRemoteManagersForApiTesting()
         val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson())
 
         mockServer.enqueue(mockResponseForUploadPatient())
         mockServer.enqueue(mockResponseForDownloadPatient(fakePerson))
 
-        val dbManager = DbManagerImpl(mockLocalDbManager, mockRemoteDbManager)
         val testObservable = dbManager.savePerson(fakePerson).test()
 
         testObservable.awaitTerminalEvent()
@@ -58,38 +57,51 @@ class DbManagerTest : RxJavaTest() {
             .assertNoErrors()
             .assertComplete()
 
-        verify(mockLocalDbManager, times(1)).savePersonInLocal(anyNotNull())
-        verify(mockLocalDbManager, times(1)).updatePersonInLocal(anyNotNull())
+        verify(localDbManager, times(1)).savePersonInLocal(anyNotNull())
+        verify(localDbManager, times(1)).updatePersonInLocal(anyNotNull())
     }
 
     @Test
     fun savingPerson_serverProblemStillSavesPerson() {
-        SyncApiInterface.baseUrl = this.mockServer.url("/").toString()
-        val mockLocalDbManager = spy(LocalDbManager::class.java)
-        val mockRemoteDbManager = mock(RemoteDbManager::class.java)
-        whenever(mockLocalDbManager.savePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
-        whenever(mockRemoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))
+        val (dbManager, localDbManager, _) = getDbManagerWithMockedLocalAndRemoteManagersForApiTesting()
         val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson())
 
         for (i in 0..20) mockServer.enqueue(mockFailingResponse())
 
-        val dbManager = DbManagerImpl(mockLocalDbManager, mockRemoteDbManager)
         val testObservable = dbManager.savePerson(fakePerson).test()
 
         testObservable.awaitTerminalEvent()
         testObservable.assertError(Throwable::class.java)
 
-        verify(mockLocalDbManager, times(1)).savePersonInLocal(anyNotNull())
-        verify(mockLocalDbManager, times(0)).updatePersonInLocal(anyNotNull())
+        verify(localDbManager, times(1)).savePersonInLocal(anyNotNull())
+        verify(localDbManager, times(0)).updatePersonInLocal(anyNotNull())
     }
 
-    private fun mockFailingResponse(): MockResponse? =
+    private fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(): Triple<DbManager, LocalDbManager, RemoteDbManager> {
+        SyncApiInterface.baseUrl = this.mockServer.url("/").toString()
+        val localDbManager = spy(LocalDbManager::class.java)
+        val mockConnectionListenerManager = mock(FirebaseConnectionListenerManager::class.java)
+        val mockAuthListenerManager = mock(FirebaseAuthListenerManager::class.java)
+        whenever(localDbManager.savePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
+        whenever(localDbManager.updatePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
+
+        val remoteDbManager = spy(FirebaseManager(
+            (RuntimeEnvironment.application as Application),
+            mockConnectionListenerManager,
+            mockAuthListenerManager))
+        whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))
+
+        val dbManager = DbManagerImpl(localDbManager, remoteDbManager)
+        return Triple(dbManager, localDbManager, remoteDbManager)
+    }
+
+    private fun mockFailingResponse(): MockResponse =
         MockResponse().setResponseCode(500)
 
-    private fun mockResponseForUploadPatient(): MockResponse? =
+    private fun mockResponseForUploadPatient(): MockResponse =
         MockResponse().setResponseCode(200)
 
-    private fun mockResponseForDownloadPatient(patient: fb_Person): MockResponse? {
+    private fun mockResponseForDownloadPatient(patient: fb_Person): MockResponse {
         val fbPersonJson = JsonHelper.gson.toJson(patient)
 
         return MockResponse().let {
