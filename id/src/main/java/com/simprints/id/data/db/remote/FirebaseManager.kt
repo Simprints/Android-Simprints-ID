@@ -31,7 +31,6 @@ import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.session.Session
-import com.simprints.id.tools.extensions.deviceId
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -167,23 +166,6 @@ class FirebaseManager(private val appContext: Context,
     }
 
     override fun savePersonInRemote(fbPerson: fb_Person): Completable {
-        // TODO : Implement sending the person to our own custom end point
-        val projectId = fbPerson.projectId
-        val updates = mutableMapOf<String, Any>(patientNode(fbPerson.patientId) to fbPerson.toMap())
-
-        userRef(legacyFirebaseApp, projectId, fbPerson.userId).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val user = dataSnapshot.getValue(fb_User::class.java)
-                if (user == null) {
-                    updates[userNode(fbPerson.userId)] = fb_User(fbPerson.userId, appContext.deviceId, fbPerson.patientId)
-                } else {
-                    updates[userPatientListNode(fbPerson.userId, fbPerson.patientId)] = true
-                }
-                projectRef(legacyFirebaseApp, projectId).updateChildren(updates)
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {}
-        })
         return Completable.complete()
     }
 

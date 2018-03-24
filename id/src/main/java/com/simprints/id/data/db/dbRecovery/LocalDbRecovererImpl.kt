@@ -4,13 +4,14 @@ import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.db.local.RealmDbManager
-import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.DATA_ERROR
 import com.simprints.id.data.db.DataCallback
+import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.domain.Constants
+import com.simprints.id.tools.json.JsonHelper
 import io.realm.RealmChangeListener
 import io.realm.RealmResults
 import org.json.JSONException
@@ -82,19 +83,8 @@ class LocalDbRecovererImpl(realmManager: RealmDbManager,
     }
 
     private fun writeAllPeopleToOutputStream(results: RealmResults<rl_Person>) {
-        realmDbOutputStream.write("{")
-        results.mapIndexed { count, person -> convertPersonToJsonString(person, count) }
-            .forEach { realmDbOutputStream.write(it) }
-        realmDbOutputStream.write("}")
+        realmDbOutputStream.write(JsonHelper.toJson(ArrayList(results)))
         closeRealmAndOutputStream()
-    }
-
-    private fun convertPersonToJsonString(person: rl_Person, count: Int): String {
-        // We need commas before all entries except the first
-        val commaString = if (count == 0) "" else ","
-        val patientId = person.jsonPerson.get("patientId").toString()
-        val patientValue = person.jsonPerson.toString()
-        return "$commaString\"$patientId\":$patientValue"
     }
 
     private fun PipedOutputStream.write(string: String) =

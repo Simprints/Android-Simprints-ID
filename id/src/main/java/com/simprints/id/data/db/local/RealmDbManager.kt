@@ -53,7 +53,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
     // Data transfer
     override fun savePersonInLocal(fbPerson: fb_Person): Completable {
         val realm = getRealmInstance()
-        rl_Person(fbPerson).save(realm)
+        savePersonInLocal(fbPerson)
         realm.close()
         return Completable.complete()
     }
@@ -68,7 +68,11 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
             while (reader.hasNext()) {
                 val person = gson.fromJson<fb_Person>(reader, fb_Person::class.java)
                 r.insertOrUpdate(rl_Person(person))
-                r.insertOrUpdate(RealmSyncInfo(groupSync.ordinal, person.updatedAt))
+
+                val lastUpdatedTime = person.updatedAt
+                if (lastUpdatedTime != null) {
+                    r.insertOrUpdate(RealmSyncInfo(groupSync.ordinal, lastUpdatedTime))
+                }
                 if (shouldStop()) {
                     break
                 }
