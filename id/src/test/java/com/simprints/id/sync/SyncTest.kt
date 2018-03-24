@@ -15,7 +15,7 @@ import com.simprints.id.services.progress.UploadProgress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.whenever
-import com.simprints.id.tools.JsonHelper
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.base.RxJavaTest
 import com.simprints.id.tools.retrofit.createMockBehaviorService
 import com.simprints.id.tools.roboletric.TestApplication
