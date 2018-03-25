@@ -14,7 +14,7 @@ import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.id.tools.JsonHelper
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -62,7 +62,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     // Data transfer
     override fun savePerson(fbPerson: fb_Person): Completable =
-        localDbManager.savePersonInLocal(fbPerson)
+        localDbManager.insertOrUpdatePersonInLocal(fbPerson)
             .andThen(uploadPersonAndDownloadAgain(fbPerson))
             .updatePersonInLocal()
             .subscribeOn(Schedulers.io())
@@ -71,11 +71,11 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     private fun uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
         remoteDbManager
             .uploadPerson(fbPerson)
-            .andThen(remoteDbManager.downloadPerson(fbPerson.patientId))
+            .andThen(remoteDbManager.downloadPerson(fbPerson.patientId, fbPerson.projectId))
 
     private fun Single<out fb_Person>.updatePersonInLocal(): Completable =
         flatMapCompletable {
-            localDbManager.updatePersonInLocal(it)
+            localDbManager.insertOrUpdatePersonInLocal(it)
         }
 
     override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {

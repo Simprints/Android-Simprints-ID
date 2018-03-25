@@ -1,6 +1,6 @@
 package com.simprints.id.network
 
-import com.simprints.id.tools.JsonHelper
+import com.simprints.id.tools.json.JsonHelper
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -27,7 +27,7 @@ open class SimApiClient<T>(val service: Class<T>,
 
     val okHttpClientConfig: OkHttpClient.Builder by lazy {
         val logger = HttpLoggingInterceptor()
-        logger.level = HttpLoggingInterceptor.Level.HEADERS
+        logger.level = HttpLoggingInterceptor.Level.BODY
         OkHttpClient.Builder()
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
@@ -38,7 +38,7 @@ open class SimApiClient<T>(val service: Class<T>,
     private val authenticator = Interceptor { chain ->
         val newRequest = chain.request().newBuilder()
         if (!authToken.isNullOrBlank()) {
-            // newRequest.addHeader("Authorization", "Bearer " + authToken) // TODO: uncomment once implemented
+            newRequest.addHeader("Authorization", "Bearer " + authToken)
         }
         chain.proceed(newRequest.build())
     }

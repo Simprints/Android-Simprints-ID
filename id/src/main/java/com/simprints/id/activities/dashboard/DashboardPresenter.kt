@@ -4,7 +4,6 @@ import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import com.simprints.id.R
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.sync.NaiveSyncManager
 import com.simprints.id.domain.Constants.GROUP
 import com.simprints.id.services.progress.Progress
@@ -32,16 +31,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
         }
     })
 
-
     override fun start() {
         if (!started) {
             started = true
-
-            //FIXME: remove it!
-            val realm = dataManager.getRealmInstance()
-            realm.executeTransaction {
-                it.where(rl_Person::class.java).findAll().deleteAllFromRealm()
-            }
         }
     }
 

@@ -5,7 +5,7 @@ import com.google.gson.reflect.TypeToken
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.tools.JsonHelper
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.extensions.handleResponse
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers

@@ -25,13 +25,14 @@ interface SyncApiInterface {
         @Query("api_key") key: String = SyncApiInterface.apiKey): Single<ResponseBody>
 
     @POST("/patients")
-    fun upSync(@Body patientsJson: String,
-               @Query("api_key") key: String = SyncApiInterface.apiKey): Completable
+    fun upSync(@Body patientsJson: HashMap<String, ArrayList<fb_Person>>,
+               @Query("api_key") key: String = apiKey): Completable
 
     @GET("/patients")
     fun getPatient(
         @Query("patientId") patientId: String,
-        @Query("api_key") key: String = SyncApiInterface.apiKey): Single<fb_Person>
+        @Query("projectId") projectId: String,
+        @Query("api_key") key: String = SyncApiInterface.apiKey): Single<ArrayList<fb_Person>>
 
     @GET("/patient-counts")
     fun patientsCount(

@@ -49,7 +49,7 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
     // API
     fun uploadPerson(fbPerson: fb_Person): Completable
     fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable
-    fun downloadPerson(patientId: String): Single<fb_Person>
+    fun downloadPerson(patientId: String, projectId: String): Single<fb_Person>
 
     fun getSyncApi(): Single<SyncApiInterface>
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
