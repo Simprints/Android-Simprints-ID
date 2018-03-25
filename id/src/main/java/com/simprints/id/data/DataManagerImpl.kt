@@ -102,7 +102,7 @@ class DataManagerImpl(private val context: Context,
 
     // Data transfer
     override fun savePerson(person: Person): Completable =
-        dbManager.savePerson(fb_Person(person, projectId, userId, moduleId))
+        dbManager.savePerson(fb_Person(person, getSignedInProjectIdOrEmpty(), userId, moduleId))
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
         dbManager.loadPeople(destinationList, group, userId, moduleId, callback)
@@ -116,7 +116,7 @@ class DataManagerImpl(private val context: Context,
         }
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
-        dbManager.saveIdentification(probe, projectId, userId, deviceId, moduleId, matchSize, matches, sessionId)
+        dbManager.saveIdentification(probe, getSignedInProjectIdOrEmpty(), userId, deviceId, moduleId, matchSize, matches, sessionId)
     }
 
     override fun updateIdentification(projectId: String, selectedGuid: String) {
@@ -124,11 +124,11 @@ class DataManagerImpl(private val context: Context,
     }
 
     override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
-        dbManager.saveVerification(probe, projectId, userId, deviceId, moduleId, patientId, match, sessionId, guidExistsResult)
+        dbManager.saveVerification(probe, getSignedInProjectIdOrEmpty(), userId, deviceId, moduleId, patientId, match, sessionId, guidExistsResult)
     }
 
     override fun saveRefusalForm(refusalForm: RefusalForm) {
-        dbManager.saveRefusalForm(refusalForm, projectId, userId, sessionId)
+        dbManager.saveRefusalForm(refusalForm, getSignedInProjectIdOrEmpty(), userId, sessionId)
     }
 
     override fun saveSession() {

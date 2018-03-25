@@ -27,7 +27,6 @@ import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.id.tools.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -211,13 +210,14 @@ class FirebaseManager(private val appContext: Context,
 
     override fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable =
         getSyncApi().flatMapCompletable {
-            it.upSync(JsonHelper.gson.toJson(mapOf("patients" to patientsToUpload)))
+            it.upSync(hashMapOf("patients" to patientsToUpload))
                 .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
         }
 
-    override fun downloadPerson(patientId: String): Single<fb_Person> =
+    override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getSyncApi().flatMap {
-            it.getPatient(patientId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+            it.getPatient(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+                .map { it.first() }
         }
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =

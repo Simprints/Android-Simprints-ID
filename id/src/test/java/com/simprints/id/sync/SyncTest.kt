@@ -23,7 +23,7 @@ import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.whenever
-import com.simprints.id.tools.JsonHelper
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
