@@ -14,6 +14,7 @@ import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Emitter
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import timber.log.Timber
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
@@ -31,6 +32,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
     }
 
     fun sync(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
+        Timber.d("Sync Started")
         return Observable.concat(
             uploadNewPatients(isInterrupted),
             downloadNewPatients(isInterrupted, syncParams))
@@ -42,6 +44,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
         val patientsToUpload = getPeopleToSync()
         val counter = AtomicInteger(0)
 
+        Timber.d("Uploading ${patientsToUpload.size} persons")
         return batchPatientsArray(patientsToUpload, isInterrupted, batchSize)
             .uploadEachBatch()
             .updateUploadCounterAndConvertItToProgress(counter, patientsToUpload.size)
@@ -56,6 +59,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
 
     private fun Observable<out Int>.updateUploadCounterAndConvertItToProgress(counter: AtomicInteger, maxValueForProgress: Int): Observable<Progress> =
         map {
+            Timber.d("Uploading batch - ${counter.get() + 1} / $maxValueForProgress")
             UploadProgress(counter.addAndGet(it), maxValueForProgress)
         }
 
@@ -74,15 +78,21 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
     }
 
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
-        return remoteDbManager.getNumberOfPatientsForSyncParams(syncParams).flatMapObservable { nPatientsForDownSyncQuery ->
+        Timber.d("Downloading - reading from db")
 
+        return remoteDbManager.getNumberOfPatientsForSyncParams(syncParams).flatMapObservable { nPatientsForDownSyncQuery ->
             val nPatientsToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery, syncParams)
-            val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup())
+
+            Timber.d("Downloading - Persons to be downloaded $nPatientsToDownload.")
 
             remoteDbManager.getSyncApi().flatMapObservable {
+                Timber.d("Downloading - Making request")
+                val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup())
+                Timber.d("Downloading - Last sync was at ${realmSyncInfo?.lastSyncTime?.time ?: Date(0).time}")
+
                 it.downSync(
                     realmSyncInfo?.lastSyncTime?.time ?: Date(0).time,
-                    mapOf("projectId" to syncParams.projectId)/* syncParams.toMap()*/)
+                    syncParams.toMap())
                     .flatMapObservable {
                         downloadNewPatientsFromStream(
                             isInterrupted,
@@ -112,6 +122,8 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
                                                      input: InputStream): Observable<Int> =
 
         Observable.create<Int> {
+            Timber.d("Downloading - Reading from stream")
+
             val reader = JsonReader(InputStreamReader(input) as Reader?)
 
             try {
