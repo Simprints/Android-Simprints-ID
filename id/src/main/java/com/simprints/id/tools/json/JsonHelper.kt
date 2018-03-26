@@ -27,7 +27,8 @@ class JsonHelper {
 
             val exclusionStrategy = object : ExclusionStrategy {
                 override fun shouldSkipField(fieldAttributes: FieldAttributes): Boolean {
-                    return fieldAttributes.getAnnotation(SkipSerialisation::class.java) != null
+                    return fieldAttributes.getAnnotation(SkipSerialisationProperty::class.java) != null ||
+                        fieldAttributes.getAnnotation(SkipSerialisationField::class.java) != null
                 }
 
                 override fun shouldSkipClass(clazz: Class<*>): Boolean {

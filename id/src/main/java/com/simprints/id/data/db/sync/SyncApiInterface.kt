@@ -11,9 +11,8 @@ import retrofit2.http.*
 interface SyncApiInterface {
 
     companion object {
-        private const val apiVersion = "2018-1-0-dev3"
+        private const val apiVersion = "2018-1-0-dev4"
         var baseUrl = "https://$apiVersion-dot-sync-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
-        private const val apiKey: String = "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s"
     }
 
     @GET("/patients")
@@ -21,21 +20,17 @@ interface SyncApiInterface {
     fun downSync(
         @Query("lastSync") date: Long, //Date in ms
         @QueryMap(encoded = true) syncParams: Map<String, String>, //projectId, userId, moduleId
-        @Query("batchSize") batchSize: Int = 5000,
-        @Query("api_key") key: String = SyncApiInterface.apiKey): Single<ResponseBody>
+        @Query("batchSize") batchSize: Int = 5000): Single<ResponseBody>
 
     @POST("/patients")
-    fun upSync(@Body patientsJson: HashMap<String, ArrayList<fb_Person>>,
-               @Query("api_key") key: String = apiKey): Completable
+    fun upSync(@Body patientsJson: HashMap<String, ArrayList<fb_Person>>): Completable
 
     @GET("/patients")
     fun getPatient(
         @Query("patientId") patientId: String,
-        @Query("projectId") projectId: String,
-        @Query("api_key") key: String = SyncApiInterface.apiKey): Single<ArrayList<fb_Person>>
+        @Query("projectId") projectId: String): Single<ArrayList<fb_Person>>
 
     @GET("/patient-counts")
     fun patientsCount(
-        @QueryMap(encoded = true) syncParams: Map<String, String>,
-        @Query("api_key") key: String = SyncApiInterface.apiKey): Single<PatientsCount>
+        @QueryMap(encoded = true) syncParams: Map<String, String>): Single<PatientsCount>
 }

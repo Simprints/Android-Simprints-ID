@@ -3,7 +3,7 @@ package com.simprints.id.data.db.remote.models
 import com.google.firebase.firestore.ServerTimestamp
 import com.google.gson.annotations.SerializedName
 import com.simprints.id.data.db.local.models.rl_Person
-import com.simprints.id.tools.json.SkipSerialisation
+import com.simprints.id.tools.json.SkipSerialisationProperty
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.FingerIdentifier
 import java.util.*
@@ -16,7 +16,7 @@ data class fb_Person(@SerializedName("id") var patientId: String = "",
                      var moduleId: String = "",
                      @ServerTimestamp var createdAt: Date? = null,
                      @ServerTimestamp var updatedAt: Date? = null,
-                     private var fingerprints: HashMap<FingerIdentifier, ArrayList<fb_Fingerprint>> = hashMapOf()) {
+                     var fingerprints: HashMap<FingerIdentifier, ArrayList<fb_Fingerprint>> = hashMapOf()) {
 
     constructor (person: Person,
                  projectId: String,
@@ -49,6 +49,7 @@ data class fb_Person(@SerializedName("id") var patientId: String = "",
                 .mapValues { ArrayList(it.value) })
     }
 
-    @SkipSerialisation
-    val fingerprintsAsList = ArrayList(fingerprints.flatMap { t -> t.value })
+    @SkipSerialisationProperty
+    val fingerprintsAsList
+        get() = ArrayList(fingerprints.flatMap { t -> t.value })
 }

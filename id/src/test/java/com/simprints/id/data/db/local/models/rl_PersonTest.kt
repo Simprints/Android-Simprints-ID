@@ -1,14 +1,21 @@
 package com.simprints.id.data.db.local.models
 
+import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.FingerIdentifier
 import junit.framework.Assert
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import java.util.*
 
+@RunWith(RobolectricTestRunner::class)
+@Config(constants = BuildConfig::class, application = TestApplication::class)
 class rl_PersonTest {
 
     @Test
@@ -44,7 +51,7 @@ class rl_PersonTest {
 
         val rlPerson = rl_Person(fb_Person)
 
-        Assert.assertEquals(rlPerson.patientId, "guid")
+        Assert.assertEquals(rlPerson.patientId, "giud")
         Assert.assertEquals(rlPerson.userId, "userId")
         Assert.assertNull(rlPerson.createdAt)
         Assert.assertNull(rlPerson.updatedAt)
@@ -67,7 +74,7 @@ class rl_PersonTest {
 
         val rlPerson = rl_Person(fb_Person)
 
-        Assert.assertEquals(rlPerson.patientId, "guid")
+        Assert.assertEquals(rlPerson.patientId, "giud")
         Assert.assertEquals(rlPerson.userId, "userId")
         Assert.assertEquals(rlPerson.createdAt, Date(1))
         Assert.assertEquals(rlPerson.updatedAt, Date(0))
