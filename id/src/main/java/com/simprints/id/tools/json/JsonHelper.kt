@@ -6,7 +6,7 @@ import java.util.*
 
 class JsonHelper {
     companion object {
-        val gson by lazy {
+        val gson: Gson by lazy {
 
             val builder = GsonBuilder()
             builder.registerTypeAdapter(Date::class.java, JsonDeserializer<Date> { json, _, _ ->

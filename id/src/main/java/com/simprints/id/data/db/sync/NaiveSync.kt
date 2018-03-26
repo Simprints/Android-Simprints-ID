@@ -70,7 +70,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
     }
 
     private fun getPeopleToSync(): ArrayList<rl_Person> {
-        return localDbManager.getPeopleFromLocal(toSync = true)
+        return localDbManager.loadPersonsFromLocal(toSync = true)
     }
 
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
@@ -98,7 +98,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
 
     private fun calculateNPatientsToDownload(nPatientsForDownSyncQuery: Int, syncParams: SyncTaskParameters): Int {
 
-        val nPatientsForDownSyncParamsInRealm = localDbManager.getPeopleCountFromLocal(
+        val nPatientsForDownSyncParamsInRealm = localDbManager.getPersonsCountFromLocal(
             projectId = syncParams.projectId,
             userId = syncParams.userId,
             moduleId = syncParams.moduleId,
