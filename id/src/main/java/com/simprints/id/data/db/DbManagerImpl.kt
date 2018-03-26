@@ -64,7 +64,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     // Data transfer
     override fun savePerson(fbPerson: fb_Person): Completable =
-        localDbManager.insertOrUpdatePersonInLocal(fbPerson)
+        localDbManager.insertOrUpdatePersonInLocal(rl_Person(fbPerson))
             .andThen(uploadPersonAndDownloadAgain(fbPerson))
             .updatePersonInLocal()
             .subscribeOn(Schedulers.io())
@@ -77,7 +77,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     private fun Single<out fb_Person>.updatePersonInLocal(): Completable =
         flatMapCompletable {
-            localDbManager.insertOrUpdatePersonInLocal(it)
+            localDbManager.insertOrUpdatePersonInLocal(rl_Person(it))
         }
 
     override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
