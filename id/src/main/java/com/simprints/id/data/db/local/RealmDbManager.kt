@@ -111,7 +111,7 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
 
         val realm = getRealmInstance()
         val query = buildQueryForPerson(realm, patientId, projectId, userId, moduleId, toSync)
-        return ArrayList(query.findAll()).also { realm.close() }
+        return ArrayList(realm.copyFromRealm(query.findAll(), 4)).also { realm.close() }
     }
 
     private fun buildQueryForPerson(realm: Realm,

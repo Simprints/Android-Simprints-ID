@@ -138,9 +138,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
             remoteDbManager,
             JsonHelper.gson).sync(interrupted, parameters)
 
-    override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
+    override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP): Completable {
         val firebaseManager = remoteDbManager as FirebaseManager
         val realmManager = localDbManager as RealmDbManager
-        LocalDbRecovererImpl(realmManager, firebaseManager, projectId, userId, androidId, moduleId, group, callback).recoverDb()
+        return LocalDbRecovererImpl(realmManager, firebaseManager, projectId, userId, androidId, moduleId, group).recoverDb()
     }
 }
