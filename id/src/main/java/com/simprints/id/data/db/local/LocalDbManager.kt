@@ -3,7 +3,6 @@ package com.simprints.id.data.db.local
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.models.rl_Person
-import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Completable
@@ -18,7 +17,7 @@ interface LocalDbManager {
     fun isLocalDbInitialized(projectId: String): Boolean
 
     // Data transfer
-    fun insertOrUpdatePersonInLocal(fbPerson: fb_Person): Completable
+    fun insertOrUpdatePersonInLocal(person: rl_Person): Completable
     fun savePeopleFromStream(reader: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: () -> Boolean)
 
     fun getPersonsCountFromLocal(patientId: String? = null,

@@ -50,10 +50,10 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
     override fun isLocalDbInitialized(projectId: String): Boolean =
         realmConfig != null
 
-    override fun insertOrUpdatePersonInLocal(fbPerson: fb_Person): Completable {
+    override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable {
         val realm = getRealmInstance()
         realm.executeTransaction {
-            it.insertOrUpdate(rl_Person(fbPerson))
+            it.insertOrUpdate(person)
         }
         realm.close()
         return Completable.complete()
