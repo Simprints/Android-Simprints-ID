@@ -68,7 +68,7 @@ class SyncTest : RxJavaTest() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
 
         val patientsToUpload = getRandomPeople(35)
-        whenever(localDbManager.getPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
+        whenever(localDbManager.loadPersonsFromLocal(toSync = true)).thenReturn(patientsToUpload)
         val poorNetworkClientMock: SyncApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
@@ -94,7 +94,7 @@ class SyncTest : RxJavaTest() {
     fun uploadPeopleGetInterrupted_shouldStopUploading() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
         val patientsToUpload = getRandomPeople(35)
-        whenever(localDbManager.getPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
+        whenever(localDbManager.loadPersonsFromLocal(toSync = true)).thenReturn(patientsToUpload)
         val poorNetworkClientMock: SyncApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
@@ -256,8 +256,8 @@ class SyncTest : RxJavaTest() {
         mockLocalDbToSavePatientsFromStream(localDbMock)
 
         //Mock app has already patients in localDb
-        whenever(localDbMock.getPeopleFromLocal(any(), any(), any(), any(), any())).thenReturn(getRandomPeople(patientsAlreadyInLocalDb))
-        whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any(), any())).thenReturn(patientsAlreadyInLocalDb)
+        whenever(localDbMock.loadPersonsFromLocal(any(), any(), any(), any(), any())).thenReturn(getRandomPeople(patientsAlreadyInLocalDb))
+        whenever(localDbMock.getPersonsCountFromLocal(any(), any(), any(), any(), any())).thenReturn(patientsAlreadyInLocalDb)
 
         //Mock app RealmSyncInfo for syncParams
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup().ordinal, lastSyncTime))

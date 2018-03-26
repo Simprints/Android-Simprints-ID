@@ -36,7 +36,7 @@ import java.util.Locale;
 import static android.app.Activity.RESULT_OK;
 import static com.simprints.id.tools.TierHelper.computeTier;
 
-class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListener {
+public class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListener {
 
     @NonNull
     private final MatchingContract.View matchingView;
@@ -53,7 +53,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
     @NonNull
     private TimeHelper timeHelper;
 
-    MatchingPresenter(@NonNull MatchingContract.View matchingView,
+    public MatchingPresenter(@NonNull MatchingContract.View matchingView,
                       @NonNull DataManager dataManager,
                       @NonNull TimeHelper timeHelper,
                       Person probe) {
@@ -119,7 +119,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
         }
     }
 
-    private DataCallback newOnLoadPeopleCallback() {
+    public DataCallback newOnLoadPeopleCallback() {
         return new DataCallback() {
             @Override
             public void onSuccess() {

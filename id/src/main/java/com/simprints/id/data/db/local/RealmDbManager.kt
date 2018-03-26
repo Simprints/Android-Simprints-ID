@@ -3,16 +3,16 @@ package com.simprints.id.data.db.local
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
-import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.tools.Utils.wrapCallback
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.libcommon.Person
 import io.reactivex.Completable
-import io.realm.*
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import io.realm.RealmQuery
+import io.realm.Sort
 import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
@@ -93,52 +93,21 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         realm.close()
     }
 
-    override fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback) {
-        val wrappedCallback = wrapCallback("RealmDbManager.loadPerson()", callback)
-
-        val realm = getRealmInstance()
-        val rlPerson = realm.where(rl_Person::class.java).equalTo(PATIENT_ID_FIELD, guid).findFirst()
-        if (rlPerson != null) {
-            destinationList.add(rlPerson.libPerson)
-            wrappedCallback.onSuccess()
-        }
-        realm.close()
-    }
-
-    override fun loadPeopleFromLocal(destinationList: MutableList<Person>,
-                                     group: Constants.GROUP, userId: String, moduleId: String,
-                                     callback: DataCallback?) {
-        val wrappedCallback = wrapCallback("RealmDbManager.loadPeopleFromLocal()", callback)
-
-        val realm = getRealmInstance()
-        val request: RealmResults<rl_Person> = when (group) {
-            Constants.GROUP.GLOBAL -> realm.where(rl_Person::class.java).findAllAsync()
-            Constants.GROUP.USER -> realm.where(rl_Person::class.java).equalTo(USER_ID_FIELD, userId).findAllAsync()
-            Constants.GROUP.MODULE -> realm.where(rl_Person::class.java).equalTo(MODULE_ID_FIELD, moduleId).findAllAsync()
-        }
-        request.addChangeListener({ results: RealmResults<rl_Person> ->
-            request.removeAllChangeListeners()
-            results.mapTo(destinationList) { it.libPerson }
-            realm.close()
-            wrappedCallback.onSuccess()
-        })
-    }
-
-    override fun getPeopleCountFromLocal(patientId: String?,
-                                         projectId: String?,
-                                         userId: String?,
-                                         moduleId: String?,
-                                         toSync: Boolean?): Int {
+    override fun getPersonsCountFromLocal(patientId: String?,
+                                          projectId: String?,
+                                          userId: String?,
+                                          moduleId: String?,
+                                          toSync: Boolean?): Int {
         val realm = getRealmInstance()
         val query = buildQueryForPerson(realm, patientId, projectId, userId, moduleId, toSync)
         return query.count().toInt().also { realm.close() }
     }
 
-    override fun getPeopleFromLocal(patientId: String?,
-                                    projectId: String?,
-                                    userId: String?,
-                                    moduleId: String?,
-                                    toSync: Boolean?): ArrayList<rl_Person> {
+    override fun loadPersonsFromLocal(patientId: String?,
+                                      projectId: String?,
+                                      userId: String?,
+                                      moduleId: String?,
+                                      toSync: Boolean?): ArrayList<rl_Person> {
 
         val realm = getRealmInstance()
         val query = buildQueryForPerson(realm, patientId, projectId, userId, moduleId, toSync)
@@ -163,8 +132,8 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
 
     override fun getRealmInstance(): Realm {
         realmConfig?.let {
-            return Realm.getInstance(it) ?: throw RealmUninitialisedError()
-        } ?: throw RealmUninitialisedError()
+            return Realm.getInstance(it) ?: throw RealmUninitialisedError("Error in getInstance")
+        } ?: throw RealmUninitialisedError("RealmConfig null")
     }
 
     override fun getValidRealmConfig(): RealmConfiguration {

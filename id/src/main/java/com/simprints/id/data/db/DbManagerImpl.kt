@@ -4,6 +4,7 @@ import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
+import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
@@ -23,6 +24,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
 class DbManagerImpl(private val localDbManager: LocalDbManager,
@@ -79,12 +81,32 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         }
 
     override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
-        // TODO : Rx-ify with new implementation. Check Remote if not in local
-        localDbManager.loadPersonFromLocal(destinationList, guid, callback)
+        val result = localDbManager.loadPersonsFromLocal(
+            projectId = projectId,
+            patientId = guid).map { it.libPerson }
+
+        if (result.isEmpty()) {
+            remoteDbManager.downloadPerson(guid, projectId)
+                .subscribeBy(
+                    onSuccess = {
+                        destinationList.add(rl_Person(it).libPerson)
+                        callback.onSuccess()
+                    },
+                    onError = { callback.onSuccess() })
+        } else {
+            destinationList.add(result.first())
+            callback.onSuccess()
+        }
     }
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
-        localDbManager.loadPeopleFromLocal(destinationList, group, userId, moduleId, callback)
+        val result = when (group) {
+            Constants.GROUP.GLOBAL -> localDbManager.loadPersonsFromLocal().map { it.libPerson }
+            Constants.GROUP.USER -> localDbManager.loadPersonsFromLocal(userId = userId).map { it.libPerson }
+            Constants.GROUP.MODULE -> localDbManager.loadPersonsFromLocal(moduleId = moduleId).map { it.libPerson }
+        }
+        destinationList.addAll(result)
+        callback?.onSuccess()
     }
 
     override fun getPeopleCount(personId: String?,
@@ -92,7 +114,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                                 userId: String?,
                                 moduleId: String?,
                                 toSync: Boolean?): Int =
-        localDbManager.getPeopleCountFromLocal(projectId, personId, userId, moduleId, toSync)
+        localDbManager.getPersonsCountFromLocal(projectId, personId, userId, moduleId, toSync)
 
     override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
         remoteDbManager.saveIdentificationInRemote(probe, projectId, userId, moduleId, androidId, matchSize, matches, sessionId)
