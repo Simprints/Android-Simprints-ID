@@ -50,5 +50,5 @@ interface DataManager : PreferencesManager, DbManager,
 
     fun saveSession()
 
-    fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback)
+    fun recoverRealmDb(group: Constants.GROUP): Completable
 }
