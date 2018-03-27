@@ -17,13 +17,13 @@ class SyncTaskParametersTest {
     @Test
     fun buildSyncTaskParametersTest() {
         val userSync = SyncTaskParameters.UserSyncTaskParameters("projectId", "userId")
-        val moduleSync = SyncTaskParameters.UserSyncTaskParameters("projectId", "userId")
-        val projectSync = SyncTaskParameters.UserSyncTaskParameters("projectId", "userId")
+        val moduleSync = SyncTaskParameters.ModuleIdSyncTaskParameters("projectId", "moduleId")
+        val projectSync = SyncTaskParameters.GlobalSyncTaskParameters("projectId")
 
         Assert.assertNotNull(userSync.projectId)
         Assert.assertNotNull(userSync.userId)
         Assert.assertEquals(userSync.toGroup(), Constants.GROUP.USER)
-        Assert.assertEquals(userSync.toMap(), hashMapOf("projectId" to "projectId", "moduleId" to "moduleId"))
+        Assert.assertEquals(userSync.toMap(), hashMapOf("projectId" to "projectId", "userId" to "userId"))
 
         Assert.assertNotNull(moduleSync.projectId)
         Assert.assertNotNull(moduleSync.moduleId)
@@ -31,7 +31,7 @@ class SyncTaskParametersTest {
         Assert.assertEquals(moduleSync.toMap(), hashMapOf("projectId" to "projectId", "moduleId" to "moduleId"))
 
         Assert.assertNotNull(projectSync.projectId)
-        Assert.assertEquals(projectSync.toGroup(), Constants.GROUP.USER)
+        Assert.assertEquals(projectSync.toGroup(), Constants.GROUP.GLOBAL)
         Assert.assertEquals(projectSync.toMap(), hashMapOf("projectId" to "projectId"))
     }
 }
