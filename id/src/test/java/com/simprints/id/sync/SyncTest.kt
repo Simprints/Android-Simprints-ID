@@ -282,7 +282,7 @@ class SyncTest : RxJavaTest() {
     private fun mockResponseForPatientsCount(count: Int): MockResponse? {
         return MockResponse().let {
             it.setResponseCode(200)
-            it.setBody("{\"patientsCount\": $count}")
+            it.setBody("{\"count\": $count}")
         }
     }
 
