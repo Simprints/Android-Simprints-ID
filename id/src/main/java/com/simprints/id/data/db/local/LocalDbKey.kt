@@ -1,8 +1,10 @@
 package com.simprints.id.data.db.local
 
+import com.simprints.id.tools.Log
 import java.util.*
 
 data class LocalDbKey(val value: ByteArray) {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -17,4 +19,5 @@ data class LocalDbKey(val value: ByteArray) {
     override fun hashCode(): Int {
         return Arrays.hashCode(value)
     }
+
 }
