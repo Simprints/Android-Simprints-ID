@@ -27,7 +27,7 @@ import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.id.tools.extensions.toHex
+import com.simprints.id.tools.extensions.toHexString
 import com.simprints.id.tools.extensions.toMap
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
@@ -158,12 +158,12 @@ class FirebaseManager(private val appContext: Context,
 
     private fun handleGetLocalDbKeyTaskComplete(task: Task<QuerySnapshot>, result: SingleEmitter<LocalDbKey>) {
         if (task.isSuccessful) {
-            val localDbKeyValue = task.result.first().getBlob(LOCAL_DB_KEY_VALUE_NAME).toBytes()
+            val realmKeys = task.result.first().toObject(fs_RealmKeys::class.java)
 
             //TODO Remove before final pull request
-            Timber.d(localDbKeyValue.toHex())
+            Timber.d(realmKeys.value.toBytes().toHexString())
 
-            result.onSuccess(LocalDbKey(localDbKeyValue))
+            result.onSuccess(LocalDbKey(realmKeys))
         } else {
             result.onError(CouldNotRetrieveLocalDbKeyError.withException(task.exception))
         }

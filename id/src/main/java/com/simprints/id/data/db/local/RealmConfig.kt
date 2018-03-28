@@ -6,12 +6,12 @@ import io.realm.RealmConfiguration
 
 object RealmConfig {
 
-    fun get(projectId: String, localDbKey: LocalDbKey): RealmConfiguration = RealmConfiguration
+    fun get(databaseName: String, key: ByteArray): RealmConfiguration = RealmConfiguration
         .Builder()
-        .name("$projectId.realm")
+        .name("$databaseName.realm")
         .schemaVersion(REALM_SCHEMA_VERSION)
         .migration(Migration())
-        .encryptionKey(localDbKey.value)
+        .encryptionKey(key)
         .addModulesIfNotNull()
         .build()
 

@@ -12,12 +12,15 @@ import io.realm.RealmConfiguration
 interface LocalDbManager {
 
     // Lifecycle
-    fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Completable
+    fun signInToLocal(localDbKey: LocalDbKey): Completable
+
     fun signOutOfLocal()
+
     fun isLocalDbInitialized(projectId: String): Boolean
 
     // Data transfer
     fun insertOrUpdatePersonInLocal(person: rl_Person): Completable
+
     fun savePeopleFromStream(reader: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: () -> Boolean)
 
     fun getPersonsCountFromLocal(patientId: String? = null,
@@ -39,5 +42,7 @@ interface LocalDbManager {
     fun getValidRealmConfig(): RealmConfiguration
 
     fun getRealmInstance(): Realm
+
     fun updateSyncInfo(syncParams: SyncTaskParameters)
+
 }
