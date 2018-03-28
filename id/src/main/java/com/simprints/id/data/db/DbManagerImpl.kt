@@ -42,16 +42,16 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     override fun getLocalKeyAndSignInToLocal(projectId: String): Completable =
         remoteDbManager
             .getLocalDbKeyFromRemote(projectId)
-            .signInToLocal(projectId)
+            .signInToLocal()
 
     override fun signIn(projectId: String, tokens: Tokens): Completable =
         remoteDbManager
             .signInToRemoteDb(tokens)
             .andThen(getLocalKeyAndSignInToLocal(projectId))
 
-    private fun Single<out LocalDbKey>.signInToLocal(projectId: String): Completable =
+    private fun Single<out LocalDbKey>.signInToLocal(): Completable =
         flatMapCompletable { key ->
-            localDbManager.signInToLocal(projectId, key)
+            localDbManager.signInToLocal(key)
         }
 
     override fun signOut() {

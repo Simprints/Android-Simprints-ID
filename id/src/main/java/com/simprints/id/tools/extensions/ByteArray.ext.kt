@@ -2,7 +2,7 @@ package com.simprints.id.tools.extensions
 
 private val HEX_CHARS = "0123456789ABCDEF".toCharArray()
 
-fun ByteArray.toHex(): String {
+fun ByteArray.toHexString(): String {
     val result = StringBuffer()
 
     forEach {
