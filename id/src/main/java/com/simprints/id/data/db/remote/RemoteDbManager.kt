@@ -8,6 +8,7 @@ import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.SyncApiInterface
 import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
+import com.simprints.id.exceptions.safe.remoteDbManager.DownloadingAPersonWhoDoesntExistOnServer
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
@@ -49,6 +50,8 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
     // API
     fun uploadPerson(fbPerson: fb_Person): Completable
     fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable
+
+    @Throws(DownloadingAPersonWhoDoesntExistOnServer::class)
     fun downloadPerson(patientId: String, projectId: String): Single<fb_Person>
 
     fun getSyncApi(): Single<SyncApiInterface>
