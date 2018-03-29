@@ -178,16 +178,15 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
 
     //TODO Delete this temp method
     private fun addFakeLegacyData(dbKey: LocalDbKey) {
-        val person = rl_Person().apply {
-            patientId = "123"
-            userId = "123"
-            moduleId = "123"
-            projectId = "123"
-            fingerprints = RealmList<rl_Fingerprint>()
-        }
         val realm = Realm.getInstance(getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey))
         realm.executeTransaction {
-            it.copyToRealmOrUpdate(person)
+            it.insertOrUpdate(rl_Person().apply {
+                patientId = "123"
+                userId = "123"
+                moduleId = "123"
+                projectId = "123"
+                fingerprints = RealmList<rl_Fingerprint>()
+            })
         }
         realm.close()
     }
