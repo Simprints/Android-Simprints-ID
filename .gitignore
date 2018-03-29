@@ -47,3 +47,4 @@ obj/
 
 # Test Log Files
 testing/logs/
+.idea/caches
