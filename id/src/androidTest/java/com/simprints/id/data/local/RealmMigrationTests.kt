@@ -18,44 +18,43 @@ import java.util.*
 class RealmMigrationTests {
 
     companion object {
-        const val legacyDatabaseName: String = "legacyDB"
-        val legacyDatabaseKey: ByteArray = Arrays.copyOf(legacyDatabaseName.toByteArray(), 64)
+        private const val KEY_LENGTH = 64
 
+        const val legacyDatabaseName: String = "legacyDB"
+        val legacyDatabaseKey: ByteArray = Arrays.copyOf(legacyDatabaseName.toByteArray(), KEY_LENGTH)
         const val newDatabaseName: String = "newDatabase"
-        val newDatabaseKey: ByteArray = Arrays.copyOf("newKey".toByteArray(), 64)
+        val newDatabaseKey: ByteArray = Arrays.copyOf("newKey".toByteArray(), KEY_LENGTH)
 
         const val FAKE_STRING_FIELD: String = "123"
     }
 
-    private val fakePatientModel = rl_Person().apply {
-        patientId = FAKE_STRING_FIELD
-        userId = FAKE_STRING_FIELD
-        moduleId = FAKE_STRING_FIELD
-        projectId = FAKE_STRING_FIELD
-        fingerprints = RealmList<rl_Fingerprint>()
-    }
+    private val legacyConfig = RealmConfig.get(legacyDatabaseName, legacyDatabaseKey)
+    private val newConfig = RealmConfig.get(newDatabaseName, newDatabaseKey)
+    private val localDbKey = LocalDbKey(newDatabaseName, newDatabaseKey, legacyDatabaseName)
 
     @Test
     fun changeRealmEncryption_ShouldSucceed() {
-        val legacyConfig = RealmConfig.get(legacyDatabaseName, legacyDatabaseKey)
-        val newConfig = RealmConfig.get(newDatabaseName, newDatabaseKey)
+        Realm.getInstance(legacyConfig).apply { addFakePatient(this); close() }
 
-        val legacyRealm = Realm.getInstance(legacyConfig)
-        addFakePatient(legacyRealm)
-        legacyRealm.close()
-
-        val realmDbManager = RealmDbManager(InstrumentationRegistry.getContext())
-
-        realmDbManager.signInToLocal(LocalDbKey(newDatabaseName, newDatabaseKey, legacyDatabaseName))
+        RealmDbManager(InstrumentationRegistry.getContext()).apply { signInToLocal(localDbKey) }
 
         assert(!File(legacyConfig.path).exists())
         assert(File(newConfig.path).exists())
     }
 
-    private fun addFakePatient(realm: Realm) {
-        realm.executeTransaction {
-            it.insertOrUpdate(fakePatientModel)
-        }
+    private fun getFakePatientModel() = rl_Person().apply {
+        patientId = FAKE_STRING_FIELD
+        userId = FAKE_STRING_FIELD
+        moduleId = FAKE_STRING_FIELD
+        projectId = FAKE_STRING_FIELD
+        @Suppress("RemoveExplicitTypeArguments")
+        fingerprints = RealmList<rl_Fingerprint>()
     }
 
+    private fun addFakePatient(realm: Realm) {
+        realm.executeTransaction {
+            it.insertOrUpdate(getFakePatientModel())
+        }
+    }
+    
 }
