@@ -15,12 +15,13 @@ import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
+import com.simprints.id.data.db.remote.models.adapters.toLocalDbKey
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.data.db.sync.SyncApiInterface
+import com.simprints.id.exceptions.safe.remoteDbManager.DownloadingAPersonWhoDoesntExistOnServer
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
-import com.simprints.id.exceptions.safe.remoteDbManager.DownloadingAPersonWhoDoesntExistOnServer
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
@@ -163,7 +164,7 @@ class FirebaseManager(private val appContext: Context,
             //TODO Remove before final pull request
             Timber.d(realmKeys.value.toBytes().toHexString())
 
-            result.onSuccess(LocalDbKey(realmKeys))
+            result.onSuccess(realmKeys.toLocalDbKey())
         } else {
             result.onError(CouldNotRetrieveLocalDbKeyError.withException(task.exception))
         }
@@ -223,9 +224,10 @@ class FirebaseManager(private val appContext: Context,
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getSyncApi().flatMap {
             it.getPatient(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
-                .map { if (it.isEmpty())
-                    throw DownloadingAPersonWhoDoesntExistOnServer()
-                else it.first()
+                .map {
+                    if (it.isEmpty())
+                        throw DownloadingAPersonWhoDoesntExistOnServer()
+                    else it.first()
                 }
         }
 
