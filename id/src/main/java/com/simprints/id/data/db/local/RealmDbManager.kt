@@ -170,11 +170,15 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         Realm.getInstance(legacyConfig).use {
             it.writeEncryptedCopyTo(File(appContext.filesDir, "${dbKey.projectId}.realm"), dbKey.value)
         }
-        Realm.deleteRealm(legacyConfig)
-        File(appContext.filesDir, "${legacyConfig.path}.lock").delete()
+
+        deleteRealm(legacyConfig)
     }
 
     private fun getLegacyConfig(legacyApiKey: String, legacyDatabaseKey: ByteArray): RealmConfiguration =
         RealmConfig.get(legacyApiKey.substring(0, LEGACY_APP_KEY_LENGTH), legacyDatabaseKey)
 
+    private fun deleteRealm(config: RealmConfiguration) {
+        Realm.deleteRealm(config)
+        File(appContext.filesDir, "${config.path}.lock").delete()
+    }
 }
