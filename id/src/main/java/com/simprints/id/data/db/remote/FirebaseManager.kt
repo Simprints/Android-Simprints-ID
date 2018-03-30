@@ -2,7 +2,6 @@ package com.simprints.id.data.db.remote
 
 import android.content.Context
 import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -21,6 +20,7 @@ import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.data.db.sync.SyncApiInterface
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
+import com.simprints.id.exceptions.safe.remoteDbManager.DownloadingAPersonWhoDoesntExistOnServer
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
@@ -186,8 +186,7 @@ class FirebaseManager(private val appContext: Context,
     }
 
     override fun saveSessionInRemote(session: Session) {
-        val task = sessionRef(legacyFirebaseApp).push().setValue(session.toFirebaseSession())
-        Tasks.await(task)
+        sessionRef(legacyFirebaseApp).push().setValue(session.toFirebaseSession())
     }
 
     fun getFirebaseStorageInstance() = FirebaseStorage.getInstance(legacyFirebaseApp)
@@ -224,7 +223,10 @@ class FirebaseManager(private val appContext: Context,
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getSyncApi().flatMap {
             it.getPatient(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
-                .map { it.first() }
+                .map { if (it.isEmpty())
+                    throw DownloadingAPersonWhoDoesntExistOnServer()
+                else it.first()
+                }
         }
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
