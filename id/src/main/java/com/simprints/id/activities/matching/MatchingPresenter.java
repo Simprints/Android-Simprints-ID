@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
+import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
 import static com.simprints.id.tools.TierHelper.computeTier;
 
 public class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListener {
@@ -72,6 +73,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
                     public void run() {
+
                         onIdentifyStart();
                     }
                 };
@@ -112,7 +114,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     private void onIdentifyStart() {
         final Constants.GROUP matchGroup = dataManager.getMatchGroup();
         try {
-            dataManager.loadPeople(candidates, matchGroup, newOnLoadPeopleCallback());
+            dataManager.loadPeople(candidates, matchGroup, wrapCallback("loading people", newOnLoadPeopleCallback()));
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             matchingView.launchAlert();
@@ -163,7 +165,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     private void onVerifyStart() {
         final String guid = dataManager.getPatientId();
         try {
-            dataManager.loadPerson(candidates, dataManager.getSignedInProjectId(), guid, newOnLoadPersonCallback());
+            dataManager.loadPerson(candidates, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             matchingView.launchAlert();
