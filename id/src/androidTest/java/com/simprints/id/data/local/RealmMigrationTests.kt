@@ -46,7 +46,7 @@ class RealmMigrationTests {
 
     @Test
     fun localSignInWithEncryptionChange_ShouldMigrateDatabase() {
-        Realm.getInstance(legacyConfig).apply { addFakePatient(this); close() }
+        Realm.getInstance(legacyConfig).use { addFakePatient(it) }
 
         RealmDbManager(testContext).signInToLocal(localDbKey).test()
             .awaitAndAssertSuccess()
@@ -68,18 +68,18 @@ class RealmMigrationTests {
 
     @Test
     fun localSignInWithEncryptionChange_ShouldCloseLegacyRealm() {
-        val realm = Realm.getInstance(legacyConfig).apply { addFakePatient(this); close() }
+        Realm.getInstance(newConfig).use { addFakePatient(it) }
 
         RealmDbManager(testContext).signInToLocal(localDbKey).test()
             .awaitAndAssertSuccess()
             .let {
-                assert(realm.isClosed)
+                assert(Realm.getInstance(newConfig).use { it.isClosed })
             }
     }
 
     @Test
     fun localSignInWithEncryptionChange_ShouldHaveValidData() {
-        Realm.getInstance(legacyConfig).apply { addFakePatient(this); close() }
+        Realm.getInstance(legacyConfig).use { addFakePatient(it) }
 
         RealmDbManager(testContext).signInToLocal(localDbKey).test()
             .awaitAndAssertSuccess()
