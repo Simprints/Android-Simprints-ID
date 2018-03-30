@@ -33,13 +33,30 @@ class RealmMigrationTests {
     private val localDbKey = LocalDbKey(newDatabaseName, newDatabaseKey, legacyDatabaseName)
 
     @Test
-    fun changeRealmEncryption_ShouldSucceed() {
+    fun localSignInWithEncryptionChange_ShouldMigrateDatabase() {
         Realm.getInstance(legacyConfig).apply { addFakePatient(this); close() }
 
         RealmDbManager(InstrumentationRegistry.getContext()).apply { signInToLocal(localDbKey) }
 
         assert(!File(legacyConfig.path).exists())
         assert(File(newConfig.path).exists())
+    }
+
+    @Test
+    fun localSignInWithoutEncryptionChange_ShouldNotEffectNewDatabase() {
+        RealmDbManager(InstrumentationRegistry.getContext()).apply { signInToLocal(localDbKey) }
+
+        assert(!File(legacyConfig.path).exists())
+        assert(File(newConfig.path).exists())
+    }
+
+    @Test
+    fun localSignInWithEncryptionChange_ShouldCloseLegacyRealm() {
+        val realm = Realm.getInstance(legacyConfig).apply { addFakePatient(this); close() }
+
+        RealmDbManager(InstrumentationRegistry.getContext()).apply { signInToLocal(localDbKey) }
+
+        assert(realm.isClosed)
     }
 
     private fun getFakePatientModel() = rl_Person().apply {
@@ -56,5 +73,5 @@ class RealmMigrationTests {
             it.insertOrUpdate(getFakePatientModel())
         }
     }
-    
+
 }
