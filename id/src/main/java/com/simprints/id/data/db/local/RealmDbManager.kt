@@ -3,14 +3,16 @@ package com.simprints.id.data.db.local
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
-import com.simprints.id.data.db.local.models.rl_Fingerprint
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Completable
-import io.realm.*
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import io.realm.RealmQuery
+import io.realm.Sort
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -38,13 +40,10 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
     override fun signInToLocal(localDbKey: LocalDbKey): Completable = Completable.create {
         Timber.d("Realm sign in. Project: ${localDbKey.projectId} Key: $localDbKey")
 
-        //TODO DELETE THIS LINE
-        addFakeLegacyData(localDbKey)
         checkLegacyDatabaseAndMigrate(localDbKey)
 
         realmConfig = RealmConfig.get(localDbKey.projectId, localDbKey.value)
-        val realm = getRealmInstance()
-        realm.close()
+        getRealmInstance().close()
         it.onComplete()
     }
 
@@ -166,29 +165,16 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
     }
 
     private fun migrateLegacyRealm(dbKey: LocalDbKey) {
-        Realm.getInstance(getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey)).apply {
-            writeEncryptedCopyTo(File(appContext.filesDir, "${dbKey.projectId}.realm"), dbKey.value)
-            close()
+        val legacyConfig = getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey)
+
+        Realm.getInstance(legacyConfig).use {
+            it.writeEncryptedCopyTo(File(appContext.filesDir, "${dbKey.projectId}.realm"), dbKey.value)
         }
-        Realm.deleteRealm(getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey))
+        Realm.deleteRealm(legacyConfig)
+        File(appContext.filesDir, "${legacyConfig.path}.lock").delete()
     }
 
     private fun getLegacyConfig(legacyApiKey: String, legacyDatabaseKey: ByteArray): RealmConfiguration =
         RealmConfig.get(legacyApiKey.substring(0, LEGACY_APP_KEY_LENGTH), legacyDatabaseKey)
-
-    //TODO Delete this temp method
-    private fun addFakeLegacyData(dbKey: LocalDbKey) {
-        val realm = Realm.getInstance(getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey))
-        realm.executeTransaction {
-            it.insertOrUpdate(rl_Person().apply {
-                patientId = "123"
-                userId = "123"
-                moduleId = "123"
-                projectId = "123"
-                fingerprints = RealmList<rl_Fingerprint>()
-            })
-        }
-        realm.close()
-    }
 
 }

@@ -57,6 +57,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
             viewPresenter.didUserWantToSyncBy(dataManager.syncGroup)
         }
 
+        //TODO: I Don't know what this is but it needs to be destroyed immediately
         buttonAddPersonRealm.setOnClickListener {
             app.dbManager.getRealmInstance().executeTransaction { realm ->
                 realm.copyToRealmOrUpdate(PeopleGeneratorUtils.getRandomPerson())
