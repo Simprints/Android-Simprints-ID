@@ -21,6 +21,8 @@ import kotlin.collections.ArrayList
 class RealmDbManager(private val appContext: Context) : LocalDbManager {
 
     companion object {
+        const val SYNC_ID_FIELD = "id"
+
         const val USER_ID_FIELD = "userId"
         const val PROJECT_ID_FIELD = "projectId"
         const val PATIENT_ID_FIELD = "patientId"
@@ -146,7 +148,9 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
     }
 
     override fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo? {
-        return getRealmInstance().where(RealmSyncInfo::class.java).equalTo("id", typeSync.ordinal).findFirst()
+        return getRealmInstance().use {
+            it.where(RealmSyncInfo::class.java).equalTo("id", typeSync.ordinal).findFirst()
+        }
     }
 
     private fun checkLegacyDatabaseAndMigrate(dbKey: LocalDbKey) {
