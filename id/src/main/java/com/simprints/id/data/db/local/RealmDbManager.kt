@@ -39,14 +39,13 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         Realm.init(appContext)
     }
 
-    override fun signInToLocal(localDbKey: LocalDbKey): Completable = Completable.create {
+    override fun signInToLocal(localDbKey: LocalDbKey): Completable = Completable.create { em ->
         Timber.d("Realm sign in. Project: ${localDbKey.projectId} Key: $localDbKey")
 
         checkLegacyDatabaseAndMigrate(localDbKey)
 
         realmConfig = RealmConfig.get(localDbKey.projectId, localDbKey.value)
-        getRealmInstance().close()
-        it.onComplete()
+        getRealmInstance().use { em.onComplete() }
     }
 
     override fun signOutOfLocal() {
@@ -56,13 +55,10 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
     override fun isLocalDbInitialized(projectId: String): Boolean =
         realmConfig != null
 
-    override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable {
-        val realm = getRealmInstance()
-        realm.executeTransaction {
-            it.insertOrUpdate(person)
-        }
-        realm.close()
-        return Completable.complete()
+    override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable = Completable.create { em ->
+        getRealmInstance().use {
+            it.executeTransaction { it.insertOrUpdate(person) }
+        }.let { em.onComplete() }
     }
 
     override fun savePeopleFromStream(reader: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: () -> Boolean) {
