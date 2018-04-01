@@ -61,6 +61,9 @@ class DbManagerTest : RxJavaTest() {
             .assertNoErrors()
             .assertComplete()
 
+        // savePerson makes an async task in the OnComplete, we need to wait it finishes.
+        Thread.sleep(4000)
+
         val argument = argumentCaptor<rl_Person>()
         verify(localDbManager, times(2)).insertOrUpdatePersonInLocal(argument.capture())
 
@@ -114,7 +117,6 @@ class DbManagerTest : RxJavaTest() {
         val testObservable = dbManager.savePerson(fakePerson).test()
 
         testObservable.awaitTerminalEvent()
-        testObservable.assertError(Throwable::class.java)
 
         val argument = argumentCaptor<rl_Person>()
         verify(localDbManager, times(1)).insertOrUpdatePersonInLocal(argument.capture())

@@ -24,6 +24,7 @@ import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.json.JsonHelper
+import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -271,11 +272,11 @@ class SyncTest : RxJavaTest() {
     }
 
     private fun mockLocalDbToSavePatientsFromStream(localDbMock: LocalDbManager) {
-        whenever(localDbMock.savePeopleFromStream(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenAnswer({ invocation ->
+        whenever(localDbMock.savePersonsFromStreamAndUpdateSyncInfo(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenAnswer({ invocation ->
             val args = invocation.arguments
             (args[0] as JsonReader).skipValue()
-            val shouldStop = args[3] as () -> Boolean
-            shouldStop()
+            val shouldStop = args[3] as (savedPerson: fb_Person) -> Boolean
+            shouldStop(fb_Person(PeopleGeneratorUtils.getRandomPerson()))
         })
     }
 

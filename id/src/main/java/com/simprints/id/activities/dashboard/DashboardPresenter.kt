@@ -13,9 +13,8 @@ import io.reactivex.observers.DisposableObserver
 
 class DashboardPresenter(private val view: DashboardContract.View,
                          syncClient: SyncClient,
-                         private val dataManager: DataManager) : DashboardContract.Presenter {
+                         dataManager: DataManager) : DashboardContract.Presenter {
 
-    private var started: Boolean = false
     private val syncManager = NaiveSyncManager(dataManager, syncClient, object : DisposableObserver<Progress>() {
 
         override fun onNext(progress: Progress) {
@@ -31,11 +30,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         }
     })
 
-    override fun start() {
-        if (!started) {
-            started = true
-        }
-    }
+    override fun start() {}
 
     override fun pause() {
         syncManager.stop()

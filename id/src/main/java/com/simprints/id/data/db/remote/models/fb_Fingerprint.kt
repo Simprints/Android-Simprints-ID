@@ -5,9 +5,9 @@ import com.simprints.libcommon.Fingerprint
 import com.simprints.libcommon.Utils
 import com.simprints.libsimprints.FingerIdentifier
 
-data class fb_Fingerprint(@SkipSerialisationField val fingerId: FingerIdentifier = FingerIdentifier.LEFT_THUMB,
-                          val template: String = "",
-                          val quality: Int = 0) {
+data class fb_Fingerprint(@SkipSerialisationField var fingerId: FingerIdentifier,
+                          val template: String,
+                          val quality: Int) {
 
     constructor (fingerprint: Fingerprint) : this (
         fingerId = fingerprint.fingerId,

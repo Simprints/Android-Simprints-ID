@@ -23,7 +23,6 @@ class fb_FingerprintTest {
         val jsonString = JsonHelper.toJson(fingerprint)
         val json = JsonHelper.gson.fromJson(jsonString, JsonObject::class.java)
 
-        print(jsonString)
         assertTrue(json.has("quality"))
         assertTrue(json.has("template"))
         assertEquals(json.keySet().size, 2)

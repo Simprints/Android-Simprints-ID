@@ -19,6 +19,7 @@ import java.util.*
 @Config(constants = BuildConfig::class, application = TestApplication::class)
 class fb_PersonTest {
 
+    val fbPersonJson = "{\"id\":\"aeed3784-a399-445a-9dcd-0a373184709c\",\"projectId\":\"test10MProject\",\"moduleId\":\"module2\",\"userId\":\"user2\",\"createdAt\":1520621879620,\"updatedAt\":1520621879620,\"fingerprints\":{\"LEFT_THUMB\":[{\"quality\":52,\"template\":\"Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA\"}],\"LEFT_INDEX_FINGER\":[{\"quality\":60,\"template\":\"Rk1SACAyMAAAAAGkAAABLAGQAMUAxQEAABBPQUAcACxpAEA3ADd4AEAsADv4AIAfAD5uAEA0AEh7AECPAFFzAIBkAF14AEA/AF54AEAZAGmHAEA0AG/7AEANAHkNAEBRAHn1AEAVAHqRAEBgAH11AIAbAH4GAEAjAISKAEAGAI8UAIBUAJF7AEC7AJnqAECWALDkAIAzALGQAEAVALMRAIByALZyAIAiALyeAECLAMnhAIBEAMuMAICDANBiAEA2ANMVAICqANdiAEAwANmuAEBuAOFxAIA8AOOhAIApAOgpAECqAO1nAEAZAO+zAEBFAPGzAEBdAPSbAEBjAPb0AIB6APZpAEDNAP5oAIB0AP9sAEBfAQH0AEBfAQPRAEBoAQroAIAhAQq7AEDYARd1AEDGARh4AIBfARhNAEB3ARnqAEBYARnZAIBuAR3kAEAYASO7AEDFASyGAICVAS5vAIBqATReAEA4ATjdAEAtATzaAEDGAUOGAEBGAUldAEDEAVCNAECjAVN9AEA4AVpiAEBPAWRoAECjAW6DAIBwAXl1AAAA\"}]}}"
     @Test
     fun buildFbPersonFromRlPerson() {
         val rlPerson = PeopleGeneratorUtils.getRandomPerson().also {
@@ -60,21 +61,42 @@ class fb_PersonTest {
     }
 
     @Test
-    fun serialiseFbPerson_skipUnwantedFields() {
+    fun serialiseFbPerson() {
+        val person = JsonHelper.gson.fromJson(fbPersonJson, fb_Person::class.java)
+        Assert.assertEquals(person.patientId, "aeed3784-a399-445a-9dcd-0a373184709c")
+        Assert.assertEquals(person.projectId, "test10MProject")
+        Assert.assertEquals(person.moduleId, "module2")
+        Assert.assertEquals(person.userId, "user2")
+        Assert.assertEquals(person.createdAt!!.time.toString(), "1520621879620")
+        Assert.assertEquals(person.updatedAt!!.time.toString(), "1520621879620")
+        Assert.assertEquals(person.fingerprints.values.size, 2)
+
+        val fingerprints = person.fingerprints[FingerIdentifier.LEFT_THUMB]
+        Assert.assertNotNull(fingerprints)
+        Assert.assertEquals(fingerprints!!.first().fingerId, FingerIdentifier.LEFT_THUMB)
+        Assert.assertEquals(fingerprints!!.first().quality, 52)
+        Assert.assertEquals(fingerprints!!.first().template, "Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA")
+    }
+
+    @Test
+    fun deserializeFbPerson_skipUnwantedFields() {
         val fbPerson = fb_Person(PeopleGeneratorUtils.getRandomPerson())
-
         val jsonString = JsonHelper.toJson(fbPerson)
-        val json = JsonHelper.gson.fromJson(jsonString, JsonObject::class.java)
+        val personJson = JsonHelper.gson.fromJson(jsonString, JsonObject::class.java)
 
-        print(jsonString)
-        Assert.assertTrue(json.has("id"))
-        Assert.assertTrue(json.has("projectId"))
-        Assert.assertTrue(json.has("userId"))
-        Assert.assertTrue(json.has("moduleId"))
-        Assert.assertTrue(json.has("createdAt"))
-        Assert.assertTrue(json.has("updatedAt"))
-        Assert.assertTrue(json.has("fingerprints"))
+        Assert.assertTrue(personJson.has("id"))
+        Assert.assertTrue(personJson.has("projectId"))
+        Assert.assertTrue(personJson.has("userId"))
+        Assert.assertTrue(personJson.has("moduleId"))
+        Assert.assertTrue(personJson.has("createdAt"))
+        Assert.assertTrue(personJson.has("updatedAt"))
+        Assert.assertTrue(personJson.has("fingerprints"))
+        val fingerprintId = fbPerson.fingerprintsAsList.first().fingerId.name
+        val fingerprintJson = personJson.get("fingerprints").asJsonObject.get(fingerprintId).asJsonArray.first().asJsonObject
+        Assert.assertTrue(fingerprintJson.has("quality"))
+        Assert.assertTrue(fingerprintJson.has("template"))
 
-        Assert.assertEquals(json.keySet().size, 7)
+        Assert.assertEquals(personJson.keySet().size, 7)
+        Assert.assertEquals(fingerprintJson.keySet().size, 2)
     }
 }

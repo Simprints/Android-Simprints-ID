@@ -57,6 +57,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
             viewPresenter.didUserWantToSyncBy(dataManager.syncGroup)
         }
 
+        //FIXME: remove this code
         buttonAddPersonRealm.setOnClickListener {
             app.dbManager.getRealmInstance().executeTransaction { realm ->
                 realm.copyToRealmOrUpdate(PeopleGeneratorUtils.getRandomPerson())
