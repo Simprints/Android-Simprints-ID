@@ -55,9 +55,13 @@ open class RealmTestsBase {
     }
 
     protected fun rl_Person.deepEquals(other: rl_Person): Boolean = when {
+        this.patientId != other.patientId -> false
         this.projectId != other.projectId -> false
         this.userId != other.userId -> false
         this.moduleId != other.moduleId -> false
+        this.toSync != other.toSync -> false
+        this.createdAt != other.createdAt -> false
+        this.updatedAt != other.updatedAt -> false
         else -> true
     }
 
