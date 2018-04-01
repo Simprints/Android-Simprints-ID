@@ -81,19 +81,23 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
     }
 
     override fun updateSyncInfo(syncParams: SyncTaskParameters) {
-        val realm = getRealmInstance()
-        realm.executeTransaction { r ->
-            val query = buildQueryForPerson(r,
-                projectId = syncParams.projectId,
-                moduleId = syncParams.moduleId,
-                userId = syncParams.userId,
-                toSync = false)
+        getRealmInstance().use {
+            it.executeTransaction {
+                val query = buildQueryForPerson(
+                    realm = it,
+                    projectId = syncParams.projectId,
+                    moduleId = syncParams.moduleId,
+                    userId = syncParams.userId,
+                    toSync = false
+                )
 
-            val lastTimestamp = query.sort(UPDATED_FIELD, Sort.DESCENDING).findFirst()
-            r.insertOrUpdate(RealmSyncInfo(syncParams.toGroup().ordinal, lastTimestamp?.updatedAt
-                ?: Date(0)))
+                val lastTimestamp = query.sort(UPDATED_FIELD, Sort.DESCENDING).findFirst()
+                it.insertOrUpdate(RealmSyncInfo(
+                    id = syncParams.toGroup().ordinal,
+                    lastSyncTime = lastTimestamp?.updatedAt ?: Date(0))
+                )
+            }
         }
-        realm.close()
     }
 
     override fun getPersonsCountFromLocal(patientId: String?,
