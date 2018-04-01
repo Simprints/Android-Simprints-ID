@@ -103,7 +103,7 @@ class RealmManagerTests : RealmTestsBase() {
     @Test
     fun insertOrUpdatePerson_ShouldSucceed() {
         val fakePerson = getFakePerson()
-        realmManager.insertOrUpdatePersonInLocal(fakePerson)
+        realmManager.insertOrUpdatePersonInLocal(fakePerson).blockingAwait()
 
         assertEquals(realm.where(rl_Person::class.java).count(), 1)
         assertTrue(realm.where(rl_Person::class.java).findFirst()!!.deepEquals(fakePerson))
@@ -112,8 +112,8 @@ class RealmManagerTests : RealmTestsBase() {
     @Test
     fun insertOrUpdateSamePerson_ShouldNotSaveTwoPeople() {
         val fakePerson = getFakePerson()
-        realmManager.insertOrUpdatePersonInLocal(fakePerson)
-        realmManager.insertOrUpdatePersonInLocal(fakePerson)
+        realmManager.insertOrUpdatePersonInLocal(fakePerson).blockingAwait()
+        realmManager.insertOrUpdatePersonInLocal(fakePerson).blockingAwait()
 
         assertEquals(realm.where(rl_Person::class.java).count(), 1)
         assertTrue(realm.where(rl_Person::class.java).findFirst()!!.deepEquals(fakePerson))
