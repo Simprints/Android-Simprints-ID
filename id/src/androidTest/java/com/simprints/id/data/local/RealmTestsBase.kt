@@ -18,7 +18,6 @@ open class RealmTestsBase {
     companion object {
         private const val KEY_LENGTH = 64
 
-
         const val legacyDatabaseName: String = "legacyDB"
         const val newDatabaseName: String = "newDatabase"
         val newDatabaseKey: ByteArray = Arrays.copyOf("newKey".toByteArray(), KEY_LENGTH)
@@ -36,25 +35,13 @@ open class RealmTestsBase {
 
     protected fun getFakePerson(): rl_Person = PeopleGeneratorUtils.getRandomPerson()
 
-    protected fun saveFakePerson(realm: Realm, fakePerson: rl_Person): rl_Person {
-        realm.executeTransaction {
-            it.insertOrUpdate(fakePerson)
-        }
-        return fakePerson
-    }
+    protected fun saveFakePerson(realm: Realm, fakePerson: rl_Person): rl_Person =
+        fakePerson.apply { realm.executeTransaction { it.insertOrUpdate(this) } }
 
-    protected fun saveFakePeople(realm: Realm, people: ArrayList<rl_Person>): ArrayList<rl_Person> {
-        realm.executeTransaction {
-            it.insertOrUpdate(people)
-        }
-        return people
-    }
+    protected fun saveFakePeople(realm: Realm, people: ArrayList<rl_Person>): ArrayList<rl_Person> =
+        people.apply { realm.executeTransaction { it.insertOrUpdate(this) } }
 
-    protected fun deleteAll(realm: Realm) {
-        realm.executeTransaction {
-            it.deleteAll()
-        }
-    }
+    protected fun deleteAll(realm: Realm) = realm.executeTransaction { it.deleteAll() }
 
     protected fun rl_Person.deepEquals(other: rl_Person): Boolean = when {
         this.patientId != other.patientId -> false
@@ -70,17 +57,11 @@ open class RealmTestsBase {
     protected fun saveFakeSyncInfo(realm: Realm,
                                    userId: String = "",
                                    moduleId: String = ""): RealmSyncInfo {
-        val syncInfo = when {
+        return when {
             userId.isNotEmpty() -> RealmSyncInfo(USER.ordinal, Date(0))
             moduleId.isNotEmpty() -> RealmSyncInfo(MODULE.ordinal, Date(0))
             else -> RealmSyncInfo(GLOBAL.ordinal, Date(0))
-        }
-
-        realm.executeTransaction {
-            it.insertOrUpdate(syncInfo)
-        }
-
-        return syncInfo
+        }.apply { realm.executeTransaction { it.insertOrUpdate(this) } }
     }
 
     protected fun RealmSyncInfo.deepEquals(other: RealmSyncInfo): Boolean = when {
