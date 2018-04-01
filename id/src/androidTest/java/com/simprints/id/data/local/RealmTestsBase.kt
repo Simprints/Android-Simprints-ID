@@ -56,13 +56,11 @@ open class RealmTestsBase {
 
     protected fun saveFakeSyncInfo(realm: Realm,
                                    userId: String = "",
-                                   moduleId: String = ""): RealmSyncInfo {
-        return when {
-            userId.isNotEmpty() -> RealmSyncInfo(USER.ordinal, Date(0))
-            moduleId.isNotEmpty() -> RealmSyncInfo(MODULE.ordinal, Date(0))
-            else -> RealmSyncInfo(GLOBAL.ordinal, Date(0))
-        }.apply { realm.executeTransaction { it.insertOrUpdate(this) } }
-    }
+                                   moduleId: String = ""): RealmSyncInfo = when {
+        userId.isNotEmpty() -> RealmSyncInfo(USER.ordinal, Date(0))
+        moduleId.isNotEmpty() -> RealmSyncInfo(MODULE.ordinal, Date(0))
+        else -> RealmSyncInfo(GLOBAL.ordinal, Date(0))
+    }.apply { realm.executeTransaction { it.insertOrUpdate(this) } }
 
     protected fun RealmSyncInfo.deepEquals(other: RealmSyncInfo): Boolean = when {
         this.id != other.id -> false
