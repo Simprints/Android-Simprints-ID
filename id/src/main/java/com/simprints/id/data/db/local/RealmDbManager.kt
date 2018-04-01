@@ -21,12 +21,12 @@ import kotlin.collections.ArrayList
 class RealmDbManager(private val appContext: Context) : LocalDbManager {
 
     companion object {
-        private const val USER_ID_FIELD = "userId"
-        private const val PROJECT_ID_FIELD = "projectId"
-        private const val PATIENT_ID_FIELD = "patientId"
-        private const val MODULE_ID_FIELD = "moduleId"
-        private const val TO_SYNC_FIELD = "toSync"
-        private const val UPDATED_FIELD = "updatedAt"
+        const val USER_ID_FIELD = "userId"
+        const val PROJECT_ID_FIELD = "projectId"
+        const val PATIENT_ID_FIELD = "patientId"
+        const val MODULE_ID_FIELD = "moduleId"
+        const val TO_SYNC_FIELD = "toSync"
+        const val UPDATED_FIELD = "updatedAt"
 
         private const val LEGACY_APP_KEY_LENGTH: Int = 8
     }
