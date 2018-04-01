@@ -39,6 +39,12 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         Realm.init(appContext)
     }
 
+    override fun getRealmInstance(): Realm {
+        realmConfig?.let {
+            return Realm.getInstance(it) ?: throw RealmUninitialisedError("Error in getInstance")
+        } ?: throw RealmUninitialisedError("RealmConfig null")
+    }
+
     override fun signInToLocal(localDbKey: LocalDbKey): Completable = Completable.create { em ->
         Timber.d("Realm sign in. Project: ${localDbKey.projectId} Key: $localDbKey")
 
@@ -123,12 +129,6 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
             val query = buildQueryForPerson(it, patientId, projectId, userId, moduleId, toSync)
             ArrayList(it.copyFromRealm(query.findAll(), 4))
         }
-    }
-
-    override fun getRealmInstance(): Realm {
-        realmConfig?.let {
-            return Realm.getInstance(it) ?: throw RealmUninitialisedError("Error in getInstance")
-        } ?: throw RealmUninitialisedError("RealmConfig null")
     }
 
     override fun getValidRealmConfig(): RealmConfiguration {
