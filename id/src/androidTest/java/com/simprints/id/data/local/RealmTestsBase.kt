@@ -16,6 +16,7 @@ open class RealmTestsBase {
     companion object {
         private const val KEY_LENGTH = 64
 
+
         const val legacyDatabaseName: String = "legacyDB"
         const val newDatabaseName: String = "newDatabase"
         val newDatabaseKey: ByteArray = Arrays.copyOf("newKey".toByteArray(), KEY_LENGTH)
@@ -33,10 +34,18 @@ open class RealmTestsBase {
 
     protected fun getFakePerson(): rl_Person = PeopleGeneratorUtils.getRandomPerson()
 
-    protected fun saveFakePerson(realm: Realm, fakePerson: rl_Person) {
+    protected fun saveFakePerson(realm: Realm, fakePerson: rl_Person): rl_Person {
         realm.executeTransaction {
             it.insertOrUpdate(fakePerson)
         }
+        return fakePerson
+    }
+
+    protected fun saveFakePeople(realm: Realm, people: ArrayList<rl_Person>): ArrayList<rl_Person> {
+        realm.executeTransaction {
+            it.insertOrUpdate(people)
+        }
+        return people
     }
 
     protected fun deleteAll(realm: Realm) {
