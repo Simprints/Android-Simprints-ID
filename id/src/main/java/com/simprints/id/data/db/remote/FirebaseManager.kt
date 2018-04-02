@@ -17,7 +17,7 @@ import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.data.db.sync.SyncApiInterface
+import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.exceptions.safe.remoteDbManager.DownloadingAPersonWhoDoesntExistOnServer
@@ -210,13 +210,13 @@ class FirebaseManager(private val appContext: Context,
 
     override fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable =
         getSyncApi().flatMapCompletable {
-            it.upSync(hashMapOf("patients" to patientsToUpload))
+            it.uploadPersons(hashMapOf("patients" to patientsToUpload))
                 .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
         }
 
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getSyncApi().flatMap {
-            it.getPatient(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+            it.downloadPersons(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
                 .map { if (it.isEmpty())
                     throw DownloadingAPersonWhoDoesntExistOnServer()
                 else it.first()
@@ -225,19 +225,19 @@ class FirebaseManager(private val appContext: Context,
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
         getSyncApi().flatMap {
-            it.patientsCount(syncParams.toMap())
+            it.personsCount(syncParams.toMap())
                 .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
                 .map { it.count }
         }
 
-    override fun getSyncApi(): Single<SyncApiInterface> =
+    override fun getSyncApi(): Single<RemoteApiInterface> =
         getCurrentFirestoreToken()
             .flatMap {
                 Single.just(getApiClient(it))
             }
 
-    private fun getApiClient(authToken: String): SyncApiInterface =
-        SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl, authToken).api
+    private fun getApiClient(authToken: String): RemoteApiInterface =
+        SimApiClient(RemoteApiInterface::class.java, RemoteApiInterface.baseUrl, authToken).api
 
     companion object {
         private const val COLLECTION_LOCAL_DB_KEYS = "localDbKeys"

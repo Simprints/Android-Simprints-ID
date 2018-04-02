@@ -12,7 +12,7 @@ import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.NaiveSync
-import com.simprints.id.data.db.sync.SyncApiInterface
+import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class SyncTest : RxJavaTest() {
 
     private var mockServer = MockWebServer()
-    private lateinit var apiClient: SimApiClient<SyncApiInterface>
+    private lateinit var apiClient: SimApiClient<RemoteApiInterface>
 
     private var remoteDbManager: RemoteDbManager = spy(FirebaseManager(mock(Context::class.java),
         mock(FirebaseConnectionListenerManager::class.java),
@@ -61,7 +61,7 @@ class SyncTest : RxJavaTest() {
         whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just(""))
 
         mockServer.start()
-        apiClient = SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl)
+        apiClient = SimApiClient(RemoteApiInterface::class.java, RemoteApiInterface.baseUrl)
     }
 
     @Test
@@ -70,7 +70,7 @@ class SyncTest : RxJavaTest() {
 
         val patientsToUpload = getRandomPeople(35)
         whenever(localDbManager.loadPersonsFromLocal(toSync = true)).thenReturn(patientsToUpload)
-        val poorNetworkClientMock: SyncApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java))
+        val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
         val sync = NaiveSyncMock(
@@ -96,7 +96,7 @@ class SyncTest : RxJavaTest() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
         val patientsToUpload = getRandomPeople(35)
         whenever(localDbManager.loadPersonsFromLocal(toSync = true)).thenReturn(patientsToUpload)
-        val poorNetworkClientMock: SyncApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, SyncApiInterface::class.java))
+        val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
         val sync = NaiveSyncMock(
@@ -117,7 +117,7 @@ class SyncTest : RxJavaTest() {
 
     @Test
     fun downloadPatientsForGlobalSync_shouldSuccess() {
-        SyncApiInterface.baseUrl = this.mockServer.url("/").toString()
+        RemoteApiInterface.baseUrl = this.mockServer.url("/").toString()
         val localDbMock = Mockito.mock(LocalDbManager::class.java)
 
         //Params
@@ -155,7 +155,7 @@ class SyncTest : RxJavaTest() {
 
     @Test
     fun downloadPatientsForModuleSync_shouldSuccess() {
-        SyncApiInterface.baseUrl = this.mockServer.url("/").toString()
+        RemoteApiInterface.baseUrl = this.mockServer.url("/").toString()
         val localDbMock = Mockito.mock(LocalDbManager::class.java)
 
         //Params
@@ -196,7 +196,7 @@ class SyncTest : RxJavaTest() {
 
     @Test
     fun downloadPatientsForUserSync_shouldSuccess() {
-        SyncApiInterface.baseUrl = this.mockServer.url("/").toString()
+        RemoteApiInterface.baseUrl = this.mockServer.url("/").toString()
         val localDbMock = Mockito.mock(LocalDbManager::class.java)
 
         //Params

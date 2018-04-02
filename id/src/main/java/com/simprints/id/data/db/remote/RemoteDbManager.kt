@@ -6,7 +6,7 @@ import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.sync.SyncApiInterface
+import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
 import com.simprints.id.exceptions.safe.remoteDbManager.DownloadingAPersonWhoDoesntExistOnServer
 import com.simprints.id.secure.models.Tokens
@@ -54,6 +54,6 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
     @Throws(DownloadingAPersonWhoDoesntExistOnServer::class)
     fun downloadPerson(patientId: String, projectId: String): Single<fb_Person>
 
-    fun getSyncApi(): Single<SyncApiInterface>
+    fun getSyncApi(): Single<RemoteApiInterface>
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
 }
