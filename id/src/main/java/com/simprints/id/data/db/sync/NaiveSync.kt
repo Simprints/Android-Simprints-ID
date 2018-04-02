@@ -3,9 +3,11 @@ package com.simprints.id.data.db.sync
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.RealmSyncInfo
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.exceptions.safe.InterruptedSyncException
 import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
@@ -31,6 +33,10 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 
+    private val syncApi: RemoteApiInterface by lazy {
+        remoteDbManager.getSyncApi().blockingGet()
+    }
+
     fun sync(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
         Timber.d("Sync Started")
         return Observable.concat(
@@ -50,7 +56,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
             .updateUploadCounterAndConvertItToProgress(counter, patientsToUpload.size)
     }
 
-     private fun Observable<out MutableList<fb_Person>>.uploadEachBatch(): Observable<Int> =
+    private fun Observable<out MutableList<fb_Person>>.uploadEachBatch(): Observable<Int> =
         flatMap { batch ->
             remoteDbManager
                 .uploadPeople(ArrayList(batch))
@@ -78,31 +84,25 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
     }
 
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
-        Timber.d("Downloading - reading from db")
 
         return remoteDbManager.getNumberOfPatientsForSyncParams(syncParams).flatMapObservable { nPatientsForDownSyncQuery ->
             val nPatientsToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery, syncParams)
+            Timber.d("Downloading batch $nPatientsToDownload persons")
 
-            Timber.d("Downloading - Persons to be downloaded $nPatientsToDownload.")
+            val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup()) ?: RealmSyncInfo(syncParams.toGroup())
 
-            remoteDbManager.getSyncApi().flatMapObservable {
-                Timber.d("Downloading - Making request")
-                val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup())
-                Timber.d("Downloading - Last sync was at ${realmSyncInfo?.lastSyncTime?.time ?: Date(0).time}")
-
-                it.downSync(
-                    realmSyncInfo?.lastSyncTime?.time ?: Date(0).time,
-                    syncParams.toMap())
-                    .flatMapObservable {
-                        downloadNewPatientsFromStream(
-                            isInterrupted,
-                            syncParams,
-                            it.byteStream()).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
-                            .map {
-                                DownloadProgress(it, nPatientsToDownload)
-                            }
-                    }
-            }
+            syncApi.downSync(
+                realmSyncInfo.lastSyncTime.time,
+                syncParams.toMap())
+                .flatMapObservable {
+                    savePersonsFromStream(
+                        isInterrupted,
+                        syncParams,
+                        it.byteStream()).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+                        .map {
+                            DownloadProgress(it, nPatientsToDownload)
+                        }
+                }
         }
     }
 
@@ -117,50 +117,42 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
         return nPatientsForDownSyncQuery - nPatientsForDownSyncParamsInRealm
     }
 
-    protected open fun downloadNewPatientsFromStream(isInterrupted: () -> Boolean,
-                                                     syncParams: SyncTaskParameters,
-                                                     input: InputStream): Observable<Int> =
+    protected open fun savePersonsFromStream(isInterrupted: () -> Boolean,
+                                             syncParams: SyncTaskParameters,
+                                             input: InputStream): Observable<Int> =
 
-        Observable.create<Int> {
-            Timber.d("Downloading - Reading from stream")
+        Observable.create<Int> { result ->
 
             val reader = JsonReader(InputStreamReader(input) as Reader?)
-
             try {
                 reader.beginArray()
                 var totalDownloaded = 0
                 while (reader.hasNext() && !isInterrupted()) {
-                    localDbManager.savePeopleFromStream(reader, gson, syncParams.toGroup()) {
+                    localDbManager.savePersonsFromStreamAndUpdateSyncInfo(reader, gson, syncParams.toGroup()) {
                         totalDownloaded++
 
-                        emitProgressIfRequired(it, totalDownloaded, UPDATE_UI_BATCH_SIZE)
-                        isCurrentBatchDownloadedOrTaskInterrupted(
-                            totalDownloaded,
-                            isInterrupted,
-                            LOCAL_DB_BATCH_SIZE)
+                        emitResultProgressIfRequired(result, totalDownloaded, UPDATE_UI_BATCH_SIZE)
+                        val shouldDownloadingBatchStop = isInterrupted() || hasCurrentBatchDownloadedFinished(totalDownloaded, LOCAL_DB_BATCH_SIZE)
+                        shouldDownloadingBatchStop
                     }
-
-                    localDbManager.updateSyncInfo(syncParams)
                 }
 
                 val possibleError = if (isInterrupted()) InterruptedSyncException() else null
-                finishDownload(reader, it, possibleError)
+                finishDownload(reader, result, possibleError)
             } catch (e: Exception) {
-                finishDownload(reader, it, e)
+                finishDownload(reader, result, e)
             }
         }
 
-    private fun isCurrentBatchDownloadedOrTaskInterrupted(totalDownloaded: Int,
-                                                          isInterrupted: () -> Boolean,
-                                                          maxPatientsForBatch: Int): Boolean {
+    private fun hasCurrentBatchDownloadedFinished(totalDownloaded: Int,
+                                                  maxPatientsForBatch: Int): Boolean {
 
-        val isCurrentBatchFullyDownloaded = totalDownloaded % maxPatientsForBatch == 0
-        return isCurrentBatchFullyDownloaded || isInterrupted()
+        return totalDownloaded % maxPatientsForBatch == 0
     }
 
-    private fun emitProgressIfRequired(it: ObservableEmitter<Int>,
-                                       totalDownloaded: Int,
-                                       emitProgressEvery: Int) {
+    private fun emitResultProgressIfRequired(it: ObservableEmitter<Int>,
+                                             totalDownloaded: Int,
+                                             emitProgressEvery: Int) {
 
         if (totalDownloaded % emitProgressEvery == 0) {
             it.onNext(totalDownloaded)

@@ -1,3 +1,3 @@
 package com.simprints.id.data.db.sync.model
 
-data class PatientsCount(val count: Int)
+data class PersonsCount(val count: Int)

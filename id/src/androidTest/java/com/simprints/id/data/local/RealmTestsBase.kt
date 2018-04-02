@@ -63,7 +63,7 @@ open class RealmTestsBase {
     }.apply { realm.executeTransaction { it.insertOrUpdate(this) } }
 
     protected fun RealmSyncInfo.deepEquals(other: RealmSyncInfo): Boolean = when {
-        this.id != other.id -> false
+        this.syncGroupId != other.syncGroupId -> false
         this.lastSyncTime != other.lastSyncTime -> false
         else -> true
     }

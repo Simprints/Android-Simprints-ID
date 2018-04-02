@@ -7,12 +7,10 @@ import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
-import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
-import io.realm.Sort
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -20,15 +18,15 @@ import kotlin.collections.ArrayList
 
 class RealmDbManager(private val appContext: Context) : LocalDbManager {
 
+
     companion object {
-        const val SYNC_ID_FIELD = "id"
+        const val SYNC_ID_FIELD = "syncGroupId"
 
         const val USER_ID_FIELD = "userId"
         const val PROJECT_ID_FIELD = "projectId"
         const val PATIENT_ID_FIELD = "patientId"
         const val MODULE_ID_FIELD = "moduleId"
         const val TO_SYNC_FIELD = "toSync"
-        const val UPDATED_FIELD = "updatedAt"
 
         private const val LEGACY_APP_KEY_LENGTH: Int = 8
     }
@@ -44,6 +42,7 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
             return Realm.getInstance(it) ?: throw RealmUninitialisedError("Error in getInstance")
         } ?: throw RealmUninitialisedError("RealmConfig null")
     }
+
 
     override fun signInToLocal(localDbKey: LocalDbKey): Completable = Completable.create { em ->
         Timber.d("Realm sign in. Project: ${localDbKey.projectId} Key: $localDbKey")
@@ -67,46 +66,35 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         }.let { em.onComplete() }
     }
 
-    override fun savePeopleFromStream(reader: JsonReader,
-                                      gson: Gson,
-                                      groupSync: Constants.GROUP,
-                                      shouldStop: () -> Boolean) {
+    override fun savePersonsFromStreamAndUpdateSyncInfo(readerOfPersonsArray: JsonReader,
+                                                        gson: Gson,
+                                                        groupSync: Constants.GROUP,
+                                                        shouldStop: (personSaved: fb_Person) -> Boolean) {
+
         getRealmInstance().use {
             it.executeTransaction {
-                while (reader.hasNext()) {
-                    val person = gson.fromJson<fb_Person>(reader, fb_Person::class.java)
-                    it.insertOrUpdate(rl_Person(person))
+                while (readerOfPersonsArray.hasNext()) {
 
-                    val lastUpdatedTime = person.updatedAt
-                    if (lastUpdatedTime != null) {
-                        it.insertOrUpdate(RealmSyncInfo(groupSync.ordinal, lastUpdatedTime))
-                    }
+                    val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPersonsArray, it)
+                    it.insertOrUpdate(RealmSyncInfo(
+                        syncGroupId = groupSync.ordinal,
+                        lastSyncTime = lastPersonSaved.updatedAt ?: Date(0))
+                    )
 
-                    if (shouldStop()) {
+                    if (shouldStop(lastPersonSaved)) {
                         break
                     }
+
                 }
             }
         }
     }
 
-    override fun updateSyncInfo(syncParams: SyncTaskParameters) {
-        getRealmInstance().use {
-            it.executeTransaction {
-                val query = buildQueryForPerson(
-                    realm = it,
-                    projectId = syncParams.projectId,
-                    moduleId = syncParams.moduleId,
-                    userId = syncParams.userId,
-                    toSync = false
-                )
-
-                val lastTimestamp = query.sort(UPDATED_FIELD, Sort.DESCENDING).findFirst()
-                it.insertOrUpdate(RealmSyncInfo(
-                    id = syncParams.toGroup().ordinal,
-                    lastSyncTime = lastTimestamp?.updatedAt ?: Date(0))
-                )
-            }
+    private fun parseFromStreamAndSavePerson(gson: Gson,
+                                             readerOfPersonsArray: JsonReader,
+                                             realm: Realm): fb_Person {
+        return gson.fromJson<fb_Person>(readerOfPersonsArray, fb_Person::class.java).apply {
+            realm.insertOrUpdate(rl_Person(this))
         }
     }
 
@@ -137,7 +125,7 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
 
     override fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo? {
         return getRealmInstance().use {
-            it.where(RealmSyncInfo::class.java).equalTo("id", typeSync.ordinal).findFirst()
+            it.where(RealmSyncInfo::class.java).equalTo(SYNC_ID_FIELD, typeSync.ordinal).findFirst()
         }
     }
 

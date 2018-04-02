@@ -58,6 +58,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         }
 
         //TODO: I Don't know what this is but it needs to be destroyed immediately
+        //FIXME: remove this code
         buttonAddPersonRealm.setOnClickListener {
             app.dbManager.getRealmInstance().executeTransaction { realm ->
                 realm.copyToRealmOrUpdate(PeopleGeneratorUtils.getRandomPerson())
