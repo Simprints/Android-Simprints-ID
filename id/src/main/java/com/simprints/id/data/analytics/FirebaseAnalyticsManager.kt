@@ -8,6 +8,7 @@ import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.data.db.remote.models.fb_Session
+import com.simprints.id.exceptions.safe.SafeException
 import timber.log.Timber
 import kotlin.reflect.full.memberProperties
 
@@ -51,7 +52,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         Crashlytics.logException(error)
     }
 
-    override fun logSafeException(exception: RuntimeException) {
+    override fun logSafeException(exception: SafeException) {
         Timber.d("FirebaseAnalyticsManager.logSafeException(description=$exception)")
         val bundle = Bundle()
         bundle.putString("exception", exception.toString())

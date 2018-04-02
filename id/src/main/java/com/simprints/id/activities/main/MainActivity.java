@@ -74,7 +74,6 @@ import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.FingerIdentifier;
 import com.simprints.libsimprints.Registration;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -556,11 +555,7 @@ public class MainActivity extends AppCompatActivity implements
                     }, new Consumer<Throwable>() {
                         @Override
                         public void accept(Throwable throwable) {
-                            if (throwable instanceof IOException) {
-                                handleRegistrationSuccess();
-                            } else {
-                                handleRegistrationFailure(throwable);
-                            }
+                            handleRegistrationFailure(throwable);
                         }
                     });
             } else {
@@ -581,7 +576,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void handleRegistrationFailure(Throwable throwable) {
-        dataManager.logSafeException(new RuntimeException(throwable));
+        dataManager.logError(new Error(throwable));
         launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         setResult(RESULT_CANCELED);
         finish();
