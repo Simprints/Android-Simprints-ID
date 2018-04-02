@@ -1,6 +1,6 @@
 package com.simprints.id.exceptions.safe.secure
 
-import com.simprints.id.exceptions.safe.SafeException
+import com.simprints.id.exceptions.safe.SimprintsException
 
 
-class AuthException(cause: Throwable) : SafeException(cause)
+class AuthException(cause: Throwable) : SimprintsException(cause)

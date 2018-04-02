@@ -1,7 +1,7 @@
 package com.simprints.id.exceptions.safe.secure
 
-import com.simprints.id.exceptions.safe.SafeException
+import com.simprints.id.exceptions.safe.SimprintsException
 
 
 class SimprintsInternalServerException(message: String = "SimprintsInternalServerException")
-    : SafeException(message)
+    : SimprintsException(message)
