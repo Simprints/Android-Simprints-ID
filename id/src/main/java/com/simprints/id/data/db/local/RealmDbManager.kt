@@ -57,14 +57,14 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         return Completable.complete()
     }
 
-    override fun savePersonsFromStreamAndUpdateSyncInfo(readerOfPersonsArray: JsonReader,
-                                                        gson: Gson,
-                                                        groupSync: Constants.GROUP,
-                                                        shouldStop: (personSaved: fb_Person) -> Boolean) {
+    override fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
+                                                       gson: Gson,
+                                                       groupSync: Constants.GROUP,
+                                                       shouldStop: (personSaved: fb_Person) -> Boolean) {
 
         getRealmInstance().executeTransaction { r ->
-            while (readerOfPersonsArray.hasNext()) {
-                val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPersonsArray, r)
+            while (readerOfPeopleArray.hasNext()) {
+                val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPeopleArray, r)
                 r.insertOrUpdate(RealmSyncInfo(groupSync.ordinal, lastPersonSaved.updatedAt ?: Date(0)))
 
                 if (shouldStop(lastPersonSaved)) {
@@ -75,27 +75,27 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
         }
     }
 
-    private fun parseFromStreamAndSavePerson(gson: Gson, readerOfPersonsArray: JsonReader, r: Realm): fb_Person {
-        val person = gson.fromJson<fb_Person>(readerOfPersonsArray, fb_Person::class.java)
+    private fun parseFromStreamAndSavePerson(gson: Gson, readerOfPeopleArray: JsonReader, r: Realm): fb_Person {
+        val person = gson.fromJson<fb_Person>(readerOfPeopleArray, fb_Person::class.java)
         r.insertOrUpdate(rl_Person(person))
         return person
     }
 
-    override fun getPersonsCountFromLocal(patientId: String?,
-                                          projectId: String?,
-                                          userId: String?,
-                                          moduleId: String?,
-                                          toSync: Boolean?): Int {
+    override fun getPeopleCountFromLocal(patientId: String?,
+                                         projectId: String?,
+                                         userId: String?,
+                                         moduleId: String?,
+                                         toSync: Boolean?): Int {
         val realm = getRealmInstance()
         val query = buildQueryForPerson(realm, patientId, projectId, userId, moduleId, toSync)
         return query.count().toInt().also { realm.close() }
     }
 
-    override fun loadPersonsFromLocal(patientId: String?,
-                                      projectId: String?,
-                                      userId: String?,
-                                      moduleId: String?,
-                                      toSync: Boolean?): ArrayList<rl_Person> {
+    override fun loadPeopleFromLocal(patientId: String?,
+                                     projectId: String?,
+                                     userId: String?,
+                                     moduleId: String?,
+                                     toSync: Boolean?): ArrayList<rl_Person> {
 
         val realm = getRealmInstance()
         val query = buildQueryForPerson(realm, patientId, projectId, userId, moduleId, toSync)

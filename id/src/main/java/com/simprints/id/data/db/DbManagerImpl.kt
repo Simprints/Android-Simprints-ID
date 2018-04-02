@@ -85,7 +85,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         }
 
     override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
-        val result = localDbManager.loadPersonsFromLocal(
+        val result = localDbManager.loadPeopleFromLocal(
             projectId = projectId,
             patientId = guid).map { it.libPerson }
 
@@ -105,9 +105,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
         val result = when (group) {
-            Constants.GROUP.GLOBAL -> localDbManager.loadPersonsFromLocal().map { it.libPerson }
-            Constants.GROUP.USER -> localDbManager.loadPersonsFromLocal(userId = userId).map { it.libPerson }
-            Constants.GROUP.MODULE -> localDbManager.loadPersonsFromLocal(moduleId = moduleId).map { it.libPerson }
+            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal().map { it.libPerson }
+            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(userId = userId).map { it.libPerson }
+            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(moduleId = moduleId).map { it.libPerson }
         }
         destinationList.addAll(result)
         callback?.onSuccess()
@@ -118,7 +118,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                                 userId: String?,
                                 moduleId: String?,
                                 toSync: Boolean?): Int =
-        localDbManager.getPersonsCountFromLocal(projectId, personId, userId, moduleId, toSync)
+        localDbManager.getPeopleCountFromLocal(projectId, personId, userId, moduleId, toSync)
 
     override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
         remoteDbManager.saveIdentificationInRemote(probe, projectId, userId, moduleId, androidId, matchSize, matches, sessionId)

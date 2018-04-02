@@ -18,19 +18,19 @@ interface LocalDbManager {
 
     // Data transfer
     fun insertOrUpdatePersonInLocal(person: rl_Person): Completable
-    fun savePersonsFromStreamAndUpdateSyncInfo(readerOfPersonsArray: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: (personSaved: fb_Person) -> Boolean)
+    fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: (personSaved: fb_Person) -> Boolean)
 
-    fun getPersonsCountFromLocal(patientId: String? = null,
-                                 projectId: String? = null,
-                                 userId: String? = null,
-                                 moduleId: String? = null,
-                                 toSync: Boolean? = null): Int
+    fun getPeopleCountFromLocal(patientId: String? = null,
+                                projectId: String? = null,
+                                userId: String? = null,
+                                moduleId: String? = null,
+                                toSync: Boolean? = null): Int
 
-    fun loadPersonsFromLocal(patientId: String? = null,
-                             projectId: String? = null,
-                             userId: String? = null,
-                             moduleId: String? = null,
-                             toSync: Boolean? = null): ArrayList<rl_Person>
+    fun loadPeopleFromLocal(patientId: String? = null,
+                            projectId: String? = null,
+                            userId: String? = null,
+                            moduleId: String? = null,
+                            toSync: Boolean? = null): ArrayList<rl_Person>
 
     //Sync
     fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo?
