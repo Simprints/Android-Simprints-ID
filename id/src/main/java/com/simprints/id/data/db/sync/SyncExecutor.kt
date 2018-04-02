@@ -23,9 +23,9 @@ import java.io.Reader
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-open class NaiveSync(private val localDbManager: LocalDbManager,
-                     private val remoteDbManager: RemoteDbManager,
-                     private val gson: Gson) {
+open class SyncExecutor(private val localDbManager: LocalDbManager,
+                        private val remoteDbManager: RemoteDbManager,
+                        private val gson: Gson) {
 
     companion object {
         private const val LOCAL_DB_BATCH_SIZE = 10000

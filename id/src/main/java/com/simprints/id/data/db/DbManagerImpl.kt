@@ -9,7 +9,7 @@ import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.sync.NaiveSync
+import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.domain.Constants
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.progress.Progress
@@ -137,7 +137,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     }
 
     override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
-        NaiveSync(
+        SyncExecutor(
             localDbManager,
             remoteDbManager,
             JsonHelper.gson).sync(interrupted, parameters)

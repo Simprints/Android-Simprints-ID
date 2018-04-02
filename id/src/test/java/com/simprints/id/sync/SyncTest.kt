@@ -11,7 +11,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.sync.NaiveSync
+import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.progress.DownloadProgress
@@ -73,7 +73,7 @@ class SyncTest : RxJavaTest() {
         val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = NaiveSyncMock(
+        val sync = SyncExecutorMock(
             localDbManager,
             remoteDbManager,
             JsonHelper.gson)
@@ -99,7 +99,7 @@ class SyncTest : RxJavaTest() {
         val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = NaiveSyncMock(
+        val sync = SyncExecutorMock(
             localDbManager,
             remoteDbManager,
             JsonHelper.gson)
@@ -142,7 +142,7 @@ class SyncTest : RxJavaTest() {
             .assertComplete()
 
         Assert.assertTrue(testObserver.values().containsAll(arrayListOf(
-            DownloadProgress(NaiveSync.UPDATE_UI_BATCH_SIZE, nPatientsToDownload),
+            DownloadProgress(SyncExecutor.UPDATE_UI_BATCH_SIZE, nPatientsToDownload),
             DownloadProgress(nPatientsToDownload, nPatientsToDownload))))
 
         val patientsCountRequest = mockServer.takeRequest().requestUrl
@@ -181,7 +181,7 @@ class SyncTest : RxJavaTest() {
             .assertComplete()
 
         Assert.assertTrue(testObserver.values().containsAll(arrayListOf(
-            DownloadProgress(NaiveSync.UPDATE_UI_BATCH_SIZE, nPatientsToDownload),
+            DownloadProgress(SyncExecutor.UPDATE_UI_BATCH_SIZE, nPatientsToDownload),
             DownloadProgress(nPatientsToDownload, nPatientsToDownload))))
 
         val patientsCountRequest = mockServer.takeRequest()
@@ -222,7 +222,7 @@ class SyncTest : RxJavaTest() {
             .assertComplete()
 
         Assert.assertTrue(testObserver.values().containsAll(arrayListOf(
-            DownloadProgress(NaiveSync.UPDATE_UI_BATCH_SIZE, nPatientsToDownload),
+            DownloadProgress(SyncExecutor.UPDATE_UI_BATCH_SIZE, nPatientsToDownload),
             DownloadProgress(nPatientsToDownload, nPatientsToDownload))))
 
         val patientsCountRequest = mockServer.takeRequest()
@@ -263,7 +263,7 @@ class SyncTest : RxJavaTest() {
         //Mock app RealmSyncInfo for syncParams
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup().ordinal, lastSyncTime))
 
-        val sync = NaiveSyncMock(
+        val sync = SyncExecutorMock(
             localDbMock,
             remoteDbMock,
             JsonHelper.gson)
