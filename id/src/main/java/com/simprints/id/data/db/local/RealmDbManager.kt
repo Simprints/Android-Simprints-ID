@@ -93,14 +93,6 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         updateSyncInfo(syncParams)
     }
 
-    private fun parseFromStreamAndSavePerson(gson: Gson,
-                                             readerOfPersonsArray: JsonReader,
-                                             realm: Realm): fb_Person {
-        return gson.fromJson<fb_Person>(readerOfPersonsArray, fb_Person::class.java).apply {
-            realm.insertOrUpdate(rl_Person(this))
-        }
-    }
-
     override fun getPersonsCountFromLocal(patientId: String?,
                                           projectId: String?,
                                           userId: String?,
@@ -139,13 +131,23 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
                                     moduleId: String? = null,
                                     toSync: Boolean? = null): RealmQuery<rl_Person> {
 
-        val query = realm.where(rl_Person::class.java)
-        projectId?.let { query.equalTo(PROJECT_ID_FIELD, it) }
-        patientId?.let { query.equalTo(PATIENT_ID_FIELD, it) }
-        userId?.let { query.equalTo(USER_ID_FIELD, it) }
-        moduleId?.let { query.equalTo(MODULE_ID_FIELD, it) }
-        toSync?.let { query.equalTo(TO_SYNC_FIELD, it) }
-        return query
+        return realm.where(rl_Person::class.java).apply {
+            projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
+            patientId?.let { this.equalTo(PATIENT_ID_FIELD, it) }
+            userId?.let { this.equalTo(USER_ID_FIELD, it) }
+            moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
+            toSync?.let { this.equalTo(TO_SYNC_FIELD, it) }
+        }
+    }
+
+    private fun buildQueryForPerson(realm: Realm,
+                                    syncParams: SyncTaskParameters): RealmQuery<rl_Person> {
+        return buildQueryForPerson(
+            realm = realm,
+            projectId = syncParams.projectId,
+            userId = syncParams.userId,
+            moduleId = syncParams.moduleId
+        )
     }
 
     private fun checkLegacyDatabaseAndMigrate(dbKey: LocalDbKey) {
@@ -183,21 +185,25 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
 
     private fun updateSyncInfo(syncParams: SyncTaskParameters) {
         getRealmInstance().use { realm ->
-            val query = buildQueryForPerson(
-                realm = realm,
-                projectId = syncParams.projectId,
-                moduleId = syncParams.moduleId,
-                userId = syncParams.userId
-            )
-
-            query.sort(UPDATE_TIME_FIELD, Sort.DESCENDING).findAll().first()?.let { person ->
-                realm.executeTransaction {
-                    it.insertOrUpdate(RealmSyncInfo(
-                        syncGroupId = syncParams.toGroup().ordinal,
-                        lastSyncTime = person.updatedAt ?: Date(0))
-                    )
+            buildQueryForPerson(realm, syncParams)
+                .sort(UPDATE_TIME_FIELD, Sort.DESCENDING)
+                .findAll()
+                .first()?.let { person ->
+                    realm.executeTransaction {
+                        it.insertOrUpdate(RealmSyncInfo(
+                            syncGroupId = syncParams.toGroup().ordinal,
+                            lastSyncTime = person.updatedAt ?: Date(0))
+                        )
+                    }
                 }
-            }
+        }
+    }
+
+    private fun parseFromStreamAndSavePerson(gson: Gson,
+                                             readerOfPersonsArray: JsonReader,
+                                             realm: Realm): fb_Person {
+        return gson.fromJson<fb_Person>(readerOfPersonsArray, fb_Person::class.java).apply {
+            realm.insertOrUpdate(rl_Person(this))
         }
     }
 
