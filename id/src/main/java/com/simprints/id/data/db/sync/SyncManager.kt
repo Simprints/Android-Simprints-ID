@@ -9,9 +9,9 @@ import com.simprints.id.services.sync.SyncTaskParameters.*
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 
-class NaiveSyncManager(private val dataManager: DataManager,
-                       private val syncClient: SyncClient,
-                       private val uiObserver: DisposableObserver<Progress>? = null) {
+class SyncManager(private val dataManager: DataManager,
+                  private val syncClient: SyncClient,
+                  private val uiObserver: DisposableObserver<Progress>? = null) {
 
     fun sync(user: Constants.GROUP) {
 

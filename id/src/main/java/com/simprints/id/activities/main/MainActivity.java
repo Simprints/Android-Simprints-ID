@@ -42,7 +42,7 @@ import com.simprints.id.activities.matching.MatchingActivity;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.data.db.sync.NaiveSyncManager;
+import com.simprints.id.data.db.sync.SyncManager;
 import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.domain.Finger;
 import com.simprints.id.domain.FingerRes;
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements
     // Singletons
     private AppState appState;
     private Setup setup;
-    private NaiveSyncManager syncManager;
+    private SyncManager syncManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -805,7 +805,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initSyncManager() {
-        syncManager = new NaiveSyncManager(dataManager, syncClient, new DisposableObserver<Progress>() {
+        syncManager = new SyncManager(dataManager, syncClient, new DisposableObserver<Progress>() {
 
             @Override public void onStart() {
                 System.out.println("Start!");
