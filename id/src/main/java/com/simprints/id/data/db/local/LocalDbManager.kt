@@ -3,8 +3,8 @@ package com.simprints.id.data.db.local
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
-import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -21,7 +21,10 @@ interface LocalDbManager {
     // Data transfer
     fun insertOrUpdatePersonInLocal(person: rl_Person): Completable
 
-    fun savePeopleFromStream(reader: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: () -> Boolean)
+    fun savePersonsFromStreamAndUpdateSyncInfo(readerOfPersonsArray: JsonReader,
+                                               gson: Gson,
+                                               groupSync: Constants.GROUP,
+                                               shouldStop: (personSaved: fb_Person) -> Boolean)
 
     fun getPersonsCountFromLocal(patientId: String? = null,
                                  projectId: String? = null,
@@ -42,7 +45,5 @@ interface LocalDbManager {
     fun getValidRealmConfig(): RealmConfiguration
 
     fun getRealmInstance(): Realm
-
-    fun updateSyncInfo(syncParams: SyncTaskParameters)
 
 }

@@ -10,7 +10,7 @@ import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.authListener.FirebaseAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
-import com.simprints.id.data.db.sync.SyncApiInterface
+import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.whenever
 import io.reactivex.Completable
@@ -45,7 +45,7 @@ fun mockIsSignedIn(app: Application, sharedPrefs: SharedPreferences) {
 }
 
 fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer: MockWebServer): Triple<DbManager, LocalDbManager, RemoteDbManager> {
-    SyncApiInterface.baseUrl = mockServer.url("/").toString()
+    RemoteApiInterface.baseUrl = mockServer.url("/").toString()
     val localDbManager = Mockito.spy(LocalDbManager::class.java)
     val mockConnectionListenerManager = Mockito.mock(FirebaseConnectionListenerManager::class.java)
     val mockAuthListenerManager = Mockito.mock(FirebaseAuthListenerManager::class.java)

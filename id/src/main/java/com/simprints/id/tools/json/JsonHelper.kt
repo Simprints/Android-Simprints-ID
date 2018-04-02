@@ -9,22 +9,18 @@ class JsonHelper {
         val gson: Gson by lazy {
 
             val builder = GsonBuilder()
-            builder.registerTypeAdapter(Date::class.java, JsonDeserializer<Date> { json, _, _ ->
-                if (json.asJsonPrimitive.isNumber)
-                    Date(json.asJsonPrimitive.asLong)
-                else Date(json.asJsonPrimitive.asString)
-            })
+            registerDateAdapter(builder)
+            registerFingerIdentifierAdapter(builder)
+            enablePostProcessing(builder)
+            defineCustomStrategyToSkipSerialization(builder)
+            builder.create()
+        }
 
-            builder.registerTypeAdapter(FingerIdentifier::class.java, JsonDeserializer<FingerIdentifier> { json, _, _ ->
-                if (json.asJsonPrimitive.isNumber)
-                    FingerIdentifier.values()[json.asJsonPrimitive.asInt]
-                else FingerIdentifier.valueOf(json.asJsonPrimitive.asString)
-            })
+        private fun enablePostProcessing(builder: GsonBuilder) {
+            builder.registerTypeAdapterFactory(PostProcessingEnabler())
+        }
 
-            builder.registerTypeAdapter(FingerIdentifier::class.java, JsonSerializer<FingerIdentifier> { src, _, _ ->
-                JsonPrimitive(src.name)
-            })
-
+        private fun defineCustomStrategyToSkipSerialization(builder: GsonBuilder) {
             val exclusionStrategy = object : ExclusionStrategy {
                 override fun shouldSkipField(fieldAttributes: FieldAttributes): Boolean {
                     return fieldAttributes.getAnnotation(SkipSerialisationProperty::class.java) != null ||
@@ -36,8 +32,26 @@ class JsonHelper {
                 }
             }
             builder.addSerializationExclusionStrategy(exclusionStrategy)
+        }
 
-            builder.create()
+        private fun registerFingerIdentifierAdapter(builder: GsonBuilder) {
+            builder.registerTypeAdapter(FingerIdentifier::class.java, JsonDeserializer<FingerIdentifier> { json, _, _ ->
+                if (json.asJsonPrimitive.isNumber)
+                    FingerIdentifier.values()[json.asJsonPrimitive.asInt]
+                else FingerIdentifier.valueOf(json.asJsonPrimitive.asString)
+            })
+
+            builder.registerTypeAdapter(FingerIdentifier::class.java, JsonSerializer<FingerIdentifier> { src, _, _ ->
+                JsonPrimitive(src.name)
+            })
+        }
+
+        private fun registerDateAdapter(builder: GsonBuilder) {
+            builder.registerTypeAdapter(Date::class.java, JsonDeserializer<Date> { json, _, _ ->
+                if (json.asJsonPrimitive.isNumber)
+                    Date(json.asJsonPrimitive.asLong)
+                else Date(json.asJsonPrimitive.asString) //TODO: find a replacement for deprecated method
+            })
         }
 
         fun toJson(any: Any): String {
