@@ -47,6 +47,7 @@ import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.domain.Finger;
 import com.simprints.id.domain.FingerRes;
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError;
+import com.simprints.id.exceptions.unsafe.SimprintsError;
 import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
 import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.services.progress.Progress;
@@ -500,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements
         alertLauncher.launch(alertType, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
-    private void handleUnexpectedError(Error error) {
+    private void handleUnexpectedError(SimprintsError error) {
         dataManager.logError(error);
         launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
     }
@@ -576,7 +577,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void handleRegistrationFailure(Throwable throwable) {
-        dataManager.logError(new Error(throwable));
+        dataManager.logError(new SimprintsError(throwable));
         launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         setResult(RESULT_CANCELED);
         finish();
@@ -928,7 +929,7 @@ public class MainActivity extends AppCompatActivity implements
                                         appState.getScanner().getTemplate()));
                 // TODO : change exceptions in libcommon
             } catch (IllegalArgumentException ex) {
-                dataManager.logError(new Error("IllegalArgumentException in MainActivity.captureSuccess()"));
+                dataManager.logError(new SimprintsError("IllegalArgumentException in MainActivity.captureSuccess()"));
                 resetUIFromError();
                 return;
             }

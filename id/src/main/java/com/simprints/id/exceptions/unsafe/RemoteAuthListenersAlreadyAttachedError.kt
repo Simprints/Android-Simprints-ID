@@ -1,4 +1,4 @@
 package com.simprints.id.exceptions.unsafe
 
 
-class RemoteAuthListenersAlreadyAttachedError(message: String = "RemoteAuthListenersAlreadyAttachedError") : Error(message)
+class RemoteAuthListenersAlreadyAttachedError(message: String = "RemoteAuthListenersAlreadyAttachedError") : SimprintsError(message)

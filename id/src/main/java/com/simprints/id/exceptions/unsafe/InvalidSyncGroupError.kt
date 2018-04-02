@@ -1,4 +1,4 @@
 package com.simprints.id.exceptions.unsafe
 
 
-class InvalidSyncGroupError(message: String = "InvalidSyncGroupError") : Error(message)
+class InvalidSyncGroupError(message: String = "InvalidSyncGroupError") : SimprintsError(message)
