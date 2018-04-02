@@ -2,6 +2,7 @@ package com.simprints.id.data.db.sync
 
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.Constants
+import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncClient
@@ -69,7 +70,7 @@ class SyncManager(private val dataManager: DataManager,
         private fun logThrowable(throwable: Throwable) {
             if (throwable is Error) {
                 dataManager.logError(throwable)
-            } else if (throwable is RuntimeException) {
+            } else if (throwable is SafeException) {
                 dataManager.logSafeException(throwable)
             }
         }

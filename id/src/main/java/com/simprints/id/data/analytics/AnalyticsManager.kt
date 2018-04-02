@@ -1,5 +1,6 @@
 package com.simprints.id.data.analytics
 
+import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
 
@@ -11,7 +12,7 @@ interface AnalyticsManager {
     fun logAlert(alertName: String, apiKey: String, moduleId: String, userId: String,
                  deviceId: String)
 
-    fun logSafeException(exception: RuntimeException)
+    fun logSafeException(exception: SafeException)
 
     fun logCallout(callout: Callout)
 
