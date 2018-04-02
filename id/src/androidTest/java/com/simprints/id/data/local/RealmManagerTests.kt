@@ -10,6 +10,7 @@ import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Constants.GROUP.*
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.extensions.awaitAndAssertSuccess
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople
@@ -29,7 +30,7 @@ import java.util.*
 class RealmManagerTests : RealmTestsBase() {
 
     companion object {
-        const val SYNC_INFO_FIELD = "infoField"
+        const val FAKE_DB_FIELD = "infoField"
     }
 
     private lateinit var realm: Realm
@@ -186,6 +187,25 @@ class RealmManagerTests : RealmTestsBase() {
     }
 
     @Test
+    fun savePeopleFromStream_ShouldSaveLatestSyncTime() {
+        val downloadPeople = getRandomPeople(35)
+        saveFromStream(GLOBAL, 35, downloadPeople)
+
+        val latestPersonTime = Calendar.getInstance().apply {
+            time = downloadPeople.maxBy { it.updatedAt?.time ?: 0 }?.updatedAt
+        }
+
+        val dbSyncTime = Calendar.getInstance().apply {
+            time = realm.where(RealmSyncInfo::class.java)
+                .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal)
+                .findAll()
+                .first()!!.lastSyncTime
+        }
+
+        assertEquals(latestPersonTime.get(Calendar.SECOND), dbSyncTime.get(Calendar.SECOND))
+    }
+
+    @Test
     fun updateSyncInfo_ShouldSucceed() {
         saveFromStream(GLOBAL)
 
@@ -195,18 +215,17 @@ class RealmManagerTests : RealmTestsBase() {
             .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal).findFirst()!!.syncGroupId, GLOBAL.ordinal)
     }
 
-    //
-//    @Test
-//    fun updateSyncInfoBesidesProject_ShouldNotReturnProjectSync() {
-//        realmManager.updateSyncInfo(UserSyncTaskParameters(SYNC_INFO_FIELD, SYNC_INFO_FIELD))
-//        realmManager.updateSyncInfo(ModuleIdSyncTaskParameters(SYNC_INFO_FIELD, SYNC_INFO_FIELD))
-//
-//        assertEquals(realm.where(RealmSyncInfo::class.java)
-//            .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal).count(), 0)
-//        assertEquals(realm.where(RealmSyncInfo::class.java)
-//            .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal).findFirst(), null)
-//    }
-//
+    @Test
+    fun updateSyncInfoBesidesProject_ShouldNotReturnProjectSync() {
+        saveFromStream(USER)
+        saveFromStream(MODULE)
+
+        assertEquals(realm.where(RealmSyncInfo::class.java)
+            .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal).count(), 0)
+        assertEquals(realm.where(RealmSyncInfo::class.java)
+            .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal).findFirst(), null)
+    }
+
     @Test
     fun updateUserSyncInfo_ShouldSucceed() {
         saveFromStream(USER)
@@ -216,38 +235,38 @@ class RealmManagerTests : RealmTestsBase() {
         assertEquals(realm.where(RealmSyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, USER.ordinal).findFirst()!!.syncGroupId, USER.ordinal)
     }
-//
-//    @Test
-//    fun updateSyncInfoBesidesUser_ShouldNotReturnUserSync() {
-//        realmManager.updateSyncInfo(GlobalSyncTaskParameters(SYNC_INFO_FIELD))
-//        realmManager.updateSyncInfo(ModuleIdSyncTaskParameters(SYNC_INFO_FIELD, SYNC_INFO_FIELD))
-//
-//        assertEquals(realm.where(RealmSyncInfo::class.java)
-//            .equalTo(SYNC_ID_FIELD, USER.ordinal).count(), 0)
-//        assertEquals(realm.where(RealmSyncInfo::class.java)
-//            .equalTo(SYNC_ID_FIELD, USER.ordinal).findFirst(), null)
-//    }
-//
-//    @Test
-//    fun updateModuleSyncInfo_ShouldSucceed() {
-//        realmManager.updateSyncInfo(ModuleIdSyncTaskParameters(SYNC_INFO_FIELD, SYNC_INFO_FIELD))
-//
-//        assertEquals(realm.where(RealmSyncInfo::class.java)
-//            .equalTo(SYNC_ID_FIELD, MODULE.ordinal).count(), 1)
-//        assertEquals(realm.where(RealmSyncInfo::class.java)
-//            .equalTo(SYNC_ID_FIELD, MODULE.ordinal).findFirst()!!.id, MODULE.ordinal)
-//    }
-//
-//    @Test
-//    fun updateSyncInfoBesidesModule_ShouldNotReturnModuleSync() {
-//        realmManager.updateSyncInfo(GlobalSyncTaskParameters(SYNC_INFO_FIELD))
-//        realmManager.updateSyncInfo(UserSyncTaskParameters(SYNC_INFO_FIELD, SYNC_INFO_FIELD))
-//
-//        assertEquals(realm.where(RealmSyncInfo::class.java)
-//            .equalTo(SYNC_ID_FIELD, MODULE.ordinal).count(), 0)
-//        assertEquals(realm.where(RealmSyncInfo::class.java)
-//            .equalTo(SYNC_ID_FIELD, MODULE.ordinal).findFirst(), null)
-//    }
+
+    @Test
+    fun updateSyncInfoBesidesUser_ShouldNotReturnUserSync() {
+        saveFromStream(GLOBAL)
+        saveFromStream(MODULE)
+
+        assertEquals(realm.where(RealmSyncInfo::class.java)
+            .equalTo(SYNC_ID_FIELD, USER.ordinal).count(), 0)
+        assertEquals(realm.where(RealmSyncInfo::class.java)
+            .equalTo(SYNC_ID_FIELD, USER.ordinal).findFirst(), null)
+    }
+
+    @Test
+    fun updateModuleSyncInfo_ShouldSucceed() {
+        saveFromStream(MODULE)
+
+        assertEquals(realm.where(RealmSyncInfo::class.java)
+            .equalTo(SYNC_ID_FIELD, MODULE.ordinal).count(), 1)
+        assertEquals(realm.where(RealmSyncInfo::class.java)
+            .equalTo(SYNC_ID_FIELD, MODULE.ordinal).findFirst()!!.syncGroupId, MODULE.ordinal)
+    }
+
+    @Test
+    fun updateSyncInfoBesidesModule_ShouldNotReturnModuleSync() {
+        saveFromStream(GLOBAL)
+        saveFromStream(USER)
+
+        assertEquals(realm.where(RealmSyncInfo::class.java)
+            .equalTo(SYNC_ID_FIELD, MODULE.ordinal).count(), 0)
+        assertEquals(realm.where(RealmSyncInfo::class.java)
+            .equalTo(SYNC_ID_FIELD, MODULE.ordinal).findFirst(), null)
+    }
 
     @Test
     fun getSyncInfoForGlobal_ShouldSucceed() {
@@ -259,7 +278,7 @@ class RealmManagerTests : RealmTestsBase() {
 
     @Test
     fun getSyncInfoForUser_ShouldSucceed() {
-        val fakeSync = saveFakeSyncInfo(realm, userId = SYNC_INFO_FIELD)
+        val fakeSync = saveFakeSyncInfo(realm, userId = FAKE_DB_FIELD)
         val loadSyncInfo = realmManager.getSyncInfoFor(USER)
 
         assertTrue(loadSyncInfo!!.deepEquals(fakeSync))
@@ -267,7 +286,7 @@ class RealmManagerTests : RealmTestsBase() {
 
     @Test
     fun getSyncInfoForModule_ShouldSucceed() {
-        val fakeSync = saveFakeSyncInfo(realm, moduleId = SYNC_INFO_FIELD)
+        val fakeSync = saveFakeSyncInfo(realm, moduleId = FAKE_DB_FIELD)
         val loadSyncInfo = realmManager.getSyncInfoFor(MODULE)
 
         assertTrue(loadSyncInfo!!.deepEquals(fakeSync))
@@ -286,7 +305,21 @@ class RealmManagerTests : RealmTestsBase() {
         val json = JsonHelper.toJson(downloadPeople.map { fb_Person(it) }).byteInputStream()
         val reader = JsonReader(InputStreamReader(json) as Reader?).apply { beginArray() }
 
-        realmManager.savePersonsFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, group, { false })
+        val taskParams = when (group) {
+            Constants.GROUP.GLOBAL -> SyncTaskParameters.GlobalSyncTaskParameters(
+                projectId = downloadPeople.first().projectId
+            )
+            Constants.GROUP.USER -> SyncTaskParameters.UserSyncTaskParameters(
+                projectId = downloadPeople.first().projectId,
+                userId = downloadPeople.first().userId
+            )
+            Constants.GROUP.MODULE -> SyncTaskParameters.ModuleIdSyncTaskParameters(
+                projectId = downloadPeople.first().projectId,
+                moduleId = downloadPeople.first().moduleId
+            )
+        }
+
+        realmManager.savePersonsFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams, { false })
     }
 
 }

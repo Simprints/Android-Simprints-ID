@@ -5,6 +5,7 @@ import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
+import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -23,7 +24,7 @@ interface LocalDbManager {
 
     fun savePersonsFromStreamAndUpdateSyncInfo(readerOfPersonsArray: JsonReader,
                                                gson: Gson,
-                                               groupSync: Constants.GROUP,
+                                               syncParams: SyncTaskParameters,
                                                shouldStop: (personSaved: fb_Person) -> Boolean)
 
     fun getPersonsCountFromLocal(patientId: String? = null,
