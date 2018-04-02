@@ -89,7 +89,8 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
             val nPatientsToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery, syncParams)
             Timber.d("Downloading batch $nPatientsToDownload persons")
 
-            val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup()) ?: RealmSyncInfo(syncParams.toGroup())
+            val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup())
+                ?: RealmSyncInfo(syncParams.toGroup())
 
             syncApi.downSync(
                 realmSyncInfo.lastSyncTime.time,
@@ -128,13 +129,15 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
                 reader.beginArray()
                 var totalDownloaded = 0
                 while (reader.hasNext() && !isInterrupted()) {
-                    localDbManager.savePersonsFromStreamAndUpdateSyncInfo(reader, gson, syncParams.toGroup()) {
+                    localDbManager.savePersonsFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
                         totalDownloaded++
 
                         emitResultProgressIfRequired(result, totalDownloaded, UPDATE_UI_BATCH_SIZE)
                         val shouldDownloadingBatchStop = isInterrupted() || hasCurrentBatchDownloadedFinished(totalDownloaded, LOCAL_DB_BATCH_SIZE)
                         shouldDownloadingBatchStop
                     }
+
+
                 }
 
                 val possibleError = if (isInterrupted()) InterruptedSyncException() else null

@@ -7,10 +7,12 @@ import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
+import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
+import io.realm.Sort
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -27,6 +29,7 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         const val PATIENT_ID_FIELD = "patientId"
         const val MODULE_ID_FIELD = "moduleId"
         const val TO_SYNC_FIELD = "toSync"
+        const val UPDATE_TIME_FIELD = "updatedAt"
 
         private const val LEGACY_APP_KEY_LENGTH: Int = 8
     }
@@ -68,16 +71,15 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
 
     override fun savePersonsFromStreamAndUpdateSyncInfo(readerOfPersonsArray: JsonReader,
                                                         gson: Gson,
-                                                        groupSync: Constants.GROUP,
+                                                        syncParams: SyncTaskParameters,
                                                         shouldStop: (personSaved: fb_Person) -> Boolean) {
-
         getRealmInstance().use {
             it.executeTransaction {
                 while (readerOfPersonsArray.hasNext()) {
 
                     val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPersonsArray, it)
                     it.insertOrUpdate(RealmSyncInfo(
-                        syncGroupId = groupSync.ordinal,
+                        syncGroupId = syncParams.toGroup().ordinal,
                         lastSyncTime = lastPersonSaved.updatedAt ?: Date(0))
                     )
 
@@ -88,6 +90,7 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
                 }
             }
         }
+        updateSyncInfo(syncParams)
     }
 
     private fun parseFromStreamAndSavePerson(gson: Gson,
@@ -177,4 +180,25 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         Realm.deleteRealm(config)
         File(appContext.filesDir, "${config.path}.lock").delete()
     }
+
+    private fun updateSyncInfo(syncParams: SyncTaskParameters) {
+        getRealmInstance().use { realm ->
+            val query = buildQueryForPerson(
+                realm = realm,
+                projectId = syncParams.projectId,
+                moduleId = syncParams.moduleId,
+                userId = syncParams.userId
+            )
+
+            query.sort(UPDATE_TIME_FIELD, Sort.DESCENDING).findAll().first()?.let { person ->
+                realm.executeTransaction {
+                    it.insertOrUpdate(RealmSyncInfo(
+                        syncGroupId = syncParams.toGroup().ordinal,
+                        lastSyncTime = person.updatedAt ?: Date(0))
+                    )
+                }
+            }
+        }
+    }
+
 }
