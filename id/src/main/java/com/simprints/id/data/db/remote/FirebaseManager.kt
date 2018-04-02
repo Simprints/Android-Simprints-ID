@@ -210,13 +210,13 @@ class FirebaseManager(private val appContext: Context,
 
     override fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable =
         getSyncApi().flatMapCompletable {
-            it.uploadPersons(hashMapOf("patients" to patientsToUpload))
+            it.uploadPeople(hashMapOf("patients" to patientsToUpload))
                 .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
         }
 
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getSyncApi().flatMap {
-            it.downloadPersons(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+            it.downloadPeople(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
                 .map { if (it.isEmpty())
                     throw DownloadingAPersonWhoDoesntExistOnServer()
                 else it.first()
@@ -225,7 +225,7 @@ class FirebaseManager(private val appContext: Context,
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
         getSyncApi().flatMap {
-            it.personsCount(syncParams.toMap())
+            it.peopleCount(syncParams.toMap())
                 .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
                 .map { it.count }
         }

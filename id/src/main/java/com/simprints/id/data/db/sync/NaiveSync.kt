@@ -50,7 +50,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
         val patientsToUpload = getPeopleToSync()
         val counter = AtomicInteger(0)
 
-        Timber.d("Uploading ${patientsToUpload.size} persons")
+        Timber.d("Uploading ${patientsToUpload.size} people")
         return batchPatientsArray(patientsToUpload, isInterrupted, batchSize)
             .uploadEachBatch()
             .updateUploadCounterAndConvertItToProgress(counter, patientsToUpload.size)
@@ -80,14 +80,14 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
     }
 
     private fun getPeopleToSync(): ArrayList<rl_Person> {
-        return localDbManager.loadPersonsFromLocal(toSync = true)
+        return localDbManager.loadPeopleFromLocal(toSync = true)
     }
 
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
 
         return remoteDbManager.getNumberOfPatientsForSyncParams(syncParams).flatMapObservable { nPatientsForDownSyncQuery ->
             val nPatientsToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery, syncParams)
-            Timber.d("Downloading batch $nPatientsToDownload persons")
+            Timber.d("Downloading batch $nPatientsToDownload people")
 
             val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup()) ?: RealmSyncInfo(syncParams.toGroup())
 
@@ -95,7 +95,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
                 realmSyncInfo.lastSyncTime.time,
                 syncParams.toMap())
                 .flatMapObservable {
-                    savePersonsFromStream(
+                    savePeopleFromStream(
                         isInterrupted,
                         syncParams,
                         it.byteStream()).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
@@ -108,7 +108,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
 
     private fun calculateNPatientsToDownload(nPatientsForDownSyncQuery: Int, syncParams: SyncTaskParameters): Int {
 
-        val nPatientsForDownSyncParamsInRealm = localDbManager.getPersonsCountFromLocal(
+        val nPatientsForDownSyncParamsInRealm = localDbManager.getPeopleCountFromLocal(
             projectId = syncParams.projectId,
             userId = syncParams.userId,
             moduleId = syncParams.moduleId,
@@ -117,9 +117,9 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
         return nPatientsForDownSyncQuery - nPatientsForDownSyncParamsInRealm
     }
 
-    protected open fun savePersonsFromStream(isInterrupted: () -> Boolean,
-                                             syncParams: SyncTaskParameters,
-                                             input: InputStream): Observable<Int> =
+    protected open fun savePeopleFromStream(isInterrupted: () -> Boolean,
+                                            syncParams: SyncTaskParameters,
+                                            input: InputStream): Observable<Int> =
 
         Observable.create<Int> { result ->
 
@@ -128,7 +128,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
                 reader.beginArray()
                 var totalDownloaded = 0
                 while (reader.hasNext() && !isInterrupted()) {
-                    localDbManager.savePersonsFromStreamAndUpdateSyncInfo(reader, gson, syncParams.toGroup()) {
+                    localDbManager.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams.toGroup()) {
                         totalDownloaded++
 
                         emitResultProgressIfRequired(result, totalDownloaded, UPDATE_UI_BATCH_SIZE)
