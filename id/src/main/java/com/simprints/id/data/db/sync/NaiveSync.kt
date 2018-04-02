@@ -7,6 +7,7 @@ import com.simprints.id.data.db.local.RealmSyncInfo
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.exceptions.safe.InterruptedSyncException
 import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
@@ -32,7 +33,7 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 
-    private val syncApi: SyncApiInterface by lazy {
+    private val syncApi: RemoteApiInterface by lazy {
         remoteDbManager.getSyncApi().blockingGet()
     }
 
