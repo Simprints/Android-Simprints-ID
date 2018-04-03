@@ -48,7 +48,7 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
     override fun signInToLocal(localDbKey: LocalDbKey): Completable = Completable.create { em ->
         Timber.d("Realm sign in. Project: ${localDbKey.projectId} Key: $localDbKey")
 
-        checkLegacyDatabaseAndMigrate(localDbKey)
+        migrateLegacyDatabaseIfRequired(localDbKey)
 
         realmConfig = RealmConfig.get(localDbKey.projectId, localDbKey.value)
         getRealmInstance().use { em.onComplete() }
@@ -68,9 +68,9 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
     }
 
     override fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
-                                                        gson: Gson,
-                                                        syncParams: SyncTaskParameters,
-                                                        shouldStop: (personSaved: fb_Person) -> Boolean) {
+                                                       gson: Gson,
+                                                       syncParams: SyncTaskParameters,
+                                                       shouldStop: (personSaved: fb_Person) -> Boolean) {
         getRealmInstance().use {
             it.executeTransaction {
                 while (readerOfPeopleArray.hasNext()) {
@@ -91,20 +91,20 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
     }
 
     override fun getPeopleCountFromLocal(patientId: String?,
-                                          projectId: String?,
-                                          userId: String?,
-                                          moduleId: String?,
-                                          toSync: Boolean?): Int {
+                                         projectId: String?,
+                                         userId: String?,
+                                         moduleId: String?,
+                                         toSync: Boolean?): Int {
         return getRealmInstance().use {
             buildQueryForPerson(it, patientId, projectId, userId, moduleId, toSync).count().toInt()
         }
     }
 
     override fun loadPeopleFromLocal(patientId: String?,
-                                      projectId: String?,
-                                      userId: String?,
-                                      moduleId: String?,
-                                      toSync: Boolean?): ArrayList<rl_Person> {
+                                     projectId: String?,
+                                     userId: String?,
+                                     moduleId: String?,
+                                     toSync: Boolean?): ArrayList<rl_Person> {
         return getRealmInstance().use {
             val query = buildQueryForPerson(it, patientId, projectId, userId, moduleId, toSync)
             ArrayList(it.copyFromRealm(query.findAll(), 4))
@@ -147,15 +147,15 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         )
     }
 
-    private fun checkLegacyDatabaseAndMigrate(dbKey: LocalDbKey) {
-        if (dbKey.legacyApiKey.isEmpty())
-            return
-
-        if (needsToMigrate(dbKey))
+    private fun migrateLegacyDatabaseIfRequired(dbKey: LocalDbKey) {
+        if (checkIfLegacyDatabaseNeedsToMigrate(dbKey))
             migrateLegacyRealm(dbKey)
     }
 
-    private fun needsToMigrate(dbKey: LocalDbKey): Boolean {
+    private fun checkIfLegacyDatabaseNeedsToMigrate(dbKey: LocalDbKey): Boolean {
+        if (dbKey.legacyApiKey.isEmpty())
+            return false
+
         val legacyConfig = getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey)
         val newConfig = RealmConfig.get(dbKey.projectId, dbKey.value)
 
