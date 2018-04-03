@@ -66,6 +66,7 @@ class SyncTest : RxJavaTest() {
 
     @Test
     fun uploadPeopleInBatches_shouldWorkWithPoorConnection() {
+        // TODO : change this test to be deterministic instead of probabilistic
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
 
         val patientsToUpload = getRandomPeople(35)

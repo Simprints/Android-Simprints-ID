@@ -67,9 +67,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         localDbManager.insertOrUpdatePersonInLocal(rl_Person(fbPerson))
             .doOnComplete {
                 uploadPersonAndDownloadAgain(fbPerson)
-                .updatePersonInLocal()
-                .subscribeOn(Schedulers.io())
-                .subscribe()
+                    .updatePersonInLocal()
+                    .subscribeOn(Schedulers.io())
+                    .subscribe()
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
