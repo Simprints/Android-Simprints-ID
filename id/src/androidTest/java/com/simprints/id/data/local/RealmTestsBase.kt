@@ -36,10 +36,10 @@ open class RealmTestsBase {
     protected fun getFakePerson(): rl_Person = PeopleGeneratorUtils.getRandomPerson()
 
     protected fun saveFakePerson(realm: Realm, fakePerson: rl_Person): rl_Person =
-        fakePerson.apply { realm.executeTransaction { it.insertOrUpdate(this) } }
+        fakePerson.also { realm.executeTransaction { it.insertOrUpdate(fakePerson) } }
 
     protected fun saveFakePeople(realm: Realm, people: ArrayList<rl_Person>): ArrayList<rl_Person> =
-        people.apply { realm.executeTransaction { it.insertOrUpdate(this) } }
+        people.also { realm.executeTransaction { it.insertOrUpdate(people) } }
 
     protected fun deleteAll(realm: Realm) = realm.executeTransaction { it.deleteAll() }
 
