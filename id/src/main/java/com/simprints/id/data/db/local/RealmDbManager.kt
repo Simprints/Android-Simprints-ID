@@ -20,7 +20,6 @@ import kotlin.collections.ArrayList
 
 class RealmDbManager(private val appContext: Context) : LocalDbManager {
 
-
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"
 
@@ -46,7 +45,6 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         } ?: throw RealmUninitialisedError("RealmConfig null")
     }
 
-
     override fun signInToLocal(localDbKey: LocalDbKey): Completable = Completable.create { em ->
         Timber.d("Realm sign in. Project: ${localDbKey.projectId} Key: $localDbKey")
 
@@ -69,15 +67,15 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         }.let { em.onComplete() }
     }
 
-    override fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPersonsArray: JsonReader,
+    override fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
                                                         gson: Gson,
                                                         syncParams: SyncTaskParameters,
                                                         shouldStop: (personSaved: fb_Person) -> Boolean) {
         getRealmInstance().use {
             it.executeTransaction {
-                while (readerOfPersonsArray.hasNext()) {
+                while (readerOfPeopleArray.hasNext()) {
 
-                    val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPersonsArray, it)
+                    val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPeopleArray, it)
                     it.insertOrUpdate(RealmSyncInfo(
                         syncGroupId = syncParams.toGroup().ordinal,
                         lastSyncTime = lastPersonSaved.updatedAt ?: Date(0))
@@ -86,7 +84,6 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
                     if (shouldStop(lastPersonSaved)) {
                         break
                     }
-
                 }
             }
         }
@@ -117,7 +114,6 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
     override fun getValidRealmConfig(): RealmConfiguration {
         return realmConfig ?: throw RealmUninitialisedError()
     }
-
 
     override fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo? {
         return getRealmInstance().use {
@@ -207,5 +203,4 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
             realm.insertOrUpdate(rl_Person(this))
         }
     }
-
 }
