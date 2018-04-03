@@ -2,18 +2,19 @@ package com.simprints.id.data.db
 
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.models.Session
-import com.simprints.id.libdata.DataCallback
-import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.libdata.models.firebase.fb_Person
+import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.domain.Constants
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.session.Session
 import com.simprints.libcommon.Person
-import com.simprints.libcommon.Progress
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
-import io.reactivex.Emitter
+import io.reactivex.Observable
 
 interface DbManager : LocalDbManager, RemoteDbManager {
 
@@ -27,10 +28,15 @@ interface DbManager : LocalDbManager, RemoteDbManager {
     fun isDbInitialised(): Boolean
 
     // Data transfer
-    fun savePerson(fbPerson: fb_Person, projectId: String)
+    fun savePerson(fbPerson: fb_Person): Completable
     fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
-    fun loadPeople(destinationList: MutableList<Person>, group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
-    fun getPeopleCount(group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String): Long
+    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
+
+    fun getPeopleCount(personId: String? = null,
+                       projectId: String? = null,
+                       userId: String? = null,
+                       moduleId: String? = null,
+                       toSync: Boolean? = null): Int
 
     fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
 
@@ -40,8 +46,7 @@ interface DbManager : LocalDbManager, RemoteDbManager {
 
     fun saveRefusalForm(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String)
 
-    fun syncGlobal(legacyApiKey: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
-    fun syncUser(legacyApiKey: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>)
+    fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress>
 
-    fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback)
+    fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback)
 }

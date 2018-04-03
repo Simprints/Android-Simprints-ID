@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import com.simprints.id.activities.AlertActivity
 import com.simprints.id.activities.IntentKeys
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.domain.ALERT_TYPE
 
 
 class AlertLauncher(private val activity: Activity) {

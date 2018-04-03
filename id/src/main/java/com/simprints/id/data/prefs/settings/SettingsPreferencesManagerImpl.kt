@@ -4,13 +4,13 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.tools.delegates.ComplexPreference
 import com.simprints.id.tools.delegates.PrimitivePreference
 import com.simprints.id.tools.serializers.Serializer
-import com.simprints.id.libdata.tools.Constants
+import com.simprints.id.domain.Constants
 import com.simprints.libsimprints.FingerIdentifier
 
 
 class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                      fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                                     groupSerializer: Serializer<com.simprints.id.libdata.tools.Constants.GROUP>)
+                                     groupSerializer: Serializer<Constants.GROUP>)
     : SettingsPreferencesManager {
 
     companion object {
@@ -40,10 +40,10 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private val TIMEOUT_DEFAULT = 3
 
         private val SYNC_GROUP_KEY = "SyncGroup"
-        private val SYNC_GROUP_DEFAULT = com.simprints.id.libdata.tools.Constants.GROUP.USER
+        private val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
 
         private val MATCH_GROUP_KEY = "MatchGroup"
-        private val MATCH_GROUP_DEFAULT = com.simprints.id.libdata.tools.Constants.GROUP.USER
+        private val MATCH_GROUP_DEFAULT = Constants.GROUP.USER
 
         private val VIBRATE_KEY = "VibrateOn"
         private val VIBRATE_DEFAULT = true
@@ -94,11 +94,11 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         by PrimitivePreference(prefs, TIMEOUT_KEY, TIMEOUT_DEFAULT)
 
     // Sync group. Default is user
-    override var syncGroup: com.simprints.id.libdata.tools.Constants.GROUP
+    override var syncGroup: Constants.GROUP
         by ComplexPreference(prefs, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
 
     // Match group. Default is user
-    override var matchGroup: com.simprints.id.libdata.tools.Constants.GROUP
+    override var matchGroup: Constants.GROUP
         by ComplexPreference(prefs, MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT, groupSerializer)
 
     // Is the vibrate on

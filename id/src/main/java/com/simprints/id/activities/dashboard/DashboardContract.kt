@@ -2,7 +2,8 @@ package com.simprints.id.activities.dashboard
 
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.domain.Constants
+import com.simprints.id.domain.ALERT_TYPE
 
 interface DashboardContract {
 
@@ -14,8 +15,7 @@ interface DashboardContract {
     }
 
     interface Presenter : BasePresenter {
-        fun sync()
         fun pause()
+        fun didUserWantToSyncBy(user: Constants.GROUP)
     }
 }
-

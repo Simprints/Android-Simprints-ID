@@ -1,24 +1,29 @@
 package com.simprints.id.data.db.local
 
 import android.content.Context
+import com.google.gson.Gson
+import com.google.gson.stream.JsonReader
+import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
-import com.simprints.id.libdata.DataCallback
-import com.simprints.id.libdata.models.firebase.fb_Person
-import com.simprints.id.libdata.models.realm.rl_Person
-import com.simprints.id.libdata.tools.Utils.wrapCallback
-import com.simprints.libcommon.Person
 import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import io.realm.RealmResults
+import io.realm.RealmQuery
 import timber.log.Timber
+import java.util.*
+import kotlin.collections.ArrayList
 
 class RealmDbManager(appContext: Context) : LocalDbManager {
 
     companion object {
         private const val USER_ID_FIELD = "userId"
+        private const val PROJECT_ID_FIELD = "projectId"
         private const val PATIENT_ID_FIELD = "patientId"
         private const val MODULE_ID_FIELD = "moduleId"
+        private const val TO_SYNC_FIELD = "toSync"
+        private const val UPDATED_FIELD = "updatedAt"
     }
 
     private var realmConfig: RealmConfiguration? = null
@@ -43,58 +48,87 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
     override fun isLocalDbInitialized(projectId: String): Boolean =
         realmConfig != null
 
-    // Data transfer
-    override fun savePersonInLocal(fbPerson: fb_Person) {
+    override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable {
         val realm = getRealmInstance()
-        rl_Person(fbPerson).save(realm)
-        realm.close()
-    }
-
-    override fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback) {
-        val wrappedCallback = wrapCallback("RealmDbManager.loadPerson()", callback)
-
-        val realm = getRealmInstance()
-        val rlPerson = realm.where(rl_Person::class.java).equalTo(PATIENT_ID_FIELD, guid).findFirst()
-        if (rlPerson != null) {
-            destinationList.add(rlPerson.libPerson)
-            wrappedCallback.onSuccess()
+        realm.executeTransaction {
+            it.insertOrUpdate(person)
         }
         realm.close()
+        return Completable.complete()
     }
 
-    override fun loadPeopleFromLocal(destinationList: MutableList<Person>,
-                                     group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String,
-                                     callback: DataCallback?) {
-        val wrappedCallback = wrapCallback("RealmDbManager.loadPeopleFromLocal()", callback)
+    override fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
+                                                       gson: Gson,
+                                                       groupSync: Constants.GROUP,
+                                                       shouldStop: (personSaved: fb_Person) -> Boolean) {
 
-        val realm = getRealmInstance()
-        val request: RealmResults<rl_Person> = when (group) {
-            com.simprints.id.libdata.tools.Constants.GROUP.GLOBAL -> realm.where(rl_Person::class.java).findAllAsync()
-            com.simprints.id.libdata.tools.Constants.GROUP.USER -> realm.where(rl_Person::class.java).equalTo(USER_ID_FIELD, userId).findAllAsync()
-            com.simprints.id.libdata.tools.Constants.GROUP.MODULE -> realm.where(rl_Person::class.java).equalTo(MODULE_ID_FIELD, moduleId).findAllAsync()
+        getRealmInstance().executeTransaction { r ->
+            while (readerOfPeopleArray.hasNext()) {
+                val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPeopleArray, r)
+                r.insertOrUpdate(RealmSyncInfo(groupSync.ordinal, lastPersonSaved.updatedAt ?: Date(0)))
+
+                if (shouldStop(lastPersonSaved)) {
+                    break
+                }
+            }
+            r.close()
         }
-        request.addChangeListener({ results: RealmResults<rl_Person> ->
-            request.removeAllChangeListeners()
-            results.mapTo(destinationList) { it.libPerson }
-            realm.close()
-            wrappedCallback.onSuccess()
-        })
     }
 
-    override fun getPeopleCountFromLocal(group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String): Long {
+    private fun parseFromStreamAndSavePerson(gson: Gson, readerOfPeopleArray: JsonReader, r: Realm): fb_Person {
+        val person = gson.fromJson<fb_Person>(readerOfPeopleArray, fb_Person::class.java)
+        r.insertOrUpdate(rl_Person(person))
+        return person
+    }
+
+    override fun getPeopleCountFromLocal(patientId: String?,
+                                         projectId: String?,
+                                         userId: String?,
+                                         moduleId: String?,
+                                         toSync: Boolean?): Int {
         val realm = getRealmInstance()
-        val count = rl_Person.count(realm, userId, moduleId, group)
-        realm.close()
-        return count
+        val query = buildQueryForPerson(realm, patientId, projectId, userId, moduleId, toSync)
+        return query.count().toInt().also { realm.close() }
+    }
+
+    override fun loadPeopleFromLocal(patientId: String?,
+                                     projectId: String?,
+                                     userId: String?,
+                                     moduleId: String?,
+                                     toSync: Boolean?): ArrayList<rl_Person> {
+
+        val realm = getRealmInstance()
+        val query = buildQueryForPerson(realm, patientId, projectId, userId, moduleId, toSync)
+        return ArrayList(realm.copyFromRealm(query.findAll(), 4)).also { realm.close() }
+    }
+
+    private fun buildQueryForPerson(realm: Realm,
+                                    patientId: String? = null,
+                                    projectId: String? = null,
+                                    userId: String? = null,
+                                    moduleId: String? = null,
+                                    toSync: Boolean? = null): RealmQuery<rl_Person> {
+
+        val query = realm.where(rl_Person::class.java)
+        projectId?.let { query.equalTo(PROJECT_ID_FIELD, it) }
+        patientId?.let { query.equalTo(PATIENT_ID_FIELD, it) }
+        userId?.let { query.equalTo(USER_ID_FIELD, it) }
+        moduleId?.let { query.equalTo(MODULE_ID_FIELD, it) }
+        toSync?.let { query.equalTo(TO_SYNC_FIELD, it) }
+        return query
     }
 
     override fun getRealmInstance(): Realm {
         realmConfig?.let {
-            return Realm.getInstance(it) ?: throw RealmUninitialisedError()
-        } ?: throw RealmUninitialisedError()
+            return Realm.getInstance(it) ?: throw RealmUninitialisedError("Error in getInstance")
+        } ?: throw RealmUninitialisedError("RealmConfig null")
     }
 
     override fun getValidRealmConfig(): RealmConfiguration {
         return realmConfig ?: throw RealmUninitialisedError()
+    }
+
+    override fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo? {
+        return getRealmInstance().where(RealmSyncInfo::class.java).equalTo("syncGroupId", typeSync.ordinal).findFirst()
     }
 }

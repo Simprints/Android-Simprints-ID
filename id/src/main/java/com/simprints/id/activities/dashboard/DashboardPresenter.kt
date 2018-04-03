@@ -4,153 +4,68 @@ import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import com.simprints.id.R
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.remote.authListener.AuthListener
-import com.simprints.id.data.db.remote.connectionListener.ConnectionListener
-import com.simprints.id.exceptions.unsafe.InvalidSyncGroupError
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
-import com.simprints.id.libdata.tools.Constants.GROUP
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.data.db.sync.SyncManager
+import com.simprints.id.domain.Constants.GROUP
+import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.progress.UploadProgress
 import com.simprints.id.services.sync.SyncClient
-import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.libcommon.Progress
 import io.reactivex.observers.DisposableObserver
-import timber.log.Timber
 
-class DashboardPresenter(val view: DashboardContract.View,
-                         val syncClient: SyncClient,
-                         val dataManager: DataManager) : DashboardContract.Presenter {
+class DashboardPresenter(private val view: DashboardContract.View,
+                         syncClient: SyncClient,
+                         dataManager: DataManager) : DashboardContract.Presenter {
 
-    private var started: Boolean = false
+    private val syncManager = SyncManager(dataManager, syncClient, object : DisposableObserver<Progress>() {
 
-    override fun start() {
-        if (!started) {
-            started = true
-            startListeners()
+        override fun onNext(progress: Progress) {
+            setProgressSyncItem(progress)
         }
-    }
+
+        override fun onComplete() {
+            setCompleteSyncItem()
+        }
+
+        override fun onError(throwable: Throwable) {
+            setErrorSyncItem()
+        }
+    })
+
+    override fun start() {}
 
     override fun pause() {
-        stopListeners()
+        syncManager.stop()
     }
 
-    override fun sync() {
-        val syncParameters = when (dataManager.syncGroup) {
-            GROUP.GLOBAL -> SyncTaskParameters.GlobalSyncTaskParameters(dataManager.getSignedInHashedLegacyApiKeyOrEmpty())
-            GROUP.USER -> SyncTaskParameters.UserSyncTaskParameters(dataManager.getSignedInHashedLegacyApiKeyOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
-            else -> {
-                handleUnexpectedError(InvalidSyncGroupError())
-                return
-            }
-        }
-
-        syncClient.sync(syncParameters, {
-            syncClient.startListening(newSyncObserver())
-        }, {
-            setErrorSyncItem()
-            view.showToast(R.string.wait_for_current_sync_to_finish)
-        })
-    }
-
-    private fun stopListeners() {
-        try {
-            syncClient.stopListening()
-            dataManager.unregisterRemoteAuthListener(authListener)
-            dataManager.unregisterRemoteConnectionListener(connectionListener)
-        } catch (error: UninitializedDataManagerError) {
-            handleUnexpectedError(error)
-        }
-    }
-
-    private fun startListeners() {
-        dataManager.registerRemoteAuthListener(authListener)
-        dataManager.registerRemoteConnectionListener(connectionListener)
-        updateConnectionState()
-        syncClient.startListening(newSyncObserver())
-    }
-
-    private fun updateConnectionState() {
-        if (dataManager.isRemoteConnected) {
-            connectionListener.onConnection()
-        } else {
-            connectionListener.onDisconnection()
-        }
-    }
-
-    private val authListener = object : AuthListener {
-        override fun onSignIn() {
-        }
-
-        override fun onSignOut() {
-            setOfflineSyncItem()
-        }
-    }
-
-    private val connectionListener = object : ConnectionListener {
-        override fun onConnection() {
-            setReadySyncItem()
-        }
-
-        override fun onDisconnection() {
-            setOfflineSyncItem()
-        }
-    }
-
-    private fun newSyncObserver(): DisposableObserver<Progress> {
-        return object : DisposableObserver<Progress>() {
-
-            override fun onNext(progress: Progress) {
-                Timber.d("onNext")
-                setProgressSyncItem(progress)
-            }
-
-            override fun onComplete() {
-                Timber.d("onComplete")
-                setCompleteSyncItem()
-                syncClient.stopListening()
-            }
-
-            override fun onError(throwable: Throwable) {
-                Timber.d("onError")
-                setErrorSyncItem()
-                logThrowable(throwable)
-                syncClient.stopListening()
-            }
-
-            private fun logThrowable(throwable: Throwable) {
-                if (throwable is Error) {
-                    dataManager.logError(throwable)
-                } else if (throwable is RuntimeException) {
-                    dataManager.logSafeException(throwable)
-                }
-            }
-        }
-    }
-
-    private fun handleUnexpectedError(error: Error) {
-        dataManager.logError(error)
-        view.launchAlertView(ALERT_TYPE.UNEXPECTED_ERROR)
+    override fun didUserWantToSyncBy(user: GROUP) {
+        syncManager.sync(user)
     }
 
     private fun setProgressSyncItem(progress: Progress) {
-        if (isProgressZero(progress))
-            view.setSyncItem(false,
-                view.getStringWithParams(R.string.syncing_calculating),
-                R.drawable.ic_syncing)
-        else view.setSyncItem(false,
-                view.getStringWithParams(R.string.syncing_with_progress, progress.currentValue, progress.maxValue),
-                R.drawable.ic_syncing)
+        when {
+            isProgressZero(progress) ->
+                view.setSyncItem(false,
+                    view.getStringWithParams(R.string.syncing_calculating),
+                    R.drawable.ic_syncing)
+            else -> {
+                val messageRes = if (progress is UploadProgress) {
+                    R.string.sync_progress_upload_notification_content
+                } else {
+                    R.string.sync_progress_download_notification_content
+                }
+
+                view.setSyncItem(false,
+                    view.getStringWithParams(messageRes, progress.currentValue, progress.maxValue),
+                    R.drawable.ic_syncing)
+            }
+        }
+    }
+
+    private fun isProgressZero(progress: Progress): Boolean {
+        return progress.currentValue == 0 && progress.maxValue == 0
     }
 
     private fun setCompleteSyncItem() {
         setSyncItem(true, R.string.nav_sync_complete, R.drawable.ic_sync_success)
-    }
-
-    private fun setReadySyncItem() {
-        setSyncItem(true, R.string.nav_sync, R.drawable.ic_menu_sync_ready)
-    }
-
-    private fun setOfflineSyncItem() {
-        setSyncItem(false, R.string.not_signed_in, R.drawable.ic_menu_sync_off)
     }
 
     private fun setSyncItem(enabled: Boolean, @StringRes title: Int, @DrawableRes icon: Int) {
@@ -159,9 +74,5 @@ class DashboardPresenter(val view: DashboardContract.View,
 
     private fun setErrorSyncItem() {
         setSyncItem(true, R.string.nav_sync_failed, R.drawable.ic_sync_failed)
-    }
-
-    private fun isProgressZero(progress: Progress): Boolean {
-        return progress.currentValue == 0 && progress.maxValue == 0
     }
 }

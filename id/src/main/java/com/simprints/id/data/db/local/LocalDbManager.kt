@@ -1,8 +1,10 @@
 package com.simprints.id.data.db.local
 
-import com.simprints.id.libdata.DataCallback
-import com.simprints.id.libdata.models.firebase.fb_Person
-import com.simprints.libcommon.Person
+import com.google.gson.Gson
+import com.google.gson.stream.JsonReader
+import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.domain.Constants
 import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -15,12 +17,26 @@ interface LocalDbManager {
     fun isLocalDbInitialized(projectId: String): Boolean
 
     // Data transfer
-    fun savePersonInLocal(fbPerson: fb_Person)
-    fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
-    fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
-    fun getPeopleCountFromLocal(group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String): Long
+    fun insertOrUpdatePersonInLocal(person: rl_Person): Completable
+    fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader, gson: Gson, groupSync: Constants.GROUP, shouldStop: (personSaved: fb_Person) -> Boolean)
+
+    fun getPeopleCountFromLocal(patientId: String? = null,
+                                projectId: String? = null,
+                                userId: String? = null,
+                                moduleId: String? = null,
+                                toSync: Boolean? = null): Int
+
+    fun loadPeopleFromLocal(patientId: String? = null,
+                            projectId: String? = null,
+                            userId: String? = null,
+                            moduleId: String? = null,
+                            toSync: Boolean? = null): ArrayList<rl_Person>
+
+    //Sync
+    fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo?
 
     // Database instances
     fun getValidRealmConfig(): RealmConfiguration
+
     fun getRealmInstance(): Realm
 }

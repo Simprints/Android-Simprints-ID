@@ -4,22 +4,28 @@ import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
+import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.sync.NaiveSyncManager
-import com.simprints.id.data.models.Session
-import com.simprints.id.libdata.DataCallback
-import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.libdata.models.firebase.fb_Person
+import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.sync.SyncExecutor
+import com.simprints.id.domain.Constants
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.session.Session
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
-import com.simprints.libcommon.Progress
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
-import io.reactivex.Emitter
+import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 
 class DbManagerImpl(private val localDbManager: LocalDbManager,
                     private val remoteDbManager: RemoteDbManager) :
@@ -57,30 +63,69 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.isRemoteDbInitialized()
 
     // Data transfer
+    override fun savePerson(fbPerson: fb_Person): Completable =
+        localDbManager.insertOrUpdatePersonInLocal(rl_Person(fbPerson))
+            .doOnComplete {
+                uploadPersonAndDownloadAgain(fbPerson)
+                    .updatePersonInLocal()
+                    .subscribeOn(Schedulers.io())
+                    .subscribe()
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
 
-    override fun savePerson(fbPerson: fb_Person, projectId: String) {
-        localDbManager.savePersonInLocal(fbPerson)
-        remoteDbManager.savePersonInRemote(fbPerson, projectId)
-    }
+    private fun uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
+        remoteDbManager
+            .uploadPerson(fbPerson)
+            .andThen(remoteDbManager.downloadPerson(fbPerson.patientId, fbPerson.projectId))
+
+    private fun Single<out fb_Person>.updatePersonInLocal(): Completable =
+        flatMapCompletable {
+            localDbManager.insertOrUpdatePersonInLocal(rl_Person(it))
+        }
 
     override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
-        localDbManager.loadPersonFromLocal(destinationList, guid, callback)
-        if (destinationList.size == 0) remoteDbManager.loadPersonFromRemote(destinationList, projectId, guid, callback)
+        val result = localDbManager.loadPeopleFromLocal(
+            projectId = projectId,
+            patientId = guid).map { it.libPerson }
+
+        if (result.isEmpty()) {
+            remoteDbManager.downloadPerson(guid, projectId)
+                .subscribeBy(
+                    onSuccess = {
+                        destinationList.add(rl_Person(it).libPerson)
+                        callback.onSuccess()
+                    },
+                    onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
+        } else {
+            destinationList.add(result.first())
+            callback.onSuccess()
+        }
     }
 
-    override fun loadPeople(destinationList: MutableList<Person>, group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
-        localDbManager.loadPeopleFromLocal(destinationList, group, userId, moduleId, callback)
+    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
+        val result = when (group) {
+            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal().map { it.libPerson }
+            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(userId = userId).map { it.libPerson }
+            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(moduleId = moduleId).map { it.libPerson }
+        }
+        destinationList.addAll(result)
+        callback?.onSuccess()
     }
 
-    override fun getPeopleCount(group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String): Long =
-        localDbManager.getPeopleCountFromLocal(group, userId, moduleId)
+    override fun getPeopleCount(personId: String?,
+                                projectId: String?,
+                                userId: String?,
+                                moduleId: String?,
+                                toSync: Boolean?): Int =
+        localDbManager.getPeopleCountFromLocal(projectId, personId, userId, moduleId, toSync)
 
     override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
-        remoteDbManager.saveIdentificationInRemote(probe, projectId, userId, androidId, moduleId, matchSize, matches, sessionId)
+        remoteDbManager.saveIdentificationInRemote(probe, projectId, userId, moduleId, androidId, matchSize, matches, sessionId)
     }
 
     override fun saveVerification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
-        remoteDbManager.saveVerificationInRemote(probe, projectId, userId, androidId, moduleId, patientId, match, sessionId, guidExistsResult)
+        remoteDbManager.saveVerificationInRemote(probe, projectId, userId, moduleId, androidId, patientId, match, sessionId, guidExistsResult)
     }
 
     override fun saveSession(session: Session) {
@@ -91,20 +136,13 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         remoteDbManager.saveRefusalFormInRemote(refusalForm, projectId, userId, sessionId)
     }
 
-    override fun syncGlobal(legacyApiKey: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        getSyncManager(legacyApiKey).syncGlobal(isInterrupted, emitter)
-    }
+    override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
+        SyncExecutor(
+            localDbManager,
+            remoteDbManager,
+            JsonHelper.gson).sync(interrupted, parameters)
 
-    override fun syncUser(legacyApiKey: String, userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        getSyncManager(legacyApiKey).syncUser(userId, isInterrupted, emitter)
-    }
-
-    private fun getSyncManager(legacyApiKey: String): NaiveSyncManager =
-        // if localDbManager.realmConfig is null, the user is not signed in and we should not be here,
-        // TODO: that is temporary, we will fix in the migration firestore
-        NaiveSyncManager(remoteDbManager.getFirebaseLegacyApp(), legacyApiKey, localDbManager.getValidRealmConfig())
-
-    override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback) {
+    override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback) {
         val firebaseManager = remoteDbManager as FirebaseManager
         val realmManager = localDbManager as RealmDbManager
         LocalDbRecovererImpl(realmManager, firebaseManager, projectId, userId, androidId, moduleId, group, callback).recoverDb()

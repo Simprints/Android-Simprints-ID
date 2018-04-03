@@ -17,7 +17,7 @@ buildscript {
     ext.support_version = "27.0.2"
     ext.volley_version = "1.0.0"
     ext.retrofit_version = "2.4.0-SNAPSHOT"
-    ext.okhttp_version = "3.9.1"
+    ext.okhttp_version = "3.10.0"
     ext.rxkotlin_version = "2.2.0"
 
     repositories {
@@ -35,12 +35,13 @@ buildscript {
         // in the individual module build.gradle files
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.5.4"
         classpath "com.google.gms:google-services:3.2.0"
-        classpath "io.realm:realm-gradle-plugin:4.1.1"
+        classpath "io.realm:realm-gradle-plugin:4.3.3"
         classpath "com.google.firebase:firebase-plugins:1.1.4"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.fabric.tools:gradle:1.25.1"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+
     }
 }
 
