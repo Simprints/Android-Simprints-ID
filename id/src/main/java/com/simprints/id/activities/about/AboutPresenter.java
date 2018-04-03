@@ -8,11 +8,11 @@ import android.view.WindowManager;
 
 import com.simprints.id.data.DataManager;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
-import com.simprints.id.model.ALERT_TYPE;
+import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.tools.AlertLauncher;
-import com.simprints.id.libdata.DATA_ERROR;
-import com.simprints.id.libdata.DataCallback;
-import com.simprints.id.libdata.tools.Constants;
+import com.simprints.id.data.db.DATA_ERROR;
+import com.simprints.id.data.db.DataCallback;
+import com.simprints.id.domain.Constants;
 
 class AboutPresenter implements AboutContract.Presenter {
 
@@ -105,7 +105,7 @@ class AboutPresenter implements AboutContract.Presenter {
                     aboutView.setSuccessRecovering();
                     aboutView.setRecoverDbAvailable();
                 } catch (WindowManager.BadTokenException e) {
-                    dataManager.logSafeException(e);
+                    // dataManager.logSafeException(e); // FIXME
                     e.printStackTrace();
                 }
             }
@@ -118,7 +118,7 @@ class AboutPresenter implements AboutContract.Presenter {
                     aboutView.setErrorRecovering(data_error.details());
                     aboutView.setRecoverDbAvailable();
                 } catch (WindowManager.BadTokenException e) {
-                    dataManager.logSafeException(e);
+                    // dataManager.logSafeException(e); // FIXME
                     e.printStackTrace();
                 }
             }

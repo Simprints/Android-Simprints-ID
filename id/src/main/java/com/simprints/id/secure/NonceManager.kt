@@ -5,12 +5,13 @@ import com.google.gson.reflect.TypeToken
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.extensions.handleResponse
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import retrofit2.HttpException
 
-class NonceManager(val client: ApiServiceInterface) {
+class NonceManager(val client: SecureApiInterface) {
 
     fun requestNonce(nonceScope: NonceScope): Single<Nonce> {
         val headers = convertNonceScopeIntoMap(nonceScope)

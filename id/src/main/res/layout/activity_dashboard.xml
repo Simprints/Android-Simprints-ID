@@ -13,49 +13,42 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             tools:ignore="UseCompoundDrawables">
 
-            <ImageView
-                android:id="@+id/dashboardSyncStateIcon"
+            <Button
+                android:id="@+id/dashboardButtonSync"
                 android:layout_width="wrap_content"
-                android:layout_height="20dp"
-                android:contentDescription="@string/dashboard_sync_status_icon" />
+                android:layout_height="wrap_content"
+                android:text="Sync" />
 
-            <TextView
+            <LinearLayout
                 android:id="@+id/dashboardSyncState"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginStart="5dp" />
-        </LinearLayout>
+                android:layout_marginTop="3dp"
+                android:orientation="horizontal">
 
-        <LinearLayout
-            android:id="@+id/dashboardLayerSync"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            tools:ignore="UseCompoundDrawables">
-            <ImageView
-                android:id="@+id/dashboardLayerSyncIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/dashboard_sync_icon" />
+                <ImageView
+                    android:id="@+id/dashboardSyncStateIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:contentDescription="@string/dashboard_sync_status_icon" />
 
-            <TextView
-                android:id="@+id/dashboardLayerSyncText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp"/>
+                <TextView
+                    android:id="@+id/dashboardSyncStateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp" />
+            </LinearLayout>
         </LinearLayout>
 
         <Button
@@ -64,5 +57,19 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/logout" />
+
+
+        <TextView
+            android:id="@+id/textAddPersonRealm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp" />
+
+        <Button
+            android:id="@+id/buttonAddPersonRealm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Add to realm" />
     </LinearLayout>
 </RelativeLayout>

@@ -31,14 +31,19 @@ fun <T> verifyOnlyInteractions(mock: T, vararg methodCalls: T.() -> Any?) {
 }
 
 fun <T> anyNotNull(): T {
-    Mockito.any<T>()
+    try {
+        Mockito.any<T>()
+    } catch (e: Exception){
+        e.printStackTrace()
+    }
+
     return uninitialized()
 }
 fun <T> uninitialized(): T = null as T
 
 /**
  * Junit 5 has a nice assertThrows method
- * (http://junit.org/junit5/docs/current/api/org/junit/jupiter/api/Assertions.html#assertThrows-java.lang.Class-org.junit.jupiter.api.function.Executable-)
+ * (http://junit.org/junit5/docs/current/secureApi/org/junit/jupiter/secureApi/Assertions.html#assertThrows-java.lang.Class-org.junit.jupiter.secureApi.function.Executable-)
  * This is a placeholder until we migrate from JUnit 4 to Junit 5
  */
 inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {

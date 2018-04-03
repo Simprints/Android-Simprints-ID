@@ -10,8 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.simprints.id.R;
-import com.simprints.id.model.Finger;
-import com.simprints.id.model.FingerRes;
+import com.simprints.id.domain.Finger;
+import com.simprints.id.domain.FingerRes;
 
 public class FingerFragment extends Fragment {
 

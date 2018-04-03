@@ -20,7 +20,7 @@ import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.LanguageHelper;
-import com.simprints.id.libdata.tools.Constants;
+import com.simprints.id.domain.Constants;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 

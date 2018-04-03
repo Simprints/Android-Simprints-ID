@@ -7,7 +7,7 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import retrofit2.HttpException
 
-class PublicKeyManager(val client: ApiServiceInterface) {
+class PublicKeyManager(val client: SecureApiInterface) {
 
     fun requestPublicKey(): Single<PublicKeyString> =
         client.publicKey()

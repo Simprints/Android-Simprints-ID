@@ -2,7 +2,7 @@ package com.simprints.id.secure.cryptography
 
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.PublicKeyString
-import com.simprints.id.tools.roboletric.TestApplication
+import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test

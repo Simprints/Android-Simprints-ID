@@ -1,17 +1,21 @@
 package com.simprints.id.activities.dashboard
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.Toast
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.extensions.launchAlert
+import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import kotlinx.android.synthetic.main.activity_dashboard.*
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
@@ -40,6 +44,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         viewPresenter.pause()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initUI() {
         dashboardButtonLogout.setOnClickListener {
             app.secureDataManager.cleanCredentials()
@@ -48,8 +53,17 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
             finish()
         }
 
-        dashboardLayerSync.setOnClickListener {
-            viewPresenter.sync()
+        dashboardButtonSync.setOnClickListener {
+            viewPresenter.didUserWantToSyncBy(dataManager.syncGroup)
+        }
+
+        //FIXME: remove this code
+        buttonAddPersonRealm.setOnClickListener {
+            app.dbManager.getRealmInstance().executeTransaction { realm ->
+                realm.copyToRealmOrUpdate(PeopleGeneratorUtils.getRandomPerson())
+                val results = realm.where(rl_Person::class.java).findAll()
+                textAddPersonRealm.text = "Count: ${results.count()}"
+            }
         }
     }
 
@@ -64,9 +78,10 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     override fun setSyncItem(enabled: Boolean, string: String, icon: Int) {
-        dashboardLayerSync.isEnabled = enabled
-        dashboardLayerSyncText.text = string
-        dashboardLayerSyncIcon.setImageDrawable(ContextCompat.getDrawable(this, icon))
+        dashboardButtonSync.visibility = View.GONE
+        dashboardSyncState.isEnabled = enabled
+        dashboardSyncStateText.text = string
+        dashboardSyncStateIcon.setImageDrawable(ContextCompat.getDrawable(this, icon))
     }
 
     override fun launchAlertView(error: ALERT_TYPE) {

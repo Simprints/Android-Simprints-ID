@@ -4,38 +4,35 @@ package com.simprints.id.data
 import android.content.Context
 import android.os.Build
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.authListener.AuthListener
 import com.simprints.id.data.db.remote.connectionListener.ConnectionListener
-import com.simprints.id.data.models.Session
-import com.simprints.id.data.network.ApiManager
+import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.domain.sessionParameters.SessionParameters
-import com.simprints.id.libdata.DataCallback
-import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.libdata.models.firebase.fb_Person
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.Constants
+import com.simprints.id.session.Session
+import com.simprints.id.session.sessionParameters.SessionParameters
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
-import com.simprints.libcommon.Progress
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
-import io.reactivex.Emitter
+import io.reactivex.Completable
 
 class DataManagerImpl(private val context: Context,
                       private val preferencesManager: PreferencesManager,
                       private val dbManager: DbManager,
-                      private val apiManager: ApiManager,
                       private val analyticsManager: AnalyticsManager,
                       private val secureDataManager: SecureDataManager)
     : DataManager,
     PreferencesManager by preferencesManager,
     AnalyticsManager by analyticsManager,
     DbManager by dbManager,
-    ApiManager by apiManager,
     SecureDataManager by secureDataManager {
 
     override val androidSdkVersion: Int
@@ -104,19 +101,22 @@ class DataManagerImpl(private val context: Context,
     }
 
     // Data transfer
-    override fun savePerson(person: Person) {
-        dbManager.savePerson(fb_Person(person, userId, deviceId, moduleId), projectId)
-    }
+    override fun savePerson(person: Person): Completable =
+        dbManager.savePerson(fb_Person(person, getSignedInProjectIdOrEmpty(), userId, moduleId))
 
-    override fun loadPeople(destinationList: MutableList<Person>, group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback?) {
+    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
         dbManager.loadPeople(destinationList, group, userId, moduleId, callback)
     }
 
-    override fun getPeopleCount(group: com.simprints.id.libdata.tools.Constants.GROUP): Long =
-        dbManager.getPeopleCount(group, userId, moduleId)
+    override fun getPeopleCount(group: Constants.GROUP): Int =
+        when (group) {
+            Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
+            Constants.GROUP.USER -> dbManager.getPeopleCount(userId = userId)
+            Constants.GROUP.MODULE -> dbManager.getPeopleCount(userId = userId, moduleId = moduleId)
+        }
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
-        dbManager.saveIdentification(probe, projectId, userId, deviceId, moduleId, matchSize, matches, sessionId)
+        dbManager.saveIdentification(probe, getSignedInProjectIdOrEmpty(), userId, deviceId, moduleId, matchSize, matches, sessionId)
     }
 
     override fun updateIdentification(projectId: String, selectedGuid: String) {
@@ -124,11 +124,11 @@ class DataManagerImpl(private val context: Context,
     }
 
     override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
-        dbManager.saveVerification(probe, projectId, userId, deviceId, moduleId, patientId, match, sessionId, guidExistsResult)
+        dbManager.saveVerification(probe, getSignedInProjectIdOrEmpty(), userId, deviceId, moduleId, patientId, match, sessionId, guidExistsResult)
     }
 
     override fun saveRefusalForm(refusalForm: RefusalForm) {
-        dbManager.saveRefusalForm(refusalForm, projectId, userId, sessionId)
+        dbManager.saveRefusalForm(refusalForm, getSignedInProjectIdOrEmpty(), userId, sessionId)
     }
 
     override fun saveSession() {
@@ -142,15 +142,7 @@ class DataManagerImpl(private val context: Context,
         analyticsManager.logSession(session)
     }
 
-    override fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        dbManager.syncGlobal(projectId, isInterrupted, emitter)
-    }
-
-    override fun syncUser(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        dbManager.syncUser(projectId, userId, isInterrupted, emitter)
-    }
-
-    override fun recoverRealmDb(group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback) {
+    override fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback) {
         dbManager.recoverLocalDb(deviceId, userId, deviceId, moduleId, group, callback)
     }
 }

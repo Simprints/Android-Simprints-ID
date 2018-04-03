@@ -75,7 +75,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.main.MainActivity"
             android:label="Main"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
@@ -153,7 +153,7 @@
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value=".activities.MainActivity" />
+            android:value=".activities.main.MainActivity" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="897ed2ef7a2d43e09bcd42998f2533acbb9657e7" />
