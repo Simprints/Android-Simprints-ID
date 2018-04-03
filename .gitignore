@@ -49,3 +49,5 @@ obj/
 testing/logs/
 
 \.idea/codeStyles/
+
+\.idea/caches/
