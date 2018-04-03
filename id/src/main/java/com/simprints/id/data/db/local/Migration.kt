@@ -52,7 +52,7 @@ internal class Migration : RealmMigration {
     }
 
     override fun hashCode(): Int {
-        return 37
+        return Migration.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
