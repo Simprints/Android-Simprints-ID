@@ -5,7 +5,7 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncClient
-import com.simprints.id.services.sync.SyncTaskParameters.*
+import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 
@@ -13,17 +13,13 @@ class NaiveSyncManager(private val dataManager: DataManager,
                        private val syncClient: SyncClient,
                        private val uiObserver: DisposableObserver<Progress>? = null) {
 
-    fun sync(user: Constants.GROUP) {
+    fun sync(group: Constants.GROUP) {
 
-        dataManager.syncGroup = user
-        val syncParameters = when (user) {
-            Constants.GROUP.GLOBAL -> GlobalSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty())
-            Constants.GROUP.USER -> UserSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
-            Constants.GROUP.MODULE -> ModuleIdSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.moduleId)
-        }
+        dataManager.syncGroup = group
+        val syncParameters = SyncTaskParameters.build(group, dataManager)
 
-        startListeners()
         syncClient.sync(syncParameters, {
+            startListeners()
         }, {
             uiObserver?.onError(Throwable("Server busy"))
             stopListeners()
@@ -50,7 +46,6 @@ class NaiveSyncManager(private val dataManager: DataManager,
 
     private val internalSyncObserver: DisposableObserver<Progress> = object : DisposableObserver<Progress>() {
 
-        val start = System.currentTimeMillis()
         override fun onNext(progress: Progress) {
             Timber.d("onNext")
         }

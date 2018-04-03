@@ -7,22 +7,23 @@ import android.support.annotation.Nullable;
 
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.session.callout.CalloutAction;
+import com.simprints.id.data.db.DATA_ERROR;
+import com.simprints.id.data.db.DataCallback;
+import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.exceptions.unsafe.NullScannerError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
-import com.simprints.id.domain.ALERT_TYPE;
+import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.libcommon.Person;
-import com.simprints.id.data.db.DATA_ERROR;
-import com.simprints.id.data.db.DataCallback;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.ScannerUtils;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,6 +142,9 @@ public class Setup {
         String macAddress = pairedScanners.get(0);
         dataManager.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
+
+        //FIXME: conversion should not be here
+        dataManager.setLastScannerUsed("SP" + new BigInteger(macAddress.replace("F0:AC:D7:C", "").replace(":", ""), 16));
 
         Timber.d("Setup: Scanner initialized.");
         goOn(activity);

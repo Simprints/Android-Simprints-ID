@@ -10,17 +10,18 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
 import com.simprints.id.data.db.local.LocalDbKey
+import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
+import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.data.db.remote.network.RemoteApiInterface
+import com.simprints.id.exceptions.safe.remoteDbManager.DownloadingAPersonWhoDoesntExistOnServer
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
-import com.simprints.id.exceptions.safe.remoteDbManager.DownloadingAPersonWhoDoesntExistOnServer
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
@@ -235,6 +236,12 @@ class FirebaseManager(private val appContext: Context,
             .flatMap {
                 Single.just(getApiClient(it))
             }
+
+    override fun loadProjectFromRemote(projectId: String): Single<Project> =
+        getSyncApi().flatMap {
+            it.project(projectId)
+                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+        }
 
     private fun getApiClient(authToken: String): RemoteApiInterface =
         SimApiClient(RemoteApiInterface::class.java, RemoteApiInterface.baseUrl, authToken).api

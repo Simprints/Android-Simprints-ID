@@ -163,6 +163,8 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
                                emitter: Emitter<Int>,
                                error: Throwable? = null) {
 
+        Timber.d("Download finished")
+
         reader.endArray()
         reader.close()
         if (error != null) {

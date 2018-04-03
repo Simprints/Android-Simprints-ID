@@ -337,5 +337,15 @@
     <string name="hint_graphic">Hint graphic</string>
     <string name="dashboard_sync_status_icon">Synchronisation status icon</string>
     <string name="dashboard_sync_icon">Synchronisation icon</string>
+    <string name="account_menu">Account</string>
+    <string name="nav_logout">Logout</string>
+    <string name="dashboard_card_project_title">Project</string>
+    <string name="dashboard_card_localdb_title">People saved on phone</string>
+    <string name="dashboard_card_remotedb_title">People saved on server</string>
+    <string name="dashboard_card_scanner_title">Last scanner used</string>
+    <string name="dashboard_card_enrol_title">Last Enrol</string>
+    <string name="dashboard_card_verification_title">Last Verification</string>
+    <string name="dashboard_card_identification_title">Last Identification</string>
+    <string name="dashboard_card_localdb_action">SYNC</string>
 
 </resources>

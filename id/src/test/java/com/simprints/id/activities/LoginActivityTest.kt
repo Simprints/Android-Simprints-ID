@@ -9,13 +9,14 @@ import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.testUtils.anyNotNull
+import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.extensions.scannerAppIntent
-import com.simprints.id.testUtils.roboletric.*
 import io.reactivex.Completable
 import junit.framework.Assert.assertNotNull
 import junit.framework.Assert.assertTrue
 import kotlinx.android.synthetic.main.activity_login.*
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -117,7 +118,7 @@ class LoginActivityTest {
         assertNotNull(nextActivity)
 
         val isIntentForScannerApp = nextActivity.action == "com.google.zxing.client.android.SCAN"
-        assert(isIntentForScannerApp)
+        Assert.assertTrue(isIntentForScannerApp)
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.simprints.id.data.db
 
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
@@ -15,6 +16,7 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 
 interface DbManager : LocalDbManager, RemoteDbManager {
 
@@ -31,6 +33,7 @@ interface DbManager : LocalDbManager, RemoteDbManager {
     fun savePerson(fbPerson: fb_Person): Completable
     fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
     fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
+    fun loadProject(projectId: String): Single<Project>
 
     fun getPeopleCount(personId: String? = null,
                        projectId: String? = null,

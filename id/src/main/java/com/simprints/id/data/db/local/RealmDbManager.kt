@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
@@ -61,8 +62,8 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
                                                         gson: Gson,
                                                         groupSync: Constants.GROUP,
                                                         shouldStop: (personSaved: fb_Person) -> Boolean) {
-
-        getRealmInstance().executeTransaction { r ->
+        val realm = getRealmInstance()
+        realm.executeTransaction { r ->
             while (readerOfPersonsArray.hasNext()) {
                 val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPersonsArray, r)
                 r.insertOrUpdate(RealmSyncInfo(groupSync.ordinal, lastPersonSaved.updatedAt ?: Date(0)))
@@ -71,14 +72,23 @@ class RealmDbManager(appContext: Context) : LocalDbManager {
                     break
                 }
             }
-            r.close()
         }
+        realm.close()
     }
 
     private fun parseFromStreamAndSavePerson(gson: Gson, readerOfPersonsArray: JsonReader, r: Realm): fb_Person {
         val person = gson.fromJson<fb_Person>(readerOfPersonsArray, fb_Person::class.java)
         r.insertOrUpdate(rl_Person(person))
         return person
+    }
+
+    override fun loadProjectFromLocal(projectId: String): Project? = getRealmInstance().where(Project::class.java).equalTo(PROJECT_ID_FIELD, projectId).findFirst()
+    override fun saveProjectIntoLocal(project: Project) {
+        val realm = getRealmInstance()
+        realm.executeTransaction { r ->
+            r.insertOrUpdate(project)
+        }
+        realm.close()
     }
 
     override fun getPersonsCountFromLocal(patientId: String?,

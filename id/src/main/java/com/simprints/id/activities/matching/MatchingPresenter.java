@@ -7,19 +7,19 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.data.DataManager;
-import com.simprints.id.session.callout.CalloutAction;
-import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
-import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
-import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
-import com.simprints.id.tools.FormatResult;
-import com.simprints.id.tools.Log;
-import com.simprints.id.tools.TimeHelper;
-import com.simprints.libcommon.Person;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.id.domain.Constants;
+import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
+import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
+import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
+import com.simprints.id.session.callout.CalloutAction;
+import com.simprints.id.tools.FormatResult;
+import com.simprints.id.tools.Log;
+import com.simprints.id.tools.TimeHelper;
+import com.simprints.libcommon.Person;
 import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
 import com.simprints.libmatcher.Progress;
@@ -251,6 +251,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
                         try {
                             dataManager.saveIdentification(probe, candidates.size(), topCandidates);
+
                         } catch (UninitializedDataManagerError error) {
                             dataManager.logError(error);
                             matchingView.launchAlert();
