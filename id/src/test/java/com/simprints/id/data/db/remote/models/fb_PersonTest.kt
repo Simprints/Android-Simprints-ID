@@ -61,7 +61,7 @@ class fb_PersonTest {
     }
 
     @Test
-    fun serialiseFbPerson() {
+    fun deserialiseFbPerson() {
         val person = JsonHelper.gson.fromJson(fbPersonJson, fb_Person::class.java)
         Assert.assertEquals(person.patientId, "aeed3784-a399-445a-9dcd-0a373184709c")
         Assert.assertEquals(person.projectId, "test10MProject")
@@ -73,13 +73,13 @@ class fb_PersonTest {
 
         val fingerprints = person.fingerprints[FingerIdentifier.LEFT_THUMB]
         Assert.assertNotNull(fingerprints)
-        Assert.assertEquals(fingerprints!!.first().fingerId, FingerIdentifier.LEFT_THUMB)
-        Assert.assertEquals(fingerprints!!.first().quality, 52)
-        Assert.assertEquals(fingerprints!!.first().template, "Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA")
+        Assert.assertEquals(fingerprints?.first()?.fingerId, FingerIdentifier.LEFT_THUMB)
+        Assert.assertEquals(fingerprints?.first()?.quality, 52)
+        Assert.assertEquals(fingerprints?.first()?.template, "Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA")
     }
 
     @Test
-    fun deserializeFbPerson_skipUnwantedFields() {
+    fun serialiseFbPerson_skipUnwantedFields() {
         val fbPerson = fb_Person(PeopleGeneratorUtils.getRandomPerson())
         val jsonString = JsonHelper.toJson(fbPerson)
         val personJson = JsonHelper.gson.fromJson(jsonString, JsonObject::class.java)
@@ -88,8 +88,8 @@ class fb_PersonTest {
         Assert.assertTrue(personJson.has("projectId"))
         Assert.assertTrue(personJson.has("userId"))
         Assert.assertTrue(personJson.has("moduleId"))
-        Assert.assertTrue(personJson.has("createdAt"))
-        Assert.assertTrue(personJson.has("updatedAt"))
+        Assert.assertTrue(personJson.get("createdAt").asJsonPrimitive.isNumber)
+        Assert.assertTrue(personJson.get("updatedAt").asJsonPrimitive.isNumber)
         Assert.assertTrue(personJson.has("fingerprints"))
         val fingerprintId = fbPerson.fingerprintsAsList.first().fingerId.name
         val fingerprintJson = personJson.get("fingerprints").asJsonObject.get(fingerprintId).asJsonArray.first().asJsonObject
