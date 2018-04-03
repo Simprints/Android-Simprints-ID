@@ -20,7 +20,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 
 interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListenerManager {
-
+    // TODO : agree on consistent method naming for load/save vs get/put etc
     // Lifecycle
     fun initialiseRemoteDb()
 

@@ -15,6 +15,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
+import java.io.IOException
 
 open class ProjectAuthenticator(secureDataManager: SecureDataManager,
                                 private val dbManager: DbManager,
@@ -28,6 +29,7 @@ open class ProjectAuthenticator(secureDataManager: SecureDataManager,
     private val authManager = AuthManager(secureApiClient)
 
     @Throws(
+        IOException::class,
         DifferentProjectIdReceivedFromIntentException::class,
         AuthRequestInvalidCredentialsException::class,
         SimprintsInternalServerException::class)
