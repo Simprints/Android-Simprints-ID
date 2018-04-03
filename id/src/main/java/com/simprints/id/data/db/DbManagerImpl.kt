@@ -5,6 +5,7 @@ import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
@@ -111,6 +112,23 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         }
         destinationList.addAll(result)
         callback?.onSuccess()
+    }
+
+    override fun loadProject(projectId: String): Single<Project> {
+        val possibleProject = localDbManager.loadProjectFromLocal(projectId)
+        if (possibleProject != null) {
+            return Single.just(possibleProject).doAfterSuccess {
+                refreshProjectInfo(projectId)
+            }
+        }
+
+        return refreshProjectInfo(projectId)
+    }
+
+    private fun refreshProjectInfo(projectId: String): Single<Project> {
+        return remoteDbManager.loadProjectFromRemote(projectId).doAfterSuccess {
+            localDbManager.saveProjectIntoLocal(it)
+        }
     }
 
     override fun getPeopleCount(personId: String?,

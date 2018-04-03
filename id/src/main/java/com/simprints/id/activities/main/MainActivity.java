@@ -78,6 +78,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -551,6 +552,7 @@ public class MainActivity extends AppCompatActivity implements
                     .subscribe(new Action() {
                         @Override
                         public void run() {
+                            dataManager.setLastEnrolDate(new Date());
                             handleRegistrationSuccess();
                         }
                     }, new Consumer<Throwable>() {

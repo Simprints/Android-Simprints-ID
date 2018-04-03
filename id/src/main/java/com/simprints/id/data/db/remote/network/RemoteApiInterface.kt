@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.remote.network
 
 import com.simprints.id.BuildConfig
+import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.model.PersonsCount
 import io.reactivex.Completable
@@ -12,7 +13,7 @@ interface RemoteApiInterface {
 
     companion object {
         private const val apiVersion = "2018-1-0-dev4"
-        var baseUrl = "https://${apiVersion}-dot-sync-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
+        var baseUrl = "https://$apiVersion-dot-sync-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
     }
 
     @GET("/patients")
@@ -33,4 +34,8 @@ interface RemoteApiInterface {
     @GET("/patient-counts")
     fun personsCount(
         @QueryMap(encoded = true) syncParams: Map<String, String>): Single<PersonsCount>
+
+    @GET("/projects")
+    fun project(
+        @Query("projectId") projectId: String): Single<Project>
 }

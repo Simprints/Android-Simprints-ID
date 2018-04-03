@@ -8,7 +8,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class, application = TestApplication::class)
 class HasherTest {
@@ -17,8 +16,7 @@ class HasherTest {
     fun testCanEncryptString() {
         val string = "this is some string"
         val hashedString = Hasher().hash(string)
-        Assert.assertNotNull(hashedString)
-        assert(hashedString.isEmpty())
+        Assert.assertTrue(hashedString.isNotEmpty())
     }
 
     @Test

@@ -23,6 +23,7 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
+import java.util.*
 
 class DataManagerImpl(private val context: Context,
                       private val preferencesManager: PreferencesManager,
@@ -57,10 +58,10 @@ class DataManagerImpl(private val context: Context,
         }
 
     override fun logAlert(alertType: ALERT_TYPE) =
-        analyticsManager.logAlert(alertType.name, getSignedInProjectIdOrEmpty(), moduleId, userId, deviceId)
+        analyticsManager.logAlert(alertType.name, getSignedInProjectIdOrEmpty(), moduleId, getSignedInUserIdOrEmpty(), deviceId)
 
     override fun logUserProperties() =
-        analyticsManager.logUserProperties(userId, getSignedInProjectIdOrEmpty(), moduleId, deviceId)
+        analyticsManager.logUserProperties(getSignedInUserIdOrEmpty(), getSignedInProjectIdOrEmpty(), moduleId, deviceId)
 
     override fun logScannerProperties() =
         analyticsManager.logScannerProperties(macAddress, scannerId)
@@ -102,21 +103,22 @@ class DataManagerImpl(private val context: Context,
 
     // Data transfer
     override fun savePerson(person: Person): Completable =
-        dbManager.savePerson(fb_Person(person, getSignedInProjectIdOrEmpty(), userId, moduleId))
+        dbManager.savePerson(fb_Person(person, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), moduleId))
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
-        dbManager.loadPeople(destinationList, group, userId, moduleId, callback)
+        dbManager.loadPeople(destinationList, group, getSignedInUserIdOrEmpty(), moduleId, callback)
     }
 
     override fun getPeopleCount(group: Constants.GROUP): Int =
         when (group) {
             Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
-            Constants.GROUP.USER -> dbManager.getPeopleCount(userId = userId)
-            Constants.GROUP.MODULE -> dbManager.getPeopleCount(userId = userId, moduleId = moduleId)
+            Constants.GROUP.USER -> dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty())
+            Constants.GROUP.MODULE -> dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty(), moduleId = moduleId)
         }
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
-        dbManager.saveIdentification(probe, getSignedInProjectIdOrEmpty(), userId, deviceId, moduleId, matchSize, matches, sessionId)
+        preferencesManager.lastIdentificationDate = Date()
+        dbManager.saveIdentification(probe, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, matchSize, matches, sessionId)
     }
 
     override fun updateIdentification(projectId: String, selectedGuid: String) {
@@ -124,16 +126,17 @@ class DataManagerImpl(private val context: Context,
     }
 
     override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
-        dbManager.saveVerification(probe, getSignedInProjectIdOrEmpty(), userId, deviceId, moduleId, patientId, match, sessionId, guidExistsResult)
+        preferencesManager.lastVerificationDate = Date()
+        dbManager.saveVerification(probe, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, patientId, match, sessionId, guidExistsResult)
     }
 
     override fun saveRefusalForm(refusalForm: RefusalForm) {
-        dbManager.saveRefusalForm(refusalForm, getSignedInProjectIdOrEmpty(), userId, sessionId)
+        dbManager.saveRefusalForm(refusalForm, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), sessionId)
     }
 
     override fun saveSession() {
         val session = Session(sessionId, androidSdkVersion, deviceModel, deviceId, appVersionName,
-            libVersionName, calloutAction.toString(), getSignedInProjectIdOrEmpty(), moduleId, userId,
+            libVersionName, calloutAction.toString(), getSignedInProjectIdOrEmpty(), moduleId, getSignedInUserIdOrEmpty(),
             patientId, callingPackage, metadata, resultFormat, macAddress, scannerId,
             hardwareVersion.toInt(), location.latitude, location.longitude,
             msSinceBootOnSessionStart, msSinceBootOnLoadEnd, msSinceBootOnMainStart,
@@ -143,6 +146,6 @@ class DataManagerImpl(private val context: Context,
     }
 
     override fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback) {
-        dbManager.recoverLocalDb(deviceId, userId, deviceId, moduleId, group, callback)
+        dbManager.recoverLocalDb(deviceId, getSignedInUserIdOrEmpty(), deviceId, moduleId, group, callback)
     }
 }

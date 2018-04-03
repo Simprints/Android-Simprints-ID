@@ -2,6 +2,7 @@ package com.simprints.id.data.db.remote
 
 import com.google.firebase.FirebaseApp
 import com.simprints.id.data.db.local.LocalDbKey
+import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
@@ -56,4 +57,5 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
 
     fun getSyncApi(): Single<RemoteApiInterface>
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
+    fun loadProjectFromRemote(projectId: String): Single<Project>
 }

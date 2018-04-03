@@ -1,75 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/simprints_blue"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin">
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/drawer_layout"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fitsSystemWindows="true" tools:openDrawer="start">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        tools:ignore="UselessParent">
+    <include layout="@layout/app_bar_dashboard"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            tools:ignore="UseCompoundDrawables">
+    <android.support.design.widget.NavigationView android:id="@+id/nav_view"
+        android:layout_width="wrap_content" android:layout_height="match_parent"
+        android:layout_gravity="start" android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_main" app:menu="@menu/activity_dashboard_drawer" />
 
-            <Button
-                android:id="@+id/dashboardButtonSync"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sync" />
-
-            <LinearLayout
-                android:id="@+id/dashboardSyncState"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/dashboardSyncStateIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20dp"
-                    android:contentDescription="@string/dashboard_sync_status_icon" />
-
-                <TextView
-                    android:id="@+id/dashboardSyncStateText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginStart="5dp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/dashboardButtonLogout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/logout" />
-
-
-        <TextView
-            android:id="@+id/textAddPersonRealm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp" />
-
-        <Button
-            android:id="@+id/buttonAddPersonRealm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Add to realm" />
-    </LinearLayout>
-</RelativeLayout>
+</android.support.v4.widget.DrawerLayout>
