@@ -62,11 +62,8 @@ open class RealmTestsBase {
         else -> RealmSyncInfo(GLOBAL.ordinal, Date(0))
     }.apply { realm.executeTransaction { it.insertOrUpdate(this) } }
 
-    protected fun RealmSyncInfo.deepEquals(other: RealmSyncInfo): Boolean = when {
-        this.syncGroupId != other.syncGroupId -> false
-        this.lastSyncTime != other.lastSyncTime -> false
-        else -> true
-    }
+    protected fun RealmSyncInfo.deepEquals(other: RealmSyncInfo): Boolean =
+        syncGroupId == other.syncGroupId && lastSyncTime == other.lastSyncTime
 
     protected fun deleteRealmFiles(realmConfig: RealmConfiguration) {
         Realm.deleteRealm(realmConfig)
