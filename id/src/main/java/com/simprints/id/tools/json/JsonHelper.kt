@@ -52,6 +52,10 @@ class JsonHelper {
                     Date(json.asJsonPrimitive.asLong)
                 else Date(json.asJsonPrimitive.asString)
             })
+
+            builder.registerTypeAdapter(Date::class.java, JsonSerializer<Date> { src, _, _ ->
+                JsonPrimitive(src.time)
+            })
         }
 
         fun toJson(any: Any): String {
