@@ -3,7 +3,6 @@ package com.simprints.id.data.db.sync
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.safe.SimprintsException
-import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncClient
@@ -11,9 +10,9 @@ import com.simprints.id.services.sync.SyncTaskParameters.*
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 
-class NaiveSyncManager(private val dataManager: DataManager,
-                       private val syncClient: SyncClient,
-                       private val uiObserver: DisposableObserver<Progress>? = null) {
+class SyncManager(private val dataManager: DataManager,
+                  private val syncClient: SyncClient,
+                  private val uiObserver: DisposableObserver<Progress>? = null) {
 
     fun sync(user: Constants.GROUP) {
 
@@ -32,6 +31,10 @@ class NaiveSyncManager(private val dataManager: DataManager,
         })
     }
 
+    fun stop() {
+        stopListeners()
+    }
+
     private fun stopListeners() {
         try {
             syncClient.stopListening()
@@ -48,6 +51,7 @@ class NaiveSyncManager(private val dataManager: DataManager,
 
     private val internalSyncObserver: DisposableObserver<Progress> = object : DisposableObserver<Progress>() {
 
+        val start = System.currentTimeMillis()
         override fun onNext(progress: Progress) {
             Timber.d("onNext")
         }
@@ -59,20 +63,12 @@ class NaiveSyncManager(private val dataManager: DataManager,
 
         override fun onError(throwable: Throwable) {
             Timber.d("onError")
-            logThrowable(throwable)
+            dataManager.logThrowable(throwable)
             syncClient.stopListening()
-        }
-
-        private fun logThrowable(throwable: Throwable) {
-            if (throwable is Error) {
-                dataManager.logError(SimprintsError(throwable))
-            } else if (throwable is RuntimeException) {
-                dataManager.logSafeException(SimprintsException(throwable))
-            }
         }
     }
 
     private fun handleUnexpectedError(error: Error) {
-        dataManager.logError(SimprintsError(error))
+        dataManager.logThrowable(error)
     }
 }

@@ -50,54 +50,54 @@ class RealmManagerTests : RealmTestsBase() {
     }
 
     @Test
-    fun getPersonsCountFromLocal_ShouldReturnOne() {
+    fun getPeopleCountFromLocal_ShouldReturnOne() {
         saveFakePerson(realm, getFakePerson())
 
-        val count = realmManager.getPersonsCountFromLocal()
+        val count = realmManager.getPeopleCountFromLocal()
         assertEquals(count, 1)
     }
 
     @Test
-    fun getPersonsCountFromLocal_ShouldReturnMany() {
+    fun getPeopleCountFromLocal_ShouldReturnMany() {
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPersonsCountFromLocal()
+        val count = realmManager.getPeopleCountFromLocal()
         assertEquals(count, 20)
     }
 
     @Test
-    fun getPersonsCountFromLocalByUserId_ShouldReturnOne() {
+    fun getPeopleCountFromLocalByUserId_ShouldReturnOne() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPersonsCountFromLocal(userId = fakePerson.userId)
+        val count = realmManager.getPeopleCountFromLocal(userId = fakePerson.userId)
         assertEquals(count, 1)
     }
 
     @Test
-    fun getPersonsCountFromLocalByModuleId_ShouldReturnOne() {
+    fun getPeopleCountFromLocalByModuleId_ShouldReturnOne() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPersonsCountFromLocal(moduleId = fakePerson.moduleId)
+        val count = realmManager.getPeopleCountFromLocal(moduleId = fakePerson.moduleId)
         assertEquals(count, 1)
     }
 
     @Test
-    fun getPersonsCountFromLocalByProjectId_ShouldReturnOne() {
+    fun getPeopleCountFromLocalByProjectId_ShouldReturnOne() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPersonsCountFromLocal(projectId = fakePerson.projectId)
+        val count = realmManager.getPeopleCountFromLocal(projectId = fakePerson.projectId)
         assertEquals(count, 1)
     }
 
     @Test
-    fun getPersonsCountFromLocalByPatientId_ShouldReturnOne() {
+    fun getPeopleCountFromLocalByPatientId_ShouldReturnOne() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPersonsCountFromLocal(patientId = fakePerson.patientId)
+        val count = realmManager.getPeopleCountFromLocal(patientId = fakePerson.patientId)
         assertEquals(count, 1)
     }
 
@@ -121,57 +121,57 @@ class RealmManagerTests : RealmTestsBase() {
     }
 
     @Test
-    fun loadPersonsFromLocal_ShouldSucceed() {
+    fun loadPeopleFromLocal_ShouldSucceed() {
         val fakePerson = getFakePerson()
         saveFakePerson(realm, fakePerson)
 
-        val people = realmManager.loadPersonsFromLocal()
+        val people = realmManager.loadPeopleFromLocal()
         assertTrue(people.first().deepEquals(fakePerson))
     }
 
     @Test
-    fun loadPersonsFromLocalByUserId_ShouldLoadOnlyUsersPeople() {
+    fun loadPeopleFromLocalByUserId_ShouldLoadOnlyUsersPeople() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPersonsFromLocal(userId = fakePerson.userId)
+        val people = realmManager.loadPeopleFromLocal(userId = fakePerson.userId)
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
 
     @Test
-    fun loadPersonsFromLocalByModuleId_ShouldLoadOnlyModulesPeople() {
+    fun loadPeopleFromLocalByModuleId_ShouldLoadOnlyModulesPeople() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPersonsFromLocal(moduleId = fakePerson.moduleId)
+        val people = realmManager.loadPeopleFromLocal(moduleId = fakePerson.moduleId)
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
 
     @Test
-    fun loadPersonsFromLocalByProjectId_ShouldLoadOnlyProjectsPeople() {
+    fun loadPeopleFromLocalByProjectId_ShouldLoadOnlyProjectsPeople() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPersonsFromLocal(projectId = fakePerson.projectId)
+        val people = realmManager.loadPeopleFromLocal(projectId = fakePerson.projectId)
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
 
     @Test
-    fun loadPersonsFromLocalByToSyncTrue_ShouldLoadAllPeople() {
+    fun loadPeopleFromLocalByToSyncTrue_ShouldLoadAllPeople() {
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPersonsFromLocal(toSync = true)
+        val people = realmManager.loadPeopleFromLocal(toSync = true)
         assertEquals(people.size, 20)
     }
 
     @Test
-    fun loadPersonsFromLocalByToSyncFalse_ShouldLoadNoPeople() {
+    fun loadPeopleFromLocalByToSyncFalse_ShouldLoadNoPeople() {
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPersonsFromLocal(toSync = false)
+        val people = realmManager.loadPeopleFromLocal(toSync = false)
         assertEquals(people.size, 0)
     }
 
@@ -319,7 +319,7 @@ class RealmManagerTests : RealmTestsBase() {
             )
         }
 
-        realmManager.savePersonsFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams, { false })
+        realmManager.savePeopleFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams, { false })
     }
 
 }

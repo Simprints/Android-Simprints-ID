@@ -2,7 +2,7 @@ package com.simprints.id.exceptions.unsafe
 
 
 class InvalidCalloutParameterError(message: String = "InvalidCalloutParameterError")
-    : Error(message) {
+    : SimprintsError(message) {
 
     companion object {
 

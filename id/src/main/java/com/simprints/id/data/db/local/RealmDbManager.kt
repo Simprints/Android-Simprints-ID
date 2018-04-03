@@ -69,7 +69,7 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         }.let { em.onComplete() }
     }
 
-    override fun savePersonsFromStreamAndUpdateSyncInfo(readerOfPersonsArray: JsonReader,
+    override fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPersonsArray: JsonReader,
                                                         gson: Gson,
                                                         syncParams: SyncTaskParameters,
                                                         shouldStop: (personSaved: fb_Person) -> Boolean) {
@@ -93,7 +93,7 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         updateSyncInfo(syncParams)
     }
 
-    override fun getPersonsCountFromLocal(patientId: String?,
+    override fun getPeopleCountFromLocal(patientId: String?,
                                           projectId: String?,
                                           userId: String?,
                                           moduleId: String?,
@@ -103,7 +103,7 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         }
     }
 
-    override fun loadPersonsFromLocal(patientId: String?,
+    override fun loadPeopleFromLocal(patientId: String?,
                                       projectId: String?,
                                       userId: String?,
                                       moduleId: String?,
@@ -117,6 +117,7 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
     override fun getValidRealmConfig(): RealmConfiguration {
         return realmConfig ?: throw RealmUninitialisedError()
     }
+
 
     override fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo? {
         return getRealmInstance().use {
