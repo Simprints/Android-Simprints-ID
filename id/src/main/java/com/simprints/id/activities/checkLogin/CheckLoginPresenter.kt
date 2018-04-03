@@ -28,6 +28,7 @@ abstract class CheckLoginPresenter (
             dataManager.getLocalKeyAndSignInToLocal(projectId).subscribe({
                 handleSignedInUser()
             }, {
+                dataManager.logThrowable(it)
                 view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
             })
         } else {
