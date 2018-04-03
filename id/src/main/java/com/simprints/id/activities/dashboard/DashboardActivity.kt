@@ -60,7 +60,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         //FIXME: remove this code
         buttonAddPersonRealm.setOnClickListener {
             app.dbManager.getRealmInstance().executeTransaction { realm ->
-                realm.copyToRealmOrUpdate(PeopleGeneratorUtils.getRandomPerson())
+                realm.copyToRealmOrUpdate(PeopleGeneratorUtils.getRandomPerson(projectId = dataManager.getSignedInProjectIdOrEmpty()))
                 val results = realm.where(rl_Person::class.java).findAll()
                 textAddPersonRealm.text = "Count: ${results.count()}"
             }
