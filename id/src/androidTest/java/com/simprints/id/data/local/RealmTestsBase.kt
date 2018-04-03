@@ -60,7 +60,7 @@ open class RealmTestsBase {
         userId.isNotEmpty() -> RealmSyncInfo(USER.ordinal, Date(0))
         moduleId.isNotEmpty() -> RealmSyncInfo(MODULE.ordinal, Date(0))
         else -> RealmSyncInfo(GLOBAL.ordinal, Date(0))
-    }.apply { realm.executeTransaction { it.insertOrUpdate(this) } }
+    }.also { info -> realm.executeTransaction { it.insertOrUpdate(info) } }
 
     protected fun RealmSyncInfo.deepEquals(other: RealmSyncInfo): Boolean =
         syncGroupId == other.syncGroupId && lastSyncTime == other.lastSyncTime
