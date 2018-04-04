@@ -51,5 +51,5 @@ interface DbManager : LocalDbManager, RemoteDbManager {
 
     fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress>
 
-    fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP, callback: DataCallback)
+    fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP): Completable
 }
