@@ -16,7 +16,7 @@ import kotlin.collections.ArrayList
 open class rl_Person : RealmObject {
 
     @PrimaryKey
-    @SerializedName("syncGroupId")
+    @SerializedName("id")
     lateinit var patientId: String
 
     @Required
