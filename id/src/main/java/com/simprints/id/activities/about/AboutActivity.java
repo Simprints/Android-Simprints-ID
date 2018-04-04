@@ -100,7 +100,7 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
                 }).create();
 
         // Create the presenter and pass it the information it needs
-        viewPresenter = new AboutPresenter(this, dataManager, new AlertLauncher(this));
+        viewPresenter = new AboutPresenter(this, dataManager);
     }
 
     @Override
@@ -158,7 +158,7 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
     }
 
     @Override
-    public void setErrorRecovering(String errorMessage) {
+    public void setRecoveringFailed(String errorMessage) {
         recoveryDialog.cancel();
         if (errorMessage != null) errorDialog.setMessage(errorMessage);
         errorDialog.show();
