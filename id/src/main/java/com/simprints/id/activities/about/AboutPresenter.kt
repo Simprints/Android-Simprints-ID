@@ -13,7 +13,7 @@ internal class AboutPresenter(private val view: AboutContract.View,
     override fun start() {
         initVersions()
         initCounts()
-        view.setRecoveryAvailability(recoveryRunning)
+        if (recoveryRunning) view.setStartRecovering()
     }
 
     private fun initVersions() {
