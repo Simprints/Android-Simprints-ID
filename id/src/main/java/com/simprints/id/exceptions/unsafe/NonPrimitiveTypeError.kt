@@ -1,7 +1,7 @@
 package com.simprints.id.exceptions.unsafe
 
 
-class NonPrimitiveTypeError(message: String = "NonPrimitiveTypeError"): Error(message) {
+class NonPrimitiveTypeError(message: String = "NonPrimitiveTypeError"): SimprintsError(message) {
 
     companion object {
 

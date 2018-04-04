@@ -6,6 +6,7 @@ import com.simprints.id.exceptions.safe.secure.*
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import java.io.IOException
 
 class LoginPresenter(val view: LoginContract.View,
@@ -71,8 +72,8 @@ class LoginPresenter(val view: LoginContract.View,
 
     private fun logSignInError(e: Throwable) {
         when (e) {
-            is Error -> analyticsManager.logError(e)
-            else -> analyticsManager.logSafeException(AuthException(cause = e))
+            is IOException -> Timber.d("Attempted login offline")
+            else -> analyticsManager.logThrowable(e)
         }
     }
 

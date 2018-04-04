@@ -1,7 +1,7 @@
 package com.simprints.id.exceptions.unsafe
 
 
-class GoogleServicesJsonNotFoundError(message: String = "GoogleServicesJsonNotFoundError") : Error(message) {
+class GoogleServicesJsonNotFoundError(message: String = "GoogleServicesJsonNotFoundError") : SimprintsError(message) {
 
     companion object {
 

@@ -1,7 +1,7 @@
 package com.simprints.id.exceptions.unsafe
 
 
-class InvalidServiceError(msg: String): Error(msg) {
+class InvalidServiceError(msg: String): SimprintsError(msg) {
 
     companion object {
 

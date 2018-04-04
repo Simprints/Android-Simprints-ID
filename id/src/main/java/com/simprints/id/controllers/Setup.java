@@ -30,6 +30,7 @@ import timber.log.Timber;
 
 import static com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE;
 import static com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE;
+import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
 
 public class Setup {
 
@@ -205,7 +206,7 @@ public class Setup {
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = dataManager.getPatientId();
         try {
-            dataManager.loadPerson(loadedPerson, dataManager.getSignedInProjectId(), guid, newLoadPersonCallback(activity, guid));
+            dataManager.loadPerson(loadedPerson, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people from db", newLoadPersonCallback(activity, guid)));
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);

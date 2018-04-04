@@ -57,9 +57,11 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
             viewPresenter.didUserWantToSyncBy(dataManager.syncGroup)
         }
 
+        //TODO: I Don't know what this is but it needs to be destroyed immediately
+        //FIXME: remove this code
         buttonAddPersonRealm.setOnClickListener {
             app.dbManager.getRealmInstance().executeTransaction { realm ->
-                realm.copyToRealmOrUpdate(PeopleGeneratorUtils.getRandomPerson())
+                realm.copyToRealmOrUpdate(PeopleGeneratorUtils.getRandomPerson(projectId = dataManager.getSignedInProjectIdOrEmpty()))
                 val results = realm.where(rl_Person::class.java).findAll()
                 textAddPersonRealm.text = "Count: ${results.count()}"
             }

@@ -17,8 +17,7 @@ class HasherTest {
     fun testCanEncryptString() {
         val string = "this is some string"
         val hashedString = Hasher().hash(string)
-        Assert.assertNotNull(hashedString)
-        assert(hashedString.isEmpty())
+        Assert.assertTrue(hashedString.isNotEmpty())
     }
 
     @Test

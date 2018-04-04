@@ -50,9 +50,9 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
 
     private fun getPeopleToSaveIntoRecover(): ArrayList<rl_Person> {
         return when (group) {
-            Constants.GROUP.GLOBAL -> localDbManager.loadPersonsFromLocal()
-            Constants.GROUP.USER -> localDbManager.loadPersonsFromLocal(userId = userId)
-            Constants.GROUP.MODULE -> localDbManager.loadPersonsFromLocal(moduleId = moduleId)
+            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal()
+            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(userId = userId)
+            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(moduleId = moduleId)
         }
     }
 

@@ -2,7 +2,6 @@ package com.simprints.id.data.db.remote
 
 import android.content.Context
 import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -16,17 +15,20 @@ import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
+import com.simprints.id.data.db.remote.models.adapters.toLocalDbKey
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.data.db.sync.SyncApiInterface
+import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
+import com.simprints.id.exceptions.safe.remoteDbManager.DownloadingAPersonWhoDoesntExistOnServer
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
+import com.simprints.id.tools.extensions.toHexString
 import com.simprints.id.tools.extensions.toMap
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
@@ -37,6 +39,7 @@ import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
+
 
 class FirebaseManager(private val appContext: Context,
                       firebaseConnectionListenerManager: RemoteDbConnectionListenerManager,
@@ -156,15 +159,19 @@ class FirebaseManager(private val appContext: Context,
 
     private fun handleGetLocalDbKeyTaskComplete(task: Task<QuerySnapshot>, result: SingleEmitter<LocalDbKey>) {
         if (task.isSuccessful) {
-            val localDbKeyValue = task.result.first().getBlob(LOCAL_DB_KEY_VALUE_NAME).toBytes()
-            result.onSuccess(LocalDbKey(localDbKeyValue))
+            val realmKeys = task.result.first().toObject(fs_RealmKeys::class.java)
+
+            //TODO Remove before final pull request
+            Timber.d(realmKeys.value.toBytes().toHexString())
+
+            result.onSuccess(realmKeys.toLocalDbKey())
         } else {
             result.onError(CouldNotRetrieveLocalDbKeyError.withException(task.exception))
         }
     }
 
     override fun saveIdentificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
-        idEventRef(legacyFirebaseApp, projectId).push().setValue(fb_IdEvent(probe, projectId, userId, androidId, moduleId, matchSize, matches, sessionId).toMap())
+        idEventRef(legacyFirebaseApp, projectId).push().setValue(fb_IdEvent(probe, projectId, userId, moduleId, matchSize, matches, sessionId).toMap())
     }
 
     override fun updateIdentificationInRemote(projectId: String, selectedGuid: String, deviceId: String, sessionId: String) {
@@ -172,7 +179,7 @@ class FirebaseManager(private val appContext: Context,
     }
 
     override fun saveVerificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
-        vfEventRef(legacyFirebaseApp, projectId).push().setValue(fb_VfEvent(probe, projectId, userId, androidId, moduleId, patientId, match, sessionId, guidExistsResult).toMap())
+        vfEventRef(legacyFirebaseApp, projectId).push().setValue(fb_VfEvent(probe, projectId, userId, moduleId, patientId, match, sessionId, guidExistsResult).toMap())
     }
 
     override fun saveRefusalFormInRemote(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String) {
@@ -180,8 +187,7 @@ class FirebaseManager(private val appContext: Context,
     }
 
     override fun saveSessionInRemote(session: Session) {
-        val task = sessionRef(legacyFirebaseApp).push().setValue(session.toFirebaseSession())
-        Tasks.await(task)
+        sessionRef(legacyFirebaseApp).push().setValue(session.toFirebaseSession())
     }
 
     fun getFirebaseStorageInstance() = FirebaseStorage.getInstance(legacyFirebaseApp)
@@ -206,36 +212,39 @@ class FirebaseManager(private val appContext: Context,
 
     // API
 
-   override fun uploadPerson(fbPerson: fb_Person): Completable =
+    override fun uploadPerson(fbPerson: fb_Person): Completable =
         uploadPeople(arrayListOf(fbPerson))
 
     override fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable =
         getSyncApi().flatMapCompletable {
-            it.upSync(hashMapOf("patients" to patientsToUpload))
+            it.uploadPeople(hashMapOf("patients" to patientsToUpload))
                 .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
         }
 
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getSyncApi().flatMap {
-            it.getPatient(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
-                .map { it.first() }
+            it.downloadPeople(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+                .map { if (it.isEmpty())
+                    throw DownloadingAPersonWhoDoesntExistOnServer()
+                else it.first()
+                }
         }
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
         getSyncApi().flatMap {
-            it.patientsCount(syncParams.toMap())
+            it.peopleCount(syncParams.toMap())
                 .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
-                .map { it.patientsCount }
+                .map { it.count }
         }
 
-    override fun getSyncApi(): Single<SyncApiInterface> =
+    override fun getSyncApi(): Single<RemoteApiInterface> =
         getCurrentFirestoreToken()
             .flatMap {
                 Single.just(getApiClient(it))
             }
 
-    private fun getApiClient(authToken: String): SyncApiInterface =
-        SimApiClient(SyncApiInterface::class.java, SyncApiInterface.baseUrl, authToken).api
+    private fun getApiClient(authToken: String): RemoteApiInterface =
+        SimApiClient(RemoteApiInterface::class.java, RemoteApiInterface.baseUrl, authToken).api
 
     companion object {
         private const val COLLECTION_LOCAL_DB_KEYS = "localDbKeys"

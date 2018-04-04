@@ -12,6 +12,7 @@ import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.ProjectId
 import io.reactivex.Completable
 import io.reactivex.Single
+import java.io.IOException
 
 class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
                                            dbManager: DbManager,
@@ -23,6 +24,7 @@ class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
     private val legacyProjectIdManager = LegacyProjectIdManager(secureApiClient)
 
     @Throws(
+        IOException::class,
         DifferentProjectIdReceivedFromIntentException::class,
         InvalidLegacyProjectIdReceivedFromIntentException::class,
         AuthRequestInvalidCredentialsException::class,
