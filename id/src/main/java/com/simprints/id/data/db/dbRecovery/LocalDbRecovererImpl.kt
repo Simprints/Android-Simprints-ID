@@ -5,57 +5,54 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.DATA_ERROR
-import com.simprints.id.data.db.DataCallback
-import com.simprints.id.data.db.local.RealmDbManager
+import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.FirebaseManager
-import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.domain.Constants
 import com.simprints.id.tools.json.JsonHelper
-import io.realm.RealmChangeListener
-import io.realm.RealmResults
+import io.reactivex.Completable
+import io.reactivex.CompletableEmitter
 import org.json.JSONException
 import timber.log.Timber
 import java.io.IOException
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
-class LocalDbRecovererImpl(realmManager: RealmDbManager,
+class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
                            private val firebaseManager: FirebaseManager,
                            private val projectId: String,
                            private val userId: String,
                            private val androidId: String,
                            private val moduleId: String,
-                           private val group: Constants.GROUP,
-                           callback: DataCallback) :
+                           private val group: Constants.GROUP) :
     LocalDbRecoverer {
-
-    private val wrappedCallback = Utils.wrapCallback("FirebaseManager.recoverRealmDb", callback)
-
-    private val realm = realmManager.getRealmInstance()
-    private lateinit var request: RealmResults<rl_Person>
 
     private val realmDbInputStream = PipedInputStream()
     private val realmDbOutputStream = PipedOutputStream()
 
-    override fun recoverDb() {
-        Timber.d("LocalDbRecovererImpl.recoverDb()")
+    private lateinit var resultEmitter: CompletableEmitter
 
-        initialiseRealmAndWriteToOutputStream()
-        initialiseFirebaseStorageFileReferenceAndReadFromInputStream()
+    override fun recoverDb(): Completable {
+
+        return Completable.create {
+            resultEmitter = it
+            Timber.d("LocalDbRecovererImpl.recoverDb()")
+
+            initialiseRealmAndWriteToOutputStream()
+            initialiseFirebaseStorageFileReferenceAndReadFromInputStream()
+        }
     }
 
     private fun initialiseRealmAndWriteToOutputStream() {
-        request = getRealmRequest()
         connectTheStreams()
-        request.addChangeListener(realmChangeListener)
+        writeAllPeopleToOutputStream()
     }
 
-    private fun getRealmRequest(): RealmResults<rl_Person> {
+    private fun getPeopleToSaveIntoRecover(): ArrayList<rl_Person> {
         return when (group) {
-            Constants.GROUP.GLOBAL -> realm.where(rl_Person::class.java).findAllAsync()
-            Constants.GROUP.USER -> realm.where(rl_Person::class.java).equalTo("userId", userId).findAllAsync()
-            Constants.GROUP.MODULE -> realm.where(rl_Person::class.java).equalTo("moduleId", moduleId).findAllAsync()
+            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal()
+            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(userId = userId)
+            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(moduleId = moduleId)
         }
     }
 
@@ -67,24 +64,19 @@ class LocalDbRecovererImpl(realmManager: RealmDbManager,
         }
     }
 
-    private val realmChangeListener = object : RealmChangeListener<RealmResults<rl_Person>> {
-        override fun onChange(results: RealmResults<rl_Person>) {
-            try {
-                request.removeChangeListener(this)
-                writeAllPeopleToOutputStream(results)
-            } catch (e: JSONException) {
-                e.printStackTrace()
-                wrappedCallback.onFailure(DATA_ERROR.JSON_ERROR)
-            } catch (e: IOException) {
-                e.printStackTrace()
-                wrappedCallback.onFailure(DATA_ERROR.IO_BUFFER_WRITE_ERROR)
-            }
+    private fun writeAllPeopleToOutputStream() {
+        try {
+            val people = getPeopleToSaveIntoRecover()
+            val json = JsonHelper.gson.toJson(hashMapOf("patients" to people))
+            realmDbOutputStream.write(json)
+            closeRealmAndOutputStream()
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            resultEmitter.onError(Throwable(DATA_ERROR.JSON_ERROR.details()))
+        } catch (e: IOException) {
+            e.printStackTrace()
+            resultEmitter.onError(Throwable(DATA_ERROR.IO_BUFFER_WRITE_ERROR.details()))
         }
-    }
-
-    private fun writeAllPeopleToOutputStream(results: RealmResults<rl_Person>) {
-        realmDbOutputStream.write(JsonHelper.toJson(ArrayList(results)))
-        closeRealmAndOutputStream()
     }
 
     private fun PipedOutputStream.write(string: String) =
@@ -92,7 +84,6 @@ class LocalDbRecovererImpl(realmManager: RealmDbManager,
 
     private fun closeRealmAndOutputStream() {
         realmDbOutputStream.close()
-        realm.close()
     }
 
     private fun initialiseFirebaseStorageFileReferenceAndReadFromInputStream() {
@@ -127,13 +118,13 @@ class LocalDbRecovererImpl(realmManager: RealmDbManager,
 
     private fun handleUploadTaskSuccess() {
         closeInputStream()
-        wrappedCallback.onSuccess()
+        resultEmitter.onComplete()
     }
 
     private fun handleUploadTaskFailure(e: Exception) {
         e.printStackTrace()
         closeInputStream()
-        wrappedCallback.onFailure(DATA_ERROR.FAILED_TO_UPLOAD)
+        resultEmitter.onError(Throwable(DATA_ERROR.FAILED_TO_UPLOAD.details()))
     }
 
     private fun closeInputStream() {
