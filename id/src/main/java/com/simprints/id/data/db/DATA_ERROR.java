@@ -9,6 +9,7 @@ public enum DATA_ERROR {
     SYNC_INTERRUPTED("Syncing was interrupted because connection was lost"),
     NOT_FOUND("The requested element was not found in the database"),
 
+    STREAM_CONNECT_ERROR("Could not connect piped streams"),
     FAILED_TO_UPLOAD("Failed to upload to online storage"),
     JSON_ERROR("Could not convert database into JSON format."),
     IO_BUFFER_WRITE_ERROR("Could not write to output stream.");
