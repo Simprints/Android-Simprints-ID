@@ -50,7 +50,12 @@ class JsonHelper {
             builder.registerTypeAdapter(Date::class.java, JsonDeserializer<Date> { json, _, _ ->
                 if (json.asJsonPrimitive.isNumber)
                     Date(json.asJsonPrimitive.asLong)
-                else Date(json.asJsonPrimitive.asString)
+                else 
+                    Date(json.asJsonPrimitive.asString) //TODO: find a replacement for deprecated method
+            })
+
+            builder.registerTypeAdapter(Date::class.java, JsonSerializer<Date> { src, _, _ ->
+                JsonPrimitive(src.time)
             })
         }
 
