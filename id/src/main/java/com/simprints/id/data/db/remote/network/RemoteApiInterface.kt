@@ -18,7 +18,7 @@ interface RemoteApiInterface {
     @GET("/patients")
     @Streaming
     fun downSync(
-        @Query("lastSync") date: Long, //Date in ms
+        @Query("updatedAfter") date: Long, //Date in ms
         @QueryMap(encoded = true) syncParams: Map<String, String>, //projectId, userId, moduleId
         @Query("batchSize") batchSize: Int = 5000): Single<ResponseBody>
 
