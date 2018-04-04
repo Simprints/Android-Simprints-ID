@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.services.sync.SyncTaskParameters;
 import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.LanguageHelper;
 
@@ -33,6 +34,9 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
     TextView tv_globalDbCount;
 
     private Button recoverDbButton;
+    private Button deleteSyncInfo;
+    private Button deleteRealmDb;
+
     private ProgressDialog recoveryDialog;
     private AlertDialog errorDialog;
     private AlertDialog successDialog;
@@ -42,7 +46,7 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Application app = ((Application) getApplication());
+        final Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
 
@@ -101,6 +105,23 @@ public class AboutActivity extends AppCompatActivity implements AboutContract.Vi
 
         // Create the presenter and pass it the information it needs
         viewPresenter = new AboutPresenter(this, dataManager, new AlertLauncher(this));
+
+
+        //FIXME: Delete me
+        deleteSyncInfo = findViewById(R.id.bt_deleteSyncInfo);
+        deleteSyncInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dataManager.deleteSyncInfoFromLocal(SyncTaskParameters.build(app.getDataManager().getSyncGroup(), app.getDataManager()));
+            }
+        });
+        deleteRealmDb = findViewById(R.id.bt_deletePeopleFromRealm);
+        deleteRealmDb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dataManager.deletePeopleFromLocal(SyncTaskParameters.build(app.getDataManager().getSyncGroup(), app.getDataManager()));
+            }
+        });
     }
 
     @Override

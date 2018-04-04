@@ -168,4 +168,20 @@
         android:padding="10dp"
         android:text="@string/recover_db" />
 
+    <Button
+        android:id="@+id/bt_deleteSyncInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="DELETE SYNC INFO" />
+
+    <Button
+        android:id="@+id/bt_deletePeopleFromRealm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="DELETE PEOPLE" />
+
+
+
 </LinearLayout>

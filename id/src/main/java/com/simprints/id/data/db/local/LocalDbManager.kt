@@ -49,4 +49,6 @@ interface LocalDbManager {
     fun getRealmInstance(): Realm
     fun loadProjectFromLocal(projectId: String): Project?
     fun saveProjectIntoLocal(project: Project)
+    fun deletePeopleFromLocal(syncParams: SyncTaskParameters)
+    fun deleteSyncInfoFromLocal(syncParams: SyncTaskParameters)
 }
