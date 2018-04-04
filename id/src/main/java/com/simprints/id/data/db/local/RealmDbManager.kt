@@ -103,7 +103,7 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
 
     override fun loadProjectFromLocal(projectId: String): Project? =
         getRealmInstance().where(Project::class.java).equalTo(PROJECT_ID_FIELD, projectId).findFirst()
-    
+
     override fun saveProjectIntoLocal(project: Project) {
         val realm = getRealmInstance()
         realm.executeTransaction { r ->
@@ -131,6 +131,27 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         return getRealmInstance().use {
             it.where(RealmSyncInfo::class.java).equalTo(SYNC_ID_FIELD, typeSync.ordinal).findFirst()?.let { realmSyncInfo ->
                 it.copyFromRealm(realmSyncInfo)
+            }
+        }
+    }
+
+    override fun deletePeopleFromLocal(syncParams: SyncTaskParameters) {
+        getRealmInstance().use {
+            it.executeTransaction {
+                val query = buildQueryForPerson(it, syncParams).findAll()
+                query.deleteAllFromRealm()
+            }
+        }
+    }
+
+    override fun deleteSyncInfoFromLocal(syncParams: SyncTaskParameters) {
+        getRealmInstance().use {
+            it.executeTransaction {
+                val query = it.where(RealmSyncInfo::class.java)
+                    .equalTo(SYNC_ID_FIELD, syncParams.toGroup().ordinal)
+                    .findAll()
+
+                query.deleteAllFromRealm()
             }
         }
     }
@@ -198,13 +219,13 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
                 .sort(UPDATE_TIME_FIELD, Sort.DESCENDING)
                 .findAll()
                 .first()?.let { person ->
-                    realm.executeTransaction {
-                        it.insertOrUpdate(RealmSyncInfo(
-                            syncGroupId = syncParams.toGroup().ordinal,
-                            lastSyncTime = person.updatedAt ?: Date(0))
-                        )
-                    }
+                realm.executeTransaction {
+                    it.insertOrUpdate(RealmSyncInfo(
+                        syncGroupId = syncParams.toGroup().ordinal,
+                        lastSyncTime = person.updatedAt ?: Date(0))
+                    )
                 }
+            }
         }
     }
 

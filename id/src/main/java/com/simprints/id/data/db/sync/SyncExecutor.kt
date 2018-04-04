@@ -123,12 +123,20 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
                                             input: InputStream): Observable<Int> =
         Observable.create<Int> { result ->
 
+            val peopleInserted = hashMapOf<String, Int>()
+
             val reader = JsonReader(InputStreamReader(input) as Reader?)
             try {
                 reader.beginArray()
                 var totalDownloaded = 0
                 while (reader.hasNext() && !isInterrupted()) {
                     localDbManager.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
+                        if (!peopleInserted.containsKey(it.patientId)) {
+                            peopleInserted[it.patientId] = 1
+                        } else {
+                            Timber.d("Duplicate!!!!!!! ${it.patientId}")
+                        }
+
                         totalDownloaded++
                         emitResultProgressIfRequired(result, totalDownloaded, UPDATE_UI_BATCH_SIZE)
                         val shouldDownloadingBatchStop = isInterrupted() || hasCurrentBatchDownloadedFinished(totalDownloaded, LOCAL_DB_BATCH_SIZE)

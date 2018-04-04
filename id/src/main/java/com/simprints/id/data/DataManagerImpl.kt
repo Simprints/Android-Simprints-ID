@@ -105,9 +105,8 @@ class DataManagerImpl(private val context: Context,
     override fun savePerson(person: Person): Completable =
         dbManager.savePerson(fb_Person(person, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), moduleId))
 
-    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
+    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) =
         dbManager.loadPeople(destinationList, group, getSignedInUserIdOrEmpty(), moduleId, callback)
-    }
 
     override fun getPeopleCount(group: Constants.GROUP): Int =
         when (group) {
@@ -121,18 +120,16 @@ class DataManagerImpl(private val context: Context,
         dbManager.saveIdentification(probe, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, matchSize, matches, sessionId)
     }
 
-    override fun updateIdentification(projectId: String, selectedGuid: String) {
+    override fun updateIdentification(projectId: String, selectedGuid: String) =
         dbManager.updateIdentificationInRemote(projectId, selectedGuid, deviceId, sessionId)
-    }
 
     override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
         preferencesManager.lastVerificationDate = Date()
         dbManager.saveVerification(probe, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, patientId, match, sessionId, guidExistsResult)
     }
 
-    override fun saveRefusalForm(refusalForm: RefusalForm) {
+    override fun saveRefusalForm(refusalForm: RefusalForm) =
         dbManager.saveRefusalForm(refusalForm, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), sessionId)
-    }
 
     override fun saveSession() {
         val session = Session(sessionId, androidSdkVersion, deviceModel, deviceId, appVersionName,
@@ -145,7 +142,6 @@ class DataManagerImpl(private val context: Context,
         analyticsManager.logSession(session)
     }
 
-    override fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback) {
-        dbManager.recoverLocalDb(deviceId, getSignedInUserIdOrEmpty(), deviceId, moduleId, group, callback)
-    }
+    override fun recoverRealmDb(group: Constants.GROUP): Completable =
+        dbManager.recoverLocalDb(deviceId, userId, deviceId, moduleId, group)
 }

@@ -7,7 +7,7 @@ import com.simprints.id.services.progress.service.ProgressTaskParameters
 sealed class SyncTaskParameters(open val projectId: String, open val moduleId: String?, open val userId: String?) : ProgressTaskParameters {
 
     companion object {
-        fun build(group: Constants.GROUP, dataManager: DataManager): SyncTaskParameters {
+        @JvmStatic fun build(group: Constants.GROUP, dataManager: DataManager): SyncTaskParameters {
             return when (group) {
                 Constants.GROUP.GLOBAL -> GlobalSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty())
                 Constants.GROUP.USER -> UserSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
