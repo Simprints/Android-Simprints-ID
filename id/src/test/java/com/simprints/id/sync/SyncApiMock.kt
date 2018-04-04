@@ -1,5 +1,6 @@
 package com.simprints.id.sync
 
+import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.data.db.sync.model.PeopleCount
@@ -16,6 +17,9 @@ import retrofit2.mock.Calls
 // It's required to use NetworkBehavior, even if response is not used in the tests (e.g failing responses due to no connectivity).
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class SimApiMock(private val delegate: BehaviorDelegate<RemoteApiInterface>) : RemoteApiInterface {
+    override fun project(projectId: String): Single<Project> {
+        return delegate.returning(buildSuccessResponseWith("")).project("")
+    }
 
     override fun uploadPeople(patientsJson: HashMap<String, ArrayList<fb_Person>>): Completable {
         return delegate.returning(buildSuccessResponseWith("")).uploadPeople(patientsJson)
