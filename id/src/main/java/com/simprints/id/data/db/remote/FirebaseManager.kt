@@ -21,7 +21,7 @@ import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
-import com.simprints.id.exceptions.safe.remoteDbManager.DownloadingAPersonWhoDoesntExistOnServer
+import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
@@ -225,7 +225,7 @@ class FirebaseManager(private val appContext: Context,
         getSyncApi().flatMap {
             it.downloadPeople(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
                 .map { if (it.isEmpty())
-                    throw DownloadingAPersonWhoDoesntExistOnServer()
+                    throw DownloadingAPersonWhoDoesntExistOnServerException()
                 else it.first()
                 }
         }
