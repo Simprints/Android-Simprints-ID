@@ -39,10 +39,10 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
             resultEmitter = it
 
             connectTheStreams()
-            writeAllPeopleToOutputStream()
             val fileReference = generateFirebaseStorageFileReference()
             val metadata = generateMetaData()
             readAllPeopleIntoInputStream(fileReference, metadata)
+            writeAllPeopleToOutputStream()
         }
 
     private fun connectTheStreams() =
