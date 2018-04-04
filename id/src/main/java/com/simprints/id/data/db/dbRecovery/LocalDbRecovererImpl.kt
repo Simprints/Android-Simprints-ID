@@ -4,12 +4,12 @@ import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.db.DATA_ERROR
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.domain.Constants
+import com.simprints.id.exceptions.safe.data.db.LocalDbRecoveryFailedException
 import com.simprints.id.tools.json.JsonHelper
 import io.reactivex.Completable
 import io.reactivex.CompletableEmitter
@@ -49,7 +49,7 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
         try {
             realmDbOutputStream.connect(realmDbInputStream)
         } catch (e: IOException) {
-            resultEmitter.onError(Throwable(DATA_ERROR.STREAM_CONNECT_ERROR.details()))
+            resultEmitter.onError(LocalDbRecoveryFailedException("Failed to connect the streams", e))
         }
 
     private fun writeAllPeopleToOutputStream() =
@@ -59,11 +59,9 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
             realmDbOutputStream.write(jsonString)
             realmDbOutputStream.close()
         } catch (e: JSONException) {
-            e.printStackTrace()
-            resultEmitter.onError(Throwable(DATA_ERROR.JSON_ERROR.details()))
+            resultEmitter.onError(LocalDbRecoveryFailedException("Failed to convert people list into JSON", e))
         } catch (e: IOException) {
-            e.printStackTrace()
-            resultEmitter.onError(Throwable(DATA_ERROR.IO_BUFFER_WRITE_ERROR.details()))
+            resultEmitter.onError(LocalDbRecoveryFailedException("Failed to write to the output stream", e))
         }
 
     private fun getListOfPeopleToRecover(): ArrayList<rl_Person> =
@@ -113,16 +111,15 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
     }
 
     private fun handleUploadTaskFailure(e: Exception) {
-        e.printStackTrace()
         closeInputStream()
-        resultEmitter.onError(Throwable(DATA_ERROR.FAILED_TO_UPLOAD.details()))
+        resultEmitter.onError(LocalDbRecoveryFailedException("Failed to upload file to storage", e))
     }
 
     private fun closeInputStream() =
         try {
             realmDbInputStream.close()
         } catch (e: IOException) {
-            e.printStackTrace()
+            throw LocalDbRecoveryFailedException("Failed to close the input stream", e)
         }
 
     companion object {
