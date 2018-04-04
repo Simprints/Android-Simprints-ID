@@ -22,7 +22,7 @@ import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionList
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.data.prefs.events.EventsPreferencesManager
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.EventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
@@ -130,7 +130,7 @@ open class Application : MultiDexApplication() {
         SettingsPreferencesManagerImpl(prefs, fingerIdToBooleanSerializer, groupSerializer)
     }
 
-    private val eventsPreferencesManager: EventsPreferencesManager by lazy {
+    private val eventsPreferencesManager: RecentEventsPreferencesManager by lazy {
         EventsPreferencesManagerImpl(prefs)
     }
 

@@ -9,16 +9,19 @@ import com.simprints.id.domain.Constants
 interface DashboardContract {
 
     interface View : BaseView<Presenter> {
-        fun getStringWithParams(stringRes: Int, currentValue: Int = 0, maxValue: Int = 0): String
         fun showToast(messageRes: Int)
-        fun launchAlertView(error: ALERT_TYPE)
         fun updateCardViews()
+        fun stopRequestIfRequired()
+        fun launchAlertView(error: ALERT_TYPE)
         fun notifyCardViewChanged(position: Int)
+        fun getStringWithParams(stringRes: Int, currentValue: Int = 0, maxValue: Int = 0): String
     }
 
     interface Presenter : BasePresenter {
-        fun pause()
-        fun didUserWantToSyncBy(user: Constants.GROUP)
         val cardsModelsList: ArrayList<DashboardCard>
+
+        fun pause()
+        fun didUserWantToRefreshCards()
+        fun didUserWantToSyncBy(user: Constants.GROUP)
     }
 }

@@ -5,9 +5,10 @@ import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
@@ -17,12 +18,15 @@ import com.simprints.id.R
 import com.simprints.id.activities.PrivacyActivity
 import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.about.AboutActivity
+import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.utils.ResourcesHelperImpl
+import org.jetbrains.anko.support.v4.onRefresh
+
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View, NavigationView.OnNavigationItemSelectedListener {
 
@@ -50,14 +54,21 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     }
 
     private lateinit var cardsViewAdapter: DashboardCardAdapter
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private fun initCards() {
-        val cardsViewManager = LinearLayoutManager(this)
         cardsViewAdapter = DashboardCardAdapter(viewPresenter.cardsModelsList)
-        dashboardCards = (findViewById<RecyclerView>(R.id.dashboardCardsId)).apply {
-            setHasFixedSize(true)
-            layoutManager = cardsViewManager
-            adapter = cardsViewAdapter
+        dashboardCards = (findViewById<RecyclerView>(R.id.dashboardCardsId)).also {
+            it.setHasFixedSize(false)
+            it.itemAnimator = DefaultItemAnimator()
+            it.layoutManager = WrapContentLinearLayoutManager(this)
+            it.adapter = cardsViewAdapter
+        }
+
+        swipeRefreshLayout = (findViewById<SwipeRefreshLayout>(R.id.dashboardCardsSwipeId)).apply {
+            this.onRefresh {
+                viewPresenter.didUserWantToRefreshCards()
+            }
         }
     }
 
@@ -67,6 +78,10 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
 
     override fun updateCardViews() {
         cardsViewAdapter.notifyDataSetChanged()
+    }
+
+    override fun stopRequestIfRequired() {
+        swipeRefreshLayout.isRefreshing = false
     }
 
     override fun onResume() {

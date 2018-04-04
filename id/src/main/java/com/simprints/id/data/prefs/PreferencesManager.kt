@@ -1,6 +1,6 @@
 package com.simprints.id.data.prefs
 
-import com.simprints.id.data.prefs.events.EventsPreferencesManager
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 
@@ -11,4 +11,4 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
  *
  * @author: Etienne Thiery (etienne@simprints.com)
  */
-interface PreferencesManager : SessionStatePreferencesManager, SettingsPreferencesManager, EventsPreferencesManager
+interface PreferencesManager : SessionStatePreferencesManager, SettingsPreferencesManager, RecentEventsPreferencesManager
