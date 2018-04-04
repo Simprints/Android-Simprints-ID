@@ -138,14 +138,12 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
     }
 
     private fun buildQueryForPerson(realm: Realm,
-                                    syncParams: SyncTaskParameters): RealmQuery<rl_Person> {
-        return buildQueryForPerson(
-            realm = realm,
-            projectId = syncParams.projectId,
-            userId = syncParams.userId,
-            moduleId = syncParams.moduleId
-        )
-    }
+                                    syncParams: SyncTaskParameters): RealmQuery<rl_Person> = buildQueryForPerson(
+        realm = realm,
+        projectId = syncParams.projectId,
+        userId = syncParams.userId,
+        moduleId = syncParams.moduleId
+    )
 
     private fun migrateLegacyDatabaseIfRequired(dbKey: LocalDbKey) {
         if (checkIfLegacyDatabaseNeedsToMigrate(dbKey))
