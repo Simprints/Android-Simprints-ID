@@ -20,7 +20,7 @@ interface AboutContract {
 
         void setSuccessRecovering();
 
-        void setErrorRecovering(String errorMessage);
+        void setRecoveringFailed(String errorMessage);
     }
 
     interface Presenter extends BasePresenter {
