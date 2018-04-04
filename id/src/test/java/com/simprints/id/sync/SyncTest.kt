@@ -11,8 +11,8 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.data.db.remote.network.RemoteApiInterface
+import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
@@ -151,7 +151,7 @@ class SyncTest : RxJavaTest() {
 
         val patientsRequest = mockServer.takeRequest().requestUrl
         Assert.assertEquals(projectIdTest, patientsRequest.queryParameter("projectId"))
-        Assert.assertEquals(lastSyncTime.time, patientsRequest.queryParameter("lastSync")?.toLong())
+        Assert.assertEquals(lastSyncTime.time, patientsRequest.queryParameter("updatedAfter")?.toLong())
     }
 
     @Test
@@ -192,7 +192,7 @@ class SyncTest : RxJavaTest() {
         val patientsRequest = mockServer.takeRequest()
         Assert.assertEquals(projectIdTest, patientsRequest.requestUrl.queryParameter("projectId"))
         Assert.assertEquals(moduleIdTest, patientsCountRequest.requestUrl.queryParameter("moduleId"))
-        Assert.assertEquals(lastSyncTime.time, patientsRequest.requestUrl.queryParameter("lastSync")?.toLong())
+        Assert.assertEquals(lastSyncTime.time, patientsRequest.requestUrl.queryParameter("updatedAfter")?.toLong())
     }
 
     @Test
@@ -233,7 +233,7 @@ class SyncTest : RxJavaTest() {
         val patientsRequest = mockServer.takeRequest()
         Assert.assertEquals(projectIdTest, patientsRequest.requestUrl.queryParameter("projectId"))
         Assert.assertEquals(userIdTest, patientsCountRequest.requestUrl.queryParameter("userId"))
-        Assert.assertEquals(lastSyncTime.time, patientsRequest.requestUrl.queryParameter("lastSync")?.toLong())
+        Assert.assertEquals(lastSyncTime.time, patientsRequest.requestUrl.queryParameter("updatedAfter")?.toLong())
     }
 
     private fun makeFakeDownloadRequest(
