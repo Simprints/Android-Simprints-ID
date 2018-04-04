@@ -30,7 +30,7 @@ class SimApiMock(private val delegate: BehaviorDelegate<RemoteApiInterface>) : R
     }
 
     override fun peopleCount(syncParams: Map<String, String>): Single<PeopleCount> {
-        return delegate.returning(buildSuccessResponseWith("{\"peopleCount\": 10}")).peopleCount(mapOf())
+        return delegate.returning(buildSuccessResponseWith("{\"count\": 10}")).peopleCount(mapOf())
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {

@@ -86,10 +86,11 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
 
         return remoteDbManager.getNumberOfPatientsForSyncParams(syncParams).flatMapObservable { nPatientsForDownSyncQuery ->
-            val nPatientsToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery, syncParams)
-            Timber.d("Downloading batch $nPatientsToDownload people")
+            val nPeopleToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery, syncParams)
 
-            val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup()) ?: RealmSyncInfo(syncParams.toGroup())
+            Timber.d("Downloading batch $nPeopleToDownload people")
+            val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup()) 
+                ?: RealmSyncInfo(syncParams.toGroup())
 
             syncApi.downSync(
                 realmSyncInfo.lastSyncTime.time,
@@ -100,7 +101,7 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
                         syncParams,
                         it.byteStream()).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
                         .map {
-                            DownloadProgress(it, nPatientsToDownload)
+                            DownloadProgress(it, nPeopleToDownload)
                         }
                 }
         }
@@ -120,7 +121,6 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
     protected open fun savePeopleFromStream(isInterrupted: () -> Boolean,
                                             syncParams: SyncTaskParameters,
                                             input: InputStream): Observable<Int> =
-
         Observable.create<Int> { result ->
 
             val reader = JsonReader(InputStreamReader(input) as Reader?)
@@ -128,7 +128,7 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
                 reader.beginArray()
                 var totalDownloaded = 0
                 while (reader.hasNext() && !isInterrupted()) {
-                    localDbManager.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams.toGroup()) {
+                    localDbManager.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
                         totalDownloaded++
 
                         emitResultProgressIfRequired(result, totalDownloaded, UPDATE_UI_BATCH_SIZE)

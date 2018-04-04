@@ -15,6 +15,7 @@ import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
+import com.simprints.id.data.db.remote.models.adapters.toLocalDbKey
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.data.db.remote.network.RemoteApiInterface
@@ -27,6 +28,7 @@ import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
+import com.simprints.id.tools.extensions.toHexString
 import com.simprints.id.tools.extensions.toMap
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
@@ -37,6 +39,7 @@ import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
+
 
 class FirebaseManager(private val appContext: Context,
                       firebaseConnectionListenerManager: RemoteDbConnectionListenerManager,
@@ -156,8 +159,12 @@ class FirebaseManager(private val appContext: Context,
 
     private fun handleGetLocalDbKeyTaskComplete(task: Task<QuerySnapshot>, result: SingleEmitter<LocalDbKey>) {
         if (task.isSuccessful) {
-            val localDbKeyValue = task.result.first().getBlob(LOCAL_DB_KEY_VALUE_NAME).toBytes()
-            result.onSuccess(LocalDbKey(localDbKeyValue))
+            val realmKeys = task.result.first().toObject(fs_RealmKeys::class.java)
+
+            //TODO Remove before final pull request
+            Timber.d(realmKeys.value.toBytes().toHexString())
+
+            result.onSuccess(realmKeys.toLocalDbKey())
         } else {
             result.onError(CouldNotRetrieveLocalDbKeyError.withException(task.exception))
         }
@@ -205,7 +212,7 @@ class FirebaseManager(private val appContext: Context,
 
     // API
 
-   override fun uploadPerson(fbPerson: fb_Person): Completable =
+    override fun uploadPerson(fbPerson: fb_Person): Completable =
         uploadPeople(arrayListOf(fbPerson))
 
     override fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable =

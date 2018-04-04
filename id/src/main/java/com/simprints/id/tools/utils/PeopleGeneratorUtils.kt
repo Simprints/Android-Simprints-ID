@@ -33,8 +33,8 @@ object PeopleGeneratorUtils {
             this.projectId = projectId
             this.userId = userId
             this.moduleId = moduleId
-            createdAt = Calendar.getInstance().time
-            updatedAt = Calendar.getInstance().time
+            createdAt = getRandomTime()
+            updatedAt = getRandomTime()
             toSync = true
             fingerprints = prints
         }
@@ -48,5 +48,11 @@ object PeopleGeneratorUtils {
         print.fingerId = fingerprint.fingerId.ordinal
 
         return print
+    }
+
+    private fun getRandomTime(minutesOffset: Int = 60): Date {
+        return Calendar.getInstance().apply {
+            add(Calendar.MINUTE, (Math.random() * minutesOffset).toInt())
+        }.time
     }
 }

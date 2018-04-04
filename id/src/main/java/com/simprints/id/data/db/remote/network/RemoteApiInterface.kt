@@ -12,7 +12,7 @@ interface RemoteApiInterface {
 
     companion object {
         private const val apiVersion = "2018-1-0-dev4"
-        var baseUrl = "https://$apiVersion-dot-sync-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
+        var baseUrl = "https://${apiVersion}-dot-sync-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
     }
 
     @GET("/patients")

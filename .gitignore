@@ -48,6 +48,5 @@ obj/
 # Test Log Files
 testing/logs/
 
-\.idea/codeStyles/
-
-\.idea/caches/
+.idea/codeStyles/
+.idea/caches/
