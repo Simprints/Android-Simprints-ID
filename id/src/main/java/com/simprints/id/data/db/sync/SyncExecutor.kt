@@ -131,12 +131,6 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
                 var totalDownloaded = 0
                 while (reader.hasNext() && !isInterrupted()) {
                     localDbManager.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
-                        if (!peopleInserted.containsKey(it.patientId)) {
-                            peopleInserted[it.patientId] = 1
-                        } else {
-                            Timber.d("Duplicate!!!!!!! ${it.patientId}")
-                        }
-
                         totalDownloaded++
                         emitResultProgressIfRequired(result, totalDownloaded, UPDATE_UI_BATCH_SIZE)
                         val shouldDownloadingBatchStop = isInterrupted() || hasCurrentBatchDownloadedFinished(totalDownloaded, LOCAL_DB_BATCH_SIZE)
