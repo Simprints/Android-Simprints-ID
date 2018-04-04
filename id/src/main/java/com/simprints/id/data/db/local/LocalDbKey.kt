@@ -1,8 +1,13 @@
 package com.simprints.id.data.db.local
 
+import com.simprints.id.data.db.remote.models.fs_RealmKeys
 import java.util.*
 
-data class LocalDbKey(val value: ByteArray) {
+
+data class LocalDbKey(val projectId: String, val value: ByteArray, val legacyApiKey: String = "") {
+
+    val legacyRealmKey: ByteArray = Arrays.copyOf(legacyApiKey.toByteArray(), 64)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -17,4 +22,5 @@ data class LocalDbKey(val value: ByteArray) {
     override fun hashCode(): Int {
         return Arrays.hashCode(value)
     }
+
 }

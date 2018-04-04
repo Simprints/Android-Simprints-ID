@@ -95,8 +95,8 @@ class SyncTest : RxJavaTest() {
     @Test
     fun uploadPeopleGetInterrupted_shouldStopUploading() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
-        val patientsToUpload = getRandomPeople(35)
-        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
+        val peopleToUpload = getRandomPeople(35)
+        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(peopleToUpload)
         val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
