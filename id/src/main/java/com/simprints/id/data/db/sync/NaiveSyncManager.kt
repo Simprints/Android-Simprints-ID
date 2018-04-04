@@ -2,6 +2,8 @@ package com.simprints.id.data.db.sync
 
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.Constants
+import com.simprints.id.exceptions.safe.SimprintsException
+import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncClient
@@ -24,10 +26,6 @@ class NaiveSyncManager(private val dataManager: DataManager,
             uiObserver?.onError(Throwable("Server busy"))
             stopListeners()
         })
-    }
-
-    fun stop() {
-        stopListeners()
     }
 
     private fun stopListeners() {
@@ -64,14 +62,14 @@ class NaiveSyncManager(private val dataManager: DataManager,
 
         private fun logThrowable(throwable: Throwable) {
             if (throwable is Error) {
-                dataManager.logError(throwable)
+                dataManager.logError(SimprintsError(throwable))
             } else if (throwable is RuntimeException) {
-                dataManager.logSafeException(throwable)
+                dataManager.logSafeException(SimprintsException(throwable))
             }
         }
     }
 
     private fun handleUnexpectedError(error: Error) {
-        dataManager.logError(error)
+        dataManager.logError(SimprintsError(error))
     }
 }

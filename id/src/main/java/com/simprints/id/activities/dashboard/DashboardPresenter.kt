@@ -5,7 +5,7 @@ import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardLocalDbCard
 import com.simprints.id.activities.dashboard.models.SyncUIState
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.sync.NaiveSyncManager
+import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.domain.Constants.GROUP
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncClient
@@ -27,7 +27,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private var localDbViewModel: DashboardLocalDbCard? = null
 
-    private val syncManager = NaiveSyncManager(dataManager, syncClient, object : DisposableObserver<Progress>() {
+    private val syncManager = SyncManager(dataManager, syncClient, object : DisposableObserver<Progress>() {
 
         override fun onNext(progress: Progress) {
             setSyncingProgressInLocalDbCardView(progress)

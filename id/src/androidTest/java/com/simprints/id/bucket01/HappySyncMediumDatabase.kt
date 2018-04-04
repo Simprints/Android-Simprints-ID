@@ -5,7 +5,6 @@ import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
-import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.local.RealmConfig
 import com.simprints.id.templates.FirstUseTest
 import com.simprints.id.templates.HappyBluetooth
@@ -47,7 +46,7 @@ class HappySyncMediumDatabase : FirstUseTest(), HappyWifi, HappyBluetooth {
         super<HappyBluetooth>.setUp()
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        realmConfiguration = RealmConfig.get(calloutCredentials.apiKey, LocalDbKey(byteArrayOf() /*FIXME: temporary array to compile code*/))
+        realmConfiguration = RealmConfig.get(calloutCredentials.apiKey, byteArrayOf())
         super<FirstUseTest>.setUp()
 
         log("bucket01.HappySyncMediumDatabase.setUp() creating remote database with ${SyncParameters.MEDIUM_DATABASE_NUMBER_OF_PATIENTS} patients")

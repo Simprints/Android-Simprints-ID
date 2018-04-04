@@ -5,6 +5,7 @@ import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner

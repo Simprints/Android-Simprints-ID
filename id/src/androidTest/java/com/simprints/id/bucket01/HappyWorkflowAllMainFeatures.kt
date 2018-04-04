@@ -1,12 +1,10 @@
 package com.simprints.id.bucket01
 
-
 import android.support.test.InstrumentationRegistry.getInstrumentation
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
-import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.local.RealmConfig
 import com.simprints.id.templates.FirstUseTest
 import com.simprints.id.templates.HappyBluetooth
@@ -56,7 +54,7 @@ class HappyWorkflowAllMainFeatures : FirstUseTest(), HappyWifi, HappyBluetooth {
         super<HappyBluetooth>.setUp()
 
         Realm.init(getInstrumentation().targetContext)
-        realmConfiguration = RealmConfig.get(calloutCredentials.apiKey, LocalDbKey(byteArrayOf() /*FIXME: temporary array to compile code*/ ))
+        realmConfiguration = RealmConfig.get(calloutCredentials.apiKey, byteArrayOf())
         super<FirstUseTest>.setUp()
     }
 

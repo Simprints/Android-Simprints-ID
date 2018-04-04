@@ -27,7 +27,7 @@ open class SimApiClient<T>(val service: Class<T>,
 
     val okHttpClientConfig: OkHttpClient.Builder by lazy {
         val logger = HttpLoggingInterceptor()
-        logger.level = HttpLoggingInterceptor.Level.BODY
+        logger.level = HttpLoggingInterceptor.Level.HEADERS
         OkHttpClient.Builder()
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
@@ -38,7 +38,7 @@ open class SimApiClient<T>(val service: Class<T>,
     private val authenticator = Interceptor { chain ->
         val newRequest = chain.request().newBuilder()
         if (!authToken.isNullOrBlank()) {
-            newRequest.addHeader("Authorization", "Bearer " + authToken)
+            newRequest.addHeader("Authorization", "Bearer $authToken")
         }
 
         if (chain.request().url().toString().contains("/projects")) {

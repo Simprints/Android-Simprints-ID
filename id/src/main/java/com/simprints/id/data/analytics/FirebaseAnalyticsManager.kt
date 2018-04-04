@@ -8,6 +8,8 @@ import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.data.db.remote.models.fb_Session
+import com.simprints.id.exceptions.safe.SimprintsException
+import com.simprints.id.exceptions.unsafe.SimprintsError
 import timber.log.Timber
 import kotlin.reflect.full.memberProperties
 
@@ -46,17 +48,32 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         firebaseAnalytics.logEvent("alert", bundle)
     }
 
-    override fun logError(error: Error) {
-        Timber.d("FirebaseAnalyticsManager.logError(throwable=$error)")
-        Crashlytics.logException(error)
+    override fun logThrowable(throwable: Throwable) =
+        when (throwable) {
+            is SimprintsError -> logError(throwable)
+            is SimprintsException -> logSafeException(throwable)
+            else -> logUnexpectedThrowable(throwable)
+        }
+
+    private fun logUnexpectedThrowable(throwable: Throwable) {
+        logUnsafeThrowable(throwable)
     }
 
-    override fun logSafeException(exception: RuntimeException) {
+    override fun logError(error: SimprintsError) {
+        logUnsafeThrowable(error)
+    }
+
+    override fun logSafeException(exception: SimprintsException) {
         Timber.d("FirebaseAnalyticsManager.logSafeException(description=$exception)")
         val bundle = Bundle()
         bundle.putString("exception", exception.toString())
         bundle.putString("description", exception.message)
         firebaseAnalytics.logEvent("safe_exception", bundle)
+    }
+
+    private fun logUnsafeThrowable(e: Throwable) {
+        Timber.d(e)
+        Crashlytics.logException(e)
     }
 
     override fun logCallout(callout: Callout) {
