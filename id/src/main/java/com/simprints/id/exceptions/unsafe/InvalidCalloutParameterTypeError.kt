@@ -2,7 +2,7 @@ package com.simprints.id.exceptions.unsafe
 
 import kotlin.reflect.KClass
 
-class InvalidCalloutParameterTypeError(message: String = "InvalidCalloutParameterTypeError") : Error(message) {
+class InvalidCalloutParameterTypeError(message: String = "InvalidCalloutParameterTypeError") : SimprintsError(message) {
 
     companion object {
 

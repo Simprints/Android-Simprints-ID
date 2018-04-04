@@ -4,7 +4,7 @@ import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import com.simprints.id.R
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.sync.NaiveSyncManager
+import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.domain.Constants.GROUP
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.UploadProgress
@@ -13,10 +13,9 @@ import io.reactivex.observers.DisposableObserver
 
 class DashboardPresenter(private val view: DashboardContract.View,
                          syncClient: SyncClient,
-                         private val dataManager: DataManager) : DashboardContract.Presenter {
+                         dataManager: DataManager) : DashboardContract.Presenter {
 
-    private var started: Boolean = false
-    private val syncManager = NaiveSyncManager(dataManager, syncClient, object : DisposableObserver<Progress>() {
+    private val syncManager = SyncManager(dataManager, syncClient, object : DisposableObserver<Progress>() {
 
         override fun onNext(progress: Progress) {
             setProgressSyncItem(progress)
@@ -31,11 +30,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         }
     })
 
-    override fun start() {
-        if (!started) {
-            started = true
-        }
-    }
+    override fun start() {}
 
     override fun pause() {
         syncManager.stop()

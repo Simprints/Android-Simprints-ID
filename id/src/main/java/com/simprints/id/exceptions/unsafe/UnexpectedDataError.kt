@@ -3,7 +3,7 @@ package com.simprints.id.exceptions.unsafe
 import com.simprints.id.data.db.DATA_ERROR
 
 
-class UnexpectedDataError(message: String = "UnexpectedDataError") : Error(message) {
+class UnexpectedDataError(message: String = "UnexpectedDataError") : SimprintsError(message) {
 
     companion object {
 

@@ -9,7 +9,7 @@ import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.sync.NaiveSync
+import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.domain.Constants
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.progress.Progress
@@ -42,16 +42,16 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     override fun getLocalKeyAndSignInToLocal(projectId: String): Completable =
         remoteDbManager
             .getLocalDbKeyFromRemote(projectId)
-            .signInToLocal(projectId)
+            .signInToLocal()
 
     override fun signIn(projectId: String, tokens: Tokens): Completable =
         remoteDbManager
             .signInToRemoteDb(tokens)
             .andThen(getLocalKeyAndSignInToLocal(projectId))
 
-    private fun Single<out LocalDbKey>.signInToLocal(projectId: String): Completable =
+    private fun Single<out LocalDbKey>.signInToLocal(): Completable =
         flatMapCompletable { key ->
-            localDbManager.signInToLocal(projectId, key)
+            localDbManager.signInToLocal(key)
         }
 
     override fun signOut() {
@@ -65,8 +65,12 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     // Data transfer
     override fun savePerson(fbPerson: fb_Person): Completable =
         localDbManager.insertOrUpdatePersonInLocal(rl_Person(fbPerson))
-            .andThen(uploadPersonAndDownloadAgain(fbPerson))
-            .updatePersonInLocal()
+            .doOnComplete {
+                uploadPersonAndDownloadAgain(fbPerson)
+                    .updatePersonInLocal()
+                    .subscribeOn(Schedulers.io())
+                    .subscribe()
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
@@ -81,7 +85,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         }
 
     override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
-        val result = localDbManager.loadPersonsFromLocal(
+        val result = localDbManager.loadPeopleFromLocal(
             projectId = projectId,
             patientId = guid).map { it.libPerson }
 
@@ -92,7 +96,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                         destinationList.add(rl_Person(it).libPerson)
                         callback.onSuccess()
                     },
-                    onError = { callback.onSuccess() })
+                    onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
         } else {
             destinationList.add(result.first())
             callback.onSuccess()
@@ -101,9 +105,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
         val result = when (group) {
-            Constants.GROUP.GLOBAL -> localDbManager.loadPersonsFromLocal().map { it.libPerson }
-            Constants.GROUP.USER -> localDbManager.loadPersonsFromLocal(userId = userId).map { it.libPerson }
-            Constants.GROUP.MODULE -> localDbManager.loadPersonsFromLocal(moduleId = moduleId).map { it.libPerson }
+            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal().map { it.libPerson }
+            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(userId = userId).map { it.libPerson }
+            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(moduleId = moduleId).map { it.libPerson }
         }
         destinationList.addAll(result)
         callback?.onSuccess()
@@ -114,7 +118,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                                 userId: String?,
                                 moduleId: String?,
                                 toSync: Boolean?): Int =
-        localDbManager.getPersonsCountFromLocal(projectId, personId, userId, moduleId, toSync)
+        localDbManager.getPeopleCountFromLocal(projectId, personId, userId, moduleId, toSync)
 
     override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
         remoteDbManager.saveIdentificationInRemote(probe, projectId, userId, moduleId, androidId, matchSize, matches, sessionId)
@@ -133,7 +137,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     }
 
     override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
-        NaiveSync(
+        SyncExecutor(
             localDbManager,
             remoteDbManager,
             JsonHelper.gson).sync(interrupted, parameters)

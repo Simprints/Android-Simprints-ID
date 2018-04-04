@@ -6,12 +6,12 @@ import com.simprints.id.services.progress.service.ProgressTaskParameters
 sealed class SyncTaskParameters(open val projectId: String, open val moduleId: String?, open val userId: String?) : ProgressTaskParameters {
 
     data class UserSyncTaskParameters(override val projectId: String,
-                                      override val userId: String): SyncTaskParameters(projectId, userId, null)
+                                      override val userId: String) : SyncTaskParameters(projectId, null, userId)
 
     data class ModuleIdSyncTaskParameters(override val projectId: String,
-                                          override val moduleId: String): SyncTaskParameters(projectId, null, moduleId)
+                                          override val moduleId: String) : SyncTaskParameters(projectId, moduleId, null)
 
-    data class GlobalSyncTaskParameters(override val projectId: String): SyncTaskParameters(projectId, null, null)
+    data class GlobalSyncTaskParameters(override val projectId: String) : SyncTaskParameters(projectId, null, null)
 
     fun toGroup(): Constants.GROUP {
         return when (this) {

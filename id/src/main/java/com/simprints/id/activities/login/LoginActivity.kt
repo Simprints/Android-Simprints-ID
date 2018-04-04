@@ -113,6 +113,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     override fun handleMissingCredentials() {
+        progressDialog.dismiss()
         showToast(R.string.login_missing_credentials)
     }
 
