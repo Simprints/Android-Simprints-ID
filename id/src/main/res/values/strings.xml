@@ -347,5 +347,7 @@
     <string name="dashboard_card_verification_title">Last Verification</string>
     <string name="dashboard_card_identification_title">Last Identification</string>
     <string name="dashboard_card_localdb_action">SYNC</string>
+    <string name="dashboard_card_lastuser_title">Last user</string>
+    <string name="dashboard_card_localdb_sync_needed">you may need to sync</string>
 
 </resources>

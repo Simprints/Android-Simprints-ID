@@ -6,7 +6,7 @@ import com.simprints.id.tools.delegates.PrimitivePreference
 import java.util.*
 
 class EventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
-    : EventsPreferencesManager {
+    : RecentEventsPreferencesManager {
 
     companion object {
         private const val LAST_SCANNER_USED_KEY = "LastScannerUsed"

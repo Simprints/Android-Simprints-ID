@@ -2,7 +2,7 @@ package com.simprints.id.data.prefs.events
 
 import java.util.*
 
-interface EventsPreferencesManager {
+interface RecentEventsPreferencesManager {
 
     var lastScannerUsed: String
 

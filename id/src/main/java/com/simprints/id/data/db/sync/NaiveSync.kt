@@ -20,6 +20,7 @@ import timber.log.Timber
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
+import java.lang.Thread.sleep
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -127,14 +128,16 @@ open class NaiveSync(private val localDbManager: LocalDbManager,
             try {
                 reader.beginArray()
                 var totalDownloaded = 0
-                while (reader.hasNext() && !isInterrupted()) {
-                    localDbManager.savePersonsFromStreamAndUpdateSyncInfo(reader, gson, syncParams.toGroup()) {
+                while (totalDownloaded < 5000 /*reader.hasNext() && !isInterrupted()*/) {
+                    //localDbManager.savePersonsFromStreamAndUpdateSyncInfo(reader, gson, syncParams.toGroup()) {
                         totalDownloaded++
+
+                    sleep(1)
 
                         emitResultProgressIfRequired(result, totalDownloaded, UPDATE_UI_BATCH_SIZE)
                         val shouldDownloadingBatchStop = isInterrupted() || hasCurrentBatchDownloadedFinished(totalDownloaded, LOCAL_DB_BATCH_SIZE)
-                        shouldDownloadingBatchStop
-                    }
+                    //   shouldDownloadingBatchStop
+                    //}
                 }
 
                 val possibleError = if (isInterrupted()) InterruptedSyncException() else null

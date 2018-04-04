@@ -12,9 +12,9 @@ open class DashboardCardView(itemView: View) : RecyclerView.ViewHolder(itemView)
     private val title: TextView = itemView.findViewById(R.id.dashboardCardTitle)
     private val description: TextView = itemView.findViewById(R.id.dashboardCardDescription)
 
-    open fun bind(item: DashboardCard) {
-        image.setImageResource(item.imageRes)
-        title.text = item.title
-        description.text = item.description
+    open fun bind(cardModel: DashboardCard) {
+        image.setImageResource(cardModel.imageRes)
+        title.text = cardModel.title
+        description.text = cardModel.description
     }
 }
