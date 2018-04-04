@@ -7,6 +7,7 @@ import android.view.WindowManager;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.domain.Constants;
+import com.simprints.id.exceptions.safe.SimprintsException;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.tools.AlertLauncher;
 
@@ -88,7 +89,7 @@ class AboutPresenter implements AboutContract.Presenter {
                             aboutView.setSuccessRecovering();
                             aboutView.setRecoverDbAvailable();
                         } catch (WindowManager.BadTokenException e) {
-                            dataManager.logSafeException(e);
+                            dataManager.logSafeException(new SimprintsException(e));
                             e.printStackTrace();
                         }
                     }
@@ -100,7 +101,7 @@ class AboutPresenter implements AboutContract.Presenter {
                             aboutView.setErrorRecovering(throwable.getMessage());
                             aboutView.setRecoverDbAvailable();
                         } catch (WindowManager.BadTokenException e) {
-                            dataManager.logSafeException(e);
+                            dataManager.logSafeException(new SimprintsException(e));
                             e.printStackTrace();
                         }
                     }
