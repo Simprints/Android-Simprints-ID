@@ -11,12 +11,11 @@ import com.simprints.id.activities.dashboard.models.DashboardLocalDbCard
 import com.simprints.id.activities.dashboard.models.SyncUIState
 import org.jetbrains.anko.textResource
 
-class DashboardLocalDbCardView(itemView: View) : DashboardCardView(itemView) {
-    private val syncStateIcon: ImageView = itemView.findViewById(R.id.dashboardCardSyncState)
-    private val syncDescription: TextView = itemView.findViewById(R.id.dashboardCardSyncDescription)
-    private val syncProgressBar: ProgressBar = itemView.findViewById(R.id.dashboardCardSyncProgressBar)
-    private val syncProgressCounter: TextView = itemView.findViewById(R.id.dashboardCardSyncProgressCounter)
-    private val syncAction: TextView = itemView.findViewById(R.id.dashboardCardSyncAction)
+class DashboardLocalDbCardView(private val rootView: View) : DashboardCardView(rootView) {
+    private val syncStateIcon: ImageView = rootView.findViewById(R.id.dashboardCardSyncState)
+    private val syncDescription: TextView = rootView.findViewById(R.id.dashboardCardSyncDescription)
+    private val syncProgressBar: ProgressBar = rootView.findViewById(R.id.dashboardCardSyncProgressBar)
+    private val syncAction: TextView = rootView.findViewById(R.id.dashboardCardSyncAction)
 
     override fun bind(cardModel: DashboardCard) {
         super.bind(cardModel)
@@ -35,7 +34,6 @@ class DashboardLocalDbCardView(itemView: View) : DashboardCardView(itemView) {
     private fun setUIForSyncNotStarted(dataModel: DashboardLocalDbCard) {
         syncStateIcon.visibility = View.INVISIBLE
         syncProgressBar.visibility = View.INVISIBLE
-        syncProgressCounter.text = ""
 
         if (dataModel.syncNeeded) {
             syncDescription.textResource = R.string.dashboard_card_localdb_sync_needed
@@ -49,9 +47,8 @@ class DashboardLocalDbCardView(itemView: View) : DashboardCardView(itemView) {
     private fun setUIForSyncSucceed(dataModel: DashboardLocalDbCard) {
         syncStateIcon.visibility = View.VISIBLE
         syncStateIcon.setImageResource(R.drawable.ic_sync_success)
-        syncProgressCounter.text = ""
         syncProgressBar.visibility = View.INVISIBLE
-        syncDescription.text = dataModel.lastSyncTime
+        syncDescription.text = String.format(rootView.context.getString(R.string.dashboard_card_localdb_last_sync), dataModel.lastSyncTime)
 
         syncAction.setOnClickListener { dataModel.onSyncActionClicked(dataModel) }
     }
@@ -59,7 +56,7 @@ class DashboardLocalDbCardView(itemView: View) : DashboardCardView(itemView) {
     private fun setUIForSyncFailed(dataModel: DashboardLocalDbCard) {
         syncStateIcon.visibility = View.VISIBLE
         syncStateIcon.setImageResource(R.drawable.ic_sync_failed)
-        syncProgressCounter.textResource = R.string.nav_sync_failed
+        syncDescription.textResource = R.string.nav_sync_failed
         syncProgressBar.visibility = View.INVISIBLE
         syncAction.setOnClickListener { dataModel.onSyncActionClicked(dataModel) }
     }
@@ -68,10 +65,18 @@ class DashboardLocalDbCardView(itemView: View) : DashboardCardView(itemView) {
     private fun setUIForSyncInProgress(dataModel: DashboardLocalDbCard) {
         syncStateIcon.visibility = View.VISIBLE
         syncStateIcon.setImageResource(R.drawable.ic_syncing)
-        syncProgressCounter.text = "${dataModel.progress?.currentValue}/${dataModel.progress?.maxValue}"
         syncDescription.textResource = R.string.syncing
-
         syncProgressBar.visibility = View.VISIBLE
+
+        val progressData = dataModel.progress
+        if (progressData != null) {
+            syncProgressBar.isIndeterminate = false
+            syncProgressBar.max = progressData.maxValue
+            syncProgressBar.progress = progressData.currentValue
+        } else {
+            syncProgressBar.isIndeterminate = true
+        }
+
         syncAction.setOnClickListener { }
     }
 }

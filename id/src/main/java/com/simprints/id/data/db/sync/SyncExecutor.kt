@@ -96,6 +96,7 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
                 realmSyncInfo.lastSyncTime.time,
                 syncParams.toMap())
                 .flatMapObservable {
+
                     savePeopleFromStream(
                         isInterrupted,
                         syncParams,
@@ -122,8 +123,6 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
                                             syncParams: SyncTaskParameters,
                                             input: InputStream): Observable<Int> =
         Observable.create<Int> { result ->
-
-            val peopleInserted = hashMapOf<String, Int>()
 
             val reader = JsonReader(InputStreamReader(input) as Reader?)
             try {
