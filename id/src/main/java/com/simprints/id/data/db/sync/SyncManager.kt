@@ -45,24 +45,26 @@ class SyncManager(private val dataManager: DataManager,
     private fun startListeners() {
         stopListeners()
         syncClient.startListening(internalSyncObserver)
-        uiObserver?.let { syncClient.startListening(uiObserver) }
     }
 
     private val internalSyncObserver: DisposableObserver<Progress> = object : DisposableObserver<Progress>() {
 
         override fun onNext(progress: Progress) {
             Timber.d("onNext")
+            uiObserver?.onNext(progress)
         }
 
         override fun onComplete() {
             Timber.d("onComplete")
             syncClient.stopListening()
+            uiObserver?.onComplete()
         }
 
         override fun onError(throwable: Throwable) {
             Timber.d("onError")
             dataManager.logThrowable(throwable)
             syncClient.stopListening()
+            uiObserver?.onError(throwable)
         }
     }
 
