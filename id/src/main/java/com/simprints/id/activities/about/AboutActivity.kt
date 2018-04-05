@@ -10,6 +10,7 @@ import com.simprints.id.R
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
+import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_about.*
 
 
@@ -97,16 +98,18 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
     }
 
     override fun setSuccessRecovering() =
-        runOnUiThreadIfStillRunning {
-            recoveryDialog.dismiss()
-            successDialog.show()
-            bt_recoverDb.isEnabled = true
-        }
+        runOnUiThreadIfStillRunning(
+            then = {
+                recoveryDialog.dismiss()
+                successDialog.show()
+                bt_recoverDb.isEnabled = true
+            }, otherwise = { showToast(R.string.success_recovery_message) })
 
     override fun setRecoveringFailed() =
-        runOnUiThreadIfStillRunning {
-            recoveryDialog.dismiss()
-            errorDialog.show()
-            bt_recoverDb.isEnabled = true
-        }
+        runOnUiThreadIfStillRunning(
+            then = {
+                recoveryDialog.dismiss()
+                errorDialog.show()
+                bt_recoverDb.isEnabled = true
+            }, otherwise = { showToast(R.string.error_recovery_message) })
 }
