@@ -27,7 +27,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private var localDbViewModel: DashboardLocalDbCard? = null
 
-    private val syncManager = SyncManager(dataManager, syncClient, object : DisposableObserver<Progress>() {
+    private val syncListener = object : DisposableObserver<Progress>() {
 
         override fun onNext(progress: Progress) {
             setSyncingProgressInLocalDbCardView(progress)
@@ -40,7 +40,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
         override fun onError(throwable: Throwable) {
             setSyncingErrorInLocalDbCardView()
         }
-    })
+    }
+    private val syncManager = SyncManager(dataManager, syncClient, syncListener)
 
     private var started: Boolean = false
     private val dateFormat by lazy {
@@ -49,11 +50,13 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override val cardsModelsList: ArrayList<DashboardCard> = arrayListOf()
 
-    var readableLastTimeSync: String = ""
+    private var readableLastTimeSync: String? = null
         get() {
-            val lastSyncTime: Date? = dataManager.getSyncInfoFor(dataManager.syncGroup)?.lastSyncTime
-                ?: Date() //FIXME
-            return if (lastSyncTime != null) dateFormat.format(lastSyncTime).toString() else ""
+            dataManager.getSyncInfoFor(dataManager.syncGroup)?.lastSyncTime?.let {
+                return dateFormat.format(it).toString()
+            }
+
+            return null
         }
 
     override fun start() {
@@ -147,7 +150,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
                 resourcesHelper.getString(R.string.dashboard_card_scanner_title),
                 dataManager.lastScannerUsed)
                 .also { addCard(it) }
-
         }
     }
 

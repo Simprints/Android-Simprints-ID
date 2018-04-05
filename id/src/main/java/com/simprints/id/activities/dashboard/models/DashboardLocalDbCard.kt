@@ -6,7 +6,7 @@ class DashboardLocalDbCard(override val position: Int,
                            override val imageRes: Int,
                            override val title: String,
                            override val description: String,
-                           var lastSyncTime: String,
+                           var lastSyncTime: String?,
                            val syncNeeded: Boolean,
                            val onSyncActionClicked: (cardModel: DashboardLocalDbCard) -> Unit,
                            var progress: Progress? = null) : DashboardCard(position, imageRes, title, description) {
