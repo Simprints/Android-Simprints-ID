@@ -12,13 +12,11 @@ interface AboutContract {
 
         fun setDbCountData(userCount: String, moduleCount: String, globalCount: String)
 
-        fun setStartRecovering()
+        fun setRecoveryInProgress()
 
         fun setSuccessRecovering()
 
         fun setRecoveringFailed()
-
-        fun setRecoveryAvailability(recoveryRunning: Boolean)
     }
 
     interface Presenter : BasePresenter {

@@ -91,7 +91,7 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
         tv_globalDbCount.text = globalCount
     }
 
-    override fun setStartRecovering() {
+    override fun setRecoveryInProgress() {
         recoveryDialog.show()
         bt_recoverDb.isEnabled = false
     }
@@ -108,10 +108,5 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
             recoveryDialog.dismiss()
             errorDialog.show()
             bt_recoverDb.isEnabled = true
-        }
-
-    override fun setRecoveryAvailability(recoveryRunning: Boolean) =
-        runOnUiThreadIfStillRunning {
-            bt_recoverDb.isEnabled = !recoveryRunning
         }
 }

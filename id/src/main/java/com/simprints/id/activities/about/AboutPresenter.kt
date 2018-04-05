@@ -13,7 +13,7 @@ internal class AboutPresenter(private val view: AboutContract.View,
     override fun start() {
         initVersions()
         initCounts()
-        if (recoveryRunning) view.setStartRecovering()
+        if (recoveryRunning) view.setRecoveryInProgress()
     }
 
     private fun initVersions() {
@@ -32,7 +32,7 @@ internal class AboutPresenter(private val view: AboutContract.View,
 
     override fun recoverDb() {
         recoveryRunning = true
-        view.setStartRecovering()
+        view.setRecoveryInProgress()
         dataManager.recoverRealmDb(Constants.GROUP.GLOBAL)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
