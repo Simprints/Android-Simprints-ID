@@ -7,12 +7,16 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.FirebaseManager
+import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.safe.data.db.LocalDbRecoveryFailedException
 import com.simprints.id.tools.json.JsonHelper
 import io.reactivex.Completable
 import io.reactivex.CompletableEmitter
+import io.reactivex.Flowable
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import org.json.JSONException
 import timber.log.Timber
 import java.io.IOException
@@ -54,25 +58,47 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
 
     private fun writeAllPeopleToOutputStream() =
         try {
-            val people = getListOfPeopleToRecover()
-            val jsonString = convertListOfPeopleToJsonString(people)
-            realmDbOutputStream.write(jsonString)
-            realmDbOutputStream.close()
+            writeBeginningOfStream()
+            getListOfPeopleToRecover()
+                .subscribeOn(Schedulers.io())
+                .subscribeBy(
+                    onNext = { writePersonToStream(it) },
+                    onComplete = { writeEndOfStreamAndClose() },
+                    onError = { resultEmitter.onError(LocalDbRecoveryFailedException("Failed to load people from DB", it)) }
+                )
         } catch (e: JSONException) {
             resultEmitter.onError(LocalDbRecoveryFailedException("Failed to convert people list into JSON", e))
         } catch (e: IOException) {
             resultEmitter.onError(LocalDbRecoveryFailedException("Failed to write to the output stream", e))
         }
 
-    private fun getListOfPeopleToRecover(): ArrayList<rl_Person> =
+    private fun writeBeginningOfStream() {
+        realmDbOutputStream.write("{\"$peopleJsonKey\":[")
+    }
+
+    private var peopleCount = 0
+    private fun writePersonToStream(person: rl_Person) {
+        val commaString = if (peopleCount == 0) "" else ","
+        val personString = convertPersonToJsonString(person)
+        val fullString = "$commaString$personString"
+        realmDbOutputStream.write(fullString)
+        peopleCount++
+    }
+
+    private fun writeEndOfStreamAndClose() {
+        realmDbOutputStream.write("]}")
+        realmDbOutputStream.close()
+    }
+
+    private fun getListOfPeopleToRecover(): Flowable<rl_Person> =
         when (group) {
-            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal()
-            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(userId = userId)
-            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(moduleId = moduleId)
+            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocalRx()
+            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocalRx(userId = userId)
+            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocalRx(moduleId = moduleId)
         }
 
-    private fun convertListOfPeopleToJsonString(people: ArrayList<rl_Person>): String =
-        JsonHelper.gson.toJson(hashMapOf(peopleJsonKey to people))
+    private fun convertPersonToJsonString(person: rl_Person): String =
+        JsonHelper.gson.toJson(fb_Person(person))
 
     private fun PipedOutputStream.write(string: String) =
         write(string.toByteArray())
@@ -132,6 +158,6 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
         private const val metaDataUserIdKey = "userId"
         private const val metaDataAndroidIdKey = "androidId"
 
-        private const val peopleJsonKey = "people"
+        private const val peopleJsonKey = "patients"
     }
 }

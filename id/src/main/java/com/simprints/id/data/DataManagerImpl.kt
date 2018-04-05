@@ -143,6 +143,6 @@ class DataManagerImpl(private val context: Context,
     }
 
     override fun recoverRealmDb(group: Constants.GROUP): Completable {
-        return dbManager.recoverLocalDb(deviceId, userId, deviceId, moduleId, group)
+        return dbManager.recoverLocalDb(getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, group)
     }
 }
