@@ -106,7 +106,6 @@ class DashboardLocalDbCardView(private val rootView: View) : DashboardCardView(r
     }
 
     private fun disableSyncButton(dataModel: DashboardLocalDbCard) {
-        syncAction.isEnabled = false
-        syncAction.textColor = ContextCompat.getColor(rootView.context, R.color.dialog_button_disabled_text_color_dark)
+        syncAction.textColor = ContextCompat.getColor(rootView.context, R.color.simprints_grey)
     }
 }
