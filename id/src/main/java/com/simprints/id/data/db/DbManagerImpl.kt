@@ -131,6 +131,17 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         }
     }
 
+    override fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Int {
+
+        val nPatientsForDownSyncParamsInRealm = getPeopleCountFromLocal(
+            projectId = syncParams.projectId,
+            userId = syncParams.userId,
+            moduleId = syncParams.moduleId,
+            toSync = false)
+
+        return nPatientsOnServerForSyncParam - nPatientsForDownSyncParamsInRealm
+    }
+
     override fun getPeopleCount(personId: String?,
                                 projectId: String?,
                                 userId: String?,
@@ -156,8 +167,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
         SyncExecutor(
-            localDbManager,
-            remoteDbManager,
+            this,
             JsonHelper.gson).sync(interrupted, parameters)
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP): Completable {

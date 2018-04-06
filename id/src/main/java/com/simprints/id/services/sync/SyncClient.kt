@@ -52,21 +52,17 @@ class SyncClient(context: Context)
     }
 
     private fun setProgressReplayObservable(observable: Observable<Progress>) {
-        synchronized(this) {
-            currentProgressReplayObservable = observable
-        }
+        currentProgressReplayObservable = observable
     }
 
     fun startListening(observer: DisposableObserver<Progress>) {
         Timber.d("startListening()")
-        synchronized(this) {
-            val observable = currentProgressReplayObservable
-            if (observable != null) {
-                disposables.add(observable
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribeWith(observer))
-            }
+        val observable = currentProgressReplayObservable
+        if (observable != null) {
+            disposables.add(observable
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribeWith(observer))
         }
     }
 
