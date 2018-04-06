@@ -2,12 +2,14 @@ package com.simprints.id.activities.dashboard
 
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
-import com.simprints.id.activities.dashboard.models.DashboardLocalDbCard
+import com.simprints.id.activities.dashboard.models.DashboardCardType
+import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.activities.dashboard.models.SyncUIState
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.domain.Constants.GROUP
 import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.progress.service.ProgressService
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.ResourcesHelper
@@ -25,20 +27,20 @@ class DashboardPresenter(private val view: DashboardContract.View,
                          val dataManager: DataManager,
                          private val resourcesHelper: ResourcesHelper) : DashboardContract.Presenter {
 
-    private var localDbViewModel: DashboardLocalDbCard? = null
+    private var syncViewModel: DashboardSyncCard? = null
 
     private val syncListener = object : DisposableObserver<Progress>() {
 
         override fun onNext(progress: Progress) {
-            setSyncingProgressInLocalDbCardView(progress)
+            syncViewModel?.onSyncProgress(progress)
         }
 
         override fun onComplete() {
-            setSyncingCompleteInLocalDbCardView()
+            syncViewModel?.onSyncComplete()
         }
 
         override fun onError(throwable: Throwable) {
-            setSyncingErrorInLocalDbCardView()
+            syncViewModel?.onSyncError(throwable)
         }
     }
     private val syncManager = SyncManager(dataManager, syncClient, syncListener)
@@ -74,11 +76,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
             createAndAddLastEnrolInfoCard(),
             createAndAddLastVerificationInfoCard(),
             createAndAddLastIdentificationInfoCard(),
-            createAndAddRemoteDbInfoCard()
-                .onErrorResumeNext { SingleJust(-1) }
-                .flatMapCompletable {
-                    createAndAddLocalDbInfoCard(it)
-                }
+            createAndAddLocalDbInfoCard(),
+            createAndAddDbCards()
         ).subscribeOn(AndroidSchedulers.mainThread())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -86,9 +85,21 @@ class DashboardPresenter(private val view: DashboardContract.View,
                 onError = { view.stopRequestIfRequired() })
     }
 
+    private fun createAndAddDbCards(): Completable? =
+        createAndAddRemoteDbInfoCard()
+            .onErrorResumeNext { SingleJust(-1) }
+            .flatMapCompletable {
+                createAndAddSyncInfoCard(if (dataManager.syncGroup == GROUP.GLOBAL) 93764 else it)
+            }
+
+
     override fun didUserWantToRefreshCards() {
-        cardsModelsList.clear()
-        initCards()
+        if (syncViewModel?.syncState != SyncUIState.IN_PROGRESS) {
+            cardsModelsList.clear()
+            initCards()
+        } else {
+            view.stopRequestIfRequired()
+        }
     }
 
     override fun pause() {
@@ -96,6 +107,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun didUserWantToSyncBy(user: GROUP) {
+        setSyncingStartedInLocalDbCardView()
         syncManager.sync(user)
     }
 
@@ -105,6 +117,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess {
                 DashboardCard(
+                    DashboardCardType.PROJECT_INFO,
                     0,
                     R.drawable.simprints_logo_blue,
                     resourcesHelper.getString(R.string.dashboard_card_project_title),
@@ -112,20 +125,43 @@ class DashboardPresenter(private val view: DashboardContract.View,
                     .also { addCard(it) }
             }.toCompletable()
 
-    private fun createAndAddLocalDbInfoCard(remotePeopleCount: Int): Completable = Completable.fromAction {
+    private fun createAndAddLocalDbInfoCard(): Completable = Completable.fromAction {
         val localPeopleCount = dataManager.getPeopleCount(dataManager.syncGroup)
 
-        localDbViewModel = DashboardLocalDbCard(
+        DashboardCard(
+            DashboardCardType.LOCAL_DB,
             1,
             R.drawable.local_db,
             resourcesHelper.getString(R.string.dashboard_card_localdb_title),
-            "$localPeopleCount",
+            "$localPeopleCount")
+            .also { addCard(it) }
+    }
+
+
+    private fun createAndAddSyncInfoCard(remotePeopleCount: Int): Completable = Completable.fromAction {
+        val peopleToUpload = dataManager.loadPeopleFromLocal(toSync = true).count()
+
+        val syncParams =  SyncTaskParameters.build( dataManager.syncGroup, dataManager)
+        val peopleToDownload = dataManager.calculateNPatientsToDownSync(remotePeopleCount, syncParams)
+
+        syncViewModel = DashboardSyncCard(
+            DashboardCardType.SYNC_DB,
+            2,
+            R.drawable.dashboard_sync,
+            resourcesHelper.getString(R.string.dashboard_card_localdb_title),
+            peopleToUpload,
+            peopleToDownload,
             readableLastTimeSync,
-            remotePeopleCount != localPeopleCount,
+            peopleToDownload > 0 || peopleToUpload > 0,
             {
                 didUserWantToSyncBy(dataManager.syncGroup)
             })
             .also { addCard(it) }
+
+        //FIXME: Super hacky: if the ProgressService is running, then we try to catch up with its state
+        if(ProgressService.isRunning.get()) {
+            syncManager.sync(dataManager.syncGroup)
+        }
     }
 
     private fun createAndAddRemoteDbInfoCard(): Single<Int> =
@@ -133,18 +169,21 @@ class DashboardPresenter(private val view: DashboardContract.View,
             dataManager.getNumberOfPatientsForSyncParams(SyncTaskParameters.build(dataManager.syncGroup, dataManager))
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess {
+                    val total = if (dataManager.syncGroup == GROUP.GLOBAL) 93764 else it
                     DashboardCard(
-                        2,
+                        DashboardCardType.REMOTE_DB,
+                        3,
                         R.drawable.remote_db,
                         resourcesHelper.getString(R.string.dashboard_card_remotedb_title),
-                        "$it")
-                        .also { addCard(it) }
+                        "$total")
+                        .also { /* addCard(it) */}
                 }
         }
 
     private fun createAndAddScannerInfoCard(): Completable = Completable.fromAction {
         if (dataManager.lastScannerUsed.isNotEmpty()) {
             DashboardCard(
+                DashboardCardType.LAST_SCANNER,
                 3,
                 R.drawable.scanner,
                 resourcesHelper.getString(R.string.dashboard_card_scanner_title),
@@ -156,6 +195,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     private fun createAndAddLastUserInfoCard(): Completable = Completable.fromAction {
         if (dataManager.getSignedInUserIdOrEmpty().isNotEmpty()) {
             DashboardCard(
+                DashboardCardType.LAST_USER,
                 4,
                 R.drawable.last_user,
                 resourcesHelper.getString(R.string.dashboard_card_lastuser_title),
@@ -167,6 +207,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     private fun createAndAddLastEnrolInfoCard(): Completable = Completable.fromAction {
         dataManager.lastEnrolDate?.let {
             DashboardCard(
+                DashboardCardType.LAST_ENROL,
                 5,
                 R.drawable.fingerprint_enrol,
                 resourcesHelper.getString(R.string.dashboard_card_enrol_title),
@@ -178,6 +219,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     private fun createAndAddLastVerificationInfoCard(): Completable = Completable.fromAction {
         dataManager.lastVerificationDate?.let {
             DashboardCard(
+                DashboardCardType.LAST_VERIFICATION,
                 6,
                 R.drawable.fingerprint_verification,
                 resourcesHelper.getString(R.string.dashboard_card_verification_title),
@@ -189,6 +231,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     private fun createAndAddLastIdentificationInfoCard(): Completable = Completable.fromAction {
         dataManager.lastIdentificationDate?.let {
             DashboardCard(
+                DashboardCardType.LAST_IDENTIFICATION,
                 7,
                 R.drawable.fingerprint_identification,
                 resourcesHelper.getString(R.string.dashboard_card_identification_title),
@@ -198,32 +241,23 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun addCard(dashboardCard: DashboardCard) {
+        removeCardIfExist(dashboardCard.type)
+
         cardsModelsList.add(dashboardCard)
         cardsModelsList.sortBy { it.position }
         view.updateCardViews()
     }
 
-    private fun setSyncingProgressInLocalDbCardView(progress: Progress) {
-        localDbViewModel?.let {
-            it.syncState = SyncUIState.IN_PROGRESS
-            it.progress = progress
-            view.notifyCardViewChanged(cardsModelsList.indexOf(it))
-        }
+    private fun setSyncingStartedInLocalDbCardView() {
+        syncViewModel?.let {
+                it.syncStarted()
+                view.notifyCardViewChanged(cardsModelsList.indexOf(it))
+            }
     }
 
-    private fun setSyncingCompleteInLocalDbCardView() {
-        localDbViewModel?.apply {
-            syncState = SyncUIState.SUCCEED
-            lastSyncTime = readableLastTimeSync
-
-            view.notifyCardViewChanged(cardsModelsList.indexOf(this))
-        }
-    }
-
-    private fun setSyncingErrorInLocalDbCardView() {
-        localDbViewModel?.let {
-            localDbViewModel?.syncState = SyncUIState.FAILED
-            view.notifyCardViewChanged(cardsModelsList.indexOf(it))
+    private fun removeCardIfExist(projectType :DashboardCardType) {
+        cardsModelsList.findLast { it.type == projectType }.also {
+            cardsModelsList.remove(it)
         }
     }
 }

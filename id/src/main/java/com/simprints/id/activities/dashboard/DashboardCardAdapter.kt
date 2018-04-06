@@ -5,21 +5,21 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
-import com.simprints.id.activities.dashboard.models.DashboardLocalDbCard
+import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.activities.dashboard.views.DashboardCardView
-import com.simprints.id.activities.dashboard.views.DashboardLocalDbCardView
+import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 
 class DashboardCardAdapter(private val cardModels: ArrayList<DashboardCard>) :
     RecyclerView.Adapter<DashboardCardView>() {
 
     enum class CardViewType {
         GENERAL,
-        LOCAL_DB
+        SYNC
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (cardModels[position] is DashboardLocalDbCard) {
-            CardViewType.LOCAL_DB.ordinal
+        return if (cardModels[position] is DashboardSyncCard) {
+            CardViewType.SYNC.ordinal
         } else {
             CardViewType.GENERAL.ordinal
         }
@@ -30,7 +30,7 @@ class DashboardCardAdapter(private val cardModels: ArrayList<DashboardCard>) :
         if (viewType == CardViewType.GENERAL.ordinal) {
             DashboardCardView(LayoutInflater.from(parent.context).inflate(R.layout.activity_dashboard_card, parent, false))
         } else {
-            DashboardLocalDbCardView(LayoutInflater.from(parent.context).inflate(R.layout.activity_dashboard_localdb_card, parent, false))
+            DashboardSyncCardView(LayoutInflater.from(parent.context).inflate(R.layout.activity_dashboard_sync_card, parent, false))
         }
 
     override fun getItemCount() = cardModels.size

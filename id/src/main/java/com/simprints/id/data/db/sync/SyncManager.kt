@@ -13,6 +13,8 @@ class SyncManager(private val dataManager: DataManager,
                   private val syncClient: SyncClient,
                   private val uiObserver: DisposableObserver<Progress>? = null) {
 
+    private var internalSyncObserver: DisposableObserver<Progress> = createInternalDisposable()
+
     fun sync(user: Constants.GROUP) {
 
         dataManager.syncGroup = user
@@ -37,6 +39,7 @@ class SyncManager(private val dataManager: DataManager,
     private fun stopListeners() {
         try {
             syncClient.stopListening()
+            internalSyncObserver.dispose()
         } catch (error: UninitializedDataManagerError) {
             handleUnexpectedError(error)
         }
@@ -44,29 +47,38 @@ class SyncManager(private val dataManager: DataManager,
 
     private fun startListeners() {
         stopListeners()
+
+        internalSyncObserver.dispose()
+        internalSyncObserver = createInternalDisposable()
         syncClient.startListening(internalSyncObserver)
     }
 
-    private val internalSyncObserver: DisposableObserver<Progress> = object : DisposableObserver<Progress>() {
 
-        override fun onNext(progress: Progress) {
-            Timber.d("onNext")
-            uiObserver?.onNext(progress)
-        }
+    private fun createInternalDisposable(): DisposableObserver<Progress> =
+        object : DisposableObserver<Progress>() {
 
-        override fun onComplete() {
-            Timber.d("onComplete")
-            syncClient.stopListening()
-            uiObserver?.onComplete()
-        }
+            override fun onNext(progress: Progress) {
+                Timber.d("onSyncProgress")
+                uiObserver?.onNext(progress)
+            }
 
-        override fun onError(throwable: Throwable) {
-            Timber.d("onError")
-            dataManager.logThrowable(throwable)
-            syncClient.stopListening()
-            uiObserver?.onError(throwable)
+            override fun onComplete() {
+                Timber.d("onComplete")
+                syncClient.stopListening()
+                syncClient.stop()
+
+                uiObserver?.onComplete()
+            }
+
+            override fun onError(throwable: Throwable) {
+                Timber.d("onError")
+                dataManager.logThrowable(throwable)
+                syncClient.stopListening()
+                syncClient.stop()
+
+                uiObserver?.onError(throwable)
+            }
         }
-    }
 
     private fun handleUnexpectedError(error: Error) {
         dataManager.logThrowable(error)

@@ -19,6 +19,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 @SuppressLint("Registered")
 abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
 
+    companion object {
+        val isRunning: AtomicBoolean = AtomicBoolean(false)
+    }
+
     private val isInterrupted: AtomicBoolean = AtomicBoolean(false)
 
     private val finishObserver = object : DisposableObserver<Progress>() {
@@ -35,7 +39,7 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         }
 
         override fun onNext(progress: Progress) {
-            Timber.d("onNext($progress)")
+            Timber.d("onSyncProgress($progress)")
         }
     }
 
@@ -54,6 +58,7 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         Timber.d("onCreate()")
         super.onCreate()
         progressReplayObservable = ReplaySubject.create<Progress>()
+        isRunning.set(true)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -147,5 +152,6 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         Timber.d("ProgressService: onDestroy()")
         super.onDestroy()
         isInterrupted.set(true)
+        isRunning.set(false)
     }
 }
