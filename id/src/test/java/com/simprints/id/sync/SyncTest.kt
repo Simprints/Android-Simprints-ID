@@ -3,6 +3,7 @@ package com.simprints.id.sync
 import android.content.Context
 import com.google.gson.stream.JsonReader
 import com.simprints.id.BuildConfig
+import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.RealmSyncInfo
 import com.simprints.id.data.db.remote.FirebaseManager
@@ -74,9 +75,9 @@ class SyncTest : RxJavaTest() {
         val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
+        val dbManager = spy(DbManagerImpl(localDbManager, remoteDbManager))
         val sync = SyncExecutorMock(
-            localDbManager,
-            remoteDbManager,
+            dbManager,
             JsonHelper.gson)
 
         val testObserver = sync.uploadNewPatients({ false }, 10).test()
@@ -100,9 +101,9 @@ class SyncTest : RxJavaTest() {
         val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
+        val dbManager = spy(DbManagerImpl(localDbManager, remoteDbManager))
         val sync = SyncExecutorMock(
-            localDbManager,
-            remoteDbManager,
+            dbManager,
             JsonHelper.gson)
 
         val count = AtomicInteger(0)
@@ -264,9 +265,9 @@ class SyncTest : RxJavaTest() {
         //Mock app RealmSyncInfo for syncParams
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup().ordinal, lastSyncTime))
 
+        val dbManager = spy(DbManagerImpl(localDbMock, remoteDbMock))
         val sync = SyncExecutorMock(
-            localDbMock,
-            remoteDbMock,
+            dbManager,
             JsonHelper.gson)
 
         return sync.downloadNewPatients({ false }, syncParams).test()
