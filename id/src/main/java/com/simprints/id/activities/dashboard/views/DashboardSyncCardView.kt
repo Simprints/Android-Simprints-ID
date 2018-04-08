@@ -62,7 +62,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         enableSyncButton(dataModel)
     }
 
-    fun setUIForSyncStarted(dataModel: DashboardSyncCard) {
+    private fun setUIForSyncStarted(dataModel: DashboardSyncCard) {
         syncStateIcon.visibility = View.VISIBLE
         syncStateIcon.setImageResource(R.drawable.ic_syncing)
         syncProgressBar.visibility = View.INVISIBLE
@@ -124,12 +124,12 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     private fun showLastSyncTimeText(dataModel: DashboardSyncCard) {
         syncDescription.text = ""
         dataModel.lastSyncTime?.let {
-            syncDescription.text = String.format(rootView.context.getString(R.string.dashboard_card_localdb_last_sync), it)
+            syncDescription.text = String.format(rootView.context.getString(R.string.dashboard_card_sync_last_sync), it)
         }
     }
 
     private fun showSyncNeededText() {
-        syncDescription.textResource = R.string.dashboard_card_localdb_sync_needed
+        syncDescription.textResource = R.string.dashboard_card_sync_needed
     }
 
     private fun enableSyncButton(dataModel: DashboardSyncCard) {

@@ -24,7 +24,7 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.extensions.launchAlert
-import com.simprints.id.tools.utils.ResourcesHelperImpl
+import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import org.jetbrains.anko.support.v4.onRefresh
 
 
@@ -47,7 +47,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
         setContentView(R.layout.activity_dashboard)
 
         val syncClient = SyncService.getClient(this)
-        viewPresenter = DashboardPresenter(this, syncClient, dataManager, ResourcesHelperImpl(app))
+        viewPresenter = DashboardPresenter(this, syncClient, dataManager, AndroidResourcesHelperImpl(app))
 
         initDrawer()
         initCards()
@@ -67,7 +67,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
 
         swipeRefreshLayout = (findViewById<SwipeRefreshLayout>(R.id.dashboardCardsSwipeId)).apply {
             this.onRefresh {
-                viewPresenter.didUserWantToRefreshCards()
+                viewPresenter.didUserWantToRefreshCardsIfPossible()
             }
         }
     }

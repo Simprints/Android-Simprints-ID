@@ -127,7 +127,7 @@
                     android:id="@+id/dashboardCardSyncAction"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/dashboard_card_localdb_action"
+                    android:text="@string/dashboard_card_sync_action"
                     android:textColor="@color/colorAccent"
                     android:textSize="15sp"
                     android:minWidth="50dp"
