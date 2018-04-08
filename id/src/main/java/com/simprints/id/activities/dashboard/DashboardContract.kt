@@ -4,7 +4,6 @@ import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.Constants
 
 interface DashboardContract {
 
@@ -21,7 +20,7 @@ interface DashboardContract {
         val cardsModelsList: ArrayList<DashboardCard>
 
         fun pause()
-        fun didUserWantToRefreshCards()
-        fun didUserWantToSyncBy(user: Constants.GROUP)
+        fun didUserWantToRefreshCardsIfPossible()
+        fun didUserWantToSync()
     }
 }
