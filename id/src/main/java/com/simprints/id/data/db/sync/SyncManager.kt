@@ -14,13 +14,15 @@ class SyncManager(private val dataManager: DataManager,
     private var internalSyncObserver: DisposableObserver<Progress> = createInternalDisposable()
 
     // hashset to avoid duplicates
-    var observers = hashSetOf<DisposableObserver<Progress>>()
+    private var observers = hashSetOf<DisposableObserver<Progress>>()
 
     fun sync(syncParams: SyncTaskParameters) {
         syncClient.sync(syncParams, {
             startListeners()
         }, {
-            observers.forEach { it.onError(Throwable("Server busy")) }
+            synchronized(observers) {
+                observers.forEach { it.onError(Throwable("Server busy")) }
+            }
             stopListeners()
         })
     }
@@ -49,14 +51,15 @@ class SyncManager(private val dataManager: DataManager,
         syncClient.startListening(internalSyncObserver)
     }
 
-
     private fun createInternalDisposable(): DisposableObserver<Progress> =
         object : DisposableObserver<Progress>() {
 
             override fun onNext(progress: Progress) {
                 Timber.d("onSyncProgress")
 
-                observers.forEach { it.onNext(progress) }
+                synchronized(observers) {
+                    observers.forEach { it.onNext(progress) }
+                }
             }
 
             override fun onComplete() {
@@ -64,7 +67,9 @@ class SyncManager(private val dataManager: DataManager,
                 syncClient.stopListening()
                 syncClient.stop()
 
-                observers.forEach { it.onComplete() }
+                synchronized(observers) {
+                    observers.forEach { it.onComplete() }
+                }
             }
 
             override fun onError(throwable: Throwable) {
@@ -73,7 +78,9 @@ class SyncManager(private val dataManager: DataManager,
                 syncClient.stopListening()
                 syncClient.stop()
 
-                observers.forEach { it.onError(throwable) }
+                synchronized(observers) {
+                    observers.forEach { it.onError(throwable) }
+                }
             }
         }
 
@@ -82,10 +89,14 @@ class SyncManager(private val dataManager: DataManager,
     }
 
     fun remoteObservers() {
-        observers.clear()
+        synchronized(observers) {
+            observers.clear()
+        }
     }
 
     fun addObserver(syncObserver: DisposableObserver<Progress>) {
-        observers.add(syncObserver)
+        synchronized(observers) {
+            observers.add(syncObserver)
+        }
     }
 }

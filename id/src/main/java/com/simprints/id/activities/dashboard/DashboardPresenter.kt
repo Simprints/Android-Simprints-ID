@@ -35,9 +35,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
             return cardsModelsList.find { it is DashboardSyncCard } as DashboardSyncCard?
         }
 
-
     override fun start() {
-        val syncParams  = SyncTaskParameters.build(dataManager.syncGroup, dataManager)
+        val syncParams = SyncTaskParameters.build(dataManager.syncGroup, dataManager)
         val hasSyncGroupChangedSinceLastRun = actualSyncParams != syncParams
         actualSyncParams = syncParams
 
@@ -68,11 +67,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
                     }
                 }
         )
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribeBy(
-            onComplete = { handleCardsCreated() },
-            onError = { handleCardsCreationFailed() })
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = { handleCardsCreated() },
+                onError = { handleCardsCreationFailed() })
     }
 
     private fun handleCardsCreated() {
@@ -80,7 +79,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         view.stopRequestIfRequired()
     }
 
-    private fun handleCardsCreationFailed(){
+    private fun handleCardsCreationFailed() {
         view.stopRequestIfRequired()
     }
 
@@ -89,7 +88,10 @@ class DashboardPresenter(private val view: DashboardContract.View,
         syncManager.addObserver(it.syncObserver)
         syncManager.addObserver(object : DisposableObserver<Progress>() {
             override fun onNext(t: Progress) {}
-            override fun onError(e: Throwable) {}
+            override fun onError(e: Throwable) {
+                initCards()
+            }
+
             override fun onComplete() {
                 initCards()
             }
