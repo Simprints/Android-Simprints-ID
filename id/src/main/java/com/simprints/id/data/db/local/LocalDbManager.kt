@@ -7,6 +7,7 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.realm.Realm
 import io.realm.RealmConfiguration
 
@@ -38,6 +39,12 @@ interface LocalDbManager {
                             userId: String? = null,
                             moduleId: String? = null,
                             toSync: Boolean? = null): ArrayList<rl_Person>
+
+    fun loadPeopleFromLocalRx(patientId: String? = null,
+                              projectId: String? = null,
+                              userId: String? = null,
+                              moduleId: String? = null,
+                              toSync: Boolean? = null): Flowable<rl_Person>
 
     //Sync
     fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo?

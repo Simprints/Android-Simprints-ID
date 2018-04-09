@@ -15,20 +15,19 @@ import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
-import com.simprints.id.data.db.remote.models.adapters.toLocalDbKey
+import com.simprints.id.data.db.remote.adapters.toLocalDbKey
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
-import com.simprints.id.exceptions.safe.remoteDbManager.DownloadingAPersonWhoDoesntExistOnServer
+import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.id.tools.extensions.toHexString
 import com.simprints.id.tools.extensions.toMap
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
@@ -160,10 +159,6 @@ class FirebaseManager(private val appContext: Context,
     private fun handleGetLocalDbKeyTaskComplete(task: Task<QuerySnapshot>, result: SingleEmitter<LocalDbKey>) {
         if (task.isSuccessful) {
             val realmKeys = task.result.first().toObject(fs_RealmKeys::class.java)
-
-            //TODO Remove before final pull request
-            Timber.d(realmKeys.value.toBytes().toHexString())
-
             result.onSuccess(realmKeys.toLocalDbKey())
         } else {
             result.onError(CouldNotRetrieveLocalDbKeyError.withException(task.exception))
@@ -225,7 +220,7 @@ class FirebaseManager(private val appContext: Context,
         getSyncApi().flatMap {
             it.downloadPeople(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
                 .map { if (it.isEmpty())
-                    throw DownloadingAPersonWhoDoesntExistOnServer()
+                    throw DownloadingAPersonWhoDoesntExistOnServerException()
                 else it.first()
                 }
         }
