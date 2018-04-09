@@ -8,11 +8,8 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.services.sync.SyncTaskParameters
-import io.reactivex.Completable
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.RealmQuery
-import io.realm.Sort
+import io.reactivex.*
+import io.realm.*
 import timber.log.Timber
 import java.io.File
 import java.util.*
@@ -110,6 +107,22 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
             ArrayList(it.copyFromRealm(query.findAll(), 4))
         }
     }
+
+    override fun loadPeopleFromLocalRx(patientId: String?,
+                                       projectId: String?,
+                                       userId: String?,
+                                       moduleId: String?,
+                                       toSync: Boolean?): Flowable<rl_Person> =
+        Flowable.create({ emitter ->
+            getRealmInstance().use {
+                val query = buildQueryForPerson(it, patientId, projectId, userId, moduleId, toSync)
+                val people = query.findAll()
+                for (person in people) {
+                    emitter.onNext(person)
+                }
+                emitter.onComplete()
+            }
+        }, BackpressureStrategy.BUFFER)
 
     override fun getValidRealmConfig(): RealmConfiguration {
         return realmConfig ?: throw RealmUninitialisedError()
