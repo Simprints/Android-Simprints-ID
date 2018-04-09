@@ -5,12 +5,11 @@ import com.simprints.id.testUtils.mock
 import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
-import junit.framework.Assert.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.verify
-
 
 class ComplexPreferenceTest {
 
@@ -28,7 +27,6 @@ class ComplexPreferenceTest {
     private var fingerPreference by ComplexPreference(improvedPrefs, aKey, defaultFingerId,
             fingerIdSerializer)
 
-
     private fun mockFingerIdentifierSerializer(): Serializer<FingerIdentifier> {
         val serializer = mock<Serializer<FingerIdentifier>>()
         whenever(serializer.serialize(defaultFingerId)).thenReturn(serializedDefaultFingerId)
@@ -44,8 +42,7 @@ class ComplexPreferenceTest {
         return editor
     }
 
-    private fun mockImprovedPreferences(editorToReturn: ImprovedSharedPreferences.Editor)
-            :ImprovedSharedPreferences {
+    private fun mockImprovedPreferences(editorToReturn: ImprovedSharedPreferences.Editor): ImprovedSharedPreferences {
         val prefs = mock<ImprovedSharedPreferences>()
         whenever(prefs.getPrimitive(aKey, serializedDefaultFingerId)).thenReturn(storedSerializedFingerId)
         whenever(prefs.edit()).thenReturn(editorToReturn)
@@ -92,6 +89,4 @@ class ComplexPreferenceTest {
         verify(improvedEditor).putPrimitive(aKey, storedSerializedFingerId)
         verify(improvedEditor).apply()
     }
-
-
 }

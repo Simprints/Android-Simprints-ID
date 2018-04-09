@@ -4,7 +4,7 @@ import android.util.Base64
 import com.google.common.io.BaseEncoding
 import com.simprints.id.BuildConfig
 import com.simprints.id.testUtils.roboletric.TestApplication
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner

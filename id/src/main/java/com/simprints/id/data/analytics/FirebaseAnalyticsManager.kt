@@ -9,6 +9,7 @@ import com.simprints.id.exceptions.safe.SimprintsException
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
+import com.simprints.id.tools.extensions.fromLowerCamelToLowerUnderscore
 import timber.log.Timber
 import kotlin.reflect.full.memberProperties
 
@@ -138,11 +139,8 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         val fbSession = session.toFirebaseSession()
         val bundle = Bundle()
         for (property in fb_Session::class.memberProperties) {
-            bundle.putString(property.name.fromCamelToUnderscore(), property.get(fbSession).toString())
+            bundle.putString(property.name.fromLowerCamelToLowerUnderscore(), property.get(fbSession).toString())
         }
         firebaseAnalytics.logEvent("session", bundle)
     }
-
-    private fun String.fromCamelToUnderscore(): String = this
-        //CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, this)
 }
