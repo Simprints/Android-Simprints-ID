@@ -25,9 +25,9 @@ internal class AboutPresenter(private val view: AboutContract.View,
 
     private fun initCounts() {
         view.setDbCountData(
-            dataManager.getPeopleCount(Constants.GROUP.USER).toLong().toString(),
-            dataManager.getPeopleCount(Constants.GROUP.MODULE).toLong().toString(),
-            dataManager.getPeopleCount(Constants.GROUP.GLOBAL).toLong().toString())
+            dataManager.getPeopleCount(Constants.GROUP.USER).toString(),
+            dataManager.getPeopleCount(Constants.GROUP.MODULE).toString(),
+            dataManager.getPeopleCount(Constants.GROUP.GLOBAL).toString())
     }
 
     override fun recoverDb() {
