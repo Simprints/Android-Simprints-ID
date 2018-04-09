@@ -279,6 +279,10 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
                 dataManager.setLanguage("ha");
                 dataManager.setLanguagePosition(6);
                 break;
+            case 7:
+                dataManager.setLanguage("ny");
+                dataManager.setLanguagePosition(7);
+                break;
         }
     }
 
