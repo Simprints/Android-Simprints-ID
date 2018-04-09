@@ -16,7 +16,7 @@ import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
-import junit.framework.Assert.*
+import org.junit.Assert.*
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test

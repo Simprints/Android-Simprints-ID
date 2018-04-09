@@ -1,6 +1,6 @@
 package com.simprints.id.tools.extensions
 
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.Test
 
 class String_extKtTest {

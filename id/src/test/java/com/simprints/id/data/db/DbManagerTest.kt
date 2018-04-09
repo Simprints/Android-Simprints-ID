@@ -14,9 +14,9 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.getDbManagerWithMockedLocalAndRemoteManagersForApiTesting
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import com.simprints.libcommon.Person
-import junit.framework.Assert
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
