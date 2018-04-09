@@ -18,7 +18,7 @@ class HasherTest {
         val string = "this is some string"
         val hashedString = Hasher().hash(string)
         Assert.assertNotNull(hashedString)
-        assert(hashedString.isEmpty())
+        assert(!hashedString.isEmpty())
     }
 
     @Test
