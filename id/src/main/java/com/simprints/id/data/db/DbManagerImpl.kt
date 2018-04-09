@@ -1,9 +1,10 @@
 package com.simprints.id.data.db
 
+import android.content.Context
 import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmDbManager
+import com.simprints.id.data.db.local.RealmDbManagerImpl
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -27,11 +28,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
-class DbManagerImpl(private val localDbManager: LocalDbManager,
+class DbManagerImpl(private val appContext: Context,
                     private val remoteDbManager: RemoteDbManager) :
     DbManager,
-    LocalDbManager by localDbManager,
     RemoteDbManager by remoteDbManager {
+
+    override lateinit var localDbManager: LocalDbManager
 
     // Lifecycle
 
@@ -51,11 +53,11 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     private fun Single<out LocalDbKey>.signInToLocal(): Completable =
         flatMapCompletable { key ->
-            localDbManager.signInToLocal(key)
+            localDbManager = RealmDbManagerImpl(appContext, key)
+            localDbManager.signInToLocal()
         }
 
     override fun signOut() {
-        localDbManager.signOutOfLocal()
         remoteDbManager.signOutOfRemoteDb()
     }
 
@@ -144,7 +146,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP): Completable {
         val firebaseManager = remoteDbManager as FirebaseManager
-        val realmManager = localDbManager as RealmDbManager
+        val realmManager = localDbManager as RealmDbManagerImpl
         return LocalDbRecovererImpl(realmManager, firebaseManager, projectId, userId, androidId, moduleId, group).recoverDb()
     }
 }

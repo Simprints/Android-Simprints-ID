@@ -9,16 +9,11 @@ import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.realm.Realm
-import io.realm.RealmConfiguration
 
 interface LocalDbManager {
 
     // Lifecycle
-    fun signInToLocal(localDbKey: LocalDbKey): Completable
-
-    fun signOutOfLocal()
-
-    fun isLocalDbInitialized(projectId: String): Boolean
+    fun signInToLocal(): Completable
 
     // Data transfer
     fun insertOrUpdatePersonInLocal(person: rl_Person): Completable
@@ -50,7 +45,5 @@ interface LocalDbManager {
     fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo?
 
     // Database instances
-    fun getValidRealmConfig(): RealmConfiguration
-
     fun getRealmInstance(): Realm
 }

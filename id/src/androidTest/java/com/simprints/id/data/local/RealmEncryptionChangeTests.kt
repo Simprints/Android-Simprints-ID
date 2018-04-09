@@ -2,7 +2,7 @@ package com.simprints.id.data.local
 
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.data.db.local.RealmConfig
-import com.simprints.id.data.db.local.RealmDbManager
+import com.simprints.id.data.db.local.RealmDbManagerImpl
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.tools.extensions.awaitAndAssertSuccess
 import io.realm.Realm
@@ -26,7 +26,7 @@ class RealmEncryptionChangeTests : RealmTestsBase() {
     fun localSignInWithEncryptionChange_ShouldMigrateDatabase() {
         Realm.getInstance(legacyConfig).use { saveFakePerson(it, getFakePerson()) }
 
-        RealmDbManager(testContext).signInToLocal(localDbKey).test()
+        RealmDbManagerImpl(testContext, localDbKey).signInToLocal().test()
             .awaitAndAssertSuccess()
             .let {
                 Assert.assertTrue(!File(legacyConfig.path).exists())
@@ -36,7 +36,7 @@ class RealmEncryptionChangeTests : RealmTestsBase() {
 
     @Test
     fun localSignInWithoutEncryptionChange_ShouldNotEffectNewDatabase() {
-        RealmDbManager(testContext).signInToLocal(localDbKey).test()
+        RealmDbManagerImpl(testContext, localDbKey).signInToLocal().test()
             .awaitAndAssertSuccess()
             .let {
                 assert(!File(legacyConfig.path).exists())
@@ -48,7 +48,7 @@ class RealmEncryptionChangeTests : RealmTestsBase() {
     fun localSignInWithEncryptionChange_ShouldCloseLegacyRealm() {
         Realm.getInstance(config).use { saveFakePerson(it, getFakePerson()) }
 
-        RealmDbManager(testContext).signInToLocal(localDbKey).test()
+        RealmDbManagerImpl(testContext, localDbKey).signInToLocal().test()
             .awaitAndAssertSuccess()
             .let {
                 assert(Realm.getInstance(config).use { it.isClosed })
@@ -60,7 +60,7 @@ class RealmEncryptionChangeTests : RealmTestsBase() {
         val fakePerson = getFakePerson()
         Realm.getInstance(legacyConfig).use { saveFakePerson(it, fakePerson) }
 
-        RealmDbManager(testContext).signInToLocal(localDbKey).test()
+        RealmDbManagerImpl(testContext, localDbKey).signInToLocal().test()
             .awaitAndAssertSuccess()
             .let {
                 Realm.getInstance(config).use {

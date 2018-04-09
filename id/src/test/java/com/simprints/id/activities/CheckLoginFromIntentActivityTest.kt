@@ -52,7 +52,6 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         app = RuntimeEnvironment.application as TestApplication
         sharedPreferences = getRoboSharedPreferences()
 
-        mockLocalDbManager(app)
         mockRemoteDbManager(app)
         mockIsSignedIn(app, sharedPreferences)
         mockDbManager(app)
@@ -238,17 +237,17 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
     }
 
     private fun createACallingAppIntentWithLegacyApiKey(actionString: String = DEFAULT_ACTION,
-                                        legacyApiKey: String = DEFAULT_LEGACY_API_KEY,
-                                        userId: String = DEFAULT_USER_ID,
-                                        moduleId: String = DEFAULT_MODULE_ID): Intent {
+                                                        legacyApiKey: String = DEFAULT_LEGACY_API_KEY,
+                                                        userId: String = DEFAULT_USER_ID,
+                                                        moduleId: String = DEFAULT_MODULE_ID): Intent {
 
         return createACallingAppIntent(actionString, userId, moduleId).also { it.putExtra("apiKey", legacyApiKey) }
     }
 
     private fun createACallingAppIntentWithProjectId(actionString: String = DEFAULT_ACTION,
-                                        projectId: String = DEFAULT_PROJECT_ID,
-                                        userId: String = DEFAULT_USER_ID,
-                                        moduleId: String = DEFAULT_MODULE_ID): Intent {
+                                                     projectId: String = DEFAULT_PROJECT_ID,
+                                                     userId: String = DEFAULT_USER_ID,
+                                                     moduleId: String = DEFAULT_MODULE_ID): Intent {
 
         return createACallingAppIntent(actionString, userId, moduleId).also { it.putExtra("projectId", projectId) }
     }

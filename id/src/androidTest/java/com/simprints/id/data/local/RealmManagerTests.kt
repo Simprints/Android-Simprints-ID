@@ -2,9 +2,9 @@ package com.simprints.id.data.local
 
 import android.support.test.runner.AndroidJUnit4
 import com.google.gson.stream.JsonReader
-import com.simprints.id.data.db.local.RealmDbManager
-import com.simprints.id.data.db.local.RealmDbManager.Companion.PATIENT_ID_FIELD
-import com.simprints.id.data.db.local.RealmDbManager.Companion.SYNC_ID_FIELD
+import com.simprints.id.data.db.local.RealmDbManagerImpl
+import com.simprints.id.data.db.local.RealmDbManagerImpl.Companion.PATIENT_ID_FIELD
+import com.simprints.id.data.db.local.RealmDbManagerImpl.Companion.SYNC_ID_FIELD
 import com.simprints.id.data.db.local.RealmSyncInfo
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
@@ -34,19 +34,19 @@ class RealmManagerTests : RealmTestsBase() {
     }
 
     private lateinit var realm: Realm
-    private lateinit var realmManager: RealmDbManager
+    private lateinit var realmManager: RealmDbManagerImpl
 
     @Before
     fun setup() {
         realm = Realm.getInstance(config)
-        realmManager = RealmDbManager(testContext).apply {
-            signInToLocal(localDbKey).blockingAwait()
+        realmManager = RealmDbManagerImpl(testContext, localDbKey).apply {
+            signInToLocal().blockingAwait()
         }
     }
 
     @Test
     fun signInToLocal_ShouldSucceed() {
-        realmManager.signInToLocal(localDbKey).test().awaitAndAssertSuccess()
+        realmManager.signInToLocal().test().awaitAndAssertSuccess()
     }
 
     @Test

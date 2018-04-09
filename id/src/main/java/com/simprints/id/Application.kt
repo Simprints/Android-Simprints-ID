@@ -13,7 +13,7 @@ import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmDbManager
+import com.simprints.id.data.db.local.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.authListener.FirebaseAuthListenerManager
@@ -132,10 +132,6 @@ open class Application : MultiDexApplication() {
         PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager)
     }
 
-    var localDbManager: LocalDbManager by lazyVar {
-        RealmDbManager(this)
-    }
-
     private val remoteDbConnectionListenerManager: RemoteDbConnectionListenerManager by lazy {
         FirebaseConnectionListenerManager()
     }
@@ -149,7 +145,7 @@ open class Application : MultiDexApplication() {
     }
 
     var dbManager: DbManager by lazyVar {
-        DbManagerImpl(localDbManager, remoteDbManager)
+        DbManagerImpl(this, remoteDbManager)
     }
 
     private val fabric: Fabric by lazy {
