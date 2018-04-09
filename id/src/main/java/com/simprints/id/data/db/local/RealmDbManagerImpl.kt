@@ -6,16 +6,22 @@ import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
-import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.services.sync.SyncTaskParameters
-import io.reactivex.*
-import io.realm.*
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Completable
+import io.reactivex.Flowable
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import io.realm.RealmQuery
+import io.realm.Sort
 import timber.log.Timber
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class RealmDbManager(private val appContext: Context) : LocalDbManager {
+
+class RealmDbManagerImpl(private val appContext: Context,
+                         private val localDbKey: LocalDbKey) : LocalDbManager {
 
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"
@@ -30,33 +36,21 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
         private const val LEGACY_APP_KEY_LENGTH: Int = 8
     }
 
-    private var realmConfig: RealmConfiguration? = null
+    private var realmConfig = RealmConfig.get(localDbKey.projectId, localDbKey.value)
 
     init {
         Realm.init(appContext)
     }
 
-    override fun getRealmInstance(): Realm {
-        realmConfig?.let {
-            return Realm.getInstance(it) ?: throw RealmUninitialisedError("Error in getInstance")
-        } ?: throw RealmUninitialisedError("RealmConfig null")
-    }
+    override fun getRealmInstance(): Realm = Realm.getInstance(realmConfig)
 
-    override fun signInToLocal(localDbKey: LocalDbKey): Completable = Completable.create { em ->
+    override fun signInToLocal(): Completable = Completable.create { em ->
         Timber.d("Realm sign in. Project: ${localDbKey.projectId} Key: $localDbKey")
 
         migrateLegacyDatabaseIfRequired(localDbKey)
 
-        realmConfig = RealmConfig.get(localDbKey.projectId, localDbKey.value)
         getRealmInstance().use { em.onComplete() }
     }
-
-    override fun signOutOfLocal() {
-        realmConfig = null
-    }
-
-    override fun isLocalDbInitialized(projectId: String): Boolean =
-        realmConfig != null
 
     override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable = Completable.create { em ->
         getRealmInstance().use {
@@ -123,10 +117,6 @@ class RealmDbManager(private val appContext: Context) : LocalDbManager {
                 emitter.onComplete()
             }
         }, BackpressureStrategy.BUFFER)
-
-    override fun getValidRealmConfig(): RealmConfiguration {
-        return realmConfig ?: throw RealmUninitialisedError()
-    }
 
     override fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo? {
         return getRealmInstance().use {

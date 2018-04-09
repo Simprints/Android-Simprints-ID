@@ -30,7 +30,6 @@ class CheckLoginFromMainLauncherActivityTest {
 
         sharedPrefs = getRoboSharedPreferences()
 
-        mockLocalDbManager(app)
         mockRemoteDbManager(app)
         mockIsSignedIn(app, sharedPrefs)
         mockDbManager(app)

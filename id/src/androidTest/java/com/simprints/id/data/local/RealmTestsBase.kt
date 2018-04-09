@@ -24,12 +24,14 @@ open class RealmTestsBase {
     }
 
     protected val localDbKey = LocalDbKey(newDatabaseName, newDatabaseKey, legacyDatabaseName)
-    protected val config = RealmConfig.get(localDbKey.projectId, localDbKey.value)
+    protected val config: RealmConfiguration
 
     protected val testContext = InstrumentationRegistry.getTargetContext()
         ?: throw IllegalStateException()
 
     init {
+        Realm.init(testContext)
+        config = RealmConfig.get(localDbKey.projectId, localDbKey.value)
         deleteRealmFiles(config)
     }
 

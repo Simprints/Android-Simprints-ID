@@ -7,7 +7,6 @@ import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.createRoboAboutActivity
 import com.simprints.id.testUtils.roboletric.mockDbManager
-import com.simprints.id.testUtils.roboletric.mockLocalDbManager
 import kotlinx.android.synthetic.main.activity_about.*
 import org.junit.Assert.*
 import org.junit.Before
@@ -28,7 +27,6 @@ class AboutActivityTest {
     @Before
     fun setUp() {
         app = (RuntimeEnvironment.application as Application)
-        mockLocalDbManager(app)
         mockDbManager(app)
         mockAnalyticsManager()
     }
