@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
+import com.simprints.id.data.db.LocalDbKeyProvider
 import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
@@ -46,7 +47,8 @@ class FirebaseManager(private val appContext: Context,
                       private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
     RemoteDbManager,
     RemoteDbConnectionListenerManager by firebaseConnectionListenerManager,
-    RemoteDbAuthListenerManager by firebaseAuthListenerManager {
+    RemoteDbAuthListenerManager by firebaseAuthListenerManager,
+    LocalDbKeyProvider {
 
     private var isInitialised = false
 
@@ -204,6 +206,9 @@ class FirebaseManager(private val appContext: Context,
             }
             .addOnFailureListener { e -> it.onError(e) }
     }
+
+    override fun getLocalDbKey(projectId: String): Single<LocalDbKey> =
+        getLocalDbKeyFromRemote(projectId)
 
     // API
 

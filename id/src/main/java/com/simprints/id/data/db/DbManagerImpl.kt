@@ -29,11 +29,13 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
 class DbManagerImpl(private val appContext: Context,
-                    private val remoteDbManager: RemoteDbManager) :
+                    private val remoteDbManager: RemoteDbManager,
+                    private val projectIdProvider: ProjectIdProvider) :
     DbManager,
     RemoteDbManager by remoteDbManager {
 
-    override lateinit var localDbManager: LocalDbManager
+    override var localDbManager : LocalDbManager =
+        RealmDbManagerImpl(appContext, projectIdProvider, remoteDbManager)
 
     // Lifecycle
 
