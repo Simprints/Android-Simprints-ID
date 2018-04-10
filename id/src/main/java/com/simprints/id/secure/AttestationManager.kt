@@ -1,7 +1,10 @@
 package com.simprints.id.secure
 
+//import com.google.common.io.BaseEncoding
+
+import android.util.Base64
+import android.util.Base64.NO_WRAP
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.google.common.io.BaseEncoding
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
 import io.reactivex.Single
@@ -13,7 +16,7 @@ class AttestationManager {
 
        return Single.create<AttestToken> { emitter ->
 
-           safetyNetClient.attest(BaseEncoding.base64().decode(nonce.value), "AIzaSyAGYfgKYVGHsRJwrPnbNEwLrFfbbNdlAyE")
+           safetyNetClient.attest(Base64.decode(nonce.value, NO_WRAP), "AIzaSyAGYfgKYVGHsRJwrPnbNEwLrFfbbNdlAyE")
                .addOnSuccessListener { attestationResponse ->
                    val result = attestationResponse.jwsResult
                    val attestToken = AttestToken(result)

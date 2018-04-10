@@ -142,6 +142,7 @@ class DataManagerImpl(private val context: Context,
         analyticsManager.logSession(session)
     }
 
-    override fun recoverRealmDb(group: Constants.GROUP): Completable =
-        dbManager.recoverLocalDb(deviceId, userId, deviceId, moduleId, group)
+    override fun recoverRealmDb(group: Constants.GROUP): Completable {
+        return dbManager.recoverLocalDb(getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, group)
+    }
 }

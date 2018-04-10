@@ -143,7 +143,7 @@ open class SyncExecutor(private val dbManager: DbManager,
 
         if (totalDownloaded % emitProgressEvery == 0) {
             it.onNext(totalDownloaded)
-        }
+        }gi
     }
 
     private fun finishDownload(reader: JsonReader,
