@@ -145,7 +145,7 @@ open class Application : MultiDexApplication() {
     }
 
     var dbManager: DbManager by lazyVar {
-        DbManagerImpl(this, remoteDbManager)
+        DbManagerImpl(this, remoteDbManager, secureDataManager)
     }
 
     private val fabric: Fabric by lazy {

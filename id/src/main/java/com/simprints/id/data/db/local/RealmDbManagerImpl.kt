@@ -3,6 +3,8 @@ package com.simprints.id.data.db.local
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
+import com.simprints.id.data.db.LocalDbKeyProvider
+import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
@@ -21,7 +23,8 @@ import kotlin.collections.ArrayList
 
 
 class RealmDbManagerImpl(private val appContext: Context,
-                         private val localDbKey: LocalDbKey) : LocalDbManager {
+                         private val projectIdProvider: ProjectIdProvider,
+                         private val localDbKeyProvider: LocalDbKeyProvider) : LocalDbManager {
 
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"

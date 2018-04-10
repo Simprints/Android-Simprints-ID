@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.remote
 
 import com.google.firebase.FirebaseApp
+import com.simprints.id.data.db.LocalDbKeyProvider
 import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
@@ -19,7 +20,7 @@ import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 
-interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListenerManager {
+interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListenerManager, LocalDbKeyProvider {
     // TODO : agree on consistent method naming for load/save vs get/put etc
     // Lifecycle
     fun initialiseRemoteDb()
