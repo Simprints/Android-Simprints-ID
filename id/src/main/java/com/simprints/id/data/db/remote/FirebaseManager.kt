@@ -9,8 +9,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
-import com.simprints.id.data.db.LocalDbKeyProvider
-import com.simprints.id.data.db.local.LocalDbKey
+import com.simprints.id.data.db.local.LocalDbKeyProvider
+import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager

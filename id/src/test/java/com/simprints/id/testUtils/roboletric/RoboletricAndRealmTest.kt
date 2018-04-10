@@ -5,7 +5,7 @@ import com.simprints.id.Application
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmDbManagerImpl
+import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.authListener.FirebaseAuthListenerManager

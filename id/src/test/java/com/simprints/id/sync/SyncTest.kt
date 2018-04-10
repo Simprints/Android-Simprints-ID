@@ -4,7 +4,7 @@ import android.content.Context
 import com.google.gson.stream.JsonReader
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmSyncInfo
+import com.simprints.id.data.db.local.realm.RealmSyncInfo
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.FirebaseOptionsHelper
 import com.simprints.id.data.db.remote.RemoteDbManager

@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.remote
 
 import com.google.firebase.FirebaseApp
-import com.simprints.id.data.db.LocalDbKeyProvider
-import com.simprints.id.data.db.local.LocalDbKey
+import com.simprints.id.data.db.local.LocalDbKeyProvider
+import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT

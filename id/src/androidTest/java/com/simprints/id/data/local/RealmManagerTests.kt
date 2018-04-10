@@ -2,11 +2,11 @@ package com.simprints.id.data.local
 
 import android.support.test.runner.AndroidJUnit4
 import com.google.gson.stream.JsonReader
-import com.simprints.id.data.db.local.RealmDbManagerImpl
-import com.simprints.id.data.db.local.RealmDbManagerImpl.Companion.PATIENT_ID_FIELD
-import com.simprints.id.data.db.local.RealmDbManagerImpl.Companion.SYNC_ID_FIELD
-import com.simprints.id.data.db.local.RealmSyncInfo
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
+import com.simprints.id.data.db.local.realm.RealmDbManagerImpl.Companion.PATIENT_ID_FIELD
+import com.simprints.id.data.db.local.realm.RealmDbManagerImpl.Companion.SYNC_ID_FIELD
+import com.simprints.id.data.db.local.realm.RealmSyncInfo
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Constants.GROUP.*
@@ -39,9 +39,12 @@ class RealmManagerTests : RealmTestsBase() {
     @Before
     fun setup() {
         realm = Realm.getInstance(config)
-        realmManager = RealmDbManagerImpl(testContext, localDbKey).apply {
-            signInToLocal().blockingAwait()
-        }
+        realmManager = RealmDbManagerImpl(testContext,
+            TestProjectIdProvider(),
+            TestLocalDbKeyProvider())
+            .apply {
+                signInToLocal().blockingAwait()
+            }
     }
 
     @Test

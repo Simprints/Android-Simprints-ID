@@ -18,9 +18,6 @@ import io.reactivex.Observable
 
 interface DbManager : RemoteDbManager {
 
-    // Test Mock Injection
-    var localDbManager: LocalDbManager
-
     // Lifecycle
     fun initialiseDb()
 

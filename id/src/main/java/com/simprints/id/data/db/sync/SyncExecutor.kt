@@ -3,8 +3,8 @@ package com.simprints.id.data.db.sync
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmSyncInfo
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.RealmSyncInfo
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.RemoteApiInterface

@@ -13,7 +13,7 @@ import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmDbManagerImpl
+import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.authListener.FirebaseAuthListenerManager
@@ -63,6 +63,7 @@ import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 import java.util.*
+
 
 open class Application : MultiDexApplication() {
 
@@ -144,8 +145,12 @@ open class Application : MultiDexApplication() {
         FirebaseManager(this, remoteDbConnectionListenerManager, remoteDbAuthListenerManager)
     }
 
+    private val localDbManager: LocalDbManager by lazy {
+        RealmDbManagerImpl(this, secureDataManager, remoteDbManager)
+    }
+
     var dbManager: DbManager by lazyVar {
-        DbManagerImpl(this, remoteDbManager, secureDataManager)
+        DbManagerImpl(localDbManager, remoteDbManager)
     }
 
     private val fabric: Fabric by lazy {

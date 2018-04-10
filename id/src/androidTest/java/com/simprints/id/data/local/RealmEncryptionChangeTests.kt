@@ -1,9 +1,9 @@
 package com.simprints.id.data.local
 
 import android.support.test.runner.AndroidJUnit4
-import com.simprints.id.data.db.local.RealmConfig
-import com.simprints.id.data.db.local.RealmDbManagerImpl
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.RealmConfig
+import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.tools.extensions.awaitAndAssertSuccess
 import io.realm.Realm
 import junit.framework.Assert
@@ -26,7 +26,9 @@ class RealmEncryptionChangeTests : RealmTestsBase() {
     fun localSignInWithEncryptionChange_ShouldMigrateDatabase() {
         Realm.getInstance(legacyConfig).use { saveFakePerson(it, getFakePerson()) }
 
-        RealmDbManagerImpl(testContext, localDbKey).signInToLocal().test()
+        RealmDbManagerImpl(testContext, TestProjectIdProvider(), TestLocalDbKeyProvider())
+            .signInToLocal()
+            .test()
             .awaitAndAssertSuccess()
             .let {
                 Assert.assertTrue(!File(legacyConfig.path).exists())
@@ -36,7 +38,9 @@ class RealmEncryptionChangeTests : RealmTestsBase() {
 
     @Test
     fun localSignInWithoutEncryptionChange_ShouldNotEffectNewDatabase() {
-        RealmDbManagerImpl(testContext, localDbKey).signInToLocal().test()
+        RealmDbManagerImpl(testContext, TestProjectIdProvider(), TestLocalDbKeyProvider())
+            .signInToLocal()
+            .test()
             .awaitAndAssertSuccess()
             .let {
                 assert(!File(legacyConfig.path).exists())
@@ -48,7 +52,9 @@ class RealmEncryptionChangeTests : RealmTestsBase() {
     fun localSignInWithEncryptionChange_ShouldCloseLegacyRealm() {
         Realm.getInstance(config).use { saveFakePerson(it, getFakePerson()) }
 
-        RealmDbManagerImpl(testContext, localDbKey).signInToLocal().test()
+        RealmDbManagerImpl(testContext, TestProjectIdProvider(), TestLocalDbKeyProvider())
+            .signInToLocal()
+            .test()
             .awaitAndAssertSuccess()
             .let {
                 assert(Realm.getInstance(config).use { it.isClosed })
@@ -60,7 +66,9 @@ class RealmEncryptionChangeTests : RealmTestsBase() {
         val fakePerson = getFakePerson()
         Realm.getInstance(legacyConfig).use { saveFakePerson(it, fakePerson) }
 
-        RealmDbManagerImpl(testContext, localDbKey).signInToLocal().test()
+        RealmDbManagerImpl(testContext, TestProjectIdProvider(), TestLocalDbKeyProvider())
+            .signInToLocal()
+            .test()
             .awaitAndAssertSuccess()
             .let {
                 Realm.getInstance(config).use {

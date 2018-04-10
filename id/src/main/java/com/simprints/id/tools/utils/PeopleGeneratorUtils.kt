@@ -1,7 +1,7 @@
 package com.simprints.id.tools.utils
 
-import com.simprints.id.data.db.local.models.rl_Fingerprint
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_Fingerprint
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.libcommon.Fingerprint
 import io.realm.RealmList
 import java.util.*

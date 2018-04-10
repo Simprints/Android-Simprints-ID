@@ -1,13 +1,16 @@
-package com.simprints.id.data.db.local
+package com.simprints.id.data.db.local.realm
 
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
-import com.simprints.id.data.db.LocalDbKeyProvider
 import com.simprints.id.data.db.ProjectIdProvider
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.LocalDbKeyProvider
+import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
+import com.simprints.id.exceptions.safe.NotSignedInException
 import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
@@ -16,7 +19,6 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import io.realm.Sort
-import timber.log.Timber
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -39,19 +41,38 @@ class RealmDbManagerImpl(private val appContext: Context,
         private const val LEGACY_APP_KEY_LENGTH: Int = 8
     }
 
-    private var realmConfig = RealmConfig.get(localDbKey.projectId, localDbKey.value)
+    private var realmConfig: RealmConfiguration? = null
 
     init {
         Realm.init(appContext)
     }
 
-    override fun getRealmInstance(): Realm = Realm.getInstance(realmConfig)
+    private fun getLocalDbKey(): LocalDbKey {
+        try {
+            val projectId = projectIdProvider.getSignedInProjectId().blockingGet()
+            return localDbKeyProvider.getLocalDbKey(projectId).blockingGet()
+        } catch (e: Exception) {
+            throw NotSignedInException(cause = e)
+        }
+    }
+
+    private fun getRealmConfig(localDbKey: LocalDbKey) =
+        RealmConfig.get(localDbKey.projectId, localDbKey.value)
+
+    private fun getRealmInstance(): Realm {
+        return realmConfig.let {
+            if (it == null) {
+                getRealmConfig(getLocalDbKey()).let {
+                    realmConfig = it
+                    Realm.getInstance(it)
+                }
+            } else
+                Realm.getInstance(it)
+        }
+    }
 
     override fun signInToLocal(): Completable = Completable.create { em ->
-        Timber.d("Realm sign in. Project: ${localDbKey.projectId} Key: $localDbKey")
-
-        migrateLegacyDatabaseIfRequired(localDbKey)
-
+        migrateLegacyDatabaseIfRequired(getLocalDbKey())
         getRealmInstance().use { em.onComplete() }
     }
 
@@ -207,4 +228,5 @@ class RealmDbManagerImpl(private val appContext: Context,
             realm.insertOrUpdate(rl_Person(this))
         }
     }
+
 }

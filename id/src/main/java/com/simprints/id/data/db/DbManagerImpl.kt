@@ -1,11 +1,10 @@
 package com.simprints.id.data.db
 
-import android.content.Context
 import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
-import com.simprints.id.data.db.local.LocalDbKey
+import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmDbManagerImpl
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
@@ -28,16 +27,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
-class DbManagerImpl(private val appContext: Context,
-                    private val remoteDbManager: RemoteDbManager,
-                    private val projectIdProvider: ProjectIdProvider) :
+
+class DbManagerImpl(private val localDbManager: LocalDbManager,
+                    private val remoteDbManager: RemoteDbManager) :
     DbManager,
     RemoteDbManager by remoteDbManager {
-
-    override var localDbManager : LocalDbManager =
-        RealmDbManagerImpl(appContext, projectIdProvider, remoteDbManager)
-
-    // Lifecycle
 
     override fun initialiseDb() {
         remoteDbManager.initialiseRemoteDb()
@@ -54,8 +48,7 @@ class DbManagerImpl(private val appContext: Context,
             .andThen(getLocalKeyAndSignInToLocal(projectId))
 
     private fun Single<out LocalDbKey>.signInToLocal(): Completable =
-        flatMapCompletable { key ->
-            localDbManager = RealmDbManagerImpl(appContext, key)
+        flatMapCompletable {
             localDbManager.signInToLocal()
         }
 
@@ -151,4 +144,5 @@ class DbManagerImpl(private val appContext: Context,
         val realmManager = localDbManager as RealmDbManagerImpl
         return LocalDbRecovererImpl(realmManager, firebaseManager, projectId, userId, androidId, moduleId, group).recoverDb()
     }
+
 }

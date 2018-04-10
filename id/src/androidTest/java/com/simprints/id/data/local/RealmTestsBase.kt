@@ -1,12 +1,15 @@
 package com.simprints.id.data.local
 
 import android.support.test.InstrumentationRegistry
-import com.simprints.id.data.db.local.LocalDbKey
-import com.simprints.id.data.db.local.RealmConfig
-import com.simprints.id.data.db.local.RealmSyncInfo
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.ProjectIdProvider
+import com.simprints.id.data.db.local.LocalDbKeyProvider
+import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.db.local.realm.RealmConfig
+import com.simprints.id.data.db.local.realm.RealmSyncInfo
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.domain.Constants.GROUP.*
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
+import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File
@@ -72,4 +75,18 @@ open class RealmTestsBase {
         File("${realmConfig.path}.lock").delete()
     }
 
+}
+
+class TestProjectIdProvider : ProjectIdProvider {
+    override fun getSignedInProjectId(): Single<String> = Single.create {
+        it.onSuccess(RealmTestsBase.newDatabaseName)
+    }
+}
+
+class TestLocalDbKeyProvider : LocalDbKeyProvider {
+    override fun getLocalDbKey(projectId: String): Single<LocalDbKey> = Single.create {
+        it.onSuccess(LocalDbKey(RealmTestsBase.newDatabaseName,
+            RealmTestsBase.newDatabaseKey,
+            RealmTestsBase.legacyDatabaseName))
+    }
 }
