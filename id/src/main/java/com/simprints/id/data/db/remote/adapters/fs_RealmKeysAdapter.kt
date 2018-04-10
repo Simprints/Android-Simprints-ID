@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.remote.models.adapters
+package com.simprints.id.data.db.remote.adapters
 
 import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.models.fs_RealmKeys
