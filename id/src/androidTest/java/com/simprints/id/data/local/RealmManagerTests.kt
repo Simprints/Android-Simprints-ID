@@ -5,7 +5,7 @@ import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl.Companion.PATIENT_ID_FIELD
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl.Companion.SYNC_ID_FIELD
-import com.simprints.id.data.db.local.realm.RealmSyncInfo
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
@@ -199,7 +199,7 @@ class RealmManagerTests : RealmTestsBase() {
         }
 
         val dbSyncTime = Calendar.getInstance().apply {
-            time = realm.where(RealmSyncInfo::class.java)
+            time = realm.where(rl_SyncInfo::class.java)
                 .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal)
                 .findAll()
                 .first()!!.lastSyncTime
@@ -212,9 +212,9 @@ class RealmManagerTests : RealmTestsBase() {
     fun updateSyncInfo_ShouldSucceed() {
         saveFromStream(GLOBAL)
 
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal).count(), 1)
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal).findFirst()!!.syncGroupId, GLOBAL.ordinal)
     }
 
@@ -223,9 +223,9 @@ class RealmManagerTests : RealmTestsBase() {
         saveFromStream(USER)
         saveFromStream(MODULE)
 
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal).count(), 0)
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal).findFirst(), null)
     }
 
@@ -233,9 +233,9 @@ class RealmManagerTests : RealmTestsBase() {
     fun updateUserSyncInfo_ShouldSucceed() {
         saveFromStream(USER)
 
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, USER.ordinal).count(), 1)
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, USER.ordinal).findFirst()!!.syncGroupId, USER.ordinal)
     }
 
@@ -244,9 +244,9 @@ class RealmManagerTests : RealmTestsBase() {
         saveFromStream(GLOBAL)
         saveFromStream(MODULE)
 
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, USER.ordinal).count(), 0)
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, USER.ordinal).findFirst(), null)
     }
 
@@ -254,9 +254,9 @@ class RealmManagerTests : RealmTestsBase() {
     fun updateModuleSyncInfo_ShouldSucceed() {
         saveFromStream(MODULE)
 
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, MODULE.ordinal).count(), 1)
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, MODULE.ordinal).findFirst()!!.syncGroupId, MODULE.ordinal)
     }
 
@@ -265,9 +265,9 @@ class RealmManagerTests : RealmTestsBase() {
         saveFromStream(GLOBAL)
         saveFromStream(USER)
 
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, MODULE.ordinal).count(), 0)
-        assertEquals(realm.where(RealmSyncInfo::class.java)
+        assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, MODULE.ordinal).findFirst(), null)
     }
 

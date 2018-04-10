@@ -3,7 +3,7 @@ package com.simprints.id.data.db.sync
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.RealmSyncInfo
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
@@ -90,7 +90,7 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
 
             Timber.d("Downloading batch $nPeopleToDownload people")
             val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup()) 
-                ?: RealmSyncInfo(syncParams.toGroup())
+                ?: rl_SyncInfo(syncParams.toGroup())
 
             syncApi.downSync(
                 realmSyncInfo.lastSyncTime.time,

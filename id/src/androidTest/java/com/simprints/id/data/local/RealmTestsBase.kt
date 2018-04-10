@@ -5,7 +5,7 @@ import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbKeyProvider
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmConfig
-import com.simprints.id.data.db.local.realm.RealmSyncInfo
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.domain.Constants.GROUP.*
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
@@ -61,13 +61,13 @@ open class RealmTestsBase {
 
     protected fun saveFakeSyncInfo(realm: Realm,
                                    userId: String = "",
-                                   moduleId: String = ""): RealmSyncInfo = when {
-        userId.isNotEmpty() -> RealmSyncInfo(USER.ordinal, Date(0))
-        moduleId.isNotEmpty() -> RealmSyncInfo(MODULE.ordinal, Date(0))
-        else -> RealmSyncInfo(GLOBAL.ordinal, Date(0))
+                                   moduleId: String = ""): rl_SyncInfo = when {
+        userId.isNotEmpty() -> rl_SyncInfo(USER.ordinal, Date(0))
+        moduleId.isNotEmpty() -> rl_SyncInfo(MODULE.ordinal, Date(0))
+        else -> rl_SyncInfo(GLOBAL.ordinal, Date(0))
     }.also { info -> realm.executeTransaction { it.insertOrUpdate(info) } }
 
-    protected fun RealmSyncInfo.deepEquals(other: RealmSyncInfo): Boolean =
+    protected fun rl_SyncInfo.deepEquals(other: rl_SyncInfo): Boolean =
         syncGroupId == other.syncGroupId && lastSyncTime == other.lastSyncTime
 
     protected fun deleteRealmFiles(realmConfig: RealmConfiguration) {

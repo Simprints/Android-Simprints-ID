@@ -8,6 +8,7 @@ import com.simprints.id.data.db.local.LocalDbKeyProvider
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.safe.NotSignedInException
@@ -91,7 +92,7 @@ class RealmDbManagerImpl(private val appContext: Context,
                 while (readerOfPeopleArray.hasNext()) {
 
                     val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPeopleArray, it)
-                    it.insertOrUpdate(RealmSyncInfo(
+                    it.insertOrUpdate(rl_SyncInfo(
                         syncGroupId = syncParams.toGroup().ordinal,
                         lastSyncTime = lastPersonSaved.updatedAt ?: Date(0))
                     )
@@ -142,9 +143,9 @@ class RealmDbManagerImpl(private val appContext: Context,
             }
         }, BackpressureStrategy.BUFFER)
 
-    override fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo? {
+    override fun getSyncInfoFor(typeSync: Constants.GROUP): rl_SyncInfo? {
         return getRealmInstance().use {
-            it.where(RealmSyncInfo::class.java).equalTo(SYNC_ID_FIELD, typeSync.ordinal).findFirst()
+            it.where(rl_SyncInfo::class.java).equalTo(SYNC_ID_FIELD, typeSync.ordinal).findFirst()
         }
     }
 
@@ -212,7 +213,7 @@ class RealmDbManagerImpl(private val appContext: Context,
                 .findAll()
                 .first()?.let { person ->
                     realm.executeTransaction {
-                        it.insertOrUpdate(RealmSyncInfo(
+                        it.insertOrUpdate(rl_SyncInfo(
                             syncGroupId = syncParams.toGroup().ordinal,
                             lastSyncTime = person.updatedAt ?: Date(0))
                         )

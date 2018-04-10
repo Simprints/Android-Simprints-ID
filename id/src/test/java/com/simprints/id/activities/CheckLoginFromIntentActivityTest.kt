@@ -52,6 +52,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         app = RuntimeEnvironment.application as TestApplication
         sharedPreferences = getRoboSharedPreferences()
 
+        mockLocalDbManager(app)
         mockRemoteDbManager(app)
         mockIsSignedIn(app, sharedPreferences)
         mockDbManager(app)

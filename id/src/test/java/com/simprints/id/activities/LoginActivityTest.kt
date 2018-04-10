@@ -9,10 +9,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.testUtils.anyNotNull
-import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.createRoboLoginActivity
-import com.simprints.id.testUtils.roboletric.injectHowToResolveScannerAppIntent
-import com.simprints.id.testUtils.roboletric.mockDbManager
+import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.extensions.scannerAppIntent
 import io.reactivex.Completable
@@ -48,6 +45,7 @@ class LoginActivityTest {
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
+        mockLocalDbManager(app)
         mockDbManager(app)
     }
 
