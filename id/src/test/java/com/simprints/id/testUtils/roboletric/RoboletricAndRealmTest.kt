@@ -20,6 +20,11 @@ import org.mockito.Mockito
 import org.mockito.stubbing.Answer
 import org.robolectric.RuntimeEnvironment
 
+fun mockLocalDbManager(app: Application) {
+    app.localDbManager = Mockito.mock(RealmDbManagerImpl::class.java)
+}
+
+
 fun mockRemoteDbManager(app: Application) {
     app.remoteDbManager = Mockito.mock(FirebaseManager::class.java)
 }
@@ -30,9 +35,6 @@ fun mockDbManager(app: Application) {
     Mockito.doReturn(Completable.complete()).`when`(spy).signIn(anyNotNull(), anyNotNull())
     Mockito.doReturn(Completable.complete()).`when`(spy).getLocalKeyAndSignInToLocal(anyNotNull())
     app.dbManager = spy
-
-    //Because Roboletric doesn't work with Realm, we mock the localManager.
-    app.dbManager.localDbManager = Mockito.mock(RealmDbManagerImpl::class.java)
 }
 
 fun mockIsSignedIn(app: Application, sharedPrefs: SharedPreferences) {
@@ -55,7 +57,6 @@ fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer: MockWe
         mockAuthListenerManager))
     whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))
 
-    val dbManager = DbManagerImpl(RuntimeEnvironment.application, remoteDbManager)
-    dbManager.localDbManager = localDbManager
+    val dbManager = DbManagerImpl(localDbManager, remoteDbManager)
     return Triple(dbManager, localDbManager, remoteDbManager)
 }

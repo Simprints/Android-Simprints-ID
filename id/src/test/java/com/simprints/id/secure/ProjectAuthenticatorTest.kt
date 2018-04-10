@@ -10,6 +10,7 @@ import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.mockDbManager
+import com.simprints.id.testUtils.roboletric.mockLocalDbManager
 import com.simprints.id.testUtils.roboletric.mockRemoteDbManager
 import org.junit.Before
 import org.junit.Test
@@ -30,6 +31,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
+        mockLocalDbManager(app)
         mockRemoteDbManager(app)
         mockDbManager(app)
         apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)

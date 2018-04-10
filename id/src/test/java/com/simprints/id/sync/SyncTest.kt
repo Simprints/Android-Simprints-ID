@@ -4,7 +4,7 @@ import android.content.Context
 import com.google.gson.stream.JsonReader
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.RealmSyncInfo
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.FirebaseOptionsHelper
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -262,7 +262,7 @@ class SyncTest : RxJavaTest() {
         whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any(), any())).thenReturn(patientsAlreadyInLocalDb)
 
         //Mock app RealmSyncInfo for syncParams
-        whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup().ordinal, lastSyncTime))
+        whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(rl_SyncInfo(syncParams.toGroup().ordinal, lastSyncTime))
 
         val sync = SyncExecutorMock(
             localDbMock,
