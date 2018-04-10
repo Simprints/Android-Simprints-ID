@@ -9,8 +9,8 @@ import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Observable
 
 class SyncExecutorMock(localDbManager: LocalDbManager,
-                       remoteDataManager: RemoteDbManager,
-                       gson: Gson) : SyncExecutor(localDbManager, remoteDataManager, gson) {
+                       remoteDbManager: RemoteDbManager,
+                       gson: Gson) : SyncExecutor(localDbManager, remoteDbManager, gson) {
 
     public override fun uploadNewPatients(isInterrupted: () -> Boolean, batchSize: Int): Observable<Progress> {
         return super.uploadNewPatients(isInterrupted, batchSize)
