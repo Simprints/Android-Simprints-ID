@@ -131,7 +131,6 @@ class SyncTest : RxJavaTest() {
             nPatientsToDownload,
             25000,
             localDbMock,
-            remoteDbManager,
             3000,
             syncParams,
             lastSyncTime
@@ -170,7 +169,6 @@ class SyncTest : RxJavaTest() {
             nPatientsToDownload,
             25000,
             localDbMock,
-            remoteDbManager,
             3000,
             syncParams,
             lastSyncTime
@@ -211,7 +209,6 @@ class SyncTest : RxJavaTest() {
             nPatientsToDownload,
             25000,
             localDbMock,
-            remoteDbManager,
             3000,
             syncParams,
             lastSyncTime
@@ -240,7 +237,6 @@ class SyncTest : RxJavaTest() {
         nPatientsToDownload: Int,
         nPatientsForProjectIdFromServer: Int,
         localDbMock: LocalDbManager,
-        remoteDbMock: RemoteDbManager,
         patientsAlreadyInLocalDb: Int,
         syncParams: SyncTaskParameters,
         lastSyncTime: Date): TestObserver<Progress> {
@@ -266,7 +262,7 @@ class SyncTest : RxJavaTest() {
 
         val sync = SyncExecutorMock(
             localDbMock,
-            remoteDbMock,
+            remoteDbManager,
             JsonHelper.gson)
 
         return sync.downloadNewPatients({ false }, syncParams).test()

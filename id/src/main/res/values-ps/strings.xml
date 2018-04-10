@@ -128,7 +128,6 @@
     <string name="low_battery_title">د بطرۍ چارج لږ دی</string>
     <string name="alert_api_key_verify_failed">د API Key پیژندنه ناکامه شوه</string>
     <!-- Error Message Text -->
-    <string name="missing_apikey_message">د missing API key په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
     <string name="invalid_apikey_message">د (invalid API Key)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
     <string name="invalid_intentAction_message">د (invalid Intent Action)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
     <string name="invalid_metadata_message">د (invalid metadata)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>

@@ -1,6 +1,7 @@
 package com.simprints.id.secure.cryptography
 
-import com.google.common.io.BaseEncoding
+import android.util.Base64
+import android.util.Base64.NO_WRAP
 import com.simprints.id.secure.models.PublicKeyString
 import java.security.KeyFactory
 import java.security.PublicKey
@@ -17,11 +18,11 @@ class AsymmetricEncrypter(publicKeyString: PublicKeyString) {
         val plainBytes = string.toByteArray()
         val encryptedBytes = rsaCipher.doFinal(plainBytes)
 
-        return BaseEncoding.base64().encode(encryptedBytes)
+        return Base64.encodeToString(encryptedBytes, NO_WRAP)
     }
 
     private fun getPublicKeyFromBase64String(publicKeyString: String): PublicKey {
-        val publicKeyByteArray = BaseEncoding.base64().decode(publicKeyString)
+        val publicKeyByteArray = Base64.decode(publicKeyString, NO_WRAP)
         val keyFactory = KeyFactory.getInstance(RSA_ALGORITHM)
         return keyFactory.generatePublic(X509EncodedKeySpec(publicKeyByteArray))
     }

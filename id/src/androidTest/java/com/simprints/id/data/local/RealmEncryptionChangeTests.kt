@@ -6,12 +6,11 @@ import com.simprints.id.data.db.local.RealmDbManager
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.tools.extensions.awaitAndAssertSuccess
 import io.realm.Realm
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
-
 
 @RunWith(AndroidJUnit4::class)
 class RealmEncryptionChangeTests : RealmTestsBase() {
@@ -76,5 +75,4 @@ class RealmEncryptionChangeTests : RealmTestsBase() {
         deleteRealmFiles(legacyConfig)
         deleteRealmFiles(config)
     }
-
 }

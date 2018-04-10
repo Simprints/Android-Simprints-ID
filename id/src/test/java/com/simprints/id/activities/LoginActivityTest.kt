@@ -13,8 +13,8 @@ import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.testUtils.roboletric.*
 import io.reactivex.Completable
-import junit.framework.Assert.assertNotNull
-import junit.framework.Assert.assertTrue
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
