@@ -2,13 +2,13 @@ package com.simprints.id.data.db.local
 
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.RealmSyncInfo
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.realm.Realm
 
 interface LocalDbManager {
 
@@ -44,6 +44,4 @@ interface LocalDbManager {
     //Sync
     fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo?
 
-    // Database instances
-    fun getRealmInstance(): Realm
 }

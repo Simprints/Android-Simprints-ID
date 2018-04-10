@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.local
+package com.simprints.id.data.db.local.realm
 
 import com.simprints.id.domain.Constants
 

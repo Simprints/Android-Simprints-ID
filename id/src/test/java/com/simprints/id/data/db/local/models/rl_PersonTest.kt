@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.local.models
 
 import com.simprints.id.BuildConfig
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.utils.PeopleGeneratorUtils

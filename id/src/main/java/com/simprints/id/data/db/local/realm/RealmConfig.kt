@@ -1,6 +1,6 @@
-package com.simprints.id.data.db.local
+package com.simprints.id.data.db.local.realm
 
-import com.simprints.id.data.db.local.Migration.Companion.REALM_SCHEMA_VERSION
+import com.simprints.id.data.db.local.realm.Migration.Companion.REALM_SCHEMA_VERSION
 import io.realm.Realm
 import io.realm.RealmConfiguration
 

@@ -6,6 +6,6 @@ import io.reactivex.Single
 
 interface ProjectIdProvider {
 
-    @Throws(NotSignedInException::class)
     fun getSignedInProjectId(): Single<String>
+
 }

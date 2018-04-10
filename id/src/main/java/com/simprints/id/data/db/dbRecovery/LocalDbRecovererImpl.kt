@@ -5,7 +5,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.tools.Utils
