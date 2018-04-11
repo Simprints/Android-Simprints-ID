@@ -5,8 +5,8 @@ import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl.Companion.PATIENT_ID_FIELD
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl.Companion.SYNC_ID_FIELD
-import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Constants.GROUP.*
@@ -56,7 +56,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun getPeopleCountFromLocal_ShouldReturnOne() {
         saveFakePerson(realm, getFakePerson())
 
-        val count = realmManager.getPeopleCountFromLocal()
+        val count = realmManager.getPeopleCountFromLocal().blockingGet()
         assertEquals(count, 1)
     }
 
@@ -64,7 +64,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun getPeopleCountFromLocal_ShouldReturnMany() {
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal()
+        val count = realmManager.getPeopleCountFromLocal().blockingGet()
         assertEquals(count, 20)
     }
 
@@ -73,7 +73,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal(userId = fakePerson.userId)
+        val count = realmManager.getPeopleCountFromLocal(userId = fakePerson.userId).blockingGet()
         assertEquals(count, 1)
     }
 
@@ -82,7 +82,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal(moduleId = fakePerson.moduleId)
+        val count = realmManager.getPeopleCountFromLocal(moduleId = fakePerson.moduleId).blockingGet()
         assertEquals(count, 1)
     }
 
@@ -91,7 +91,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal(projectId = fakePerson.projectId)
+        val count = realmManager.getPeopleCountFromLocal(projectId = fakePerson.projectId).blockingGet()
         assertEquals(count, 1)
     }
 
@@ -100,7 +100,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal(patientId = fakePerson.patientId)
+        val count = realmManager.getPeopleCountFromLocal(patientId = fakePerson.patientId).blockingGet()
         assertEquals(count, 1)
     }
 
@@ -128,7 +128,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = getFakePerson()
         saveFakePerson(realm, fakePerson)
 
-        val people = realmManager.loadPeopleFromLocal()
+        val people = realmManager.loadPeopleFromLocal().blockingGet()
         assertTrue(people.first().deepEquals(fakePerson))
     }
 
@@ -137,7 +137,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(userId = fakePerson.userId)
+        val people = realmManager.loadPeopleFromLocal(userId = fakePerson.userId).blockingGet()
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
@@ -147,7 +147,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(moduleId = fakePerson.moduleId)
+        val people = realmManager.loadPeopleFromLocal(moduleId = fakePerson.moduleId).blockingGet()
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
@@ -157,7 +157,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(projectId = fakePerson.projectId)
+        val people = realmManager.loadPeopleFromLocal(projectId = fakePerson.projectId).blockingGet()
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
@@ -166,7 +166,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun loadPeopleFromLocalByToSyncTrue_ShouldLoadAllPeople() {
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(toSync = true)
+        val people = realmManager.loadPeopleFromLocal(toSync = true).blockingGet()
         assertEquals(people.size, 20)
     }
 
@@ -174,7 +174,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun loadPeopleFromLocalByToSyncFalse_ShouldLoadNoPeople() {
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(toSync = false)
+        val people = realmManager.loadPeopleFromLocal(toSync = false).blockingGet()
         assertEquals(people.size, 0)
     }
 
@@ -274,7 +274,7 @@ class RealmManagerTests : RealmTestsBase() {
     @Test
     fun getSyncInfoForGlobal_ShouldSucceed() {
         val fakeSync = saveFakeSyncInfo(realm)
-        val loadSyncInfo = realmManager.getSyncInfoFor(GLOBAL)
+        val loadSyncInfo = realmManager.getSyncInfoFor(GLOBAL).blockingGet()
 
         assertTrue(loadSyncInfo!!.deepEquals(fakeSync))
     }
@@ -282,7 +282,7 @@ class RealmManagerTests : RealmTestsBase() {
     @Test
     fun getSyncInfoForUser_ShouldSucceed() {
         val fakeSync = saveFakeSyncInfo(realm, userId = FAKE_DB_FIELD)
-        val loadSyncInfo = realmManager.getSyncInfoFor(USER)
+        val loadSyncInfo = realmManager.getSyncInfoFor(USER).blockingGet()
 
         assertTrue(loadSyncInfo!!.deepEquals(fakeSync))
     }
@@ -290,7 +290,7 @@ class RealmManagerTests : RealmTestsBase() {
     @Test
     fun getSyncInfoForModule_ShouldSucceed() {
         val fakeSync = saveFakeSyncInfo(realm, moduleId = FAKE_DB_FIELD)
-        val loadSyncInfo = realmManager.getSyncInfoFor(MODULE)
+        val loadSyncInfo = realmManager.getSyncInfoFor(MODULE).blockingGet()
 
         assertTrue(loadSyncInfo!!.deepEquals(fakeSync))
     }

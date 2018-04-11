@@ -13,9 +13,10 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
+import io.reactivex.Single
 
 interface DataManager : PreferencesManager, DbManager,
-        AnalyticsManager, SecureDataManager {
+    AnalyticsManager, SecureDataManager {
 
     val androidSdkVersion: Int
     val deviceModel: String
@@ -25,6 +26,7 @@ interface DataManager : PreferencesManager, DbManager,
 
     // Analytics
     fun logAlert(alertType: ALERT_TYPE)
+
     fun logUserProperties()
     fun logScannerProperties()
     fun logGuidSelectionService(apiKey: String, sessionId: String, selectedGuid: String, callbackSent: Boolean)
@@ -34,12 +36,14 @@ interface DataManager : PreferencesManager, DbManager,
     // DbManager call interception for populating arguments
     // Lifecycle
     override fun initialiseDb()
+
     override fun signOut()
 
     // Data transfer
     fun savePerson(person: Person): Completable
+
     fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
-    fun getPeopleCount(group: Constants.GROUP): Int
+    fun getPeopleCount(group: Constants.GROUP): Single<Int>
 
     fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
     fun updateIdentification(projectId: String, selectedGuid: String)

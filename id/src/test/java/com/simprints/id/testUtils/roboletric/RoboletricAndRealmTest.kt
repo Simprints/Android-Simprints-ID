@@ -1,6 +1,7 @@
 package com.simprints.id.testUtils.roboletric
 
 import android.content.SharedPreferences
+import com.nhaarman.mockito_kotlin.any
 import com.simprints.id.Application
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
@@ -50,6 +51,7 @@ fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer: MockWe
     val mockConnectionListenerManager = Mockito.mock(FirebaseConnectionListenerManager::class.java)
     val mockAuthListenerManager = Mockito.mock(FirebaseAuthListenerManager::class.java)
     whenever(localDbManager.insertOrUpdatePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
+    whenever(localDbManager.loadPersonFromLocal(any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
 
     val remoteDbManager = Mockito.spy(FirebaseManager(
         (RuntimeEnvironment.application as Application),
