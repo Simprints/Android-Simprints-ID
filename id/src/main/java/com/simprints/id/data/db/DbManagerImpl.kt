@@ -1,8 +1,8 @@
 package com.simprints.id.data.db
 
 import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
-import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.FirebaseManager
@@ -81,12 +81,15 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
             localDbManager.insertOrUpdatePersonInLocal(rl_Person(it))
         }
 
-    override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
-        val result = localDbManager.loadPeopleFromLocal(
-            projectId = projectId,
-            patientId = guid).map { it.libPerson }
+    override fun loadPerson(destinationList: MutableList<Person>,
+                            projectId: String,
+                            guid: String,
+                            callback: DataCallback) {
 
-        if (result.isEmpty()) {
+        localDbManager.loadPersonFromLocal(guid).subscribe({
+            destinationList.add(it)
+            callback.onSuccess()
+        }, {
             remoteDbManager.downloadPerson(guid, projectId)
                 .subscribeBy(
                     onSuccess = {
@@ -94,17 +97,16 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                         callback.onSuccess()
                     },
                     onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
-        } else {
-            destinationList.add(result.first())
-            callback.onSuccess()
-        }
+        })
+
     }
+
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
         val result = when (group) {
-            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal().map { it.libPerson }
-            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(userId = userId).map { it.libPerson }
-            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(moduleId = moduleId).map { it.libPerson }
+            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal().blockingGet().map { it.libPerson }
+            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(userId = userId).blockingGet().map { it.libPerson }
+            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(moduleId = moduleId).blockingGet().map { it.libPerson }
         }
         destinationList.addAll(result)
         callback?.onSuccess()
@@ -114,7 +116,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                                 projectId: String?,
                                 userId: String?,
                                 moduleId: String?,
-                                toSync: Boolean?): Int =
+                                toSync: Boolean?): Single<Int> =
         localDbManager.getPeopleCountFromLocal(projectId, personId, userId, moduleId, toSync)
 
     override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {

@@ -44,6 +44,7 @@ import org.robolectric.annotation.Config
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
+
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class, application = TestApplication::class)
 class SyncTest : RxJavaTest() {
@@ -70,7 +71,7 @@ class SyncTest : RxJavaTest() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
 
         val patientsToUpload = getRandomPeople(35)
-        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
+        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(Single.create { it.onSuccess(patientsToUpload) })
         val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
@@ -96,7 +97,9 @@ class SyncTest : RxJavaTest() {
     fun uploadPeopleGetInterrupted_shouldStopUploading() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
         val peopleToUpload = getRandomPeople(35)
-        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(peopleToUpload)
+        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(
+            Single.create { it.onSuccess(peopleToUpload) }
+        )
         val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
@@ -258,11 +261,11 @@ class SyncTest : RxJavaTest() {
         mockLocalDbToSavePatientsFromStream(localDbMock)
 
         //Mock app has already patients in localDb
-        whenever(localDbMock.loadPeopleFromLocal(any(), any(), any(), any(), any())).thenReturn(getRandomPeople(patientsAlreadyInLocalDb))
-        whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any(), any())).thenReturn(patientsAlreadyInLocalDb)
+        whenever(localDbMock.loadPeopleFromLocal(any(), any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(getRandomPeople(patientsAlreadyInLocalDb)) })
+        whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(patientsAlreadyInLocalDb) })
 
         //Mock app RealmSyncInfo for syncParams
-        whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(rl_SyncInfo(syncParams.toGroup().ordinal, lastSyncTime))
+        whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup().ordinal, lastSyncTime)) })
 
         val sync = SyncExecutorMock(
             localDbMock,
@@ -298,7 +301,8 @@ class SyncTest : RxJavaTest() {
     }
 
     @After
-    @Throws fun tearDown() {
+    @Throws
+    fun tearDown() {
         mockServer.shutdown()
     }
 }

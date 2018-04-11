@@ -13,9 +13,11 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.safe.NotSignedInException
 import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.libcommon.Person
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
@@ -62,12 +64,9 @@ class RealmDbManagerImpl(private val appContext: Context,
 
     private fun getRealmInstance(): Realm {
         return realmConfig.let {
-            if (it == null) {
-                getRealmConfig(getLocalDbKey()).let {
-                    realmConfig = it
-                    Realm.getInstance(it)
-                }
-            } else
+            if (it == null)
+                getRealmConfig(getLocalDbKey()).let { realmConfig = it; Realm.getInstance(it) }
+            else
                 Realm.getInstance(it)
         }
     }
@@ -110,9 +109,24 @@ class RealmDbManagerImpl(private val appContext: Context,
                                          projectId: String?,
                                          userId: String?,
                                          moduleId: String?,
-                                         toSync: Boolean?): Int {
-        return getRealmInstance().use {
-            buildQueryForPerson(it, patientId, projectId, userId, moduleId, toSync).count().toInt()
+                                         toSync: Boolean?): Single<Int> = Single.create { em ->
+        getRealmInstance().use {
+            em.onSuccess(
+                buildQueryForPerson(it, patientId, projectId, userId, moduleId, toSync)
+                    .count()
+                    .toInt()
+            )
+        }
+    }
+
+    override fun loadPersonFromLocal(personId: String): Single<Person> = Single.create { em ->
+        getRealmInstance().use {
+            it.where(rl_Person::class.java).equalTo(PATIENT_ID_FIELD, personId).findFirst().let {
+                if (it != null)
+                    em.onSuccess(it.libPerson)
+                else
+                    em.onError(IllegalStateException())
+            }
         }
     }
 
@@ -120,10 +134,15 @@ class RealmDbManagerImpl(private val appContext: Context,
                                      projectId: String?,
                                      userId: String?,
                                      moduleId: String?,
-                                     toSync: Boolean?): ArrayList<rl_Person> {
-        return getRealmInstance().use {
+                                     toSync: Boolean?): Single<ArrayList<rl_Person>> = Single.create { em ->
+        getRealmInstance().use {
             val query = buildQueryForPerson(it, patientId, projectId, userId, moduleId, toSync)
-            ArrayList(it.copyFromRealm(query.findAll(), 4))
+            ArrayList(it.copyFromRealm(query.findAll(), 4)).let {
+                if (it.isEmpty())
+                    em.onError(IllegalStateException())
+                else
+                    em.onSuccess(it)
+            }
         }
     }
 
@@ -143,9 +162,16 @@ class RealmDbManagerImpl(private val appContext: Context,
             }
         }, BackpressureStrategy.BUFFER)
 
-    override fun getSyncInfoFor(typeSync: Constants.GROUP): rl_SyncInfo? {
-        return getRealmInstance().use {
-            it.where(rl_SyncInfo::class.java).equalTo(SYNC_ID_FIELD, typeSync.ordinal).findFirst()
+    override fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo> = Single.create { em ->
+        getRealmInstance().use {
+            it.where(rl_SyncInfo::class.java)
+                .equalTo(SYNC_ID_FIELD, typeSync.ordinal)
+                .findFirst().let {
+                    if (it == null)
+                        em.onError(IllegalStateException())
+                    else
+                        em.onSuccess(it)
+                }
         }
     }
 
