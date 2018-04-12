@@ -42,7 +42,6 @@ import org.jetbrains.anko.doAsync
 import retrofit2.HttpException
 import timber.log.Timber
 
-
 class FirebaseManager(private val appContext: Context,
                       firebaseConnectionListenerManager: RemoteDbConnectionListenerManager,
                       firebaseAuthListenerManager: RemoteDbAuthListenerManager,
@@ -133,11 +132,12 @@ class FirebaseManager(private val appContext: Context,
     private fun isLegacySignedInUserAsExpected(projectId: String): Boolean {
         val firebaseUser = getFirebaseAuth(legacyFirebaseApp).currentUser ?: return false
 
+        // Note: LegacyApiKey and LegacyProjectId are the same thing.
         // For legacy reason, the firebase user has the projectId(for new projects) or legacyApiKey
         // (for old projects) as uid. Because the legacyApiKey soon will disappear, we try to map it immediately (CheckLogin)
-        // to a projectId and use it for any task. In this case, we need the legacyApiKey
-        // so we grab through the Application to avoid injecting it through all methods, so it will be easier
-        // to get rid of it.
+        // to a projectId and use it for any task. So we store <ProjectId, HashedLegacyApiKey> in the shared prefs.
+        // In this case, we need the legacyApiKey so we grab through the Application to avoid injecting
+        // it through all methods, so it will be easier to get rid of it.
         val hashedLegacyApiKey = (appContext as Application).secureDataManager.getHashedLegacyProjectIdForProjectIdOrEmpty(projectId)
         return if (hashedLegacyApiKey.isNotEmpty()) {
             Hasher().hash(firebaseUser.uid) == hashedLegacyApiKey
@@ -252,7 +252,6 @@ class FirebaseManager(private val appContext: Context,
             }
 
     private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api
-
 
     override fun getProjectApiClient(): Single<ProjectRemoteInterface> =
         getCurrentFirestoreToken()
