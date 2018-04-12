@@ -117,7 +117,12 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                                 userId: String?,
                                 moduleId: String?,
                                 toSync: Boolean?): Single<Int> =
-        localDbManager.getPeopleCountFromLocal(projectId, personId, userId, moduleId, toSync)
+        localDbManager.getPeopleCountFromLocal(
+            patientId = personId,
+            userId = userId,
+            moduleId = moduleId,
+            toSync = toSync
+        )
 
     override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
         remoteDbManager.saveIdentificationInRemote(probe, projectId, userId, moduleId, androidId, matchSize, matches, sessionId)

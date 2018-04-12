@@ -261,8 +261,8 @@ class SyncTest : RxJavaTest() {
         mockLocalDbToSavePatientsFromStream(localDbMock)
 
         //Mock app has already patients in localDb
-        whenever(localDbMock.loadPeopleFromLocal(any(), any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(getRandomPeople(patientsAlreadyInLocalDb)) })
-        whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(patientsAlreadyInLocalDb) })
+        whenever(localDbMock.loadPeopleFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(getRandomPeople(patientsAlreadyInLocalDb)) })
+        whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(patientsAlreadyInLocalDb) })
 
         //Mock app RealmSyncInfo for syncParams
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup().ordinal, lastSyncTime)) })

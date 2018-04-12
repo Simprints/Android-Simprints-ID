@@ -27,7 +27,6 @@ interface LocalDbManager {
                                               shouldStop: (personSaved: fb_Person) -> Boolean)
 
     fun getPeopleCountFromLocal(patientId: String? = null,
-                                projectId: String? = null,
                                 userId: String? = null,
                                 moduleId: String? = null,
                                 toSync: Boolean? = null): Single<Int>
@@ -35,13 +34,11 @@ interface LocalDbManager {
     fun loadPersonFromLocal(personId: String): Single<Person>
 
     fun loadPeopleFromLocal(patientId: String? = null,
-                            projectId: String? = null,
                             userId: String? = null,
                             moduleId: String? = null,
                             toSync: Boolean? = null): Single<ArrayList<rl_Person>>
 
     fun loadPeopleFromLocalRx(patientId: String? = null,
-                              projectId: String? = null,
                               userId: String? = null,
                               moduleId: String? = null,
                               toSync: Boolean? = null): Flowable<rl_Person>

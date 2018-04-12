@@ -87,12 +87,11 @@ class RealmManagerTests : RealmTestsBase() {
     }
 
     @Test
-    fun getPeopleCountFromLocalByProjectId_ShouldReturnOne() {
-        val fakePerson = saveFakePerson(realm, getFakePerson())
+    fun getPeopleCountFromLocalByProjectId_ShouldReturnAll() {
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal(projectId = fakePerson.projectId).blockingGet()
-        assertEquals(count, 1)
+        val count = realmManager.getPeopleCountFromLocal().blockingGet()
+        assertEquals(count, 20)
     }
 
     @Test
@@ -148,16 +147,6 @@ class RealmManagerTests : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20))
 
         val people = realmManager.loadPeopleFromLocal(moduleId = fakePerson.moduleId).blockingGet()
-        assertTrue(people.first().deepEquals(fakePerson))
-        assertEquals(people.size, 1)
-    }
-
-    @Test
-    fun loadPeopleFromLocalByProjectId_ShouldLoadOnlyProjectsPeople() {
-        val fakePerson = saveFakePerson(realm, getFakePerson())
-        saveFakePeople(realm, getRandomPeople(20))
-
-        val people = realmManager.loadPeopleFromLocal(projectId = fakePerson.projectId).blockingGet()
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }

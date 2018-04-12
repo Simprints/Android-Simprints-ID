@@ -110,10 +110,10 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
     private fun calculateNPatientsToDownload(nPatientsForDownSyncQuery: Int, syncParams: SyncTaskParameters): Int {
 
         val nPatientsForDownSyncParamsInRealm = localDbManager.getPeopleCountFromLocal(
-            projectId = syncParams.projectId,
             userId = syncParams.userId,
             moduleId = syncParams.moduleId,
-            toSync = false).blockingGet()
+            toSync = false
+        ).blockingGet()
 
         return nPatientsForDownSyncQuery - nPatientsForDownSyncParamsInRealm
     }
