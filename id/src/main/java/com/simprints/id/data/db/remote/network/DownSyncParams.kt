@@ -36,7 +36,6 @@ class DownSyncParams(syncParams: SyncTaskParameters,
             }
         }
 
-
         this[BATCH_SIZE] = BATCH_SIZE_VALUE
     }
 }
