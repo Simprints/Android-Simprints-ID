@@ -45,7 +45,7 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
 
     private val executing = AtomicBoolean(false)
     private lateinit var task: ProgressTask
-    private lateinit var taskParameters: T
+    private var taskParameters: T? = null
 
     private lateinit var progressLiveObservable: Observable<Progress>
     private lateinit var progressReplayObservable: ReplaySubject<Progress>
@@ -58,7 +58,6 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         Timber.d("onCreate()")
         super.onCreate()
         progressReplayObservable = ReplaySubject.create<Progress>()
-        isRunning.set(true)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -69,12 +68,13 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
     inner class ProgressServiceBinderImpl : android.os.Binder(), ProgressServiceBinder<T> {
 
         override val progressReplayObservable: Observable<Progress> =
-                this@ProgressService.progressReplayObservable
+            this@ProgressService.progressReplayObservable
 
         override fun execute(taskParameters: T) =
-                this@ProgressService.execute(taskParameters)
+            this@ProgressService.execute(taskParameters)
 
         override fun startForeground() {
+            taskParameters = null
             startForeground(progressNotificationBuilder.id, progressNotificationBuilder.build())
             setNotificationVisibility(true)
         }
@@ -82,6 +82,7 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         override fun stopForeground() {
             stopForeground(true)
             setNotificationVisibility(false)
+            isRunning.set(false)
         }
 
         private fun setNotificationVisibility(visible: Boolean) {
@@ -92,6 +93,8 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
     }
 
     private fun execute(taskParameters: T) {
+        isRunning.set(true)
+
         if (executing.getAndSet(true)) {
             checkTaskOverlap(taskParameters)
         } else {
@@ -126,9 +129,11 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
     }
 
     private fun initNotificationBuilders() {
-        progressNotificationBuilder = getProgressNotificationBuilder(taskParameters)
-        completeNotificationBuilder = getCompleteNotificationBuilder(taskParameters)
-        errorNotificationBuilder = getErrorNotificationBuilder(taskParameters)
+        val taskParameters = this.taskParameters?.let{
+            progressNotificationBuilder = getProgressNotificationBuilder(it)
+            completeNotificationBuilder = getCompleteNotificationBuilder(it)
+            errorNotificationBuilder = getErrorNotificationBuilder(it)
+        }
     }
 
     private fun subscribeNotificationProgressObservers() {

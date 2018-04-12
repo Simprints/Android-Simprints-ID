@@ -791,7 +791,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        syncManager.stop();
+        syncManager.stopListeners();
     }
 
     @Override

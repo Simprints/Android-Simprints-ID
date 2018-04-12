@@ -11,6 +11,8 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.Sort
+import java.util.*
 
 interface LocalDbManager {
 
@@ -39,13 +41,15 @@ interface LocalDbManager {
                             projectId: String? = null,
                             userId: String? = null,
                             moduleId: String? = null,
-                            toSync: Boolean? = null): ArrayList<rl_Person>
+                            toSync: Boolean? = null,
+                            sortBy: Map<String, Sort>? = null): ArrayList<rl_Person>
 
     fun loadPeopleFromLocalRx(patientId: String? = null,
                               projectId: String? = null,
                               userId: String? = null,
                               moduleId: String? = null,
-                              toSync: Boolean? = null): Flowable<rl_Person>
+                              toSync: Boolean? = null,
+                              sortBy: Map<String, Sort>? = null): Flowable<rl_Person>
 
     //Sync
     fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo?

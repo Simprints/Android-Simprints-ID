@@ -76,4 +76,13 @@ class SyncClient(context: Context)
         }
     }
 
+    fun stopSync() {
+        async(UI) {
+            bg {
+                connectAnd {
+                    stopForeground()
+                }
+            }
+        }
+    }
 }

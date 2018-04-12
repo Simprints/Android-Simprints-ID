@@ -5,10 +5,13 @@ import com.simprints.id.tools.delegates.DatePreference
 import com.simprints.id.tools.delegates.PrimitivePreference
 import java.util.*
 
-class EventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
+class RecentEventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
     : RecentEventsPreferencesManager {
 
     companion object {
+        private const val LAST_USER = "LastUserUsed"
+        private const val LAST_USER_DEFAULT: String = ""
+
         private const val LAST_SCANNER_USED_KEY = "LastScannerUsed"
         private const val LAST_SCANNER_USED_DEFAULT: String = ""
 
@@ -24,6 +27,9 @@ class EventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
 
     override var lastScannerUsed: String
         by PrimitivePreference(prefs, LAST_SCANNER_USED_KEY, LAST_SCANNER_USED_DEFAULT)
+
+    override var lastUserUsed: String
+        by PrimitivePreference(prefs, LAST_USER, LAST_USER_DEFAULT)
 
     override var lastIdentificationDate: Date?
         by DatePreference(prefs, LAST_ENROL_EVENT_KEY, LAST_ENROL_EVENT_DEFAULT)

@@ -32,7 +32,7 @@ interface DbManager : LocalDbManager, RemoteDbManager {
     // Data transfer
     fun savePerson(fbPerson: fb_Person): Completable
     fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
-    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
+    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, projectId: String, userId: String, moduleId: String, callback: DataCallback?)
     fun loadProject(projectId: String): Single<Project>
 
     fun getPeopleCount(personId: String? = null,

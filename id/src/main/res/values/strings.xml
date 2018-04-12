@@ -350,7 +350,7 @@
     <string name="dashboard_card_sync_action">SYNC</string>
 
     <string name="dashboard_card_remotedb_title">People saved on server</string>
-    <string name="dashboard_card_scanner_title">Last scanner used</string>
+    <string name="dashboard_card_lastscanner_title">Last scanner used</string>
     <string name="dashboard_card_enrol_title">Last Enrol</string>
     <string name="dashboard_card_verification_title">Last Verification</string>
     <string name="dashboard_card_identification_title">Last Identification</string>

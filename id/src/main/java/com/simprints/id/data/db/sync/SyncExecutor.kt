@@ -3,10 +3,10 @@ package com.simprints.id.data.db.sync
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.RealmSyncInfo
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.network.RemoteApiInterface
+import com.simprints.id.data.db.remote.network.DownSyncParams
+import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.exceptions.safe.InterruptedSyncException
 import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
@@ -31,8 +31,8 @@ open class SyncExecutor(private val dbManager: DbManager,
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 
-    private val syncApi: RemoteApiInterface by lazy {
-        dbManager.getSyncApi().blockingGet()
+    private val syncApi: PeopleRemoteInterface by lazy {
+        dbManager.getPeopleApiClient().blockingGet()
     }
 
     fun sync(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
@@ -87,14 +87,11 @@ open class SyncExecutor(private val dbManager: DbManager,
             val nPeopleToDownload = dbManager.calculateNPatientsToDownSync(nPatientsForDownSyncQuery, syncParams)
 
             Timber.d("Downloading batch $nPeopleToDownload people")
-            val realmSyncInfo = dbManager.getSyncInfoFor(syncParams.toGroup())
-                ?: RealmSyncInfo(syncParams.toGroup())
 
             syncApi.downSync(
-                realmSyncInfo.lastSyncTime.time,
-                syncParams.toMap())
+                syncParams.projectId,
+                DownSyncParams(syncParams, dbManager))
                 .flatMapObservable {
-
                     savePeopleFromStream(
                         isInterrupted,
                         syncParams,
@@ -143,7 +140,7 @@ open class SyncExecutor(private val dbManager: DbManager,
 
         if (totalDownloaded % emitProgressEvery == 0) {
             it.onNext(totalDownloaded)
-        }gi
+        }
     }
 
     private fun finishDownload(reader: JsonReader,

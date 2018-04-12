@@ -23,7 +23,7 @@ import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionList
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
-import com.simprints.id.data.prefs.events.EventsPreferencesManagerImpl
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
@@ -131,7 +131,7 @@ open class Application : MultiDexApplication() {
     }
 
     private val eventsPreferencesManager: RecentEventsPreferencesManager by lazy {
-        EventsPreferencesManagerImpl(prefs)
+        RecentEventsPreferencesManagerImpl(prefs)
     }
 
     private val preferencesManager: PreferencesManager by lazy {
