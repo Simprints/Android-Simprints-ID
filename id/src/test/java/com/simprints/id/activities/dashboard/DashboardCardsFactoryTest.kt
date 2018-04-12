@@ -73,7 +73,7 @@ class DashboardCardsFactoryTest {
     }
 
     @Test
-    fun shouldCreateTheLastIdentificationCard_onlyWhenAnIdentificationEventHappened(){
+    fun shouldCreateTheLastIdentificationCard_onlyWhenAnIdentificationEventHappened() {
         val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
         val lastIdentificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
@@ -84,7 +84,7 @@ class DashboardCardsFactoryTest {
     }
 
     @Test
-    fun shouldCreateTheLastVerificationCard_onlyWhenAnVerificationEventHappened(){
+    fun shouldCreateTheLastVerificationCard_onlyWhenAnVerificationEventHappened() {
         val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
         val lastVerificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
@@ -94,9 +94,8 @@ class DashboardCardsFactoryTest {
             app.getString(R.string.dashboard_card_verification_title))
     }
 
-
     @Test
-    fun shouldCreateTheLastUserCard_onlyWhenAnLastUserEventHappened(){
+    fun shouldCreateTheLastUserCard_onlyWhenAnLastUserEventHappened() {
         val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
         val lastUser = "someone"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
@@ -107,7 +106,7 @@ class DashboardCardsFactoryTest {
     }
 
     @Test
-    fun shouldCreateTheLasScannerCard_onlyWhenAnLasScannerEventHappened(){
+    fun shouldCreateTheLasScannerCard_onlyWhenAnLasScannerEventHappened() {
         val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
         val lastScanner = "SPXXXX"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
@@ -150,8 +149,7 @@ class DashboardCardsFactoryTest {
         }
     }
 
-    private fun mockNPeopleForSyncRequest(remoteDbManager: RemoteDbManager, count: Int){
+    private fun mockNPeopleForSyncRequest(remoteDbManager: RemoteDbManager, count: Int) {
         whenever(remoteDbManager.getNumberOfPatientsForSyncParams(anyNotNull())).thenReturn(Single.just(count))
     }
-
 }

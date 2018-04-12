@@ -147,7 +147,7 @@ class SyncTest : RxJavaTest() {
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
         assertUrlParam(peopleRequestUrl, "projectId", projectIdTest)
-        val lastDownloadedPatient =  peopleToDownload.last()
+        val lastDownloadedPatient = peopleToDownload.last()
         assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, lastDownloadedPatient.updatedAt!!.time, { it?.toLong() })
         assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, lastDownloadedPatient.patientId)
     }
@@ -190,7 +190,6 @@ class SyncTest : RxJavaTest() {
         assertUrlParam(peopleRequestUrl, "moduleId", moduleIdTest)
         assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
         assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, peopleToDownload.last().patientId)
-
     }
 
     @Test
@@ -260,7 +259,6 @@ class SyncTest : RxJavaTest() {
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup(), rl_Person(peopleToDownload.last())))
 
         val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManager), JsonHelper.gson)
-
 
         return sync.downloadNewPatients({ false }, syncParams).test()
     }
