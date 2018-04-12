@@ -8,7 +8,7 @@ import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.FingerIdentifier
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner

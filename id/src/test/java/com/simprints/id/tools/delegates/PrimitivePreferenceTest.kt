@@ -3,10 +3,9 @@ package com.simprints.id.tools.delegates
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
 import com.simprints.id.testUtils.*
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mockito.*
-
 
 class PrimitivePreferenceTest {
 
@@ -28,8 +27,7 @@ class PrimitivePreferenceTest {
         return editor
     }
 
-    private fun mockImprovedPrefs(editorToReturn: ImprovedSharedPreferences.Editor)
-            : ImprovedSharedPreferences {
+    private fun mockImprovedPrefs(editorToReturn: ImprovedSharedPreferences.Editor): ImprovedSharedPreferences {
         val prefs = mock<ImprovedSharedPreferences>()
         whenever(prefs.edit()).thenReturn(editorToReturn)
         whenever(prefs.getPrimitive(aKey, aString)).thenReturn(storedString)
@@ -73,7 +71,6 @@ class PrimitivePreferenceTest {
         Assert.assertEquals(storedString, secondGet)
     }
 
-
     @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE", "UNUSED_VALUE")
     @Test
     fun testSetValuePutsPrimitiveAndAppliesChange() {
@@ -98,7 +95,6 @@ class PrimitivePreferenceTest {
         Assert.assertEquals(storedString, stringPref)
     }
 
-
     @Suppress("UNUSED_VARIABLE")
     @Test
     fun testDeclarationOfNonPrimitiveTypeThrowsNonPrimitiveException() {
@@ -108,5 +104,4 @@ class PrimitivePreferenceTest {
     }
 
     // TODO: figure out how to test thread safety
-
 }
