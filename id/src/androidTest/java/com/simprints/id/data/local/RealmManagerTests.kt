@@ -3,9 +3,8 @@ package com.simprints.id.data.local
 import android.support.test.runner.AndroidJUnit4
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.RealmDbManager
-import com.simprints.id.data.db.local.RealmDbManager.Companion.PATIENT_ID_FIELD
-import com.simprints.id.data.db.local.RealmDbManager.Companion.SYNC_ID_FIELD
 import com.simprints.id.data.db.local.RealmSyncInfo
+import com.simprints.id.data.db.local.RealmSyncInfo.Companion.SYNC_ID_FIELD
 import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
@@ -24,7 +23,6 @@ import org.junit.runner.RunWith
 import java.io.InputStreamReader
 import java.io.Reader
 import java.util.*
-
 
 @RunWith(AndroidJUnit4::class)
 class RealmManagerTests : RealmTestsBase() {
@@ -125,7 +123,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = getFakePerson()
         saveFakePerson(realm, fakePerson)
 
-        val people = realmManager.loadPeopleFromLocal(sortBy = rl_Person::updatedAt)
+        val people = realmManager.loadPeopleFromLocal()
         assertTrue(people.first().deepEquals(fakePerson))
     }
 
@@ -134,7 +132,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(userId = fakePerson.userId, sortBy = rl_Person::updatedAt)
+        val people = realmManager.loadPeopleFromLocal(userId = fakePerson.userId)
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
@@ -144,7 +142,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(moduleId = fakePerson.moduleId, sortBy = rl_Person::updatedAt)
+        val people = realmManager.loadPeopleFromLocal(moduleId = fakePerson.moduleId)
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
@@ -154,24 +152,24 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(projectId = fakePerson.projectId, sortBy = rl_Person::updatedAt)
+        val people = realmManager.loadPeopleFromLocal(projectId = fakePerson.projectId)
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
 
     @Test
     fun loadPeopleFromLocalByToSyncTrue_ShouldLoadAllPeople() {
-        saveFakePeople(realm, getRandomPeople(20))
+        saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
-        val people = realmManager.loadPeopleFromLocal(toSync = true, sortBy = rl_Person::updatedAt)
+        val people = realmManager.loadPeopleFromLocal(toSync = true)
         assertEquals(people.size, 20)
     }
 
     @Test
     fun loadPeopleFromLocalByToSyncFalse_ShouldLoadNoPeople() {
-        saveFakePeople(realm, getRandomPeople(20))
+        saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
-        val people = realmManager.loadPeopleFromLocal(toSync = false, sortBy = rl_Person::updatedAt)
+        val people = realmManager.loadPeopleFromLocal(toSync = false)
         assertEquals(people.size, 0)
     }
 
@@ -182,7 +180,7 @@ class RealmManagerTests : RealmTestsBase() {
 
         assertEquals(realm.where(rl_Person::class.java).count(), 35)
         downloadPeople.forEach {
-            assertTrue(realm.where(rl_Person::class.java).contains(PATIENT_ID_FIELD, it.patientId).isValid)
+            assertTrue(realm.where(rl_Person::class.java).contains(rl_Person.PATIENT_ID_FIELD, it.patientId).isValid)
         }
     }
 
@@ -321,5 +319,4 @@ class RealmManagerTests : RealmTestsBase() {
 
         realmManager.savePeopleFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams, { false })
     }
-
 }
