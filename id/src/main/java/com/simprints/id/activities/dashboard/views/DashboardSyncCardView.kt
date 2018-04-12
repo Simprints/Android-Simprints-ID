@@ -32,11 +32,19 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
 
         if (cardModel is DashboardSyncCard) {
             cardModel.cardView = this
-            syncUploadCount.text = "${cardModel.peopleToUpload}"
-            syncDownloadCount.text = "${cardModel.peopleToDownload}"
+            syncUploadCount.text = "${Math.max(cardModel.peopleToUpload, 0)}"
+
+            syncDownloadCount.text = ""
+            cardModel.peopleToDownload?.let {
+                syncDownloadCount.text = "${Math.max(it, 0)}"
+            }
 
             updateState(cardModel)
         }
+    }
+
+    fun updateCard(cardModel: DashboardCard) {
+        bind(cardModel)
     }
 
     fun updateState(cardModel: DashboardSyncCard) {

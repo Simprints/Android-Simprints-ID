@@ -2,6 +2,7 @@ package com.simprints.id.data.db.sync
 
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.db.sync.model.SyncManagerState
+import com.simprints.id.exceptions.safe.TaskInProgressException
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncClient
@@ -11,8 +12,6 @@ import timber.log.Timber
 
 class SyncManager(private val dataManager: DataManager,
                   private val syncClient: SyncClient) {
-
-    var state: SyncManagerState = SyncManagerState.NOT_STARTED
 
     private var internalSyncObserver: DisposableObserver<Progress> = createInternalDisposable()
 
@@ -24,7 +23,10 @@ class SyncManager(private val dataManager: DataManager,
         syncClient.sync(syncParams, {
             startListeners()
         }, {
-            state = SyncManagerState.FAILED
+            if (it is TaskInProgressException) {
+                startListeners()
+            }
+
             observers.forEach { it.onError(Throwable("Server busy")) }
             stopListeners()
         })
@@ -59,7 +61,6 @@ class SyncManager(private val dataManager: DataManager,
         object : DisposableObserver<Progress>() {
 
             override fun onNext(progress: Progress) {
-                state = SyncManagerState.IN_PROGRESS
                 Timber.d("onSyncProgress")
 
                 // Some callback can call SyncManager Api and modify "observers". That can cause
@@ -69,8 +70,6 @@ class SyncManager(private val dataManager: DataManager,
             }
 
             override fun onComplete() {
-                state = SyncManagerState.SUCCEED
-
                 Timber.d("onComplete")
                 syncClient.stopListening()
                 syncClient.stop()
@@ -81,8 +80,6 @@ class SyncManager(private val dataManager: DataManager,
             }
 
             override fun onError(throwable: Throwable) {
-                state = SyncManagerState.FAILED
-
                 Timber.d("onError")
                 dataManager.logThrowable(throwable)
                 syncClient.stopListening()
