@@ -6,8 +6,9 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/mainInfo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:ignore="UselessParent">
 
@@ -180,14 +181,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_below="@+id/mainInfo">
 
         <Button
-            android:id="@+id/bt_recoverDb"
+            android:id="@+id/bt_addPatient"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:text="@string/recover_db" />
+            android:text="ADD 10 People" />
+
+        <Button
+            android:id="@+id/bt_enrollPeople"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Enroll 1 Person" />
 
         <Button
             android:id="@+id/bt_deleteSyncInfo"

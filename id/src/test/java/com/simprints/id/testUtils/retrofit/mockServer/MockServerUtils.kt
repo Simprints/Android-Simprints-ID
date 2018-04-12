@@ -13,6 +13,6 @@ fun mockResponseForUploadPatient(): MockResponse =
 fun mockResponseForDownloadPatient(patient: fb_Person): MockResponse {
     return MockResponse().let {
         it.setResponseCode(200)
-        it.setBody(JsonHelper.toJson(arrayListOf(patient)))
+        it.setBody(JsonHelper.toJson(patient))
     }
 }

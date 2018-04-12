@@ -9,7 +9,7 @@ import android.widget.TextView
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
-import com.simprints.id.activities.dashboard.models.SyncUIState
+import com.simprints.id.data.db.sync.model.SyncManagerState
 import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.UploadProgress
@@ -41,11 +41,11 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
 
     fun updateState(cardModel: DashboardSyncCard) {
         when (cardModel.syncState) {
-            SyncUIState.NOT_STARTED -> setUIForSyncNotStarted(cardModel)
-            SyncUIState.STARTED -> setUIForSyncStarted()
-            SyncUIState.IN_PROGRESS -> setUIForSyncInProgress(cardModel)
-            SyncUIState.SUCCEED -> setUIForSyncSucceed(cardModel)
-            SyncUIState.FAILED -> setUIForSyncFailed(cardModel)
+            SyncManagerState.NOT_STARTED -> setUIForSyncNotStarted(cardModel)
+            SyncManagerState.STARTED -> setUIForSyncStarted()
+            SyncManagerState.IN_PROGRESS -> setUIForSyncInProgress(cardModel)
+            SyncManagerState.SUCCEED -> setUIForSyncSucceed(cardModel)
+            SyncManagerState.FAILED -> setUIForSyncFailed(cardModel)
         }
     }
 

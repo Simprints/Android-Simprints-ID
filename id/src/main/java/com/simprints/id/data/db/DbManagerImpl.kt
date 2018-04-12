@@ -70,7 +70,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                 uploadPersonAndDownloadAgain(fbPerson)
                     .updatePersonInLocal()
                     .subscribeOn(Schedulers.io())
-                    .subscribe()
+                    .subscribeBy (onComplete = {}, onError = {it.printStackTrace()})
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -87,8 +87,8 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
         val result = localDbManager.loadPeopleFromLocal(
-            projectId = projectId,
-            patientId = guid).map { it.libPerson }
+            patientId = guid,
+            projectId = projectId).map { it.libPerson }
 
         if (result.isEmpty()) {
             remoteDbManager.downloadPerson(guid, projectId)
@@ -104,11 +104,11 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         }
     }
 
-    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
+    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, projectId: String, userId: String, moduleId: String, callback: DataCallback?) {
         val result = when (group) {
-            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal().map { it.libPerson }
-            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(userId = userId).map { it.libPerson }
-            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(moduleId = moduleId).map { it.libPerson }
+            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal(projectId = projectId).map { it.libPerson }
+            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(projectId = projectId, userId = userId).map { it.libPerson }
+            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(projectId = projectId, moduleId = moduleId).map { it.libPerson }
         }
         destinationList.addAll(result)
         callback?.onSuccess()
@@ -118,14 +118,14 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         val possibleProject = localDbManager.loadProjectFromLocal(projectId)
         if (possibleProject != null) {
             return Single.just(possibleProject).doAfterSuccess {
-                refreshProjectInfo(projectId)
+                refreshProjectInfoWithServer(projectId)
             }
         }
 
-        return refreshProjectInfo(projectId)
+        return refreshProjectInfoWithServer(projectId)
     }
 
-    private fun refreshProjectInfo(projectId: String): Single<Project> {
+    private fun refreshProjectInfoWithServer(projectId: String): Single<Project> {
         return remoteDbManager.loadProjectFromRemote(projectId).doAfterSuccess {
             localDbManager.saveProjectIntoLocal(it)
         }
@@ -139,7 +139,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
             moduleId = syncParams.moduleId,
             toSync = false)
 
-        return nPatientsOnServerForSyncParam - nPatientsForDownSyncParamsInRealm
+        return Math.max(nPatientsOnServerForSyncParam - nPatientsForDownSyncParamsInRealm, 0)
     }
 
     override fun getPeopleCount(personId: String?,

@@ -3,9 +3,9 @@ package com.simprints.id.activities.dashboard
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
-import com.simprints.id.activities.dashboard.models.SyncUIState
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.db.sync.SyncManager
+import com.simprints.id.data.db.sync.model.SyncManagerState
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.service.ProgressService
 import com.simprints.id.services.sync.SyncClient
@@ -48,13 +48,13 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun pause() {
-        syncManager.stop()
+        syncManager.stopListeners()
     }
 
     private fun initCards() {
         val cardsFactory = DashboardCardsFactory(dataManager, androidResourcesHelper)
-        syncManager.remoteObservers()
         cardsModelsList.clear()
+        syncManager.removeObservers()
 
         Single.merge(
             cardsFactory.createCards()
@@ -67,11 +67,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
                     }
                 }
         )
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = { handleCardsCreated() },
-                onError = { handleCardsCreationFailed() })
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeBy(
+            onComplete = { handleCardsCreated() },
+            onError = { handleCardsCreationFailed() })
     }
 
     private fun handleCardsCreated() {
@@ -113,7 +113,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun didUserWantToRefreshCardsIfPossible() {
-        if (syncCardModel?.syncState != SyncUIState.IN_PROGRESS) {
+        if (syncCardModel?.syncState != SyncManagerState.IN_PROGRESS) {
             initCards()
         } else {
             view.stopRequestIfRequired()

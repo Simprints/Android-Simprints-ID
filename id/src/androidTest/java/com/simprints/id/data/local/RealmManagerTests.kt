@@ -125,7 +125,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = getFakePerson()
         saveFakePerson(realm, fakePerson)
 
-        val people = realmManager.loadPeopleFromLocal()
+        val people = realmManager.loadPeopleFromLocal(sortBy = rl_Person::updatedAt)
         assertTrue(people.first().deepEquals(fakePerson))
     }
 
@@ -134,7 +134,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(userId = fakePerson.userId)
+        val people = realmManager.loadPeopleFromLocal(userId = fakePerson.userId, sortBy = rl_Person::updatedAt)
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
@@ -144,7 +144,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(moduleId = fakePerson.moduleId)
+        val people = realmManager.loadPeopleFromLocal(moduleId = fakePerson.moduleId, sortBy = rl_Person::updatedAt)
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
@@ -154,7 +154,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(projectId = fakePerson.projectId)
+        val people = realmManager.loadPeopleFromLocal(projectId = fakePerson.projectId, sortBy = rl_Person::updatedAt)
         assertTrue(people.first().deepEquals(fakePerson))
         assertEquals(people.size, 1)
     }
@@ -163,7 +163,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun loadPeopleFromLocalByToSyncTrue_ShouldLoadAllPeople() {
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(toSync = true)
+        val people = realmManager.loadPeopleFromLocal(toSync = true, sortBy = rl_Person::updatedAt)
         assertEquals(people.size, 20)
     }
 
@@ -171,7 +171,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun loadPeopleFromLocalByToSyncFalse_ShouldLoadNoPeople() {
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(toSync = false)
+        val people = realmManager.loadPeopleFromLocal(toSync = false, sortBy = rl_Person::updatedAt)
         assertEquals(people.size, 0)
     }
 

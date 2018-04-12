@@ -106,7 +106,7 @@ class DataManagerImpl(private val context: Context,
         dbManager.savePerson(fb_Person(person, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), moduleId))
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) =
-        dbManager.loadPeople(destinationList, group, getSignedInUserIdOrEmpty(), moduleId, callback)
+        dbManager.loadPeople(destinationList, group, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), moduleId, callback)
 
     override fun getPeopleCount(group: Constants.GROUP): Int =
         when (group) {

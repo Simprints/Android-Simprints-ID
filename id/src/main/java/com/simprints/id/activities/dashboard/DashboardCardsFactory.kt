@@ -20,7 +20,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
         SyncTaskParameters.build(dataManager.syncGroup, dataManager)
     }()
 
-    private val dateFormat by lazy {
+    val dateFormat by lazy {
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
@@ -37,14 +37,14 @@ class DashboardCardsFactory(private val dataManager: DataManager,
 
     private fun createAndAddProjectInfoCard(position: Int): Single<DashboardCard> =
         dataManager
-            .loadProject(dataManager.signedInProjectId)
+            .loadProject(dataManager.getSignedInProjectIdOrEmpty())
             .observeOn(AndroidSchedulers.mainThread())
             .map {
                 DashboardCard(
                     DashboardCardType.PROJECT_INFO,
                     position,
                     R.drawable.simprints_logo_blue,
-                    androidResourcesHelper.getString(R.string.dashboard_card_project_title),
+                    it.name,
                     it.description)
             }.doOnError{ print(it.printStackTrace()) }
 
@@ -87,7 +87,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
                 DashboardCardType.LAST_SCANNER,
                 position,
                 R.drawable.scanner,
-                androidResourcesHelper.getString(R.string.dashboard_card_scanner_title),
+                androidResourcesHelper.getString(R.string.dashboard_card_lastscanner_title),
                 dataManager.lastScannerUsed)
             ).doOnError{ it.printStackTrace() }
         } else {
@@ -96,13 +96,13 @@ class DashboardCardsFactory(private val dataManager: DataManager,
     }
 
     private fun createAndAddLastUserInfoCard(position: Int): Single<DashboardCard>? {
-        return if (dataManager.getSignedInUserIdOrEmpty().isNotEmpty()) {
+        return if (dataManager.lastUserUsed.isNotEmpty()) {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_USER,
                 position,
                 R.drawable.last_user,
                 androidResourcesHelper.getString(R.string.dashboard_card_lastuser_title),
-                dataManager.getSignedInUserIdOrEmpty())
+                dataManager.lastUserUsed)
             ).doOnError{ it.printStackTrace() }
         } else {
             null
