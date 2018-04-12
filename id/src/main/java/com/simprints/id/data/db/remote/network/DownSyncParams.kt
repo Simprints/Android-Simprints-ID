@@ -26,6 +26,7 @@ class DownSyncParams(syncParams: SyncTaskParameters,
 
     init {
         syncParams.userId?.let { this[SyncTaskParameters.USER_ID_FIELD] = it }
+        syncParams.moduleId?.let { this[SyncTaskParameters.MODULE_ID_FIELD] = it }
 
         localDbManager.getSyncInfoFor(syncParams.toGroup())?.let {
             this[LAST_KNOWN_PATIENT_AT] = it.lastKnownPatientUpdatedAt.time

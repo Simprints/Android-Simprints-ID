@@ -4,6 +4,7 @@ import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
+import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.testUtils.anyNotNull
@@ -45,12 +46,19 @@ class DashboardCardsFactoryTest {
         mockNPeopleForSyncRequest(app.remoteDbManager, 0)
 
         val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
-        var card = getCardIfCreated(factory, "project name")
+        val card = getCardIfCreated(factory, "project name")
         Assert.assertEquals(card?.description, "project desc")
 
-        whenever(app.dbManager.loadProject(anyNotNull())).thenReturn(Single.just(null))
-        card = getCardIfCreated(factory, "project name")
-        Assert.assertNull(card)
+        whenever(app.localDbManager.loadProjectFromLocal(anyNotNull())).thenReturn(null)
+        whenever(app.remoteDbManager.loadProjectFromRemote(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
+
+        val testObserver = Single.merge(factory.createCards()).test()
+        testObserver.awaitTerminalEvent()
+        try {
+            testObserver.values().first { it.type == DashboardCardType.LOCAL_DB }
+        } catch (e: Exception) {
+            Assert.assertTrue(true)
+        }
     }
 
     @Test
@@ -114,7 +122,7 @@ class DashboardCardsFactoryTest {
                                                                deleteEvent: () -> Unit,
                                                                cardTitle: String) {
         val event = createEvent()
-        whenever(app.remoteDbManager.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(Project().apply { description = "" }))
+        whenever(app.remoteDbManager.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(Project().apply { description = ""; name = "" }))
         mockNPeopleForSyncRequest(app.remoteDbManager, 0)
 
         var card = getCardIfCreated(

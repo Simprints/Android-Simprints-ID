@@ -6,7 +6,6 @@ import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.Constants
-import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,26 +15,22 @@ import java.util.*
 class DashboardCardsFactory(private val dataManager: DataManager,
                             private val androidResourcesHelper: AndroidResourcesHelper) {
 
-    private val syncParams = {
-        SyncTaskParameters.build(dataManager.syncGroup, dataManager)
-    }()
-
-    val dateFormat by lazy {
+    val dateFormat: DateFormat by lazy {
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
     fun createCards() = arrayListOf(
-        createAndAddProjectInfoCard(0),
-        createAndAddLocalDbInfoCard(1),
-        createAndAddSyncInfoCard(2),
-        createAndAddScannerInfoCard(3),
-        createAndAddLastUserInfoCard(4),
-        createAndAddLastEnrolInfoCard(5),
-        createAndAddLastVerificationInfoCard(6),
-        createAndAddLastIdentificationInfoCard(7)
+        createProjectInfoCard(),
+        createLocalDbInfoCard(),
+        createSyncInfoCard(),
+        createLastScannerInfoCard(),
+        createLastUserInfoCard(),
+        createLastEnrolInfoCard(),
+        createLastVerificationInfoCard(),
+        createLastIdentificationInfoCard()
         ).filterNotNull()
 
-    private fun createAndAddProjectInfoCard(position: Int): Single<DashboardCard> =
+    private fun createProjectInfoCard(position: Int = 0): Single<DashboardCard> =
         dataManager
             .loadProject(dataManager.getSignedInProjectIdOrEmpty())
             .observeOn(AndroidSchedulers.mainThread())
@@ -48,7 +43,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
                     it.description)
             }.doOnError { print(it.printStackTrace()) }
 
-    private fun createAndAddLocalDbInfoCard(position: Int): Single<DashboardCard> =
+    fun createLocalDbInfoCard(position: Int = 1): Single<DashboardCard> =
         Single.just(
             dataManager.getPeopleCount(dataManager.syncGroup).let {
                 val titleRes =
@@ -67,7 +62,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
             }
         ).doOnError { it.printStackTrace() }
 
-    private fun createAndAddSyncInfoCard(position: Int): Single<DashboardSyncCard>? =
+    private fun createSyncInfoCard(position: Int = 2): Single<DashboardSyncCard>? =
         Single.just(
             DashboardSyncCard(
                 DashboardCardType.SYNC_DB,
@@ -78,7 +73,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
                 dateFormat)
         )
 
-    private fun createAndAddScannerInfoCard(position: Int): Single<DashboardCard>? {
+    private fun createLastScannerInfoCard(position: Int = 3): Single<DashboardCard>? {
         return if (dataManager.lastScannerUsed.isNotEmpty()) {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_SCANNER,
@@ -92,7 +87,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
         }
     }
 
-    private fun createAndAddLastUserInfoCard(position: Int): Single<DashboardCard>? {
+    private fun createLastUserInfoCard(position: Int = 4): Single<DashboardCard>? {
         return if (dataManager.lastUserUsed.isNotEmpty()) {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_USER,
@@ -106,7 +101,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
         }
     }
 
-    private fun createAndAddLastEnrolInfoCard(position: Int): Single<DashboardCard>? =
+    private fun createLastEnrolInfoCard(position: Int = 5): Single<DashboardCard>? =
         dataManager.lastEnrolDate?.let {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_ENROL,
@@ -117,7 +112,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
             ).doOnError { it.printStackTrace() }
         }
 
-    private fun createAndAddLastVerificationInfoCard(position: Int): Single<DashboardCard>? =
+    private fun createLastVerificationInfoCard(position: Int = 6): Single<DashboardCard>? =
         dataManager.lastVerificationDate?.let {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_VERIFICATION,
@@ -128,7 +123,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
             ).doOnError { it.printStackTrace() }
         }
 
-    private fun createAndAddLastIdentificationInfoCard(position: Int): Single<DashboardCard>? =
+    private fun createLastIdentificationInfoCard(position: Int = 7): Single<DashboardCard>? =
         dataManager.lastIdentificationDate?.let {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_IDENTIFICATION,
