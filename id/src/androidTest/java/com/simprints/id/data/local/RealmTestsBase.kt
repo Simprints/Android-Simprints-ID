@@ -12,7 +12,6 @@ import io.realm.RealmConfiguration
 import java.io.File
 import java.util.*
 
-
 open class RealmTestsBase {
 
     companion object {
@@ -57,9 +56,9 @@ open class RealmTestsBase {
     protected fun saveFakeSyncInfo(realm: Realm,
                                    userId: String = "",
                                    moduleId: String = ""): RealmSyncInfo = when {
-        userId.isNotEmpty() -> RealmSyncInfo(USER.ordinal, Date(0))
-        moduleId.isNotEmpty() -> RealmSyncInfo(MODULE.ordinal, Date(0))
-        else -> RealmSyncInfo(GLOBAL.ordinal, Date(0))
+        userId.isNotEmpty() -> RealmSyncInfo(USER, PeopleGeneratorUtils.getRandomPerson(toSync = false))
+        moduleId.isNotEmpty() -> RealmSyncInfo(MODULE, PeopleGeneratorUtils.getRandomPerson(toSync = false))
+        else -> RealmSyncInfo(GLOBAL, PeopleGeneratorUtils.getRandomPerson(toSync = false))
     }.also { info -> realm.executeTransaction { it.insertOrUpdate(info) } }
 
     protected fun RealmSyncInfo.deepEquals(other: RealmSyncInfo): Boolean =
@@ -69,5 +68,4 @@ open class RealmTestsBase {
         Realm.deleteRealm(realmConfig)
         File("${realmConfig.path}.lock").delete()
     }
-
 }
