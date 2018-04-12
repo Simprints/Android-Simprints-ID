@@ -14,8 +14,9 @@ import java.util.*
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class, application = TestApplication::class)
 class rl_PersonTest {
+
     @Test
-    fun test() {
+    fun testAndroidBase64ReturnsSameValueOfGuava() {
 
         //Alternative to CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, this)
         val decodewithBase64 = BaseEncoding.base64().decode("test")

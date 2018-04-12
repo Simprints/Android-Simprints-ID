@@ -149,7 +149,7 @@ class SyncTest : RxJavaTest() {
         assertUrlParam(peopleRequestUrl, "projectId", projectIdTest)
         val lastDownloadedPatient =  peopleToDownload.last()
         assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, lastDownloadedPatient.updatedAt!!.time, { it?.toLong() })
-        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, lastDownloadedPatient.patientId, { it?.toLong() })
+        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, lastDownloadedPatient.patientId)
     }
 
     @Test
@@ -188,8 +188,8 @@ class SyncTest : RxJavaTest() {
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
         assertUrlParam(peopleRequestUrl, "projectId", projectIdTest)
         assertUrlParam(peopleRequestUrl, "moduleId", moduleIdTest)
-        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, peopleToDownload.last().updatedAt!!, { it?.toLong() })
-        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, peopleToDownload.last().patientId, { it?.toLong() })
+        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
+        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, peopleToDownload.last().patientId)
 
     }
 
@@ -229,8 +229,8 @@ class SyncTest : RxJavaTest() {
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
         assertUrlParam(peopleRequestUrl, "projectId", projectIdTest)
         assertUrlParam(peopleRequestUrl, "userId", userIdTest)
-        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, peopleToDownload.last().updatedAt!!, { it?.toLong() })
-        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, peopleToDownload.last().patientId, { it?.toLong() })
+        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
+        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, peopleToDownload.last().patientId)
     }
 
     private fun makeFakeDownloadRequest(

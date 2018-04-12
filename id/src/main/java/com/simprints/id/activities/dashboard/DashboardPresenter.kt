@@ -27,6 +27,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private val syncManager = SyncManager(dataManager, syncClient)
 
+    private val cardsFactory = DashboardCardsFactory(dataManager, androidResourcesHelper)
+
     private var actualSyncParams: SyncTaskParameters =
         SyncTaskParameters.build(dataManager.syncGroup, dataManager)
 
@@ -58,7 +60,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun initCards() {
-        val cardsFactory = DashboardCardsFactory(dataManager, androidResourcesHelper)
         cardsModelsList.clear()
         syncManager.removeObservers()
 
@@ -73,11 +74,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
                     }
                 }
         )
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribeBy(
-            onComplete = { handleCardsCreated() },
-            onError = { handleCardsCreationFailed() })
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = { handleCardsCreated() },
+                onError = { handleCardsCreationFailed() })
     }
 
     private fun handleCardsCreated() {
@@ -94,9 +95,22 @@ class DashboardPresenter(private val view: DashboardContract.View,
         syncManager.addObserver(it.syncObserver)
         syncManager.addObserver(object : DisposableObserver<Progress>() {
             override fun onNext(t: Progress) {}
-            override fun onError(e: Throwable) { e.printStackTrace() }
-            override fun onComplete() {}
+            override fun onError(e: Throwable) {
+                e.printStackTrace()
+                createAndAddLocalDbCard()
+            }
+
+            override fun onComplete() {
+                createAndAddLocalDbCard()
+            }
         })
+    }
+
+    fun createAndAddLocalDbCard() {
+        cardsFactory.createLocalDbInfoCard()
+            .subscribeBy(
+                onSuccess = { addCard(it) },
+                onError = { it.printStackTrace() })
     }
 
     private fun addCard(dashboardCard: DashboardCard) {
