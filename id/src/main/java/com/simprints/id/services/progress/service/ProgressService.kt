@@ -45,7 +45,7 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
 
     private val executing = AtomicBoolean(false)
     private lateinit var task: ProgressTask
-    private var taskParameters: T? = null
+    private lateinit var taskParameters: T
 
     private lateinit var progressLiveObservable: Observable<Progress>
     private lateinit var progressReplayObservable: ReplaySubject<Progress>
@@ -74,7 +74,6 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
             this@ProgressService.execute(taskParameters)
 
         override fun startForeground() {
-            taskParameters = null
             startForeground(progressNotificationBuilder.id, progressNotificationBuilder.build())
             setNotificationVisibility(true)
         }
@@ -129,11 +128,9 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
     }
 
     private fun initNotificationBuilders() {
-        val taskParameters = this.taskParameters?.let{
-            progressNotificationBuilder = getProgressNotificationBuilder(it)
-            completeNotificationBuilder = getCompleteNotificationBuilder(it)
-            errorNotificationBuilder = getErrorNotificationBuilder(it)
-        }
+        progressNotificationBuilder = getProgressNotificationBuilder(taskParameters)
+        completeNotificationBuilder = getCompleteNotificationBuilder(taskParameters)
+        errorNotificationBuilder = getErrorNotificationBuilder(taskParameters)
     }
 
     private fun subscribeNotificationProgressObservers() {

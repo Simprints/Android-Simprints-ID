@@ -46,7 +46,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
                     R.drawable.simprints_logo_blue,
                     it.name,
                     it.description)
-            }.doOnError{ print(it.printStackTrace()) }
+            }.doOnError { print(it.printStackTrace()) }
 
     private fun createAndAddLocalDbInfoCard(position: Int): Single<DashboardCard> =
         Single.just(
@@ -65,21 +65,18 @@ class DashboardCardsFactory(private val dataManager: DataManager,
                     androidResourcesHelper.getString(titleRes),
                     "$it")
             }
-        ).doOnError{ it.printStackTrace() }
+        ).doOnError { it.printStackTrace() }
 
     private fun createAndAddSyncInfoCard(position: Int): Single<DashboardSyncCard>? =
-        dataManager.getNumberOfPatientsForSyncParams(syncParams)
-            .observeOn(AndroidSchedulers.mainThread())
-            .map {
-                DashboardSyncCard(
-                    DashboardCardType.SYNC_DB,
-                    position,
-                    R.drawable.dashboard_sync,
-                    androidResourcesHelper.getString(R.string.dashboard_card_sync_title),
-                    dataManager,
-                    dateFormat,
-                    it)
-            }.doOnError{ it.printStackTrace() }
+        Single.just(
+            DashboardSyncCard(
+                DashboardCardType.SYNC_DB,
+                position,
+                R.drawable.dashboard_sync,
+                androidResourcesHelper.getString(R.string.dashboard_card_sync_title),
+                dataManager,
+                dateFormat)
+        )
 
     private fun createAndAddScannerInfoCard(position: Int): Single<DashboardCard>? {
         return if (dataManager.lastScannerUsed.isNotEmpty()) {
@@ -89,7 +86,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
                 R.drawable.scanner,
                 androidResourcesHelper.getString(R.string.dashboard_card_lastscanner_title),
                 dataManager.lastScannerUsed)
-            ).doOnError{ it.printStackTrace() }
+            ).doOnError { it.printStackTrace() }
         } else {
             null
         }
@@ -103,7 +100,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
                 R.drawable.last_user,
                 androidResourcesHelper.getString(R.string.dashboard_card_lastuser_title),
                 dataManager.lastUserUsed)
-            ).doOnError{ it.printStackTrace() }
+            ).doOnError { it.printStackTrace() }
         } else {
             null
         }
@@ -117,9 +114,8 @@ class DashboardCardsFactory(private val dataManager: DataManager,
                 R.drawable.fingerprint_enrol,
                 androidResourcesHelper.getString(R.string.dashboard_card_enrol_title),
                 dateFormat.format(it).toString())
-            ).doOnError{ it.printStackTrace() }
+            ).doOnError { it.printStackTrace() }
         }
-
 
     private fun createAndAddLastVerificationInfoCard(position: Int): Single<DashboardCard>? =
         dataManager.lastVerificationDate?.let {
@@ -129,7 +125,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
                 R.drawable.fingerprint_verification,
                 androidResourcesHelper.getString(R.string.dashboard_card_verification_title),
                 dateFormat.format(it).toString())
-            ).doOnError{ it.printStackTrace() }
+            ).doOnError { it.printStackTrace() }
         }
 
     private fun createAndAddLastIdentificationInfoCard(position: Int): Single<DashboardCard>? =
@@ -140,6 +136,6 @@ class DashboardCardsFactory(private val dataManager: DataManager,
                 R.drawable.fingerprint_identification,
                 androidResourcesHelper.getString(R.string.dashboard_card_identification_title),
                 dateFormat.format(it).toString())
-            ).doOnError{ it.printStackTrace() }
+            ).doOnError { it.printStackTrace() }
         }
 }

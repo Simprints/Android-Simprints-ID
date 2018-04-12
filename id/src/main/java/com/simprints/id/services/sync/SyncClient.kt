@@ -15,7 +15,6 @@ import kotlinx.coroutines.experimental.async
 import org.jetbrains.anko.coroutines.experimental.bg
 import timber.log.Timber
 
-
 class SyncClient(context: Context)
     : ProgressClientImpl<SyncTaskParameters>(context, SyncService::class.java) {
 
@@ -24,13 +23,13 @@ class SyncClient(context: Context)
 
     fun sync(syncParameters: SyncTaskParameters,
              onStarted: () -> Unit,
-             onBusy: () -> Unit) {
+             onBusy: (e: Exception) -> Unit) {
         async(UI) {
             try {
                 bg { startSyncAndObserve(syncParameters) }.await()
                 onStarted()
             } catch (exception: TaskInProgressException) {
-                onBusy()
+                onBusy(exception)
             }
         }
     }

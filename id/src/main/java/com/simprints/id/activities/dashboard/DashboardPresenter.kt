@@ -88,13 +88,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
         syncManager.addObserver(it.syncObserver)
         syncManager.addObserver(object : DisposableObserver<Progress>() {
             override fun onNext(t: Progress) {}
-            override fun onError(e: Throwable) {
-                initCards()
-            }
-
-            override fun onComplete() {
-                initCards()
-            }
+            override fun onError(e: Throwable) { e.printStackTrace() }
+            override fun onComplete() {}
         })
     }
 
