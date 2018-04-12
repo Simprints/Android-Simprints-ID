@@ -27,7 +27,6 @@ import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import org.jetbrains.anko.support.v4.onRefresh
 
-
 class DashboardActivity : AppCompatActivity(), DashboardContract.View, NavigationView.OnNavigationItemSelectedListener {
 
     companion object {
@@ -40,7 +39,9 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     private val app: Application by lazy { application as Application }
     private val dataManager: DataManager by lazy { app.dataManager }
 
-    private lateinit var dashboardCards: RecyclerView
+    private lateinit var dashboardCardsView: RecyclerView
+    private lateinit var cardsViewAdapter: DashboardCardAdapter
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,18 +54,36 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
         initCards()
     }
 
-    private lateinit var cardsViewAdapter: DashboardCardAdapter
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private fun initDrawer() {
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
+        val toggle = ActionBarDrawerToggle(
+            this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer.addDrawerListener(toggle)
+        toggle.syncState()
+
+        val navigationView = findViewById<NavigationView>(R.id.nav_view)
+        navigationView.setNavigationItemSelectedListener(this)
+    }
 
     private fun initCards() {
+        initRecyclerCardViews(viewPresenter)
+        initSwipeRefreshLayout(viewPresenter)
+    }
+
+    private fun initRecyclerCardViews(viewPresenter: DashboardContract.Presenter) {
         cardsViewAdapter = DashboardCardAdapter(viewPresenter.cardsModelsList)
-        dashboardCards = (findViewById<RecyclerView>(R.id.dashboardCardsId)).also {
+        dashboardCardsView = (findViewById<RecyclerView>(R.id.dashboardCardsId)).also {
             it.setHasFixedSize(false)
             it.itemAnimator = DefaultItemAnimator()
             it.layoutManager = WrapContentLinearLayoutManager(this)
             it.adapter = cardsViewAdapter
         }
+    }
 
+    private fun initSwipeRefreshLayout(viewPresenter: DashboardContract.Presenter) {
         swipeRefreshLayout = (findViewById<SwipeRefreshLayout>(R.id.dashboardCardsSwipeId)).apply {
             this.onRefresh {
                 viewPresenter.didUserWantToRefreshCardsIfPossible()
@@ -92,22 +111,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     override fun onPause() {
         super.onPause()
         viewPresenter.pause()
-    }
-
-    private fun initDrawer() {
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
-        val toggle = ActionBarDrawerToggle(
-            this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer.addDrawerListener(toggle)
-        toggle.syncState()
-
-        val navigationView = findViewById<NavigationView>(R.id.nav_view)
-        //syncItem = navigationView.menu.findItem(R.id.nav_sync)
-
-        navigationView.setNavigationItemSelectedListener(this)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

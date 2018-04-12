@@ -27,24 +27,19 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     private val syncProgressBar: ProgressBar = rootView.findViewById(R.id.dashboardCardSyncProgressBar)
     private val syncAction: TextView = rootView.findViewById(R.id.dashboardCardSyncAction)
 
+    fun updateCard(cardModel: DashboardCard) {
+        bind(cardModel)
+    }
+
     override fun bind(cardModel: DashboardCard) {
         super.bind(cardModel)
 
         if (cardModel is DashboardSyncCard) {
             cardModel.cardView = this
-            syncUploadCount.text = "${Math.max(cardModel.peopleToUpload, 0)}"
-
-            syncDownloadCount.text = ""
-            cardModel.peopleToDownload?.let {
-                syncDownloadCount.text = "${Math.max(it, 0)}"
-            }
-
+            setUploadCounter(cardModel)
+            setDownloadCounter(cardModel)
             updateState(cardModel)
         }
-    }
-
-    fun updateCard(cardModel: DashboardCard) {
-        bind(cardModel)
     }
 
     fun updateState(cardModel: DashboardSyncCard) {
@@ -117,7 +112,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         }
 
         val progressEmitted = dataModel.progress
-        updateCounters(progressEmitted)
+        updateCountersDuringSync(progressEmitted)
         syncProgressBar.apply {
             visibility = View.VISIBLE
             isIndeterminate = false
@@ -132,14 +127,25 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         disableSyncButton()
     }
 
-    private fun updateCounters(progress: Progress?) {
+    private fun updateCountersDuringSync(progress: Progress?) {
         when (progress) {
             null -> {
                 syncDownloadCount.text = ""
                 syncUploadCount.text = ""
             }
-            is DownloadProgress -> syncDownloadCount.text = "${progress.maxValue - progress.currentValue}"
-            is UploadProgress -> syncUploadCount.text = "${progress.maxValue - progress.currentValue}"
+            is DownloadProgress -> syncDownloadCount.text = "${Math.max(progress.maxValue - progress.currentValue, 0)}"
+            is UploadProgress -> syncUploadCount.text = "${Math.max(progress.maxValue - progress.currentValue, 0)}"
+        }
+    }
+
+    private fun setUploadCounter(cardModel: DashboardSyncCard) {
+        syncUploadCount.text = "${Math.max(cardModel.peopleToUpload, 0)}"
+    }
+
+    private fun setDownloadCounter(cardModel: DashboardSyncCard) {
+        syncDownloadCount.text = ""
+        cardModel.peopleToDownload?.let {
+            syncDownloadCount.text = "${Math.max(it, 0)}"
         }
     }
 
