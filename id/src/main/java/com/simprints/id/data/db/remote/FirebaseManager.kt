@@ -11,17 +11,17 @@ import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
 import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
+import com.simprints.id.data.db.remote.adapters.toLocalDbKey
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
-import com.simprints.id.data.db.remote.adapters.toLocalDbKey
+import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.data.db.remote.network.RemoteApiInterface
+import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
-import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
@@ -38,7 +38,6 @@ import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
-
 
 class FirebaseManager(private val appContext: Context,
                       firebaseConnectionListenerManager: RemoteDbConnectionListenerManager,
@@ -130,11 +129,12 @@ class FirebaseManager(private val appContext: Context,
     private fun isLegacySignedInUserAsExpected(projectId: String): Boolean {
         val firebaseUser = getFirebaseAuth(legacyFirebaseApp).currentUser ?: return false
 
+        // Note: LegacyApiKey and LegacyProjectId are the same thing.
         // For legacy reason, the firebase user has the projectId(for new projects) or legacyApiKey
         // (for old projects) as uid. Because the legacyApiKey soon will disappear, we try to map it immediately (CheckLogin)
-        // to a projectId and use it for any task. In this case, we need the legacyApiKey
-        // so we grab through the Application to avoid injecting it through all methods, so it will be easier
-        // to get rid of it.
+        // to a projectId and use it for any task. So we store <ProjectId, HashedLegacyApiKey> in the shared prefs.
+        // In this case, we need the legacyApiKey so we grab through the Application to avoid injecting
+        // it through all methods, so it will be easier to get rid of it.
         val hashedLegacyApiKey = (appContext as Application).secureDataManager.getHashedLegacyProjectIdForProjectIdOrEmpty(projectId)
         return if (hashedLegacyApiKey.isNotEmpty()) {
             Hasher().hash(firebaseUser.uid) == hashedLegacyApiKey
