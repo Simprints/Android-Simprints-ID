@@ -33,6 +33,7 @@ android {
                 // TODO : Remove whenever possible
                 // Check in the Translations Editor for crucial translations that may be missing
                 disable "MissingTranslation"
+                checkReleaseBuilds true
             }
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
@@ -168,7 +169,6 @@ dependencies {
 
     // Google
     implementation "com.google.android.gms:play-services-location:$google_version"
-    implementation "com.google.guava:guava:23.6-android"
     implementation "com.google.android.gms:play-services-safetynet:$google_version"
 
     // Databases
@@ -238,7 +238,7 @@ dependencies {
     androidTestImplementation "joda-time:joda-time:2.9.9"
 
     //UI
-    compile 'com.github.michael-rapp:android-material-dialog:4.3.3'
+    implementation 'com.github.michael-rapp:android-material-dialog:4.3.3'
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {

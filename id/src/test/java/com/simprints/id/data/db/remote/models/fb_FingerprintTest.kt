@@ -6,8 +6,8 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libsimprints.FingerIdentifier
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import junit.framework.AssertionFailedError
+
 import org.hamcrest.CoreMatchers
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -33,7 +34,7 @@ fun <T> verifyOnlyInteractions(mock: T, vararg methodCalls: T.() -> Any?) {
 fun <T> anyNotNull(): T {
     try {
         Mockito.any<T>()
-    } catch (e: Exception){
+    } catch (e: Exception) {
         e.printStackTrace()
     }
 
