@@ -337,5 +337,6 @@
     <string name="hint_graphic">Hint graphic</string>
     <string name="dashboard_sync_status_icon">Synchronisation status icon</string>
     <string name="dashboard_sync_icon">Synchronisation icon</string>
+    <string name="zero">0</string>
 
 </resources>
