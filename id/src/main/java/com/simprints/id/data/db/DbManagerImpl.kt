@@ -38,14 +38,10 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
     }
 
     override fun getLocalKeyAndSignInToLocal(projectId: String): Completable =
-        remoteDbManager
-            .getLocalDbKeyFromRemote(projectId)
-            .signInToLocal()
+        remoteDbManager.getLocalDbKeyFromRemote(projectId).signInToLocal()
 
     override fun signIn(projectId: String, tokens: Tokens): Completable =
-        remoteDbManager
-            .signInToRemoteDb(tokens)
-            .andThen(getLocalKeyAndSignInToLocal(projectId))
+        remoteDbManager.signInToRemoteDb(tokens).andThen(getLocalKeyAndSignInToLocal(projectId))
 
     private fun Single<out LocalDbKey>.signInToLocal(): Completable =
         flatMapCompletable {
@@ -76,10 +72,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
             .uploadPerson(fbPerson)
             .andThen(remoteDbManager.downloadPerson(fbPerson.patientId, fbPerson.projectId))
 
-    private fun Single<out fb_Person>.updatePersonInLocal(): Completable =
-        flatMapCompletable {
-            localDbManager.insertOrUpdatePersonInLocal(rl_Person(it))
-        }
+    private fun Single<out fb_Person>.updatePersonInLocal(): Completable = flatMapCompletable {
+        localDbManager.insertOrUpdatePersonInLocal(rl_Person(it))
+    }
 
     override fun loadPerson(destinationList: MutableList<Person>,
                             projectId: String,
@@ -90,13 +85,9 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
             destinationList.add(it)
             callback.onSuccess()
         }, {
-            remoteDbManager.downloadPerson(guid, projectId)
-                .subscribeBy(
-                    onSuccess = {
-                        destinationList.add(rl_Person(it).libPerson)
-                        callback.onSuccess()
-                    },
-                    onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
+            remoteDbManager.downloadPerson(guid, projectId).subscribeBy(
+                onSuccess = { destinationList.add(rl_Person(it).libPerson); callback.onSuccess() },
+                onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
         })
 
     }
@@ -144,7 +135,8 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         SyncExecutor(
             localDbManager,
             remoteDbManager,
-            JsonHelper.gson).sync(interrupted, parameters)
+            JsonHelper.gson
+        ).sync(interrupted, parameters)
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP): Completable {
         val firebaseManager = remoteDbManager as FirebaseManager
