@@ -35,7 +35,6 @@ class RealmDbManagerImpl(private val appContext: Context,
         const val SYNC_ID_FIELD = "syncGroupId"
 
         const val USER_ID_FIELD = "userId"
-        //const val PROJECT_ID_FIELD = "projectId"
         const val PATIENT_ID_FIELD = "patientId"
         const val MODULE_ID_FIELD = "moduleId"
         const val TO_SYNC_FIELD = "toSync"
@@ -48,27 +47,6 @@ class RealmDbManagerImpl(private val appContext: Context,
 
     init {
         Realm.init(appContext)
-    }
-
-    private fun getLocalDbKey(): LocalDbKey {
-        try {
-            val projectId = projectIdProvider.getSignedInProjectId().blockingGet()
-            return localDbKeyProvider.getLocalDbKey(projectId).blockingGet()
-        } catch (e: Exception) {
-            throw NotSignedInException(cause = e)
-        }
-    }
-
-    private fun getRealmConfig(localDbKey: LocalDbKey) =
-        RealmConfig.get(localDbKey.projectId, localDbKey.value)
-
-    private fun getRealmInstance(): Realm {
-        return realmConfig.let {
-            if (it == null)
-                getRealmConfig(getLocalDbKey()).let { realmConfig = it; Realm.getInstance(it) }
-            else
-                Realm.getInstance(it)
-        }
     }
 
     override fun signInToLocal(): Completable = Completable.create { em ->
@@ -110,11 +88,7 @@ class RealmDbManagerImpl(private val appContext: Context,
                                          moduleId: String?,
                                          toSync: Boolean?): Single<Int> = Single.create { em ->
         getRealmInstance().use {
-            em.onSuccess(
-                buildQueryForPerson(it, patientId, userId, moduleId, toSync)
-                    .count()
-                    .toInt()
-            )
+            em.onSuccess(buildQueryForPerson(it, patientId, userId, moduleId, toSync).count().toInt())
         }
     }
 
@@ -164,6 +138,27 @@ class RealmDbManagerImpl(private val appContext: Context,
                     else
                         em.onSuccess(it)
                 }
+        }
+    }
+
+    private fun getLocalDbKey(): LocalDbKey {
+        try {
+            val projectId = projectIdProvider.getSignedInProjectId().blockingGet()
+            return localDbKeyProvider.getLocalDbKey(projectId).blockingGet()
+        } catch (e: Exception) {
+            throw NotSignedInException(cause = e)
+        }
+    }
+
+    private fun getRealmConfig(localDbKey: LocalDbKey) =
+        RealmConfig.get(localDbKey.projectId, localDbKey.value)
+
+    private fun getRealmInstance(): Realm {
+        return realmConfig.let {
+            if (it == null)
+                getRealmConfig(getLocalDbKey()).let { realmConfig = it; Realm.getInstance(it) }
+            else
+                Realm.getInstance(it)
         }
     }
 
