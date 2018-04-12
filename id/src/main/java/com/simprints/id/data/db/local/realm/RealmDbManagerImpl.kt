@@ -35,7 +35,7 @@ class RealmDbManagerImpl(private val appContext: Context,
         const val SYNC_ID_FIELD = "syncGroupId"
 
         const val USER_ID_FIELD = "userId"
-        const val PROJECT_ID_FIELD = "projectId"
+        //const val PROJECT_ID_FIELD = "projectId"
         const val PATIENT_ID_FIELD = "patientId"
         const val MODULE_ID_FIELD = "moduleId"
         const val TO_SYNC_FIELD = "toSync"
@@ -106,13 +106,12 @@ class RealmDbManagerImpl(private val appContext: Context,
     }
 
     override fun getPeopleCountFromLocal(patientId: String?,
-                                         projectId: String?,
                                          userId: String?,
                                          moduleId: String?,
                                          toSync: Boolean?): Single<Int> = Single.create { em ->
         getRealmInstance().use {
             em.onSuccess(
-                buildQueryForPerson(it, patientId, projectId, userId, moduleId, toSync)
+                buildQueryForPerson(it, patientId, userId, moduleId, toSync)
                     .count()
                     .toInt()
             )
@@ -131,29 +130,22 @@ class RealmDbManagerImpl(private val appContext: Context,
     }
 
     override fun loadPeopleFromLocal(patientId: String?,
-                                     projectId: String?,
                                      userId: String?,
                                      moduleId: String?,
                                      toSync: Boolean?): Single<ArrayList<rl_Person>> = Single.create { em ->
         getRealmInstance().use {
-            val query = buildQueryForPerson(it, patientId, projectId, userId, moduleId, toSync)
-            ArrayList(it.copyFromRealm(query.findAll(), 4)).let {
-                if (it.isEmpty())
-                    em.onError(IllegalStateException())
-                else
-                    em.onSuccess(it)
-            }
+            val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync)
+            em.onSuccess(ArrayList(it.copyFromRealm(query.findAll(), 4)))
         }
     }
 
     override fun loadPeopleFromLocalRx(patientId: String?,
-                                       projectId: String?,
                                        userId: String?,
                                        moduleId: String?,
                                        toSync: Boolean?): Flowable<rl_Person> =
         Flowable.create({ emitter ->
             getRealmInstance().use {
-                val query = buildQueryForPerson(it, patientId, projectId, userId, moduleId, toSync)
+                val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync)
                 val people = query.findAll()
                 for (person in people) {
                     emitter.onNext(person)
@@ -177,13 +169,11 @@ class RealmDbManagerImpl(private val appContext: Context,
 
     private fun buildQueryForPerson(realm: Realm,
                                     patientId: String? = null,
-                                    projectId: String? = null,
                                     userId: String? = null,
                                     moduleId: String? = null,
                                     toSync: Boolean? = null): RealmQuery<rl_Person> {
 
         return realm.where(rl_Person::class.java).apply {
-            projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
             patientId?.let { this.equalTo(PATIENT_ID_FIELD, it) }
             userId?.let { this.equalTo(USER_ID_FIELD, it) }
             moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
@@ -194,7 +184,6 @@ class RealmDbManagerImpl(private val appContext: Context,
     private fun buildQueryForPerson(realm: Realm,
                                     syncParams: SyncTaskParameters): RealmQuery<rl_Person> = buildQueryForPerson(
         realm = realm,
-        projectId = syncParams.projectId,
         userId = syncParams.userId,
         moduleId = syncParams.moduleId
     )
