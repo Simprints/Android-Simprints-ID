@@ -25,16 +25,11 @@ class SyncManager(private val dataManager: DataManager,
         }, {
             if (it is TaskInProgressException) {
                 startListeners()
+            } else {
+                observers.forEach { it.onError(Throwable("Server busy")) }
+                stopListeners()
             }
-
-            observers.forEach { it.onError(Throwable("Server busy")) }
-            stopListeners()
         })
-    }
-
-    fun stop() {
-        //syncClient.stopSync()
-        stopListeners()
     }
 
     fun stopListeners() {

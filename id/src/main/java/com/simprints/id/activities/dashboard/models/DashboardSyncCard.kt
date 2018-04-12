@@ -19,25 +19,27 @@ class DashboardSyncCard(override val type: DashboardCardType,
 
     val syncParams = SyncTaskParameters.build(dataManager.syncGroup, dataManager)
     var onSyncActionClicked: (cardModel: DashboardSyncCard) -> Unit = {}
-
     var peopleToUpload: Int = 0
     var peopleToDownload: Int? = null
     var syncNeeded: Boolean = false
     var lastSyncTime: String? = null
-
     var progress: Progress? = null
-
     var cardView: DashboardSyncCardView? = null
 
     var syncState: SyncManagerState = SyncManagerState.NOT_STARTED
         set(value) {
             field = value
-            when {
-                field != SyncManagerState.IN_PROGRESS -> this.progress = null
-                field == SyncManagerState.SUCCEED -> updateSyncInfo()
-                field == SyncManagerState.FAILED -> updateSyncInfo()
+            if (field != SyncManagerState.IN_PROGRESS) {
+                this.progress = null
             }
-            cardView?.updateState(this)
+
+            when (field) {
+                SyncManagerState.NOT_STARTED -> cardView?.updateState(this)
+                SyncManagerState.IN_PROGRESS -> cardView?.updateState(this)
+                SyncManagerState.SUCCEED -> updateSyncInfo()
+                SyncManagerState.FAILED -> updateSyncInfo()
+                SyncManagerState.STARTED -> updateSyncInfo()
+            }
         }
 
     val syncObserver = object : DisposableObserver<Progress>() {
@@ -62,6 +64,10 @@ class DashboardSyncCard(override val type: DashboardCardType,
 
     private fun updateSyncInfo() {
         peopleToUpload = dataManager.loadPeopleFromLocal(toSync = true).count()
+        lastSyncTime = dataManager.getSyncInfoFor(syncParams.toGroup())?.lastSyncTime?.let {
+            dateFormat.format(it).toString()
+        }
+
         dataManager.getNumberOfPatientsForSyncParams(syncParams)
             .map {
                 dataManager.calculateNPatientsToDownSync(it, syncParams)
@@ -80,10 +86,6 @@ class DashboardSyncCard(override val type: DashboardCardType,
                     cardView?.updateCard(this)
                 }
             )
-
-        lastSyncTime = dataManager.getSyncInfoFor(syncParams.toGroup())?.lastSyncTime?.let {
-            dateFormat.format(it).toString()
-        }
     }
 
     fun syncStarted() {

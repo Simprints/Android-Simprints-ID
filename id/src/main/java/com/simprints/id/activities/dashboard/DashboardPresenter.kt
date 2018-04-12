@@ -24,7 +24,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
                          private val androidResourcesHelper: AndroidResourcesHelper) : DashboardContract.Presenter {
 
     private var started: AtomicBoolean = AtomicBoolean(false)
+
     private val syncManager = SyncManager(dataManager, syncClient)
+
     private var actualSyncParams: SyncTaskParameters =
         SyncTaskParameters.build(dataManager.syncGroup, dataManager)
 
@@ -32,18 +34,22 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private var syncCardModel: DashboardSyncCard? = null
         get() {
-            return cardsModelsList.find { it is DashboardSyncCard } as DashboardSyncCard?
+            return cardsModelsList.first { it is DashboardSyncCard } as DashboardSyncCard?
         }
 
     override fun start() {
-        val syncParams = SyncTaskParameters.build(dataManager.syncGroup, dataManager)
-        val hasSyncGroupChangedSinceLastRun = actualSyncParams != syncParams
-        actualSyncParams = syncParams
 
-        if (!started.getAndSet(true) || hasSyncGroupChangedSinceLastRun) {
+        if (!started.getAndSet(true) || hasSyncGroupChangedSinceLastRun()) {
             initCards()
         } else {
             catchUpWithSyncStateIfServiceRunning()
+        }
+    }
+
+    private fun hasSyncGroupChangedSinceLastRun(): Boolean {
+        val syncParams = SyncTaskParameters.build(dataManager.syncGroup, dataManager)
+        return (actualSyncParams != syncParams).also {
+            actualSyncParams = syncParams
         }
     }
 
@@ -108,12 +114,14 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun didUserWantToRefreshCardsIfPossible() {
-        if (syncCardModel?.syncState != SyncManagerState.IN_PROGRESS) {
+        if (isUserAllowedToRefresh()) {
             initCards()
         } else {
             view.stopRequestIfRequired()
         }
     }
+
+    private fun isUserAllowedToRefresh(): Boolean = syncCardModel?.syncState != SyncManagerState.IN_PROGRESS
 
     override fun didUserWantToSync() {
         setSyncingStartedInLocalDbCardView()
