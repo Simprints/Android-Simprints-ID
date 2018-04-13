@@ -80,7 +80,7 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
     override fun getSignedInProjectId(): Single<String> =
         Single.create<String> {
             try {
-                it.onSuccess(signedInUserId)
+                it.onSuccess(signedInProjectId)
             } catch (e: CredentialMissingException) {
                 it.onError(NotSignedInException())
             }
