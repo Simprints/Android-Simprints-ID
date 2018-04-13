@@ -16,12 +16,11 @@ import com.simprints.id.R;
 import com.simprints.id.activities.AlertActivity;
 import com.simprints.id.activities.IntentKeys;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
 import com.simprints.id.domain.ALERT_TYPE;
+import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.libcommon.Person;
-
-import static com.simprints.id.tools.ResourceHelper.getStringPlural;
+import static com.simprints.id.tools.utils.AndroidResourcesHelperImpl.getStringPlural;
 
 public class MatchingActivity extends AppCompatActivity implements MatchingContract.View {
 

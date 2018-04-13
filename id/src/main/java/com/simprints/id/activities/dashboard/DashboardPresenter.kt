@@ -74,11 +74,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
                     }
                 }
         )
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = { handleCardsCreated() },
-                onError = { handleCardsCreationFailed() })
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeBy(
+            onComplete = { handleCardsCreated() },
+            onError = { handleCardsCreationFailed() })
     }
 
     private fun handleCardsCreated() {
@@ -91,7 +91,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun initSyncCardModel(it: DashboardSyncCard) {
-        it.onSyncActionClicked = { didUserWantToSync() }
+        it.onSyncActionClicked = { userDidWantToSync() }
         syncManager.addObserver(it.syncObserver)
         syncManager.addObserver(object : DisposableObserver<Progress>() {
             override fun onNext(t: Progress) {}
@@ -130,7 +130,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         }
     }
 
-    override fun didUserWantToRefreshCardsIfPossible() {
+    override fun userDidWantToRefreshCardsIfPossible() {
         if (isUserAllowedToRefresh()) {
             initCards()
         } else {
@@ -140,7 +140,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun isUserAllowedToRefresh(): Boolean = syncCardModel?.syncState != SyncManagerState.IN_PROGRESS
 
-    override fun didUserWantToSync() {
+    override fun userDidWantToSync() {
         setSyncingStartedInLocalDbCardView()
         syncManager.sync(SyncTaskParameters.build(dataManager.syncGroup, dataManager))
     }

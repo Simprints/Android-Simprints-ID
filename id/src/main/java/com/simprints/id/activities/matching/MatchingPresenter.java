@@ -165,6 +165,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     private void onVerifyStart() {
         final String guid = dataManager.getPatientId();
         try {
+            //StopShip: we should read only from the localDb
             dataManager.loadPerson(candidates, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);

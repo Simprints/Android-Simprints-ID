@@ -12,6 +12,7 @@ class WrapContentLinearLayoutManager(context: Context?) : LinearLayoutManager(co
         try {
             super.onLayoutChildren(recycler, state)
         } catch (e: IndexOutOfBoundsException) {
+            //TODO: send crashlytics event.
             Timber.e("IndexOutOfBoundsException in RecyclerView happens")
         }
     }

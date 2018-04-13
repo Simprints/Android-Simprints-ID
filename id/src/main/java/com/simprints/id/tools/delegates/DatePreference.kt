@@ -9,10 +9,14 @@ class DatePreference(private val preferences: ImprovedSharedPreferences,
                      private val key: String,
                      private val defValue: Date?) {
 
+    companion object {
+        private const val NULL_DATE: Long = -1
+    }
+
     private var value: Date? by lazyVar {
         Timber.d("DatePreference read $key from Shared Preferences")
-        val longTime: Long = preferences.getPrimitive(key, defValue?.time ?: -1)
-         if (longTime > 0) {
+        val longTime: Long = preferences.getPrimitive(key, defValue?.time ?: NULL_DATE)
+         if (longTime > NULL_DATE) {
              Date(longTime)
         } else {
              null
