@@ -10,10 +10,10 @@ import io.reactivex.observers.DisposableObserver
 import io.reactivex.rxkotlin.subscribeBy
 import java.text.DateFormat
 
-class DashboardSyncCard(override val type: DashboardCardType,
-                        override val position: Int,
-                        override val imageRes: Int,
-                        override val title: String,
+class DashboardSyncCard(type: DashboardCardType,
+                        position: Int,
+                        imageRes: Int,
+                        title: String,
                         var dataManager: DataManager,
                         private val dateFormat: DateFormat) : DashboardCard(type, position, imageRes, title, "") {
 

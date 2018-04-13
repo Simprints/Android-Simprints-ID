@@ -113,18 +113,22 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
 
         val progressEmitted = dataModel.progress
         updateCountersDuringSync(progressEmitted)
-        syncProgressBar.apply {
-            visibility = View.VISIBLE
-            isIndeterminate = false
-            max = progressEmitted?.maxValue ?: 0
-            progress = progressEmitted?.currentValue ?: 0
-        }
+        updateProgressBar(progressEmitted)
 
         description.text = ""
 
         syncDescription.textResource = R.string.syncing
 
         disableSyncButton()
+    }
+
+    private fun updateProgressBar(progressEmitted: Progress?) {
+        syncProgressBar.apply {
+            visibility = View.VISIBLE
+            isIndeterminate = false
+            max = progressEmitted?.maxValue ?: 0
+            progress = progressEmitted?.currentValue ?: 0
+        }
     }
 
     private fun updateCountersDuringSync(progress: Progress?) {
