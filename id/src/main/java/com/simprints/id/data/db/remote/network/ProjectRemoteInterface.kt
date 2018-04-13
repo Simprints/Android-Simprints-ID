@@ -4,16 +4,16 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.models.Project
 import io.reactivex.Single
 import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.Path
 
 interface ProjectRemoteInterface {
 
     companion object {
-        private const val apiVersion = "2018-1-0-dev7"
+        private const val apiVersion = "2018-1-0-dev8"
         var baseUrl = "https://$apiVersion-dot-project-management-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
     }
 
-    @GET("/projects/byId")
+    @GET("/projects/id/{id}")
     fun project(
-        @Query("id") projectId: String): Single<Project>
+        @Path("id") projectId: String): Single<Project>
 }

@@ -11,7 +11,7 @@ import retrofit2.http.*
 interface PeopleRemoteInterface {
 
     companion object {
-        private const val apiVersion = "2018-1-0-dev8"
+        private const val apiVersion = "2018-1-0-dev9"
         var baseUrl = "https://$apiVersion-dot-sync-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
     }
 
@@ -25,10 +25,10 @@ interface PeopleRemoteInterface {
     @POST("/patients")
     fun uploadPeople(@Body patientsJson: HashMap<String, ArrayList<fb_Person>>): Completable
 
-    @GET("/patients/byId")
+    @GET("/patients/{projectId}/{patientId}")
     fun person(
-        @Query("patientId") patientId: String,
-        @Query("projectId") projectId: String): Single<fb_Person>
+        @Path("patientId") patientId: String,
+        @Path("projectId") projectId: String): Single<fb_Person>
 
     @GET("/patient-counts")
     fun peopleCount(
