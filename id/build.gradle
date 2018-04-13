@@ -57,9 +57,9 @@ android {
             buildConfigField("String", "GCP_PROJECT", "\"${getDevProjectId()}\"")
         } else if (variant.buildType.name == "endToEndTesting") {
             buildConfigField("String", "GCP_PROJECT", "\"simprints-testing\"")
-            buildConfigField("String", "SCANNER", getLocalPropertyForTesting('ext.scanner'))
-            buildConfigField("String", "WIFI_NETWORK", getLocalPropertyForTesting('ext.wifiNetwork'))
-            buildConfigField("String", "WIFI_PASSWORD", getLocalPropertyForTesting('ext.wifiPassword'))
+            buildConfigField("String", "SCANNER", getLocalPropertyForTesting("ext.scanner"))
+            buildConfigField("String", "WIFI_NETWORK", getLocalPropertyForTesting("ext.wifiNetwork"))
+            buildConfigField("String", "WIFI_PASSWORD", getLocalPropertyForTesting("ext.wifiPassword"))
         }
     }
 
@@ -67,7 +67,7 @@ android {
 }
 
 def getDevProjectId() {
-    if (project.hasProperty('development_gcp_project')) {
+    if (project.hasProperty("development_gcp_project")) {
         return development_gcp_project
     } else {
         return "simprints-dev"
@@ -217,10 +217,9 @@ dependencies {
     testImplementation("junit:junit:$junit_version") {
         exclude group: "com.android.support"
     }
-    testImplementation 'org.robolectric:robolectric:3.7.1'
-    testImplementation 'org.robolectric:shadows-multidex:3.7.1'
-    testImplementation 'com.android.support.test:monitor:1.0.2-alpha1'
-
+    testImplementation "org.robolectric:robolectric:3.7.1"
+    testImplementation "org.robolectric:shadows-multidex:3.7.1"
+    testImplementation "com.android.support.test:monitor:1.0.2-alpha1"
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"
     testImplementation "com.squareup.okhttp3:mockwebserver:3.9.1" // 3.10 hangs around with roboeletric
@@ -230,15 +229,14 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-core:2.15.0"
     androidTestImplementation("com.schibsted.spain:barista:1.7.0") {
         exclude group: "com.android.support"
-        exclude group: 'com.google.code.findbugs'
+        exclude group: "com.google.code.findbugs"
     }
-
     androidTestImplementation "com.simprints:cerberus-library:2018.1.1-dev-1"
     androidTestImplementation "com.simprints:remote-admin-client:2017.4.0-dev-5"
     androidTestImplementation "joda-time:joda-time:2.9.9"
 
     //UI
-    implementation 'com.github.michael-rapp:android-material-dialog:4.3.3'
+    implementation "com.github.michael-rapp:android-material-dialog:4.3.3"
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {
