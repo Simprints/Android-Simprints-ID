@@ -23,7 +23,6 @@ import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.ScannerUtils;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,8 +142,7 @@ public class Setup {
         dataManager.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
 
-        //FIXME: conversion should not be here
-        dataManager.setLastScannerUsed("SP" + new BigInteger(macAddress.replace("F0:AC:D7:C", "").replace(":", ""), 16));
+        dataManager.setLastScannerUsed(com.simprints.id.tools.utils.ScannerUtils.convertAddressToSerial(macAddress));
 
         Timber.d("Setup: Scanner initialized.");
         goOn(activity);
