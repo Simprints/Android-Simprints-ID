@@ -17,9 +17,6 @@ import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_about.*
 
-
-
-
 class AboutActivity : AppCompatActivity(), AboutContract.View {
 
     override lateinit var viewPresenter: AboutContract.Presenter
@@ -48,8 +45,7 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
 
         viewPresenter = AboutPresenter(this, dataManager)
 
-
-        //FIXME: Delete me
+        //STOPSHIP: Delete bt_deleteSyncInfo, bt_deletePeopleFromRealm, bt_addPatient, bt_enrollPeople before release
         bt_deleteSyncInfo.setOnClickListener { dataManager.deleteSyncInfoFromLocal(SyncTaskParameters.build(app.dataManager.syncGroup, app.dataManager)) }
         bt_deletePeopleFromRealm.setOnClickListener { dataManager.deletePeopleFromLocal(SyncTaskParameters.build(app.dataManager.syncGroup, app.dataManager)) }
         bt_addPatient.setOnClickListener {
@@ -59,9 +55,8 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
                         projectId = dataManager.getSignedInProjectIdOrEmpty(),
                         userId = dataManager.getSignedInUserIdOrEmpty(),
                         toSync = true).first()
-                ).subscribeBy ( onComplete = {}, onError = { it.printStackTrace() } )
+                ).subscribeBy ( onComplete = {}, onError = { it.printStackTrace() })
             }
-
         }
 
         bt_enrollPeople.setOnClickListener {
@@ -71,10 +66,9 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
                     userId = dataManager.getSignedInUserIdOrEmpty()).first())
             ).subscribeBy(
                 onComplete = {},
-                onError = { it.printStackTrace()}
+                onError = { it.printStackTrace() }
             )
         }
-
     }
 
     private fun initUi() {

@@ -33,6 +33,8 @@ android {
                 // TODO : Remove whenever possible
                 // Check in the Translations Editor for crucial translations that may be missing
                 disable "MissingTranslation"
+                abortOnError true
+                fatal 'StopShip'
                 checkReleaseBuilds true
             }
             minifyEnabled true
