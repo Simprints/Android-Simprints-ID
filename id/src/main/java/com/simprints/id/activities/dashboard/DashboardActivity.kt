@@ -110,7 +110,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
 
     override fun onPause() {
         super.onPause()
-        viewPresenter.pause()
+        //viewPresenter.pause()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
