@@ -86,10 +86,16 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
         tv_scannerVersion.text = scannerVersion
     }
 
-    override fun setDbCountData(userCount: String, moduleCount: String, globalCount: String) {
+    override fun setUserCount(userCount: String) {
         tv_userDbCount.text = userCount
+    }
+
+    override fun setProjectCount(projectCount: String) {
+        tv_globalDbCount.text = projectCount
+    }
+
+    override fun setModuleCount(moduleCount: String) {
         tv_moduleDbCount.text = moduleCount
-        tv_globalDbCount.text = globalCount
     }
 
     override fun setRecoveryInProgress() {

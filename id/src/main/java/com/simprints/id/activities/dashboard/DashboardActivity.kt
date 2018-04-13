@@ -11,11 +11,9 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.local.models.rl_Person
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.extensions.launchAlert
-import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import kotlinx.android.synthetic.main.activity_dashboard.*
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
@@ -59,13 +57,13 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
         //TODO: I Don't know what this is but it needs to be destroyed immediately
         //FIXME: remove this code
-        buttonAddPersonRealm.setOnClickListener {
-            app.dbManager.getRealmInstance().executeTransaction { realm ->
-                realm.copyToRealmOrUpdate(PeopleGeneratorUtils.getRandomPerson(projectId = dataManager.getSignedInProjectIdOrEmpty()))
-                val results = realm.where(rl_Person::class.java).findAll()
-                textAddPersonRealm.text = "Count: ${results.count()}"
-            }
-        }
+//        buttonAddPersonRealm.setOnClickListener {
+//            app.dbManager.getRealmInstance().executeTransaction { realm ->
+//                realm.copyToRealmOrUpdate(PeopleGeneratorUtils.getRandomPerson(projectId = dataManager.getSignedInProjectIdOrEmpty()))
+//                val results = realm.where(rl_Person::class.java).findAll()
+//                textAddPersonRealm.text = "Count: ${results.count()}"
+//            }
+//        }
     }
 
     override fun showToast(messageRes: Int) {

@@ -1,10 +1,10 @@
 package com.simprints.id.data.db
 
 import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
-import com.simprints.id.data.db.local.LocalDbKey
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmDbManager
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
@@ -27,35 +27,28 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
+
 class DbManagerImpl(private val localDbManager: LocalDbManager,
                     private val remoteDbManager: RemoteDbManager) :
     DbManager,
-    LocalDbManager by localDbManager,
     RemoteDbManager by remoteDbManager {
-
-    // Lifecycle
 
     override fun initialiseDb() {
         remoteDbManager.initialiseRemoteDb()
     }
 
     override fun getLocalKeyAndSignInToLocal(projectId: String): Completable =
-        remoteDbManager
-            .getLocalDbKeyFromRemote(projectId)
-            .signInToLocal()
+        remoteDbManager.getLocalDbKeyFromRemote(projectId).signInToLocal()
 
     override fun signIn(projectId: String, tokens: Tokens): Completable =
-        remoteDbManager
-            .signInToRemoteDb(tokens)
-            .andThen(getLocalKeyAndSignInToLocal(projectId))
+        remoteDbManager.signInToRemoteDb(tokens).andThen(getLocalKeyAndSignInToLocal(projectId))
 
     private fun Single<out LocalDbKey>.signInToLocal(): Completable =
-        flatMapCompletable { key ->
-            localDbManager.signInToLocal(key)
+        flatMapCompletable {
+            localDbManager.signInToLocal()
         }
 
     override fun signOut() {
-        localDbManager.signOutOfLocal()
         remoteDbManager.signOutOfRemoteDb()
     }
 
@@ -79,35 +72,32 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
             .uploadPerson(fbPerson)
             .andThen(remoteDbManager.downloadPerson(fbPerson.patientId, fbPerson.projectId))
 
-    private fun Single<out fb_Person>.updatePersonInLocal(): Completable =
-        flatMapCompletable {
-            localDbManager.insertOrUpdatePersonInLocal(rl_Person(it))
-        }
-
-    override fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback) {
-        val result = localDbManager.loadPeopleFromLocal(
-            projectId = projectId,
-            patientId = guid).map { it.libPerson }
-
-        if (result.isEmpty()) {
-            remoteDbManager.downloadPerson(guid, projectId)
-                .subscribeBy(
-                    onSuccess = {
-                        destinationList.add(rl_Person(it).libPerson)
-                        callback.onSuccess()
-                    },
-                    onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
-        } else {
-            destinationList.add(result.first())
-            callback.onSuccess()
-        }
+    private fun Single<out fb_Person>.updatePersonInLocal(): Completable = flatMapCompletable {
+        localDbManager.insertOrUpdatePersonInLocal(rl_Person(it))
     }
+
+    override fun loadPerson(destinationList: MutableList<Person>,
+                            projectId: String,
+                            guid: String,
+                            callback: DataCallback) {
+
+        localDbManager.loadPersonFromLocal(guid).subscribe({
+            destinationList.add(it)
+            callback.onSuccess()
+        }, {
+            remoteDbManager.downloadPerson(guid, projectId).subscribeBy(
+                onSuccess = { destinationList.add(rl_Person(it).libPerson); callback.onSuccess() },
+                onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
+        })
+
+    }
+
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
         val result = when (group) {
-            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal().map { it.libPerson }
-            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(userId = userId).map { it.libPerson }
-            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(moduleId = moduleId).map { it.libPerson }
+            Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocal().blockingGet().map { it.libPerson }
+            Constants.GROUP.USER -> localDbManager.loadPeopleFromLocal(userId = userId).blockingGet().map { it.libPerson }
+            Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocal(moduleId = moduleId).blockingGet().map { it.libPerson }
         }
         destinationList.addAll(result)
         callback?.onSuccess()
@@ -117,8 +107,13 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                                 projectId: String?,
                                 userId: String?,
                                 moduleId: String?,
-                                toSync: Boolean?): Int =
-        localDbManager.getPeopleCountFromLocal(projectId, personId, userId, moduleId, toSync)
+                                toSync: Boolean?): Single<Int> =
+        localDbManager.getPeopleCountFromLocal(
+            patientId = personId,
+            userId = userId,
+            moduleId = moduleId,
+            toSync = toSync
+        )
 
     override fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
         remoteDbManager.saveIdentificationInRemote(probe, projectId, userId, moduleId, androidId, matchSize, matches, sessionId)
@@ -140,11 +135,13 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         SyncExecutor(
             localDbManager,
             remoteDbManager,
-            JsonHelper.gson).sync(interrupted, parameters)
+            JsonHelper.gson
+        ).sync(interrupted, parameters)
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP): Completable {
         val firebaseManager = remoteDbManager as FirebaseManager
-        val realmManager = localDbManager as RealmDbManager
+        val realmManager = localDbManager as RealmDbManagerImpl
         return LocalDbRecovererImpl(realmManager, firebaseManager, projectId, userId, androidId, moduleId, group).recoverDb()
     }
+
 }

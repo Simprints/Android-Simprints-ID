@@ -9,9 +9,9 @@ import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.testUtils.anyNotNull
+import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.extensions.scannerAppIntent
-import com.simprints.id.testUtils.roboletric.*
 import io.reactivex.Completable
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue

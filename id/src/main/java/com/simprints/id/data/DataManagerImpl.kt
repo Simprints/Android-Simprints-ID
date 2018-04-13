@@ -1,4 +1,3 @@
-
 package com.simprints.id.data
 
 import android.content.Context
@@ -23,6 +22,7 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
+import io.reactivex.Single
 
 class DataManagerImpl(private val context: Context,
                       private val preferencesManager: PreferencesManager,
@@ -108,12 +108,13 @@ class DataManagerImpl(private val context: Context,
         dbManager.loadPeople(destinationList, group, userId, moduleId, callback)
     }
 
-    override fun getPeopleCount(group: Constants.GROUP): Int =
+    override fun getPeopleCount(group: Constants.GROUP): Single<Int> = Single.create {
         when (group) {
-            Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
-            Constants.GROUP.USER -> dbManager.getPeopleCount(userId = userId)
-            Constants.GROUP.MODULE -> dbManager.getPeopleCount(userId = userId, moduleId = moduleId)
+            Constants.GROUP.GLOBAL -> it.onSuccess(dbManager.getPeopleCount().blockingGet())
+            Constants.GROUP.USER -> it.onSuccess(dbManager.getPeopleCount(userId = userId).blockingGet())
+            Constants.GROUP.MODULE -> it.onSuccess(dbManager.getPeopleCount(userId = userId, moduleId = moduleId).blockingGet())
         }
+    }
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
         dbManager.saveIdentification(probe, getSignedInProjectIdOrEmpty(), userId, deviceId, moduleId, matchSize, matches, sessionId)

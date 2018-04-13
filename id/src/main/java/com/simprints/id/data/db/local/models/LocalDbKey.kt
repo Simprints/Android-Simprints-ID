@@ -1,6 +1,5 @@
-package com.simprints.id.data.db.local
+package com.simprints.id.data.db.local.models
 
-import com.simprints.id.data.db.remote.models.fs_RealmKeys
 import java.util.*
 
 

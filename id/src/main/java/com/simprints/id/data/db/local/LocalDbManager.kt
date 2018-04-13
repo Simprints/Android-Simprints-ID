@@ -2,23 +2,21 @@ package com.simprints.id.data.db.local
 
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.libcommon.Person
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import io.reactivex.Single
+
 
 interface LocalDbManager {
 
     // Lifecycle
-    fun signInToLocal(localDbKey: LocalDbKey): Completable
-
-    fun signOutOfLocal()
-
-    fun isLocalDbInitialized(projectId: String): Boolean
+    fun signInToLocal(): Completable
 
     // Data transfer
     fun insertOrUpdatePersonInLocal(person: rl_Person): Completable
@@ -26,31 +24,26 @@ interface LocalDbManager {
     fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
                                               gson: Gson,
                                               syncParams: SyncTaskParameters,
-                                              shouldStop: (personSaved: fb_Person) -> Boolean)
+                                              shouldStop: (personSaved: fb_Person) -> Boolean): Completable
 
     fun getPeopleCountFromLocal(patientId: String? = null,
-                                projectId: String? = null,
                                 userId: String? = null,
                                 moduleId: String? = null,
-                                toSync: Boolean? = null): Int
+                                toSync: Boolean? = null): Single<Int>
+
+    fun loadPersonFromLocal(personId: String): Single<Person>
 
     fun loadPeopleFromLocal(patientId: String? = null,
-                            projectId: String? = null,
                             userId: String? = null,
                             moduleId: String? = null,
-                            toSync: Boolean? = null): ArrayList<rl_Person>
+                            toSync: Boolean? = null): Single<ArrayList<rl_Person>>
 
     fun loadPeopleFromLocalRx(patientId: String? = null,
-                              projectId: String? = null,
                               userId: String? = null,
                               moduleId: String? = null,
                               toSync: Boolean? = null): Flowable<rl_Person>
 
     //Sync
-    fun getSyncInfoFor(typeSync: Constants.GROUP): RealmSyncInfo?
+    fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo>
 
-    // Database instances
-    fun getValidRealmConfig(): RealmConfiguration
-
-    fun getRealmInstance(): Realm
 }

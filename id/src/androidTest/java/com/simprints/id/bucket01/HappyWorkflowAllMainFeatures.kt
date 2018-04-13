@@ -5,7 +5,7 @@ import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
-import com.simprints.id.data.db.local.RealmConfig
+import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.templates.FirstUseTest
 import com.simprints.id.templates.HappyBluetooth
 import com.simprints.id.templates.HappyWifi

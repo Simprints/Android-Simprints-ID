@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.local.models
+package com.simprints.id.data.db.local.realm.models
 
 import com.google.gson.annotations.JsonAdapter
 import com.simprints.id.data.db.remote.models.fb_Fingerprint

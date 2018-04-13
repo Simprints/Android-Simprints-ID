@@ -31,8 +31,8 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
-        mockRemoteDbManager(app)
         mockLocalDbManager(app)
+        mockRemoteDbManager(app)
         mockDbManager(app)
         apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
     }

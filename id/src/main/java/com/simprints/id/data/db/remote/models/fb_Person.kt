@@ -2,7 +2,7 @@ package com.simprints.id.data.db.remote.models
 
 import com.google.firebase.firestore.ServerTimestamp
 import com.google.gson.annotations.SerializedName
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.tools.json.PostGsonProcessable
 import com.simprints.id.tools.json.SkipSerialisationProperty
 import com.simprints.libcommon.Person
