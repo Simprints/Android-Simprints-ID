@@ -14,6 +14,7 @@ import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.extensions.awaitAndAssertSuccess
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople
+import io.reactivex.Completable
 import io.realm.Realm
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -170,7 +171,7 @@ class RealmManagerTests : RealmTestsBase() {
     @Test
     fun savePeopleFromStream_ShouldSucceed() {
         val downloadPeople = getRandomPeople(35)
-        saveFromStream(GLOBAL, 35, downloadPeople)
+        saveFromStream(GLOBAL, 35, downloadPeople).test().awaitAndAssertSuccess()
 
         assertEquals(realm.where(rl_Person::class.java).count(), 35)
         downloadPeople.forEach {
@@ -181,7 +182,7 @@ class RealmManagerTests : RealmTestsBase() {
     @Test
     fun savePeopleFromStream_ShouldSaveLatestSyncTime() {
         val downloadPeople = getRandomPeople(35)
-        saveFromStream(GLOBAL, 35, downloadPeople)
+        saveFromStream(GLOBAL, 35, downloadPeople).test().awaitAndAssertSuccess()
 
         val latestPersonTime = Calendar.getInstance().apply {
             time = downloadPeople.maxBy { it.updatedAt?.time ?: 0 }?.updatedAt
@@ -199,7 +200,7 @@ class RealmManagerTests : RealmTestsBase() {
 
     @Test
     fun updateSyncInfo_ShouldSucceed() {
-        saveFromStream(GLOBAL)
+        saveFromStream(GLOBAL).test().awaitAndAssertSuccess()
 
         assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal).count(), 1)
@@ -209,8 +210,8 @@ class RealmManagerTests : RealmTestsBase() {
 
     @Test
     fun updateSyncInfoBesidesProject_ShouldNotReturnProjectSync() {
-        saveFromStream(USER)
-        saveFromStream(MODULE)
+        saveFromStream(USER).test().awaitAndAssertSuccess()
+        saveFromStream(MODULE).test().awaitAndAssertSuccess()
 
         assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, GLOBAL.ordinal).count(), 0)
@@ -220,7 +221,7 @@ class RealmManagerTests : RealmTestsBase() {
 
     @Test
     fun updateUserSyncInfo_ShouldSucceed() {
-        saveFromStream(USER)
+        saveFromStream(USER).test().awaitAndAssertSuccess()
 
         assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, USER.ordinal).count(), 1)
@@ -230,8 +231,8 @@ class RealmManagerTests : RealmTestsBase() {
 
     @Test
     fun updateSyncInfoBesidesUser_ShouldNotReturnUserSync() {
-        saveFromStream(GLOBAL)
-        saveFromStream(MODULE)
+        saveFromStream(GLOBAL).test().awaitAndAssertSuccess()
+        saveFromStream(MODULE).test().awaitAndAssertSuccess()
 
         assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, USER.ordinal).count(), 0)
@@ -241,7 +242,7 @@ class RealmManagerTests : RealmTestsBase() {
 
     @Test
     fun updateModuleSyncInfo_ShouldSucceed() {
-        saveFromStream(MODULE)
+        saveFromStream(MODULE).test().awaitAndAssertSuccess()
 
         assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, MODULE.ordinal).count(), 1)
@@ -251,8 +252,8 @@ class RealmManagerTests : RealmTestsBase() {
 
     @Test
     fun updateSyncInfoBesidesModule_ShouldNotReturnModuleSync() {
-        saveFromStream(GLOBAL)
-        saveFromStream(USER)
+        saveFromStream(GLOBAL).test().awaitAndAssertSuccess()
+        saveFromStream(USER).test().awaitAndAssertSuccess()
 
         assertEquals(realm.where(rl_SyncInfo::class.java)
             .equalTo(SYNC_ID_FIELD, MODULE.ordinal).count(), 0)
@@ -292,7 +293,7 @@ class RealmManagerTests : RealmTestsBase() {
 
     private fun saveFromStream(group: Constants.GROUP,
                                numberOfPeople: Int = 35,
-                               downloadPeople: ArrayList<rl_Person> = getRandomPeople(numberOfPeople)) {
+                               downloadPeople: ArrayList<rl_Person> = getRandomPeople(numberOfPeople)): Completable {
 
         val json = JsonHelper.toJson(downloadPeople.map { fb_Person(it) }).byteInputStream()
         val reader = JsonReader(InputStreamReader(json) as Reader?).apply { beginArray() }
@@ -311,7 +312,7 @@ class RealmManagerTests : RealmTestsBase() {
             )
         }
 
-        realmManager.savePeopleFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams, { false })
+        return realmManager.savePeopleFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams, { false })
     }
 
 }

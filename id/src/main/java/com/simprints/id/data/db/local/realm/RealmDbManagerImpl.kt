@@ -11,7 +11,6 @@ import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
-import com.simprints.id.exceptions.safe.NotSignedInException
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.BackpressureStrategy
@@ -22,7 +21,6 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import io.realm.Sort
-import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -39,8 +37,6 @@ class RealmDbManagerImpl(private val appContext: Context,
         const val MODULE_ID_FIELD = "moduleId"
         const val TO_SYNC_FIELD = "toSync"
         const val UPDATE_TIME_FIELD = "updatedAt"
-
-        private const val LEGACY_APP_KEY_LENGTH: Int = 8
     }
 
     private var realmConfig: RealmConfiguration? = null
@@ -49,56 +45,57 @@ class RealmDbManagerImpl(private val appContext: Context,
         Realm.init(appContext)
     }
 
-    override fun signInToLocal(): Completable = Completable.create { em ->
-        migrateLegacyDatabaseIfRequired(getLocalDbKey())
-        getRealmInstance().use { em.onComplete() }
+    override fun signInToLocal(): Completable = getLocalDbKey().flatMapCompletable {
+        EncryptionMigration(it, appContext)
+        getRealmInstance().map { realm -> realm.use { } }.toCompletable()
     }
 
-    override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable = Completable.create { em ->
-        getRealmInstance().use {
-            it.executeTransaction { it.insertOrUpdate(person) }
-        }.let { em.onComplete() }
-    }
+    override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable =
+        getRealmInstance().flatMapCompletable {
+            it.use {
+                it.executeTransaction { it.insertOrUpdate(person) }.let { Completable.complete() }
+            }
+        }
 
     override fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
                                                        gson: Gson,
                                                        syncParams: SyncTaskParameters,
-                                                       shouldStop: (personSaved: fb_Person) -> Boolean) {
-        getRealmInstance().use {
-            it.executeTransaction {
-                while (readerOfPeopleArray.hasNext()) {
+                                                       shouldStop: (personSaved: fb_Person) -> Boolean): Completable =
+        getRealmInstance().map {
+            it.use {
+                //TODO Try to throw and exception in the method to see if it's caught in the caller
+                it.executeTransaction {
+                    while (readerOfPeopleArray.hasNext()) {
 
-                    val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPeopleArray, it)
-                    it.insertOrUpdate(rl_SyncInfo(
-                        syncGroupId = syncParams.toGroup().ordinal,
-                        lastSyncTime = lastPersonSaved.updatedAt ?: Date(0))
-                    )
+                        val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPeopleArray, it)
+                        it.insertOrUpdate(rl_SyncInfo(
+                            syncGroupId = syncParams.toGroup().ordinal,
+                            lastSyncTime = lastPersonSaved.updatedAt ?: Date(0))
+                        )
 
-                    if (shouldStop(lastPersonSaved)) {
-                        break
+                        if (shouldStop(lastPersonSaved)) {
+                            break
+                        }
                     }
                 }
             }
-        }
-        updateSyncInfo(syncParams)
-    }
+            updateSyncInfo(syncParams)
+        }.toCompletable()
 
     override fun getPeopleCountFromLocal(patientId: String?,
                                          userId: String?,
                                          moduleId: String?,
-                                         toSync: Boolean?): Single<Int> = Single.create { em ->
-        getRealmInstance().use {
-            em.onSuccess(buildQueryForPerson(it, patientId, userId, moduleId, toSync).count().toInt())
-        }
+                                         toSync: Boolean?): Single<Int> = getRealmInstance().map {
+        it.use { buildQueryForPerson(it, patientId, userId, moduleId, toSync).count().toInt() }
     }
 
-    override fun loadPersonFromLocal(personId: String): Single<Person> = Single.create { em ->
-        getRealmInstance().use {
+    override fun loadPersonFromLocal(personId: String): Single<Person> = getRealmInstance().map {
+        it.use {
             it.where(rl_Person::class.java).equalTo(PATIENT_ID_FIELD, personId).findFirst().let {
                 if (it != null)
-                    em.onSuccess(it.libPerson)
+                    return@map it.libPerson
                 else
-                    em.onError(IllegalStateException())
+                    throw IllegalStateException()
             }
         }
     }
@@ -106,61 +103,62 @@ class RealmDbManagerImpl(private val appContext: Context,
     override fun loadPeopleFromLocal(patientId: String?,
                                      userId: String?,
                                      moduleId: String?,
-                                     toSync: Boolean?): Single<ArrayList<rl_Person>> = Single.create { em ->
-        getRealmInstance().use {
+                                     toSync: Boolean?): Single<ArrayList<rl_Person>> =
+        getRealmInstance().map {
             val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync)
-            em.onSuccess(ArrayList(it.copyFromRealm(query.findAll(), 4)))
+            ArrayList(it.copyFromRealm(query.findAll(), 4))
         }
-    }
 
     override fun loadPeopleFromLocalRx(patientId: String?,
                                        userId: String?,
                                        moduleId: String?,
                                        toSync: Boolean?): Flowable<rl_Person> =
-        Flowable.create({ emitter ->
-            getRealmInstance().use {
-                val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync)
-                val people = query.findAll()
-                for (person in people) {
-                    emitter.onNext(person)
-                }
-                emitter.onComplete()
-            }
-        }, BackpressureStrategy.BUFFER)
 
-    override fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo> = Single.create { em ->
-        getRealmInstance().use {
+        getRealmInstance().toFlowable().flatMap {
+            Flowable.create<rl_Person>({ emitter ->
+                it.use {
+                    val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync)
+                    val people = query.findAll()
+                    for (person in people) {
+                        emitter.onNext(person)
+                    }
+                    emitter.onComplete()
+                }
+            }, BackpressureStrategy.BUFFER)
+        }
+
+    override fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo> =
+        getRealmInstance().map {
             it.where(rl_SyncInfo::class.java)
                 .equalTo(SYNC_ID_FIELD, typeSync.ordinal)
                 .findFirst().let {
                     if (it == null)
-                        em.onError(IllegalStateException())
+                        throw IllegalStateException()
                     else
-                        em.onSuccess(it)
+                        return@map it
                 }
+
+        }
+
+    private fun getLocalDbKey(): Single<LocalDbKey> =
+        projectIdProvider.getSignedInProjectId().flatMap { localDbKeyProvider.getLocalDbKey(it) }
+
+    private fun getRealmConfig(): Single<RealmConfiguration> = realmConfig.let {
+        return if (it == null) {
+            getLocalDbKey().flatMap { createAndSaveRealmConfig(it) }
+        } else {
+            Single.just(it)
         }
     }
 
-    private fun getLocalDbKey(): LocalDbKey {
-        try {
-            val projectId = projectIdProvider.getSignedInProjectId().blockingGet()
-            return localDbKeyProvider.getLocalDbKey(projectId).blockingGet()
-        } catch (e: Exception) {
-            throw NotSignedInException(cause = e)
-        }
-    }
+    private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
+        Single.just(RealmConfig.get(localDbKey.projectId, localDbKey.value)
+            .also { realmConfig = it })
 
-    private fun getRealmConfig(localDbKey: LocalDbKey) =
-        RealmConfig.get(localDbKey.projectId, localDbKey.value)
-
-    private fun getRealmInstance(): Realm {
-        return realmConfig.let {
-            if (it == null)
-                getRealmConfig(getLocalDbKey()).let { realmConfig = it; Realm.getInstance(it) }
-            else
-                Realm.getInstance(it)
+    private fun getRealmInstance(): Single<Realm> = getRealmConfig()
+        .flatMap {
+            Single.just(Realm.getInstance(it))
         }
-    }
 
     private fun buildQueryForPerson(realm: Realm,
                                     patientId: String? = null,
@@ -183,41 +181,8 @@ class RealmDbManagerImpl(private val appContext: Context,
         moduleId = syncParams.moduleId
     )
 
-    private fun migrateLegacyDatabaseIfRequired(dbKey: LocalDbKey) {
-        if (checkIfLegacyDatabaseNeedsToMigrate(dbKey))
-            migrateLegacyRealm(dbKey)
-    }
-
-    private fun checkIfLegacyDatabaseNeedsToMigrate(dbKey: LocalDbKey): Boolean {
-        if (dbKey.legacyApiKey.isEmpty())
-            return false
-
-        val legacyConfig = getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey)
-        val newConfig = RealmConfig.get(dbKey.projectId, dbKey.value)
-
-        return File(legacyConfig.path).exists() && !File(newConfig.path).exists()
-    }
-
-    private fun migrateLegacyRealm(dbKey: LocalDbKey) {
-        val legacyConfig = getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey)
-
-        Realm.getInstance(legacyConfig).use {
-            it.writeEncryptedCopyTo(File(appContext.filesDir, "${dbKey.projectId}.realm"), dbKey.value)
-        }
-
-        deleteRealm(legacyConfig)
-    }
-
-    private fun getLegacyConfig(legacyApiKey: String, legacyDatabaseKey: ByteArray): RealmConfiguration =
-        RealmConfig.get(legacyApiKey.substring(0, LEGACY_APP_KEY_LENGTH), legacyDatabaseKey)
-
-    private fun deleteRealm(config: RealmConfiguration) {
-        Realm.deleteRealm(config)
-        File(appContext.filesDir, "${config.path}.lock").delete()
-    }
-
-    private fun updateSyncInfo(syncParams: SyncTaskParameters) {
-        getRealmInstance().use { realm ->
+    private fun updateSyncInfo(syncParams: SyncTaskParameters): Completable =
+        getRealmInstance().map { realm ->
             buildQueryForPerson(realm, syncParams)
                 .sort(UPDATE_TIME_FIELD, Sort.DESCENDING)
                 .findAll()
@@ -229,8 +194,7 @@ class RealmDbManagerImpl(private val appContext: Context,
                         )
                     }
                 }
-        }
-    }
+        }.toCompletable()
 
     private fun parseFromStreamAndSavePerson(gson: Gson,
                                              readerOfPersonsArray: JsonReader,
