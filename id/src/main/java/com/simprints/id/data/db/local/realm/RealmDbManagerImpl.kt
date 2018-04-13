@@ -110,7 +110,7 @@ class RealmDbManagerImpl(private val appContext: Context,
                                        moduleId: String?,
                                        toSync: Boolean?): Flowable<rl_Person> =
 
-        getRealmInstance().toFlowable().flatMap {
+        getRealmInstance().flatMapPublisher {
             Flowable.create<rl_Person>({ emitter ->
                 it.use {
                     val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync)
