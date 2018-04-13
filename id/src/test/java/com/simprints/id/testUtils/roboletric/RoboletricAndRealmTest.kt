@@ -12,7 +12,7 @@ import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.authListener.FirebaseAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
-import com.simprints.id.data.db.remote.network.RemoteApiInterface
+import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.whenever
 import io.reactivex.Completable
@@ -43,10 +43,11 @@ fun mockIsSignedIn(app: Application, sharedPrefs: SharedPreferences) {
         sharedPrefs.getBoolean("IS_FIREBASE_TOKEN_VALID", false)
     }
     Mockito.doAnswer(answer).`when`(app.remoteDbManager).isSignedIn(anyNotNull(), anyNotNull())
+    whenever(app.remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just(""))
 }
 
 fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer: MockWebServer): Triple<DbManager, LocalDbManager, RemoteDbManager> {
-    RemoteApiInterface.baseUrl = mockServer.url("/").toString()
+    PeopleRemoteInterface.baseUrl = mockServer.url("/").toString()
     val localDbManager = Mockito.spy(LocalDbManager::class.java)
     val mockConnectionListenerManager = Mockito.mock(FirebaseConnectionListenerManager::class.java)
     val mockAuthListenerManager = Mockito.mock(FirebaseAuthListenerManager::class.java)

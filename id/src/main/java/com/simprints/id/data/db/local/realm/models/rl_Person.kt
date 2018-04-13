@@ -15,6 +15,15 @@ import kotlin.collections.ArrayList
 
 open class rl_Person : RealmObject {
 
+    companion object {
+        const val USER_ID_FIELD = "userId"
+        const val PROJECT_ID_FIELD = "projectId"
+        const val PATIENT_ID_FIELD = "patientId"
+        const val MODULE_ID_FIELD = "moduleId"
+        const val TO_SYNC_FIELD = "toSync"
+        const val UPDATE_TIME_FIELD = "updatedAt"
+    }
+
     @PrimaryKey
     @SerializedName("id")
     lateinit var patientId: String

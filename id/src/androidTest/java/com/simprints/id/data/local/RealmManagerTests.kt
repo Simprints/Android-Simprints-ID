@@ -3,7 +3,6 @@ package com.simprints.id.data.local
 import android.support.test.runner.AndroidJUnit4
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
-import com.simprints.id.data.db.local.realm.RealmDbManagerImpl.Companion.PATIENT_ID_FIELD
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl.Companion.SYNC_ID_FIELD
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
@@ -152,7 +151,7 @@ class RealmManagerTests : RealmTestsBase() {
 
     @Test
     fun loadPeopleFromLocalByToSyncTrue_ShouldLoadAllPeople() {
-        saveFakePeople(realm, getRandomPeople(20))
+        saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
         val people = realmManager.loadPeopleFromLocal(toSync = true).blockingGet()
         assertEquals(people.size, 20)
@@ -160,7 +159,7 @@ class RealmManagerTests : RealmTestsBase() {
 
     @Test
     fun loadPeopleFromLocalByToSyncFalse_ShouldLoadNoPeople() {
-        saveFakePeople(realm, getRandomPeople(20))
+        saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
         val people = realmManager.loadPeopleFromLocal(toSync = false).blockingGet()
         assertEquals(people.size, 0)
@@ -173,7 +172,7 @@ class RealmManagerTests : RealmTestsBase() {
 
         assertEquals(realm.where(rl_Person::class.java).count(), 35)
         downloadPeople.forEach {
-            assertTrue(realm.where(rl_Person::class.java).contains(PATIENT_ID_FIELD, it.patientId).isValid)
+            assertTrue(realm.where(rl_Person::class.java).contains(rl_Person.PATIENT_ID_FIELD, it.patientId).isValid)
         }
     }
 

@@ -1,9 +1,24 @@
 package com.simprints.id.services.sync
 
+import com.simprints.id.data.DataManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.progress.service.ProgressTaskParameters
 
 sealed class SyncTaskParameters(open val projectId: String, open val moduleId: String?, open val userId: String?) : ProgressTaskParameters {
+
+    companion object {
+        const val PROJECT_ID_FIELD = "projectId"
+        const val USER_ID_FIELD = "userId"
+        const val MODULE_ID_FIELD = "moduleId"
+
+        @JvmStatic fun build(group: Constants.GROUP, dataManager: DataManager): SyncTaskParameters {
+            return when (group) {
+                Constants.GROUP.GLOBAL -> GlobalSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty())
+                Constants.GROUP.USER -> UserSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
+                Constants.GROUP.MODULE -> ModuleIdSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.moduleId)
+            }
+        }
+    }
 
     data class UserSyncTaskParameters(override val projectId: String,
                                       override val userId: String) : SyncTaskParameters(projectId, null, userId)
@@ -22,9 +37,9 @@ sealed class SyncTaskParameters(open val projectId: String, open val moduleId: S
     }
 
     fun toMap(): Map<String, String> {
-        val map = mutableMapOf("projectId" to projectId)
-        moduleId?.let { map["moduleId"] = it }
-        userId?.let { map["userId"] = it }
+        val map = mutableMapOf(PROJECT_ID_FIELD to projectId)
+        moduleId?.let { map[MODULE_ID_FIELD] = it }
+        userId?.let { map[USER_ID_FIELD] = it }
         return map
     }
 }

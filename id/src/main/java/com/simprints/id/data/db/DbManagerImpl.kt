@@ -5,6 +5,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
@@ -28,8 +29,8 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
 
-class DbManagerImpl(private val localDbManager: LocalDbManager,
-                    private val remoteDbManager: RemoteDbManager) :
+class DbManagerImpl(override val localDbManager: LocalDbManager,
+                    override val remoteDbManager: RemoteDbManager) :
     DbManager,
     RemoteDbManager by remoteDbManager {
 
@@ -62,7 +63,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                 uploadPersonAndDownloadAgain(fbPerson)
                     .updatePersonInLocal()
                     .subscribeOn(Schedulers.io())
-                    .subscribe()
+                    .subscribeBy (onComplete = {}, onError = { it.printStackTrace() })
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -89,9 +90,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                 onSuccess = { destinationList.add(rl_Person(it).libPerson); callback.onSuccess() },
                 onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
         })
-
     }
-
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
         val result = when (group) {
@@ -102,6 +101,29 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
         destinationList.addAll(result)
         callback?.onSuccess()
     }
+
+    override fun loadProject(projectId: String): Single<Project> =
+        localDbManager.loadProjectFromLocal(projectId)
+            .doAfterSuccess {
+                refreshProjectInfoWithServer(projectId)
+            }
+            .onErrorResumeNext {
+                refreshProjectInfoWithServer(projectId)
+            }
+
+    private fun refreshProjectInfoWithServer(projectId: String): Single<Project> {
+        return remoteDbManager.loadProjectFromRemote(projectId).doAfterSuccess {
+            localDbManager.saveProjectIntoLocal(it)
+        }
+    }
+
+    override fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int> =
+        localDbManager.getPeopleCountFromLocal(
+            userId = syncParams.userId,
+            moduleId = syncParams.moduleId,
+            toSync = false).map {
+                Math.max(nPatientsOnServerForSyncParam - it, 0)
+            }
 
     override fun getPeopleCount(personId: String?,
                                 projectId: String?,
@@ -133,8 +155,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
 
     override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
         SyncExecutor(
-            localDbManager,
-            remoteDbManager,
+            this,
             JsonHelper.gson
         ).sync(interrupted, parameters)
 

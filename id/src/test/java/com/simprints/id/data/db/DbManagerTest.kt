@@ -4,7 +4,7 @@ import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.network.RemoteApiInterface
+import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.retrofit.mockServer.mockFailingResponse
@@ -32,12 +32,12 @@ import java.util.concurrent.CompletableFuture
 class DbManagerTest : RxJavaTest() {
 
     private var mockServer = MockWebServer()
-    private lateinit var apiClient: SimApiClient<RemoteApiInterface>
+    private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
 
     @Before
     fun setUp() {
         mockServer.start()
-        apiClient = SimApiClient(RemoteApiInterface::class.java, RemoteApiInterface.baseUrl)
+        apiClient = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl)
     }
 
     @Test

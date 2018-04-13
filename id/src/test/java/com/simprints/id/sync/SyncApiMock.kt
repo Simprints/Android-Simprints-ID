@@ -1,7 +1,8 @@
 package com.simprints.id.sync
 
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.network.RemoteApiInterface
+import com.simprints.id.data.db.remote.network.DownSyncParams
+import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.sync.model.PeopleCount
 import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import io.reactivex.Completable
@@ -15,18 +16,18 @@ import retrofit2.mock.Calls
 
 // It's required to use NetworkBehavior, even if response is not used in the tests (e.g failing responses due to no connectivity).
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
-class SimApiMock(private val delegate: BehaviorDelegate<RemoteApiInterface>) : RemoteApiInterface {
+class SimApiMock(private val delegate: BehaviorDelegate<PeopleRemoteInterface>) : PeopleRemoteInterface {
 
     override fun uploadPeople(patientsJson: HashMap<String, ArrayList<fb_Person>>): Completable {
         return delegate.returning(buildSuccessResponseWith("")).uploadPeople(patientsJson)
     }
 
-    override fun downSync(date: Long, syncParams: Map<String, String>, batchSize: Int): Single<ResponseBody> {
-        return delegate.returning(buildSuccessResponseWith("")).downSync(date, syncParams)
+    override fun downSync(projectId: String, syncParams: DownSyncParams, batchSize: Int): Single<ResponseBody> {
+        return delegate.returning(buildSuccessResponseWith("")).downSync("", syncParams)
     }
 
-    override fun downloadPeople(patientId: String, projectId: String): Single<ArrayList<fb_Person>> {
-        return delegate.returning(buildSuccessResponseWith("")).downloadPeople(patientId, projectId)
+    override fun person(patientId: String, projectId: String): Single<fb_Person> {
+        return delegate.returning(buildSuccessResponseWith("")).person(patientId, projectId)
     }
 
     override fun peopleCount(syncParams: Map<String, String>): Single<PeopleCount> {
@@ -38,6 +39,6 @@ class SimApiMock(private val delegate: BehaviorDelegate<RemoteApiInterface>) : R
     }
 }
 
-fun createMockServiceToFailRequests(retrofit: Retrofit): RemoteApiInterface {
-    return SimApiMock(createMockBehaviorService(retrofit, 0, RemoteApiInterface::class.java))
+fun createMockServiceToFailRequests(retrofit: Retrofit): PeopleRemoteInterface {
+    return SimApiMock(createMockBehaviorService(retrofit, 0, PeopleRemoteInterface::class.java))
 }
