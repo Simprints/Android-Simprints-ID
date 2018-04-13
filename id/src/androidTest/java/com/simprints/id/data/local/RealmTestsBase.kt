@@ -1,12 +1,11 @@
 package com.simprints.id.data.local
 
 import android.support.test.InstrumentationRegistry
-import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbKeyProvider
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmConfig
-import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.domain.Constants.GROUP.*
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import io.reactivex.Single
@@ -15,16 +14,15 @@ import io.realm.RealmConfiguration
 import java.io.File
 import java.util.*
 
-
 open class RealmTestsBase {
 
     companion object {
-        private const val KEY_LENGTH = 64
-
-        const val legacyDatabaseName: String = "legacyDB"
-        const val newDatabaseName: String = "newDatabase"
-        val newDatabaseKey: ByteArray = Arrays.copyOf("newKey".toByteArray(), KEY_LENGTH)
+        const val KEY_LENGTH = 64
     }
+
+    val newDatabaseKey: ByteArray = Arrays.copyOf("newKey".toByteArray(), KEY_LENGTH)
+    val legacyDatabaseName: String = "${Date().time}legacyDB"
+    val newDatabaseName: String = "${Date().time}newDatabase"
 
     protected val localDbKey = LocalDbKey(newDatabaseName, newDatabaseKey, legacyDatabaseName)
     protected val config: RealmConfiguration
@@ -74,19 +72,16 @@ open class RealmTestsBase {
         Realm.deleteRealm(realmConfig)
         File("${realmConfig.path}.lock").delete()
     }
-
 }
 
-class TestProjectIdProvider : ProjectIdProvider {
-    override fun getSignedInProjectId(): Single<String> = Single.create {
-        it.onSuccess(RealmTestsBase.newDatabaseName)
-    }
-}
+class TestLocalDbKeyProvider(private val newDbName: String,
+                             private val dbKey: ByteArray,
+                             private val legacyDbName: String) : LocalDbKeyProvider {
 
-class TestLocalDbKeyProvider : LocalDbKeyProvider {
-    override fun getLocalDbKey(projectId: String): Single<LocalDbKey> = Single.create {
-        it.onSuccess(LocalDbKey(RealmTestsBase.newDatabaseName,
-            RealmTestsBase.newDatabaseKey,
-            RealmTestsBase.legacyDatabaseName))
+    override fun getLocalDbKey(): Single<LocalDbKey> = Single.create {
+        it.onSuccess(LocalDbKey(
+            newDbName,
+            dbKey,
+            legacyDbName))
     }
 }

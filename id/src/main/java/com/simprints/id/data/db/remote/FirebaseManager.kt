@@ -9,20 +9,21 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
+import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbKeyProvider
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
+import com.simprints.id.data.db.remote.adapters.toLocalDbKey
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
-import com.simprints.id.data.db.remote.adapters.toLocalDbKey
+import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.data.db.remote.network.RemoteApiInterface
+import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
-import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
@@ -40,8 +41,8 @@ import io.reactivex.SingleEmitter
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
 
-
 class FirebaseManager(private val appContext: Context,
+                      private val projectIdProvider: ProjectIdProvider,
                       firebaseConnectionListenerManager: RemoteDbConnectionListenerManager,
                       firebaseAuthListenerManager: RemoteDbAuthListenerManager,
                       private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
@@ -55,6 +56,8 @@ class FirebaseManager(private val appContext: Context,
     // FirebaseApp
     private lateinit var legacyFirebaseApp: FirebaseApp
     private lateinit var firestoreFirebaseApp: FirebaseApp
+
+    private var tentativeSignedInProjectId: String? = null
 
     // Lifecycle
     override fun initialiseRemoteDb() {
@@ -149,11 +152,13 @@ class FirebaseManager(private val appContext: Context,
     // Firebase
     override fun getLocalDbKeyFromRemote(projectId: String): Single<LocalDbKey> =
         Single.create<LocalDbKey> { result ->
+            tentativeSignedInProjectId = null
             val db = FirebaseFirestore.getInstance(firestoreFirebaseApp)
             db.collection(COLLECTION_LOCAL_DB_KEYS)
                 .whereEqualTo(PROJECT_ID_FIELD, projectId)
                 .get()
                 .addOnCompleteListener {
+                    tentativeSignedInProjectId = projectId
                     handleGetLocalDbKeyTaskComplete(it, result)
                 }
         }
@@ -207,11 +212,17 @@ class FirebaseManager(private val appContext: Context,
             .addOnFailureListener { e -> it.onError(e) }
     }
 
-    override fun getLocalDbKey(projectId: String): Single<LocalDbKey> =
-        getLocalDbKeyFromRemote(projectId)
+    override fun getLocalDbKey(): Single<LocalDbKey> =
+        projectIdProvider.getSignedInProjectId()
+            .doOnSuccess {
+                tentativeSignedInProjectId = null
+            }.onErrorResumeNext {
+                Single.just(tentativeSignedInProjectId)
+            }.flatMap {
+                getLocalDbKeyFromRemote(it)
+            }
 
     // API
-
     override fun uploadPerson(fbPerson: fb_Person): Completable =
         uploadPeople(arrayListOf(fbPerson))
 
