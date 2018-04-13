@@ -3,6 +3,7 @@ package com.simprints.id.activities.about
 
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.Constants
+import com.simprints.id.exceptions.safe.SimprintsException
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -24,17 +25,16 @@ internal class AboutPresenter(private val view: AboutContract.View,
     }
 
     private fun initCounts() {
-        dataManager.getPeopleCount(Constants.GROUP.GLOBAL).subscribe { count ->
+        dataManager.getPeopleCount(Constants.GROUP.GLOBAL).subscribe({ count ->
             view.setProjectCount(count.toString())
-        }
-
-        dataManager.getPeopleCount(Constants.GROUP.MODULE).subscribe { count ->
+        }, { dataManager.logSafeException(SimprintsException(it)) })
+        dataManager.getPeopleCount(Constants.GROUP.MODULE).subscribe({ count ->
             view.setModuleCount(count.toString())
-        }
+        }, { dataManager.logSafeException(SimprintsException(it)) })
 
-        dataManager.getPeopleCount(Constants.GROUP.USER).subscribe { count ->
+        dataManager.getPeopleCount(Constants.GROUP.USER).subscribe({ count ->
             view.setUserCount(count.toString())
-        }
+        }, { dataManager.logSafeException(SimprintsException(it)) })
     }
 
     override fun recoverDb() {
