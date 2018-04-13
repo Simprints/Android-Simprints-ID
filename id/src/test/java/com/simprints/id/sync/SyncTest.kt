@@ -3,8 +3,9 @@ package com.simprints.id.sync
 import android.content.Context
 import com.google.gson.stream.JsonReader
 import com.simprints.id.BuildConfig
+import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmSyncInfo
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.FirebaseOptionsHelper
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -50,8 +51,12 @@ class SyncTest : RxJavaTest() {
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<RemoteApiInterface>
+    private val projectIdProviderMock = mock(ProjectIdProvider::class.java).also {
+        whenever(it.getSignedInProjectId()).thenReturn(Single.just("some_local_key"))
+    }
 
     private var remoteDbManager: RemoteDbManager = spy(FirebaseManager(mock(Context::class.java),
+        projectIdProviderMock,
         mock(FirebaseConnectionListenerManager::class.java),
         mock(RemoteDbAuthListenerManager::class.java),
         mock(FirebaseOptionsHelper::class.java)))
@@ -70,7 +75,7 @@ class SyncTest : RxJavaTest() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
 
         val patientsToUpload = getRandomPeople(35)
-        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
+        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(Single.create { it.onSuccess(patientsToUpload) })
         val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
@@ -96,7 +101,9 @@ class SyncTest : RxJavaTest() {
     fun uploadPeopleGetInterrupted_shouldStopUploading() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
         val peopleToUpload = getRandomPeople(35)
-        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(peopleToUpload)
+        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(
+            Single.create { it.onSuccess(peopleToUpload) }
+        )
         val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
         whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
 
@@ -254,11 +261,11 @@ class SyncTest : RxJavaTest() {
         mockLocalDbToSavePatientsFromStream(localDbMock)
 
         //Mock app has already patients in localDb
-        whenever(localDbMock.loadPeopleFromLocal(any(), any(), any(), any(), any())).thenReturn(getRandomPeople(patientsAlreadyInLocalDb))
-        whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any(), any())).thenReturn(patientsAlreadyInLocalDb)
+        whenever(localDbMock.loadPeopleFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(getRandomPeople(patientsAlreadyInLocalDb)) })
+        whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(patientsAlreadyInLocalDb) })
 
         //Mock app RealmSyncInfo for syncParams
-        whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup().ordinal, lastSyncTime))
+        whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup().ordinal, lastSyncTime)) })
 
         val sync = SyncExecutorMock(
             localDbMock,
@@ -294,7 +301,8 @@ class SyncTest : RxJavaTest() {
     }
 
     @After
-    @Throws fun tearDown() {
+    @Throws
+    fun tearDown() {
         mockServer.shutdown()
     }
 }

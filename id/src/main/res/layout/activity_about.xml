@@ -117,7 +117,8 @@
             <TextView
                 android:id="@+id/tv_userDbCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="@string/zero" />
 
         </LinearLayout>
 
@@ -140,7 +141,8 @@
             <TextView
                 android:id="@+id/tv_moduleDbCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="@string/zero" />
 
         </LinearLayout>
 
@@ -163,7 +165,8 @@
             <TextView
                 android:id="@+id/tv_globalDbCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="@string/zero" />
 
         </LinearLayout>
 

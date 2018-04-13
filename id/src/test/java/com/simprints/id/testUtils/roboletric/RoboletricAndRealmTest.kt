@@ -1,11 +1,13 @@
 package com.simprints.id.testUtils.roboletric
 
 import android.content.SharedPreferences
+import com.nhaarman.mockito_kotlin.any
 import com.simprints.id.Application
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
+import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmDbManager
+import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.authListener.FirebaseAuthListenerManager
@@ -20,9 +22,8 @@ import org.mockito.Mockito
 import org.mockito.stubbing.Answer
 import org.robolectric.RuntimeEnvironment
 
-//Because Roboletric doesn't work with Realm, we need to mock the localManager to run tests with Roboletric.
 fun mockLocalDbManager(app: Application) {
-    app.localDbManager = Mockito.mock(RealmDbManager::class.java)
+    app.localDbManager = Mockito.mock(RealmDbManagerImpl::class.java)
 }
 
 fun mockRemoteDbManager(app: Application) {
@@ -50,9 +51,15 @@ fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer: MockWe
     val mockConnectionListenerManager = Mockito.mock(FirebaseConnectionListenerManager::class.java)
     val mockAuthListenerManager = Mockito.mock(FirebaseAuthListenerManager::class.java)
     whenever(localDbManager.insertOrUpdatePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
+    whenever(localDbManager.loadPersonFromLocal(any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
+
+    val projectIdProvider = Mockito.mock(ProjectIdProvider::class.java).also {
+        whenever(it.getSignedInProjectId()).thenReturn(Single.just("some_local_key"))
+    }
 
     val remoteDbManager = Mockito.spy(FirebaseManager(
         (RuntimeEnvironment.application as Application),
+        projectIdProvider,
         mockConnectionListenerManager,
         mockAuthListenerManager))
     whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))

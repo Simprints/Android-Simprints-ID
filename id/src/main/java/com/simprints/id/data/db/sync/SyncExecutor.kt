@@ -3,8 +3,8 @@ package com.simprints.id.data.db.sync
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmSyncInfo
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.RemoteApiInterface
@@ -80,7 +80,7 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
     }
 
     private fun getPeopleToSync(): ArrayList<rl_Person> {
-        return localDbManager.loadPeopleFromLocal(toSync = true)
+        return localDbManager.loadPeopleFromLocal(toSync = true).blockingGet()
     }
 
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
@@ -89,8 +89,8 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
             val nPeopleToDownload = calculateNPatientsToDownload(nPatientsForDownSyncQuery, syncParams)
 
             Timber.d("Downloading batch $nPeopleToDownload people")
-            val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup()) 
-                ?: RealmSyncInfo(syncParams.toGroup())
+            val realmSyncInfo = localDbManager.getSyncInfoFor(syncParams.toGroup()).blockingGet()
+                ?: rl_SyncInfo(syncParams.toGroup())
 
             syncApi.downSync(
                 realmSyncInfo.lastSyncTime.time,
@@ -110,10 +110,10 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
     private fun calculateNPatientsToDownload(nPatientsForDownSyncQuery: Int, syncParams: SyncTaskParameters): Int {
 
         val nPatientsForDownSyncParamsInRealm = localDbManager.getPeopleCountFromLocal(
-            projectId = syncParams.projectId,
             userId = syncParams.userId,
             moduleId = syncParams.moduleId,
-            toSync = false)
+            toSync = false
+        ).blockingGet()
 
         return nPatientsForDownSyncQuery - nPatientsForDownSyncParamsInRealm
     }
@@ -134,7 +134,7 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
                         emitResultProgressIfRequired(result, totalDownloaded, UPDATE_UI_BATCH_SIZE)
                         val shouldDownloadingBatchStop = isInterrupted() || hasCurrentBatchDownloadedFinished(totalDownloaded, LOCAL_DB_BATCH_SIZE)
                         shouldDownloadingBatchStop
-                    }
+                    }.subscribe()
                 }
 
                 val possibleError = if (isInterrupted()) InterruptedSyncException() else null

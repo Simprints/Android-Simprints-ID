@@ -2,7 +2,7 @@ package com.simprints.id.data.db
 
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.RemoteApiInterface
 import com.simprints.id.network.SimApiClient

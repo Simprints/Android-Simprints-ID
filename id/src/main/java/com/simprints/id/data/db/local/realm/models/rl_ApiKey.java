@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.local.models;
+package com.simprints.id.data.db.local.realm.models;
 
 import android.support.annotation.NonNull;
 
