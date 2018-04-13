@@ -74,14 +74,4 @@ class SyncClient(context: Context)
             disposables.clear()
         }
     }
-
-    fun stopSync() {
-        async(UI) {
-            bg {
-                connectAnd {
-                    stopForeground()
-                }
-            }
-        }
-    }
 }

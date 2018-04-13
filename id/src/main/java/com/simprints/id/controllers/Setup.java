@@ -142,6 +142,7 @@ public class Setup {
         dataManager.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
 
+        //TODO: move convertAddressToSerial in libscanner
         dataManager.setLastScannerUsed(com.simprints.id.tools.utils.ScannerUtils.convertAddressToSerial(macAddress));
 
         Timber.d("Setup: Scanner initialized.");

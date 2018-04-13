@@ -13,6 +13,7 @@ interface ProjectRemoteInterface {
         var baseUrl = "https://$apiVersion-dot-project-management-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
     }
 
+    //StopShip: 2018-1-0-dev8 in dev8 this API is broken
     @GET("/projects/id/{id}")
     fun project(
         @Path("id") projectId: String): Single<Project>

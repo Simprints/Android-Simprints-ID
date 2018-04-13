@@ -87,6 +87,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
         }
     }
 
+    //TODO: think about the option to use Maybe
     private fun createLastUserInfoCard(position: Int = 4): Single<DashboardCard>? {
         return if (dataManager.lastUserUsed.isNotEmpty()) {
             Single.just(DashboardCard(

@@ -47,7 +47,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
             SyncManagerState.NOT_STARTED -> setUIForSyncNotStarted(cardModel)
             SyncManagerState.STARTED -> setUIForSyncStarted()
             SyncManagerState.IN_PROGRESS -> setUIForSyncInProgress(cardModel)
-            SyncManagerState.SUCCEED -> setUIForSyncSucceed(cardModel)
+            SyncManagerState.SUCCEED -> setUIForSyncSucceeded(cardModel)
             SyncManagerState.FAILED -> setUIForSyncFailed(cardModel)
         }
     }
@@ -79,7 +79,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         disableSyncButton()
     }
 
-    private fun setUIForSyncSucceed(dataModel: DashboardSyncCard) {
+    private fun setUIForSyncSucceeded(dataModel: DashboardSyncCard) {
         syncStateIcon.apply {
             visibility = View.VISIBLE
             setImageResource(R.drawable.ic_sync_success)

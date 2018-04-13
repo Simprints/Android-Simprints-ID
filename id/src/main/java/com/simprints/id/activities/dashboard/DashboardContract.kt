@@ -20,7 +20,7 @@ interface DashboardContract {
         val cardsModelsList: ArrayList<DashboardCard>
 
         fun pause()
-        fun didUserWantToRefreshCardsIfPossible()
-        fun didUserWantToSync()
+        fun userDidWantToRefreshCardsIfPossible()
+        fun userDidWantToSync()
     }
 }

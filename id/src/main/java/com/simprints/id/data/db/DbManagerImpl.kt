@@ -70,7 +70,7 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                 uploadPersonAndDownloadAgain(fbPerson)
                     .updatePersonInLocal()
                     .subscribeOn(Schedulers.io())
-                    .subscribeBy (onComplete = {}, onError = {it.printStackTrace()})
+                    .subscribeBy (onComplete = {}, onError = { it.printStackTrace() })
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -97,7 +97,8 @@ class DbManagerImpl(private val localDbManager: LocalDbManager,
                         destinationList.add(rl_Person(it).libPerson)
                         callback.onSuccess()
                     },
-                    onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
+                    onError = {
+                        callback.onFailure(DATA_ERROR.NOT_FOUND) })
         } else {
             destinationList.add(result.first())
             callback.onSuccess()
