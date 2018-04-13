@@ -21,7 +21,7 @@ import kotlin.reflect.KProperty
  *
  * @author etienne@simprints.com
  */
-class PrimitivePreference<T: Any>(private val preferences: ImprovedSharedPreferences,
+class PrimitivePreference<T : Any>(private val preferences: ImprovedSharedPreferences,
                                   private val key: String,
                                   private val defValue: T) {
 
@@ -51,5 +51,4 @@ class PrimitivePreference<T: Any>(private val preferences: ImprovedSharedPrefere
                 .putPrimitive(key, value)
                 .apply()
     }
-
 }

@@ -19,6 +19,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 @SuppressLint("Registered")
 abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
 
+    companion object {
+        val isRunning: AtomicBoolean = AtomicBoolean(false)
+    }
+
     private val isInterrupted: AtomicBoolean = AtomicBoolean(false)
 
     private val finishObserver = object : DisposableObserver<Progress>() {
@@ -35,7 +39,7 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         }
 
         override fun onNext(progress: Progress) {
-            Timber.d("onNext($progress)")
+            Timber.d("onSyncProgress($progress)")
         }
     }
 
@@ -64,10 +68,10 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
     inner class ProgressServiceBinderImpl : android.os.Binder(), ProgressServiceBinder<T> {
 
         override val progressReplayObservable: Observable<Progress> =
-                this@ProgressService.progressReplayObservable
+            this@ProgressService.progressReplayObservable
 
         override fun execute(taskParameters: T) =
-                this@ProgressService.execute(taskParameters)
+            this@ProgressService.execute(taskParameters)
 
         override fun startForeground() {
             startForeground(progressNotificationBuilder.id, progressNotificationBuilder.build())
@@ -77,6 +81,7 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         override fun stopForeground() {
             stopForeground(true)
             setNotificationVisibility(false)
+            isRunning.set(false)
         }
 
         private fun setNotificationVisibility(visible: Boolean) {
@@ -87,6 +92,8 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
     }
 
     private fun execute(taskParameters: T) {
+        isRunning.set(true)
+
         if (executing.getAndSet(true)) {
             checkTaskOverlap(taskParameters)
         } else {
@@ -147,5 +154,6 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         Timber.d("ProgressService: onDestroy()")
         super.onDestroy()
         isInterrupted.set(true)
+        isRunning.set(false)
     }
 }

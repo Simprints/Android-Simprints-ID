@@ -12,13 +12,15 @@ import com.simprints.id.Application
 import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbKeyProvider
 import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.adapters.toLocalDbKey
 import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
-import com.simprints.id.data.db.remote.network.RemoteApiInterface
+import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
 import com.simprints.id.data.db.remote.tools.Routes.*
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
@@ -39,6 +41,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import org.jetbrains.anko.doAsync
+import retrofit2.HttpException
 import timber.log.Timber
 
 class FirebaseManager(private val appContext: Context,
@@ -228,35 +231,52 @@ class FirebaseManager(private val appContext: Context,
         uploadPeople(arrayListOf(fbPerson))
 
     override fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable =
-        getSyncApi().flatMapCompletable {
+        getPeopleApiClient().flatMapCompletable {
             it.uploadPeople(hashMapOf("patients" to patientsToUpload))
                 .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
         }
 
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
-        getSyncApi().flatMap {
-            it.downloadPeople(patientId, projectId).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
-                .map { if (it.isEmpty())
-                    throw DownloadingAPersonWhoDoesntExistOnServerException()
-                else it.first()
+        getPeopleApiClient().flatMap {
+            it.person(patientId, projectId).retry({ attempts, error ->
+                attempts < RETRY_ATTEMPTS_FOR_NETWORK_CALLS && (error is HttpException && error.code() != 404)
+            }).onErrorResumeNext {
+                if (it is HttpException && it.code() == 404) {
+                    Single.error(DownloadingAPersonWhoDoesntExistOnServerException())
+                } else {
+                    Single.error(it)
                 }
+            }
         }
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
-        getSyncApi().flatMap {
+        getPeopleApiClient().flatMap {
             it.peopleCount(syncParams.toMap())
                 .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
                 .map { it.count }
         }
 
-    override fun getSyncApi(): Single<RemoteApiInterface> =
+    override fun loadProjectFromRemote(projectId: String): Single<Project> =
+        getProjectApiClient().flatMap {
+            it.project(projectId)
+                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+        }
+
+    override fun getPeopleApiClient(): Single<PeopleRemoteInterface> =
         getCurrentFirestoreToken()
             .flatMap {
-                Single.just(getApiClient(it))
+                Single.just(buildPeopleApi(it))
             }
 
-    private fun getApiClient(authToken: String): RemoteApiInterface =
-        SimApiClient(RemoteApiInterface::class.java, RemoteApiInterface.baseUrl, authToken).api
+    private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api
+
+    override fun getProjectApiClient(): Single<ProjectRemoteInterface> =
+        getCurrentFirestoreToken()
+            .flatMap {
+                Single.just(buildProjectApi(it))
+            }
+
+    private fun buildProjectApi(authToken: String): ProjectRemoteInterface = SimApiClient(ProjectRemoteInterface::class.java, ProjectRemoteInterface.baseUrl, authToken).api
 
     companion object {
         private const val COLLECTION_LOCAL_DB_KEYS = "localDbKeys"

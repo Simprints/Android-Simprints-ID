@@ -53,6 +53,7 @@ import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.services.progress.Progress;
 import com.simprints.id.services.sync.SyncClient;
 import com.simprints.id.services.sync.SyncService;
+import com.simprints.id.services.sync.SyncTaskParameters;
 import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.AppState;
@@ -78,6 +79,7 @@ import com.simprints.libsimprints.Registration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -551,6 +553,7 @@ public class MainActivity extends AppCompatActivity implements
                     .subscribe(new Action() {
                         @Override
                         public void run() {
+                            dataManager.setLastEnrolDate(new Date());
                             handleRegistrationSuccess();
                         }
                     }, new Consumer<Throwable>() {
@@ -639,7 +642,7 @@ public class MainActivity extends AppCompatActivity implements
                         PRIVACY_ACTIVITY_REQUEST_CODE);
                 break;
             case R.id.nav_sync:
-                syncManager.sync(dataManager.getSyncGroup());
+                syncManager.sync(SyncTaskParameters.build(dataManager.getSyncGroup(), dataManager));
                 return true;
             case R.id.nav_about:
                 startActivityForResult(new Intent(this, AboutActivity.class),
@@ -788,7 +791,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        syncManager.stop();
+        syncManager.stopListeners();
     }
 
     @Override
@@ -801,7 +804,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initSyncManager() {
-        syncManager = new SyncManager(dataManager, syncClient, new DisposableObserver<Progress>() {
+        syncManager = new SyncManager(dataManager, syncClient);
+        syncManager.addObserver(new DisposableObserver<Progress>() {
 
             @Override public void onStart() {
                 System.out.println("Start!");

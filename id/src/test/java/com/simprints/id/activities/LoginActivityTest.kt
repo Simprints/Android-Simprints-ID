@@ -16,6 +16,7 @@ import io.reactivex.Completable
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import kotlinx.android.synthetic.main.activity_login.*
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -117,7 +118,7 @@ class LoginActivityTest {
         assertNotNull(nextActivity)
 
         val isIntentForScannerApp = nextActivity.action == "com.google.zxing.client.android.SCAN"
-        assert(isIntentForScannerApp)
+        Assert.assertTrue(isIntentForScannerApp)
     }
 
     @Test

@@ -22,6 +22,8 @@ import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionList
 import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
@@ -128,8 +130,12 @@ open class Application : MultiDexApplication() {
         SettingsPreferencesManagerImpl(prefs, fingerIdToBooleanSerializer, groupSerializer)
     }
 
+    private val eventsPreferencesManager: RecentEventsPreferencesManager by lazy {
+        RecentEventsPreferencesManagerImpl(prefs)
+    }
+
     private val preferencesManager: PreferencesManager by lazy {
-        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager)
+        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, eventsPreferencesManager)
     }
 
     private val remoteDbConnectionListenerManager: RemoteDbConnectionListenerManager by lazy {

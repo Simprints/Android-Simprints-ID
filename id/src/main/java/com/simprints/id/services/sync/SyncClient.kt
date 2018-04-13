@@ -15,7 +15,6 @@ import kotlinx.coroutines.experimental.async
 import org.jetbrains.anko.coroutines.experimental.bg
 import timber.log.Timber
 
-
 class SyncClient(context: Context)
     : ProgressClientImpl<SyncTaskParameters>(context, SyncService::class.java) {
 
@@ -24,13 +23,13 @@ class SyncClient(context: Context)
 
     fun sync(syncParameters: SyncTaskParameters,
              onStarted: () -> Unit,
-             onBusy: () -> Unit) {
+             onBusy: (e: Exception) -> Unit) {
         async(UI) {
             try {
                 bg { startSyncAndObserve(syncParameters) }.await()
                 onStarted()
             } catch (exception: TaskInProgressException) {
-                onBusy()
+                onBusy(exception)
             }
         }
     }
@@ -52,21 +51,17 @@ class SyncClient(context: Context)
     }
 
     private fun setProgressReplayObservable(observable: Observable<Progress>) {
-        synchronized(this) {
-            currentProgressReplayObservable = observable
-        }
+        currentProgressReplayObservable = observable
     }
 
     fun startListening(observer: DisposableObserver<Progress>) {
         Timber.d("startListening()")
-        synchronized(this) {
-            val observable = currentProgressReplayObservable
-            if (observable != null) {
-                disposables.add(observable
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribeWith(observer))
-            }
+        val observable = currentProgressReplayObservable
+        if (observable != null) {
+            disposables.add(observable
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribeWith(observer))
         }
     }
 
@@ -79,5 +74,4 @@ class SyncClient(context: Context)
             disposables.clear()
         }
     }
-
 }

@@ -5,11 +5,25 @@ import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import java.util.*
 
-open class rl_SyncInfo(@field:PrimaryKey var syncGroupId: Int = 0,
-                       var lastSyncTime: Date = Date(0)) : RealmObject() {
+open class rl_SyncInfo : RealmObject {
 
-    constructor(syncGroup: Constants.GROUP) : this(
+    @field:PrimaryKey
+    var syncGroupId: Int = 0
+
+    lateinit var lastKnownPatientUpdatedAt: Date
+    lateinit var lastKnownPatientId: String
+    lateinit var lastSyncTime: Date
+
+    companion object {
+        const val SYNC_ID_FIELD = "syncGroupId"
+    }
+
+    constructor() {}
+
+    constructor(syncGroup: Constants.GROUP, lastPerson: rl_Person) {
         syncGroupId = syncGroup.ordinal
-    )
-
+        lastKnownPatientUpdatedAt = lastPerson.updatedAt ?: Date(0)
+        lastKnownPatientId = lastPerson.patientId
+        lastSyncTime = Date()
+    }
 }
