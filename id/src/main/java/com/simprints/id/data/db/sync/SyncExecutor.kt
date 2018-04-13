@@ -134,7 +134,7 @@ open class SyncExecutor(private val localDbManager: LocalDbManager,
                         emitResultProgressIfRequired(result, totalDownloaded, UPDATE_UI_BATCH_SIZE)
                         val shouldDownloadingBatchStop = isInterrupted() || hasCurrentBatchDownloadedFinished(totalDownloaded, LOCAL_DB_BATCH_SIZE)
                         shouldDownloadingBatchStop
-                    }
+                    }.subscribe()
                 }
 
                 val possibleError = if (isInterrupted()) InterruptedSyncException() else null

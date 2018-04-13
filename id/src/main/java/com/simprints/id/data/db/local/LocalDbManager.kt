@@ -24,7 +24,7 @@ interface LocalDbManager {
     fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
                                               gson: Gson,
                                               syncParams: SyncTaskParameters,
-                                              shouldStop: (personSaved: fb_Person) -> Boolean)
+                                              shouldStop: (personSaved: fb_Person) -> Boolean): Completable
 
     fun getPeopleCountFromLocal(patientId: String? = null,
                                 userId: String? = null,
