@@ -123,6 +123,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun catchUpWithSyncStateIfServiceRunning() {
         if (ProgressService.isRunning.get()) {
+            // The "sync" happens only once at time on Service, no matters how many times we call "sync".
+            // When "sync" is called, syncManager connect to the Service and syncManager either starts
+            // the sync or catch with the Sync state.
             syncManager.sync(SyncTaskParameters.build(dataManager.syncGroup, dataManager))
         }
     }
