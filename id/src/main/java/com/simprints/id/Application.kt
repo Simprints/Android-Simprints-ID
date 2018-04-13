@@ -64,7 +64,6 @@ import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 import java.util.*
 
-
 open class Application : MultiDexApplication() {
 
     // TODO: dependency injection with Dagger 2!
@@ -142,11 +141,11 @@ open class Application : MultiDexApplication() {
     }
 
     var remoteDbManager: RemoteDbManager by lazyVar {
-        FirebaseManager(this, remoteDbConnectionListenerManager, remoteDbAuthListenerManager)
+        FirebaseManager(this, secureDataManager, remoteDbConnectionListenerManager, remoteDbAuthListenerManager)
     }
 
     var localDbManager: LocalDbManager by lazyVar {
-        RealmDbManagerImpl(this, secureDataManager, remoteDbManager)
+        RealmDbManagerImpl(this, remoteDbManager)
     }
 
     var dbManager: DbManager by lazyVar {

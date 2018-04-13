@@ -3,6 +3,7 @@ package com.simprints.id.sync
 import android.content.Context
 import com.google.gson.stream.JsonReader
 import com.simprints.id.BuildConfig
+import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.FirebaseManager
@@ -44,15 +45,18 @@ import org.robolectric.annotation.Config
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class, application = TestApplication::class)
 class SyncTest : RxJavaTest() {
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<RemoteApiInterface>
+    private val projectIdProviderMock = mock(ProjectIdProvider::class.java).also {
+        whenever(it.getSignedInProjectId()).thenReturn(Single.just("some_local_key"))
+    }
 
     private var remoteDbManager: RemoteDbManager = spy(FirebaseManager(mock(Context::class.java),
+        projectIdProviderMock,
         mock(FirebaseConnectionListenerManager::class.java),
         mock(RemoteDbAuthListenerManager::class.java),
         mock(FirebaseOptionsHelper::class.java)))

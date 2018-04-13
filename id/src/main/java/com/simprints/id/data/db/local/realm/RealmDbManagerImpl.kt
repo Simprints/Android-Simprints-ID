@@ -3,7 +3,6 @@ package com.simprints.id.data.db.local.realm
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
-import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbKeyProvider
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
@@ -24,9 +23,7 @@ import io.realm.Sort
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 class RealmDbManagerImpl(private val appContext: Context,
-                         private val projectIdProvider: ProjectIdProvider,
                          private val localDbKeyProvider: LocalDbKeyProvider) : LocalDbManager {
 
     companion object {
@@ -94,8 +91,7 @@ class RealmDbManagerImpl(private val appContext: Context,
             it.where(rl_Person::class.java).equalTo(PATIENT_ID_FIELD, personId).findFirst().let {
                 if (it != null)
                     return@map it.libPerson
-                else
-                    throw IllegalStateException()
+                else throw IllegalStateException()
             }
         }
     }
@@ -134,14 +130,11 @@ class RealmDbManagerImpl(private val appContext: Context,
                 .findFirst().let {
                     if (it == null)
                         throw IllegalStateException()
-                    else
-                        return@map it
+                    else return@map it
                 }
-
         }
 
-    private fun getLocalDbKey(): Single<LocalDbKey> =
-        projectIdProvider.getSignedInProjectId().flatMap { localDbKeyProvider.getLocalDbKey(it) }
+    private fun getLocalDbKey(): Single<LocalDbKey> = localDbKeyProvider.getLocalDbKey()
 
     private fun getRealmConfig(): Single<RealmConfiguration> = realmConfig.let {
         return if (it == null) {
@@ -203,5 +196,4 @@ class RealmDbManagerImpl(private val appContext: Context,
             realm.insertOrUpdate(rl_Person(this))
         }
     }
-
 }

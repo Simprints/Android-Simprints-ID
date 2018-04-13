@@ -26,7 +26,6 @@ import java.io.InputStreamReader
 import java.io.Reader
 import java.util.*
 
-
 @RunWith(AndroidJUnit4::class)
 class RealmManagerTests : RealmTestsBase() {
 
@@ -41,8 +40,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun setup() {
         realm = Realm.getInstance(config)
         realmManager = RealmDbManagerImpl(testContext,
-            TestProjectIdProvider(),
-            TestLocalDbKeyProvider())
+            TestLocalDbKeyProvider(newDatabaseName, newDatabaseKey, legacyDatabaseName))
             .apply {
                 signInToLocal().blockingAwait()
             }
@@ -314,5 +312,4 @@ class RealmManagerTests : RealmTestsBase() {
 
         return realmManager.savePeopleFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams, { false })
     }
-
 }
