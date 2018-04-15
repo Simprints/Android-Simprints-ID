@@ -5,8 +5,6 @@ import android.os.Build
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.remote.authListener.AuthListener
-import com.simprints.id.data.db.remote.connectionListener.ConnectionListener
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.prefs.PreferencesManager
@@ -80,25 +78,11 @@ class DataManagerImpl(private val context: Context,
     // DbManager call interception for populating arguments
     // Lifecycle
     override fun initialiseDb() {
-        dbManager.registerRemoteConnectionListener(connectionStateLogger)
-        dbManager.registerRemoteAuthListener(authStateLogger)
         dbManager.initialiseDb()
     }
 
     override fun signOut() {
-        dbManager.unregisterRemoteConnectionListener(connectionStateLogger)
-        dbManager.unregisterRemoteAuthListener(authStateLogger)
         dbManager.signOut()
-    }
-
-    private val connectionStateLogger = object : ConnectionListener {
-        override fun onConnection() = logConnectionStateChange(true)
-        override fun onDisconnection() = logConnectionStateChange(false)
-    }
-
-    private val authStateLogger = object : AuthListener {
-        override fun onSignIn() = logAuthStateChange(true)
-        override fun onSignOut() = logAuthStateChange(false)
     }
 
     // Data transfer

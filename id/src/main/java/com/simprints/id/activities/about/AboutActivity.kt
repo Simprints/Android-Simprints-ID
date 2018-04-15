@@ -46,8 +46,20 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
         viewPresenter = AboutPresenter(this, dataManager)
 
         //STOPSHIP: Delete bt_deleteSyncInfo, bt_deletePeopleFromRealm, bt_addPatient, bt_enrollPeople before release
-        bt_deleteSyncInfo.setOnClickListener { dataManager.localDbManager.deleteSyncInfoFromLocal(SyncTaskParameters.build(app.dataManager.syncGroup, app.dataManager)) }
-        bt_deletePeopleFromRealm.setOnClickListener { dataManager.localDbManager.deletePeopleFromLocal(SyncTaskParameters.build(app.dataManager.syncGroup, app.dataManager)) }
+        bt_deleteSyncInfo.setOnClickListener {
+            dataManager
+                .localDbManager
+                .deleteSyncInfoFromLocal(SyncTaskParameters.build(app.dataManager.syncGroup, app.dataManager))
+                .subscribeBy ( onComplete = {}, onError = { it.printStackTrace() })
+        }
+
+        bt_deletePeopleFromRealm.setOnClickListener {
+            dataManager
+                .localDbManager
+                .deletePeopleFromLocal(SyncTaskParameters.build(app.dataManager.syncGroup, app.dataManager))
+                .subscribeBy ( onComplete = {}, onError = { it.printStackTrace() })
+        }
+
         bt_addPatient.setOnClickListener {
             (1..10).forEach {
                 dataManager.localDbManager.insertOrUpdatePersonInLocal(

@@ -124,7 +124,7 @@ class RealmDbManagerImpl(private val appContext: Context,
 
     override fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo> =
         getRealmInstance().map {
-            it.use {realm ->
+            it.use { realm ->
                 realm.where(rl_SyncInfo::class.java).equalTo(SYNC_ID_FIELD, typeSync.ordinal).findFirst()?.let {
                     realm.copyFromRealm(it)
                 } ?: throw Exception("Not found") //StopShip: Exception
@@ -133,35 +133,36 @@ class RealmDbManagerImpl(private val appContext: Context,
 
     override fun loadProjectFromLocal(projectId: String): Single<Project> =
         getRealmInstance().map {
-            it.use {realm ->
+            it.use { realm ->
                 realm.where(Project::class.java).equalTo(Project.PROJECT_ID_FIELD, projectId).findFirst()?.let {
                     realm.copyFromRealm(it)
                 } ?: throw Exception("Not found")
             }
         }
 
-    override fun deletePeopleFromLocal(syncParams: SyncTaskParameters) {
-        getRealmInstance().map {
-            it.use{
-                val query = buildQueryForPerson(it, syncParams).findAll()
-                query.deleteAllFromRealm()
+    override fun deletePeopleFromLocal(syncParams: SyncTaskParameters): Completable =
+        getRealmInstance().flatMapCompletable {
+            it.use {
+                it.executeTransaction {
+                    val query = buildQueryForPerson(it, syncParams).findAll()
+                    query.deleteAllFromRealm()
+                }
             }
+            Completable.complete()
         }
-    }
 
-    override fun deleteSyncInfoFromLocal(syncParams: SyncTaskParameters) {
-        getRealmInstance().map {
-            it.use{
+    override fun deleteSyncInfoFromLocal(syncParams: SyncTaskParameters): Completable =
+        getRealmInstance().flatMapCompletable {
+            it.use {
                 it.executeTransaction {
                     val query = it.where(rl_SyncInfo::class.java)
                         .equalTo(rl_SyncInfo.SYNC_ID_FIELD, syncParams.toGroup().ordinal)
                         .findAll()
-
                     query.deleteAllFromRealm()
                 }
             }
+            Completable.complete()
         }
-    }
 
     override fun saveProjectIntoLocal(project: Project): Completable =
         getRealmInstance().flatMapCompletable {
@@ -204,7 +205,7 @@ class RealmDbManagerImpl(private val appContext: Context,
             userId?.let { this.equalTo(USER_ID_FIELD, it) }
             moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
             toSync?.let { this.equalTo(TO_SYNC_FIELD, it) }
-            sortBy?.let {this.sort(sortBy.keys.toTypedArray(), sortBy.values.toTypedArray()) }
+            sortBy?.let { this.sort(sortBy.keys.toTypedArray(), sortBy.values.toTypedArray()) }
         }
     }
 
