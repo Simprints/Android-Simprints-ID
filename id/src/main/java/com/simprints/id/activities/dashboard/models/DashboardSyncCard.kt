@@ -71,6 +71,7 @@ class DashboardSyncCard(type: DashboardCardType,
                 .subscribeBy (
                     onSuccess = {
                         peopleToUpload = it
+                        cardView?.updateCard(this)
                     },
                     onError = { it.printStackTrace() })
 
@@ -79,9 +80,8 @@ class DashboardSyncCard(type: DashboardCardType,
             .getSyncInfoFor(syncParams.toGroup())
             .subscribeBy (
                 onSuccess = {
-                    it.lastSyncTime.let {
-                        dateFormat.format(it).toString()
-                    }
+                    lastSyncTime = dateFormat.format(it.lastSyncTime).toString()
+                    cardView?.updateCard(this)
                 },
                 onError = { it.printStackTrace() })
 
