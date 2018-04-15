@@ -53,7 +53,7 @@ interface LocalDbManager {
     //Sync
     fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo>
 
-    fun deletePeopleFromLocal(syncParams: SyncTaskParameters)
-    fun deleteSyncInfoFromLocal(syncParams: SyncTaskParameters)
+    fun deletePeopleFromLocal(syncParams: SyncTaskParameters): Completable
+    fun deleteSyncInfoFromLocal(syncParams: SyncTaskParameters): Completable
     fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
 }

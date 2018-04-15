@@ -15,8 +15,6 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.adapters.toLocalDbKey
-import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
-import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
@@ -46,12 +44,8 @@ import timber.log.Timber
 
 class FirebaseManager(private val appContext: Context,
                       private val projectIdProvider: ProjectIdProvider,
-                      firebaseConnectionListenerManager: RemoteDbConnectionListenerManager,
-                      firebaseAuthListenerManager: RemoteDbAuthListenerManager,
                       private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
     RemoteDbManager,
-    RemoteDbConnectionListenerManager by firebaseConnectionListenerManager,
-    RemoteDbAuthListenerManager by firebaseAuthListenerManager,
     LocalDbKeyProvider {
 
     private var isInitialised = false
@@ -67,8 +61,6 @@ class FirebaseManager(private val appContext: Context,
         if (isInitialised) throw DbAlreadyInitialisedError()
         initialiseLegacyFirebaseProject()
         initialiseFirestoreFirebaseProject()
-        attachConnectionListeners(legacyFirebaseApp)
-        attachAuthListeners(getFirebaseAuth(legacyFirebaseApp))
         isInitialised = true
     }
 
@@ -119,9 +111,6 @@ class FirebaseManager(private val appContext: Context,
     override fun signOutOfRemoteDb() {
         getFirebaseAuth(legacyFirebaseApp).signOut()
         getFirebaseAuth(firestoreFirebaseApp).signOut()
-
-        detachConnectionListeners(legacyFirebaseApp)
-        detachAuthListeners(getFirebaseAuth(legacyFirebaseApp))
     }
 
     override fun isRemoteDbInitialized(): Boolean = isInitialised
