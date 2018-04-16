@@ -33,6 +33,8 @@ android {
                 // TODO : Remove whenever possible
                 // Check in the Translations Editor for crucial translations that may be missing
                 disable "MissingTranslation"
+                abortOnError true
+                fatal 'StopShip'
                 checkReleaseBuilds true
             }
             minifyEnabled true
@@ -237,6 +239,7 @@ dependencies {
 
     //UI
     implementation "com.github.michael-rapp:android-material-dialog:4.3.3"
+    implementation "com.android.support:cardview-v7:$support_version"
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {

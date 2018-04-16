@@ -13,15 +13,13 @@ import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmDbManager
+import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.authListener.FirebaseAuthListenerManager
-import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
-import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
-import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
@@ -58,6 +56,7 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.serializers.*
+import com.simprints.id.tools.utils.NetworkUtils
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
@@ -128,24 +127,20 @@ open class Application : MultiDexApplication() {
         SettingsPreferencesManagerImpl(prefs, fingerIdToBooleanSerializer, groupSerializer)
     }
 
+    private val eventsPreferencesManager: RecentEventsPreferencesManager by lazy {
+        RecentEventsPreferencesManagerImpl(prefs)
+    }
+
     private val preferencesManager: PreferencesManager by lazy {
-        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager)
-    }
-
-    var localDbManager: LocalDbManager by lazyVar {
-        RealmDbManager(this)
-    }
-
-    private val remoteDbConnectionListenerManager: RemoteDbConnectionListenerManager by lazy {
-        FirebaseConnectionListenerManager()
-    }
-
-    private val remoteDbAuthListenerManager: RemoteDbAuthListenerManager by lazy {
-        FirebaseAuthListenerManager()
+        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, eventsPreferencesManager)
     }
 
     var remoteDbManager: RemoteDbManager by lazyVar {
-        FirebaseManager(this, remoteDbConnectionListenerManager, remoteDbAuthListenerManager)
+        FirebaseManager(this, secureDataManager)
+    }
+
+    var localDbManager: LocalDbManager by lazyVar {
+        RealmDbManagerImpl(this, remoteDbManager)
     }
 
     var dbManager: DbManager by lazyVar {
@@ -420,7 +415,7 @@ open class Application : MultiDexApplication() {
     }
 
     val setup: Setup by lazy {
-        Setup.getInstance(dataManager, appState)
+        Setup.getInstance(dataManager, appState, NetworkUtils(this))
     }
 
     override fun onCreate() {

@@ -1,74 +1,100 @@
 package com.simprints.id.data.db.sync
 
 import com.simprints.id.data.DataManager
-import com.simprints.id.domain.Constants
-import com.simprints.id.exceptions.safe.SimprintsException
+import com.simprints.id.data.db.sync.model.SyncManagerState
+import com.simprints.id.exceptions.safe.TaskInProgressException
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncClient
-import com.simprints.id.services.sync.SyncTaskParameters.*
+import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 
 class SyncManager(private val dataManager: DataManager,
-                  private val syncClient: SyncClient,
-                  private val uiObserver: DisposableObserver<Progress>? = null) {
+                  private val syncClient: SyncClient) {
 
-    fun sync(user: Constants.GROUP) {
+    private var internalSyncObserver: DisposableObserver<Progress> = createInternalDisposable()
 
-        dataManager.syncGroup = user
-        val syncParameters = when (user) {
-            Constants.GROUP.GLOBAL -> GlobalSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty())
-            Constants.GROUP.USER -> UserSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
-            Constants.GROUP.MODULE -> ModuleIdSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.moduleId)
-        }
+    // hashset to avoid duplicates
+    private var observers = hashSetOf<DisposableObserver<Progress>>()
 
-        startListeners()
-        syncClient.sync(syncParameters, {
+    fun sync(syncParams: SyncTaskParameters) {
+        SyncManagerState.STARTED
+        syncClient.sync(syncParams, {
+            startListeners()
         }, {
-            uiObserver?.onError(Throwable("Server busy"))
-            stopListeners()
+            if (it is TaskInProgressException) {
+                startListeners()
+            } else {
+                observers.forEach { it.onError(Throwable("Server busy")) }
+                stopListeners()
+            }
         })
     }
 
-    fun stop() {
-        stopListeners()
-    }
-
-    private fun stopListeners() {
+    fun stopListeners() {
         try {
             syncClient.stopListening()
+            internalSyncObserver.dispose()
         } catch (error: UninitializedDataManagerError) {
             handleUnexpectedError(error)
         }
     }
 
+    // When a DisposeObserver is disposed, can not be reused.
+    // So we create every time an internal one and forward the emits to
+    // the other observers
     private fun startListeners() {
         stopListeners()
+
+        internalSyncObserver.dispose()
+        internalSyncObserver = createInternalDisposable()
         syncClient.startListening(internalSyncObserver)
-        uiObserver?.let { syncClient.startListening(uiObserver) }
     }
 
-    private val internalSyncObserver: DisposableObserver<Progress> = object : DisposableObserver<Progress>() {
+    private fun createInternalDisposable(): DisposableObserver<Progress> =
+        object : DisposableObserver<Progress>() {
 
-        val start = System.currentTimeMillis()
-        override fun onNext(progress: Progress) {
-            Timber.d("onNext")
-        }
+            override fun onNext(progress: Progress) {
+                Timber.d("onSyncProgress")
 
-        override fun onComplete() {
-            Timber.d("onComplete")
-            syncClient.stopListening()
-        }
+                // Some callback can call SyncManager Api and modify "observers". That can cause
+                // an exception because "observers" is still in a loop
+                val observersToNotify = observers.toMutableSet()
+                observersToNotify.forEach { it.onNext(progress) }
+            }
 
-        override fun onError(throwable: Throwable) {
-            Timber.d("onError")
-            dataManager.logThrowable(throwable)
-            syncClient.stopListening()
+            override fun onComplete() {
+                Timber.d("onComplete")
+                syncClient.stopListening()
+                syncClient.stop()
+
+                // See onNext
+                val observersToNotify = observers.toMutableSet()
+                observersToNotify.forEach { it.onComplete() }
+            }
+
+            override fun onError(throwable: Throwable) {
+                Timber.d("onError")
+                dataManager.logThrowable(throwable)
+                syncClient.stopListening()
+                syncClient.stop()
+
+                // See onNext
+                val observersToNotify = observers.toMutableSet()
+                observersToNotify.forEach { it.onError(throwable) }
+            }
         }
-    }
 
     private fun handleUnexpectedError(error: Error) {
         dataManager.logThrowable(error)
+    }
+
+    fun removeObservers() {
+        observers.clear()
+    }
+
+    fun addObserver(syncObserver: DisposableObserver<Progress>) {
+        observers.add(syncObserver)
     }
 }

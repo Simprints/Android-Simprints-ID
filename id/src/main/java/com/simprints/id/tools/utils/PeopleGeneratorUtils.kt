@@ -1,7 +1,7 @@
 package com.simprints.id.tools.utils
 
-import com.simprints.id.data.db.local.models.rl_Fingerprint
-import com.simprints.id.data.db.local.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_Fingerprint
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.libcommon.Fingerprint
 import io.realm.RealmList
 import java.util.*
@@ -11,18 +11,20 @@ object PeopleGeneratorUtils {
     fun getRandomPeople(numberOfPeople: Int,
                         projectId: String = UUID.randomUUID().toString(),
                         userId: String = UUID.randomUUID().toString(),
-                        moduleId: String = UUID.randomUUID().toString()): ArrayList<rl_Person> {
+                        moduleId: String = UUID.randomUUID().toString(),
+                        toSync: Boolean = false): ArrayList<rl_Person> {
 
         return arrayListOf<rl_Person>().also { list ->
             (0 until numberOfPeople).forEach {
-                list.add(getRandomPerson(projectId, userId, moduleId))
+                list.add(getRandomPerson(projectId, userId, moduleId, toSync))
             }
         }
     }
 
     fun getRandomPerson(projectId: String = UUID.randomUUID().toString(),
                         userId: String = UUID.randomUUID().toString(),
-                        moduleId: String = UUID.randomUUID().toString()): rl_Person {
+                        moduleId: String = UUID.randomUUID().toString(),
+                        toSync: Boolean = false): rl_Person {
 
         val prints: RealmList<rl_Fingerprint> = RealmList()
         prints.add(getRandomFingerprint())
@@ -33,9 +35,9 @@ object PeopleGeneratorUtils {
             this.projectId = projectId
             this.userId = userId
             this.moduleId = moduleId
-            createdAt = getRandomTime()
-            updatedAt = getRandomTime()
-            toSync = true
+            createdAt = if(!toSync) getRandomTime() else null
+            updatedAt =  if(!toSync) getRandomTime() else null
+            this.toSync = toSync
             fingerprints = prints
         }
     }

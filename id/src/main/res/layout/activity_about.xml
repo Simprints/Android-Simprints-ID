@@ -6,8 +6,9 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/mainInfo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:ignore="UselessParent">
 
@@ -117,7 +118,8 @@
             <TextView
                 android:id="@+id/tv_userDbCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="@string/zero" />
 
         </LinearLayout>
 
@@ -140,7 +142,8 @@
             <TextView
                 android:id="@+id/tv_moduleDbCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="@string/zero" />
 
         </LinearLayout>
 
@@ -163,7 +166,8 @@
             <TextView
                 android:id="@+id/tv_globalDbCount"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="@string/zero" />
 
         </LinearLayout>
 
@@ -176,4 +180,39 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="vertical"
+        android:layout_below="@+id/mainInfo">
+
+        <Button
+            android:id="@+id/bt_addPatient"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="ADD 10 People" />
+
+        <Button
+            android:id="@+id/bt_enrollPeople"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Enroll 1 Person" />
+
+        <Button
+            android:id="@+id/bt_deleteSyncInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="DELETE SYNC INFO" />
+
+        <Button
+            android:id="@+id/bt_deletePeopleFromRealm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="DELETE PEOPLE" />
+    </LinearLayout>
 </RelativeLayout>
