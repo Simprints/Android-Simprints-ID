@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.remote.network
 
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfo
+import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfoException
 import com.simprints.id.services.sync.SyncTaskParameters
 import java.util.*
 
@@ -37,7 +37,7 @@ class DownSyncParams(syncParams: SyncTaskParameters,
                     if (it.lastKnownPatientId.isNotEmpty())
                         this[LAST_KNOWN_PATIENT_ID] = it.lastKnownPatientId
                 }
-        } catch (e: NoStoredLastSyncedInfo) {
+        } catch (e: NoStoredLastSyncedInfoException) {
         }
 
         this[BATCH_SIZE] = BATCH_SIZE_VALUE

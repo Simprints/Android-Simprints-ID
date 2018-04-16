@@ -8,7 +8,9 @@ import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
-import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfo
+import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfoException
+import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
+import com.simprints.id.exceptions.safe.NotSignedInException
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.Completable
@@ -16,6 +18,7 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.realm.Sort
 
+/** @throws NotSignedInException */
 interface LocalDbManager {
 
     // Lifecycle
@@ -49,10 +52,12 @@ interface LocalDbManager {
                               sortBy: Map<String, Sort>? = null): Flowable<rl_Person>
 
     fun saveProjectIntoLocal(project: Project): Completable
+
+    /** @throws NoSuchStoredProjectException */
     fun loadProjectFromLocal(projectId: String): Single<Project>
 
     //Sync
-    @Throws(NoStoredLastSyncedInfo::class)
+    /** @throws NoStoredLastSyncedInfoException */
     fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo>
 
     fun deletePeopleFromLocal(syncParams: SyncTaskParameters): Completable
