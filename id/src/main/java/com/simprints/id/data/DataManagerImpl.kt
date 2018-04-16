@@ -92,13 +92,12 @@ class DataManagerImpl(private val context: Context,
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) =
         dbManager.loadPeople(destinationList, group, getSignedInUserIdOrEmpty(), moduleId, callback)
 
-    override fun getPeopleCount(group: Constants.GROUP): Single<Int> = Single.create {
+    override fun getPeopleCount(group: Constants.GROUP): Single<Int> =
         when (group) {
-            Constants.GROUP.GLOBAL -> it.onSuccess(dbManager.getPeopleCount().blockingGet())
-            Constants.GROUP.USER -> it.onSuccess(dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty()).blockingGet())
-            Constants.GROUP.MODULE -> it.onSuccess(dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty(), moduleId = moduleId).blockingGet())
+            Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
+            Constants.GROUP.USER -> dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty())
+            Constants.GROUP.MODULE -> dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty(), moduleId = moduleId)
         }
-    }
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
         preferencesManager.lastIdentificationDate = Date()
