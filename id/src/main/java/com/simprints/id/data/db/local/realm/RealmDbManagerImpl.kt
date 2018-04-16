@@ -220,6 +220,7 @@ class RealmDbManagerImpl(private val appContext: Context,
     private fun updateSyncInfo(syncParams: SyncTaskParameters): Completable =
         getRealmInstance().map { realm ->
             buildQueryForPerson(realm, syncParams)
+                .equalTo(TO_SYNC_FIELD, false)
                 .sort(UPDATE_TIME_FIELD, Sort.DESCENDING)
                 .findAll()
                 .first()?.let { person ->
