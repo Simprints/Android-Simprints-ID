@@ -26,6 +26,7 @@ class DashboardCardAdapter(private val cardModels: ArrayList<DashboardCard>) :
     }
 
     override fun onBindViewHolder(holder: DashboardCardView, position: Int) = holder.bind(cardModels[position])
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         if (viewType == CardViewType.GENERAL.ordinal) {
             DashboardCardView(LayoutInflater.from(parent.context).inflate(R.layout.activity_dashboard_card, parent, false))
