@@ -123,10 +123,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
         finish()
     }
 
-    override fun showToast(messageRes: Int) {
-        showToast(messageRes)
-    }
-
     override fun getStringWithParams(stringRes: Int, currentValue: Int, maxValue: Int): String {
         return getString(stringRes, currentValue, maxValue)
     }
