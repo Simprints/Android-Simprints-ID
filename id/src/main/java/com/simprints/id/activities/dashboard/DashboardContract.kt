@@ -8,7 +8,6 @@ import com.simprints.id.domain.ALERT_TYPE
 interface DashboardContract {
 
     interface View : BaseView<Presenter> {
-        fun showToast(messageRes: Int)
         fun updateCardViews()
         fun stopRequestIfRequired()
         fun launchAlertView(error: ALERT_TYPE)

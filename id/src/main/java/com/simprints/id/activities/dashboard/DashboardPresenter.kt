@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class DashboardPresenter(private val view: DashboardContract.View,
                          syncClient: SyncClient,
                          val dataManager: DataManager,
-                         private val androidResourcesHelper: AndroidResourcesHelper) : DashboardContract.Presenter {
+                         androidResourcesHelper: AndroidResourcesHelper) : DashboardContract.Presenter {
 
     private var started: AtomicBoolean = AtomicBoolean(false)
 
