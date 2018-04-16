@@ -3,7 +3,6 @@ package com.simprints.id.data.db.sync
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.DownSyncParams
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
@@ -20,7 +19,6 @@ import timber.log.Timber
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 open class SyncExecutor(private val dbManager: DbManager,
@@ -44,16 +42,15 @@ open class SyncExecutor(private val dbManager: DbManager,
     }
 
     protected open fun uploadNewPatients(isInterrupted: () -> Boolean,
-                                         batchSize: Int = 10): Observable<Progress> {
+                                         batchSize: Int = 10): Observable<Progress> =
+        getPeopleCountToSync().flatMapObservable {
+            val counter = AtomicInteger(0)
 
-        val patientsToUpload = getPeopleToSync()
-        val counter = AtomicInteger(0)
-
-        Timber.d("Uploading ${patientsToUpload.size} people")
-        return batchPatientsArray(patientsToUpload, isInterrupted, batchSize)
-            .uploadEachBatch()
-            .updateUploadCounterAndConvertItToProgress(counter, patientsToUpload.size)
-    }
+            Timber.d("Uploading $it people")
+            batchPatientsArray(isInterrupted, batchSize)
+                .uploadEachBatch()
+                .updateUploadCounterAndConvertItToProgress(counter, it)
+        }
 
     private fun Observable<out MutableList<fb_Person>>.uploadEachBatch(): Observable<Int> =
         flatMap { batch ->
@@ -68,24 +65,23 @@ open class SyncExecutor(private val dbManager: DbManager,
             UploadProgress(counter.addAndGet(it), maxValueForProgress)
         }
 
-    private fun batchPatientsArray(patients: ArrayList<rl_Person>,
-                                   isInterrupted: () -> Boolean,
+    private fun batchPatientsArray(isInterrupted: () -> Boolean,
                                    batchSize: Int): Observable<MutableList<fb_Person>> {
 
-        return Observable.fromIterable(patients)
+        return dbManager.localDbManager.loadPeopleFromLocalRx(toSync = true)
             .takeUntil { isInterrupted() }
             .map { fb_Person(it) }
-            .buffer(batchSize)
+            .buffer(batchSize).toObservable()
     }
 
-    private fun getPeopleToSync(): ArrayList<rl_Person> {
-        return dbManager.localDbManager.loadPeopleFromLocal(toSync = true).blockingGet()
+    private fun getPeopleCountToSync(): Single<Int> {
+        return dbManager.localDbManager.getPeopleCountFromLocal(toSync = true)
     }
 
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> =
         dbManager.getNumberOfPatientsForSyncParams(syncParams).flatMap {
             dbManager.calculateNPatientsToDownSync(it, syncParams)
-        }.flatMapObservable {nPeopleToDownload ->
+        }.flatMapObservable { nPeopleToDownload ->
             Timber.d("Downloading batch $nPeopleToDownload people")
             syncApi.downSync(
                 syncParams.projectId,
