@@ -2,6 +2,7 @@ package com.simprints.id.activities.dashboard.views
 
 import android.annotation.SuppressLint
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.CardView
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -18,6 +19,8 @@ import org.jetbrains.anko.textResource
 
 @SuppressLint("SetTextI18n")
 class DashboardSyncCardView(private val rootView: View) : DashboardCardView(rootView) {
+
+    private val syncCard: CardView = rootView.findViewById(R.id.dashboardCardSync)
 
     private val syncStateIcon: ImageView = rootView.findViewById(R.id.dashboardCardSyncState)
     private val syncDescription: TextView = rootView.findViewById(R.id.dashboardCardSyncDescription)
@@ -167,14 +170,18 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     private fun enableSyncButton(dataModel: DashboardSyncCard) {
         syncAction.apply {
             textColor = ContextCompat.getColor(rootView.context, R.color.colorAccent)
+        }
+        syncCard.apply {
             setOnClickListener { dataModel.onSyncActionClicked(dataModel) }
         }
     }
 
     private fun disableSyncButton() {
         syncAction.apply {
-            setOnClickListener { }
             textColor = ContextCompat.getColor(rootView.context, R.color.simprints_grey)
+        }
+        syncCard.apply {
+            setOnClickListener { }
         }
     }
 }
