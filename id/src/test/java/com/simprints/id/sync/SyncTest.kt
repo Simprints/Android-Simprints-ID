@@ -3,21 +3,14 @@ package com.simprints.id.sync
 import android.content.Context
 import com.google.gson.stream.JsonReader
 import com.simprints.id.BuildConfig
-<<<<<<< HEAD
+import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
-=======
-import com.simprints.id.data.db.DbManagerImpl
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.RealmSyncInfo
-import com.simprints.id.data.db.local.models.rl_Person
->>>>>>> firestore_migration_dashboard
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.FirebaseOptionsHelper
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
-import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.DownSyncParams.Companion.LAST_KNOWN_PATIENT_AT
 import com.simprints.id.data.db.remote.network.DownSyncParams.Companion.LAST_KNOWN_PATIENT_ID
@@ -59,19 +52,13 @@ import java.util.concurrent.atomic.AtomicInteger
 class SyncTest : RxJavaTest() {
 
     private var mockServer = MockWebServer()
-<<<<<<< HEAD
-    private lateinit var apiClient: SimApiClient<RemoteApiInterface>
+    private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
     private val projectIdProviderMock = mock(ProjectIdProvider::class.java).also {
         whenever(it.getSignedInProjectId()).thenReturn(Single.just("some_local_key"))
     }
-=======
-    private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
->>>>>>> firestore_migration_dashboard
 
     private var remoteDbManager: RemoteDbManager = spy(FirebaseManager(mock(Context::class.java),
         projectIdProviderMock,
-        mock(FirebaseConnectionListenerManager::class.java),
-        mock(RemoteDbAuthListenerManager::class.java),
         mock(FirebaseOptionsHelper::class.java)))
 
     @Before
@@ -88,15 +75,10 @@ class SyncTest : RxJavaTest() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
 
         val patientsToUpload = getRandomPeople(35)
-<<<<<<< HEAD
-        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(Single.create { it.onSuccess(patientsToUpload) })
-        val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
-        whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
-=======
-        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(patientsToUpload)
+
+        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(Single.just(patientsToUpload))
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, PeopleRemoteInterface::class.java))
         whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
->>>>>>> firestore_migration_dashboard
 
         val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager), JsonHelper.gson)
 
@@ -117,17 +99,12 @@ class SyncTest : RxJavaTest() {
     fun uploadPeopleGetInterrupted_shouldStopUploading() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
         val peopleToUpload = getRandomPeople(35)
-<<<<<<< HEAD
+
         whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(
             Single.create { it.onSuccess(peopleToUpload) }
         )
-        val poorNetworkClientMock: RemoteApiInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, RemoteApiInterface::class.java))
-        whenever(remoteDbManager.getSyncApi()).thenReturn(Single.just(poorNetworkClientMock))
-=======
-        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(peopleToUpload)
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, PeopleRemoteInterface::class.java))
         whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
->>>>>>> firestore_migration_dashboard
 
         val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager), JsonHelper.gson)
 
@@ -280,19 +257,11 @@ class SyncTest : RxJavaTest() {
         mockLocalDbToSavePatientsFromStream(localDbMock)
 
         //Mock app has already patients in localDb
-<<<<<<< HEAD
         whenever(localDbMock.loadPeopleFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(getRandomPeople(patientsAlreadyInLocalDb)) })
         whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(patientsAlreadyInLocalDb) })
 
         //Mock app RealmSyncInfo for syncParams
-        whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup().ordinal, lastSyncTime)) })
-=======
-        whenever(localDbMock.loadPeopleFromLocal(any(), any(), any(), any(), any(), any())).thenReturn(getRandomPeople(patientsAlreadyInLocalDb))
-        whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any(), any())).thenReturn(patientsAlreadyInLocalDb)
-
-        //Mock app RealmSyncInfo for syncParams
-        whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(RealmSyncInfo(syncParams.toGroup(), rl_Person(peopleToDownload.last())))
->>>>>>> firestore_migration_dashboard
+        whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup(), rl_Person(peopleToDownload.last()))) })
 
         val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManager), JsonHelper.gson)
 

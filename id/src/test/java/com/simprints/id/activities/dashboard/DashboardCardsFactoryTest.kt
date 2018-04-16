@@ -40,7 +40,7 @@ class DashboardCardsFactoryTest {
     @Test
     fun shouldCreateTheProjectCard_onlyWhenItHasAValidProject() {
         val project = Project().apply { name = "project name"; description = "project desc" }
-        whenever(app.localDbManager.loadProjectFromLocal(anyNotNull())).thenReturn(project)
+        whenever(app.localDbManager.loadProjectFromLocal(anyNotNull())).thenReturn(Single.just(project))
         whenever(app.remoteDbManager.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(project))
 
         mockNPeopleForSyncRequest(app.remoteDbManager, 0)
