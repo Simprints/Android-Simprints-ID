@@ -82,11 +82,15 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     }
 
     override fun notifyCardViewChanged(position: Int) {
-        cardsViewAdapter.notifyItemChanged(position)
+        runOnUiThread {
+            cardsViewAdapter.notifyItemChanged(position)
+        }
     }
 
     override fun updateCardViews() {
-        cardsViewAdapter.notifyDataSetChanged()
+        runOnUiThread {
+            cardsViewAdapter.notifyDataSetChanged()
+        }
     }
 
     override fun stopRequestIfRequired() {
