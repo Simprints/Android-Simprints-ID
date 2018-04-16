@@ -1,12 +1,13 @@
 package com.simprints.id.data.db.remote
 
 import com.google.firebase.FirebaseApp
-import com.simprints.id.data.db.local.LocalDbKey
-import com.simprints.id.data.db.remote.authListener.RemoteDbAuthListenerManager
-import com.simprints.id.data.db.remote.connectionListener.RemoteDbConnectionListenerManager
+import com.simprints.id.data.db.local.LocalDbKeyProvider
+import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.network.RemoteApiInterface
+import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
 import com.simprints.id.exceptions.safe.DifferentCredentialsSignedInException
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.secure.models.Tokens
@@ -19,7 +20,7 @@ import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 
-interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListenerManager {
+interface RemoteDbManager : LocalDbKeyProvider {
     // TODO : agree on consistent method naming for load/save vs get/put etc
     // Lifecycle
     fun initialiseRemoteDb()
@@ -54,6 +55,8 @@ interface RemoteDbManager : RemoteDbConnectionListenerManager, RemoteDbAuthListe
     @Throws(DownloadingAPersonWhoDoesntExistOnServerException::class)
     fun downloadPerson(patientId: String, projectId: String): Single<fb_Person>
 
-    fun getSyncApi(): Single<RemoteApiInterface>
+    fun getPeopleApiClient(): Single<PeopleRemoteInterface>
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
+    fun loadProjectFromRemote(projectId: String): Single<Project>
+    fun getProjectApiClient(): Single<ProjectRemoteInterface>
 }

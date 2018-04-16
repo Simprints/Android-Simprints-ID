@@ -7,17 +7,18 @@ import android.support.annotation.Nullable;
 
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.session.callout.CalloutAction;
+import com.simprints.id.data.db.DATA_ERROR;
+import com.simprints.id.data.db.DataCallback;
+import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.exceptions.unsafe.NullScannerError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
-import com.simprints.id.domain.ALERT_TYPE;
+import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
+import com.simprints.id.tools.utils.NetworkUtils;
 import com.simprints.libcommon.Person;
-import com.simprints.id.data.db.DATA_ERROR;
-import com.simprints.id.data.db.DataCallback;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
@@ -35,17 +36,19 @@ import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
 public class Setup {
 
     private static Setup singleton;
+    private final NetworkUtils networkUtils;
 
-    public synchronized static Setup getInstance(DataManager dataManager, AppState appState) {
+    public synchronized static Setup getInstance(DataManager dataManager, AppState appState, NetworkUtils networkUtils) {
         if (singleton == null) {
-            singleton = new Setup(dataManager, appState);
+            singleton = new Setup(dataManager, appState, networkUtils);
         }
         return singleton;
     }
 
-    private Setup(DataManager dataManager, AppState appState) {
+    private Setup(DataManager dataManager, AppState appState, NetworkUtils networkUtils) {
         this.dataManager = dataManager;
         this.appState = appState;
+        this.networkUtils = networkUtils;
     }
 
 
@@ -141,6 +144,9 @@ public class Setup {
         String macAddress = pairedScanners.get(0);
         dataManager.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
+
+        //TODO: move convertAddressToSerial in libscanner
+        dataManager.setLastScannerUsed(com.simprints.id.tools.utils.ScannerUtils.convertAddressToSerial(macAddress));
 
         Timber.d("Setup: Scanner initialized.");
         goOn(activity);
@@ -243,7 +249,7 @@ public class Setup {
     }
 
     private void saveNotFoundVerification(Person probe) {
-        if (dataManager.isRemoteConnected()) {
+        if (networkUtils.isConnected()) {
             // We've synced with the online db and they're not in the db
             dataManager.saveVerification(probe, null, GUID_NOT_FOUND_ONLINE);
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
