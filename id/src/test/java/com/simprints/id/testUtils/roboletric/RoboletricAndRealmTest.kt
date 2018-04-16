@@ -10,8 +10,6 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.authListener.FirebaseAuthListenerManager
-import com.simprints.id.data.db.remote.connectionListener.FirebaseConnectionListenerManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.whenever
@@ -49,8 +47,6 @@ fun mockIsSignedIn(app: Application, sharedPrefs: SharedPreferences) {
 fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer: MockWebServer): Triple<DbManager, LocalDbManager, RemoteDbManager> {
     PeopleRemoteInterface.baseUrl = mockServer.url("/").toString()
     val localDbManager = Mockito.spy(LocalDbManager::class.java)
-    val mockConnectionListenerManager = Mockito.mock(FirebaseConnectionListenerManager::class.java)
-    val mockAuthListenerManager = Mockito.mock(FirebaseAuthListenerManager::class.java)
     whenever(localDbManager.insertOrUpdatePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
     whenever(localDbManager.loadPersonFromLocal(any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
 
@@ -60,9 +56,7 @@ fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer: MockWe
 
     val remoteDbManager = Mockito.spy(FirebaseManager(
         (RuntimeEnvironment.application as Application),
-        projectIdProvider,
-        mockConnectionListenerManager,
-        mockAuthListenerManager))
+        projectIdProvider))
     whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))
 
     val dbManager = DbManagerImpl(localDbManager, remoteDbManager)
