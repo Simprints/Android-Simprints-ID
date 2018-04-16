@@ -22,11 +22,11 @@ class SyncManager(private val dataManager: DataManager,
         SyncManagerState.STARTED
         syncClient.sync(syncParams, {
             startListeners()
-        }, {
-            if (it is TaskInProgressException) {
+        }, { e ->
+            if (e is TaskInProgressException) {
                 startListeners()
             } else {
-                observers.forEach { it.onError(Throwable("Server busy")) }
+                observers.forEach { it.onError(e) }
                 stopListeners()
             }
         })
@@ -54,6 +54,10 @@ class SyncManager(private val dataManager: DataManager,
 
     private fun createInternalDisposable(): DisposableObserver<Progress> =
         object : DisposableObserver<Progress>() {
+
+            override fun onStart() {
+                Timber.d("onStart")
+            }
 
             override fun onNext(progress: Progress) {
                 Timber.d("onSyncProgress")

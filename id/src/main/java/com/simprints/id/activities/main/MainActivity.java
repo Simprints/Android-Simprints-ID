@@ -86,6 +86,7 @@ import java.util.Map;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableObserver;
+import timber.log.Timber;
 
 import static com.simprints.id.domain.Finger.NB_OF_FINGERS;
 import static com.simprints.id.domain.Finger.Status;
@@ -144,13 +145,13 @@ public class MainActivity extends AppCompatActivity implements
     private DataManager dataManager;
 
     private SyncClient syncClient;
+    private MainActivitySyncHelper syncHelper;
 
     private AlertLauncher alertLauncher;
 
     // Singletons
     private AppState appState;
     private Setup setup;
-    private SyncManager syncManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,13 +190,13 @@ public class MainActivity extends AppCompatActivity implements
                 (ProgressBar) findViewById(R.id.pb_timeout),
                 dataManager.getTimeoutS() * 1000);
 
-        initSyncManager();
         setFingerStatus();
         initActiveFingers();
         initBarAndDrawer();
         initIndicators();
         initScanButton();
         initViewPager();
+        syncHelper = new MainActivitySyncHelper(this, dataManager, syncClient, syncItem);
         refreshDisplay();
     }
 
@@ -642,7 +643,7 @@ public class MainActivity extends AppCompatActivity implements
                         PRIVACY_ACTIVITY_REQUEST_CODE);
                 break;
             case R.id.nav_sync:
-                syncManager.sync(SyncTaskParameters.build(dataManager.getSyncGroup(), dataManager));
+                syncHelper.sync(dataManager);
                 return true;
             case R.id.nav_about:
                 startActivityForResult(new Intent(this, AboutActivity.class),
@@ -791,7 +792,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        syncManager.stopListeners();
+        syncHelper.getSyncManager().stopListeners();
     }
 
     @Override
@@ -800,66 +801,6 @@ public class MainActivity extends AppCompatActivity implements
         Scanner scanner = appState.getScanner();
         if (scanner != null) {
             scanner.unregisterButtonListener(scannerButtonListener);
-        }
-    }
-
-    private void initSyncManager() {
-        syncManager = new SyncManager(dataManager, syncClient);
-        syncManager.addObserver(new DisposableObserver<Progress>() {
-
-            @Override public void onStart() {
-                System.out.println("Start!");
-            }
-            @Override public void onNext(Progress progress) {
-                setProgressSyncItem(progress);
-            }
-            @Override public void onError(Throwable t) {
-                setErrorSyncItem();
-            }
-            @Override public void onComplete() {
-                setCompleteSyncItem();
-            }
-        });
-    }
-
-    private void setProgressSyncItem(Progress progress) {
-        if (isProgressZero(progress))
-            setSyncItem(false,
-                getString(R.string.syncing_calculating),
-                R.drawable.ic_syncing);
-        else
-            setSyncItem(false,
-                getString(R.string.syncing_with_progress, progress.getCurrentValue(), progress.getMaxValue()),
-                R.drawable.ic_syncing);
-    }
-
-    private boolean isProgressZero(Progress progress) {
-        return progress.getCurrentValue() == 0 && progress.getMaxValue() == 0;
-    }
-
-    private void setCompleteSyncItem() {
-        setSyncItem(true, R.string.nav_sync_complete, R.drawable.ic_sync_success);
-    }
-
-    //FIXME: we need to show the network state?
-    private void setReadySyncItem() {
-        setSyncItem(true, R.string.nav_sync, R.drawable.ic_menu_sync_ready);
-    }
-
-    //FIXME: we need to show the network state?
-    private void setErrorSyncItem() {
-        setSyncItem(false, R.string.not_signed_in, R.drawable.ic_menu_sync_off);
-    }
-
-    private void setSyncItem(Boolean enabled, @StringRes int title, @DrawableRes int icon) {
-        setSyncItem(enabled, getString(title), icon);
-    }
-
-    private void setSyncItem(Boolean enabled, String title, @DrawableRes int icon) {
-        if (syncItem != null) {
-            syncItem.setEnabled(enabled);
-            syncItem.setTitle(title);
-            syncItem.setIcon(icon);
         }
     }
 
