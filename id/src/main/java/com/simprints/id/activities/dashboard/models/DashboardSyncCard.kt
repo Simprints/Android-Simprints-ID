@@ -64,7 +64,7 @@ class DashboardSyncCard(type: DashboardCardType,
 
     private fun updateSyncInfo() {
 
-        //StopShip: slip in methods
+        //STOPSHIP: slip in methods
         dataManager
             .localDbManager
             .getPeopleCountFromLocal(toSync = true)

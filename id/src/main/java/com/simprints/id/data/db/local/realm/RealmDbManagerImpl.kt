@@ -12,6 +12,7 @@ import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
+import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfo
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.BackpressureStrategy
@@ -122,12 +123,13 @@ class RealmDbManagerImpl(private val appContext: Context,
             }, BackpressureStrategy.BUFFER)
         }
 
+    @Throws(NoStoredLastSyncedInfo::class)
     override fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo> =
         getRealmInstance().map {
             it.use { realm ->
                 realm.where(rl_SyncInfo::class.java).equalTo(SYNC_ID_FIELD, typeSync.ordinal).findFirst()?.let {
                     realm.copyFromRealm(it)
-                } ?: throw Exception("Not found") //StopShip: Exception
+                } ?: throw NoStoredLastSyncedInfo()
             }
         }
 
@@ -136,7 +138,7 @@ class RealmDbManagerImpl(private val appContext: Context,
             it.use { realm ->
                 realm.where(Project::class.java).equalTo(Project.PROJECT_ID_FIELD, projectId).findFirst()?.let {
                     realm.copyFromRealm(it)
-                } ?: throw Exception("Not found")
+                } ?: throw Exception("Not found") // STOPSHIP : Exception
             }
         }
 
