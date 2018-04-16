@@ -8,6 +8,7 @@ import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
+import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfo
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.Completable
@@ -51,6 +52,7 @@ interface LocalDbManager {
     fun loadProjectFromLocal(projectId: String): Single<Project>
 
     //Sync
+    @Throws(NoStoredLastSyncedInfo::class)
     fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo>
 
     fun deletePeopleFromLocal(syncParams: SyncTaskParameters): Completable
