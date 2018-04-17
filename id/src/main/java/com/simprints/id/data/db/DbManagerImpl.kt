@@ -112,8 +112,9 @@ class DbManagerImpl(override val localDbManager: LocalDbManager,
             }
 
     override fun refreshProjectInfoWithServer(projectId: String): Single<Project> =
-        remoteDbManager.loadProjectFromRemote(projectId).doAfterSuccess {
+        remoteDbManager.loadProjectFromRemote(projectId).flatMap {
             localDbManager.saveProjectIntoLocal(it)
+                .andThen(Single.just(it))
         }
 
     override fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int> =
