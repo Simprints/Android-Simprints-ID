@@ -18,7 +18,7 @@ open class rl_SyncInfo : RealmObject {
         const val SYNC_ID_FIELD = "syncGroupId"
     }
 
-    constructor() {}
+    constructor()
 
     constructor(syncGroup: Constants.GROUP, lastPerson: rl_Person) {
         syncGroupId = syncGroup.ordinal
