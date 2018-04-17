@@ -10,12 +10,12 @@ import android.view.View
 import android.view.WindowManager
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.MainActivity
 import com.simprints.id.activities.RefusalActivity
+import com.simprints.id.activities.main.MainActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.AppState
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper
@@ -27,9 +27,6 @@ import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
 import kotlinx.android.synthetic.main.activity_launch.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import org.jetbrains.anko.coroutines.experimental.bg
 
 @SuppressLint("HardwareIds")
 open class LaunchActivity : AppCompatActivity() {
@@ -176,14 +173,8 @@ open class LaunchActivity : AppCompatActivity() {
         waitingForConfirmation = false
         setResult(resultCode, resultData)
         dataManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
-        async(UI) {
-            try {
-                bg { dataManager.saveSession() }.await()
-            } catch (exception: Throwable) {
-                Log.d(this@LaunchActivity, exception.message ?: "")
-            }
-            finish()
-        }
+        dataManager.saveSession()
+        finish()
     }
 
     override fun onDestroy() {

@@ -2,9 +2,9 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.DataManager
-import com.simprints.id.domain.sessionParameters.SessionParameters
-import com.simprints.id.domain.sessionParameters.extractors.Extractor
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
+import com.simprints.id.session.sessionParameters.SessionParameters
+import com.simprints.id.session.sessionParameters.extractors.Extractor
 import com.simprints.id.tools.TimeHelper
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
@@ -22,6 +22,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
         try {
             extractSessionParameters()
+            dataManager.lastUserUsed = dataManager.userId
         } catch (exception: InvalidCalloutError) {
             view.openAlertActivityForError(exception.alertType)
             setupFailed = true

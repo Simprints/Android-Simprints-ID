@@ -4,14 +4,14 @@ import com.google.android.gms.safetynet.SafetyNet
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
+import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.tools.base.RxJavaTest
-import com.simprints.id.tools.retrofit.createMockService
-import com.simprints.id.tools.retrofit.createMockServiceToFailRequests
-import com.simprints.id.tools.roboletric.TestApplication
-import com.simprints.id.tools.roboletric.mockDbManager
-import com.simprints.id.tools.roboletric.mockLocalDbManager
-import com.simprints.id.tools.roboletric.mockRemoteDbManager
+import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.id.testUtils.retrofit.createMockBehaviorService
+import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testUtils.roboletric.mockDbManager
+import com.simprints.id.testUtils.roboletric.mockLocalDbManager
+import com.simprints.id.testUtils.roboletric.mockRemoteDbManager
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,14 +25,16 @@ import java.io.IOException
 class ProjectAuthenticatorTest : RxJavaTest() {
 
     private lateinit var app: Application
+    private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
     @Before
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
-        mockRemoteDbManager(app)
         mockLocalDbManager(app)
+        mockRemoteDbManager(app)
         mockDbManager(app)
+        apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
     }
 
     @Test
@@ -42,7 +44,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
             mockSecureDataManager(),
             app.dataManager,
             SafetyNet.getClient(app),
-            createMockService(ApiService().retrofit, 0),
+            ApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
             getMockAttestationManager())
 
         val testObserver = authenticator
@@ -65,7 +67,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
             mockSecureDataManager(),
             app.dataManager,
             SafetyNet.getClient(app),
-            createMockServiceToFailRequests(ApiService().retrofit))
+            createMockServiceToFailRequests(apiClient.retrofit))
 
             .authenticate(nonceScope, "encrypted_project_secret")
             .test()

@@ -2,9 +2,10 @@ package com.simprints.id.secure.cryptography
 
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.PublicKeyString
-import com.simprints.id.tools.roboletric.TestApplication
+import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -20,8 +21,7 @@ class AsymmetricEncrypterTest {
     fun testCanEncryptString() {
         val string = "this is some string"
         val encryptedString = AsymmetricEncrypter(publicKeyString).encrypt(string)
-        assertNotNull(encryptedString)
-        assert(!encryptedString.isEmpty())
+        assertTrue(encryptedString.isNotEmpty())
     }
 
     @Test

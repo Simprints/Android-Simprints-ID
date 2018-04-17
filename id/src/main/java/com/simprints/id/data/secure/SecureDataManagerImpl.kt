@@ -2,7 +2,9 @@ package com.simprints.id.data.secure
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.safe.CredentialMissingException
+import com.simprints.id.exceptions.safe.NotSignedInException
 import com.simprints.id.secure.cryptography.Hasher
+import io.reactivex.Single
 
 class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
 
@@ -75,6 +77,15 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
             ""
         }
 
+    override fun getSignedInProjectId(): Single<String> =
+        Single.create<String> {
+            try {
+                it.onSuccess(signedInProjectId)
+            } catch (e: CredentialMissingException) {
+                it.onError(NotSignedInException())
+            }
+        }
+
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
         getSignedInProjectIdOrEmpty().isNotEmpty() &&
             getSignedInProjectIdOrEmpty() == possibleProjectId &&
@@ -90,6 +101,12 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
         encryptedProjectSecret = ""
         signedInProjectId = ""
         signedInUserId = ""
+    }
+
+    override fun storeCredentials(projectId: String, legacyProjectId: String?, userId: String) {
+        storeProjectIdWithLegacyProjectIdPair(projectId, legacyProjectId)
+        signedInProjectId = projectId
+        signedInUserId = userId
     }
 
     override fun storeProjectIdWithLegacyProjectIdPair(projectId: String, legacyProjectId: String?) {

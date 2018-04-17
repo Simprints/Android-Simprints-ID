@@ -9,7 +9,7 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import retrofit2.HttpException
 
-class AuthManager(val client: ApiServiceInterface) {
+class AuthManager(val client: SecureApiInterface) {
 
     companion object {
         const val projectIdHeaderKey = "X-ProjectId"

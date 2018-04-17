@@ -7,7 +7,7 @@ import android.support.v4.content.ContextCompat;
 import android.widget.ProgressBar;
 
 import com.simprints.id.R;
-import com.simprints.id.model.Finger;
+import com.simprints.id.domain.Finger;
 
 public class TimeoutBar {
     private Context context;

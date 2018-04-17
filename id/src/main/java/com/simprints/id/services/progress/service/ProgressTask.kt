@@ -1,12 +1,9 @@
 package com.simprints.id.services.progress.service
 
-import com.simprints.libcommon.Progress
-import io.reactivex.Emitter
-
+import com.simprints.id.services.progress.Progress
+import io.reactivex.Observable
 
 interface ProgressTask {
 
-    fun run(isInterrupted: () -> Boolean,
-            emitter: Emitter<Progress>)
-
+    fun run(isInterrupted: () -> Boolean): Observable<Progress>
 }

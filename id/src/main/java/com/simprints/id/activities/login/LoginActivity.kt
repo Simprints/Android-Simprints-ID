@@ -10,11 +10,12 @@ import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.scannerAppIntent
+import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity(), LoginContract.View {
@@ -113,6 +114,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     override fun handleMissingCredentials() {
+        progressDialog.dismiss()
         showToast(R.string.login_missing_credentials)
     }
 
@@ -146,9 +148,4 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         progressDialog.dismiss()
         launchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }
-
-    private fun showToast(stringRes: Int) =
-        runOnUiThread {
-            Toast.makeText(this, stringRes, Toast.LENGTH_LONG).show()
-        }
 }

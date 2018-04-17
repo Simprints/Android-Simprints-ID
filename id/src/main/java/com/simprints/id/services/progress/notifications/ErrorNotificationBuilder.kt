@@ -2,9 +2,8 @@ package com.simprints.id.services.progress.notifications
 
 import android.app.NotificationManager
 import android.support.v4.app.NotificationCompat
-import com.simprints.libcommon.Progress
+import com.simprints.id.services.progress.Progress
 import io.reactivex.observers.DisposableObserver
-
 
 class ErrorNotificationBuilder(notificationManager: NotificationManager,
                                notificationBuilder: NotificationCompat.Builder,
@@ -28,7 +27,8 @@ class ErrorNotificationBuilder(notificationManager: NotificationManager,
                     dispose()
                 }
 
-                override fun onNext(progress: Progress) { }
+                override fun onNext(progress: Progress) {
+                    cancelIfVisible()
+                }
             }
-
 }
