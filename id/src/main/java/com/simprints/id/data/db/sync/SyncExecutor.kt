@@ -11,10 +11,7 @@ import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.UploadProgress
 import com.simprints.id.services.sync.SyncTaskParameters
-import io.reactivex.Emitter
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.Single
+import io.reactivex.*
 import timber.log.Timber
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -47,36 +44,34 @@ open class SyncExecutor(private val dbManager: DbManager,
             val counter = AtomicInteger(0)
 
             Timber.d("Uploading $it people")
-            batchPatientsArray(isInterrupted, batchSize)
+            getPeopleInBatches(isInterrupted, batchSize)
                 .uploadEachBatch()
                 .updateUploadCounterAndConvertItToProgress(counter, it)
+                .toObservable()
         }
 
-    private fun Observable<out MutableList<fb_Person>>.uploadEachBatch(): Observable<Int> =
+    private fun Flowable<out MutableList<fb_Person>>.uploadEachBatch(): Flowable<Int> =
         flatMap { batch ->
             dbManager
                 .uploadPeople(ArrayList(batch))
-                .andThen(Observable.just(batch.size))
+                .andThen(Flowable.just(batch.size))
         }
 
-    private fun Observable<out Int>.updateUploadCounterAndConvertItToProgress(counter: AtomicInteger, maxValueForProgress: Int): Observable<Progress> =
+    private fun Flowable<out Int>.updateUploadCounterAndConvertItToProgress(counter: AtomicInteger, maxValueForProgress: Int): Flowable<Progress> =
         map {
             Timber.d("Uploading batch - ${counter.get() + 1} / $maxValueForProgress")
             UploadProgress(counter.addAndGet(it), maxValueForProgress)
         }
 
-    private fun batchPatientsArray(isInterrupted: () -> Boolean,
-                                   batchSize: Int): Observable<MutableList<fb_Person>> {
-
-        return dbManager.localDbManager.loadPeopleFromLocalRx(toSync = true)
+    private fun getPeopleInBatches(isInterrupted: () -> Boolean,
+                                   batchSize: Int): Flowable<MutableList<fb_Person>> =
+        dbManager.localDbManager.loadPeopleFromLocalRx(toSync = true)
             .takeUntil { isInterrupted() }
             .map { fb_Person(it) }
-            .buffer(batchSize).toObservable()
-    }
+            .buffer(batchSize)
 
-    private fun getPeopleCountToSync(): Single<Int> {
-        return dbManager.localDbManager.getPeopleCountFromLocal(toSync = true)
-    }
+    private fun getPeopleCountToSync(): Single<Int> =
+        dbManager.localDbManager.getPeopleCountFromLocal(toSync = true)
 
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> =
         dbManager.getNumberOfPatientsForSyncParams(syncParams).flatMap {
@@ -122,16 +117,12 @@ open class SyncExecutor(private val dbManager: DbManager,
             }
         }
 
-    private fun hasCurrentBatchDownloadedFinished(totalDownloaded: Int,
-                                                  maxPatientsForBatch: Int): Boolean {
-
-        return totalDownloaded % maxPatientsForBatch == 0
-    }
+    private fun hasCurrentBatchDownloadedFinished(totalDownloaded: Int, maxPatientsForBatch: Int) =
+        totalDownloaded % maxPatientsForBatch == 0
 
     private fun emitResultProgressIfRequired(it: ObservableEmitter<Int>,
                                              totalDownloaded: Int,
                                              emitProgressEvery: Int) {
-
         if (totalDownloaded % emitProgressEvery == 0) {
             it.onNext(totalDownloaded)
         }
