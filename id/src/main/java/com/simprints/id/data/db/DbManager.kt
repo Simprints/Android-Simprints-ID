@@ -42,6 +42,8 @@ interface DbManager : RemoteDbManager {
 
     fun loadProject(projectId: String): Single<Project>
 
+    fun refreshProjectInfoWithServer(projectId: String): Single<Project>
+
     fun getPeopleCount(personId: String? = null,
                        projectId: String? = null,
                        userId: String? = null,
