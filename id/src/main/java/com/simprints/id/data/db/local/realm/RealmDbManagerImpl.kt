@@ -7,11 +7,12 @@ import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.LocalDbKeyProvider
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
-import com.simprints.id.data.db.models.Project
+import com.simprints.id.data.db.local.realm.models.*
+import com.simprints.id.data.db.local.realm.models.adapters.toProject
+import com.simprints.id.data.db.local.realm.models.adapters.toRealmProject
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
+import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.services.sync.SyncTaskParameters
@@ -135,8 +136,8 @@ class RealmDbManagerImpl(private val appContext: Context,
     override fun loadProjectFromLocal(projectId: String): Single<Project> =
         getRealmInstance().map {
             it.use { realm ->
-                realm.where(Project::class.java).equalTo(Project.PROJECT_ID_FIELD, projectId).findFirst()?.let {
-                    realm.copyFromRealm(it)
+                realm.where(rl_Project::class.java).equalTo(rl_Project.PROJECT_ID_FIELD, projectId).findFirst()?.let {
+                    realm.copyFromRealm(it).toProject()
                 } ?: throw NoSuchStoredProjectException()
             }
         }
@@ -169,7 +170,7 @@ class RealmDbManagerImpl(private val appContext: Context,
         getRealmInstance().flatMapCompletable {
             it.use {
                 it.executeTransaction {
-                    it.insertOrUpdate(project)
+                    it.insertOrUpdate(project.toRealmProject())
                 }
                 Completable.complete()
             }

@@ -5,7 +5,7 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
-import com.simprints.id.data.db.models.Project
+import com.simprints.id.domain.Project
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.roboletric.*
