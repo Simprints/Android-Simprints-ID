@@ -2,10 +2,12 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.domain.Project
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.NonceScope
@@ -14,19 +16,21 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
+import java.io.IOException
 
-open class ProjectAuthenticator(secureDataManager: SecureDataManager,
+open class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
                                 private val dbManager: DbManager,
                                 private val safetyNetClient: SafetyNetClient,
-                                apiClient: ApiServiceInterface = ApiService().api,
+                                secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
                                 private val attestationManager: AttestationManager = AttestationManager()) {
 
     private val projectSecretManager = ProjectSecretManager(secureDataManager)
-    private val publicKeyManager = PublicKeyManager(apiClient)
-    private val nonceManager = NonceManager(apiClient)
-    private val authManager = AuthManager(apiClient)
+    private val publicKeyManager = PublicKeyManager(secureApiClient)
+    private val nonceManager = NonceManager(secureApiClient)
+    private val authManager = AuthManager(secureApiClient)
 
     @Throws(
+        IOException::class,
         DifferentProjectIdReceivedFromIntentException::class,
         AuthRequestInvalidCredentialsException::class,
         SimprintsInternalServerException::class)
@@ -34,6 +38,8 @@ open class ProjectAuthenticator(secureDataManager: SecureDataManager,
         prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
             .signIn(nonceScope.projectId)
+            .fetchProjectInfo(nonceScope.projectId)
+            .storeCredentials(nonceScope.userId)
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
@@ -68,5 +74,16 @@ open class ProjectAuthenticator(secureDataManager: SecureDataManager,
     private fun Single<out Tokens>.signIn(projectId: String): Completable =
         flatMapCompletable { tokens ->
             dbManager.signIn(projectId, tokens)
+        }
+
+    private fun Completable.fetchProjectInfo(projectId: String): Single<Project> =
+        andThen(
+            dbManager.refreshProjectInfoWithServer(projectId)
+        )
+
+    private fun Single<out Project>.storeCredentials(userId: String): Completable =
+        flatMapCompletable {
+            secureDataManager.storeCredentials(it.id, it.legacyId, userId)
+            Completable.complete()
         }
 }

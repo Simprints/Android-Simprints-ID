@@ -2,12 +2,14 @@ package com.simprints.id.data.analytics
 
 import android.os.Bundle
 import com.crashlytics.android.Crashlytics
-import com.google.common.base.CaseFormat
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
-import com.simprints.id.data.models.Session
-import com.simprints.id.domain.callout.Callout
-import com.simprints.id.libdata.models.firebase.fb_Session
+import com.simprints.id.data.db.remote.models.fb_Session
+import com.simprints.id.exceptions.safe.SimprintsException
+import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.session.Session
+import com.simprints.id.session.callout.Callout
+import com.simprints.id.tools.extensions.fromLowerCamelToLowerUnderscore
 import timber.log.Timber
 import kotlin.reflect.full.memberProperties
 
@@ -18,8 +20,7 @@ import kotlin.reflect.full.memberProperties
  * and reduces network data usage."
  */
 
-class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics): AnalyticsManager {
-
+class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics) : AnalyticsManager {
 
     override fun logAlert(alertName: String, apiKey: String, moduleId: String, userId: String,
                           deviceId: String) {
@@ -46,17 +47,32 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         firebaseAnalytics.logEvent("alert", bundle)
     }
 
-    override fun logError(error: Error) {
-        Timber.d("FirebaseAnalyticsManager.logError(throwable=$error)")
-        Crashlytics.logException(error)
+    override fun logThrowable(throwable: Throwable) =
+        when (throwable) {
+            is SimprintsError -> logError(throwable)
+            is SimprintsException -> logSafeException(throwable)
+            else -> logUnexpectedThrowable(throwable)
+        }
+
+    private fun logUnexpectedThrowable(throwable: Throwable) {
+        logUnsafeThrowable(throwable)
     }
 
-    override fun logSafeException(exception: RuntimeException) {
+    override fun logError(error: SimprintsError) {
+        logUnsafeThrowable(error)
+    }
+
+    override fun logSafeException(exception: SimprintsException) {
         Timber.d("FirebaseAnalyticsManager.logSafeException(description=$exception)")
         val bundle = Bundle()
         bundle.putString("exception", exception.toString())
         bundle.putString("description", exception.message)
         firebaseAnalytics.logEvent("safe_exception", bundle)
+    }
+
+    private fun logUnsafeThrowable(e: Throwable) {
+        Timber.d(e)
+        Crashlytics.logException(e)
     }
 
     override fun logCallout(callout: Callout) {
@@ -123,11 +139,8 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
         val fbSession = session.toFirebaseSession()
         val bundle = Bundle()
         for (property in fb_Session::class.memberProperties) {
-            bundle.putString(property.name.fromCamelToUnderscore(), property.get(fbSession).toString())
+            bundle.putString(property.name.fromLowerCamelToLowerUnderscore(), property.get(fbSession).toString())
         }
         firebaseAnalytics.logEvent("session", bundle)
     }
-
-    private fun String.fromCamelToUnderscore(): String =
-        CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, this)
 }

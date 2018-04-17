@@ -1,26 +1,66 @@
 package com.simprints.id.data.db.local
 
-import com.simprints.id.libdata.DataCallback
-import com.simprints.id.libdata.models.firebase.fb_Person
+import com.google.gson.Gson
+import com.google.gson.stream.JsonReader
+import com.simprints.id.data.db.DataCallback
+import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
+import com.simprints.id.domain.Project
+import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.domain.Constants
+import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfoException
+import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
+import com.simprints.id.exceptions.safe.NotSignedInException
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.Completable
-import io.realm.Realm
-import io.realm.RealmConfiguration
+import io.reactivex.Flowable
+import io.reactivex.Single
+import io.realm.Sort
 
+/** @throws NotSignedInException */
 interface LocalDbManager {
 
     // Lifecycle
-    fun signInToLocal(projectId: String, localDbKey: LocalDbKey): Completable
-    fun signOutOfLocal()
-    fun isLocalDbInitialized(projectId: String): Boolean
+    fun signInToLocal(): Completable
 
     // Data transfer
-    fun savePersonInLocal(fbPerson: fb_Person)
-    fun loadPersonFromLocal(destinationList: MutableList<Person>, guid: String, callback: DataCallback)
-    fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
-    fun getPeopleCountFromLocal(group: com.simprints.id.libdata.tools.Constants.GROUP, userId: String, moduleId: String): Long
+    fun insertOrUpdatePersonInLocal(person: rl_Person): Completable
 
-    // Database instances
-    fun getValidRealmConfig(): RealmConfiguration
-    fun getRealmInstance(): Realm
+    fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
+                                              gson: Gson,
+                                              syncParams: SyncTaskParameters,
+                                              shouldStop: (personSaved: fb_Person) -> Boolean): Completable
+
+    fun getPeopleCountFromLocal(patientId: String? = null,
+                                userId: String? = null,
+                                moduleId: String? = null,
+                                toSync: Boolean? = null): Single<Int>
+
+    fun loadPersonFromLocal(personId: String): Single<Person>
+
+    fun loadPeopleFromLocal(patientId: String? = null,
+                            userId: String? = null,
+                            moduleId: String? = null,
+                            toSync: Boolean? = null,
+                            sortBy: Map<String, Sort>? = null): Single<ArrayList<rl_Person>>
+
+    fun loadPeopleFromLocalRx(patientId: String? = null,
+                              userId: String? = null,
+                              moduleId: String? = null,
+                              toSync: Boolean? = null,
+                              sortBy: Map<String, Sort>? = null): Flowable<rl_Person>
+
+    fun saveProjectIntoLocal(project: Project): Completable
+
+    /** @throws NoSuchStoredProjectException */
+    fun loadProjectFromLocal(projectId: String): Single<Project>
+
+    //Sync
+    /** @throws NoStoredLastSyncedInfoException */
+    fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo>
+
+    fun deletePeopleFromLocal(syncParams: SyncTaskParameters): Completable
+    fun deleteSyncInfoFromLocal(syncParams: SyncTaskParameters): Completable
+    fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
 }

@@ -7,19 +7,19 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.data.DataManager;
-import com.simprints.id.domain.callout.CalloutAction;
+import com.simprints.id.data.db.DATA_ERROR;
+import com.simprints.id.data.db.DataCallback;
+import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
+import com.simprints.id.domain.Constants;
 import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
+import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.Log;
 import com.simprints.id.tools.TimeHelper;
 import com.simprints.libcommon.Person;
-import com.simprints.id.libdata.DATA_ERROR;
-import com.simprints.id.libdata.DataCallback;
-import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT;
-import com.simprints.id.libdata.tools.Constants;
 import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
 import com.simprints.libmatcher.Progress;
@@ -34,9 +34,10 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
+import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
 import static com.simprints.id.tools.TierHelper.computeTier;
 
-class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListener {
+public class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListener {
 
     @NonNull
     private final MatchingContract.View matchingView;
@@ -53,7 +54,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
     @NonNull
     private TimeHelper timeHelper;
 
-    MatchingPresenter(@NonNull MatchingContract.View matchingView,
+    public MatchingPresenter(@NonNull MatchingContract.View matchingView,
                       @NonNull DataManager dataManager,
                       @NonNull TimeHelper timeHelper,
                       Person probe) {
@@ -72,6 +73,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
                     public void run() {
+
                         onIdentifyStart();
                     }
                 };
@@ -112,14 +114,14 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
     private void onIdentifyStart() {
         final Constants.GROUP matchGroup = dataManager.getMatchGroup();
         try {
-            dataManager.loadPeople(candidates, matchGroup, newOnLoadPeopleCallback());
+            dataManager.loadPeople(candidates, matchGroup, wrapCallback("loading people", newOnLoadPeopleCallback()));
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             matchingView.launchAlert();
         }
     }
 
-    private DataCallback newOnLoadPeopleCallback() {
+    public DataCallback newOnLoadPeopleCallback() {
         return new DataCallback() {
             @Override
             public void onSuccess() {
@@ -163,7 +165,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
     private void onVerifyStart() {
         final String guid = dataManager.getPatientId();
         try {
-            dataManager.loadPerson(candidates, dataManager.getSignedInProjectId(), guid, newOnLoadPersonCallback());
+            dataManager.loadPerson(candidates, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             matchingView.launchAlert();
@@ -249,6 +251,7 @@ class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListe
 
                         try {
                             dataManager.saveIdentification(probe, candidates.size(), topCandidates);
+
                         } catch (UninitializedDataManagerError error) {
                             dataManager.logError(error);
                             matchingView.launchAlert();

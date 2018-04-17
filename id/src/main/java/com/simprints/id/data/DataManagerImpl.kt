@@ -1,41 +1,37 @@
-
 package com.simprints.id.data
 
 import android.content.Context
 import android.os.Build
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.remote.authListener.AuthListener
-import com.simprints.id.data.db.remote.connectionListener.ConnectionListener
-import com.simprints.id.data.models.Session
-import com.simprints.id.data.network.ApiManager
+import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.domain.sessionParameters.SessionParameters
-import com.simprints.id.libdata.DataCallback
-import com.simprints.id.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.libdata.models.firebase.fb_Person
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.Constants
+import com.simprints.id.session.Session
+import com.simprints.id.session.sessionParameters.SessionParameters
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
-import com.simprints.libcommon.Progress
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
-import io.reactivex.Emitter
+import io.reactivex.Completable
+import io.reactivex.Single
+import java.util.*
 
 class DataManagerImpl(private val context: Context,
                       private val preferencesManager: PreferencesManager,
                       private val dbManager: DbManager,
-                      private val apiManager: ApiManager,
                       private val analyticsManager: AnalyticsManager,
                       private val secureDataManager: SecureDataManager)
     : DataManager,
     PreferencesManager by preferencesManager,
     AnalyticsManager by analyticsManager,
     DbManager by dbManager,
-    ApiManager by apiManager,
     SecureDataManager by secureDataManager {
 
     override val androidSdkVersion: Int
@@ -60,10 +56,10 @@ class DataManagerImpl(private val context: Context,
         }
 
     override fun logAlert(alertType: ALERT_TYPE) =
-        analyticsManager.logAlert(alertType.name, getSignedInProjectIdOrEmpty(), moduleId, userId, deviceId)
+        analyticsManager.logAlert(alertType.name, getSignedInProjectIdOrEmpty(), moduleId, getSignedInUserIdOrEmpty(), deviceId)
 
     override fun logUserProperties() =
-        analyticsManager.logUserProperties(userId, getSignedInProjectIdOrEmpty(), moduleId, deviceId)
+        analyticsManager.logUserProperties(getSignedInUserIdOrEmpty(), getSignedInProjectIdOrEmpty(), moduleId, deviceId)
 
     override fun logScannerProperties() =
         analyticsManager.logScannerProperties(macAddress, scannerId)
@@ -82,58 +78,46 @@ class DataManagerImpl(private val context: Context,
     // DbManager call interception for populating arguments
     // Lifecycle
     override fun initialiseDb() {
-        dbManager.registerRemoteConnectionListener(connectionStateLogger)
-        dbManager.registerRemoteAuthListener(authStateLogger)
         dbManager.initialiseDb()
     }
 
     override fun signOut() {
-        dbManager.unregisterRemoteConnectionListener(connectionStateLogger)
-        dbManager.unregisterRemoteAuthListener(authStateLogger)
         dbManager.signOut()
     }
 
-    private val connectionStateLogger = object : ConnectionListener {
-        override fun onConnection() = logConnectionStateChange(true)
-        override fun onDisconnection() = logConnectionStateChange(false)
-    }
-
-    private val authStateLogger = object : AuthListener {
-        override fun onSignIn() = logAuthStateChange(true)
-        override fun onSignOut() = logAuthStateChange(false)
-    }
-
     // Data transfer
-    override fun savePerson(person: Person) {
-        dbManager.savePerson(fb_Person(person, userId, deviceId, moduleId), projectId)
-    }
+    override fun savePerson(person: Person): Completable =
+        dbManager.savePerson(fb_Person(person, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), moduleId))
 
-    override fun loadPeople(destinationList: MutableList<Person>, group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback?) {
-        dbManager.loadPeople(destinationList, group, userId, moduleId, callback)
-    }
+    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) =
+        dbManager.loadPeople(destinationList, group, getSignedInUserIdOrEmpty(), moduleId, callback)
 
-    override fun getPeopleCount(group: com.simprints.id.libdata.tools.Constants.GROUP): Long =
-        dbManager.getPeopleCount(group, userId, moduleId)
+    override fun getPeopleCount(group: Constants.GROUP): Single<Int> =
+        when (group) {
+            Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
+            Constants.GROUP.USER -> dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty())
+            Constants.GROUP.MODULE -> dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty(), moduleId = moduleId)
+        }
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
-        dbManager.saveIdentification(probe, projectId, userId, deviceId, moduleId, matchSize, matches, sessionId)
+        preferencesManager.lastIdentificationDate = Date()
+        dbManager.saveIdentification(probe, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, matchSize, matches, sessionId)
     }
 
-    override fun updateIdentification(projectId: String, selectedGuid: String) {
+    override fun updateIdentification(projectId: String, selectedGuid: String) =
         dbManager.updateIdentificationInRemote(projectId, selectedGuid, deviceId, sessionId)
-    }
 
     override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
-        dbManager.saveVerification(probe, projectId, userId, deviceId, moduleId, patientId, match, sessionId, guidExistsResult)
+        preferencesManager.lastVerificationDate = Date()
+        dbManager.saveVerification(probe, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, patientId, match, sessionId, guidExistsResult)
     }
 
-    override fun saveRefusalForm(refusalForm: RefusalForm) {
-        dbManager.saveRefusalForm(refusalForm, projectId, userId, sessionId)
-    }
+    override fun saveRefusalForm(refusalForm: RefusalForm) =
+        dbManager.saveRefusalForm(refusalForm, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), sessionId)
 
     override fun saveSession() {
         val session = Session(sessionId, androidSdkVersion, deviceModel, deviceId, appVersionName,
-            libVersionName, calloutAction.toString(), getSignedInProjectIdOrEmpty(), moduleId, userId,
+            libVersionName, calloutAction.toString(), getSignedInProjectIdOrEmpty(), moduleId, getSignedInUserIdOrEmpty(),
             patientId, callingPackage, metadata, resultFormat, macAddress, scannerId,
             hardwareVersion.toInt(), location.latitude, location.longitude,
             msSinceBootOnSessionStart, msSinceBootOnLoadEnd, msSinceBootOnMainStart,
@@ -142,15 +126,7 @@ class DataManagerImpl(private val context: Context,
         analyticsManager.logSession(session)
     }
 
-    override fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        dbManager.syncGlobal(projectId, isInterrupted, emitter)
-    }
-
-    override fun syncUser(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) {
-        dbManager.syncUser(projectId, userId, isInterrupted, emitter)
-    }
-
-    override fun recoverRealmDb(group: com.simprints.id.libdata.tools.Constants.GROUP, callback: DataCallback) {
-        dbManager.recoverLocalDb(deviceId, userId, deviceId, moduleId, group, callback)
+    override fun recoverRealmDb(group: Constants.GROUP): Completable {
+        return dbManager.recoverLocalDb(getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, group)
     }
 }

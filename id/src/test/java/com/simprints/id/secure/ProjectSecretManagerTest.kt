@@ -3,10 +3,10 @@ package com.simprints.id.secure
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.PublicKeyString
-import com.simprints.id.tools.base.RxJavaTest
-import com.simprints.id.tools.roboletric.TestApplication
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
+import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.id.testUtils.roboletric.TestApplication
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner

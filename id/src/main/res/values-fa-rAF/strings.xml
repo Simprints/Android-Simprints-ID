@@ -130,7 +130,6 @@
     <string name="low_battery_title">چارچ بطری کم است</string>
     <string name="alert_api_key_verify_failed">شناسایی API key ناکام گردید</string>
     <!-- Error Message Text -->
-    <string name="missing_apikey_message">در تنظیمات missing API key اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
     <string name="invalid_apikey_message">در تنظیمات (invalid API Key) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
     <string name="invalid_intentAction_message">در تنظیمات (invalid Intent Action) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
     <string name="invalid_metadata_message">در تنظیمات (invalid metadata) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>

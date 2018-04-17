@@ -14,9 +14,9 @@ import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
-import com.simprints.id.tools.base.RxJavaTest
-import com.simprints.id.tools.roboletric.*
-import junit.framework.Assert.*
+import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.id.testUtils.roboletric.*
+import org.junit.Assert.*
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -56,10 +56,10 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         mockRemoteDbManager(app)
         mockIsSignedIn(app, sharedPreferences)
         mockDbManager(app)
-        mockAnalyticsMock()
+        mockAnalyticsManager()
     }
 
-    private fun mockAnalyticsMock() {
+    private fun mockAnalyticsManager() {
         analyticsManagerMock = Mockito.mock(FirebaseAnalyticsManager::class.java)
         app.analyticsManager = analyticsManagerMock
     }
@@ -82,10 +82,12 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
         val controller = Robolectric.buildActivity(CheckLoginFromIntentActivity::class.java)
 
-        val spyAct = spy(controller.get())
-        doReturn("com.app.installed.from.playstore").`when`(spyAct).getCallingPackageName()
-        replaceActivityInController(controller, spyAct)
+        val mockAct = spy(controller.get())
+        doReturn("com.app.installed.from.playstore").`when`(mockAct).getCallingPackageName()
+        replaceActivityInController(controller, mockAct)
+
         controller.create().start().resume().visible()
+
         verifyALogSafeExceptionWasThrown(0)
     }
 
@@ -236,17 +238,17 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
     }
 
     private fun createACallingAppIntentWithLegacyApiKey(actionString: String = DEFAULT_ACTION,
-                                        legacyApiKey: String = DEFAULT_LEGACY_API_KEY,
-                                        userId: String = DEFAULT_USER_ID,
-                                        moduleId: String = DEFAULT_MODULE_ID): Intent {
+                                                        legacyApiKey: String = DEFAULT_LEGACY_API_KEY,
+                                                        userId: String = DEFAULT_USER_ID,
+                                                        moduleId: String = DEFAULT_MODULE_ID): Intent {
 
         return createACallingAppIntent(actionString, userId, moduleId).also { it.putExtra("apiKey", legacyApiKey) }
     }
 
     private fun createACallingAppIntentWithProjectId(actionString: String = DEFAULT_ACTION,
-                                        projectId: String = DEFAULT_PROJECT_ID,
-                                        userId: String = DEFAULT_USER_ID,
-                                        moduleId: String = DEFAULT_MODULE_ID): Intent {
+                                                     projectId: String = DEFAULT_PROJECT_ID,
+                                                     userId: String = DEFAULT_USER_ID,
+                                                     moduleId: String = DEFAULT_MODULE_ID): Intent {
 
         return createACallingAppIntent(actionString, userId, moduleId).also { it.putExtra("projectId", projectId) }
     }

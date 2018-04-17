@@ -1,13 +1,12 @@
 package com.simprints.id.secure.cryptography
 
 import com.simprints.id.BuildConfig
-import com.simprints.id.tools.roboletric.TestApplication
+import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-
 
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class, application = TestApplication::class)
@@ -17,8 +16,7 @@ class HasherTest {
     fun testCanEncryptString() {
         val string = "this is some string"
         val hashedString = Hasher().hash(string)
-        Assert.assertNotNull(hashedString)
-        assert(!hashedString.isEmpty())
+        Assert.assertTrue(hashedString.isNotEmpty())
     }
 
     @Test

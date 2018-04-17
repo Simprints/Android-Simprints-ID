@@ -1,167 +1,160 @@
 package com.simprints.id.activities.dashboard
 
-import android.support.annotation.DrawableRes
-import android.support.annotation.StringRes
-import com.simprints.id.R
+import com.simprints.id.activities.dashboard.models.DashboardCard
+import com.simprints.id.activities.dashboard.models.DashboardCardType
+import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.remote.authListener.AuthListener
-import com.simprints.id.data.db.remote.connectionListener.ConnectionListener
-import com.simprints.id.exceptions.unsafe.InvalidSyncGroupError
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
-import com.simprints.id.libdata.tools.Constants.GROUP
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.data.db.sync.SyncManager
+import com.simprints.id.data.db.sync.model.SyncManagerState
+import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.progress.service.ProgressService
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.libcommon.Progress
+import com.simprints.id.tools.utils.AndroidResourcesHelper
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver
-import timber.log.Timber
+import io.reactivex.rxkotlin.subscribeBy
+import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 
-class DashboardPresenter(val view: DashboardContract.View,
-                         val syncClient: SyncClient,
-                         val dataManager: DataManager) : DashboardContract.Presenter {
+class DashboardPresenter(private val view: DashboardContract.View,
+                         syncClient: SyncClient,
+                         val dataManager: DataManager,
+                         androidResourcesHelper: AndroidResourcesHelper) : DashboardContract.Presenter {
 
-    private var started: Boolean = false
+    private var started: AtomicBoolean = AtomicBoolean(false)
+
+    private val syncManager = SyncManager(dataManager, syncClient)
+
+    private val cardsFactory = DashboardCardsFactory(dataManager, androidResourcesHelper)
+
+    private var actualSyncParams: SyncTaskParameters =
+        SyncTaskParameters.build(dataManager.syncGroup, dataManager)
+
+    override val cardsModelsList: ArrayList<DashboardCard> = arrayListOf()
+
+    private var syncCardModel: DashboardSyncCard? = null
+        get() {
+            return cardsModelsList.first { it is DashboardSyncCard } as DashboardSyncCard?
+        }
 
     override fun start() {
-        if (!started) {
-            started = true
-            startListeners()
+
+        if (!started.getAndSet(true) || hasSyncGroupChangedSinceLastRun()) {
+            initCards()
+        } else {
+            catchUpWithSyncStateIfServiceRunning()
+        }
+    }
+
+    private fun hasSyncGroupChangedSinceLastRun(): Boolean {
+        val syncParams = SyncTaskParameters.build(dataManager.syncGroup, dataManager)
+        return (actualSyncParams != syncParams).also {
+            actualSyncParams = syncParams
         }
     }
 
     override fun pause() {
-        stopListeners()
+        syncManager.stopListeners()
     }
 
-    override fun sync() {
-        val syncParameters = when (dataManager.syncGroup) {
-            GROUP.GLOBAL -> SyncTaskParameters.GlobalSyncTaskParameters(dataManager.getSignedInHashedLegacyApiKeyOrEmpty())
-            GROUP.USER -> SyncTaskParameters.UserSyncTaskParameters(dataManager.getSignedInHashedLegacyApiKeyOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
-            else -> {
-                handleUnexpectedError(InvalidSyncGroupError())
-                return
-            }
-        }
+    private fun initCards() {
+        cardsModelsList.clear()
+        syncManager.removeObservers()
 
-        syncClient.sync(syncParameters, {
-            syncClient.startListening(newSyncObserver())
-        }, {
-            setErrorSyncItem()
-            view.showToast(R.string.wait_for_current_sync_to_finish)
-        })
+        Single.merge(
+            cardsFactory.createCards()
+                .map {
+                    it.doOnSuccess {
+                        if (it is DashboardSyncCard) {
+                            initSyncCardModel(it)
+                        }
+                        addCard(it)
+                    }
+                }
+        )
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeBy(
+            onComplete = { handleCardsCreated() },
+            onError = { handleCardsCreationFailed() })
     }
 
-    private fun stopListeners() {
-        try {
-            syncClient.stopListening()
-            dataManager.unregisterRemoteAuthListener(authListener)
-            dataManager.unregisterRemoteConnectionListener(connectionListener)
-        } catch (error: UninitializedDataManagerError) {
-            handleUnexpectedError(error)
-        }
+    private fun handleCardsCreated() {
+        catchUpWithSyncStateIfServiceRunning()
+        view.stopRequestIfRequired()
     }
 
-    private fun startListeners() {
-        dataManager.registerRemoteAuthListener(authListener)
-        dataManager.registerRemoteConnectionListener(connectionListener)
-        updateConnectionState()
-        syncClient.startListening(newSyncObserver())
+    private fun handleCardsCreationFailed() {
+        view.stopRequestIfRequired()
     }
 
-    private fun updateConnectionState() {
-        if (dataManager.isRemoteConnected) {
-            connectionListener.onConnection()
-        } else {
-            connectionListener.onDisconnection()
-        }
-    }
-
-    private val authListener = object : AuthListener {
-        override fun onSignIn() {
-        }
-
-        override fun onSignOut() {
-            setOfflineSyncItem()
-        }
-    }
-
-    private val connectionListener = object : ConnectionListener {
-        override fun onConnection() {
-            setReadySyncItem()
-        }
-
-        override fun onDisconnection() {
-            setOfflineSyncItem()
-        }
-    }
-
-    private fun newSyncObserver(): DisposableObserver<Progress> {
-        return object : DisposableObserver<Progress>() {
-
-            override fun onNext(progress: Progress) {
-                Timber.d("onNext")
-                setProgressSyncItem(progress)
+    private fun initSyncCardModel(it: DashboardSyncCard) {
+        it.onSyncActionClicked = { userDidWantToSync() }
+        syncManager.addObserver(it.syncObserver)
+        syncManager.addObserver(object : DisposableObserver<Progress>() {
+            override fun onNext(t: Progress) {}
+            override fun onError(e: Throwable) {
+                e.printStackTrace()
+                createAndAddLocalDbCard()
             }
 
             override fun onComplete() {
-                Timber.d("onComplete")
-                setCompleteSyncItem()
-                syncClient.stopListening()
+                createAndAddLocalDbCard()
             }
+        })
+    }
 
-            override fun onError(throwable: Throwable) {
-                Timber.d("onError")
-                setErrorSyncItem()
-                logThrowable(throwable)
-                syncClient.stopListening()
-            }
+    fun createAndAddLocalDbCard() {
+        cardsFactory.createLocalDbInfoCard()
+            .subscribeBy(
+                onSuccess = { addCard(it) },
+                onError = { it.printStackTrace() })
+    }
 
-            private fun logThrowable(throwable: Throwable) {
-                if (throwable is Error) {
-                    dataManager.logError(throwable)
-                } else if (throwable is RuntimeException) {
-                    dataManager.logSafeException(throwable)
-                }
-            }
+    private fun addCard(dashboardCard: DashboardCard) {
+        removeCardIfExist(dashboardCard.type)
+
+        cardsModelsList.add(dashboardCard)
+        cardsModelsList.sortBy { it.position }
+        view.updateCardViews()
+    }
+
+    private fun catchUpWithSyncStateIfServiceRunning() {
+        if (ProgressService.isRunning.get()) {
+            // The "sync" happens only once at time on Service, no matters how many times we call "sync".
+            // When "sync" is called, syncManager connect to the Service and syncManager either starts
+            // the sync or catch with the Sync state.
+            syncManager.sync(SyncTaskParameters.build(dataManager.syncGroup, dataManager))
         }
     }
 
-    private fun handleUnexpectedError(error: Error) {
-        dataManager.logError(error)
-        view.launchAlertView(ALERT_TYPE.UNEXPECTED_ERROR)
+    override fun userDidWantToRefreshCardsIfPossible() {
+        if (isUserAllowedToRefresh()) {
+            initCards()
+        } else {
+            view.stopRequestIfRequired()
+        }
     }
 
-    private fun setProgressSyncItem(progress: Progress) {
-        if (isProgressZero(progress))
-            view.setSyncItem(false,
-                view.getStringWithParams(R.string.syncing_calculating),
-                R.drawable.ic_syncing)
-        else view.setSyncItem(false,
-                view.getStringWithParams(R.string.syncing_with_progress, progress.currentValue, progress.maxValue),
-                R.drawable.ic_syncing)
+    private fun isUserAllowedToRefresh(): Boolean = syncCardModel?.syncState != SyncManagerState.IN_PROGRESS
+
+    override fun userDidWantToSync() {
+        setSyncingStartedInLocalDbCardView()
+        syncManager.sync(SyncTaskParameters.build(dataManager.syncGroup, dataManager))
     }
 
-    private fun setCompleteSyncItem() {
-        setSyncItem(true, R.string.nav_sync_complete, R.drawable.ic_sync_success)
+    private fun setSyncingStartedInLocalDbCardView() {
+        syncCardModel?.let {
+            it.syncStarted()
+            view.notifyCardViewChanged(cardsModelsList.indexOf(it))
+        }
     }
 
-    private fun setReadySyncItem() {
-        setSyncItem(true, R.string.nav_sync, R.drawable.ic_menu_sync_ready)
-    }
-
-    private fun setOfflineSyncItem() {
-        setSyncItem(false, R.string.not_signed_in, R.drawable.ic_menu_sync_off)
-    }
-
-    private fun setSyncItem(enabled: Boolean, @StringRes title: Int, @DrawableRes icon: Int) {
-        view.setSyncItem(enabled, view.getStringWithParams(title), icon)
-    }
-
-    private fun setErrorSyncItem() {
-        setSyncItem(true, R.string.nav_sync_failed, R.drawable.ic_sync_failed)
-    }
-
-    private fun isProgressZero(progress: Progress): Boolean {
-        return progress.currentValue == 0 && progress.maxValue == 0
+    private fun removeCardIfExist(projectType: DashboardCardType) {
+        cardsModelsList.findLast { it.type == projectType }.also {
+            cardsModelsList.remove(it)
+        }
     }
 }
