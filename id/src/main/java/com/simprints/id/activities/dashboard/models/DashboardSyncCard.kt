@@ -63,34 +63,42 @@ class DashboardSyncCard(type: DashboardCardType,
     }
 
     private fun updateSyncInfo() {
+        updateLocalPeopleCount()
+        updateLastSyncedTime()
+        updateRemotePeopleCount()
+    }
 
-        //STOPSHIP: slip in methods
+    private fun updateLastSyncedTime() {
         dataManager
-            .localDbManager
-            .getPeopleCountFromLocal(toSync = true)
-                .subscribeBy (
+                .localDbManager
+                .getSyncInfoFor(syncParams.toGroup())
+                .subscribeBy(
                     onSuccess = {
-                        peopleToUpload = it
+                        lastSyncTime = dateFormat.format(it.lastSyncTime).toString()
                         cardView?.updateCard(this)
                     },
                     onError = { it.printStackTrace() })
+    }
 
+    private fun updateLocalPeopleCount() {
         dataManager
-            .localDbManager
-            .getSyncInfoFor(syncParams.toGroup())
-            .subscribeBy (
+                .localDbManager
+                .getPeopleCountFromLocal(toSync = true)
+            .subscribeBy(
                 onSuccess = {
-                    lastSyncTime = dateFormat.format(it.lastSyncTime).toString()
+                    peopleToUpload = it
                     cardView?.updateCard(this)
                 },
                 onError = { it.printStackTrace() })
+    }
 
+    private fun updateRemotePeopleCount() {
         dataManager.getNumberOfPatientsForSyncParams(syncParams)
             .flatMap {
                 dataManager.calculateNPatientsToDownSync(it, syncParams)
             }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy (
+            .subscribeBy(
                 onSuccess = {
                     peopleToDownload = it
                     syncNeeded = it > 0 || peopleToUpload > 0
