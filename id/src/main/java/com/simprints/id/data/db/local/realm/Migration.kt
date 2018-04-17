@@ -60,8 +60,8 @@ internal class Migration : RealmMigration {
         schema.get(PERSON_TABLE)?.addField(SYNC_FIELD, Boolean::class.java)?.transform {
             it.set(SYNC_FIELD, false)
         }
-
         schema.get(PERSON_TABLE)?.removeField(ANDROID_ID_FIELD)
+
         schema.remove(API_KEY_TABLE)
 
         schema.create(SYNC_INFO_TABLE)
