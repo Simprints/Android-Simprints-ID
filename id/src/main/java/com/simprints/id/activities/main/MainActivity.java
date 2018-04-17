@@ -4,12 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -42,7 +39,6 @@ import com.simprints.id.activities.matching.MatchingActivity;
 import com.simprints.id.controllers.Setup;
 import com.simprints.id.controllers.SetupCallback;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.data.db.sync.SyncManager;
 import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.domain.Finger;
 import com.simprints.id.domain.FingerRes;
@@ -50,10 +46,8 @@ import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError;
 import com.simprints.id.exceptions.unsafe.SimprintsError;
 import com.simprints.id.exceptions.unsafe.UnexpectedScannerError;
 import com.simprints.id.fragments.FingerFragment;
-import com.simprints.id.services.progress.Progress;
 import com.simprints.id.services.sync.SyncClient;
 import com.simprints.id.services.sync.SyncService;
-import com.simprints.id.services.sync.SyncTaskParameters;
 import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.AppState;
@@ -85,8 +79,6 @@ import java.util.Map;
 
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
-import io.reactivex.observers.DisposableObserver;
-import timber.log.Timber;
 
 import static com.simprints.id.domain.Finger.NB_OF_FINGERS;
 import static com.simprints.id.domain.Finger.Status;
@@ -144,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private DataManager dataManager;
 
-    private SyncClient syncClient;
     private MainActivitySyncHelper syncHelper;
 
     private AlertLauncher alertLauncher;
@@ -161,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements
         dataManager = app.getDataManager();
         appState = app.getAppState();
         setup = app.getSetup();
-        syncClient = SyncService.Companion.getClient(this);
+        SyncClient syncClient = SyncService.Companion.getClient(this);
         alertLauncher = new AlertLauncher(this);
         TimeHelper timeHelper = app.getTimeHelper();
 
@@ -378,8 +369,7 @@ public class MainActivity extends AppCompatActivity implements
     @SuppressLint("ClickableViewAccessibility")
     private void initViewPager() {
         // If the layout is from right to left, we need to reverse the scrolling direction
-        rightToLeft = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 &&
-                getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+        rightToLeft = getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
 
         viewPager.setAdapter(pageAdapter);
         viewPager.setOffscreenPageLimit(1);
