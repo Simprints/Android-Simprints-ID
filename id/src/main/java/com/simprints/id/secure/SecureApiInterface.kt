@@ -16,7 +16,7 @@ interface SecureApiInterface {
     companion object {
         private const val apiVersion = "2018-2-0"
         const val baseUrl = "https://$apiVersion-dot-android-auth-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
-        private const val apiKey: String = "AIzaSyAORPo9YH-TBw0F1ch8BMP9IGkNElgon6s"
+        private const val apiKey: String = BuildConfig.ANDROID_AUTH_API_KEY
     }
 
     @GET("/project-ids")
