@@ -16,6 +16,9 @@ open class Project : RealmObject() {
     lateinit var id: String
 
     @Expose
+    var legacyId: String? = null
+
+    @Expose
     lateinit var name: String
 
     @Expose

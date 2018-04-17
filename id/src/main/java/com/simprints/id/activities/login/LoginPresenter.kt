@@ -43,19 +43,12 @@ class LoginPresenter(val view: LoginContract.View,
             possibleProjectSecret,
             possibleLegacyApiKey)
             .subscribeBy(
-                onComplete = { handleSignInSuccess(possibleLegacyApiKey, possibleProjectId, possibleUserId) },
+                onComplete = { handleSignInSuccess() },
                 onError = { e -> handleSignInError(e) })
     }
 
-    private fun handleSignInSuccess(possibleLegacyProjectId: String?, possibleProjectId: String, possibleUserId: String) {
-        storeSignedInCredentials(possibleProjectId, possibleLegacyProjectId, possibleUserId)
+    private fun handleSignInSuccess() {
         view.handleSignInSuccess()
-    }
-
-    private fun storeSignedInCredentials(possibleProjectId: String, possibleLegacyProjectId: String?, possibleUserId: String) {
-        secureDataManager.storeProjectIdWithLegacyProjectIdPair(possibleProjectId, possibleLegacyProjectId)
-        secureDataManager.signedInProjectId = possibleProjectId
-        secureDataManager.signedInUserId = possibleUserId
     }
 
     private fun handleSignInError(e: Throwable) {
