@@ -3,6 +3,7 @@ package com.simprints.id.data.db.local.realm
 import com.simprints.id.domain.Constants
 
 import io.realm.DynamicRealm
+import io.realm.FieldAttribute
 import io.realm.RealmMigration
 import io.realm.RealmSchema
 import java.util.*
@@ -16,11 +17,16 @@ internal class Migration : RealmMigration {
         const val PERSON_TABLE: String = "rl_Person"
         const val USER_TABLE: String = "rl_User"
         const val API_KEY_TABLE: String = "rl_ApiKey"
+        const val SYNC_INFO_TABLE: String = "rl_SyncInfo"
 
         const val MODULE_FIELD: String = "moduleId"
         const val UPDATE_FIELD: String = "updatedAt"
         const val SYNC_FIELD: String = "toSync"
         const val ANDROID_ID_FIELD: String = "androidId"
+        const val SYNC_INFO_ID: String = "syncGroupId"
+        const val SYNC_INFO_LAST_UPDATE: String = "lastKnownPatientUpdatedAt"
+        const val SYNC_INFO_LAST_PATIENT_ID: String = "lastKnownPatientId"
+        const val SYNC_INFO_SYNC_TIME: String = "lastSyncTime"
     }
 
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
@@ -49,6 +55,12 @@ internal class Migration : RealmMigration {
 
         schema.get(PERSON_TABLE)?.removeField(ANDROID_ID_FIELD)
         schema.remove(API_KEY_TABLE)
+
+        schema.create(SYNC_INFO_TABLE)
+            .addField(SYNC_INFO_ID, Int::class.java, FieldAttribute.PRIMARY_KEY)
+            .addField(SYNC_INFO_LAST_UPDATE, Date::class.java)
+            .addField(SYNC_INFO_LAST_PATIENT_ID, String::class.java)
+            .addField(SYNC_INFO_SYNC_TIME, Date::class.java)
     }
 
     override fun hashCode(): Int {
@@ -58,4 +70,5 @@ internal class Migration : RealmMigration {
     override fun equals(other: Any?): Boolean {
         return other is Migration
     }
+
 }
