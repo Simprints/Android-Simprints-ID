@@ -268,7 +268,7 @@ class FirebaseManager(private val appContext: Context,
     private fun buildProjectApi(authToken: String): ProjectRemoteInterface = SimApiClient(ProjectRemoteInterface::class.java, ProjectRemoteInterface.baseUrl, authToken).api
 
     companion object {
-        private const val COLLECTION_LOCAL_DB_KEYS = "localDbKeys"
+        private const val COLLECTION_LOCAL_DB_KEYS = "projectEncryptionKeys"
         private const val PROJECT_ID_FIELD = "projectId"
 
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
