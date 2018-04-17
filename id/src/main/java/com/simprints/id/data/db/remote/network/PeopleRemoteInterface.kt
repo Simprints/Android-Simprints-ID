@@ -11,7 +11,7 @@ import retrofit2.http.*
 interface PeopleRemoteInterface {
 
     companion object {
-        private const val apiVersion = "2018-1-0-dev9"
+        private const val apiVersion = "2018-2-0"
         var baseUrl = "https://$apiVersion-dot-sync-manager-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
     }
 

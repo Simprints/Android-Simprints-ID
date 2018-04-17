@@ -103,6 +103,12 @@ class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : Sec
         signedInUserId = ""
     }
 
+    override fun storeCredentials(projectId: String, legacyProjectId: String?, userId: String) {
+        storeProjectIdWithLegacyProjectIdPair(projectId, legacyProjectId)
+        signedInProjectId = projectId
+        signedInUserId = userId
+    }
+
     override fun storeProjectIdWithLegacyProjectIdPair(projectId: String, legacyProjectId: String?) {
         if (legacyProjectId != null && legacyProjectId.isNotEmpty()) {
             val hashedLegacyApiKey = Hasher().hash(legacyProjectId)
