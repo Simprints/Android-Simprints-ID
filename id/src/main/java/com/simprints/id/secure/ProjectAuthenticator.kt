@@ -2,6 +2,7 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.models.Project
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
@@ -17,7 +18,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
 import java.io.IOException
 
-open class ProjectAuthenticator(secureDataManager: SecureDataManager,
+open class ProjectAuthenticator(private val secureDataManager: SecureDataManager,
                                 private val dbManager: DbManager,
                                 private val safetyNetClient: SafetyNetClient,
                                 secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
@@ -37,6 +38,8 @@ open class ProjectAuthenticator(secureDataManager: SecureDataManager,
         prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
             .signIn(nonceScope.projectId)
+            .fetchProjectInfo(nonceScope.projectId)
+            .storeCredentials(nonceScope.userId)
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
@@ -71,5 +74,16 @@ open class ProjectAuthenticator(secureDataManager: SecureDataManager,
     private fun Single<out Tokens>.signIn(projectId: String): Completable =
         flatMapCompletable { tokens ->
             dbManager.signIn(projectId, tokens)
+        }
+
+    private fun Completable.fetchProjectInfo(projectId: String): Single<Project> =
+        andThen(
+            dbManager.refreshProjectInfoWithServer(projectId)
+        )
+
+    private fun Single<out Project>.storeCredentials(userId: String): Completable =
+        flatMapCompletable {
+            secureDataManager.storeCredentials(it.id, it.legacyId, userId)
+            Completable.complete()
         }
 }
