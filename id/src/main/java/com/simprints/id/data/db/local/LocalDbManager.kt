@@ -5,7 +5,7 @@ import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
-import com.simprints.id.data.db.models.Project
+import com.simprints.id.domain.Project
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfoException

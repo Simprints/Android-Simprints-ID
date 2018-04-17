@@ -1,7 +1,7 @@
 package com.simprints.id.data.db
 
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.models.Project
+import com.simprints.id.domain.Project
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
