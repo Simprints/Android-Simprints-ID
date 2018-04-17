@@ -53,7 +53,7 @@ public final class Utils {
 
     public static void forceSync(FirebaseApp app) {
         // Making a write forces syncing if we are online
-        Routes.junkRef(app).setValue(true);
+        Routes.INSTANCE.junkRef(app).setValue(true);
     }
 
     /**
