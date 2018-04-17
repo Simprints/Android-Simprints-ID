@@ -34,7 +34,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         val selectedGuid = intent.parseSelectedGuid()
         val callbackSent = try {
             checkCalloutParameters(projectId, apiKey, sessionId, selectedGuid)
-            dataManager.updateIdentification(projectId ?: apiKey ?: "", selectedGuid)
+            dataManager.updateIdentification(dataManager.getSignedInProjectIdOrEmpty(), selectedGuid)
             true
         } catch (error: InvalidCalloutParameterError) {
             dataManager.logError(error)
@@ -42,7 +42,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         } catch (e: NotSignedInException) {
             false
         }
-        dataManager.logGuidSelectionService(projectId ?: apiKey ?: "",
+        dataManager.logGuidSelectionService(dataManager.getSignedInProjectIdOrEmpty(),
             sessionId ?: "", selectedGuid, callbackSent)
     }
 
