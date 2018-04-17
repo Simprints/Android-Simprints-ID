@@ -12,7 +12,7 @@ import com.simprints.id.Application
 import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbKeyProvider
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.models.Project
+import com.simprints.id.domain.Project
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.adapters.toLocalDbKey
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT

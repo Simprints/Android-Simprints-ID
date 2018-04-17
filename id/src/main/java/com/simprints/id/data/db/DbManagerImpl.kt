@@ -5,7 +5,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.data.db.models.Project
+import com.simprints.id.domain.Project
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
