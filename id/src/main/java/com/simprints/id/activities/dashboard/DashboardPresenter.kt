@@ -5,7 +5,7 @@ import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.db.sync.SyncManager
-import com.simprints.id.data.db.sync.model.SyncManagerState
+import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.service.ProgressService
 import com.simprints.id.services.sync.SyncClient

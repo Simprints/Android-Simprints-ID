@@ -2,7 +2,7 @@ package com.simprints.id.activities.dashboard.models
 
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.sync.model.SyncManagerState
+import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.android.schedulers.AndroidSchedulers

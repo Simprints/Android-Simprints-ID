@@ -2,7 +2,7 @@ package com.simprints.id.data.db.remote.network
 
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.sync.model.PeopleCount
+import com.simprints.id.data.db.sync.models.PeopleCount
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.ResponseBody

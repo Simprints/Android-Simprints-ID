@@ -10,7 +10,7 @@ import android.widget.TextView
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
-import com.simprints.id.data.db.sync.model.SyncManagerState
+import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.UploadProgress
