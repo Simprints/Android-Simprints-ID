@@ -32,7 +32,7 @@ class AuthManager(val client: SecureApiInterface) {
 
     private fun handleResponseError(e: HttpException): Nothing =
         when (e.code()) {
-            400, 401 -> throw AuthRequestInvalidCredentialsException()
+            401, 404 -> throw AuthRequestInvalidCredentialsException()
             in 500..599 -> throw SimprintsInternalServerException()
             else -> throw e
         }

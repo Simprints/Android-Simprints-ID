@@ -327,6 +327,7 @@
     <!-- sign-in toast messages -->
     <string name="login_missing_credentials">Missing credentials. Please check the User ID, Project ID, and key, and try again.</string>
     <string name="login_invalid_credentials">Invalid credentials. Please check the Project ID and key</string>
+    <string name="login_project_id_intent_mismatch">Project ID different from that supplied in intent. Please contact your system administrator.</string>
     <string name="login_no_network">Currently offline. Please check your internet connection.</string>
     <string name="login_server_error">A problem occurred trying to contact the server. Please try again later.</string>
 

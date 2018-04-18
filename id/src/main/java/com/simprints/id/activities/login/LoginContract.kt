@@ -29,10 +29,11 @@ interface LoginContract {
     interface Presenter : BasePresenter {
         var projectAuthenticator: LegacyCompatibleProjectAuthenticator
 
-        fun signIn(possibleUserId: String,
-                   possibleProjectId: String,
-                   possibleProjectSecret: String,
-                   possibleLegacyProjectId: String? = null)
+        fun signIn(suppliedUserId: String,
+                   suppliedProjectId: String,
+                   suppliedProjectSecret: String,
+                   intentProjectId: String? = null,
+                   intentLegacyProjectId: String? = null)
 
         fun openScanQRApp()
         fun processQRScannerAppResponse(scannedText: String)

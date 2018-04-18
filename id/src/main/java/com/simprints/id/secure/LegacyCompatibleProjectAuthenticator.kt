@@ -1,4 +1,5 @@
 package com.simprints.id.secure
+
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.secure.SecureDataManager
@@ -29,23 +30,35 @@ class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
         InvalidLegacyProjectIdReceivedFromIntentException::class,
         AuthRequestInvalidCredentialsException::class,
         SimprintsInternalServerException::class)
-    fun authenticate(nonceScope: NonceScope, projectSecret: String, legacyProjectId: String?): Completable =
-        if (legacyProjectId != null)
-            checkLegacyProjectIdMatchesProjectId(nonceScope.projectId, legacyProjectId)
-                .andThen(authenticate(nonceScope, projectSecret))
-        else authenticate(nonceScope, projectSecret)
+    fun authenticate(nonceScope: NonceScope, projectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?): Completable =
+        when {
+            intentLegacyProjectId != null -> checkLegacyProjectIdMatchesProjectId(nonceScope.projectId, intentLegacyProjectId)
+            intentProjectId != null -> checkIntentProjectIdMatchesProjectId(nonceScope.projectId, intentProjectId)
+            else -> Completable.complete()
+        }.andThen(authenticate(nonceScope, projectSecret))
 
-    private fun checkLegacyProjectIdMatchesProjectId(expectedProjectId: String, legacyProjectId: String): Completable {
-        val hashedLegacyProjectId = Hasher().hash(legacyProjectId)
-        return legacyProjectIdManager.requestProjectId(hashedLegacyProjectId)
-            .checkReceivedProjectIdIsAsExpected(expectedProjectId)
-    }
+    private fun checkIntentProjectIdMatchesProjectId(expectedProjectId: String, intentProjectId: String): Completable =
+        Completable.create {
+            if (expectedProjectId == intentProjectId)
+                it.onComplete()
+            else
+                it.onError(DifferentProjectIdReceivedFromIntentException.withProjectIds(expectedProjectId, intentProjectId))
+        }
+
+    private fun checkLegacyProjectIdMatchesProjectId(expectedProjectId: String, legacyProjectId: String): Completable =
+        Hasher().hash(legacyProjectId).let {
+            legacyProjectIdManager.requestProjectId(it)
+                .checkReceivedProjectIdIsAsExpected(expectedProjectId)
+        }
 
     private fun Single<out ProjectId>.checkReceivedProjectIdIsAsExpected(expectedProjectId: String): Completable =
         flatMapCompletable { projectId ->
             val receivedProjectId = projectId.value
-            if (receivedProjectId != expectedProjectId)
-                throw DifferentProjectIdReceivedFromIntentException.withProjectIds(expectedProjectId, receivedProjectId)
-            Completable.complete()
+            Completable.create {
+                if (receivedProjectId == expectedProjectId)
+                    it.onComplete()
+                else
+                    it.onError(DifferentProjectIdReceivedFromIntentException.withProjectIds(expectedProjectId, receivedProjectId))
+            }
         }
 }
