@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.sync.model
+package com.simprints.id.data.db.sync.models
 
 enum class SyncManagerState {
     NOT_STARTED,

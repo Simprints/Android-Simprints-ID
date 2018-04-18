@@ -3,7 +3,7 @@ package com.simprints.id.sync
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.DownSyncParams
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.data.db.sync.model.PeopleCount
+import com.simprints.id.data.db.sync.models.PeopleCount
 import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import io.reactivex.Completable
 import io.reactivex.Single

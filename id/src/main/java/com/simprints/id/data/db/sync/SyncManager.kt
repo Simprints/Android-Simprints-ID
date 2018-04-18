@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.sync
 
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.sync.model.SyncManagerState
+import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.exceptions.safe.TaskInProgressException
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.services.progress.Progress
