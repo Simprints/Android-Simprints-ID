@@ -7,6 +7,20 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
+# Kotlin
+-keep class kotlin.** { *; }
+-keep class kotlin.Metadata { *; }
+-dontwarn kotlin.**
+-keepclassmembers class **$WhenMappings {
+    <fields>;
+}
+-keepclassmembers class kotlin.Metadata {
+    public <methods>;
+}
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+    static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
+}
+
 # Print mapping
 -printmapping mapping.txt
 
@@ -38,8 +52,12 @@
 # Application classes that will be serialized/deserialized over Gson
 -keep class com.simprints.id.secure.models.** { *; }
 -keep class com.simprints.id.domain.Project { *; }
+-keep class com.simprints.id.session.Session { *; }
 -keep class com.simprints.id.data.db.remote.models.** { *; }
 -keep class com.simprints.id.data.db.sync.models** { *; }
+
+# For Realm
+-keepnames public class * extends io.realm.RealmObject
 
 # These contain serialised models
 -keep class com.simprints.libsimprints.** { *; }
