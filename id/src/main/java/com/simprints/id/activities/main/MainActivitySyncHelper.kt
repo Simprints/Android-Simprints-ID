@@ -74,7 +74,7 @@ class MainActivitySyncHelper(private val activity: MainActivity, dataManager: Da
     }
 
     private fun setErrorSyncItem() {
-        setSyncItem(false, R.string.nav_sync_failed, R.drawable.ic_menu_sync_bad)
+        setSyncItem(true, R.string.nav_sync_failed, R.drawable.ic_menu_sync_bad)
     }
 
     private fun setSyncItem(enabled: Boolean, @StringRes title: Int, @DrawableRes icon: Int) {
