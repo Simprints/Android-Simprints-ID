@@ -5,7 +5,9 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.secure.*
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.io.IOException
 
@@ -21,27 +23,32 @@ class LoginPresenter(val view: LoginContract.View,
 
     override fun start() {}
 
-    override fun signIn(possibleUserId: String,
-                        possibleProjectId: String,
-                        possibleProjectSecret: String,
-                        possibleLegacyProjectId: String?) =
-        if (areMandatoryCredentialsPresent(possibleProjectId, possibleProjectSecret, possibleUserId))
+    override fun signIn(suppliedUserId: String,
+                        suppliedProjectId: String,
+                        suppliedProjectSecret: String,
+                        intentProjectId: String?,
+                        intentLegacyProjectId: String?) =
+        if (areMandatoryCredentialsPresent(suppliedProjectId, suppliedProjectSecret, suppliedUserId))
             doAuthenticate(
-                possibleProjectId,
-                possibleUserId,
-                possibleProjectSecret,
-                possibleLegacyProjectId)
+                suppliedProjectId,
+                suppliedUserId,
+                suppliedProjectSecret,
+                intentProjectId,
+                intentLegacyProjectId)
         else view.handleMissingCredentials()
 
     private fun areMandatoryCredentialsPresent(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String) =
         possibleProjectId.isNotEmpty() && possibleProjectSecret.isNotEmpty() && possibleUserId.isNotEmpty()
 
-    private fun doAuthenticate(possibleProjectId: String, possibleUserId: String, possibleProjectSecret: String, possibleLegacyApiKey: String?) {
+    private fun doAuthenticate(suppliedProjectId: String, suppliedUserId: String, suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
         secureDataManager.cleanCredentials()
         projectAuthenticator.authenticate(
-            NonceScope(possibleProjectId, possibleUserId),
-            possibleProjectSecret,
-            possibleLegacyApiKey)
+            NonceScope(suppliedProjectId, suppliedUserId),
+            suppliedProjectSecret,
+            intentProjectId,
+            intentLegacyProjectId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = { handleSignInSuccess() },
                 onError = { e -> handleSignInError(e) })

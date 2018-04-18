@@ -48,7 +48,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
             }
         }
 
-        val projectAuthenticator = LegacyCompatibleProjectAuthenticator(app.secureDataManager, app.dataManager, SafetyNet.getClient(this))
+        val projectAuthenticator = LegacyCompatibleProjectAuthenticator(app.secureDataManager, app.dbManager, SafetyNet.getClient(this))
         viewPresenter = LoginPresenter(this, app.secureDataManager, app.analyticsManager, projectAuthenticator)
         viewPresenter.start()
     }
@@ -75,7 +75,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         val userId = loginEditTextUserId.text.toString()
         val projectId = loginEditTextProjectId.text.toString()
         val projectSecret = loginEditTextProjectSecret.text.toString()
-        viewPresenter.signIn(userId, projectId, projectSecret, possibleLegacyProjectId)
+        viewPresenter.signIn(userId, projectId, projectSecret, app.dataManager.projectId, possibleLegacyProjectId)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -141,7 +141,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun handleSignInFailedProjectIdIntentMismatch() {
         progressDialog.dismiss()
-        launchAlert(ALERT_TYPE.INVALID_PROJECT_ID)
+        showToast(R.string.login_project_id_intent_mismatch)
     }
 
     override fun handleSignInFailedUnknownReason() {
