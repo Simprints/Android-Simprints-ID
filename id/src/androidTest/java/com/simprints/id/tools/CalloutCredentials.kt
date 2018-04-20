@@ -1,4 +1,4 @@
 package com.simprints.id.tools
 
 
-data class CalloutCredentials(val apiKey: String, val moduleId: String, val userId: String)
+data class CalloutCredentials(val projectId: String, val moduleId: String, val userId: String, val legacyApiKey: String? = null)

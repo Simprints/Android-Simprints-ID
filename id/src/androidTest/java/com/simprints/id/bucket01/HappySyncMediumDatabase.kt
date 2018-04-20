@@ -47,7 +47,7 @@ class HappySyncMediumDatabase : FirstUseLocal, FirstUseRemote, HappyWifi, HappyB
         super<HappyBluetooth>.setUp()
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        realmConfiguration = RealmConfig.get(calloutCredentials.apiKey, byteArrayOf())
+        realmConfiguration = RealmConfig.get(calloutCredentials.projectId, byteArrayOf())
         super<FirstUseLocal>.setUp()
         super<FirstUseRemote>.setUp()
 

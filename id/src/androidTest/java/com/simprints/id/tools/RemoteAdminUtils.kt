@@ -52,6 +52,6 @@ object RemoteAdminUtils {
             "}]" +
             "}"
 
-        apiInstance.putProject(calloutCredentials.apiKey, simpleValidGroups)
+        apiInstance.putProject(calloutCredentials.legacyApiKey, simpleValidGroups)
     }
 }
