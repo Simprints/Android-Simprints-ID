@@ -16,7 +16,6 @@ import com.simprints.id.tools.AppUtils.getApp
 import com.simprints.id.tools.CalloutCredentials
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,7 +37,16 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         Base64.decode("Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ==", NO_WRAP),
         calloutCredentials.legacyApiKey)
 
+    private val invalidCredentials = CalloutCredentials(
+        "beefdeadbeefdeadbeef",
+        "the_one_and_only_module",
+        "the_lone_user",
+        "deadbeef-dead-beef-dead-deaddeadbeef"
+    )
+
     private val projectSecret = "orZje76yBgsjE2UWw/8jCtw/pBMgtURTfhO/4hZVP4vGnm1uji1OtwcRQkhn1MzQb5OoMjtu2xsbSIs40vSMEQ=="
+
+    private val invalidSecret = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
 
     override var realmConfiguration: RealmConfiguration? = null
 
@@ -55,25 +63,53 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         super<FirstUseLocal>.setUp()
     }
 
-    @After()
-    fun tearDown()
-    {
-        getApp(activityTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
-    }
-
     @Test
     fun validLegacyCredentials_shouldSucceed() {
         launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
-        awaitSignInAndEnsureSuccess(activityTestRule)
+        ensureSignInSuccess(activityTestRule)
+        getApp(activityTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
     }
 
     @Test
     fun validCredentials_shouldSucceed() {
-        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
+        launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
-        awaitSignInAndEnsureSuccess(activityTestRule)
+        ensureSignInSuccess(activityTestRule)
+        getApp(activityTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
+    }
+
+    @Test
+    fun invalidLegacyIntentAndInvalidSubmittedCredentials_shouldFail() {
+        launchAppFromIntentEnrol(invalidCredentials.toLegacy(), activityTestRule)
+        enterCredentialsDirectly(invalidCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInFailure(activityTestRule)
+    }
+
+    @Test
+    fun validLegacyIntentAndInvalidSubmittedCredentials_shouldFail() {
+        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
+        enterCredentialsDirectly(invalidCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInFailure(activityTestRule)
+    }
+
+    @Test
+    fun invalidIntentAndInvalidSubmittedCredentials_shouldFail() {
+        launchAppFromIntentEnrol(invalidCredentials, activityTestRule)
+        enterCredentialsDirectly(invalidCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInFailure(activityTestRule)
+    }
+
+    @Test
+    fun validIntentAndInvalidSubmittedCredentials_shouldFail() {
+        launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
+        enterCredentialsDirectly(invalidCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInFailure(activityTestRule)
     }
 }
