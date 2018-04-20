@@ -25,7 +25,7 @@ fun testHappyWorkflowEnrolment(calloutCredentials: CalloutCredentials,
     testFullHappyWorkflow()
     testMainActivityEnrolmentCheckFinished(enrolTestRule)
     val guid = testEnrolmentReturnedResult(enrolTestRule)
-    testEnrolmentReceivedOnline(calloutCredentials.apiKey, guid)
+    testEnrolmentReceivedOnline(calloutCredentials.projectId, guid)
     return guid
 }
 

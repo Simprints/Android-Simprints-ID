@@ -55,7 +55,7 @@ class HappyWorkflowAllMainFeatures : FirstUseLocal, FirstUseRemote, HappyWifi, H
         super<HappyBluetooth>.setUp()
 
         Realm.init(getInstrumentation().targetContext)
-        realmConfiguration = RealmConfig.get(calloutCredentials.apiKey, byteArrayOf())
+        realmConfiguration = RealmConfig.get(calloutCredentials.projectId, byteArrayOf())
         super<FirstUseLocal>.setUp()
         super<FirstUseRemote>.setUp()
     }

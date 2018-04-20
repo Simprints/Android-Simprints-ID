@@ -15,11 +15,6 @@ object RealmConfig {
         .addModulesIfNotNull()
         .build()
 
-    private fun RealmConfiguration.Builder.addModulesIfNotNull(): RealmConfiguration.Builder {
-        val defaultModule = Realm.getDefaultModule()
-        return if (defaultModule != null)
-            this.modules(defaultModule)
-        else
-            this
-    }
+    private fun RealmConfiguration.Builder.addModulesIfNotNull(): RealmConfiguration.Builder =
+        Realm.getDefaultModule()?.let { this.modules(it) }?: this
 }
