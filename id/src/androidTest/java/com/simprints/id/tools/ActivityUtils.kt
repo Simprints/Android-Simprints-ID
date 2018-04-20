@@ -7,6 +7,7 @@ import android.support.test.InstrumentationRegistry
 import android.support.test.rule.ActivityTestRule
 import android.view.WindowManager
 import com.schibsted.spain.barista.permission.PermissionGranter
+import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.libsimprints.Constants
 import java.util.*
@@ -27,18 +28,21 @@ object ActivityUtils {
                                        action: String,
                                        activityTestRule: ActivityTestRule<*>,
                                        verifyGuidExtra: String? = null) {
-        val intent = createLaunchActivityIntent(calloutCredentials, action)
+        val intent = createIntent(calloutCredentials, action)
         if (verifyGuidExtra != null) intent.putExtra(Constants.SIMPRINTS_VERIFY_GUID, verifyGuidExtra)
         activityTestRule.launchActivity(intent)
         runActivityOnUiThread(activityTestRule)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) grantPermissions()
     }
 
-    private fun createLaunchActivityIntent(calloutCredentials: CalloutCredentials, action: String): Intent {
+    private fun createIntent(calloutCredentials: CalloutCredentials, action: String): Intent {
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
-        val intent = Intent(targetContext, LaunchActivity::class.java)
+        val intent = Intent(targetContext, CheckLoginFromIntentActivity::class.java)
         intent.action = action
-        intent.putExtra(Constants.SIMPRINTS_API_KEY, calloutCredentials.legacyApiKey)
+        if (calloutCredentials.projectId.isNotEmpty())
+            intent.putExtra(Constants.SIMPRINTS_PROJECT_ID, calloutCredentials.projectId)
+        else
+            intent.putExtra(Constants.SIMPRINTS_API_KEY, calloutCredentials.legacyApiKey)
         intent.putExtra(Constants.SIMPRINTS_USER_ID, calloutCredentials.userId)
         intent.putExtra(Constants.SIMPRINTS_MODULE_ID, calloutCredentials.moduleId)
         return intent

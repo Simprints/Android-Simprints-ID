@@ -8,6 +8,7 @@ import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
+import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.tools.*
 import com.simprints.id.tools.StringUtils.getResourceString
@@ -261,4 +262,11 @@ private fun testExitFromMainActivity() {
 private fun testPressBackButton() {
     log("testPressBackButton")
     pressBack()
+}
+
+fun launchAppFromIntentEnrol(calloutCredentials: CalloutCredentials,
+                             enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
+    log("testLaunchAppFromIntent")
+    ActivityUtils.launchActivityAndRunOnUiThread(calloutCredentials,
+        Constants.SIMPRINTS_REGISTER_INTENT, enrolTestRule)
 }
