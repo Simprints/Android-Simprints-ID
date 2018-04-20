@@ -17,6 +17,6 @@ interface FirstUseRemote {
         // Clear the project for the test's APIkey via remote admin
         log("FirstUseTest.setUp(): cleaning remote data")
         val apiInstance = RemoteAdminUtils.configuredApiInstance
-        RemoteAdminUtils.clearProjectNode(apiInstance, calloutCredentials.legacyApiKey)
+        RemoteAdminUtils.clearProjectNode(apiInstance, calloutCredentials.projectId)
     }
 }

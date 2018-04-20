@@ -11,22 +11,23 @@ import com.simprints.id.tools.CalloutCredentials
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class HappyAuthTests: FirstUseLocal, HappyWifi {
+class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
 
     private val calloutCredentials = CalloutCredentials(
         "project_id",
         "the_one_and_only_module",
         "the_lone_user",
-        "legacy_project_id")
+        "deadbeef-dead-beef-dead-deaddeadbeef")
 
     private val localDbKey = LocalDbKey(
         calloutCredentials.projectId,
-        "local_db_key_value".toByteArray(),
+        "1234567890123456789012345678901234567890123456789012345678901234".toByteArray(),
         calloutCredentials.legacyApiKey?: "")
 
     override var realmConfiguration: RealmConfiguration? = null
@@ -38,5 +39,10 @@ class HappyAuthTests: FirstUseLocal, HappyWifi {
         realmConfiguration = RealmConfig.get(localDbKey.projectId, localDbKey.value)
 
         super<FirstUseLocal>.setUp()
+    }
+
+    @Test
+    fun validLegacyCredentials_shouldSucceed() {
+
     }
 }
