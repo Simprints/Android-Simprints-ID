@@ -2,7 +2,7 @@ package com.simprints.id
 
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.Espresso.pressBack
-import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
@@ -14,8 +14,7 @@ import com.simprints.id.tools.*
 import com.simprints.id.tools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
-import org.hamcrest.Matchers.anyOf
-import org.hamcrest.Matchers.containsString
+import org.hamcrest.Matchers.*
 import org.junit.Assert.*
 
 
@@ -266,7 +265,38 @@ private fun testPressBackButton() {
 
 fun launchAppFromIntentEnrol(calloutCredentials: CalloutCredentials,
                              enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
-    log("testLaunchAppFromIntent")
+    log("launchAppFromIntentEnrol")
     ActivityUtils.launchActivityAndRunOnUiThread(calloutCredentials,
         Constants.SIMPRINTS_REGISTER_INTENT, enrolTestRule)
+}
+
+fun enterCredentialsDirectly(calloutCredentials: CalloutCredentials, projectSecret: String) {
+    log("enterCredentialsDirectly")
+    WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
+        onView(withId(R.id.loginEditTextProjectId))
+            .check(matches(isDisplayed()))
+            .perform(typeText(calloutCredentials.projectId))
+            .perform(closeSoftKeyboard())
+        onView(withId(R.id.loginEditTextProjectSecret))
+            .check(matches(isDisplayed()))
+            .perform(typeText(projectSecret))
+            .perform(closeSoftKeyboard())
+    }
+}
+
+fun pressSignIn() {
+    log("pressSignIn")
+    onView(withId(R.id.loginButtonSignIn))
+        .check(matches(isDisplayed()))
+        .check(matches(isClickable()))
+        .perform(click())
+}
+
+fun awaitSignInAndEnsureSuccess(activityTestRule: ActivityTestRule<*>) {
+    log("awaitSignInAndEnsureSuccess")
+    WaitingUtils.tryOnUiUntilTimeout(5000,500) {
+        // Check for setup activity
+        log("waiting...")
+        assert(activityTestRule.activity is LaunchActivity)
+    }
 }
