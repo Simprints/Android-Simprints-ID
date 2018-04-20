@@ -6,7 +6,8 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.data.db.local.realm.RealmConfig
-import com.simprints.id.templates.FirstUseTest
+import com.simprints.id.templates.FirstUseLocal
+import com.simprints.id.templates.FirstUseRemote
 import com.simprints.id.templates.HappyBluetooth
 import com.simprints.id.templates.HappyWifi
 import com.simprints.id.testHappyWorkflowEnrolment
@@ -25,7 +26,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class HappyWorkflowAllMainFeatures : FirstUseTest(), HappyWifi, HappyBluetooth {
+class HappyWorkflowAllMainFeatures : FirstUseLocal, FirstUseRemote, HappyWifi, HappyBluetooth {
 
     override val calloutCredentials: CalloutCredentials = CalloutCredentials(
         "00000001-0000-0000-0000-000000000000",
@@ -55,7 +56,8 @@ class HappyWorkflowAllMainFeatures : FirstUseTest(), HappyWifi, HappyBluetooth {
 
         Realm.init(getInstrumentation().targetContext)
         realmConfiguration = RealmConfig.get(calloutCredentials.apiKey, byteArrayOf())
-        super<FirstUseTest>.setUp()
+        super<FirstUseLocal>.setUp()
+        super<FirstUseRemote>.setUp()
     }
 
     @Test

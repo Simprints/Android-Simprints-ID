@@ -62,7 +62,7 @@ open class RealmTestsBase {
                                    moduleId: String = ""): rl_SyncInfo = when {
         userId.isNotEmpty() -> rl_SyncInfo(USER, PeopleGeneratorUtils.getRandomPerson(toSync = false))
         moduleId.isNotEmpty() -> rl_SyncInfo(MODULE, PeopleGeneratorUtils.getRandomPerson(toSync = false))
-        else -> rl_SyncInfo(GLOBAL.ordinal, Date(0))
+        else -> rl_SyncInfo(GLOBAL, PeopleGeneratorUtils.getRandomPerson(toSync = false))
     }.also { info -> realm.executeTransaction { it.insertOrUpdate(info) } }
 
     protected fun rl_SyncInfo.deepEquals(other: rl_SyncInfo): Boolean =
