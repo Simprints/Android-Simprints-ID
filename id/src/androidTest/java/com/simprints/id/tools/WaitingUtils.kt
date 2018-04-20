@@ -36,7 +36,7 @@ object WaitingUtils {
         sleep(millis, TimeUnit.MILLISECONDS)
     }
 
-    private fun waitOnSystem(millis: Long) {
+    fun waitOnSystem(millis: Long) {
         SystemClock.sleep(millis)
     }
 

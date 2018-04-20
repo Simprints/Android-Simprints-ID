@@ -292,11 +292,16 @@ fun pressSignIn() {
         .perform(click())
 }
 
-fun awaitSignInAndEnsureSuccess(activityTestRule: ActivityTestRule<*>) {
-    log("awaitSignInAndEnsureSuccess")
-    WaitingUtils.tryOnUiUntilTimeout(5000,500) {
-        // Check for setup activity
-        log("waiting...")
+fun ensureSignInSuccess(activityTestRule: ActivityTestRule<*>) {
+    log("ensureSignInSuccess")
+    WaitingUtils.tryOnUiUntilTimeout(12000,1000) {
         assert(activityTestRule.activity is LaunchActivity)
+    }
+}
+
+fun ensureSignInFailure(activityTestRule: ActivityTestRule<*>) {
+    log("ensureSignInSuccess")
+    WaitingUtils.tryOnUiUntilTimeout(12000,1000) {
+        assert(activityTestRule.activity !is LaunchActivity)
     }
 }
