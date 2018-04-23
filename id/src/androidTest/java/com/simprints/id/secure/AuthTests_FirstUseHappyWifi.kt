@@ -12,6 +12,7 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.templates.FirstUseLocal
 import com.simprints.id.templates.HappyWifi
+import com.simprints.id.tools.ActivityUtils
 import com.simprints.id.tools.AppUtils.getApp
 import com.simprints.id.tools.CalloutCredentials
 import io.realm.Realm
@@ -68,8 +69,9 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
-        ensureSignInSuccess(activityTestRule)
+        ensureSignInSuccess(calloutCredentials, activityTestRule)
         getApp(activityTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
+        ActivityUtils.grantPermissions()
     }
 
     @Test
@@ -77,8 +79,9 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
-        ensureSignInSuccess(activityTestRule)
+        ensureSignInSuccess(calloutCredentials, activityTestRule)
         getApp(activityTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
+        ActivityUtils.grantPermissions()
     }
 
     @Test
@@ -86,7 +89,7 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), activityTestRule)
         enterCredentialsDirectly(invalidCredentials, projectSecret)
         pressSignIn()
-        ensureSignInFailure(activityTestRule)
+        ensureSignInFailure(invalidCredentials, activityTestRule)
     }
 
     @Test
@@ -94,7 +97,7 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
         enterCredentialsDirectly(invalidCredentials, projectSecret)
         pressSignIn()
-        ensureSignInFailure(activityTestRule)
+        ensureSignInFailure(invalidCredentials, activityTestRule)
     }
 
     @Test
@@ -102,7 +105,7 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         launchAppFromIntentEnrol(invalidCredentials, activityTestRule)
         enterCredentialsDirectly(invalidCredentials, projectSecret)
         pressSignIn()
-        ensureSignInFailure(activityTestRule)
+        ensureSignInFailure(invalidCredentials, activityTestRule)
     }
 
     @Test
@@ -110,7 +113,7 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
         enterCredentialsDirectly(invalidCredentials, projectSecret)
         pressSignIn()
-        ensureSignInFailure(activityTestRule)
+        ensureSignInFailure(calloutCredentials, activityTestRule)
     }
 
     @Test
@@ -118,7 +121,7 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
         enterCredentialsDirectly(calloutCredentials, invalidSecret)
         pressSignIn()
-        ensureSignInFailure(activityTestRule)
+        ensureSignInFailure(calloutCredentials, activityTestRule)
     }
 
     @Test
@@ -126,7 +129,7 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
         enterCredentialsDirectly(calloutCredentials, invalidSecret)
         pressSignIn()
-        ensureSignInFailure(activityTestRule)
+        ensureSignInFailure(calloutCredentials, activityTestRule)
     }
 
     @Test
@@ -134,7 +137,7 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         launchAppFromIntentEnrol(invalidCredentials, activityTestRule)
         enterCredentialsDirectly(invalidCredentials, invalidSecret)
         pressSignIn()
-        ensureSignInFailure(activityTestRule)
+        ensureSignInFailure(invalidCredentials, activityTestRule)
     }
 
     @Test
@@ -142,6 +145,6 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), activityTestRule)
         enterCredentialsDirectly(invalidCredentials, invalidSecret)
         pressSignIn()
-        ensureSignInFailure(activityTestRule)
+        ensureSignInFailure(invalidCredentials, activityTestRule)
     }
 }
