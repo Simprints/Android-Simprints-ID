@@ -1,8 +1,8 @@
-package com.simprints.id.templates
+package com.simprints.id.testTemplates
 
 import android.support.test.InstrumentationRegistry
-import com.simprints.id.tools.StorageUtils
-import com.simprints.id.tools.log
+import com.simprints.id.testTools.StorageUtils
+import com.simprints.id.testTools.log
 import io.realm.RealmConfiguration
 import org.junit.Before
 

@@ -1,8 +1,8 @@
-package com.simprints.id.templates
+package com.simprints.id.testTemplates
 
-import com.simprints.id.tools.CalloutCredentials
-import com.simprints.id.tools.RemoteAdminUtils
-import com.simprints.id.tools.log
+import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.RemoteAdminUtils
+import com.simprints.id.testTools.log
 import com.simprints.remoteadminclient.ApiException
 import org.junit.Before
 
