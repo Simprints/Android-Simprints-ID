@@ -8,7 +8,6 @@ import android.support.test.rule.ActivityTestRule
 import android.view.WindowManager
 import com.schibsted.spain.barista.permission.PermissionGranter
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.libsimprints.Constants
 import java.util.*
 
@@ -58,7 +57,7 @@ object ActivityUtils {
         activity.runOnUiThread(wakeUpDevice)
     }
 
-    private fun grantPermissions() {
+    fun grantPermissions() {
         // Allow all first-app permissions and dismiss the dialog box
         log("ActivityUtils.grantPermissions(): granting permissions")
         for (permission in permissions) PermissionGranter.allowPermissionsIfNeeded(permission)

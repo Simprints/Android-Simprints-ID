@@ -11,6 +11,7 @@ import android.support.test.rule.ActivityTestRule
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.tools.*
+import com.simprints.id.tools.AppUtils.getApp
 import com.simprints.id.tools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
@@ -292,16 +293,16 @@ fun pressSignIn() {
         .perform(click())
 }
 
-fun ensureSignInSuccess(activityTestRule: ActivityTestRule<*>) {
+fun ensureSignInSuccess(calloutCredentials: CalloutCredentials, activityTestRule: ActivityTestRule<*>) {
     log("ensureSignInSuccess")
-    WaitingUtils.tryOnUiUntilTimeout(12000,1000) {
-        assert(activityTestRule.activity is LaunchActivity)
+    WaitingUtils.tryOnUiUntilTimeout(25000,1000) {
+        assertTrue(getApp(activityTestRule).dataManager.isSignedIn(calloutCredentials.projectId, calloutCredentials.userId))
     }
 }
 
-fun ensureSignInFailure(activityTestRule: ActivityTestRule<*>) {
-    log("ensureSignInSuccess")
-    WaitingUtils.tryOnUiUntilTimeout(12000,1000) {
-        assert(activityTestRule.activity !is LaunchActivity)
+fun ensureSignInFailure(calloutCredentials: CalloutCredentials, activityTestRule: ActivityTestRule<*>) {
+    log("ensureSignInFailure")
+    WaitingUtils.tryOnUiUntilTimeout(25000,1000) {
+        assertFalse(getApp(activityTestRule).dataManager.isSignedIn(calloutCredentials.projectId, calloutCredentials.userId))
     }
 }
