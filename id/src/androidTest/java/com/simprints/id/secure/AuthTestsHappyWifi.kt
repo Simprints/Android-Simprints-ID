@@ -25,7 +25,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
+class AuthTestsHappyWifi: FirstUseLocal, HappyWifi {
 
     private val calloutCredentials = CalloutCredentials(
         "EGkJFvCS7202A07I0fup",
@@ -55,6 +55,10 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
     @JvmField
     val activityTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
+    @Rule
+    @JvmField
+    val anotherTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+
     @Before
     override fun setUp() {
         super<HappyWifi>.setUp()
@@ -71,6 +75,7 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         pressSignIn()
         ensureSignInSuccess(calloutCredentials, activityTestRule)
         getApp(activityTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
+
         ActivityUtils.grantPermissions()
     }
 
@@ -81,6 +86,7 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         pressSignIn()
         ensureSignInSuccess(calloutCredentials, activityTestRule)
         getApp(activityTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
+
         ActivityUtils.grantPermissions()
     }
 
@@ -146,5 +152,61 @@ class AuthTests_FirstUseHappyWifi: FirstUseLocal, HappyWifi {
         enterCredentialsDirectly(invalidCredentials, invalidSecret)
         pressSignIn()
         ensureSignInFailure(invalidCredentials, activityTestRule)
+    }
+
+    @Test
+    fun validCredentials_shouldPersistAcrossAppRestart() {
+        launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInSuccess(calloutCredentials, activityTestRule)
+        ActivityUtils.grantPermissions()
+        activityTestRule.finishActivity()
+
+        launchAppFromIntentEnrol(calloutCredentials, anotherTestRule)
+        ensureSignInSuccess(calloutCredentials, anotherTestRule)
+        getApp(anotherTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
+    }
+
+    @Test
+    fun validLegacyCredentials_shouldPersistAcrossAppRestart() {
+        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInSuccess(calloutCredentials, activityTestRule)
+        ActivityUtils.grantPermissions()
+        activityTestRule.finishActivity()
+
+        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), anotherTestRule)
+        ensureSignInSuccess(calloutCredentials, anotherTestRule)
+        getApp(anotherTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
+    }
+
+    @Test
+    fun validCredentialsThenRestartingWithInvalidCredentials_shouldFail() {
+        launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInSuccess(calloutCredentials, activityTestRule)
+        ActivityUtils.grantPermissions()
+        activityTestRule.finishActivity()
+
+        launchAppFromIntentEnrol(invalidCredentials, anotherTestRule)
+        ensureSignInFailure(invalidCredentials, anotherTestRule)
+        getApp(anotherTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
+    }
+
+    @Test
+    fun validLegacyCredentialsThenRestartingWithInvalidCredentials_shouldFail() {
+        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInSuccess(calloutCredentials, activityTestRule)
+        ActivityUtils.grantPermissions()
+        activityTestRule.finishActivity()
+
+        launchAppFromIntentEnrol(invalidCredentials.toLegacy(), anotherTestRule)
+        ensureSignInFailure(invalidCredentials, anotherTestRule)
+        getApp(anotherTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
     }
 }
