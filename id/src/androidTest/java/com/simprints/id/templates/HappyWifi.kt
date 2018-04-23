@@ -4,7 +4,6 @@ import android.support.test.InstrumentationRegistry
 import com.simprints.cerberuslibrary.WifiUtility
 import com.simprints.cerberuslibrary.services.UtilityServiceClient
 import com.simprints.id.BuildConfig
-import com.simprints.id.tools.WaitingUtils
 import com.simprints.id.tools.log
 import org.junit.Before
 
