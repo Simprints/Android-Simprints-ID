@@ -1,4 +1,4 @@
-package com.simprints.id
+package com.simprints.id.testSnippets
 
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.Espresso.pressBack
@@ -8,11 +8,11 @@ import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
-import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
+import com.simprints.id.R
 import com.simprints.id.activities.launch.LaunchActivity
+import com.simprints.id.testTools.*
 import com.simprints.id.tools.*
-import com.simprints.id.tools.AppUtils.getApp
-import com.simprints.id.tools.StringUtils.getResourceString
+import com.simprints.id.testTools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
 import org.hamcrest.Matchers.*
@@ -262,47 +262,4 @@ private fun testExitFromMainActivity() {
 private fun testPressBackButton() {
     log("testPressBackButton")
     pressBack()
-}
-
-fun launchAppFromIntentEnrol(calloutCredentials: CalloutCredentials,
-                             enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
-    log("launchAppFromIntentEnrol")
-    ActivityUtils.launchActivityAndRunOnUiThread(calloutCredentials,
-        Constants.SIMPRINTS_REGISTER_INTENT, enrolTestRule)
-}
-
-fun enterCredentialsDirectly(calloutCredentials: CalloutCredentials, projectSecret: String) {
-    log("enterCredentialsDirectly")
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
-        onView(withId(R.id.loginEditTextProjectId))
-            .check(matches(isDisplayed()))
-            .perform(typeText(calloutCredentials.projectId))
-            .perform(closeSoftKeyboard())
-        onView(withId(R.id.loginEditTextProjectSecret))
-            .check(matches(isDisplayed()))
-            .perform(typeText(projectSecret))
-            .perform(closeSoftKeyboard())
-    }
-}
-
-fun pressSignIn() {
-    log("pressSignIn")
-    onView(withId(R.id.loginButtonSignIn))
-        .check(matches(isDisplayed()))
-        .check(matches(isClickable()))
-        .perform(click())
-}
-
-fun ensureSignInSuccess(calloutCredentials: CalloutCredentials, activityTestRule: ActivityTestRule<*>) {
-    log("ensureSignInSuccess")
-    WaitingUtils.tryOnUiUntilTimeout(25000,1000) {
-        assertTrue(getApp(activityTestRule).dataManager.isSignedIn(calloutCredentials.projectId, calloutCredentials.userId))
-    }
-}
-
-fun ensureSignInFailure(calloutCredentials: CalloutCredentials, activityTestRule: ActivityTestRule<*>) {
-    log("ensureSignInFailure")
-    WaitingUtils.tryOnUiUntilTimeout(25000,1000) {
-        assertFalse(getApp(activityTestRule).dataManager.isSignedIn(calloutCredentials.projectId, calloutCredentials.userId))
-    }
 }

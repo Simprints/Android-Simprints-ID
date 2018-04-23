@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.id.testTools
 
 import android.support.test.rule.ActivityTestRule
 import com.simprints.id.Application
