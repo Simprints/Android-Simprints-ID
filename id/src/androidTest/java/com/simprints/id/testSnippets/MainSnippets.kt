@@ -2,7 +2,7 @@ package com.simprints.id.testSnippets
 
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.Espresso.pressBack
-import android.support.test.espresso.action.ViewActions.*
+import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
@@ -11,11 +11,11 @@ import android.support.test.rule.ActivityTestRule
 import com.simprints.id.R
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.testTools.*
-import com.simprints.id.tools.*
 import com.simprints.id.testTools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.anyOf
+import org.hamcrest.Matchers.containsString
 import org.junit.Assert.*
 
 

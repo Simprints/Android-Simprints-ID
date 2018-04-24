@@ -1,16 +1,14 @@
 package com.simprints.id.testSnippets
 
-import android.support.test.espresso.Espresso
-import android.support.test.espresso.action.ViewActions
-import android.support.test.espresso.assertion.ViewAssertions
-import android.support.test.espresso.matcher.ViewMatchers
+import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.action.ViewActions.*
+import android.support.test.espresso.assertion.ViewAssertions.*
+import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.testTools.*
-import com.simprints.id.tools.*
 import com.simprints.libsimprints.Constants
-import org.junit.Assert
 
 
 fun launchAppFromIntentEnrol(calloutCredentials: CalloutCredentials,
@@ -22,36 +20,46 @@ fun launchAppFromIntentEnrol(calloutCredentials: CalloutCredentials,
 
 fun enterCredentialsDirectly(calloutCredentials: CalloutCredentials, projectSecret: String) {
     log("enterCredentialsDirectly")
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
-        Espresso.onView(ViewMatchers.withId(R.id.loginEditTextProjectId))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-            .perform(ViewActions.typeText(calloutCredentials.projectId))
-            .perform(ViewActions.closeSoftKeyboard())
-        Espresso.onView(ViewMatchers.withId(R.id.loginEditTextProjectSecret))
-            .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-            .perform(ViewActions.typeText(projectSecret))
-            .perform(ViewActions.closeSoftKeyboard())
+    WaitingUtils.tryOnUiUntilTimeout(5000, 50) {
+        onView(withId(R.id.loginEditTextProjectId))
+            .check(matches(isDisplayed()))
+            .perform(typeText(calloutCredentials.projectId))
+            .perform(closeSoftKeyboard())
+        onView(withId(R.id.loginEditTextProjectSecret))
+            .check(matches(isDisplayed()))
+            .perform(typeText(projectSecret))
+            .perform(closeSoftKeyboard())
     }
 }
 
 fun pressSignIn() {
     log("pressSignIn")
-    Espresso.onView(ViewMatchers.withId(R.id.loginButtonSignIn))
-        .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        .check(ViewAssertions.matches(ViewMatchers.isClickable()))
-        .perform(ViewActions.click())
+    onView(withId(R.id.loginButtonSignIn))
+        .check(matches(isDisplayed()))
+        .check(matches(isClickable()))
+        .perform(click())
 }
 
-fun ensureSignInSuccess(calloutCredentials: CalloutCredentials, activityTestRule: ActivityTestRule<*>) {
+fun ensureSignInSuccess() {
     log("ensureSignInSuccess")
     WaitingUtils.tryOnUiUntilTimeout(25000, 1000) {
-        Assert.assertTrue(AppUtils.getApp(activityTestRule).dataManager.isSignedIn(calloutCredentials.projectId, calloutCredentials.userId))
+        ActivityUtils.grantPermissions()
+        onView(withId(R.id.confirmConsentTextView))
+            .check(matches(isDisplayed()))
+            .check(matches(withText(R.string.confirm_consent)))
+            .perform(click())
     }
 }
 
-fun ensureSignInFailure(calloutCredentials: CalloutCredentials, activityTestRule: ActivityTestRule<*>) {
+fun ensureSignInFailure() {
     log("ensureSignInFailure")
     WaitingUtils.tryOnUiUntilTimeout(25000, 1000) {
-        Assert.assertFalse(AppUtils.getApp(activityTestRule).dataManager.isSignedIn(calloutCredentials.projectId, calloutCredentials.userId))
+        onView(withId(R.id.loginButtonSignIn))
+            .check(matches(isEnabled()))
     }
+}
+
+fun exitFromMainActivity() {
+    pressBack()
+    pressBack()
 }
