@@ -21,9 +21,6 @@
     static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
 }
 
-# Print mapping
--printmapping mapping.txt
-
 # Platform calls Class.forName on types which do not exist on Android to determine platform.
 -dontnote retrofit2.Platform
 # Platform used when running on Java 8 VMs. Will not be used at runtime.
@@ -62,3 +59,11 @@
 # These contain serialised models
 -keep class com.simprints.libsimprints.** { *; }
 -keep class com.simprints.libcommon.** { *; }
+
+# Deobfuscations for Crashlytics:
+# https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception
+-keep class com.crashlytics.** { *; }
+-dontwarn com.crashlytics.**
