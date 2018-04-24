@@ -8,10 +8,7 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.retrofit.createMockBehaviorService
-import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.mockDbManager
-import com.simprints.id.testUtils.roboletric.mockLocalDbManager
-import com.simprints.id.testUtils.roboletric.mockRemoteDbManager
+import com.simprints.id.testUtils.roboletric.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,6 +31,8 @@ class ProjectAuthenticatorTest : RxJavaTest() {
         mockLocalDbManager(app)
         mockRemoteDbManager(app)
         mockDbManager(app)
+
+        mockLoadProject(app)
         apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
     }
 
