@@ -11,6 +11,7 @@ import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.domain.Project
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.whenever
 import io.reactivex.Completable
@@ -26,6 +27,13 @@ fun mockLocalDbManager(app: Application) {
 
 fun mockRemoteDbManager(app: Application) {
     app.remoteDbManager = Mockito.mock(FirebaseManager::class.java)
+}
+
+fun mockLoadProject(app: Application) {
+    val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }
+    whenever(app.localDbManager.loadProjectFromLocal(anyNotNull())).thenReturn(Single.just(project))
+    whenever(app.remoteDbManager.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(project))
+    whenever(app.localDbManager.saveProjectIntoLocal(anyNotNull())).thenReturn(Completable.complete())
 }
 
 fun mockDbManager(app: Application) {

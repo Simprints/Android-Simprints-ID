@@ -30,6 +30,8 @@ import com.simprints.id.testUtils.whenever
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople
+import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import okhttp3.mockwebserver.MockResponse
@@ -39,7 +41,6 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
@@ -76,7 +77,9 @@ class SyncTest : RxJavaTest() {
 
         val patientsToUpload = getRandomPeople(35)
 
-        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(Single.just(patientsToUpload))
+        whenever(localDbManager.loadPeopleFromLocalRx(toSync = true)).thenReturn(Flowable.fromIterable(patientsToUpload))
+        whenever(localDbManager.getPeopleCountFromLocal(toSync = true)).thenReturn(Single.just(patientsToUpload.count()))
+
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, PeopleRemoteInterface::class.java))
         whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
@@ -100,9 +103,9 @@ class SyncTest : RxJavaTest() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
         val peopleToUpload = getRandomPeople(35)
 
-        whenever(localDbManager.loadPeopleFromLocal(toSync = true)).thenReturn(
-            Single.create { it.onSuccess(peopleToUpload) }
-        )
+        whenever(localDbManager.loadPeopleFromLocalRx(toSync = true)).thenReturn(Flowable.fromIterable(peopleToUpload))
+        whenever(localDbManager.getPeopleCountFromLocal(toSync = true)).thenReturn(Single.just(peopleToUpload.count()))
+
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, PeopleRemoteInterface::class.java))
         whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
@@ -257,8 +260,7 @@ class SyncTest : RxJavaTest() {
         mockLocalDbToSavePatientsFromStream(localDbMock)
 
         //Mock app has already patients in localDb
-        whenever(localDbMock.loadPeopleFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(getRandomPeople(patientsAlreadyInLocalDb)) })
-        whenever(localDbMock.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onSuccess(patientsAlreadyInLocalDb) })
+        whenever(localDbMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(patientsAlreadyInLocalDb))
 
         //Mock app RealmSyncInfo for syncParams
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup(), rl_Person(peopleToDownload.last()))) })
@@ -270,10 +272,14 @@ class SyncTest : RxJavaTest() {
 
     private fun mockLocalDbToSavePatientsFromStream(localDbMock: LocalDbManager) {
         whenever(localDbMock.savePeopleFromStreamAndUpdateSyncInfo(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenAnswer({ invocation ->
-            val args = invocation.arguments
-            (args[0] as JsonReader).skipValue()
-            val shouldStop = args[3] as (savedPerson: fb_Person) -> Boolean
-            shouldStop(fb_Person(PeopleGeneratorUtils.getRandomPerson()))
+            Completable.create {
+                val args = invocation.arguments
+                (args[0] as JsonReader).skipValue()
+                val shouldStop = args[3] as (savedPerson: fb_Person) -> Boolean
+                if (shouldStop(fb_Person(PeopleGeneratorUtils.getRandomPerson()))) {
+                    it.onComplete()
+                }
+            }
         })
     }
 
