@@ -2,7 +2,10 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.DataManager
+import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
+import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
+import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.session.sessionParameters.SessionParameters
 import com.simprints.id.session.sessionParameters.extractors.Extractor
 import com.simprints.id.tools.TimeHelper
@@ -53,7 +56,35 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    override fun getUserId(): String = dataManager.userId
+    /** @throws DifferentProjectIdSignedInException */
+    override fun isProjectIdStoredAndMatches(): Boolean =
+        if (dataManager.getSignedInProjectIdOrEmpty().isEmpty()) {
+            false
+        } else {
+            matchIntentAndStoredProjectIdsOrThrow(dataManager.getSignedInProjectIdOrEmpty())
+        }
+
+    private fun matchIntentAndStoredProjectIdsOrThrow(storedProjectId: String): Boolean =
+        if (possibleLegacyApiKey.isEmpty()) {
+            matchProjectIdsOrThrow(storedProjectId, dataManager.projectId)
+        } else {
+            val hashedLegacyApiKey = Hasher().hash(possibleLegacyApiKey)
+            val storedProjectIdFromLegacyOrEmpty = dataManager.getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey)
+            matchProjectIdsOrThrow(storedProjectId, storedProjectIdFromLegacyOrEmpty)
+        }
+
+    private fun matchProjectIdsOrThrow(storedProjectId: String, intentProjectId: String): Boolean =
+        if (storedProjectId == intentProjectId)
+            true
+        else
+            throw DifferentProjectIdSignedInException()
+
+    /** @throws DifferentUserIdSignedInException */
+    override fun isUserIdStoredAndMatches() =
+        if (dataManager.userId != dataManager.getSignedInUserIdOrEmpty())
+            throw DifferentUserIdSignedInException()
+        else
+            dataManager.getSignedInUserIdOrEmpty().isNotEmpty()
 
     override fun handleSignedInUser() {
         view.openLaunchActivity()

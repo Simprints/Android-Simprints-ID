@@ -2,7 +2,7 @@ package com.simprints.id.data.secure
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.safe.CredentialMissingException
-import com.simprints.id.exceptions.safe.NotSignedInException
+import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.secure.cryptography.Hasher
 import io.reactivex.Single
 

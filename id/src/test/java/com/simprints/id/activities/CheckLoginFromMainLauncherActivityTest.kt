@@ -37,6 +37,7 @@ class CheckLoginFromMainLauncherActivityTest {
 
         sharedPrefs.edit().putString(SecureDataManagerImpl.ENCRYPTED_PROJECT_SECRET, "encrypted_project_secret").commit()
         sharedPrefs.edit().putString(SecureDataManagerImpl.PROJECT_ID, "projectId").commit()
+        sharedPrefs.edit().putString(SecureDataManagerImpl.USER_ID, "userId").commit()
         sharedPrefs.edit().putBoolean("IS_FIREBASE_TOKEN_VALID", true).commit()
     }
 
@@ -55,6 +56,12 @@ class CheckLoginFromMainLauncherActivityTest {
     @Test
     fun projectSecretEmpty_shouldRequestLoginActComeUp() {
         getRoboSharedPreferences().edit().putString(SecureDataManagerImpl.ENCRYPTED_PROJECT_SECRET, "").commit()
+        startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
+    }
+
+    @Test
+    fun userIdEmpty_shouldRequestLoginActComeUp() {
+        getRoboSharedPreferences().edit().putString(SecureDataManagerImpl.USER_ID, "").commit()
         startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
     }
 
