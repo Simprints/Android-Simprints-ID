@@ -5,7 +5,8 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
-import com.simprints.id.domain.Project
+import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.roboletric.*
@@ -16,6 +17,7 @@ import junit.framework.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.any
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -35,21 +37,16 @@ class DashboardCardsFactoryTest {
         mockIsSignedIn(app, getRoboSharedPreferences())
 
         mockDbManager(app)
+        mockLoadProject(app)
     }
 
     @Test
     fun shouldCreateTheProjectCard_onlyWhenItHasAValidProject() {
-        val project = Project().apply { name = "project name"; description = "project desc" }
-        whenever(app.localDbManager.loadProjectFromLocal(anyNotNull())).thenReturn(Single.just(project))
-        whenever(app.remoteDbManager.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(project))
-
-        mockNPeopleForSyncRequest(app.remoteDbManager, 0)
-
         val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
         val card = getCardIfCreated(factory, "project name")
         Assert.assertEquals(card?.description, "project desc")
 
-        whenever(app.localDbManager.loadProjectFromLocal(anyNotNull())).thenReturn(null)
+        whenever(app.localDbManager.loadProjectFromLocal(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
         whenever(app.remoteDbManager.loadProjectFromRemote(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
 
         val testObserver = Single.merge(factory.createCards()).test()
@@ -121,7 +118,6 @@ class DashboardCardsFactoryTest {
                                                                deleteEvent: () -> Unit,
                                                                cardTitle: String) {
         val event = createEvent()
-        whenever(app.remoteDbManager.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(Project().apply { description = ""; name = "" }))
         mockNPeopleForSyncRequest(app.remoteDbManager, 0)
 
         var card = getCardIfCreated(
@@ -137,6 +133,10 @@ class DashboardCardsFactoryTest {
     }
 
     private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCard? {
+        mockNPeopleForSyncRequest(app.remoteDbManager, 0)
+        mockNLocalPeople(app.localDbManager, 0)
+        mockGetSyncInfoFor(app.localDbManager)
+
         val testObserver = Single.merge(cardsFactory.createCards()).test()
         testObserver.awaitTerminalEvent()
         testObserver
@@ -151,5 +151,13 @@ class DashboardCardsFactoryTest {
 
     private fun mockNPeopleForSyncRequest(remoteDbManager: RemoteDbManager, count: Int) {
         whenever(remoteDbManager.getNumberOfPatientsForSyncParams(anyNotNull())).thenReturn(Single.just(count))
+    }
+
+    private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {
+        whenever(localDbManager.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.just(nLocalPeople))
+    }
+
+    private fun mockGetSyncInfoFor(localDbManager: LocalDbManager) {
+        whenever(localDbManager.getSyncInfoFor(anyNotNull())).thenReturn(Single.just(rl_SyncInfo().apply { lastSyncTime = Date() }))
     }
 }

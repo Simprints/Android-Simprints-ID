@@ -166,7 +166,7 @@ open class Application : MultiDexApplication() {
         SecureDataManagerImpl(prefs)
     }
 
-    val dataManager: DataManager by lazyVar {
+    var dataManager: DataManager by lazyVar {
         DataManagerImpl(this, preferencesManager, dbManager, analyticsManager, secureDataManager)
     }
 

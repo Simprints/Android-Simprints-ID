@@ -45,7 +45,7 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
 
         viewPresenter = AboutPresenter(this, dataManager)
 
-        //FIXME: Delete bt_deleteSyncInfo, bt_deletePeopleFromRealm, bt_addPatient, bt_enrollPeople before release
+        //StopShip: Delete bt_deleteSyncInfo, bt_deletePeopleFromRealm, bt_addPatient, bt_enrollPeople before release
         bt_deleteSyncInfo.setOnClickListener {
             dataManager
                 .localDbManager
