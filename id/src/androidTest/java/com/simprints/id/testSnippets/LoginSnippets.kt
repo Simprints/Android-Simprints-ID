@@ -58,8 +58,8 @@ fun ensureSignInFailure() {
     }
 }
 
-fun ensureLaunchFailure() {
-    log("ensureLaunchFailure")
+fun ensureConfigError() {
+    log("ensureConfigError")
     WaitingUtils.tryOnUiUntilTimeout(25000, 1000) {
         onView(withId(R.id.title))
             .check(matches(isDisplayed()))

@@ -88,9 +88,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
     @Test
     fun invalidIntentLegacyProjectIdAndInvalidSubmittedProjectId_shouldFail() {
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
-        enterCredentialsDirectly(invalidCredentials, projectSecret)
-        pressSignIn()
-        ensureSignInFailure()
+        ensureConfigError()
     }
 
     @Test
@@ -144,9 +142,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
     @Test
     fun invalidLegacyCredentials_shouldFail() {
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
-        enterCredentialsDirectly(invalidCredentials, invalidSecret)
-        pressSignIn()
-        ensureSignInFailure()
+        ensureConfigError()
     }
 
     @Test
@@ -181,7 +177,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
         ensureSignInSuccess()
 
         launchAppFromIntentEnrol(invalidCredentials, loginTestRule)
-        ensureLaunchFailure()
+        ensureConfigError()
         signOut(loginTestRule)
     }
 
@@ -193,7 +189,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
         ensureSignInSuccess()
 
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
-        ensureLaunchFailure()
+        ensureConfigError()
         signOut(loginTestRule)
     }
 
