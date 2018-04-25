@@ -44,6 +44,7 @@ object ActivityUtils {
             intent.putExtra(Constants.SIMPRINTS_API_KEY, calloutCredentials.legacyApiKey)
         intent.putExtra(Constants.SIMPRINTS_USER_ID, calloutCredentials.userId)
         intent.putExtra(Constants.SIMPRINTS_MODULE_ID, calloutCredentials.moduleId)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         return intent
     }
 
