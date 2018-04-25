@@ -47,7 +47,6 @@ fun ensureSignInSuccess() {
         onView(withId(R.id.confirmConsentTextView))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.confirm_consent)))
-            .perform(click())
     }
 }
 
@@ -59,7 +58,10 @@ fun ensureSignInFailure() {
     }
 }
 
-fun exitFromMainActivity() {
-    pressBack()
-    pressBack()
+fun ensureLaunchFailure() {
+    log("ensureLaunchFailure")
+    WaitingUtils.tryOnUiUntilTimeout(25000, 1000) {
+        onView(withId(R.id.title))
+            .check(matches(isDisplayed()))
+    }
 }

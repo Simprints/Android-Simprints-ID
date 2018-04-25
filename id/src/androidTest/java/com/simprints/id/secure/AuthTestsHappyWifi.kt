@@ -53,7 +53,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Rule
     @JvmField
-    val activityTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+    val loginTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
     @Before
     override fun setUp() {
@@ -69,25 +69,25 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Test
     fun validLegacyCredentials_shouldSucceed() {
-        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
+        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
         ensureSignInSuccess()
-        signOut(activityTestRule)
+        signOut(loginTestRule)
     }
 
     @Test
     fun validCredentials_shouldSucceed() {
-        launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
+        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
         ensureSignInSuccess()
-        signOut(activityTestRule)
+        signOut(loginTestRule)
     }
 
     @Test
     fun invalidIntentLegacyProjectIdAndInvalidSubmittedProjectId_shouldFail() {
-        launchAppFromIntentEnrol(invalidCredentials.toLegacy(), activityTestRule)
+        launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
         enterCredentialsDirectly(invalidCredentials, projectSecret)
         pressSignIn()
         ensureSignInFailure()
@@ -95,7 +95,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Test
     fun validIntentLegacyProjectIdAndInvalidSubmittedProjectId_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
+        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
         enterCredentialsDirectly(invalidCredentials, projectSecret)
         pressSignIn()
         ensureSignInFailure()
@@ -103,7 +103,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Test
     fun invalidIntentProjectIdAndInvalidSubmittedProjectId_shouldFail() {
-        launchAppFromIntentEnrol(invalidCredentials, activityTestRule)
+        launchAppFromIntentEnrol(invalidCredentials, loginTestRule)
         enterCredentialsDirectly(invalidCredentials, projectSecret)
         pressSignIn()
         ensureSignInFailure()
@@ -111,7 +111,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Test
     fun validIntentProjectIdAndInvalidSubmittedProjectId_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
+        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
         enterCredentialsDirectly(invalidCredentials, projectSecret)
         pressSignIn()
         ensureSignInFailure()
@@ -119,7 +119,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Test
     fun validProjectIdAndInvalidSecret_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
+        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
         enterCredentialsDirectly(calloutCredentials, invalidSecret)
         pressSignIn()
         ensureSignInFailure()
@@ -127,7 +127,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Test
     fun validLegacyProjectIdAndInvalidSecret_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
+        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
         enterCredentialsDirectly(calloutCredentials, invalidSecret)
         pressSignIn()
         ensureSignInFailure()
@@ -135,7 +135,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Test
     fun invalidCredentials_shouldFail() {
-        launchAppFromIntentEnrol(invalidCredentials, activityTestRule)
+        launchAppFromIntentEnrol(invalidCredentials, loginTestRule)
         enterCredentialsDirectly(invalidCredentials, invalidSecret)
         pressSignIn()
         ensureSignInFailure()
@@ -143,63 +143,59 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Test
     fun invalidLegacyCredentials_shouldFail() {
-        launchAppFromIntentEnrol(invalidCredentials.toLegacy(), activityTestRule)
+        launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
         enterCredentialsDirectly(invalidCredentials, invalidSecret)
         pressSignIn()
         ensureSignInFailure()
     }
 
-//    @Test
-//    fun validCredentials_shouldPersistAcrossAppRestart() {
-//        launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
-//        enterCredentialsDirectly(calloutCredentials, projectSecret)
-//        pressSignIn()
-//        ensureSignInSuccess()
-//        exitFromMainActivity()
-//
-//        launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
-//        ensureSignInSuccess()
-//        signOut(activityTestRule)
-//    }
-//
-//    @Test
-//    fun validLegacyCredentials_shouldPersistAcrossAppRestart() {
-//        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
-//        enterCredentialsDirectly(calloutCredentials, projectSecret)
-//        pressSignIn()
-//        ensureSignInSuccess()
-//        exitFromMainActivity()
-//
-//        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
-//        ensureSignInSuccess()
-//        signOut(activityTestRule)
-//    }
-//
-//    @Test
-//    fun validCredentialsThenRestartingWithInvalidCredentials_shouldFail() {
-//        launchAppFromIntentEnrol(calloutCredentials, activityTestRule)
-//        enterCredentialsDirectly(calloutCredentials, projectSecret)
-//        pressSignIn()
-//        ensureSignInSuccess()
-//        exitFromMainActivity()
-//
-//        launchAppFromIntentEnrol(invalidCredentials, activityTestRule)
-//        ensureSignInFailure()
-//        signOut(activityTestRule)
-//    }
-//
-//    @Test
-//    fun validLegacyCredentialsThenRestartingWithInvalidCredentials_shouldFail() {
-//        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), activityTestRule)
-//        enterCredentialsDirectly(calloutCredentials, projectSecret)
-//        pressSignIn()
-//        ensureSignInSuccess()
-//        exitFromMainActivity()
-//
-//        launchAppFromIntentEnrol(invalidCredentials.toLegacy(), activityTestRule)
-//        ensureSignInFailure()
-//        signOut(activityTestRule)
-//    }
+    @Test
+    fun validCredentials_shouldPersistAcrossAppRestart() {
+        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInSuccess()
+
+        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
+        ensureSignInSuccess()
+        signOut(loginTestRule)
+    }
+
+    @Test
+    fun validLegacyCredentials_shouldPersistAcrossAppRestart() {
+        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInSuccess()
+
+        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
+        ensureSignInSuccess()
+        signOut(loginTestRule)
+    }
+
+    @Test
+    fun validCredentialsThenRestartingWithInvalidCredentials_shouldFail() {
+        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInSuccess()
+
+        launchAppFromIntentEnrol(invalidCredentials, loginTestRule)
+        ensureLaunchFailure()
+        signOut(loginTestRule)
+    }
+
+    @Test
+    fun validLegacyCredentialsThenRestartingWithInvalidCredentials_shouldFail() {
+        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        ensureSignInSuccess()
+
+        launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
+        ensureLaunchFailure()
+        signOut(loginTestRule)
+    }
 
     private fun signOut(activityTestRule: ActivityTestRule<*>) {
         getApp(activityTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
