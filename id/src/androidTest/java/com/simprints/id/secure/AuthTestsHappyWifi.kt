@@ -65,8 +65,6 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
         super<FirstUseLocal>.setUp()
     }
 
-    override fun tearDown() {}
-
     @Test
     fun validLegacyCredentials_shouldSucceed() {
         launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
