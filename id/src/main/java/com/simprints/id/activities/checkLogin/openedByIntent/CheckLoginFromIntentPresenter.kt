@@ -58,11 +58,8 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     /** @throws DifferentProjectIdSignedInException */
     override fun isProjectIdStoredAndMatches(): Boolean =
-        if (dataManager.getSignedInProjectIdOrEmpty().isEmpty()) {
-            false
-        } else {
+        dataManager.getSignedInProjectIdOrEmpty().isNotEmpty() &&
             matchIntentAndStoredProjectIdsOrThrow(dataManager.getSignedInProjectIdOrEmpty())
-        }
 
     private fun matchIntentAndStoredProjectIdsOrThrow(storedProjectId: String): Boolean =
         if (possibleLegacyApiKey.isEmpty()) {
@@ -74,9 +71,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
 
     private fun matchProjectIdsOrThrow(storedProjectId: String, intentProjectId: String): Boolean =
-        if (storedProjectId == intentProjectId)
-            true
-        else
+        storedProjectId == intentProjectId ||
             throw DifferentProjectIdSignedInException()
 
     /** @throws DifferentUserIdSignedInException */
