@@ -10,10 +10,10 @@ import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.DataManager
+import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.Callout.Companion.toCallout
-import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
-import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
@@ -61,7 +61,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         }
     }
 
-    fun getCallingPackageName(): String {
+    open fun getCallingPackageName(): String {
         return callingPackage ?: ""
     }
 
