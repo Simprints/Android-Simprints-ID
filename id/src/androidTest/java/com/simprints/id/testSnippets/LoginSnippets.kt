@@ -20,7 +20,7 @@ fun launchAppFromIntentEnrol(calloutCredentials: CalloutCredentials,
 
 fun enterCredentialsDirectly(calloutCredentials: CalloutCredentials, projectSecret: String) {
     log("enterCredentialsDirectly")
-    WaitingUtils.tryOnUiUntilTimeout(5000, 50) {
+    WaitingUtils.tryOnUiUntilTimeout(10000, 50) {
         onView(withId(R.id.loginEditTextProjectId))
             .check(matches(isDisplayed()))
             .perform(typeText(calloutCredentials.projectId))
