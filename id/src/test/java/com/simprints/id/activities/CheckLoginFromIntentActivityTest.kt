@@ -16,14 +16,12 @@ import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
-import org.junit.Assert.*
 import org.junit.Assert
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.Mockito.doReturn
-import org.mockito.Mockito.spy
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
@@ -66,28 +64,13 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
     @Test
     fun unknownCallingAppSource_shouldLogEvent() {
-        val controller = Robolectric.buildActivity(CheckLoginFromIntentActivity::class.java).create()
-        val spyAct = spy(controller.get())
-        doReturn("com.app.installed.manually").`when`(spyAct).getCallingPackageName()
-        replaceActivityInController(controller, spyAct)
-
-        controller.start().resume().visible()
+        Robolectric.buildActivity(CheckLoginFromIntentActivityWithInvalidCallingPackage::class.java).setup()
         verifyALogSafeExceptionWasThrown(1)
     }
 
     @Test
     fun knownCallingAppSource_shouldNotLogEvent() {
-        val pm = app.packageManager
-        pm.setInstallerPackageName("com.app.installed.from.playstore", "com.android.vending")
-
-        val controller = Robolectric.buildActivity(CheckLoginFromIntentActivity::class.java)
-
-        val mockAct = spy(controller.get())
-        doReturn("com.app.installed.from.playstore").`when`(mockAct).getCallingPackageName()
-        replaceActivityInController(controller, mockAct)
-
-        controller.create().start().resume().visible()
-
+        Robolectric.buildActivity(CheckLoginFromIntentActivityWithValidCallingPackage::class.java).setup()
         verifyALogSafeExceptionWasThrown(0)
     }
 
@@ -262,5 +245,19 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
             putExtra("userId", userId)
             putExtra("moduleId", moduleId)
         }
+    }
+}
+
+class CheckLoginFromIntentActivityWithInvalidCallingPackage : CheckLoginFromIntentActivity() {
+
+    override fun getCallingPackageName(): String {
+        return "com.app.installed.manually"
+    }
+}
+
+class CheckLoginFromIntentActivityWithValidCallingPackage : CheckLoginFromIntentActivity() {
+
+    override fun getCallingPackageName(): String {
+        return "com.app.installed.from.playstore"
     }
 }
