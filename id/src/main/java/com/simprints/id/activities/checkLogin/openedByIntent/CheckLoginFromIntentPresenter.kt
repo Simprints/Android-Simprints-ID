@@ -9,6 +9,7 @@ import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.session.sessionParameters.SessionParameters
 import com.simprints.id.session.sessionParameters.extractors.Extractor
 import com.simprints.id.tools.TimeHelper
+import java.util.concurrent.atomic.AtomicBoolean
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     val dataManager: DataManager,
@@ -16,7 +17,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     timeHelper: TimeHelper) :
     CheckLoginPresenter(view, dataManager, timeHelper), CheckLoginFromIntentContract.Presenter {
 
-    private var loginAlreadyTried: Boolean = false
+    private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var possibleLegacyApiKey: String = ""
     private var setupFailed: Boolean = false
 
@@ -48,8 +49,8 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     override fun handleNotSignedInUser() {
-        if (!loginAlreadyTried) {
-            loginAlreadyTried = true
+        if (!loginAlreadyTried.get()) {
+            loginAlreadyTried.set(true)
             view.openLoginActivity(possibleLegacyApiKey)
         } else {
             view.finishCheckLoginFromIntentActivity()
