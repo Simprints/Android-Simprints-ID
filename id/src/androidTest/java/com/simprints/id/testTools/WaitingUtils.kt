@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.id.testTools
 
 import android.os.SystemClock
 import android.support.test.espresso.IdlingPolicies.getMasterIdlingPolicy
@@ -9,14 +9,13 @@ import java.util.concurrent.TimeUnit
 
 object WaitingUtils {
 
-    fun tryOnUiUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Any?) {
+    fun tryOnUiUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Any?): Any? {
         changeUiTimeoutPolicyIfNeeded(timeout)
-        tryUntilTimeout(timeout, pollingInterval, snippet, ::waitOnUi)
+        return tryUntilTimeout(timeout, pollingInterval, snippet, WaitingUtils::waitOnUi)
     }
 
-    fun tryOnSystemUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Any?) {
-        tryUntilTimeout(timeout, pollingInterval, snippet, ::waitOnSystem)
-    }
+    fun tryOnSystemUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Any?): Any? =
+        tryUntilTimeout(timeout, pollingInterval, snippet, WaitingUtils::waitOnSystem)
 
     private fun tryUntilTimeout(timeout: Long,
                                 pollingInterval: Long,

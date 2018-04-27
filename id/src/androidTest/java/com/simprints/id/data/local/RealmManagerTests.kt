@@ -10,7 +10,7 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Constants.GROUP.*
 import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.id.tools.extensions.awaitAndAssertSuccess
+import com.simprints.id.testTools.extensions.awaitAndAssertSuccess
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople
 import io.reactivex.Completable

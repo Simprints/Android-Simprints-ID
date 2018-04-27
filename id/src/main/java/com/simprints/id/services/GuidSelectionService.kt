@@ -4,7 +4,7 @@ import android.app.IntentService
 import android.content.Intent
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
-import com.simprints.id.exceptions.safe.NotSignedInException
+import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.libsimprints.Constants.*

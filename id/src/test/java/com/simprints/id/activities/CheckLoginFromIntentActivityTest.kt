@@ -12,6 +12,7 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -210,14 +211,20 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
     private fun setUserLogInState(logged: Boolean,
                                   projectId: String = DEFAULT_PROJECT_ID,
+                                  legacyApiKey: String = DEFAULT_LEGACY_API_KEY,
                                   userId: String = DEFAULT_USER_ID,
                                   projectSecret: String = DEFAULT_PROJECT_SECRET) {
 
         val editor = sharedPreferences.edit()
         editor.putString(SecureDataManagerImpl.ENCRYPTED_PROJECT_SECRET, if (logged) projectSecret else "").apply()
         editor.putString(SecureDataManagerImpl.PROJECT_ID, if (logged) projectId else "").apply()
+        editor.putString(SecureDataManagerImpl.PROJECT_ID, if (logged) projectId else "").apply()
         editor.putString(SecureDataManagerImpl.USER_ID, if (logged) userId else "").apply()
         editor.putBoolean("IS_FIREBASE_TOKEN_VALID", logged).apply()
+
+        val hashedLegacyApiKey = Hasher().hash(legacyApiKey)
+        editor.putString(projectId, if (logged) hashedLegacyApiKey else "").apply()
+        editor.putString(hashedLegacyApiKey, if (logged) projectId else "").apply()
     }
 
     private fun createACallingAppIntentWithLegacyApiKey(actionString: String = DEFAULT_ACTION,
