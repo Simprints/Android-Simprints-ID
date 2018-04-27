@@ -54,10 +54,12 @@ abstract class CheckLoginPresenter(
      * @throws NotSignedInException
      */
     private fun checkSignedInOrThrow() {
-        if (!isEncryptedProjectSecretPresent() ||
-            !isProjectIdStoredAndMatches() ||
-            !isUserIdStoredAndMatches() ||
-            !isFirebaseTokenValid())
+        val isUserSignedIn = isEncryptedProjectSecretPresent() &&
+            isProjectIdStoredAndMatches() &&
+            isUserIdStoredAndMatches() &&
+            isFirebaseTokenValid()
+
+        if (!isUserSignedIn)
             throw NotSignedInException()
     }
 
