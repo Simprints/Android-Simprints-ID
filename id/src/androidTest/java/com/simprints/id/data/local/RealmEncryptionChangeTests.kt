@@ -4,7 +4,7 @@ import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.tools.extensions.awaitAndAssertSuccess
+import com.simprints.id.testTools.extensions.awaitAndAssertSuccess
 import io.realm.Realm
 import org.junit.After
 import org.junit.Assert

@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.id.testTools
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -32,13 +32,13 @@ object RemoteAdminUtils {
 
     @Throws(ApiException::class)
     fun getPatientsNode(apiInstance: DefaultApi, projectApiKey: String): JsonObject {
-        val patientsFirebaseNode = apiInstance.getAny("/$FIREBASE_PROJECTS_NODE/$projectApiKey/$FIREBASE_PATIENTS_NODE") as LinkedTreeMap<*, *>
+        val patientsFirebaseNode = apiInstance.getAny("/${FIREBASE_PROJECTS_NODE}/$projectApiKey/${FIREBASE_PATIENTS_NODE}") as LinkedTreeMap<*, *>
         return Gson().toJsonTree(patientsFirebaseNode).asJsonObject
     }
 
     @Throws(ApiException::class)
     fun clearProjectNode(apiInstance: DefaultApi, projectApiKey: String) {
-        apiInstance.deleteAny("/$FIREBASE_PROJECTS_NODE/$projectApiKey")
+        apiInstance.deleteAny("/${FIREBASE_PROJECTS_NODE}/$projectApiKey")
     }
 
     @Throws(ApiException::class)
@@ -52,6 +52,6 @@ object RemoteAdminUtils {
             "}]" +
             "}"
 
-        apiInstance.putProject(calloutCredentials.apiKey, simpleValidGroups)
+        apiInstance.putProject(calloutCredentials.legacyApiKey, simpleValidGroups)
     }
 }

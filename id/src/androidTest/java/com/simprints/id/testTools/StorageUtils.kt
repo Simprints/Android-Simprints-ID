@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.id.testTools
 
 import android.content.Context
 import com.simprints.cerberuslibrary.RealmUtility

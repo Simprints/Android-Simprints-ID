@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.id.testTools
 
 import android.Manifest
 import android.content.Intent
@@ -7,7 +7,7 @@ import android.support.test.InstrumentationRegistry
 import android.support.test.rule.ActivityTestRule
 import android.view.WindowManager
 import com.schibsted.spain.barista.permission.PermissionGranter
-import com.simprints.id.activities.launch.LaunchActivity
+import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.libsimprints.Constants
 import java.util.*
 
@@ -27,20 +27,24 @@ object ActivityUtils {
                                        action: String,
                                        activityTestRule: ActivityTestRule<*>,
                                        verifyGuidExtra: String? = null) {
-        val intent = createLaunchActivityIntent(calloutCredentials, action)
+        val intent = createIntent(calloutCredentials, action)
         if (verifyGuidExtra != null) intent.putExtra(Constants.SIMPRINTS_VERIFY_GUID, verifyGuidExtra)
         activityTestRule.launchActivity(intent)
         runActivityOnUiThread(activityTestRule)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) grantPermissions()
     }
 
-    private fun createLaunchActivityIntent(calloutCredentials: CalloutCredentials, action: String): Intent {
+    private fun createIntent(calloutCredentials: CalloutCredentials, action: String): Intent {
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
-        val intent = Intent(targetContext, LaunchActivity::class.java)
+        val intent = Intent(targetContext, CheckLoginFromIntentActivity::class.java)
         intent.action = action
-        intent.putExtra(Constants.SIMPRINTS_API_KEY, calloutCredentials.apiKey)
+        if (calloutCredentials.projectId.isNotEmpty())
+            intent.putExtra(Constants.SIMPRINTS_PROJECT_ID, calloutCredentials.projectId)
+        else
+            intent.putExtra(Constants.SIMPRINTS_API_KEY, calloutCredentials.legacyApiKey)
         intent.putExtra(Constants.SIMPRINTS_USER_ID, calloutCredentials.userId)
         intent.putExtra(Constants.SIMPRINTS_MODULE_ID, calloutCredentials.moduleId)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         return intent
     }
 
@@ -54,7 +58,7 @@ object ActivityUtils {
         activity.runOnUiThread(wakeUpDevice)
     }
 
-    private fun grantPermissions() {
+    fun grantPermissions() {
         // Allow all first-app permissions and dismiss the dialog box
         log("ActivityUtils.grantPermissions(): granting permissions")
         for (permission in permissions) PermissionGranter.allowPermissionsIfNeeded(permission)

@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.id.testTools
 
 import android.app.Instrumentation
 import android.os.Bundle

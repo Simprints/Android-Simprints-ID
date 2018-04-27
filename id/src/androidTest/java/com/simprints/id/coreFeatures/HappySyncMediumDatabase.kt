@@ -1,4 +1,4 @@
-package com.simprints.id.bucket01
+package com.simprints.id.coreFeatures
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
@@ -6,14 +6,15 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.data.db.local.realm.RealmConfig
-import com.simprints.id.templates.FirstUseTest
-import com.simprints.id.templates.HappyBluetooth
-import com.simprints.id.templates.HappyWifi
-import com.simprints.id.testHappySync
-import com.simprints.id.tools.CalloutCredentials
-import com.simprints.id.tools.RemoteAdminUtils
-import com.simprints.id.tools.SyncParameters
-import com.simprints.id.tools.log
+import com.simprints.id.testTemplates.FirstUseLocal
+import com.simprints.id.testTemplates.FirstUseRemote
+import com.simprints.id.testTemplates.HappyBluetooth
+import com.simprints.id.testTemplates.HappyWifi
+import com.simprints.id.testSnippets.testHappySync
+import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.RemoteAdminUtils
+import com.simprints.id.testTools.SyncParameters
+import com.simprints.id.testTools.log
 import com.simprints.remoteadminclient.ApiException
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -25,7 +26,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class HappySyncMediumDatabase : FirstUseTest(), HappyWifi, HappyBluetooth {
+class HappySyncMediumDatabase : FirstUseLocal, FirstUseRemote, HappyWifi, HappyBluetooth {
 
     override val calloutCredentials: CalloutCredentials = CalloutCredentials(
         "00000002-0000-0000-0000-000000000000",
@@ -46,8 +47,9 @@ class HappySyncMediumDatabase : FirstUseTest(), HappyWifi, HappyBluetooth {
         super<HappyBluetooth>.setUp()
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        realmConfiguration = RealmConfig.get(calloutCredentials.apiKey, byteArrayOf())
-        super<FirstUseTest>.setUp()
+        realmConfiguration = RealmConfig.get(calloutCredentials.projectId, byteArrayOf())
+        super<FirstUseLocal>.setUp()
+        super<FirstUseRemote>.setUp()
 
         log("bucket01.HappySyncMediumDatabase.setUp() creating remote database with ${SyncParameters.MEDIUM_DATABASE_NUMBER_OF_PATIENTS} patients")
         val apiInstance = RemoteAdminUtils.configuredApiInstance

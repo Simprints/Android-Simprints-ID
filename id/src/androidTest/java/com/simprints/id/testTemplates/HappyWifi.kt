@@ -1,10 +1,10 @@
-package com.simprints.id.templates
+package com.simprints.id.testTemplates
 
 import android.support.test.InstrumentationRegistry
 import com.simprints.cerberuslibrary.WifiUtility
 import com.simprints.cerberuslibrary.services.UtilityServiceClient
 import com.simprints.id.BuildConfig
-import com.simprints.id.tools.log
+import com.simprints.id.testTools.log
 import org.junit.Before
 
 
