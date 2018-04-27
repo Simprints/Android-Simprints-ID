@@ -125,7 +125,7 @@ class LoginActivityTest : RxJavaTest() {
         val controller = createRoboLoginActivity()
         controller.start().resume().visible()
         val act = controller.get()
-        act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "project_id:validProject\nproject_secret_wrong:some_value"))
+        act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "{\"projectId\":\"someProjectId\",\"projectSecretWrong\":\"someSecret\"}"))
 
         assertEquals(app.getString(R.string.login_invalid_qr_code), ShadowToast.getTextOfLatestToast())
     }
@@ -140,7 +140,7 @@ class LoginActivityTest : RxJavaTest() {
         val projectId = "55KAiL2YmsjeuNNPnSDO"
         val projectSecret = "GMoqI_4-UToujbPrIHrNMS9_0EpCbXveTLCvvN7nasVDCNcyhuu7c8u2zrfkuVdL7t3Uxt-Rjo8sDvBi3bkpUA"
 
-        act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "project_id:$projectId\nproject_secret:$projectSecret"))
+        act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "{\"projectId\":\"$projectId\",\"projectSecret\":\"$projectSecret\"}"))
 
         assertEquals(projectId, act.loginEditTextProjectId.text.toString())
         assertEquals(projectSecret, act.loginEditTextProjectSecret.text.toString())
