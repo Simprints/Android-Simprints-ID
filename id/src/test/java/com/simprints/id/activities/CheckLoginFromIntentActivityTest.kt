@@ -71,6 +71,9 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
     @Test
     fun knownCallingAppSource_shouldNotLogEvent() {
+        val pm = app.packageManager
+        pm.setInstallerPackageName("com.app.installed.from.playstore", "com.android.vending")
+
         Robolectric.buildActivity(CheckLoginFromIntentActivityWithValidCallingPackage::class.java).setup()
         verifyALogSafeExceptionWasThrown(0)
     }
