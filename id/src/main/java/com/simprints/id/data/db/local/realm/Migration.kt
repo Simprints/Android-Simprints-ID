@@ -1,11 +1,7 @@
 package com.simprints.id.data.db.local.realm
 
-import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.domain.Constants
-import io.realm.DynamicRealm
-import io.realm.FieldAttribute
-import io.realm.RealmMigration
-import io.realm.RealmSchema
+import io.realm.*
 import java.util.*
 
 internal class Migration(val projectId: String) : RealmMigration {
@@ -37,7 +33,7 @@ internal class Migration(val projectId: String) : RealmMigration {
         const val PROJECT_UPDATED_AT = "updatedAt"
 
         const val PERSON_PROJECT_ID = "projectId"
-        const val PERSON_PATIENT_ID = "id"
+        const val PERSON_PATIENT_ID = "patientId"
         const val PERSON_MODULE_ID = "moduleId"
         const val PERSON_USER_ID = "userId"
         const val PERSON_CREATE_TIME_TEMP = "createdAt_tmp"
@@ -64,44 +60,70 @@ internal class Migration(val projectId: String) : RealmMigration {
     }
 
     private fun migrateTo2(schema: RealmSchema) {
+        migratePersonTo2(schema)
+        migrateSyncInfoTo2(schema)
+        migrateProjectInfoTo2(schema)
+
+        schema.get(FINGERPRINT_TABLE)?.removeField(FINGERPRINT_PERSON)
+        schema.remove(API_KEY_TABLE)
+    }
+
+    private fun migratePersonTo2(schema: RealmSchema) {
         schema.get(PERSON_TABLE)?.addField(PERSON_PROJECT_ID, String::class.java)?.transform {
             it.setString(PERSON_PROJECT_ID, projectId)
+        }?.setRequired(PERSON_PROJECT_ID, true)
+
+        // Workaround to make primary key required (kotlin not nullable)
+        // https://github.com/realm/realm-java/issues/5235
+        schema.get(PERSON_TABLE)?.run {
+            if (isPrimaryKey(PERSON_PATIENT_ID) && !isRequired(PERSON_PATIENT_ID)) {
+                removePrimaryKey()
+                setRequired(PERSON_PATIENT_ID, true)
+                addIndex(PERSON_PATIENT_ID)
+                addPrimaryKey(PERSON_PATIENT_ID)
+            }
         }
 
-        schema.get(PERSON_TABLE)?.setRequired(PERSON_PATIENT_ID, true)
-        schema.get(PERSON_TABLE)?.setRequired(PERSON_USER_ID, true)
-        schema.get(PERSON_TABLE)?.setRequired(PERSON_MODULE_ID, true)
-
-        schema.get(PERSON_TABLE)?.addField(PERSON_CREATE_TIME_TEMP, Date::class.java)?.transform {
-                val fieldValue = it.getInt(PERSON_CREATE_TIME).toLong()
-                it.setDate(PERSON_CREATE_TIME_TEMP, Date(fieldValue))
-            }
+        schema.get(PERSON_TABLE)
+            ?.setRequired(PERSON_USER_ID, true)
+            ?.setRequired(PERSON_MODULE_ID, true)
+            ?.addField(PERSON_CREATE_TIME_TEMP, Date::class.java)
             ?.removeField(PERSON_CREATE_TIME)
             ?.renameField(PERSON_CREATE_TIME_TEMP, PERSON_CREATE_TIME)
+            ?.removeField(ANDROID_ID_FIELD)
 
-        schema.get(PERSON_TABLE)?.addField(rl_Person.UPDATE_TIME_FIELD, Date::class.java)
+        // It's null. The record is marked toSync = true, so having updatedAt = null is
+        // even consistent with toSync = person.updatedAt == null || person.createdAt == null
+        schema.get(PERSON_TABLE)?.addField(UPDATE_FIELD, Date::class.java)
+
         schema.get(PERSON_TABLE)?.addField(SYNC_FIELD, Boolean::class.java)?.transform {
-            it.set(SYNC_FIELD, false)
+            it.set(SYNC_FIELD, true)
         }
-        schema.get(PERSON_TABLE)?.removeField(ANDROID_ID_FIELD)
-        schema.get(FINGERPRINT_TABLE)?.removeField(FINGERPRINT_PERSON)
+    }
 
-        schema.remove(API_KEY_TABLE)
-
+    private fun migrateSyncInfoTo2(schema: RealmSchema) {
         schema.create(SYNC_INFO_TABLE)
             .addField(SYNC_INFO_ID, Int::class.java, FieldAttribute.PRIMARY_KEY)
-            .addField(SYNC_INFO_LAST_UPDATE, Date::class.java)
-            .addField(SYNC_INFO_LAST_PATIENT_ID, String::class.java)
-            .addField(SYNC_INFO_SYNC_TIME, Date::class.java)
-
-        schema.create(PROJECT_TABLE)
-            .addField(PROJECT_ID, String::class.java, FieldAttribute.PRIMARY_KEY)
-            .addField(PROJECT_LEGACY_ID, String::class.java)
-            .addField(PROJECT_NAME, String::class.java)
-            .addField(PROJECT_DESCRIPTION, String::class.java)
-            .addField(PROJECT_CREATOR, String::class.java)
-            .addField(PROJECT_UPDATED_AT, String::class.java)
+            .addDateAndMakeRequired(SYNC_INFO_LAST_UPDATE)
+            .addStringAndMakeRequired(SYNC_INFO_LAST_PATIENT_ID)
+            .addDateAndMakeRequired(SYNC_INFO_SYNC_TIME)
     }
+
+    private fun migrateProjectInfoTo2(schema: RealmSchema) {
+        schema.create(PROJECT_TABLE)
+            .addField(PROJECT_ID, String::class.java, FieldAttribute.PRIMARY_KEY).setRequired(PROJECT_ID, true)
+            .addStringAndMakeRequired(PROJECT_LEGACY_ID)
+            .addStringAndMakeRequired(PROJECT_NAME)
+            .addStringAndMakeRequired(PROJECT_DESCRIPTION)
+            .addStringAndMakeRequired(PROJECT_CREATOR)
+            .addStringAndMakeRequired(PROJECT_UPDATED_AT)
+    }
+
+    private fun RealmObjectSchema.addStringAndMakeRequired(name: String): RealmObjectSchema =
+        this.addField(name, String::class.java).setRequired(name, true)
+
+    private fun RealmObjectSchema.addDateAndMakeRequired(name: String): RealmObjectSchema =
+        this.addField(name, Date::class.java).setRequired(name, true)
 
     override fun hashCode(): Int {
         return Migration.hashCode()
