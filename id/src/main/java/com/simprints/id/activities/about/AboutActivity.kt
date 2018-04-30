@@ -7,14 +7,10 @@ import android.view.MenuItem
 import android.view.WindowManager
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
-import com.simprints.id.tools.utils.PeopleGeneratorUtils
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_about.*
 
 class AboutActivity : AppCompatActivity(), AboutContract.View {
@@ -44,43 +40,6 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
         initUi()
 
         viewPresenter = AboutPresenter(this, dataManager)
-
-        //StopShip: Delete bt_deleteSyncInfo, bt_deletePeopleFromRealm, bt_addPatient, bt_enrollPeople before release
-        bt_deleteSyncInfo.setOnClickListener {
-            dataManager
-                .localDbManager
-                .deleteSyncInfoFromLocal(SyncTaskParameters.build(app.dataManager.syncGroup, app.dataManager))
-                .subscribeBy ( onComplete = {}, onError = { it.printStackTrace() })
-        }
-
-        bt_deletePeopleFromRealm.setOnClickListener {
-            dataManager
-                .localDbManager
-                .deletePeopleFromLocal(SyncTaskParameters.build(app.dataManager.syncGroup, app.dataManager))
-                .subscribeBy ( onComplete = {}, onError = { it.printStackTrace() })
-        }
-
-        bt_addPatient.setOnClickListener {
-            (1..10).forEach {
-                dataManager.localDbManager.insertOrUpdatePersonInLocal(
-                    PeopleGeneratorUtils.getRandomPeople(1,
-                        projectId = dataManager.getSignedInProjectIdOrEmpty(),
-                        userId = dataManager.getSignedInUserIdOrEmpty(),
-                        toSync = true).first()
-                ).subscribeBy ( onComplete = {}, onError = { it.printStackTrace() })
-            }
-        }
-
-        bt_enrollPeople.setOnClickListener {
-            dataManager.savePerson(
-                fb_Person(PeopleGeneratorUtils.getRandomPeople(1,
-                    projectId = dataManager.getSignedInProjectIdOrEmpty(),
-                    userId = dataManager.getSignedInUserIdOrEmpty()).first())
-            ).subscribeBy(
-                onComplete = {},
-                onError = { it.printStackTrace() }
-            )
-        }
     }
 
     private fun initUi() {
