@@ -22,6 +22,7 @@ open class rl_Person : RealmObject {
         const val MODULE_ID_FIELD = "moduleId"
         const val TO_SYNC_FIELD = "toSync"
         const val UPDATE_TIME_FIELD = "updatedAt"
+        const val CREATE_TIME_FIELD = "createdAt"
     }
 
     @PrimaryKey

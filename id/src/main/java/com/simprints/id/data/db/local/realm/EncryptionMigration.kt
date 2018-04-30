@@ -6,7 +6,6 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File
 
-
 class EncryptionMigration(localDbKey: LocalDbKey, private val appContext: Context) {
 
     companion object {
@@ -26,14 +25,14 @@ class EncryptionMigration(localDbKey: LocalDbKey, private val appContext: Contex
         if (dbKey.legacyApiKey.isEmpty())
             return false
 
-        val legacyConfig = getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey)
-        val newConfig = RealmConfig.get(dbKey.projectId, dbKey.value)
+        val legacyConfig = getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey, dbKey.projectId)
+        val newConfig = RealmConfig.get(dbKey.projectId, dbKey.value, dbKey.projectId)
 
         return File(legacyConfig.path).exists() && !File(newConfig.path).exists()
     }
 
     private fun migrateLegacyRealm(dbKey: LocalDbKey) {
-        val legacyConfig = getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey)
+        val legacyConfig = getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey, dbKey.projectId)
 
         Realm.getInstance(legacyConfig).use {
             it.writeEncryptedCopyTo(File(appContext.filesDir, "${dbKey.projectId}.realm"), dbKey.value)
@@ -42,12 +41,11 @@ class EncryptionMigration(localDbKey: LocalDbKey, private val appContext: Contex
         deleteRealm(legacyConfig)
     }
 
-    private fun getLegacyConfig(legacyApiKey: String, legacyDatabaseKey: ByteArray): RealmConfiguration =
-        RealmConfig.get(legacyApiKey.substring(0, LEGACY_APP_KEY_LENGTH), legacyDatabaseKey)
+    private fun getLegacyConfig(legacyApiKey: String, legacyDatabaseKey: ByteArray, projectId: String): RealmConfiguration =
+        RealmConfig.get(legacyApiKey.substring(0, LEGACY_APP_KEY_LENGTH), legacyDatabaseKey, projectId)
 
     private fun deleteRealm(config: RealmConfiguration) {
         Realm.deleteRealm(config)
         File(appContext.filesDir, "${config.path}.lock").delete()
     }
-
 }

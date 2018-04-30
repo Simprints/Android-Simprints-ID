@@ -7,9 +7,11 @@ import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.LocalDbKeyProvider
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.models.*
 import com.simprints.id.data.db.local.realm.models.adapters.toProject
 import com.simprints.id.data.db.local.realm.models.adapters.toRealmProject
+import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_Project
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
@@ -187,7 +189,7 @@ class RealmDbManagerImpl(private val appContext: Context,
     }
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
-        Single.just(RealmConfig.get(localDbKey.projectId, localDbKey.value)
+        Single.just(RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
             .also { realmConfig = it })
 
     private fun getRealmInstance(): Single<Realm> = getRealmConfig()
