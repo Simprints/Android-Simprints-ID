@@ -6,15 +6,15 @@ import io.realm.RealmConfiguration
 
 object RealmConfig {
 
-    fun get(databaseName: String, key: ByteArray): RealmConfiguration = RealmConfiguration
+    fun get(databaseName: String, key: ByteArray, projectId: String): RealmConfiguration = RealmConfiguration
         .Builder()
         .name("$databaseName.realm")
         .schemaVersion(REALM_SCHEMA_VERSION)
-        .migration(Migration())
+        .migration(Migration(projectId))
         .encryptionKey(key)
         .addModulesIfNotNull()
         .build()
 
     private fun RealmConfiguration.Builder.addModulesIfNotNull(): RealmConfiguration.Builder =
-        Realm.getDefaultModule()?.let { this.modules(it) }?: this
+        Realm.getDefaultModule()?.let { this.modules(it) } ?: this
 }

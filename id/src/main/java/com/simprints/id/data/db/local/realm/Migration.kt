@@ -1,21 +1,21 @@
 package com.simprints.id.data.db.local.realm
 
+import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.domain.Constants
-
 import io.realm.DynamicRealm
 import io.realm.FieldAttribute
 import io.realm.RealmMigration
 import io.realm.RealmSchema
 import java.util.*
 
-
-internal class Migration : RealmMigration {
+internal class Migration(val projectId: String) : RealmMigration {
 
     companion object {
         const val REALM_SCHEMA_VERSION: Long = 2
 
         const val PERSON_TABLE: String = "rl_Person"
         const val USER_TABLE: String = "rl_User"
+        const val FINGERPRINT_TABLE: String = "rl_Fingerprint"
         const val API_KEY_TABLE: String = "rl_ApiKey"
         const val SYNC_INFO_TABLE: String = "rl_SyncInfo"
         const val PROJECT_TABLE: String = "rl_Project"
@@ -35,6 +35,15 @@ internal class Migration : RealmMigration {
         const val PROJECT_DESCRIPTION = "description"
         const val PROJECT_CREATOR = "creator"
         const val PROJECT_UPDATED_AT = "updatedAt"
+
+        const val PERSON_PROJECT_ID = "projectId"
+        const val PERSON_PATIENT_ID = "id"
+        const val PERSON_MODULE_ID = "moduleId"
+        const val PERSON_USER_ID = "userId"
+        const val PERSON_CREATE_TIME_TEMP = "createdAt_tmp"
+        const val PERSON_CREATE_TIME = "createdAt"
+
+        const val FINGERPRINT_PERSON = "person"
     }
 
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
@@ -44,7 +53,6 @@ internal class Migration : RealmMigration {
                 1 -> migrateTo2(realm.schema)
             }
         }
-
     }
 
     private fun migrateTo1(schema: RealmSchema) {
@@ -56,11 +64,27 @@ internal class Migration : RealmMigration {
     }
 
     private fun migrateTo2(schema: RealmSchema) {
-        schema.get(PERSON_TABLE)?.addField(UPDATE_FIELD, Date::class.java)
+        schema.get(PERSON_TABLE)?.addField(PERSON_PROJECT_ID, String::class.java)?.transform {
+            it.setString(PERSON_PROJECT_ID, projectId)
+        }
+
+        schema.get(PERSON_TABLE)?.setRequired(PERSON_PATIENT_ID, true)
+        schema.get(PERSON_TABLE)?.setRequired(PERSON_USER_ID, true)
+        schema.get(PERSON_TABLE)?.setRequired(PERSON_MODULE_ID, true)
+
+        schema.get(PERSON_TABLE)?.addField(PERSON_CREATE_TIME_TEMP, Date::class.java)?.transform {
+                val fieldValue = it.getInt(PERSON_CREATE_TIME).toLong()
+                it.setDate(PERSON_CREATE_TIME_TEMP, Date(fieldValue))
+            }
+            ?.removeField(PERSON_CREATE_TIME)
+            ?.renameField(PERSON_CREATE_TIME_TEMP, PERSON_CREATE_TIME)
+
+        schema.get(PERSON_TABLE)?.addField(rl_Person.UPDATE_TIME_FIELD, Date::class.java)
         schema.get(PERSON_TABLE)?.addField(SYNC_FIELD, Boolean::class.java)?.transform {
             it.set(SYNC_FIELD, false)
         }
         schema.get(PERSON_TABLE)?.removeField(ANDROID_ID_FIELD)
+        schema.get(FINGERPRINT_TABLE)?.removeField(FINGERPRINT_PERSON)
 
         schema.remove(API_KEY_TABLE)
 
@@ -86,5 +110,4 @@ internal class Migration : RealmMigration {
     override fun equals(other: Any?): Boolean {
         return other is Migration
     }
-
 }

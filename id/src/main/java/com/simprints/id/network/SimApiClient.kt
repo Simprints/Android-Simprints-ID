@@ -1,5 +1,6 @@
 package com.simprints.id.network
 
+import com.simprints.id.BuildConfig
 import com.simprints.id.tools.json.JsonHelper
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -31,8 +32,11 @@ open class SimApiClient<T>(val service: Class<T>,
         OkHttpClient.Builder()
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor(logger)
-            .addInterceptor(authenticator)
+            .addInterceptor(authenticator).also {
+                if (BuildConfig.DEBUG) {
+                    it.addInterceptor(logger)
+                }
+            }
     }
 
     private val authenticator = Interceptor { chain ->
