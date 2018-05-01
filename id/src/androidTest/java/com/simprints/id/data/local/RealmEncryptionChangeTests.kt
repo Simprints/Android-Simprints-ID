@@ -15,7 +15,7 @@ import java.io.File
 @RunWith(AndroidJUnit4::class)
 class RealmEncryptionChangeTests : RealmTestsBase() {
 
-    private val legacyConfig = RealmConfig.get(localDbKey.legacyApiKey.substring(0, 8), localDbKey.legacyRealmKey)
+    private val legacyConfig = RealmConfig.get(localDbKey.legacyApiKey.substring(0, 8), localDbKey.legacyRealmKey, localDbKey.projectId)
 
     init {
         deleteRealmFiles(legacyConfig)

@@ -19,8 +19,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-
-class AuthTestsNoWifi: FirstUseLocal, NoWifi {
+class AuthTestsNoWifi : FirstUseLocal, NoWifi {
 
     private val calloutCredentials = CalloutCredentials(
         "EGkJFvCS7202A07I0fup",
@@ -45,7 +44,7 @@ class AuthTestsNoWifi: FirstUseLocal, NoWifi {
     override fun setUp() {
         super<NoWifi>.setUp()
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        realmConfiguration = RealmConfig.get(localDbKey.projectId, localDbKey.value)
+        realmConfiguration = RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
         super<FirstUseLocal>.setUp()
     }
