@@ -6,11 +6,11 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.data.db.local.realm.RealmConfig
+import com.simprints.id.testSnippets.testHappySync
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.FirstUseRemote
 import com.simprints.id.testTemplates.HappyBluetooth
 import com.simprints.id.testTemplates.HappyWifi
-import com.simprints.id.testSnippets.testHappySync
 import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.testTools.RemoteAdminUtils
 import com.simprints.id.testTools.SyncParameters
@@ -47,7 +47,7 @@ class HappySyncMediumDatabase : FirstUseLocal, FirstUseRemote, HappyWifi, HappyB
         super<HappyBluetooth>.setUp()
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        realmConfiguration = RealmConfig.get(calloutCredentials.projectId, byteArrayOf())
+        realmConfiguration = RealmConfig.get(calloutCredentials.projectId, byteArrayOf(), calloutCredentials.projectId)
         super<FirstUseLocal>.setUp()
         super<FirstUseRemote>.setUp()
 

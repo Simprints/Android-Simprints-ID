@@ -32,7 +32,7 @@ open class RealmTestsBase {
 
     init {
         Realm.init(testContext)
-        config = RealmConfig.get(localDbKey.projectId, localDbKey.value)
+        config = RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
         deleteRealmFiles(config)
     }
 

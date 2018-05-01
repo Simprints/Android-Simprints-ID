@@ -9,10 +9,10 @@ import android.util.Base64.NO_WRAP
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmConfig
-import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTemplates.HappyWifi
 import com.simprints.id.testSnippets.*
+import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.HappyBluetooth
+import com.simprints.id.testTemplates.HappyWifi
 import com.simprints.id.testTools.AppUtils.getApp
 import com.simprints.id.testTools.CalloutCredentials
 import io.realm.Realm
@@ -22,10 +22,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
+class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
 
     private val calloutCredentials = CalloutCredentials(
         "EGkJFvCS7202A07I0fup",
@@ -60,7 +59,7 @@ class AuthTestsHappyWifi: FirstUseLocal, HappyWifi, HappyBluetooth {
         super<HappyBluetooth>.setUp()
         super<HappyWifi>.setUp()
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        realmConfiguration = RealmConfig.get(localDbKey.projectId, localDbKey.value)
+        realmConfiguration = RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
         super<FirstUseLocal>.setUp()
     }
