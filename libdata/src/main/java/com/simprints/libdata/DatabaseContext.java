@@ -405,10 +405,10 @@ public class DatabaseContext {
      * @param refusalForm refusal form to save
      * @param sessionId   session ID
      * @return True if the form was successfully saved,
-     * False if the apiKey of this database context is invalid and the session could not be saved.
+     * False if the apiKey of this database context is invalid or user is not available and the session could not be saved.
      */
     public boolean saveRefusalForm(@NonNull RefusalForm refusalForm, @NonNull String sessionId) {
-        if (!rl_ApiKey.check(realm, key.apiKey))
+        if (!rl_ApiKey.check(realm, key.apiKey) || user == null)
             return false;
 
         refusalRef(firebaseApp).push().setValue(new fb_RefusalForm(refusalForm, key.apiKey, user.userId, sessionId));
