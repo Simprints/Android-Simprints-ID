@@ -82,8 +82,11 @@ android {
     }
 }
 
+//For Android tests, uninstall any previous apk
 afterEvaluate {
-    assembleEndToEndTestingAndroidTest.dependsOn uninstallAll
+    if (tasks.findByPath("assembleEndToEndTestingAndroidTest") != null) {
+        assembleEndToEndTestingAndroidTest.dependsOn uninstallAll
+    }
 }
 
 def getDevProjectId() {
