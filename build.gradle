@@ -52,8 +52,8 @@ allprojects {
         maven {
             url "http://178.62.61.39:8081/artifactory/libs-release-local"
             credentials {
-                username = "${artifactory_username}"
-                password = "${artifactory_password}"
+                username = "${SIMPRINTSID_ARTIFACTORY_USERNAME}"
+                password = "${SIMPRINTSID_ARTIFACTORY_PASSWORD}"
             }
         }
     }
