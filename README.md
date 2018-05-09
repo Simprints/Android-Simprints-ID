@@ -9,9 +9,9 @@ Temporarily, until the libsimprints git submodule makes it to master:
 
 Add in ~/.gradle/gradle.properties:
 
-`SIMPRINTSID_ARTIFACTORY_USERNAME=`
+`SIMPRINTS_ARTIFACTORY_USERNAME=`
 
-`SIMPRINTSID_ARTIFACTORY_PASSWORD=`
+`SIMPRINTS_ARTIFACTORY_PASSWORD=`
 
 `SIMPRINTSID_DEV_GCP_PROJECT=simprints-dev`
 
