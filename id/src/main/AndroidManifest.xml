@@ -30,8 +30,7 @@
             android:name=".activities.launch.LaunchActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name="com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
             android:label="@string/title_activity_front"
@@ -160,6 +159,12 @@
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
+
+        <!--STOPSHIP remove before release-->
+        <meta-data
+            android:name="firebase_performance_logcat_enabled"
+            android:value="true" />
+
     </application>
 
 </manifest>
