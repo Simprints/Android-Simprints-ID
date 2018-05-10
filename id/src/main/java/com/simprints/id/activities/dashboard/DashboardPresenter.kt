@@ -74,11 +74,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
                     }
                 }
         )
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribeBy(
-            onComplete = { handleCardsCreated() },
-            onError = { handleCardsCreationFailed() })
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = { handleCardsCreated() },
+                onError = { handleCardsCreationFailed() })
     }
 
     private fun handleCardsCreated() {

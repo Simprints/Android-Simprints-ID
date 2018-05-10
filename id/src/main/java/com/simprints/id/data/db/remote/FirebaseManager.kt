@@ -30,7 +30,9 @@ import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
+import com.simprints.id.tools.Log
 import com.simprints.id.tools.extensions.toMap
+import com.simprints.id.tools.extensions.trace
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -154,7 +156,7 @@ class FirebaseManager(private val appContext: Context,
                     tentativeSignedInProjectId = projectId
                     handleGetLocalDbKeyTaskComplete(it, result)
                 }
-        }
+        }.trace("getLocalDbKeyFromRemote")
 
     private fun handleGetLocalDbKeyTaskComplete(task: Task<QuerySnapshot>, result: SingleEmitter<LocalDbKey>) {
         if (task.isSuccessful) {
@@ -189,7 +191,7 @@ class FirebaseManager(private val appContext: Context,
     override fun getFirebaseLegacyApp(): FirebaseApp = legacyFirebaseApp
 
     override fun getCurrentFirestoreToken(): Single<String> = Single.create {
-        getFirebaseLegacyApp().getToken(false)
+        getFirebaseLegacyApp().getToken(false).trace("getCurrentFirestoreToken")
             .addOnSuccessListener { result ->
                 // Firebase callbacks return on main thread, so the emits
                 // will be in the same thread.
