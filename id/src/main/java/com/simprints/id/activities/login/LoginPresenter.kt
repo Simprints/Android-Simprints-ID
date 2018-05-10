@@ -1,15 +1,13 @@
 package com.simprints.id.activities.login
 
-import com.google.firebase.perf.FirebasePerformance
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.tools.Log
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -21,7 +19,7 @@ import java.io.IOException
 
 
 class LoginPresenter(val view: LoginContract.View,
-                     private val secureDataManager: SecureDataManager,
+                     private val loginInfoManager: LoginInfoManager,
                      private val analyticsManager: AnalyticsManager,
                      override var projectAuthenticator: LegacyCompatibleProjectAuthenticator) : LoginContract.Presenter {
 
@@ -45,7 +43,7 @@ class LoginPresenter(val view: LoginContract.View,
         possibleProjectId.isNotEmpty() && possibleProjectSecret.isNotEmpty() && possibleUserId.isNotEmpty()
 
     private fun doAuthenticate(suppliedProjectId: String, suppliedUserId: String, suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
-        secureDataManager.cleanCredentials()
+        loginInfoManager.cleanCredentials()
         projectAuthenticator.authenticate(
             NonceScope(suppliedProjectId, suppliedUserId),
             suppliedProjectSecret,

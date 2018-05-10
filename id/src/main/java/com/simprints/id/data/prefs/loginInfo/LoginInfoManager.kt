@@ -1,9 +1,9 @@
-package com.simprints.id.data.secure
+package com.simprints.id.data.prefs.loginInfo
 
 import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 
-interface SecureDataManager: ProjectIdProvider {
+interface LoginInfoManager: ProjectIdProvider {
 
     var encryptedProjectSecret: String
     var signedInProjectId: String

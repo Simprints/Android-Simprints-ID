@@ -21,9 +21,9 @@ class ProjectSecretManagerTest : RxJavaTest() {
     fun validPublicKeyAndProjectSecret_shouldEncryptAndStoreIt() {
        val app = RuntimeEnvironment.application as Application
 
-       assertEquals(app.secureDataManager.getEncryptedProjectSecretOrEmpty(), "")
+       assertEquals(app.loginInfoManager.getEncryptedProjectSecretOrEmpty(), "")
 
-       val projectSecretManager = ProjectSecretManager(app.secureDataManager)
+       val projectSecretManager = ProjectSecretManager(app.loginInfoManager)
        val projectSecret = "project_secret"
        val publicKey = PublicKeyString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB")
 

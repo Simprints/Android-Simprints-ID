@@ -117,7 +117,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     }
 
     private fun logout() {
-        app.secureDataManager.cleanCredentials()
+        app.loginInfoManager.cleanCredentials()
         app.dataManager.signOut()
         startActivity(Intent(this, RequestLoginActivity::class.java))
         finish()

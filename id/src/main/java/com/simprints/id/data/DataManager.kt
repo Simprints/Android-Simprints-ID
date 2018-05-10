@@ -5,7 +5,7 @@ import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Constants
 import com.simprints.libcommon.Person
@@ -16,7 +16,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 
 interface DataManager : PreferencesManager, DbManager,
-    AnalyticsManager, SecureDataManager {
+    AnalyticsManager, LoginInfoManager {
 
     val androidSdkVersion: Int
     val deviceModel: String

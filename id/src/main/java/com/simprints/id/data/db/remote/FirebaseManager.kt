@@ -30,7 +30,6 @@ import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.id.tools.Log
 import com.simprints.id.tools.extensions.toMap
 import com.simprints.id.tools.extensions.trace
 import com.simprints.libcommon.Person
@@ -135,7 +134,7 @@ class FirebaseManager(private val appContext: Context,
         // to a projectId and use it for any task. So we store <ProjectId, HashedLegacyApiKey> in the shared prefs.
         // In this case, we need the legacyApiKey so we grab through the Application to avoid injecting
         // it through all methods, so it will be easier to get rid of it.
-        val hashedLegacyApiKey = (appContext as Application).secureDataManager.getHashedLegacyProjectIdForProjectIdOrEmpty(projectId)
+        val hashedLegacyApiKey = (appContext as Application).loginInfoManager.getHashedLegacyProjectIdForProjectIdOrEmpty(projectId)
         return if (hashedLegacyApiKey.isNotEmpty()) {
             Hasher().hash(firebaseUser.uid) == hashedLegacyApiKey
         } else {
