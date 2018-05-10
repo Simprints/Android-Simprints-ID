@@ -8,7 +8,7 @@ import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
-import com.simprints.id.data.db.remote.FirebaseManager
+import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.FirebaseOptionsHelper
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
@@ -58,7 +58,7 @@ class SyncTest : RxJavaTest() {
         whenever(it.getSignedInProjectId()).thenReturn(Single.just("some_local_key"))
     }
 
-    private var remoteDbManager: RemoteDbManager = spy(FirebaseManager(mock(Context::class.java),
+    private var remoteDbManager: RemoteDbManager = spy(FirebaseManagerImpl(mock(Context::class.java),
         projectIdProviderMock,
         mock(FirebaseOptionsHelper::class.java)))
 

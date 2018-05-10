@@ -8,7 +8,7 @@ import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
-import com.simprints.id.data.db.remote.FirebaseManager
+import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.domain.Project
@@ -26,7 +26,7 @@ fun mockLocalDbManager(app: Application) {
 }
 
 fun mockRemoteDbManager(app: Application) {
-    app.remoteDbManager = Mockito.mock(FirebaseManager::class.java)
+    app.remoteDbManager = Mockito.mock(FirebaseManagerImpl::class.java)
 }
 
 fun mockLoadProject(app: Application) {
@@ -62,7 +62,7 @@ fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer: MockWe
         whenever(it.getSignedInProjectId()).thenReturn(Single.just("some_local_key"))
     }
 
-    val remoteDbManager = Mockito.spy(FirebaseManager(
+    val remoteDbManager = Mockito.spy(FirebaseManagerImpl(
         (RuntimeEnvironment.application as Application),
         projectIdProvider))
     whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))

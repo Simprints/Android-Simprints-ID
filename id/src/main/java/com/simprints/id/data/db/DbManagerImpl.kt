@@ -5,7 +5,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.data.db.remote.FirebaseManager
+import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
@@ -167,7 +167,7 @@ class DbManagerImpl(override val localDbManager: LocalDbManager,
         ).sync(interrupted, parameters).trace("sync")
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP): Completable {
-        val firebaseManager = remoteDbManager as FirebaseManager
+        val firebaseManager = remoteDbManager as FirebaseManagerImpl
         val realmManager = localDbManager as RealmDbManagerImpl
         return LocalDbRecovererImpl(
             realmManager,

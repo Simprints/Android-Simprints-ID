@@ -18,18 +18,32 @@ import javax.security.auth.x500.X500Principal
 class KeystoreManagerImpl(private val context: Context) : KeystoreManager {
 
     companion object {
-        private const val ANDROID_KEY_STORE_PROVIDER = "AndroidKeyStore"
         private const val RSA = "RSA"
         private const val KEY_ALIAS = "masterKey"
         private const val TRANSFORMATION = "RSA/ECB/PKCS1Padding"
+        private const val ANDROID_KEY_STORE_PROVIDER = "AndroidKeyStore"
+
+        private const val SEED = "seed"
     }
 
-    private val keyPair: KeyPair = getKeyPair() ?: createAndSaveKeyPair()
     private val cipher: Cipher = Cipher.getInstance(TRANSFORMATION)
 
-    override fun decryptString(string: String): String = decrypt(string, keyPair.private)
+    override fun decryptString(string: String): String {
+        val keyPair = getKeyPair() ?: throw IllegalStateException("Missing Private Key")
 
-    override fun encryptString(string: String): String = encrypt(string, keyPair.public)
+        return decrypt(string, keyPair.private).let {
+            if (it.startsWith(SEED))
+                it.removePrefix(SEED)
+            else
+                throw IllegalStateException("Invalid decryption data")
+        }
+
+    }
+
+    override fun encryptString(string: String): String {
+        val keyPair: KeyPair = getKeyPair() ?: createAndSaveKeyPair()
+        return encrypt(SEED + string, keyPair.public)
+    }
 
     private fun encrypt(data: String, key: Key): String {
         cipher.init(Cipher.ENCRYPT_MODE, key)
