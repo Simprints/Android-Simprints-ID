@@ -11,7 +11,7 @@ import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.FirebaseAnalyticsManager
-import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
@@ -219,10 +219,10 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
                                   projectSecret: String = DEFAULT_PROJECT_SECRET) {
 
         val editor = sharedPreferences.edit()
-        editor.putString(SecureDataManagerImpl.ENCRYPTED_PROJECT_SECRET, if (logged) projectSecret else "").apply()
-        editor.putString(SecureDataManagerImpl.PROJECT_ID, if (logged) projectId else "").apply()
-        editor.putString(SecureDataManagerImpl.PROJECT_ID, if (logged) projectId else "").apply()
-        editor.putString(SecureDataManagerImpl.USER_ID, if (logged) userId else "").apply()
+        editor.putString(LoginInfoManagerImpl.ENCRYPTED_PROJECT_SECRET, if (logged) projectSecret else "").apply()
+        editor.putString(LoginInfoManagerImpl.PROJECT_ID, if (logged) projectId else "").apply()
+        editor.putString(LoginInfoManagerImpl.PROJECT_ID, if (logged) projectId else "").apply()
+        editor.putString(LoginInfoManagerImpl.USER_ID, if (logged) userId else "").apply()
         editor.putBoolean("IS_FIREBASE_TOKEN_VALID", logged).apply()
 
         val hashedLegacyApiKey = Hasher().hash(legacyApiKey)

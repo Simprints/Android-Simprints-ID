@@ -1,4 +1,4 @@
-package com.simprints.id.data.secure
+package com.simprints.id.data.prefs.loginInfo
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.safe.CredentialMissingException
@@ -6,7 +6,7 @@ import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.secure.cryptography.Hasher
 import io.reactivex.Single
 
-class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
+class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) : LoginInfoManager {
 
     companion object {
         const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"

@@ -32,8 +32,8 @@ import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimesta
 import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimestampsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
@@ -136,7 +136,7 @@ open class Application : MultiDexApplication() {
     }
 
     var remoteDbManager: RemoteDbManager by lazyVar {
-        FirebaseManager(this, secureDataManager)
+        FirebaseManager(this, loginInfoManager)
     }
 
     var localDbManager: LocalDbManager by lazyVar {
@@ -162,12 +162,12 @@ open class Application : MultiDexApplication() {
         FirebaseAnalyticsManager(firebaseAnalytics)
     }
 
-    val secureDataManager: SecureDataManager by lazy {
-        SecureDataManagerImpl(prefs)
+    val loginInfoManager: LoginInfoManager by lazy {
+        LoginInfoManagerImpl(prefs)
     }
 
     var dataManager: DataManager by lazyVar {
-        DataManagerImpl(this, preferencesManager, dbManager, analyticsManager, secureDataManager)
+        DataManagerImpl(this, preferencesManager, dbManager, analyticsManager, loginInfoManager)
     }
 
     val notificationFactory: NotificationFactory by lazy {

@@ -7,7 +7,7 @@ import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.roboletric.*
 import org.junit.Before
@@ -35,9 +35,9 @@ class CheckLoginFromMainLauncherActivityTest {
         mockIsSignedIn(app, sharedPrefs)
         mockDbManager(app)
 
-        sharedPrefs.edit().putString(SecureDataManagerImpl.ENCRYPTED_PROJECT_SECRET, "encrypted_project_secret").commit()
-        sharedPrefs.edit().putString(SecureDataManagerImpl.PROJECT_ID, "projectId").commit()
-        sharedPrefs.edit().putString(SecureDataManagerImpl.USER_ID, "userId").commit()
+        sharedPrefs.edit().putString(LoginInfoManagerImpl.ENCRYPTED_PROJECT_SECRET, "encrypted_project_secret").commit()
+        sharedPrefs.edit().putString(LoginInfoManagerImpl.PROJECT_ID, "projectId").commit()
+        sharedPrefs.edit().putString(LoginInfoManagerImpl.USER_ID, "userId").commit()
         sharedPrefs.edit().putBoolean("IS_FIREBASE_TOKEN_VALID", true).commit()
     }
 
@@ -49,19 +49,19 @@ class CheckLoginFromMainLauncherActivityTest {
 
     @Test
     fun projectIdEmpty_shouldRequestLoginActComeUp() {
-        getRoboSharedPreferences().edit().putString(SecureDataManagerImpl.PROJECT_ID, "").commit()
+        getRoboSharedPreferences().edit().putString(LoginInfoManagerImpl.PROJECT_ID, "").commit()
         startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
     }
 
     @Test
     fun projectSecretEmpty_shouldRequestLoginActComeUp() {
-        getRoboSharedPreferences().edit().putString(SecureDataManagerImpl.ENCRYPTED_PROJECT_SECRET, "").commit()
+        getRoboSharedPreferences().edit().putString(LoginInfoManagerImpl.ENCRYPTED_PROJECT_SECRET, "").commit()
         startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
     }
 
     @Test
     fun userIdEmpty_shouldRequestLoginActComeUp() {
-        getRoboSharedPreferences().edit().putString(SecureDataManagerImpl.USER_ID, "").commit()
+        getRoboSharedPreferences().edit().putString(LoginInfoManagerImpl.USER_ID, "").commit()
         startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
     }
 
