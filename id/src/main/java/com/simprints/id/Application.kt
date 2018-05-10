@@ -14,7 +14,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
-import com.simprints.id.data.db.remote.FirebaseManager
+import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
@@ -22,6 +22,8 @@ import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManagerImpl
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManager
@@ -32,8 +34,6 @@ import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimesta
 import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimestampsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
@@ -132,11 +132,11 @@ open class Application : MultiDexApplication() {
     }
 
     private val preferencesManager: PreferencesManager by lazy {
-        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, eventsPreferencesManager)
+        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, eventsPreferencesManager, this)
     }
 
     var remoteDbManager: RemoteDbManager by lazyVar {
-        FirebaseManager(this, loginInfoManager)
+        FirebaseManagerImpl(this, loginInfoManager)
     }
 
     var localDbManager: LocalDbManager by lazyVar {

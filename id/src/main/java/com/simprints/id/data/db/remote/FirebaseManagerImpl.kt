@@ -43,9 +43,9 @@ import org.jetbrains.anko.doAsync
 import retrofit2.HttpException
 import timber.log.Timber
 
-class FirebaseManager(private val appContext: Context,
-                      private val projectIdProvider: ProjectIdProvider,
-                      private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
+class FirebaseManagerImpl(private val appContext: Context,
+                          private val projectIdProvider: ProjectIdProvider,
+                          private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
     RemoteDbManager,
     LocalDbKeyProvider {
 
