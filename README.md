@@ -7,6 +7,22 @@
 Temporarily, until the libsimprints git submodule makes it to master:
 `git submodule update --init --recursive`
 
+Add in ~/.gradle/gradle.properties:
+
+`SIMPRINTS_ARTIFACTORY_USERNAME=`
+
+`SIMPRINTS_ARTIFACTORY_PASSWORD=`
+
+`SIMPRINTSID_DEV_GCP_PROJECT=simprints-dev`
+
+`SIMPRINTSID_RELEASE_STORE_FILE=`
+
+`SIMPRINTSID_RELEASE_STORE_PASSWORD=`
+
+`SIMPRINTSID_RELEASE_KEY_ALIAS=`
+
+`SIMPRINTSID_RELEASE_KEY_PASSWORD=`
+
 ## Testing
 
 Tests can be run in Android Studio, but it requires Cerberus installed and running (foreground) on the devices where tests will be launched.
@@ -15,15 +31,15 @@ Alternatively, `run ./instrumented_tests` checkouts and builds Cerberus before l
 #### Requirements for testing:
 
 #####  Gradle properties #####
-variables in {ROOT}/local.properties:
+variables in ~/.gradle/gradle.properties:
 
 `sdk.dir=/..../Android/sdk`
 
-`ext.scanner="SPXXXX"`
+`SIMPRINTSID_TEST_SCANNER=`
 
-`ext.wifiNetwork="XXXXX"`
+`SIMPRINTSID_TEST_WIFI=`
 
-`ext.wifiPassword="XXXXXX"`
+`SIMPRINTSID_TEST_WIFI_PASSWORD=`
 
 #####  ENV #####
 ANDROID_HOME set to the Android SDK path
