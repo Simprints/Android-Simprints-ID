@@ -28,6 +28,7 @@ object ActivityUtils {
                                        activityTestRule: ActivityTestRule<*>,
                                        verifyGuidExtra: String? = null) {
         val intent = createIntent(calloutCredentials, action)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (verifyGuidExtra != null) intent.putExtra(Constants.SIMPRINTS_VERIFY_GUID, verifyGuidExtra)
         activityTestRule.launchActivity(intent)
         runActivityOnUiThread(activityTestRule)
