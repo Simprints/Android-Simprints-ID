@@ -112,19 +112,29 @@ class RealmDbManagerImpl(private val appContext: Context,
                                        moduleId: String?,
                                        toSync: Boolean?,
                                        sortBy: Map<String, Sort>?): Flowable<rl_Person> =
-
-        getRealmInstance().flatMapPublisher {
-            Flowable.create<rl_Person>({ emitter ->
-                it.use {
-                    val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync, sortBy)
-                    val people = query.findAll()
-                    for (person in people) {
-                        emitter.onNext(person)
-                    }
-                    emitter.onComplete()
+//        Flowable.create<rl_Person>({ emitter ->
+//            getRealmInstance().blockingGet().use {
+//                val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync, sortBy)
+//                val people = query.findAll()
+//                for (person in people) {
+//                    emitter.onNext(it.copyFromRealm(person))
+//                }
+//                emitter.onComplete()
+//            }
+//        }, BackpressureStrategy.BUFFER)
+    getRealmInstance().flatMapPublisher {
+        Flowable.create<rl_Person>({ emitter ->
+            it.use {
+                val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync, sortBy)
+                val people = query.findAll()
+                for (person in people) {
+                    emitter.onNext(person)
                 }
-            }, BackpressureStrategy.BUFFER)
-        }
+                emitter.onComplete()
+            }
+        }, BackpressureStrategy.BUFFER)
+    }
+
 
     override fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo> =
         getRealmInstance().map {
