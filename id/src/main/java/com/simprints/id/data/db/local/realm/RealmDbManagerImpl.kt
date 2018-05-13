@@ -27,7 +27,7 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import io.realm.Sort
-
+//TODO: investigate potential concurrency issues using .use
 class RealmDbManagerImpl(private val appContext: Context,
                          private val localDbKeyProvider: LocalDbKeyProvider) : LocalDbManager {
 
