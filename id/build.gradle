@@ -6,6 +6,7 @@ apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 apply plugin: "io.fabric"
 apply plugin: "com.google.firebase.firebase-crash"
+apply plugin: 'com.google.firebase.firebase-perf'
 apply plugin: "realm-android"
 
 kotlin {
@@ -49,11 +50,13 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
+            manifestPlaceholders = [firebase_performance_logcat_enabled: false]
         }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
+            manifestPlaceholders = [firebase_performance_logcat_enabled: true]
         }
         endToEndTesting {
             initWith debug
@@ -177,12 +180,15 @@ dependencies {
 
     // Databases
     implementation "com.michaelpardo:activeandroid:$active_android_version"
-    implementation "com.google.firebase:firebase-core:$google_version"
     implementation "com.google.firebase:firebase-database:$google_version"
-    implementation "com.google.firebase:firebase-storage:$google_version"
+    implementation "com.google.firebase:firebase-firestore:$google_version"
+
+    // Firebase
+    implementation "com.google.firebase:firebase-core:$google_version"
     implementation "com.google.firebase:firebase-auth:$google_version"
     implementation "com.google.firebase:firebase-config:$google_version"
-    implementation "com.google.firebase:firebase-firestore:$google_version"
+    implementation "com.google.firebase:firebase-perf:$google_version"
+    implementation "com.google.firebase:firebase-storage:$google_version"
 
     // Analytics
     implementation("com.crashlytics.sdk.android:crashlytics:$crashlytics_version@aar") {
