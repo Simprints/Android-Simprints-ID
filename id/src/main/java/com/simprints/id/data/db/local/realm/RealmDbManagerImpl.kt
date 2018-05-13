@@ -27,7 +27,7 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import io.realm.Sort
-
+//TODO: investigate potential concurrency issues using .use
 class RealmDbManagerImpl(private val appContext: Context,
                          private val localDbKeyProvider: LocalDbKeyProvider) : LocalDbManager {
 
@@ -112,19 +112,20 @@ class RealmDbManagerImpl(private val appContext: Context,
                                        moduleId: String?,
                                        toSync: Boolean?,
                                        sortBy: Map<String, Sort>?): Flowable<rl_Person> =
-
-        getRealmInstance().flatMapPublisher {
-            Flowable.create<rl_Person>({ emitter ->
-                it.use {
+        Flowable.create<rl_Person>({ emitter ->
+            try {
+                getRealmInstance().blockingGet().use {
                     val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync, sortBy)
                     val people = query.findAll()
                     for (person in people) {
-                        emitter.onNext(person)
+                        emitter.onNext(it.copyFromRealm(person))
                     }
                     emitter.onComplete()
                 }
-            }, BackpressureStrategy.BUFFER)
-        }
+            } catch (t: Throwable) {
+                emitter.onError(t)
+            }
+        }, BackpressureStrategy.BUFFER)
 
     override fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo> =
         getRealmInstance().map {
