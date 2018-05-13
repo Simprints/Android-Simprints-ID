@@ -15,7 +15,7 @@ import kotlin.reflect.KProperty
  *
  * @author etienne@simprints.com
  */
-class ComplexPreference<T:Any> (val prefs: ImprovedSharedPreferences,
+class ComplexPreference<T : Any> (val prefs: ImprovedSharedPreferences,
                                 private val key: String,
                                 defValue: T,
                                 private val serializer: Serializer<T>) {
@@ -28,7 +28,7 @@ class ComplexPreference<T:Any> (val prefs: ImprovedSharedPreferences,
 
         return try {
             serializer.deserialize(serializedValue)
-        } catch (e: MismatchedTypeError){
+        } catch (e: MismatchedTypeError) {
             ifEnumDeserializationFailedThenTryIndex() ?: throw e
         }
     }
@@ -44,13 +44,13 @@ class ComplexPreference<T:Any> (val prefs: ImprovedSharedPreferences,
      */
     private fun ifEnumDeserializationFailedThenTryIndex(): T? {
         try {
-            if(serializer is EnumSerializer) {
+            if (serializer is EnumSerializer) {
                 val serializedValue = prefs.getPrimitive(key, -1)
                 if (serializedValue > -1) {
                     return serializer.deserialize(serializedValue)
                 }
             }
-        } catch (t: Throwable){ t.printStackTrace() }
+        } catch (t: Throwable) { t.printStackTrace() }
 
         return null
     }
