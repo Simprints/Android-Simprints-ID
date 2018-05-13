@@ -29,7 +29,7 @@ class ComplexPreference<T:Any> (val prefs: ImprovedSharedPreferences,
         return try {
             serializer.deserialize(serializedValue)
         } catch (e: MismatchedTypeError){
-            ifEnumDeserializationThenWeTryReadEnumIndex() ?: throw e
+            ifEnumDeserializationFailedThenTryIndex() ?: throw e
         }
     }
 
@@ -42,7 +42,7 @@ class ComplexPreference<T:Any> (val prefs: ImprovedSharedPreferences,
      * https://github.com/Simprints/Android-Simprints-ID/commit/ae3c73e1d83739f0fc72a477f6f3f4576d223071#diff-b72b83e1b06c25b717b75c6919528a39
      * So tentatively we try to build the enum from the integer saved in the sharedPref.
      */
-    private fun ifEnumDeserializationThenWeTryReadEnumIndex(): T? {
+    private fun ifEnumDeserializationFailedThenTryIndex(): T? {
         try {
             if(serializer is EnumSerializer) {
                 val serializedValue = prefs.getPrimitive(key, -1)

@@ -36,9 +36,23 @@ class ComplexPreferenceTest {
     private val improvedPrefs = mockImprovedPreferences(improvedEditor)
     private var fingerPreference by ComplexPreference(improvedPrefs, aKey, defaultFingerId, fingerIdSerializer)
 
-    private var enumFromIndexInSharedPrefs by ComplexPreference(improvedPrefs, aKey, defaultGroupEnum, EnumSerializer(Constants.GROUP::class.java))
-    private var enumFromNameInSharedPrefs by ComplexPreference(improvedPrefs, bKey, defaultGroupEnum, EnumSerializer(Constants.GROUP::class.java))
-    private var enumFromWrontIndexInSharedPrefs by ComplexPreference(improvedPrefs, cKey, defaultGroupEnum, EnumSerializer(Constants.GROUP::class.java))
+    private var enumFromIndexInSharedPrefs by ComplexPreference(
+        improvedPrefs,
+        aKey,
+        defaultGroupEnum,
+        EnumSerializer(Constants.GROUP::class.java))
+
+    private var enumFromNameInSharedPrefs by ComplexPreference(
+        improvedPrefs,
+        bKey,
+        defaultGroupEnum,
+        EnumSerializer(Constants.GROUP::class.java))
+
+    private var enumFromWrontIndexInSharedPrefs by ComplexPreference(
+        improvedPrefs,
+        cKey,
+        defaultGroupEnum,
+        EnumSerializer(Constants.GROUP::class.java))
 
     private fun mockFingerIdentifierSerializer(): Serializer<FingerIdentifier> {
         val serializer = mock<Serializer<FingerIdentifier>>()
@@ -60,30 +74,37 @@ class ComplexPreferenceTest {
         whenever(prefs.getPrimitive(aKey, serializedDefaultFingerId)).thenReturn(storedSerializedFingerId)
 
         whenever(prefs.getPrimitive(aKey, -1)).thenReturn(2)
-        whenever(prefs.getPrimitive(aKey, serializedDefaultGroupEnum)).thenThrow(MismatchedTypeError("Expecting String, integer stored", Throwable("Expecting String, integer stored")))
+        whenever(prefs.getPrimitive(aKey, serializedDefaultGroupEnum))
+            .thenThrow(
+                MismatchedTypeError("Expecting String, integer stored",
+                Throwable("Expecting String, integer stored")))
 
         whenever(prefs.getPrimitive(bKey, serializedDefaultGroupEnum)).thenReturn(Constants.GROUP.MODULE.name)
 
         whenever(prefs.getPrimitive(cKey, -1)).thenReturn(5)
-        whenever(prefs.getPrimitive(cKey, serializedDefaultGroupEnum)).thenThrow(MismatchedTypeError("Expecting String, integer stored", Throwable("Expecting String, integer stored")))
+        whenever(prefs.getPrimitive(cKey, serializedDefaultGroupEnum))
+            .thenThrow(
+                MismatchedTypeError("Expecting String, integer stored",
+                Throwable("Expecting String, integer stored")))
+
         whenever(prefs.edit()).thenReturn(editorToReturn)
         return prefs
     }
 
     @Test
-    fun testDeserializeEnumWithIndexInSharedPrefs(){
+    fun testDeserializeEnumWithIndexInSharedPrefs() {
         //SharedPref: 2
         assertEquals(enumFromIndexInSharedPrefs, Constants.GROUP.MODULE)
     }
 
     @Test
-    fun testDeserializingEnumWithWrongIndexInSharedPrefsThrowsAnException(){
+    fun testDeserializingEnumWithWrongIndexInSharedPrefsThrowsAnException() {
         //SharedPref: 5
         assertThrows<MismatchedTypeError> { enumFromWrontIndexInSharedPrefs }
     }
 
     @Test
-    fun testDeserializeEnumWithNameInSharedPrefs(){
+    fun testDeserializeEnumWithNameInSharedPrefs() {
         //SharedPref: "MODULE"
         assertEquals(enumFromNameInSharedPrefs, Constants.GROUP.MODULE)
     }
