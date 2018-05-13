@@ -34,13 +34,12 @@ class ComplexPreference<T : Any> (val prefs: ImprovedSharedPreferences,
     }
 
     /**
-     * if we deserialize an Enum and we get a MismatchedTypeError
-     * really likely that is because in the SharedPreference an integer (enum index) instead of String (enum name) is stored.
-     * It can happen when we change the type of a value stored in the SharedPref between versions
-     * without a migration process (as we do for Realm).
-     * https://fabric.io/simprints/android/apps/com.simprints.id/issues/5af29f5111e9fa0aa5f16cd8/sessions/latest?build=78388335
-     * https://github.com/Simprints/Android-Simprints-ID/commit/ae3c73e1d83739f0fc72a477f6f3f4576d223071#diff-b72b83e1b06c25b717b75c6919528a39
-     * So tentatively we try to build the enum from the integer saved in the sharedPref.
+     * when we deserialize an Enum, sometimes we get MismatchedTypeError in Fabric.
+     * That is because in the SharedPreference an integer (enum index) instead of a String (enum name) is stored.
+     * It can happen when we changed the type stored in the SharedPref between versions
+     * without a migration process (as we do for Realm). So tentatively we try to
+     * build the enum from the integer saved in the sharedPref.
+     * More details: SID-175
      */
     private fun ifEnumDeserializationFailedThenTryIndex(): T? {
         try {
