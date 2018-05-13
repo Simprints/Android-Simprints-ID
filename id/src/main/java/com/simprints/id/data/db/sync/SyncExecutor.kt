@@ -22,8 +22,9 @@ open class SyncExecutor(private val dbManager: DbManager,
                         private val gson: Gson) {
 
     companion object {
-        private const val LOCAL_DB_BATCH_SIZE = 10000
-        const val UPDATE_UI_BATCH_SIZE = 100
+        private const val DOWN_BATCH_SIZE_FOR_DOWNLOADING = 10000
+        const val DOWN_BATCH_SIZE_FOR_UPDATING_UI = 100
+        const val UP_BATCH_SIZE = 30
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 
@@ -39,7 +40,7 @@ open class SyncExecutor(private val dbManager: DbManager,
     }
 
     protected open fun uploadNewPatients(isInterrupted: () -> Boolean,
-                                         batchSize: Int = 10): Observable<Progress> =
+                                         batchSize: Int = UP_BATCH_SIZE): Observable<Progress> =
         getPeopleCountToSync().flatMapObservable {
             val counter = AtomicInteger(0)
 
@@ -104,8 +105,9 @@ open class SyncExecutor(private val dbManager: DbManager,
                 while (reader.hasNext() && !isInterrupted()) {
                     dbManager.localDbManager.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
                         totalDownloaded++
-                        emitResultProgressIfRequired(result, totalDownloaded, UPDATE_UI_BATCH_SIZE)
-                        val shouldDownloadingBatchStop = isInterrupted() || hasCurrentBatchDownloadedFinished(totalDownloaded, LOCAL_DB_BATCH_SIZE)
+                        emitResultProgressIfRequired(result, totalDownloaded, DOWN_BATCH_SIZE_FOR_UPDATING_UI)
+                        val shouldDownloadingBatchStop = isInterrupted() ||
+                                                                  hasCurrentBatchDownloadedFinished(totalDownloaded, DOWN_BATCH_SIZE_FOR_DOWNLOADING)
                         shouldDownloadingBatchStop
                     }.subscribe()
                 }
