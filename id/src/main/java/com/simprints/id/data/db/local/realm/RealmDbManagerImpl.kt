@@ -135,7 +135,6 @@ class RealmDbManagerImpl(private val appContext: Context,
         }, BackpressureStrategy.BUFFER)
     }
 
-
     override fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo> =
         getRealmInstance().map {
             it.use { realm ->
