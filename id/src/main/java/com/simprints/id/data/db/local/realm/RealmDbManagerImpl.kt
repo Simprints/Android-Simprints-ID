@@ -113,13 +113,17 @@ class RealmDbManagerImpl(private val appContext: Context,
                                        toSync: Boolean?,
                                        sortBy: Map<String, Sort>?): Flowable<rl_Person> =
         Flowable.create<rl_Person>({ emitter ->
-            getRealmInstance().blockingGet().use {
-                val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync, sortBy)
-                val people = query.findAll()
-                for (person in people) {
-                    emitter.onNext(it.copyFromRealm(person))
+            try {
+                getRealmInstance().blockingGet().use {
+                    val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync, sortBy)
+                    val people = query.findAll()
+                    for (person in people) {
+                        emitter.onNext(it.copyFromRealm(person))
+                    }
+                    emitter.onComplete()
                 }
-                emitter.onComplete()
+            } catch (t: Throwable) {
+                emitter.onError(t)
             }
         }, BackpressureStrategy.BUFFER)
 
