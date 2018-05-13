@@ -50,11 +50,13 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
+            manifestPlaceholders = [firebase_performance_logcat_enabled: false]
         }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
+            manifestPlaceholders = [firebase_performance_logcat_enabled: true]
         }
         endToEndTesting {
             initWith debug
