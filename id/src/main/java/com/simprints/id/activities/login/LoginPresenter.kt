@@ -1,5 +1,6 @@
 package com.simprints.id.activities.login
 
+import com.google.firebase.perf.FirebasePerformance
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
@@ -8,6 +9,8 @@ import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFro
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
+import com.simprints.id.tools.Log
+import com.simprints.id.tools.extensions.trace
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -15,6 +18,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
 import java.io.IOException
+
 
 class LoginPresenter(val view: LoginContract.View,
                      private val secureDataManager: SecureDataManager,
@@ -49,6 +53,7 @@ class LoginPresenter(val view: LoginContract.View,
             intentLegacyProjectId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .trace("doAuthenticate")
             .subscribeBy(
                 onComplete = { handleSignInSuccess() },
                 onError = { e -> handleSignInError(e) })

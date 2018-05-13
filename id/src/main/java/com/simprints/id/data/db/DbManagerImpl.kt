@@ -5,17 +5,18 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.domain.Project
 import com.simprints.id.data.db.remote.FirebaseManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.domain.Constants
+import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
+import com.simprints.id.tools.extensions.trace
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
@@ -39,15 +40,19 @@ class DbManagerImpl(override val localDbManager: LocalDbManager,
     }
 
     override fun getLocalKeyAndSignInToLocal(projectId: String): Completable =
-        remoteDbManager.getLocalDbKeyFromRemote(projectId).signInToLocal()
+        remoteDbManager.getLocalDbKeyFromRemote(projectId)
+            .signInToLocal()
+            .trace("getLocalKeyAndSignInToLocal")
 
     override fun signIn(projectId: String, tokens: Tokens): Completable =
-        remoteDbManager.signInToRemoteDb(tokens).andThen(getLocalKeyAndSignInToLocal(projectId))
+        remoteDbManager.signInToRemoteDb(tokens)
+            .andThen(getLocalKeyAndSignInToLocal(projectId))
+            .trace("signIn")
 
     private fun Single<out LocalDbKey>.signInToLocal(): Completable =
         flatMapCompletable {
             localDbManager.signInToLocal()
-        }
+        }.trace("signInToLocal")
 
     override fun signOut() {
         remoteDbManager.signOutOfRemoteDb()
@@ -63,19 +68,21 @@ class DbManagerImpl(override val localDbManager: LocalDbManager,
                 uploadPersonAndDownloadAgain(fbPerson)
                     .updatePersonInLocal()
                     .subscribeOn(Schedulers.io())
-                    .subscribeBy (onComplete = {}, onError = { it.printStackTrace() })
+                    .subscribeBy(onComplete = {}, onError = { it.printStackTrace() })
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .trace("savePerson")
 
     private fun uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
         remoteDbManager
             .uploadPerson(fbPerson)
             .andThen(remoteDbManager.downloadPerson(fbPerson.patientId, fbPerson.projectId))
+            .trace("uploadPersonAndDownloadAgain")
 
     private fun Single<out fb_Person>.updatePersonInLocal(): Completable = flatMapCompletable {
         localDbManager.insertOrUpdatePersonInLocal(rl_Person(it))
-    }
+    }.trace("updatePersonInLocal")
 
     override fun loadPerson(destinationList: MutableList<Person>,
                             projectId: String,
@@ -115,15 +122,15 @@ class DbManagerImpl(override val localDbManager: LocalDbManager,
         remoteDbManager.loadProjectFromRemote(projectId).flatMap {
             localDbManager.saveProjectIntoLocal(it)
                 .andThen(Single.just(it))
-        }
+        }.trace("refreshProjectInfoWithServer")
 
     override fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int> =
         localDbManager.getPeopleCountFromLocal(
             userId = syncParams.userId,
             moduleId = syncParams.moduleId,
             toSync = false).map {
-                Math.max(nPatientsOnServerForSyncParam - it, 0)
-            }
+            Math.max(nPatientsOnServerForSyncParam - it, 0)
+        }
 
     override fun getPeopleCount(personId: String?,
                                 projectId: String?,
@@ -157,12 +164,22 @@ class DbManagerImpl(override val localDbManager: LocalDbManager,
         SyncExecutor(
             this,
             JsonHelper.gson
-        ).sync(interrupted, parameters)
+        ).sync(interrupted, parameters).trace("sync")
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP): Completable {
         val firebaseManager = remoteDbManager as FirebaseManager
         val realmManager = localDbManager as RealmDbManagerImpl
-        return LocalDbRecovererImpl(realmManager, firebaseManager, projectId, userId, androidId, moduleId, group).recoverDb()
+        return LocalDbRecovererImpl(
+            realmManager,
+            firebaseManager,
+            projectId,
+            userId,
+            androidId,
+            moduleId,
+            group
+        )
+            .recoverDb()
+            .trace("recoverLocalDb")
     }
 
 }
