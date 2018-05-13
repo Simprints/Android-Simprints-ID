@@ -18,9 +18,12 @@ import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManage
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.sync.SyncService
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
+import com.simprints.id.tools.utils.PeopleGeneratorUtils
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.app_bar_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
@@ -46,6 +49,20 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
 
         val syncClient = SyncService.getClient(this)
         viewPresenter = DashboardPresenter(this, syncClient, app.dataManager, AndroidResourcesHelperImpl(app))
+
+        app.dataManager
+            .localDbManager
+            .deletePeopleFromLocal(SyncTaskParameters.build(app.dataManager.syncGroup, app.dataManager))
+            .subscribeBy(onComplete = {}, onError = { it.printStackTrace() })
+
+        (1..5000).forEach {
+            app.dataManager.localDbManager.insertOrUpdatePersonInLocal(
+                PeopleGeneratorUtils.getRandomPeople(1,
+                    projectId = app.dataManager.getSignedInProjectIdOrEmpty(),
+                    userId = app.dataManager.getSignedInUserIdOrEmpty(),
+                    toSync = true).first()
+            ).subscribeBy(onComplete = {}, onError = { it.printStackTrace() })
+        }
 
         initDrawer()
         initCards()
