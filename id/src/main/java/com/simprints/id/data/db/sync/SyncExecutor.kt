@@ -24,7 +24,7 @@ open class SyncExecutor(private val dbManager: DbManager,
     companion object {
         private const val DOWN_BATCH_SIZE_FOR_DOWNLOADING = 10000
         const val DOWN_BATCH_SIZE_FOR_UPDATING_UI = 100
-        const val UP_BATCH_SIZE = 30
+        const val UP_BATCH_SIZE = 80
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 
