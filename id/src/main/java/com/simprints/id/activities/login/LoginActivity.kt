@@ -47,9 +47,14 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
             }
         }
 
-        val projectAuthenticator = LegacyCompatibleProjectAuthenticator(app.loginInfoManager, app.dbManager, SafetyNet.getClient(this))
+        val projectAuthenticator = LegacyCompatibleProjectAuthenticator(
+            app.loginInfoManager,
+            app.dbManager,
+            app.secureDataManager,
+            SafetyNet.getClient(this))
+
         viewPresenter = LoginPresenter(this, app.loginInfoManager, app.analyticsManager, projectAuthenticator)
-        viewPresenter.start()
+         viewPresenter.start()
     }
 
     private fun initUI() {

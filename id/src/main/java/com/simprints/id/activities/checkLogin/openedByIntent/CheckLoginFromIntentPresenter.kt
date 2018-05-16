@@ -2,6 +2,8 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
@@ -13,9 +15,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     val dataManager: DataManager,
+                                    secureDataManager: SecureDataManager,
+                                    loginInfoManager: LoginInfoManager,
                                     private val sessionParametersExtractor: Extractor<SessionParameters>,
                                     timeHelper: TimeHelper) :
-    CheckLoginPresenter(view, dataManager, timeHelper), CheckLoginFromIntentContract.Presenter {
+    CheckLoginPresenter(view, dataManager, secureDataManager, loginInfoManager, timeHelper), CheckLoginFromIntentContract.Presenter {
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var possibleLegacyApiKey: String = ""
@@ -79,8 +83,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     override fun isUserIdStoredAndMatches() =
         if (dataManager.userId != dataManager.getSignedInUserIdOrEmpty())
             throw DifferentUserIdSignedInException()
-        else
-            dataManager.getSignedInUserIdOrEmpty().isNotEmpty()
+        else dataManager.getSignedInUserIdOrEmpty().isNotEmpty()
 
     override fun handleSignedInUser() {
         view.openLaunchActivity()

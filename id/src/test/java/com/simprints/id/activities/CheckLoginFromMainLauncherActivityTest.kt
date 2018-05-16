@@ -39,6 +39,8 @@ class CheckLoginFromMainLauncherActivityTest {
         sharedPrefs.edit().putString(LoginInfoManagerImpl.PROJECT_ID, "projectId").commit()
         sharedPrefs.edit().putString(LoginInfoManagerImpl.USER_ID, "userId").commit()
         sharedPrefs.edit().putBoolean("IS_FIREBASE_TOKEN_VALID", true).commit()
+
+        app.dbManager.initialiseDb()
     }
 
     @Test

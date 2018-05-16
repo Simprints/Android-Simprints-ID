@@ -2,9 +2,9 @@ package com.simprints.id.sync
 
 import android.content.Context
 import com.google.gson.stream.JsonReader
+import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.DbManagerImpl
-import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
@@ -45,6 +45,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -54,12 +55,9 @@ class SyncTest : RxJavaTest() {
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
-    private val projectIdProviderMock = mock(ProjectIdProvider::class.java).also {
-        whenever(it.getSignedInProjectId()).thenReturn(Single.just("some_local_key"))
-    }
+    val app = RuntimeEnvironment.application as Application
 
     private var remoteDbManager: RemoteDbManager = spy(FirebaseManagerImpl(mock(Context::class.java),
-        projectIdProviderMock,
         mock(FirebaseOptionsHelper::class.java)))
 
     @Before
@@ -74,6 +72,7 @@ class SyncTest : RxJavaTest() {
     fun uploadPeopleInBatches_shouldWorkWithPoorConnection() {
         // TODO : change this test to be deterministic instead of probabilistic
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
+        val app = RuntimeEnvironment.application as Application
 
         val patientsToUpload = getRandomPeople(35)
 
@@ -83,7 +82,7 @@ class SyncTest : RxJavaTest() {
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, PeopleRemoteInterface::class.java))
         whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager), JsonHelper.gson)
 
         val testObserver = sync.uploadNewPatients({ false }, 10).test()
         testObserver.awaitTerminalEvent()
@@ -109,7 +108,7 @@ class SyncTest : RxJavaTest() {
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, PeopleRemoteInterface::class.java))
         whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager), JsonHelper.gson)
 
         val count = AtomicInteger(0)
         val testObserver = sync.uploadNewPatients({ count.addAndGet(1) > 2 }, 10).test()
@@ -265,7 +264,7 @@ class SyncTest : RxJavaTest() {
         //Mock app RealmSyncInfo for syncParams
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup(), rl_Person(peopleToDownload.last()))) })
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManager, app.secureDataManager, app.loginInfoManager), JsonHelper.gson)
 
         return sync.downloadNewPatients({ false }, syncParams).test()
     }
