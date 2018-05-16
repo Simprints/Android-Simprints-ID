@@ -2,11 +2,9 @@ package com.simprints.id.data.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.core.content.edit
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-
 
 class PreferencesManagerImpl(sessionState: SessionStatePreferencesManager,
                              settings: SettingsPreferencesManager,
@@ -31,12 +29,11 @@ class PreferencesManagerImpl(sessionState: SessionStatePreferencesManager,
 
     override fun setSharedPreference(key: String, value: Any) {
         when (value) {
-            is Boolean -> prefs.edit { putBoolean(key, value) }
-            is Float -> prefs.edit { putFloat(key, value) }
-            is Int -> prefs.edit { putInt(key, value) }
-            is Long -> prefs.edit { putLong(key, value) }
-            is String -> prefs.edit { putString(key, value) }
+            is Boolean -> prefs.edit().putBoolean(key, value).apply()
+            is Float -> prefs.edit().putFloat(key, value).apply()
+            is Int -> prefs.edit().putInt(key, value).apply()
+            is Long -> prefs.edit().putLong(key, value).apply()
+            is String -> prefs.edit().putString(key, value).apply()
         }
     }
-
 }

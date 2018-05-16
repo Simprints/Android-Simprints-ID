@@ -1,11 +1,11 @@
 package com.simprints.id.data.db
 
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.domain.Project
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
+import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
@@ -27,8 +27,6 @@ interface DbManager : RemoteDbManager {
     fun initialiseDb()
 
     fun signIn(projectId: String, tokens: Tokens): Completable
-    fun getLocalKeyAndSignInToLocal(projectId: String): Completable
-
     fun signOut()
 
     fun isDbInitialised(): Boolean

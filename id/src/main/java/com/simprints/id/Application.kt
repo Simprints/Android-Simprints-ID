@@ -34,6 +34,10 @@ import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimesta
 import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimestampsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.data.secure.keystore.KeystoreManager
+import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
@@ -135,16 +139,24 @@ open class Application : MultiDexApplication() {
         PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, eventsPreferencesManager, this)
     }
 
+    var keyStoreManager: KeystoreManager by lazyVar {
+        KeystoreManagerImpl(this)
+    }
+
+    var secureDataManager: SecureDataManager by lazyVar {
+        SecureDataManagerImpl(keyStoreManager, preferencesManager)
+    }
+
     var remoteDbManager: RemoteDbManager by lazyVar {
-        FirebaseManagerImpl(this, loginInfoManager)
+        FirebaseManagerImpl(this)
     }
 
     var localDbManager: LocalDbManager by lazyVar {
-        RealmDbManagerImpl(this, remoteDbManager)
+        RealmDbManagerImpl(this)
     }
 
     var dbManager: DbManager by lazyVar {
-        DbManagerImpl(localDbManager, remoteDbManager)
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager)
     }
 
     private val fabric: Fabric by lazy {

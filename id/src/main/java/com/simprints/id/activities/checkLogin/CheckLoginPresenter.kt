@@ -1,17 +1,21 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
+import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.StringsUtils
-import io.reactivex.rxkotlin.subscribeBy
 
 abstract class CheckLoginPresenter(
     private val view: CheckLoginContract.View,
     private val dataManager: DataManager,
+    private val secureDataManager: SecureDataManager,
+    private val loginInfoManager: LoginInfoManager,
     private val timeHelper: TimeHelper) {
 
     init {
@@ -29,17 +33,22 @@ abstract class CheckLoginPresenter(
     protected fun checkSignedInStateAndMoveOn() {
         try {
             checkSignedInOrThrow()
-            val projectId = dataManager.getSignedInProjectIdOrEmpty()
-            dataManager.getLocalKeyAndSignInToLocal(projectId).subscribeBy(onComplete = {
+            val signedProjectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+            if (signedProjectId.isNotEmpty()) {
+                secureDataManager.getLocalDbKeyOrThrow(signedProjectId)
                 handleSignedInUser()
-            })
+            } else {
+                throw NotSignedInException()
+            }
         } catch (e: Throwable) {
             when (e) {
                 is DifferentProjectIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_PROJECT_ID)
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_USER_ID)
                 is NotSignedInException -> handleNotSignedInUser()
+                is RealmUninitialisedError -> NotSignedInException()
                 else -> {
-                    dataManager.logThrowable(e); view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
+                    dataManager.logThrowable(e)
+                    view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
                 }
             }
         }

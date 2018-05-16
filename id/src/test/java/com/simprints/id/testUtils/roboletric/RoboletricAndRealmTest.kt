@@ -5,7 +5,6 @@ import com.nhaarman.mockito_kotlin.any
 import com.simprints.id.Application
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
-import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
@@ -40,7 +39,6 @@ fun mockDbManager(app: Application) {
     val spy = Mockito.spy(app.dbManager)
     Mockito.doNothing().`when`(spy).initialiseDb()
     Mockito.doReturn(Completable.complete()).`when`(spy).signIn(anyNotNull(), anyNotNull())
-    Mockito.doReturn(Completable.complete()).`when`(spy).getLocalKeyAndSignInToLocal(anyNotNull())
     app.dbManager = spy
 }
 
@@ -58,15 +56,10 @@ fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer: MockWe
     whenever(localDbManager.insertOrUpdatePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
     whenever(localDbManager.loadPersonFromLocal(any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
 
-    val projectIdProvider = Mockito.mock(ProjectIdProvider::class.java).also {
-        whenever(it.getSignedInProjectId()).thenReturn(Single.just("some_local_key"))
-    }
-
-    val remoteDbManager = Mockito.spy(FirebaseManagerImpl(
-        (RuntimeEnvironment.application as Application),
-        projectIdProvider))
+    val app = RuntimeEnvironment.application as Application
+    val remoteDbManager = Mockito.spy(FirebaseManagerImpl(RuntimeEnvironment.application as Application))
     whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))
 
-    val dbManager = DbManagerImpl(localDbManager, remoteDbManager)
+    val dbManager = DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager )
     return Triple(dbManager, localDbManager, remoteDbManager)
 }

@@ -40,6 +40,8 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         viewPresenter = CheckLoginFromIntentPresenter(
             this,
             dataManager,
+            app.secureDataManager,
+            app.loginInfoManager,
             app.sessionParametersExtractor,
             timeHelper)
 
