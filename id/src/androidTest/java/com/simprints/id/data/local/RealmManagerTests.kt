@@ -2,6 +2,7 @@ package com.simprints.id.data.local
 
 import android.support.test.runner.AndroidJUnit4
 import com.google.gson.stream.JsonReader
+import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl.Companion.SYNC_ID_FIELD
 import com.simprints.id.data.db.local.realm.models.rl_Person
@@ -38,16 +39,22 @@ class RealmManagerTests : RealmTestsBase() {
     @Before
     fun setup() {
         realm = Realm.getInstance(config)
-        realmManager = RealmDbManagerImpl(testContext,
-            TestLocalDbKeyProvider(newDatabaseName, newDatabaseKey, legacyDatabaseName))
-            .apply {
-                signInToLocal().blockingAwait()
-            }
+        realmManager = RealmDbManagerImpl(testContext)
+        realmManager.signInToLocal(LocalDbKey(newDatabaseName, newDatabaseKey, legacyDatabaseName))
     }
 
     @Test
-    fun signInToLocal_ShouldSucceed() {
-        realmManager.signInToLocal().test().awaitAndAssertSuccess()
+    fun changeLocalDbKey_shouldNotAllowedToUseFirstRealm() {
+        saveFakePerson(realm, getFakePerson())
+        val countNewRealm = realmManager.getPeopleCountFromLocal().blockingGet()
+        assertEquals(countNewRealm, 1)
+
+        val differentNewDatabaseName = "different_${Date().time}newDatabase"
+        val differentDatabaseKey: ByteArray = Arrays.copyOf("different_newKey".toByteArray(), KEY_LENGTH)
+        val differentLegacyDatabaseName = "different_${Date().time}legacyDB"
+        realmManager.signInToLocal(LocalDbKey(differentNewDatabaseName, differentDatabaseKey, differentLegacyDatabaseName))
+        val count = realmManager.getPeopleCountFromLocal().blockingGet()
+        assertEquals(count, 0)
     }
 
     @Test
