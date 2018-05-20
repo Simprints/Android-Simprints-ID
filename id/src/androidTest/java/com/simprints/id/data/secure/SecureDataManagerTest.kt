@@ -5,6 +5,7 @@ import android.support.test.filters.SmallTest
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
+import com.simprints.id.tools.RandomGeneratorImpl
 import junit.framework.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,7 +19,7 @@ class SecureDataManagerTest {
 
         val app = InstrumentationRegistry.getTargetContext().applicationContext as Application
         val keystoreManager = KeystoreManagerImpl(InstrumentationRegistry.getTargetContext())
-        val secureDataManager = SecureDataManagerImpl(keystoreManager, app.preferencesManager)
+        val secureDataManager = SecureDataManagerImpl(keystoreManager, app.preferencesManager, RandomGeneratorImpl())
 
         secureDataManager.setLocalDatabaseKey("project_id1", "legacy_key")
         val firstLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id1")

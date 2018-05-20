@@ -135,7 +135,7 @@ open class Application : MultiDexApplication() {
         RecentEventsPreferencesManagerImpl(prefs)
     }
 
-    private val preferencesManager: PreferencesManager by lazy {
+    val preferencesManager: PreferencesManager by lazy {
         PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, eventsPreferencesManager, this)
     }
 
