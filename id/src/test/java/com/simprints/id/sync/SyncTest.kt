@@ -21,12 +21,12 @@ import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.UploadProgress
 import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.id.testUtils.anyNotNull
+import shared.anyNotNull
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.mockServer.assertUrlParam
 import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.whenever
+import shared.whenever
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople

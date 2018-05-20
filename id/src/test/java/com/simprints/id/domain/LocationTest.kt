@@ -1,11 +1,10 @@
 package com.simprints.id.domain
 
-import com.simprints.id.testUtils.mock
-import com.simprints.id.testUtils.whenever
+import shared.mock
+import shared.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import android.location.Location as AndroidLocation
-
 
 class LocationTest {
 

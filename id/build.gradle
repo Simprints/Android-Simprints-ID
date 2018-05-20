@@ -81,6 +81,16 @@ android {
     testBuildType "endToEndTesting"
     productFlavors {
     }
+
+    sourceSets {
+        String sharedTestDir = 'src/sharedTest/java'
+        test {
+            java.srcDir sharedTestDir
+        }
+        androidTest {
+            java.srcDir sharedTestDir
+        }
+    }
 }
 
 def getDevProjectId() {
@@ -250,6 +260,8 @@ dependencies {
 
     // Android test
     androidTestImplementation 'org.mockito:mockito-core:2.15.0'
+    androidTestImplementation 'org.mockito:mockito-android:2.18.3'
+
     androidTestImplementation('com.schibsted.spain:barista:1.7.0') {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"

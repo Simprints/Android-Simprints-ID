@@ -1,10 +1,9 @@
 package com.simprints.id.session.callout
 
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterTypeError
-import com.simprints.id.testUtils.assertThrows
+import shared.assertThrows
 import org.junit.Assert.assertEquals
 import org.junit.Test
-
 
 class CalloutParameterTest {
 
