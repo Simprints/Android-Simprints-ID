@@ -1,13 +1,15 @@
 package com.simprints.id.data.secure
 
+import android.util.Base64
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
-import com.simprints.id.tools.extensions.toHexString
-import java.security.SecureRandom
+import com.simprints.id.tools.RandomGenerator
+import com.simprints.id.tools.RandomGeneratorImpl
 
 class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
-                            private val prefsManager: PreferencesManager)
+                            private val prefsManager: PreferencesManager,
+                            private val randomGenerator: RandomGenerator = RandomGeneratorImpl())
     : SecureDataManager {
 
     companion object {
@@ -17,9 +19,11 @@ class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
     }
 
     override fun setLocalDatabaseKey(projectId: String, legacyApiKey: String?) {
-        val possibleEncRealmKey = prefsManager.getSharedPreference(getSharedKeyForProjectId(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId), "")
-        if (possibleEncRealmKey.isEmpty()) {
-            generateAndSaveRealmKeyInSharedPrefs(projectId)
+        getSharedKeyForProjectId(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId).let {
+            val possibleEncRealmKey = prefsManager.getSharedPreference(it, "")
+            if (possibleEncRealmKey.isEmpty()) {
+                generateAndSaveRealmKeyInSharedPrefs(projectId)
+            }
         }
 
         legacyApiKey?.let {
@@ -28,11 +32,11 @@ class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
     }
 
     override fun getLocalDbKeyOrThrow(projectId: String): LocalDbKey {
-        val realmKey = readFromSharedPrefsAndDecrypt(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId)?.toByteArray()
+        val realmKey = readFromSharedPrefsAndDecrypt(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId)
             ?: throw IllegalStateException("Missing local database key")
 
-        val possibleLegacyRealmKey = readFromSharedPrefsAndDecrypt(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId)
-        return LocalDbKey(projectId, realmKey, possibleLegacyRealmKey ?: "")
+        val possibleLegacyRealmKey = readFromSharedPrefsAndDecrypt(SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY, projectId)
+        return LocalDbKey(projectId, Base64.decode(realmKey, Base64.DEFAULT) , possibleLegacyRealmKey ?: "")
     }
 
     private fun generateAndSaveLegacyRealmKeyInSharedPrefs(projectId: String, legacyApiKey: String) {
@@ -42,15 +46,11 @@ class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
     }
 
     private fun generateAndSaveRealmKeyInSharedPrefs(projectId: String) {
-        val realmKey = keystoreManager.encryptString(generateRealmKey(projectId).toHexString())
+        val randomKey = randomGenerator.generateByteArray(64, projectId.toByteArray())
+        val realmKey = keystoreManager.encryptString(Base64.encodeToString(randomKey, Base64.DEFAULT))
+
         val sharedPrefKeyForRealmKey = getSharedKeyForProjectId(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId)
         prefsManager.setSharedPreference(sharedPrefKeyForRealmKey, realmKey)
-    }
-
-    private fun generateRealmKey(projectId: String): ByteArray {
-        val key = ByteArray(32)
-        SecureRandom(projectId.toByteArray()).nextBytes(key)
-        return key
     }
 
     private fun getSharedKeyForProjectId(key: String, projectId: String) = key + projectId
