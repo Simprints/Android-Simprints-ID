@@ -1,7 +1,6 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
@@ -15,7 +14,6 @@ abstract class CheckLoginPresenter(
     private val view: CheckLoginContract.View,
     private val dataManager: DataManager,
     private val secureDataManager: SecureDataManager,
-    private val loginInfoManager: LoginInfoManager,
     private val timeHelper: TimeHelper) {
 
     init {
@@ -33,13 +31,7 @@ abstract class CheckLoginPresenter(
     protected fun checkSignedInStateAndMoveOn() {
         try {
             checkSignedInOrThrow()
-            val signedProjectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-            if (signedProjectId.isNotEmpty()) {
-                secureDataManager.getLocalDbKeyOrThrow(signedProjectId)
-                handleSignedInUser()
-            } else {
-                throw NotSignedInException()
-            }
+            handleSignedInUser()
         } catch (e: Throwable) {
             when (e) {
                 is DifferentProjectIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_PROJECT_ID)
@@ -63,8 +55,10 @@ abstract class CheckLoginPresenter(
      * @throws NotSignedInException
      */
     private fun checkSignedInOrThrow() {
-        val isUserSignedIn = isEncryptedProjectSecretPresent() &&
+        val isUserSignedIn =
+            isEncryptedProjectSecretPresent() &&
             isProjectIdStoredAndMatches() &&
+            isLocalKeyValid(dataManager.getSignedInProjectIdOrEmpty()) &&
             isUserIdStoredAndMatches() &&
             isFirebaseTokenValid()
 
@@ -74,6 +68,11 @@ abstract class CheckLoginPresenter(
 
     private fun isEncryptedProjectSecretPresent(): Boolean = dataManager.getEncryptedProjectSecretOrEmpty().isNotEmpty()
     private fun isFirebaseTokenValid(): Boolean = dataManager.isSignedIn(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
+    private fun isLocalKeyValid(projectId: String): Boolean = try {
+        secureDataManager.getLocalDbKeyOrThrow(projectId); true
+    } catch (t: Throwable) {
+        false
+    }
 
     /** @throws DifferentProjectIdSignedInException */
     abstract fun isProjectIdStoredAndMatches(): Boolean

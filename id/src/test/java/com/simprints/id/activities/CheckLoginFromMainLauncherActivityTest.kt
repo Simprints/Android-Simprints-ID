@@ -8,7 +8,7 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
-import com.simprints.id.testUtils.assertActivityStarted
+import shared.assertActivityStarted
 import com.simprints.id.testUtils.roboletric.*
 import org.junit.Before
 import org.junit.Test
@@ -30,16 +30,12 @@ class CheckLoginFromMainLauncherActivityTest {
 
         sharedPrefs = getRoboSharedPreferences()
 
-        mockLocalDbManager(app)
-        mockRemoteDbManager(app)
+        createMockForLocalDbManager(app)
+        createMockForRemoteDbManager(app)
+        createMockForSecureDataManager(app)
+
         mockIsSignedIn(app, sharedPrefs)
-        mockDbManager(app)
-
-        sharedPrefs.edit().putString(LoginInfoManagerImpl.ENCRYPTED_PROJECT_SECRET, "encrypted_project_secret").commit()
-        sharedPrefs.edit().putString(LoginInfoManagerImpl.PROJECT_ID, "projectId").commit()
-        sharedPrefs.edit().putString(LoginInfoManagerImpl.USER_ID, "userId").commit()
-        sharedPrefs.edit().putBoolean("IS_FIREBASE_TOKEN_VALID", true).commit()
-
+        createMockForDbManager(app)
         app.dbManager.initialiseDb()
     }
 

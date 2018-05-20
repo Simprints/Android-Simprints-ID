@@ -8,9 +8,9 @@ import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.testUtils.anyNotNull
+import shared.anyNotNull
 import com.simprints.id.testUtils.roboletric.*
-import com.simprints.id.testUtils.whenever
+import shared.whenever
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import io.reactivex.Single
 import junit.framework.Assert
@@ -32,11 +32,13 @@ class DashboardCardsFactoryTest {
     @Before
     fun setUp() {
         app = (RuntimeEnvironment.application as Application)
-        mockLocalDbManager(app)
-        mockRemoteDbManager(app)
+        createMockForLocalDbManager(app)
+        createMockForRemoteDbManager(app)
+        createMockForSecureDataManager(app)
+
         mockIsSignedIn(app, getRoboSharedPreferences())
 
-        mockDbManager(app)
+        createMockForDbManager(app)
         mockLoadProject(app)
     }
 
