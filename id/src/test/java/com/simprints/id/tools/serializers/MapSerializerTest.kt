@@ -1,8 +1,8 @@
 package com.simprints.id.tools.serializers
 
 import com.google.gson.Gson
-import com.simprints.id.testUtils.mock
-import com.simprints.id.testUtils.whenever
+import shared.mock
+import shared.whenever
 import org.junit.Assert
 import org.junit.Test
 
