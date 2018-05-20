@@ -41,7 +41,6 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
             this,
             dataManager,
             app.secureDataManager,
-            app.loginInfoManager,
             app.sessionParametersExtractor,
             timeHelper)
 
