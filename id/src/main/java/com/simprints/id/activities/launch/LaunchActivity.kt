@@ -190,7 +190,7 @@ open class LaunchActivity : AppCompatActivity() {
                     appState.destroy()
                 }
             })
-            appState.scanner = null
+            //appState.scanner = null
         }
 
         setup.destroy()
