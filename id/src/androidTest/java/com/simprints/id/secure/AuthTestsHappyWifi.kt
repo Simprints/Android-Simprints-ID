@@ -6,6 +6,7 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
 import android.util.Base64.NO_WRAP
+import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmConfig
@@ -32,9 +33,10 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
         "the_lone_user",
         "ec9a52bf-6803-4237-a647-6e76b133fc29")
 
+    private val realmKey = Base64.decode("Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ==", NO_WRAP)
     private val localDbKey = LocalDbKey(
         calloutCredentials.projectId,
-        Base64.decode("Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ==", NO_WRAP),
+        realmKey,
         calloutCredentials.legacyApiKey)
 
     private val invalidCredentials = CalloutCredentials(
@@ -52,16 +54,18 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Rule
     @JvmField
-    val loginTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+    val loginTestRule = ActivityTestRule<CheckLoginFromIntentActivity>(CheckLoginFromIntentActivity::class.java, false, false)
 
     @Before
     override fun setUp() {
         super<HappyBluetooth>.setUp()
         super<HappyWifi>.setUp()
+        val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
         realmConfiguration = RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
-
         super<FirstUseLocal>.setUp()
+
+        mockSecureDataManagerToGenerateKey(app, realmKey)
     }
 
     @Test
@@ -84,6 +88,8 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Test
     fun invalidIntentLegacyProjectIdAndInvalidSubmittedProjectId_shouldFail() {
+        launchAppFromIntentEnrolAndDoLogin(calloutCredentials, loginTestRule, projectSecret)
+
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
         ensureConfigError()
     }
@@ -138,16 +144,15 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Test
     fun invalidLegacyCredentials_shouldFail() {
+        launchAppFromIntentEnrolAndDoLogin(calloutCredentials, loginTestRule, projectSecret)
+
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
         ensureConfigError()
     }
 
     @Test
     fun validCredentials_shouldPersistAcrossAppRestart() {
-        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
-        pressSignIn()
-        ensureSignInSuccess()
+        launchAppFromIntentEnrolAndDoLogin(calloutCredentials, loginTestRule, projectSecret)
 
         launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
         ensureSignInSuccess()
@@ -168,10 +173,7 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
 
     @Test
     fun validCredentialsThenRestartingWithInvalidCredentials_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
-        pressSignIn()
-        ensureSignInSuccess()
+        launchAppFromIntentEnrolAndDoLogin(calloutCredentials, loginTestRule, projectSecret)
 
         launchAppFromIntentEnrol(invalidCredentials, loginTestRule)
         ensureConfigError()

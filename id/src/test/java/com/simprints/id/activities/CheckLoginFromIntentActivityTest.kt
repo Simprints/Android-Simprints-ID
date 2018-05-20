@@ -3,6 +3,7 @@ package com.simprints.id.activities
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
+import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
@@ -13,8 +14,8 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.secure.cryptography.Hasher
-import com.simprints.id.testUtils.anyNotNull
-import com.simprints.id.testUtils.assertActivityStarted
+import shared.anyNotNull
+import shared.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
 import org.junit.Assert
@@ -44,18 +45,24 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
     private lateinit var analyticsManagerMock: AnalyticsManager
     private lateinit var app: Application
-    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPrefs: SharedPreferences
 
     @Before
     fun setUp() {
-        app = RuntimeEnvironment.application as TestApplication
-        sharedPreferences = getRoboSharedPreferences()
+        FirebaseApp.initializeApp(RuntimeEnvironment.application)
+        app = (RuntimeEnvironment.application as Application)
 
-        mockLocalDbManager(app)
-        mockRemoteDbManager(app)
-        mockIsSignedIn(app, sharedPreferences)
-        mockDbManager(app)
+        sharedPrefs = getRoboSharedPreferences()
+
+        createMockForLocalDbManager(app)
+        createMockForRemoteDbManager(app)
+        createMockForSecureDataManager(app)
+
+        mockIsSignedIn(app, sharedPrefs)
         mockAnalyticsManager()
+
+        createMockForDbManager(app)
+        app.dbManager.initialiseDb()
     }
 
     private fun mockAnalyticsManager() {
@@ -218,7 +225,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
                                   userId: String = DEFAULT_USER_ID,
                                   projectSecret: String = DEFAULT_PROJECT_SECRET) {
 
-        val editor = sharedPreferences.edit()
+        val editor = sharedPrefs.edit()
         editor.putString(LoginInfoManagerImpl.ENCRYPTED_PROJECT_SECRET, if (logged) projectSecret else "").apply()
         editor.putString(LoginInfoManagerImpl.PROJECT_ID, if (logged) projectId else "").apply()
         editor.putString(LoginInfoManagerImpl.PROJECT_ID, if (logged) projectId else "").apply()

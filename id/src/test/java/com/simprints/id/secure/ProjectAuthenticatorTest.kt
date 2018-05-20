@@ -28,9 +28,9 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
-        mockLocalDbManager(app)
-        mockRemoteDbManager(app)
-        mockDbManager(app)
+        createMockForLocalDbManager(app)
+        createMockForRemoteDbManager(app)
+        createMockForDbManager(app)
 
         mockLoadProject(app)
         apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
@@ -40,7 +40,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     fun successfulResponse_userShouldSignIn() {
 
         val authenticator = ProjectAuthenticator(
-            mockSecureDataManager(),
+            mockLoginInfoManager(),
             app.dataManager,
             SafetyNet.getClient(app),
             ApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
@@ -63,7 +63,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
         val nonceScope = NonceScope("project_id", "user_id")
 
         val testObserver = ProjectAuthenticator(
-            mockSecureDataManager(),
+            mockLoginInfoManager(),
             app.dataManager,
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(apiClient.retrofit))

@@ -8,10 +8,10 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
-import com.simprints.id.testUtils.anyNotNull
+import shared.anyNotNull
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
-import com.simprints.id.testUtils.whenever
+import shared.whenever
 import com.simprints.id.tools.extensions.scannerAppIntent
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
@@ -45,8 +45,8 @@ class LoginActivityTest : RxJavaTest() {
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
-        mockLocalDbManager(app)
-        mockDbManager(app)
+        createMockForLocalDbManager(app)
+        createMockForDbManager(app)
     }
 
     @Test
