@@ -28,7 +28,6 @@ open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginF
             this,
             dataManager,
             app.secureDataManager,
-            app.loginInfoManager,
             timeHelper)
     }
 
