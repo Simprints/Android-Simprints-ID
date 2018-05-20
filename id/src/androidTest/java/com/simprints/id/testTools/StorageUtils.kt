@@ -2,6 +2,7 @@ package com.simprints.id.testTools
 
 import android.content.Context
 import com.simprints.cerberuslibrary.RealmUtility
+import com.simprints.id.data.prefs.PreferencesManagerImpl
 import io.realm.RealmConfiguration
 import java.io.File
 
@@ -17,6 +18,13 @@ object StorageUtils {
                 .filter { it != "lib" }
                 .forEach { deleteFile(File(applicationDirectory, it)) }
         }
+
+        clearSharedPrefs(context)
+    }
+
+    private fun clearSharedPrefs(context: Context) {
+        log("StorageUtils.clearApplicationData(): clearing shared prefs.")
+        context.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE).edit().clear().commit()
     }
 
     private fun deleteFile(file: File?): Boolean {
