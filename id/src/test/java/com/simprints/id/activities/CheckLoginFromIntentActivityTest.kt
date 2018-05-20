@@ -14,8 +14,7 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.FirebaseAnalyticsManager
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.secure.cryptography.Hasher
-import shared.anyNotNull
-import shared.assertActivityStarted
+import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
 import org.junit.Assert
@@ -29,6 +28,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import shared.anyNotNull
 
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class, application = TestApplication::class)

@@ -8,7 +8,7 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
-import shared.assertActivityStarted
+import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.roboletric.*
 import org.junit.Before
 import org.junit.Test
