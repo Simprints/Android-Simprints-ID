@@ -16,6 +16,8 @@ import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.cryptography.Hasher
+import com.simprints.id.shared.anyNotNull
+import com.simprints.id.shared.whenever
 import com.simprints.id.tools.RandomGeneratorImpl
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -25,8 +27,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.stubbing.Answer
 import org.robolectric.RuntimeEnvironment
-import shared.anyNotNull
-import shared.whenever
 
 const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
 const val SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY = "SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY"
@@ -89,6 +89,7 @@ fun setUserLogInState(logged: Boolean,
                       projectSecret: String = CheckLoginFromIntentActivityTest.DEFAULT_PROJECT_SECRET,
                       realmKey: String = CheckLoginFromIntentActivityTest.DEFAULT_REALM_KEY) {
 
+    Thread.sleep(1000)
     val editor = sharedPrefs.edit()
     editor.putString(LoginInfoManagerImpl.ENCRYPTED_PROJECT_SECRET, if (logged) projectSecret else "")
     editor.putString(LoginInfoManagerImpl.PROJECT_ID, if (logged) projectId else "")

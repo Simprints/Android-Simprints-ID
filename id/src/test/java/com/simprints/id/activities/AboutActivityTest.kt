@@ -21,8 +21,8 @@ import org.mockito.Mockito.spy
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
-import shared.anyNotNull
-import shared.whenever
+import com.simprints.id.shared.anyNotNull
+import com.simprints.id.shared.whenever
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)

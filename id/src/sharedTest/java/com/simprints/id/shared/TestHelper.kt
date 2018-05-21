@@ -1,4 +1,4 @@
-package shared
+package com.simprints.id.shared
 
 import junit.framework.AssertionFailedError
 import org.junit.Assert.assertEquals

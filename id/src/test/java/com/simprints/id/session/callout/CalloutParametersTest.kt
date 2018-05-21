@@ -3,7 +3,7 @@ package com.simprints.id.session.callout
 import android.content.Intent
 import com.simprints.id.session.callout.CalloutParameters.Companion.calloutParameters
 import com.simprints.id.exceptions.unsafe.MissingCalloutParameterError
-import shared.assertThrows
+import com.simprints.id.shared.assertThrows
 import org.junit.Assert.*
 import org.junit.Test
 

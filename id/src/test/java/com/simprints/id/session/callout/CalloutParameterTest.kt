@@ -1,7 +1,7 @@
 package com.simprints.id.session.callout
 
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterTypeError
-import shared.assertThrows
+import com.simprints.id.shared.assertThrows
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

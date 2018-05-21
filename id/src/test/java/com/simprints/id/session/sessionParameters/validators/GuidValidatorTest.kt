@@ -1,6 +1,6 @@
 package com.simprints.id.session.sessionParameters.validators
 
-import shared.assertThrows
+import com.simprints.id.shared.assertThrows
 import org.junit.Test
 
 class GuidValidatorTest {
