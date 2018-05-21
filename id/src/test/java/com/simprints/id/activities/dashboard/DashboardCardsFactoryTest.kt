@@ -1,16 +1,13 @@
 package com.simprints.id.activities.dashboard
 
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
-import shared.anyNotNull
 import com.simprints.id.testUtils.roboletric.*
-import shared.whenever
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import io.reactivex.Single
 import junit.framework.Assert
@@ -21,10 +18,12 @@ import org.mockito.ArgumentMatchers.any
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import shared.anyNotNull
+import shared.whenever
 import java.util.*
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class DashboardCardsFactoryTest {
 
     private lateinit var app: Application
@@ -36,7 +35,8 @@ class DashboardCardsFactoryTest {
         createMockForRemoteDbManager(app)
         createMockForSecureDataManager(app)
 
-        mockIsSignedIn(app, getRoboSharedPreferences())
+        initLogInStateMock(app, getRoboSharedPreferences())
+        setUserLogInState(true, getRoboSharedPreferences())
 
         createMockForDbManager(app)
         mockLoadProject(app)

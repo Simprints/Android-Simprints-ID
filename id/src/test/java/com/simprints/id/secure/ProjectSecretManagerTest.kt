@@ -1,7 +1,6 @@
 package com.simprints.id.secure
 
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
@@ -14,7 +13,7 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class ProjectSecretManagerTest : RxJavaTest() {
 
    @Test
