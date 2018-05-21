@@ -1,10 +1,10 @@
 package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.content.SharedPreferences
-import shared.assertThrows
-import shared.mock
-import shared.verifyOnlyInteraction
-import shared.whenever
+import com.simprints.id.shared.assertThrows
+import com.simprints.id.shared.mock
+import com.simprints.id.shared.verifyOnlyInteraction
+import com.simprints.id.shared.whenever
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
 import org.junit.Test
 import org.mockito.ArgumentMatchers.*

@@ -7,10 +7,10 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
-import shared.anyNotNull
+import com.simprints.id.shared.anyNotNull
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
-import shared.whenever
+import com.simprints.id.shared.whenever
 import com.simprints.id.tools.extensions.scannerAppIntent
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*

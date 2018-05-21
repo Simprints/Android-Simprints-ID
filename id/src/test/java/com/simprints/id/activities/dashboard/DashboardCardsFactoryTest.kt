@@ -7,6 +7,8 @@ import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.shared.anyNotNull
+import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import io.reactivex.Single
@@ -18,8 +20,6 @@ import org.mockito.ArgumentMatchers.any
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
-import shared.anyNotNull
-import shared.whenever
 import java.util.*
 
 @RunWith(RobolectricTestRunner::class)

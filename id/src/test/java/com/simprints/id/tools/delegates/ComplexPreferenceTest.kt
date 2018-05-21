@@ -1,8 +1,8 @@
 package com.simprints.id.tools.delegates
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import shared.mock
-import shared.whenever
+import com.simprints.id.shared.mock
+import com.simprints.id.shared.whenever
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
 import org.junit.Assert.assertEquals

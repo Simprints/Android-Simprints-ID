@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
-import shared.whenever
+import com.simprints.id.shared.whenever
 import org.mockito.Mockito
 
 inline fun mockLoginInfoManager(encryptedProjectSecret: String = "encryptedProjectSecret",
