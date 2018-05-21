@@ -1,7 +1,6 @@
 package com.simprints.id.data.db
 
 import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
@@ -28,7 +27,7 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class DbManagerTest : RxJavaTest() {
 
     private var mockServer = MockWebServer()

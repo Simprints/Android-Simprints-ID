@@ -3,7 +3,6 @@ package com.simprints.id.secure
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -18,7 +17,7 @@ import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class ProjectAuthenticatorTest : RxJavaTest() {
 
     private lateinit var app: Application

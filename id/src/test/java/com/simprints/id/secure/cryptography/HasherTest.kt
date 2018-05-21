@@ -1,6 +1,5 @@
 package com.simprints.id.secure.cryptography
 
-import com.simprints.id.BuildConfig
 import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Assert
 import org.junit.Test
@@ -9,7 +8,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class HasherTest {
 
     @Test

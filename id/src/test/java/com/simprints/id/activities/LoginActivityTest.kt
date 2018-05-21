@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
@@ -30,7 +29,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowToast
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class LoginActivityTest : RxJavaTest() {
 
     companion object {

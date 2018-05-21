@@ -5,15 +5,12 @@ import android.content.Intent
 import android.content.SharedPreferences
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.FirebaseAnalyticsManager
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
-import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
@@ -31,13 +28,14 @@ import org.robolectric.annotation.Config
 import shared.anyNotNull
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
     companion object {
         const val DEFAULT_ACTION = "com.simprints.id.REGISTER"
         const val DEFAULT_PROJECT_ID = "some_project_id"
         const val DEFAULT_PROJECT_SECRET = "some_project_secret"
+        const val DEFAULT_REALM_KEY = "enc_some_key"
         const val DEFAULT_USER_ID = "some_user_id"
         const val DEFAULT_MODULE_ID = "some_module_id"
         const val DEFAULT_LEGACY_API_KEY = "96307ff9-873b-45e0-8ef0-b2efd5bef12d"
@@ -58,7 +56,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         createMockForRemoteDbManager(app)
         createMockForSecureDataManager(app)
 
-        mockIsSignedIn(app, sharedPrefs)
+        initLogInStateMock(app, sharedPrefs)
         mockAnalyticsManager()
 
         createMockForDbManager(app)
@@ -114,7 +112,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
     @Test
     fun userIsLogged_shouldLaunchActComeUp() {
 
-        setUserLogInState(true)
+        setUserLogInState(true, sharedPrefs)
         val checkLoginIntent = createACallingAppIntentWithLegacyApiKey()
         val activity = startCheckLoginFromIntentActivity(checkLoginIntent)
 
@@ -124,7 +122,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
     @Test
     fun userIsNotLogged_shouldLoginActComeUp() {
 
-        setUserLogInState(false)
+        setUserLogInState(false, sharedPrefs)
         val checkLoginIntent = createACallingAppIntentWithProjectId()
         val activity = startCheckLoginFromIntentActivity(checkLoginIntent)
 
@@ -134,7 +132,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
     @Test
     fun userIsNotLoggedAndCallingAppUsesApiLegacyKey_shouldLoginActWithLegacyApiKeyComeUp() {
 
-        setUserLogInState(false)
+        setUserLogInState(false, sharedPrefs)
         val checkLoginIntent = createACallingAppIntentWithLegacyApiKey()
         val activity = startCheckLoginFromIntentActivity(checkLoginIntent)
         val sActivity = shadowOf(activity)
@@ -145,7 +143,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
     @Test
     fun normalFlowReturnsAResult_shouldForwardItBackToCallingApp() {
-        setUserLogInState(true)
+        setUserLogInState(true, sharedPrefs)
         val loginIntent = createACallingAppIntentWithProjectId()
         val activity = startCheckLoginFromIntentActivity(loginIntent)
         val sActivity = shadowOf(activity)
@@ -166,7 +164,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
     @Test
     fun loginSucceed_shouldOpenLaunchActivity() {
-        setUserLogInState(false)
+        setUserLogInState(false, sharedPrefs)
         val loginIntent = createACallingAppIntentWithProjectId()
         val controller = createRoboCheckLoginFromIntentViewActivity(loginIntent).start()
         val activity = controller.get() as CheckLoginFromIntentActivity
@@ -177,7 +175,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         val intent = sActivity.nextStartedActivity
         assertActivityStarted(LoginActivity::class.java, intent)
 
-        setUserLogInState(true)
+        setUserLogInState(true, sharedPrefs)
 
         sActivity.receiveResult(
             intent,
@@ -191,7 +189,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
 
     @Test
     fun loginFailed_shouldCloseApp() {
-        setUserLogInState(false)
+        setUserLogInState(false, sharedPrefs)
         val loginIntent = createACallingAppIntentWithProjectId()
         val controller = createRoboCheckLoginFromIntentViewActivity(loginIntent).start()
         val activity = controller.get() as CheckLoginFromIntentActivity
@@ -217,24 +215,6 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         val activity = controller.get() as CheckLoginFromIntentActivity
         controller.resume().visible()
         return activity
-    }
-
-    private fun setUserLogInState(logged: Boolean,
-                                  projectId: String = DEFAULT_PROJECT_ID,
-                                  legacyApiKey: String = DEFAULT_LEGACY_API_KEY,
-                                  userId: String = DEFAULT_USER_ID,
-                                  projectSecret: String = DEFAULT_PROJECT_SECRET) {
-
-        val editor = sharedPrefs.edit()
-        editor.putString(LoginInfoManagerImpl.ENCRYPTED_PROJECT_SECRET, if (logged) projectSecret else "").apply()
-        editor.putString(LoginInfoManagerImpl.PROJECT_ID, if (logged) projectId else "").apply()
-        editor.putString(LoginInfoManagerImpl.PROJECT_ID, if (logged) projectId else "").apply()
-        editor.putString(LoginInfoManagerImpl.USER_ID, if (logged) userId else "").apply()
-        editor.putBoolean("IS_FIREBASE_TOKEN_VALID", logged).apply()
-
-        val hashedLegacyApiKey = Hasher().hash(legacyApiKey)
-        editor.putString(projectId, if (logged) hashedLegacyApiKey else "").apply()
-        editor.putString(hashedLegacyApiKey, if (logged) projectId else "").apply()
     }
 
     private fun createACallingAppIntentWithLegacyApiKey(actionString: String = DEFAULT_ACTION,

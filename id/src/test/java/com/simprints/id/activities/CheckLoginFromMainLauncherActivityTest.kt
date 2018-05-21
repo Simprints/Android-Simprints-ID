@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.SharedPreferences
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
@@ -18,48 +17,58 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class CheckLoginFromMainLauncherActivityTest {
 
     private lateinit var app: Application
-    private lateinit var sharedPrefs: SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
+
     @Before
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
 
-        sharedPrefs = getRoboSharedPreferences()
+        val sharedPrefs = getRoboSharedPreferences()
+        editor = sharedPrefs.edit()
 
         createMockForLocalDbManager(app)
         createMockForRemoteDbManager(app)
         createMockForSecureDataManager(app)
 
-        mockIsSignedIn(app, sharedPrefs)
+        initLogInStateMock(app, sharedPrefs)
+        setUserLogInState(true, sharedPrefs)
+
         createMockForDbManager(app)
         app.dbManager.initialiseDb()
     }
 
     @Test
     fun appNotSignedInFirebase_shouldRequestLoginActComeUp() {
-        sharedPrefs.edit().putBoolean("IS_FIREBASE_TOKEN_VALID", false).commit()
+        editor.putBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, false).commit()
         startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
     }
 
     @Test
     fun projectIdEmpty_shouldRequestLoginActComeUp() {
-        getRoboSharedPreferences().edit().putString(LoginInfoManagerImpl.PROJECT_ID, "").commit()
+        editor.putString(LoginInfoManagerImpl.PROJECT_ID, "").commit()
         startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
     }
 
     @Test
     fun projectSecretEmpty_shouldRequestLoginActComeUp() {
-        getRoboSharedPreferences().edit().putString(LoginInfoManagerImpl.ENCRYPTED_PROJECT_SECRET, "").commit()
+        editor.putString(LoginInfoManagerImpl.ENCRYPTED_PROJECT_SECRET, "").commit()
         startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
     }
 
     @Test
     fun userIdEmpty_shouldRequestLoginActComeUp() {
-        getRoboSharedPreferences().edit().putString(LoginInfoManagerImpl.USER_ID, "").commit()
+        editor.putString(LoginInfoManagerImpl.USER_ID, "").commit()
+        startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
+    }
+
+    @Test
+    fun localDbNotValid_shouldRequestLoginActComeUp() {
+        editor.putBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, false).commit()
         startCheckLoginAndCheckNextActivity(RequestLoginActivity::class.java)
     }
 

@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import com.simprints.id.BuildConfig
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.Nonce
@@ -20,14 +19,14 @@ import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class NonceManagerTest : RxJavaTest() {
 
     private val validNonceJsonResponse = "{\"value\":\"nonce_from_server\"}"
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
     @Before
-    fun setUp(){
+    fun setUp() {
         apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
     }
 

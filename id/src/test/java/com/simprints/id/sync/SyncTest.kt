@@ -3,7 +3,6 @@ package com.simprints.id.sync
 import android.content.Context
 import com.google.gson.stream.JsonReader
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
@@ -50,7 +49,7 @@ import org.robolectric.annotation.Config
 import java.util.concurrent.atomic.AtomicInteger
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class SyncTest : RxJavaTest() {
 
     private var mockServer = MockWebServer()
