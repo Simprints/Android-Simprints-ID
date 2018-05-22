@@ -5,7 +5,7 @@ import android.support.test.filters.SmallTest
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.exceptions.unsafe.MissingLocalDatabaseKey
+import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.assertThrows
 import com.simprints.id.tools.RandomGeneratorImpl
@@ -58,7 +58,7 @@ class SecureDataManagerTest {
         val keystoreManager = KeystoreManagerImpl(InstrumentationRegistry.getTargetContext())
         val secureDataManager = SecureDataManagerImpl(keystoreManager, app.preferencesManager)
 
-        assertThrows<MissingLocalDatabaseKey> {
+        assertThrows<MissingLocalDatabaseKeyException> {
             secureDataManager.getLocalDbKeyOrThrow("project_id4")
         }
     }
@@ -71,7 +71,7 @@ class SecureDataManagerTest {
         doReturn("wrong_encryption").`when`(keystoreManager).encryptString(anyNotNull())
         val secureDataManager = SecureDataManagerImpl(keystoreManager, app.preferencesManager)
 
-        assertThrows<MissingLocalDatabaseKey> {
+        assertThrows<MissingLocalDatabaseKeyException> {
             secureDataManager.getLocalDbKeyOrThrow("project_id4")
         }
     }

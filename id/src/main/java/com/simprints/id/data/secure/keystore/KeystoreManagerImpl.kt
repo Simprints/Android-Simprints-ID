@@ -8,7 +8,7 @@ import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import com.simprints.id.exceptions.unsafe.InvalidDecryptionData
-import com.simprints.id.exceptions.unsafe.MissingPrivateKeyInKeystore
+import com.simprints.id.exceptions.unsafe.MissingPrivateKeyInKeystoreError
 import com.simprints.id.secure.cryptography.AsymmetricEncrypter
 import com.simprints.id.secure.cryptography.AsymmetricEncrypterImpl
 import java.math.BigInteger
@@ -33,7 +33,7 @@ open class KeystoreManagerImpl(private val context: Context,
     }
 
     override fun decryptString(string: String): String {
-        val keyPair = getKeyPair() ?: throw MissingPrivateKeyInKeystore()
+        val keyPair = getKeyPair() ?: throw MissingPrivateKeyInKeystoreError()
 
         return asymmetricEncrypter.decrypt(string, keyPair.private).let {
             if (it.startsWith(SEED))
