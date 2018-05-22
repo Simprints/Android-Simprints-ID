@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
-import com.simprints.id.secure.cryptography.AsymmetricEncrypter
+import com.simprints.id.secure.cryptography.ProjectSecretEncrypter
 import com.simprints.id.secure.models.PublicKeyString
 
 class ProjectSecretManager(private val loginInfoManager: LoginInfoManager) {
@@ -11,7 +11,7 @@ class ProjectSecretManager(private val loginInfoManager: LoginInfoManager) {
             .also { storeEncryptedProjectSecret(it) }
 
     private fun encryptProjectSecret(projectSecret: String, publicKeyString: PublicKeyString): String =
-        AsymmetricEncrypter(publicKeyString).encrypt(projectSecret)
+        ProjectSecretEncrypter(publicKeyString).encrypt(projectSecret)
 
     private fun storeEncryptedProjectSecret(encryptedProjectSecret: String) {
         loginInfoManager.encryptedProjectSecret = encryptedProjectSecret

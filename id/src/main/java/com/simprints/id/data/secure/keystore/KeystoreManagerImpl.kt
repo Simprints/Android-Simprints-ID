@@ -7,16 +7,21 @@ import android.os.Build.VERSION_CODES.M
 import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.util.Base64
 import com.simprints.id.exceptions.unsafe.InvalidDecryptionData
 import com.simprints.id.exceptions.unsafe.MissingPrivateKeyInKeystore
+import com.simprints.id.secure.cryptography.AsymmetricEncrypter
+import com.simprints.id.secure.cryptography.AsymmetricEncrypterImpl
 import java.math.BigInteger
-import java.security.*
+import java.security.KeyPair
+import java.security.KeyPairGenerator
+import java.security.KeyStore
+import java.security.PrivateKey
 import java.util.*
 import javax.crypto.Cipher
 import javax.security.auth.x500.X500Principal
 
-open class KeystoreManagerImpl(private val context: Context) : KeystoreManager {
+open class KeystoreManagerImpl(private val context: Context,
+                               val asymmetricEncrypter: AsymmetricEncrypter = AsymmetricEncrypterImpl(Cipher.getInstance(TRANSFORMATION))) : KeystoreManager {
 
     companion object {
         private const val RSA = "RSA"
@@ -27,12 +32,10 @@ open class KeystoreManagerImpl(private val context: Context) : KeystoreManager {
         private const val SEED = "seed"
     }
 
-    private val cipher: Cipher = Cipher.getInstance(TRANSFORMATION)
-
     override fun decryptString(string: String): String {
         val keyPair = getKeyPair() ?: throw MissingPrivateKeyInKeystore()
 
-        return decrypt(string, keyPair.private).let {
+        return asymmetricEncrypter.decrypt(string, keyPair.private).let {
             if (it.startsWith(SEED))
                 it.removePrefix(SEED)
             else throw InvalidDecryptionData()
@@ -41,20 +44,7 @@ open class KeystoreManagerImpl(private val context: Context) : KeystoreManager {
 
     override fun encryptString(string: String): String {
         val keyPair: KeyPair = getKeyPair() ?: createAndSaveKeyPair()
-        return encrypt(SEED + string, keyPair.public)
-    }
-
-    private fun encrypt(data: String, key: Key): String {
-        cipher.init(Cipher.ENCRYPT_MODE, key)
-        val bytes = cipher.doFinal(data.toByteArray())
-        return Base64.encodeToString(bytes, Base64.DEFAULT)
-    }
-
-    private fun decrypt(data: String, key: Key): String {
-        cipher.init(Cipher.DECRYPT_MODE, key)
-        val encryptedData = Base64.decode(data, Base64.DEFAULT)
-        val decodedData = cipher.doFinal(encryptedData)
-        return String(decodedData)
+        return asymmetricEncrypter.encrypt(SEED + string, keyPair.public)
     }
 
     private fun createAndSaveKeyPair(): KeyPair {
