@@ -47,11 +47,11 @@ class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
     }
 
     private fun generateAndSaveRealmKeyInSharedPrefs(projectId: String) {
-        val randomKey = randomGenerator.generateByteArray(64, projectId.toByteArray())
-        val realmKey = keystoreManager.encryptString(Base64.encodeToString(randomKey, Base64.DEFAULT))
+        val realmKey = randomGenerator.generateByteArray(64)
+        val encryptedRealmKey = keystoreManager.encryptString(Base64.encodeToString(realmKey, Base64.DEFAULT))
 
         val sharedPrefKeyForRealmKey = getSharedKeyForProjectId(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId)
-        prefsManager.setSharedPreference(sharedPrefKeyForRealmKey, realmKey)
+        prefsManager.setSharedPreference(sharedPrefKeyForRealmKey, encryptedRealmKey)
     }
 
     private fun getSharedKeyForProjectId(key: String, projectId: String) = key + projectId

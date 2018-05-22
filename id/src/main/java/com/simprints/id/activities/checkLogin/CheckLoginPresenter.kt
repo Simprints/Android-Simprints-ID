@@ -37,7 +37,6 @@ abstract class CheckLoginPresenter(
                 is DifferentProjectIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_PROJECT_ID)
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_USER_ID)
                 is NotSignedInException -> handleNotSignedInUser()
-                is RealmUninitialisedError -> NotSignedInException(cause = e)
                 else -> {
                     dataManager.logThrowable(e)
                     view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)

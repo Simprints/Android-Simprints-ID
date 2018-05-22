@@ -4,9 +4,9 @@ import java.security.SecureRandom
 
 class RandomGeneratorImpl : RandomGenerator {
 
-    override fun generateByteArray(length: Int, seed: ByteArray): ByteArray {
+    override fun generateByteArray(length: Int): ByteArray {
         val key = ByteArray(length)
-        SecureRandom(seed).nextBytes(key)
+        SecureRandom().nextBytes(key)
         return key
     }
 }
