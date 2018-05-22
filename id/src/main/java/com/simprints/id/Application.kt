@@ -3,6 +3,7 @@ package com.simprints.id
 import android.content.SharedPreferences
 import android.support.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
+import com.crashlytics.android.core.CrashlyticsCore
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
 import com.simprints.id.controllers.Setup
@@ -148,12 +149,16 @@ open class Application : MultiDexApplication() {
     }
 
     private val fabric: Fabric by lazy {
-        Fabric.Builder(this).kits(Crashlytics()).debuggable(BuildConfig.DEBUG).build()
+        val crashlyticsKit = Crashlytics.Builder()
+            .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
+            .build()
+
+        Fabric.Builder(this).kits(crashlyticsKit)
+            .debuggable(BuildConfig.DEBUG).build()
     }
 
     private val firebaseAnalytics: FirebaseAnalytics by lazy {
         FirebaseAnalytics.getInstance(this).apply {
-            setAnalyticsCollectionEnabled(true)
             setMinimumSessionDuration(0)
         }
     }

@@ -48,15 +48,17 @@ android {
                 checkReleaseBuilds true
             }
             minifyEnabled true
+            ext.enableCrashlytics = true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
-            manifestPlaceholders = [firebase_performance_logcat_enabled: false]
+            manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
         }
         debug {
             minifyEnabled false
+            ext.enableCrashlytics = false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
-            manifestPlaceholders = [firebase_performance_logcat_enabled: true]
+            manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: false]
         }
         endToEndTesting {
             initWith debug
