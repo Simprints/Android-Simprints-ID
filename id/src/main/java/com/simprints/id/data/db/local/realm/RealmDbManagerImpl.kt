@@ -4,7 +4,6 @@ import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.DataCallback
-import com.simprints.id.data.db.local.LocalDbKeyProvider
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.adapters.toProject
@@ -17,6 +16,7 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
+import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.libcommon.Person
 import io.reactivex.BackpressureStrategy
@@ -27,9 +27,9 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import io.realm.Sort
+
 //TODO: investigate potential concurrency issues using .use
-class RealmDbManagerImpl(private val appContext: Context,
-                         private val localDbKeyProvider: LocalDbKeyProvider) : LocalDbManager {
+class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
 
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"
@@ -42,13 +42,19 @@ class RealmDbManagerImpl(private val appContext: Context,
     }
 
     private var realmConfig: RealmConfiguration? = null
+    private var localDbKey: LocalDbKey? = null
+        set(value) {
+            field = value
+            value?.let { createAndSaveRealmConfig(value) }
+        }
 
     init {
         Realm.init(appContext)
     }
 
-    override fun signInToLocal(): Completable = getLocalDbKey().flatMapCompletable {
-        EncryptionMigration(it, appContext)
+    override fun signInToLocal(localDbKey: LocalDbKey) {
+        this.localDbKey = localDbKey
+        EncryptionMigration(localDbKey, appContext)
         getRealmInstance().map { realm -> realm.use { } }.toCompletable()
     }
 
@@ -179,15 +185,9 @@ class RealmDbManagerImpl(private val appContext: Context,
             }
         }
 
-    private fun getLocalDbKey(): Single<LocalDbKey> = localDbKeyProvider.getLocalDbKey()
-
-    private fun getRealmConfig(): Single<RealmConfiguration> = realmConfig.let {
-        return if (it == null) {
-            getLocalDbKey().flatMap { createAndSaveRealmConfig(it) }
-        } else {
-            Single.just(it)
-        }
-    }
+    private fun getRealmConfig(): Single<RealmConfiguration> = realmConfig?.let {
+        Single.just(it)
+    } ?: throw RealmUninitialisedError("No valid realm Config")
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
         Single.just(RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)

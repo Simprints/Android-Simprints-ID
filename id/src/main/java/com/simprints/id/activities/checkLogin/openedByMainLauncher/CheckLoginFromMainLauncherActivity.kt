@@ -27,6 +27,7 @@ open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginF
         viewPresenter = CheckLoginFromMainLauncherPresenter(
             this,
             dataManager,
+            app.secureDataManager,
             timeHelper)
     }
 

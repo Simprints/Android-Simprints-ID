@@ -6,7 +6,7 @@ import com.google.firebase.storage.UploadTask
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.data.db.remote.FirebaseManager
+import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.domain.Constants
@@ -24,7 +24,7 @@ import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
-                           private val firebaseManager: FirebaseManager,
+                           private val firebaseManagerImpl: FirebaseManagerImpl,
                            private val projectId: String,
                            private val userId: String,
                            private val androidId: String,
@@ -105,7 +105,7 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
 
     private fun generateFirebaseStorageFileReference(): StorageReference {
         // Get a reference to [bucket]/recovered-realm-dbs/[projectId]/[userId]/[db-name].json
-        val storage = firebaseManager.getFirebaseStorageInstance()
+        val storage = firebaseManagerImpl.getFirebaseStorageInstance()
         val rootRef = storage.getReferenceFromUrl(storageBucketUrl)
         val recoveredRealmDbsRef = rootRef.child(recoveredDbDirName)
         val projectPathRef = recoveredRealmDbsRef.child(projectId)

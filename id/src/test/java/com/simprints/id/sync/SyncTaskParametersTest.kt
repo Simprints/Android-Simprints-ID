@@ -1,6 +1,5 @@
 package com.simprints.id.sync
 
-import com.simprints.id.BuildConfig
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.testUtils.roboletric.TestApplication
@@ -11,7 +10,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class SyncTaskParametersTest {
 
     @Test

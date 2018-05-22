@@ -1,9 +1,8 @@
 package com.simprints.id.session.sessionParameters.validators
 
 import com.google.gson.Gson
-import com.simprints.id.testUtils.assertThrows
+import com.simprints.id.shared.assertThrows
 import org.junit.Test
-
 
 class MetadataValidatorTest {
 
@@ -31,5 +30,4 @@ class MetadataValidatorTest {
             metadataValidator.validate(invalidMetadata)
         }
     }
-
 }

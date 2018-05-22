@@ -2,7 +2,6 @@ package com.simprints.id.tools
 
 import android.util.Base64
 import com.google.common.io.BaseEncoding
-import com.simprints.id.BuildConfig
 import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Assert
 import org.junit.Test
@@ -12,7 +11,7 @@ import org.robolectric.annotation.Config
 import java.util.*
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class rl_PersonTest {
 
     @Test

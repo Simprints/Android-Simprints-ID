@@ -2,14 +2,15 @@ package com.simprints.id.data.db
 
 import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.data.db.remote.FirebaseManager
+import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.SyncExecutor
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Tokens
@@ -29,30 +30,32 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
-
 class DbManagerImpl(override val localDbManager: LocalDbManager,
-                    override val remoteDbManager: RemoteDbManager) :
+                    override val remoteDbManager: RemoteDbManager,
+                    private val secureDataManager: SecureDataManager,
+                    val loginInfoManager: LoginInfoManager) :
     DbManager,
     RemoteDbManager by remoteDbManager {
 
     override fun initialiseDb() {
         remoteDbManager.initialiseRemoteDb()
+        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        if (projectId.isNotEmpty()) {
+            try {
+                localDbManager.signInToLocal(secureDataManager.getLocalDbKeyOrThrow(projectId))
+            } catch (e: Exception) { e.printStackTrace() }
+        }
     }
-
-    override fun getLocalKeyAndSignInToLocal(projectId: String): Completable =
-        remoteDbManager.getLocalDbKeyFromRemote(projectId)
-            .signInToLocal()
-            .trace("getLocalKeyAndSignInToLocal")
 
     override fun signIn(projectId: String, tokens: Tokens): Completable =
         remoteDbManager.signInToRemoteDb(tokens)
-            .andThen(getLocalKeyAndSignInToLocal(projectId))
-            .trace("signIn")
-
-    private fun Single<out LocalDbKey>.signInToLocal(): Completable =
-        flatMapCompletable {
-            localDbManager.signInToLocal()
-        }.trace("signInToLocal")
+            .andThen {
+                try {
+                    localDbManager.signInToLocal(secureDataManager.getLocalDbKeyOrThrow(projectId))
+                    it.onComplete()
+                } catch (t: Throwable) { it.onError(t) }
+            }
+            .trace("signInToRemoteDb")
 
     override fun signOut() {
         remoteDbManager.signOutOfRemoteDb()
@@ -167,7 +170,7 @@ class DbManagerImpl(override val localDbManager: LocalDbManager,
         ).sync(interrupted, parameters).trace("sync")
 
     override fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP): Completable {
-        val firebaseManager = remoteDbManager as FirebaseManager
+        val firebaseManager = remoteDbManager as FirebaseManagerImpl
         val realmManager = localDbManager as RealmDbManagerImpl
         return LocalDbRecovererImpl(
             realmManager,
@@ -181,5 +184,4 @@ class DbManagerImpl(override val localDbManager: LocalDbManager,
             .recoverDb()
             .trace("recoverLocalDb")
     }
-
 }

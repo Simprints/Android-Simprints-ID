@@ -2,6 +2,7 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
@@ -15,12 +16,13 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import java.io.IOException
 
-class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
+class LegacyCompatibleProjectAuthenticator(loginInfoManager: LoginInfoManager,
                                            dbManager: DbManager,
+                                           private val secureDataManager: SecureDataManager,
                                            safetyNetClient: SafetyNetClient,
                                            secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
                                            attestationManager: AttestationManager = AttestationManager()
-) : ProjectAuthenticator(secureDataManager, dbManager, safetyNetClient, secureApiClient, attestationManager) {
+) : ProjectAuthenticator(loginInfoManager, dbManager, safetyNetClient, secureApiClient, attestationManager) {
 
     private val legacyProjectIdManager = LegacyProjectIdManager(secureApiClient)
 
@@ -35,14 +37,20 @@ class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
             intentLegacyProjectId != null -> checkLegacyProjectIdMatchesProjectId(nonceScope.projectId, intentLegacyProjectId)
             intentProjectId != null -> checkIntentProjectIdMatchesProjectId(nonceScope.projectId, intentProjectId)
             else -> Completable.complete()
-        }.andThen(authenticate(nonceScope, projectSecret))
+        }
+        .andThen(createLocalDbKeyForProject(nonceScope.projectId, intentLegacyProjectId))
+        .andThen(authenticate(nonceScope, projectSecret))
+
+    private fun createLocalDbKeyForProject(projectId: String, legacyProjectId: String?): Completable {
+        secureDataManager.setLocalDatabaseKey(projectId, legacyProjectId)
+        return Completable.complete()
+    }
 
     private fun checkIntentProjectIdMatchesProjectId(expectedProjectId: String, intentProjectId: String): Completable =
         Completable.create {
             if (expectedProjectId == intentProjectId)
                 it.onComplete()
-            else
-                it.onError(DifferentProjectIdReceivedFromIntentException.withProjectIds(expectedProjectId, intentProjectId))
+            else it.onError(DifferentProjectIdReceivedFromIntentException.withProjectIds(expectedProjectId, intentProjectId))
         }
 
     private fun checkLegacyProjectIdMatchesProjectId(expectedProjectId: String, legacyProjectId: String): Completable =
@@ -57,8 +65,7 @@ class LegacyCompatibleProjectAuthenticator(secureDataManager: SecureDataManager,
             Completable.create {
                 if (receivedProjectId == expectedProjectId)
                     it.onComplete()
-                else
-                    it.onError(DifferentProjectIdReceivedFromIntentException.withProjectIds(expectedProjectId, receivedProjectId))
+                else it.onError(DifferentProjectIdReceivedFromIntentException.withProjectIds(expectedProjectId, receivedProjectId))
             }
         }
 }

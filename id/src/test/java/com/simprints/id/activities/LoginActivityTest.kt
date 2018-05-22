@@ -4,14 +4,13 @@ import android.app.Activity
 import android.content.Intent
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
-import com.simprints.id.testUtils.anyNotNull
+import com.simprints.id.shared.anyNotNull
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
-import com.simprints.id.testUtils.whenever
+import com.simprints.id.shared.whenever
 import com.simprints.id.tools.extensions.scannerAppIntent
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
@@ -30,7 +29,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowToast
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class LoginActivityTest : RxJavaTest() {
 
     companion object {
@@ -45,8 +44,8 @@ class LoginActivityTest : RxJavaTest() {
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
-        mockLocalDbManager(app)
-        mockDbManager(app)
+        createMockForLocalDbManager(app)
+        createMockForDbManager(app)
     }
 
     @Test

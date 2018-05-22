@@ -2,7 +2,7 @@ package com.simprints.id.tools.delegates
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
-import com.simprints.id.testUtils.*
+import com.simprints.id.shared.*
 import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mockito.*
@@ -10,9 +10,9 @@ import org.mockito.Mockito.*
 class PrimitivePreferenceTest {
 
     companion object {
-        val aKey = "aKey"
-        val aString = "0"
-        val storedString = "1"
+        const val aKey = "aKey"
+        const val aString = "0"
+        const val storedString = "1"
         val aClass = PrimitivePreferenceTest::class.java
     }
 

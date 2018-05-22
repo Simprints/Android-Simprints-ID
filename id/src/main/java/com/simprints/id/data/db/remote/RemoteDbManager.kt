@@ -1,15 +1,13 @@
 package com.simprints.id.data.db.remote
 
 import com.google.firebase.FirebaseApp
-import com.simprints.id.data.db.local.LocalDbKeyProvider
-import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.domain.Project
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
-import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
+import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
+import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
@@ -20,7 +18,7 @@ import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 
-interface RemoteDbManager : LocalDbKeyProvider {
+interface RemoteDbManager {
     // TODO : agree on consistent method naming for load/save vs get/put etc
     // Lifecycle
     fun initialiseRemoteDb()
@@ -34,7 +32,6 @@ interface RemoteDbManager : LocalDbKeyProvider {
 
     // Data transfer
     // Firebase
-    fun getLocalDbKeyFromRemote(projectId: String): Single<LocalDbKey>
 
     fun saveIdentificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
     fun updateIdentificationInRemote(projectId: String, selectedGuid: String, deviceId: String, sessionId: String)

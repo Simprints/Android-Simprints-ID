@@ -83,6 +83,16 @@ android {
     testBuildType "endToEndTesting"
     productFlavors {
     }
+
+    sourceSets {
+        String sharedTestDir = 'src/sharedTest/java'
+        test {
+            java.srcDir sharedTestDir
+        }
+        androidTest {
+            java.srcDir sharedTestDir
+        }
+    }
 }
 
 //For Android tests, uninstall any previous apk
@@ -167,6 +177,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "org.jetbrains.anko:anko:$anko_version"
+    //implementation 'androidx.core:core-ktx:1.0.0-alpha1'
 
     // Support libraries
     implementation 'com.android.support:multidex:1.0.2'
@@ -228,7 +239,7 @@ dependencies {
     testImplementation("junit:junit:$junit_version") {
         exclude group: "com.android.support"
     }
-    testImplementation 'org.robolectric:robolectric:3.7.1'
+    testImplementation 'org.robolectric:robolectric:3.9-SNAPSHOT'
     testImplementation 'org.robolectric:shadows-multidex:3.7.1'
     testImplementation 'com.android.support.test:monitor:1.0.2'
 
@@ -241,6 +252,8 @@ dependencies {
 
     // Android test
     androidTestImplementation 'org.mockito:mockito-core:2.15.0'
+    androidTestImplementation 'org.mockito:mockito-android:2.18.3'
+
     androidTestImplementation('com.schibsted.spain:barista:1.7.0') {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"

@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.remote.models
 
 import com.google.gson.JsonObject
-import com.simprints.id.BuildConfig
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Fingerprint
@@ -14,7 +13,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 
 class fb_FingerprintTest {
     @Test

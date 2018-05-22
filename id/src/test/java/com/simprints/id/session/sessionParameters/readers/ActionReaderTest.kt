@@ -3,10 +3,9 @@ package com.simprints.id.session.sessionParameters.readers
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameters
-import com.simprints.id.testUtils.mock
+import com.simprints.id.shared.mock
 import org.junit.Assert.assertEquals
 import org.junit.Test
-
 
 class ActionReaderTest {
 

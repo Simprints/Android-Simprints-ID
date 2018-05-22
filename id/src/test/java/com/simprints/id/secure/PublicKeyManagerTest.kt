@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import com.simprints.id.BuildConfig
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
@@ -23,14 +22,14 @@ import retrofit2.mock.NetworkBehavior
 import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class PublicKeyManagerTest : RxJavaTest() {
 
     private val validPublicKeyJsonResponse = "{\"value\":\"public_key_from_server\"}"
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
     @Before
-    fun setUp(){
+    fun setUp() {
         apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
     }
 

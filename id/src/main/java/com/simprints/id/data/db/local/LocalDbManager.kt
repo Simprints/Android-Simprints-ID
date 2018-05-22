@@ -3,11 +3,12 @@ package com.simprints.id.data.db.local
 import com.google.gson.Gson
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.DataCallback
+import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
-import com.simprints.id.domain.Project
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
+import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
@@ -21,8 +22,7 @@ import io.realm.Sort
 /** @throws NotSignedInException */
 interface LocalDbManager {
 
-    // Lifecycle
-    fun signInToLocal(): Completable
+    fun signInToLocal(localDbKey: LocalDbKey)
 
     // Data transfer
     fun insertOrUpdatePersonInLocal(person: rl_Person): Completable
