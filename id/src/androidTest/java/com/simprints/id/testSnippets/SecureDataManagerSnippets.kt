@@ -9,6 +9,6 @@ import org.mockito.Mockito
 
 fun mockSecureDataManagerToGenerateKey(app: Application, realmKey: ByteArray?) {
     val randomGenerator = Mockito.mock(RandomGenerator::class.java)
-    Mockito.doReturn(realmKey).`when`(randomGenerator).generateByteArray(ArgumentMatchers.anyInt(), anyNotNull())
+    Mockito.doReturn(realmKey).`when`(randomGenerator).generateByteArray(ArgumentMatchers.anyInt())
     app.secureDataManager = SecureDataManagerImpl(app.keyStoreManager, app.preferencesManager, randomGenerator)
 }
