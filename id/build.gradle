@@ -22,18 +22,18 @@ android {
         minSdkVersion 19
         targetSdkVersion 27
         multiDexEnabled true
-        versionCode 75
-        versionName "2018.2.0-rc6"
+        versionCode 76
+        versionName "2018.2.0-rc7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     //Add those properties in ~/.gradle/gradle.properties
     signingConfigs {
         release {
-            storeFile file(RELEASE_STORE_FILE)
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
+            storeFile file(SIMPRINTSID_RELEASE_STORE_FILE)
+            storePassword SIMPRINTSID_RELEASE_STORE_PASSWORD
+            keyAlias SIMPRINTSID_RELEASE_KEY_ALIAS
+            keyPassword SIMPRINTSID_RELEASE_KEY_PASSWORD
         }
     }
     
@@ -50,11 +50,13 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
+            manifestPlaceholders = [firebase_performance_logcat_enabled: false]
         }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
+            manifestPlaceholders = [firebase_performance_logcat_enabled: true]
         }
         endToEndTesting {
             initWith debug
@@ -73,9 +75,9 @@ android {
         } else if (variant.buildType.name == "endToEndTesting") {
             buildConfigField("String", "GCP_PROJECT", "\"simprints-testing\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyA2v_PTWxcLGyvLwomhfbHDENaO2OZhxEU\"")
-            buildConfigField("String", "SCANNER", getLocalPropertyForTesting("ext.scanner"))
-            buildConfigField("String", "WIFI_NETWORK", getLocalPropertyForTesting("ext.wifiNetwork"))
-            buildConfigField("String", "WIFI_PASSWORD", getLocalPropertyForTesting("ext.wifiPassword"))
+            buildConfigField("String", "SCANNER", "\"${SIMPRINTSID_TEST_SCANNER}\"")
+            buildConfigField("String", "WIFI_NETWORK", "\"${SIMPRINTSID_TEST_WIFI}\"")
+            buildConfigField("String", "WIFI_PASSWORD", "\"${SIMPRINTSID_TEST_WIFI_PASSWORD}\"")
         }
     }
     testBuildType "endToEndTesting"
@@ -93,19 +95,19 @@ android {
     }
 }
 
+//For Android tests, uninstall any previous apk
+afterEvaluate {
+    if (tasks.findByPath("assembleEndToEndTestingAndroidTest") != null) {
+        assembleEndToEndTestingAndroidTest.dependsOn uninstallAll
+    }
+}
+
 def getDevProjectId() {
     if (project.hasProperty("development_gcp_project")) {
         return development_gcp_project
     } else {
         return "simprints-dev"
     }
-}
-
-def getLocalPropertyForTesting(name) {
-    Properties properties = new Properties()
-    properties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
-    def externalModuleDir = properties.getProperty(name, "")
-    return externalModuleDir
 }
 
 project.afterEvaluate {
@@ -121,17 +123,6 @@ project.afterEvaluate {
                 isConfigured  : { originalProvider.isConfigured() },
                 getMaxThreads : { originalProvider.getMaxThreads() }
             ] as DeviceProvider
-        }
-    }
-
-    if (gradle.startParameter.taskNames.contains("kaptEndToEndTestingKotlin")) {
-        project.("kaptEndToEndTestingKotlin").doFirst {
-            ["ext.scanner", "ext.wifiNetwork", "ext.wifiNetwork"].each { paramName ->
-                if (getLocalPropertyForTesting(paramName) == "") {
-                    throw new GradleException(
-                        paramName + " not found and it's required to run the instrumented tests. Please add " + paramName + " in your local.properties file.")
-                }
-            }
         }
     }
 }
@@ -250,7 +241,8 @@ dependencies {
     }
     testImplementation 'org.robolectric:robolectric:3.9-SNAPSHOT'
     testImplementation 'org.robolectric:shadows-multidex:3.7.1'
-    testImplementation 'com.android.support.test:monitor:1.0.2-alpha1'
+    testImplementation 'com.android.support.test:monitor:1.0.2'
+
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"
     testImplementation 'com.squareup.okhttp3:mockwebserver:3.9.1'

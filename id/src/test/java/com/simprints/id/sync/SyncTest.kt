@@ -145,7 +145,7 @@ class SyncTest : RxJavaTest() {
             .assertComplete()
 
         Assert.assertTrue(testObserver.values().containsAll(arrayListOf(
-            DownloadProgress(SyncExecutor.UPDATE_UI_BATCH_SIZE, nPeopleToDownload),
+            DownloadProgress(SyncExecutor.DOWN_BATCH_SIZE_FOR_UPDATING_UI, nPeopleToDownload),
             DownloadProgress(nPeopleToDownload, nPeopleToDownload))))
 
         val peopleCountRequestUrl = mockServer.takeRequest().requestUrl
@@ -184,7 +184,7 @@ class SyncTest : RxJavaTest() {
             .assertComplete()
 
         Assert.assertTrue(testObserver.values().containsAll(arrayListOf(
-            DownloadProgress(SyncExecutor.UPDATE_UI_BATCH_SIZE, nPeopleToDownload),
+            DownloadProgress(SyncExecutor.DOWN_BATCH_SIZE_FOR_UPDATING_UI, nPeopleToDownload),
             DownloadProgress(nPeopleToDownload, nPeopleToDownload))))
 
         val peopleCountRequestUrl = mockServer.takeRequest().requestUrl
@@ -224,7 +224,7 @@ class SyncTest : RxJavaTest() {
             .assertComplete()
 
         Assert.assertTrue(testObserver.values().containsAll(arrayListOf(
-            DownloadProgress(SyncExecutor.UPDATE_UI_BATCH_SIZE, nPeopleToDownload),
+            DownloadProgress(SyncExecutor.DOWN_BATCH_SIZE_FOR_UPDATING_UI, nPeopleToDownload),
             DownloadProgress(nPeopleToDownload, nPeopleToDownload))))
 
         val peopleCountRequestUrl = mockServer.takeRequest().requestUrl

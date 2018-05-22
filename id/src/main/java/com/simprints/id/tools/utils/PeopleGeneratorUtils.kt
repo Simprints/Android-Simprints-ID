@@ -18,7 +18,7 @@ object PeopleGeneratorUtils {
             (0 until numberOfPeople).forEach {
                 list.add(getRandomPerson(projectId, userId, moduleId, toSync))
             }
-        }
+        }.also { it.sortBy { it.updatedAt } }
     }
 
     fun getRandomPerson(projectId: String = UUID.randomUUID().toString(),
@@ -35,8 +35,8 @@ object PeopleGeneratorUtils {
             this.projectId = projectId
             this.userId = userId
             this.moduleId = moduleId
-            createdAt = if(!toSync) getRandomTime() else null
-            updatedAt =  if(!toSync) getRandomTime() else null
+            createdAt = if (!toSync) getRandomTime() else null
+            updatedAt = if (!toSync) getRandomTime() else null
             this.toSync = toSync
             fingerprints = prints
         }

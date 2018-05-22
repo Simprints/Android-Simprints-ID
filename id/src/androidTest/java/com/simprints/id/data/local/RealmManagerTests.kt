@@ -25,6 +25,7 @@ import org.junit.runner.RunWith
 import java.io.InputStreamReader
 import java.io.Reader
 import java.util.*
+import kotlin.math.abs
 
 @RunWith(AndroidJUnit4::class)
 class RealmManagerTests : RealmTestsBase() {
@@ -199,7 +200,8 @@ class RealmManagerTests : RealmTestsBase() {
                 .first()!!.lastSyncTime
         }
 
-        assertEquals(latestPersonTime.get(Calendar.SECOND), dbSyncTime.get(Calendar.SECOND))
+        val diff = abs(latestPersonTime.get(Calendar.SECOND) - dbSyncTime.get(Calendar.SECOND))
+        assertTrue(diff == 0 || diff == 1)
     }
 
     @Test

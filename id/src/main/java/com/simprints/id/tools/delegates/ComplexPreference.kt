@@ -1,6 +1,8 @@
 package com.simprints.id.tools.delegates
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.exceptions.unsafe.MismatchedTypeError
+import com.simprints.id.tools.serializers.EnumSerializer
 import com.simprints.id.tools.serializers.Serializer
 import timber.log.Timber
 import kotlin.reflect.KProperty
@@ -13,7 +15,7 @@ import kotlin.reflect.KProperty
  *
  * @author etienne@simprints.com
  */
-class ComplexPreference<T:Any> (prefs: ImprovedSharedPreferences,
+class ComplexPreference<T : Any> (val prefs: ImprovedSharedPreferences,
                                 private val key: String,
                                 defValue: T,
                                 private val serializer: Serializer<T>) {
@@ -23,7 +25,33 @@ class ComplexPreference<T:Any> (prefs: ImprovedSharedPreferences,
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         Timber.d("ComplexPreference.getValue $key")
-        return serializer.deserialize(serializedValue)
+
+        return try {
+            serializer.deserialize(serializedValue)
+        } catch (e: MismatchedTypeError) {
+            ifEnumDeserializationFailedThenTryIndex() ?: throw e
+        }
+    }
+
+    /**
+     * when we deserialize an Enum, sometimes we get MismatchedTypeError in Fabric.
+     * That is because in the SharedPreference an integer (enum index) instead of a String (enum name) is stored.
+     * It can happen when we changed the type stored in the SharedPref between versions
+     * without a migration process (as we do for Realm). So tentatively we try to
+     * build the enum from the integer saved in the sharedPref.
+     * More details: SID-175
+     */
+    private fun ifEnumDeserializationFailedThenTryIndex(): T? {
+        try {
+            if (serializer is EnumSerializer) {
+                val serializedValue = prefs.getPrimitive(key, -1)
+                if (serializedValue > -1) {
+                    return serializer.deserialize(serializedValue)
+                }
+            }
+        } catch (t: Throwable) { t.printStackTrace() }
+
+        return null
     }
 
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
