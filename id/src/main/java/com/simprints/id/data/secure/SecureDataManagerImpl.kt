@@ -4,6 +4,7 @@ import android.util.Base64
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
+import com.simprints.id.exceptions.unsafe.MissingLocalDatabaseKey
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.RandomGeneratorImpl
 
@@ -33,7 +34,7 @@ class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
 
     override fun getLocalDbKeyOrThrow(projectId: String): LocalDbKey {
         val realmKey = readFromSharedPrefsAndDecrypt(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId)
-            ?: throw IllegalStateException("Missing local database key")
+            ?: throw MissingLocalDatabaseKey()
 
         val possibleLegacyRealmKey = readFromSharedPrefsAndDecrypt(SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY, projectId)
         return LocalDbKey(projectId, Base64.decode(realmKey, Base64.DEFAULT) , possibleLegacyRealmKey ?: "")

@@ -8,14 +8,15 @@ import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import com.simprints.id.exceptions.unsafe.InvalidDecryptionData
+import com.simprints.id.exceptions.unsafe.MissingPrivateKeyInKeystore
 import java.math.BigInteger
 import java.security.*
 import java.util.*
 import javax.crypto.Cipher
 import javax.security.auth.x500.X500Principal
 
-
-class KeystoreManagerImpl(private val context: Context) : KeystoreManager {
+open class KeystoreManagerImpl(private val context: Context) : KeystoreManager {
 
     companion object {
         private const val RSA = "RSA"
@@ -29,15 +30,13 @@ class KeystoreManagerImpl(private val context: Context) : KeystoreManager {
     private val cipher: Cipher = Cipher.getInstance(TRANSFORMATION)
 
     override fun decryptString(string: String): String {
-        val keyPair = getKeyPair() ?: throw IllegalStateException("Missing Private Key")
+        val keyPair = getKeyPair() ?: throw MissingPrivateKeyInKeystore()
 
         return decrypt(string, keyPair.private).let {
             if (it.startsWith(SEED))
                 it.removePrefix(SEED)
-            else
-                throw IllegalStateException("Invalid decryption data")
+            else throw InvalidDecryptionData()
         }
-
     }
 
     override fun encryptString(string: String): String {
