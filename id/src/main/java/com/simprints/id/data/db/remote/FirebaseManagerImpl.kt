@@ -1,19 +1,12 @@
 package com.simprints.id.data.db.remote
 
 import android.content.Context
-import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
-import com.simprints.id.data.db.ProjectIdProvider
-import com.simprints.id.data.db.local.LocalDbKeyProvider
-import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
-import com.simprints.id.data.db.remote.adapters.toLocalDbKey
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
@@ -22,7 +15,6 @@ import com.simprints.id.data.db.remote.tools.Routes
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
-import com.simprints.id.exceptions.unsafe.CouldNotRetrieveLocalDbKeyError
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
@@ -30,7 +22,6 @@ import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.id.tools.Log
 import com.simprints.id.tools.extensions.toMap
 import com.simprints.id.tools.extensions.trace
 import com.simprints.libcommon.Person
@@ -39,24 +30,19 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.SingleEmitter
 import org.jetbrains.anko.doAsync
 import retrofit2.HttpException
 import timber.log.Timber
 
-class FirebaseManager(private val appContext: Context,
-                      private val projectIdProvider: ProjectIdProvider,
-                      private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
-    RemoteDbManager,
-    LocalDbKeyProvider {
+class FirebaseManagerImpl(private val appContext: Context,
+                          private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
+    RemoteDbManager {
 
     private var isInitialised = false
 
     // FirebaseApp
     private lateinit var legacyFirebaseApp: FirebaseApp
     private lateinit var firestoreFirebaseApp: FirebaseApp
-
-    private var tentativeSignedInProjectId: String? = null
 
     // Lifecycle
     override fun initialiseRemoteDb() {
@@ -135,7 +121,7 @@ class FirebaseManager(private val appContext: Context,
         // to a projectId and use it for any task. So we store <ProjectId, HashedLegacyApiKey> in the shared prefs.
         // In this case, we need the legacyApiKey so we grab through the Application to avoid injecting
         // it through all methods, so it will be easier to get rid of it.
-        val hashedLegacyApiKey = (appContext as Application).secureDataManager.getHashedLegacyProjectIdForProjectIdOrEmpty(projectId)
+        val hashedLegacyApiKey = (appContext as Application).loginInfoManager.getHashedLegacyProjectIdForProjectIdOrEmpty(projectId)
         return if (hashedLegacyApiKey.isNotEmpty()) {
             Hasher().hash(firebaseUser.uid) == hashedLegacyApiKey
         } else {
@@ -145,28 +131,6 @@ class FirebaseManager(private val appContext: Context,
 
     // Data transfer
     // Firebase
-    override fun getLocalDbKeyFromRemote(projectId: String): Single<LocalDbKey> =
-        Single.create<LocalDbKey> { result ->
-            tentativeSignedInProjectId = null
-            val db = FirebaseFirestore.getInstance(firestoreFirebaseApp)
-            db.collection(COLLECTION_LOCAL_DB_KEYS)
-                .whereEqualTo(PROJECT_ID_FIELD, projectId)
-                .get()
-                .addOnCompleteListener {
-                    tentativeSignedInProjectId = projectId
-                    handleGetLocalDbKeyTaskComplete(it, result)
-                }
-        }.trace("getLocalDbKeyFromRemote")
-
-    private fun handleGetLocalDbKeyTaskComplete(task: Task<QuerySnapshot>, result: SingleEmitter<LocalDbKey>) {
-        if (task.isSuccessful) {
-            val realmKeys = task.result.first().toObject(fs_RealmKeys::class.java)
-            result.onSuccess(realmKeys.toLocalDbKey())
-        } else {
-            result.onError(CouldNotRetrieveLocalDbKeyError.withException(task.exception))
-        }
-    }
-
     override fun saveIdentificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
         Routes.idEventRef(legacyFirebaseApp, projectId).push().setValue(fb_IdEvent(probe, projectId, userId, moduleId, matchSize, matches, sessionId).toMap())
     }
@@ -206,16 +170,6 @@ class FirebaseManager(private val appContext: Context,
             }
             .addOnFailureListener { e -> it.onError(e) }
     }
-
-    override fun getLocalDbKey(): Single<LocalDbKey> =
-        projectIdProvider.getSignedInProjectId()
-            .doOnSuccess {
-                tentativeSignedInProjectId = null
-            }.onErrorResumeNext {
-                Single.just(tentativeSignedInProjectId)
-            }.flatMap {
-                getLocalDbKeyFromRemote(it)
-            }
 
     // API
     override fun uploadPerson(fbPerson: fb_Person): Completable =
@@ -270,9 +224,6 @@ class FirebaseManager(private val appContext: Context,
     private fun buildProjectApi(authToken: String): ProjectRemoteInterface = SimApiClient(ProjectRemoteInterface::class.java, ProjectRemoteInterface.baseUrl, authToken).api
 
     companion object {
-        private const val COLLECTION_LOCAL_DB_KEYS = "projectEncryptionKeys"
-        private const val PROJECT_ID_FIELD = "projectId"
-
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
 
         fun getLegacyAppName(): String =

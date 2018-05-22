@@ -1,5 +1,7 @@
 package com.simprints.id.tools.extensions
 
+import java.nio.charset.Charset
+
 private val HEX_CHARS = "0123456789ABCDEF".toCharArray()
 
 fun ByteArray.toHexString(): String {
@@ -15,3 +17,5 @@ fun ByteArray.toHexString(): String {
 
     return result.toString()
 }
+
+fun ByteArray.toReadableString() = this.toString(Charset.defaultCharset())

@@ -11,4 +11,13 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
  *
  * @author: Etienne Thiery (etienne@simprints.com)
  */
-interface PreferencesManager : SessionStatePreferencesManager, SettingsPreferencesManager, RecentEventsPreferencesManager
+interface PreferencesManager :
+    SessionStatePreferencesManager,
+    SettingsPreferencesManager,
+    RecentEventsPreferencesManager {
+
+    fun <T> getSharedPreference(key: String, defaultValue: T): T
+
+    fun setSharedPreference(key: String, value: Any)
+
+}

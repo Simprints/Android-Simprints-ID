@@ -1,17 +1,19 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
+import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.StringsUtils
-import io.reactivex.rxkotlin.subscribeBy
 
 abstract class CheckLoginPresenter(
     private val view: CheckLoginContract.View,
     private val dataManager: DataManager,
+    private val secureDataManager: SecureDataManager,
     private val timeHelper: TimeHelper) {
 
     init {
@@ -29,17 +31,15 @@ abstract class CheckLoginPresenter(
     protected fun checkSignedInStateAndMoveOn() {
         try {
             checkSignedInOrThrow()
-            val projectId = dataManager.getSignedInProjectIdOrEmpty()
-            dataManager.getLocalKeyAndSignInToLocal(projectId).subscribeBy(onComplete = {
-                handleSignedInUser()
-            })
+            handleSignedInUser()
         } catch (e: Throwable) {
             when (e) {
                 is DifferentProjectIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_PROJECT_ID)
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_USER_ID)
                 is NotSignedInException -> handleNotSignedInUser()
                 else -> {
-                    dataManager.logThrowable(e); view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
+                    dataManager.logThrowable(e)
+                    view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
                 }
             }
         }
@@ -54,8 +54,10 @@ abstract class CheckLoginPresenter(
      * @throws NotSignedInException
      */
     private fun checkSignedInOrThrow() {
-        val isUserSignedIn = isEncryptedProjectSecretPresent() &&
+        val isUserSignedIn =
+            isEncryptedProjectSecretPresent() &&
             isProjectIdStoredAndMatches() &&
+            isLocalKeyValid(dataManager.getSignedInProjectIdOrEmpty()) &&
             isUserIdStoredAndMatches() &&
             isFirebaseTokenValid()
 
@@ -65,6 +67,12 @@ abstract class CheckLoginPresenter(
 
     private fun isEncryptedProjectSecretPresent(): Boolean = dataManager.getEncryptedProjectSecretOrEmpty().isNotEmpty()
     private fun isFirebaseTokenValid(): Boolean = dataManager.isSignedIn(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
+    private fun isLocalKeyValid(projectId: String): Boolean = try {
+        secureDataManager.getLocalDbKeyOrThrow(projectId)
+        true
+    } catch (t: Throwable) {
+        false
+    }
 
     /** @throws DifferentProjectIdSignedInException */
     abstract fun isProjectIdStoredAndMatches(): Boolean

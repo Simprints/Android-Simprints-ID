@@ -6,7 +6,6 @@ import com.simprints.id.testTools.log
 import io.realm.RealmConfiguration
 import org.junit.Before
 
-
 interface FirstUseLocal {
 
     var realmConfiguration: RealmConfiguration?
@@ -15,6 +14,6 @@ interface FirstUseLocal {
     fun setUp() {
         // Clear any internal data
         log("FirstUseTest.setUp(): cleaning internal data")
-        StorageUtils.clearApplicationData(InstrumentationRegistry.getContext(), realmConfiguration!!)
+        StorageUtils.clearApplicationData(InstrumentationRegistry.getTargetContext(), realmConfiguration!!)
     }
 }

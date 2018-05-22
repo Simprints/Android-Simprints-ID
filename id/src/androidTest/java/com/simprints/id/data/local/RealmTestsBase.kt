@@ -1,14 +1,12 @@
 package com.simprints.id.data.local
 
 import android.support.test.InstrumentationRegistry
-import com.simprints.id.data.db.local.LocalDbKeyProvider
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.domain.Constants.GROUP.*
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
-import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File
@@ -71,17 +69,5 @@ open class RealmTestsBase {
     protected fun deleteRealmFiles(realmConfig: RealmConfiguration) {
         Realm.deleteRealm(realmConfig)
         File("${realmConfig.path}.lock").delete()
-    }
-}
-
-class TestLocalDbKeyProvider(private val newDbName: String,
-                             private val dbKey: ByteArray,
-                             private val legacyDbName: String) : LocalDbKeyProvider {
-
-    override fun getLocalDbKey(): Single<LocalDbKey> = Single.create {
-        it.onSuccess(LocalDbKey(
-            newDbName,
-            dbKey,
-            legacyDbName))
     }
 }

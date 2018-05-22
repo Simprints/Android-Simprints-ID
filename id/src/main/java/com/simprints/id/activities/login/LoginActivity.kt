@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.Toast
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -48,9 +47,14 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
             }
         }
 
-        val projectAuthenticator = LegacyCompatibleProjectAuthenticator(app.secureDataManager, app.dbManager, SafetyNet.getClient(this))
-        viewPresenter = LoginPresenter(this, app.secureDataManager, app.analyticsManager, projectAuthenticator)
-        viewPresenter.start()
+        val projectAuthenticator = LegacyCompatibleProjectAuthenticator(
+            app.loginInfoManager,
+            app.dbManager,
+            app.secureDataManager,
+            SafetyNet.getClient(this))
+
+        viewPresenter = LoginPresenter(this, app.loginInfoManager, app.analyticsManager, projectAuthenticator)
+         viewPresenter.start()
     }
 
     private fun initUI() {

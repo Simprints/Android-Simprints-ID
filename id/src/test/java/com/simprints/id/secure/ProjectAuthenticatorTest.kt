@@ -3,7 +3,6 @@ package com.simprints.id.secure
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -18,7 +17,7 @@ import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class ProjectAuthenticatorTest : RxJavaTest() {
 
     private lateinit var app: Application
@@ -28,9 +27,9 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as Application)
-        mockLocalDbManager(app)
-        mockRemoteDbManager(app)
-        mockDbManager(app)
+        createMockForLocalDbManager(app)
+        createMockForRemoteDbManager(app)
+        createMockForDbManager(app)
 
         mockLoadProject(app)
         apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
@@ -40,7 +39,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     fun successfulResponse_userShouldSignIn() {
 
         val authenticator = ProjectAuthenticator(
-            mockSecureDataManager(),
+            mockLoginInfoManager(),
             app.dataManager,
             SafetyNet.getClient(app),
             ApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
@@ -63,7 +62,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
         val nonceScope = NonceScope("project_id", "user_id")
 
         val testObserver = ProjectAuthenticator(
-            mockSecureDataManager(),
+            mockLoginInfoManager(),
             app.dataManager,
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(apiClient.retrofit))

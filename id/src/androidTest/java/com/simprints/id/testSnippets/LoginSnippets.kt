@@ -2,20 +2,31 @@ package com.simprints.id.testSnippets
 
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.*
-import android.support.test.espresso.assertion.ViewAssertions.*
+import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.testTools.*
+import com.simprints.id.testTools.ActivityUtils
+import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.WaitingUtils
+import com.simprints.id.testTools.log
 import com.simprints.libsimprints.Constants
-
 
 fun launchAppFromIntentEnrol(calloutCredentials: CalloutCredentials,
                              enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("launchAppFromIntentEnrol")
     ActivityUtils.launchActivityAndRunOnUiThread(calloutCredentials,
         Constants.SIMPRINTS_REGISTER_INTENT, enrolTestRule)
+}
+
+fun launchAppFromIntentEnrolAndDoLogin(calloutCredentials: CalloutCredentials,
+                                       loginTestRule: ActivityTestRule<CheckLoginFromIntentActivity>,
+                                       projectSecret: String) {
+    launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
+    enterCredentialsDirectly(calloutCredentials, projectSecret)
+    pressSignIn()
+    ensureSignInSuccess()
 }
 
 fun enterCredentialsDirectly(calloutCredentials: CalloutCredentials, projectSecret: String) {

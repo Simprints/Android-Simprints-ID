@@ -2,16 +2,13 @@ package com.simprints.id.activities
 
 import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.FirebaseAnalyticsManager
-import com.simprints.id.testUtils.anyNotNull
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testUtils.roboletric.createMockForDbManager
+import com.simprints.id.testUtils.roboletric.createMockForLocalDbManager
 import com.simprints.id.testUtils.roboletric.createRoboAboutActivity
-import com.simprints.id.testUtils.roboletric.mockDbManager
-import com.simprints.id.testUtils.roboletric.mockLocalDbManager
-import com.simprints.id.testUtils.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.activity_about.*
@@ -24,9 +21,11 @@ import org.mockito.Mockito.spy
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import com.simprints.id.shared.anyNotNull
+import com.simprints.id.shared.whenever
 
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, application = TestApplication::class)
+@Config(application = TestApplication::class)
 class AboutActivityTest : RxJavaTest() {
 
     private lateinit var analyticsManagerMock: AnalyticsManager
@@ -35,10 +34,10 @@ class AboutActivityTest : RxJavaTest() {
     @Before
     fun setUp() {
         app = (RuntimeEnvironment.application as Application)
-        mockLocalDbManager(app)
+        createMockForLocalDbManager(app)
         whenever(app.dbManager.getPeopleCount(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(0))
 
-        mockDbManager(app)
+        createMockForDbManager(app)
         mockAnalyticsManager()
     }
 

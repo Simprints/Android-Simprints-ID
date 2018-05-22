@@ -3,9 +3,9 @@ package com.simprints.id.tools.delegates
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.MismatchedTypeError
-import com.simprints.id.testUtils.assertThrows
-import com.simprints.id.testUtils.mock
-import com.simprints.id.testUtils.whenever
+import com.simprints.id.shared.assertThrows
+import com.simprints.id.shared.mock
+import com.simprints.id.shared.whenever
 import com.simprints.id.tools.serializers.EnumSerializer
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier

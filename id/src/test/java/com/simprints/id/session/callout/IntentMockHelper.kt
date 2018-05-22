@@ -2,8 +2,8 @@ package com.simprints.id.session.callout
 
 import android.content.Intent
 import android.os.Bundle
-import com.simprints.id.testUtils.mock
-import com.simprints.id.testUtils.whenever
+import com.simprints.id.shared.mock
+import com.simprints.id.shared.whenever
 
 fun mockIntent(action: String?, vararg params: Pair<String, Any>): Intent {
     val intent = mockIntent(*params)

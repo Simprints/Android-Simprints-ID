@@ -1,8 +1,7 @@
 package com.simprints.id.session.sessionParameters.validators
 
-import com.simprints.id.testUtils.assertThrows
+import com.simprints.id.shared.assertThrows
 import org.junit.Test
-
 
 class ValueValidatorTest {
 
@@ -26,5 +25,4 @@ class ValueValidatorTest {
             valueValidator.validate(invalidValue)
         }
     }
-
 }
