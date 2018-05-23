@@ -64,6 +64,8 @@ import com.simprints.id.tools.utils.NetworkUtils
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
+import io.reactivex.exceptions.UndeliverableException
+import io.reactivex.plugins.RxJavaPlugins
 import timber.log.Timber
 import java.util.*
 
@@ -441,5 +443,23 @@ open class Application : MultiDexApplication() {
         }
         Fabric.with(fabric)
         dbManager.initialiseDb()
+
+        handleUndeliverableExceptionInRxJava()
+    }
+
+    // RxJava doesn't allow not handled exceptions, when that happens the app crashes.
+    // https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#error-handling
+    // It can happen when an observable throws an exception, but the
+    // chain has already terminated. E.g. given `chain = zip(network_call1, network_call2)`, when
+    // phone goes offline network_calls1 fails and it stops `chain`. But even network_call2 will throw a
+    // network exception and it won't be handled because the chain has already stopped.
+    open fun handleUndeliverableExceptionInRxJava() {
+        RxJavaPlugins.setErrorHandler { e ->
+            var exceptionToPrint = e
+            if (e is UndeliverableException) {
+                exceptionToPrint = e.cause
+            }
+            Timber.d("Undeliverable exception received", exceptionToPrint)
+        }
     }
 }
