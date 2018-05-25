@@ -9,7 +9,6 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.sync.SyncExecutor
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.Constants
@@ -70,14 +69,6 @@ class DbManagerImpl(override val localDbManager: LocalDbManager,
         remoteDbManager.isRemoteDbInitialized()
 
     // Data transfer
-    override fun savePerson(person: Person, preferencesManager: PreferencesManager, loginInfoManager: LoginInfoManager): Completable =
-        savePerson(fb_Person(
-            person,
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            loginInfoManager.getSignedInUserIdOrEmpty(),
-            preferencesManager.moduleId))
-
-
     override fun savePerson(fbPerson: fb_Person): Completable =
         localDbManager.insertOrUpdatePersonInLocal(rl_Person(fbPerson))
             .doOnComplete {

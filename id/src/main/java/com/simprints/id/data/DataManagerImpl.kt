@@ -75,9 +75,6 @@ class DataManagerImpl(private val context: Context,
         analyticsManager.logAuthStateChange(authenticated, getSignedInProjectIdOrEmpty(), deviceId, sessionId)
 
     // Data transfer
-    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) =
-        dbManager.loadPeople(destinationList, group, getSignedInUserIdOrEmpty(), moduleId, callback)
-
     override fun getPeopleCount(group: Constants.GROUP): Single<Int> =
         when (group) {
             Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
