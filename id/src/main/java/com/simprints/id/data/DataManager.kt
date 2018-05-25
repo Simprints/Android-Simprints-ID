@@ -12,16 +12,12 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
-import io.reactivex.Single
 
 interface DataManager : PreferencesManager, DbManager,
     AnalyticsManager, LoginInfoManager {
 
     val androidSdkVersion: Int
     val deviceModel: String
-    val deviceId: String
-    val appVersionName: String
-    val libVersionName: String
 
     // Analytics
     fun logAlert(alertType: ALERT_TYPE)
@@ -33,8 +29,6 @@ interface DataManager : PreferencesManager, DbManager,
     fun logAuthStateChange(authenticated: Boolean)
 
     // Data transfer
-    fun getPeopleCount(group: Constants.GROUP): Single<Int>
-
     fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
     fun updateIdentification(projectId: String, selectedGuid: String)
 

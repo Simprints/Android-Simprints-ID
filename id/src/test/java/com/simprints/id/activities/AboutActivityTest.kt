@@ -68,9 +68,9 @@ class AboutActivityTest : RxJavaTest() {
 
     @Test
     fun recoverDbButton_disablesOncePressed() {
-        val dataManagerMock = spy(app.dataManager)
-        doReturn(Completable.create { }).`when`(dataManagerMock).recoverRealmDb(anyNotNull())
-        app.dataManager = dataManagerMock
+        val dbManagerMock = spy(app.dbManager)
+        doReturn(Completable.create { }).`when`(dbManagerMock).recoverLocalDb(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())
+        app.dbManager = dbManagerMock
 
         val controller = createRoboAboutActivity().start().resume().visible()
         val activity = controller.get()

@@ -1,5 +1,6 @@
 package com.simprints.id.data.prefs.sessionState
 
+import android.content.Context
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManager
 import com.simprints.id.data.prefs.sessionState.sessionParameters.SessionParametersPreferencesManager
@@ -7,10 +8,13 @@ import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimesta
 import com.simprints.id.domain.Location
 import com.simprints.id.tools.delegates.ComplexPreference
 import com.simprints.id.tools.delegates.PrimitivePreference
+import com.simprints.id.tools.extensions.deviceId
+import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.serializers.Serializer
 
 
-class SessionStatePreferencesManagerImpl(prefs: ImprovedSharedPreferences,
+class SessionStatePreferencesManagerImpl(private val context: Context,
+                                         prefs: ImprovedSharedPreferences,
                                          scannerAttributes: ScannerAttributesPreferencesManager,
                                          sessionParameters: SessionParametersPreferencesManager,
                                          sessionTimestamps: SessionTimestampsPreferencesManager,
@@ -27,6 +31,15 @@ class SessionStatePreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private val LOCATION_KEY = "Location"
         private val LOCATION_DEFAULT = Location("", "")
     }
+
+    override val deviceId: String
+        get() = context.deviceId
+
+    override val appVersionName: String
+        get() = context.packageVersionName
+
+    override val libVersionName: String
+        get() = com.simprints.libsimprints.BuildConfig.VERSION_NAME
 
     // Unique identifier of the current session
     override var sessionId: String

@@ -1,7 +1,10 @@
 package com.simprints.id.activities.about
 
 
-import com.simprints.id.data.DataManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.safe.SimprintsException
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -9,7 +12,10 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
 internal class AboutPresenter(private val view: AboutContract.View,
-                              private val dataManager: DataManager) : AboutContract.Presenter {
+                              private val dbManager: DbManager,
+                              private val loginInfoManager: LoginInfoManager,
+                              private val preferencesManager: PreferencesManager,
+                              private val analyticsManager: AnalyticsManager) : AboutContract.Presenter {
 
     override fun start() {
         initVersions()
@@ -19,28 +25,33 @@ internal class AboutPresenter(private val view: AboutContract.View,
 
     private fun initVersions() {
         view.setVersionData(
-            dataManager.appVersionName,
-            dataManager.libVersionName,
-            dataManager.hardwareVersionString)
+            preferencesManager.appVersionName,
+            preferencesManager.libVersionName,
+            preferencesManager.hardwareVersionString)
     }
 
     private fun initCounts() {
-        dataManager.getPeopleCount(Constants.GROUP.GLOBAL).subscribe({ count ->
+        dbManager.getPeopleCount().subscribe({ count ->
             view.setProjectCount(count.toString())
-        }, { dataManager.logSafeException(SimprintsException(it)) })
-        dataManager.getPeopleCount(Constants.GROUP.MODULE).subscribe({ count ->
+        }, { analyticsManager.logSafeException(SimprintsException(it)) })
+        dbManager.getPeopleCount(moduleId = preferencesManager.moduleId).subscribe({ count ->
             view.setModuleCount(count.toString())
-        }, { dataManager.logSafeException(SimprintsException(it)) })
+        }, { analyticsManager.logSafeException(SimprintsException(it)) })
 
-        dataManager.getPeopleCount(Constants.GROUP.USER).subscribe({ count ->
+        dbManager.getPeopleCount(userId = loginInfoManager.getSignedInUserIdOrEmpty()).subscribe({ count ->
             view.setUserCount(count.toString())
-        }, { dataManager.logSafeException(SimprintsException(it)) })
+        }, { analyticsManager.logSafeException(SimprintsException(it)) })
     }
 
     override fun recoverDb() {
         recoveryRunning = true
         view.setRecoveryInProgress()
-        dataManager.recoverRealmDb(Constants.GROUP.GLOBAL)
+        dbManager.recoverLocalDb(
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            loginInfoManager.getSignedInUserIdOrEmpty(),
+            preferencesManager.deviceId,
+            preferencesManager.moduleId,
+            Constants.GROUP.GLOBAL)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribeBy(
@@ -55,7 +66,7 @@ internal class AboutPresenter(private val view: AboutContract.View,
 
     private fun handleRecoveryError(throwable: Throwable) {
         recoveryRunning = false
-        dataManager.logThrowable(throwable)
+        analyticsManager.logThrowable(throwable)
         view.setRecoveringFailed()
     }
 

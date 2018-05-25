@@ -123,7 +123,8 @@ open class Application : MultiDexApplication() {
     }
 
     private val sessionStatePreferencesManager: SessionStatePreferencesManager by lazy {
-        SessionStatePreferencesManagerImpl(prefs,
+        SessionStatePreferencesManagerImpl(this,
+            prefs,
             scannerAttributesPreferencesManager,
             sessionParametersPreferencesManager,
             sessionTimestampsPreferencesManager,
