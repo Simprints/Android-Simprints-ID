@@ -75,16 +75,6 @@ class DataManagerImpl(private val context: Context,
     override fun logAuthStateChange(authenticated: Boolean) =
         analyticsManager.logAuthStateChange(authenticated, getSignedInProjectIdOrEmpty(), deviceId, sessionId)
 
-    // DbManager call interception for populating arguments
-    // Lifecycle
-    override fun initialiseDb() {
-        dbManager.initialiseDb()
-    }
-
-    override fun signOut() {
-        dbManager.signOut()
-    }
-
     // Data transfer
     override fun savePerson(person: Person): Completable =
         dbManager.savePerson(fb_Person(person, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), moduleId))
