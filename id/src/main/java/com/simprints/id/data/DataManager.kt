@@ -33,12 +33,6 @@ interface DataManager : PreferencesManager, DbManager,
     fun logConnectionStateChange(connected: Boolean)
     fun logAuthStateChange(authenticated: Boolean)
 
-    // DbManager call interception for populating arguments
-    // Lifecycle
-    override fun initialiseDb()
-
-    override fun signOut()
-
     // Data transfer
     fun savePerson(person: Person): Completable
 
