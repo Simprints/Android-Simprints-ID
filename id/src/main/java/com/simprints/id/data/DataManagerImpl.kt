@@ -3,7 +3,6 @@ package com.simprints.id.data
 import android.content.Context
 import android.os.Build
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.prefs.PreferencesManager
@@ -12,14 +11,11 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Constants
 import com.simprints.id.session.Session
 import com.simprints.id.session.sessionParameters.SessionParameters
-import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
-import io.reactivex.Single
 import java.util.*
 
 class DataManagerImpl(private val context: Context,
@@ -38,15 +34,6 @@ class DataManagerImpl(private val context: Context,
 
     override val deviceModel: String
         get() = "${Build.MANUFACTURER} ${Build.MODEL}"
-
-    override val deviceId: String
-        get() = context.deviceId
-
-    override val appVersionName: String
-        get() = context.packageVersionName
-
-    override val libVersionName: String
-        get() = com.simprints.libsimprints.BuildConfig.VERSION_NAME
 
     override var sessionParameters: SessionParameters
         get() = preferencesManager.sessionParameters
@@ -75,13 +62,6 @@ class DataManagerImpl(private val context: Context,
         analyticsManager.logAuthStateChange(authenticated, getSignedInProjectIdOrEmpty(), deviceId, sessionId)
 
     // Data transfer
-    override fun getPeopleCount(group: Constants.GROUP): Single<Int> =
-        when (group) {
-            Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
-            Constants.GROUP.USER -> dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty())
-            Constants.GROUP.MODULE -> dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty(), moduleId = moduleId)
-        }
-
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
         preferencesManager.lastIdentificationDate = Date()
         dbManager.saveIdentification(probe, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, matchSize, matches, sessionId)

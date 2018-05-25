@@ -5,6 +5,9 @@ import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import io.reactivex.Single
@@ -12,6 +15,9 @@ import java.text.DateFormat
 import java.util.*
 
 class DashboardCardsFactory(private val dataManager: DataManager,
+                            private val dbManager: DbManager,
+                            private val loginInfoManager: LoginInfoManager,
+                            private val preferencesManager: PreferencesManager,
                             private val androidResourcesHelper: AndroidResourcesHelper) {
 
     val dateFormat: DateFormat by lazy {
@@ -42,7 +48,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
             }.doOnError { it.printStackTrace() }
 
     fun createLocalDbInfoCard(position: Int = 1): Single<DashboardCard> =
-        dataManager.getPeopleCount(dataManager.syncGroup).map {
+        handleSyncGroup(dataManager.syncGroup).map {
                 val titleRes =
                     if (dataManager.syncGroup == Constants.GROUP.USER) {
                         R.string.dashboard_card_localdb_sync_user_title
@@ -57,6 +63,13 @@ class DashboardCardsFactory(private val dataManager: DataManager,
                     androidResourcesHelper.getString(titleRes),
                     "$it")
             }.doOnError { it.printStackTrace() }
+
+    private fun handleSyncGroup(syncGroup: Constants.GROUP): Single<Int> =
+        when (syncGroup) {
+            Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
+            Constants.GROUP.USER -> dbManager.getPeopleCount(userId = loginInfoManager.getSignedInUserIdOrEmpty())
+            Constants.GROUP.MODULE -> dbManager.getPeopleCount(moduleId = preferencesManager.moduleId)
+        }
 
     private fun createSyncInfoCard(position: Int = 2): Single<DashboardSyncCard>? =
         Single.just(

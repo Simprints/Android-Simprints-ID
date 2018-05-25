@@ -45,7 +45,9 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
         LanguageHelper.setLanguage(this, app.dataManager.language)
 
         val syncClient = SyncService.getClient(this)
-        viewPresenter = DashboardPresenter(this, syncClient, app.dataManager, AndroidResourcesHelperImpl(app))
+        viewPresenter = DashboardPresenter(this, syncClient,
+            app.dataManager, app.dbManager, app.loginInfoManager, app.preferencesManager,
+            AndroidResourcesHelperImpl(app))
 
         initDrawer()
         initCards()
