@@ -4,6 +4,8 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Tokens
@@ -32,6 +34,7 @@ interface DbManager : RemoteDbManager {
     fun isDbInitialised(): Boolean
 
     // Data transfer
+    fun savePerson(person: Person, preferencesManager: PreferencesManager, loginInfoManager: LoginInfoManager): Completable
     fun savePerson(fbPerson: fb_Person): Completable
 
     fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)

@@ -31,6 +31,9 @@ import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.Finger.NB_OF_FINGERS
@@ -87,6 +90,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var un20WakeupDialog: ProgressDialog
     private lateinit var dataManager: DataManager
+    private lateinit var dbManager: DbManager
+    private lateinit var loginInfoManager: LoginInfoManager
+    private lateinit var preferencesManager: PreferencesManager
     private lateinit var syncHelper: MainActivitySyncHelper
 
     private val defaultScanConfig = ScanConfig().apply {
@@ -111,6 +117,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val app = application as Application
         dataManager = app.dataManager
+        dbManager = app.dbManager
+        loginInfoManager = app.loginInfoManager
+        preferencesManager = app.preferencesManager
         appState = app.appState
         setup = app.setup
         val syncClient = SyncService.getClient(this)
@@ -422,7 +431,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             val person = Person(dataManager.patientId, fingerprints)
             if (dataManager.calloutAction === CalloutAction.REGISTER || dataManager.calloutAction === CalloutAction.UPDATE) {
-                dataManager.savePerson(person)
+                dbManager.savePerson(person, preferencesManager, loginInfoManager)
                         .subscribe({
                             dataManager.lastEnrolDate = Date()
                             handleRegistrationSuccess()
