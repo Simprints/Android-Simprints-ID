@@ -1,7 +1,6 @@
 package com.simprints.id.data
 
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.prefs.PreferencesManager
@@ -34,7 +33,6 @@ interface DataManager : PreferencesManager, DbManager,
     fun logAuthStateChange(authenticated: Boolean)
 
     // Data transfer
-    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
     fun getPeopleCount(group: Constants.GROUP): Single<Int>
 
     fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)

@@ -9,8 +9,10 @@ import android.support.annotation.NonNull;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
+import com.simprints.id.data.db.DbManager;
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
-import com.simprints.id.domain.Constants;
+import com.simprints.id.data.prefs.PreferencesManager;
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager;
 import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
@@ -52,14 +54,29 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     private DataManager dataManager;
 
     @NonNull
+    private DbManager dbManager;
+
+    @NonNull
+    private LoginInfoManager loginInfoManager;
+
+    @NonNull
+    private PreferencesManager preferencesManager;
+
+    @NonNull
     private TimeHelper timeHelper;
 
-    public MatchingPresenter(@NonNull MatchingContract.View matchingView,
+    MatchingPresenter(@NonNull MatchingContract.View matchingView,
                       @NonNull DataManager dataManager,
+                      @NonNull DbManager dbManager,
+                      @NonNull LoginInfoManager loginInfoManager,
+                      @NonNull PreferencesManager preferencesManager,
                       @NonNull TimeHelper timeHelper,
                       Person probe) {
         this.matchingView = matchingView;
         this.dataManager = dataManager;
+        this.dbManager = dbManager;
+        this.loginInfoManager = loginInfoManager;
+        this.preferencesManager = preferencesManager;
         this.timeHelper = timeHelper;
         this.probe = probe;
     }
@@ -112,16 +129,20 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     }
 
     private void onIdentifyStart() {
-        final Constants.GROUP matchGroup = dataManager.getMatchGroup();
         try {
-            dataManager.loadPeople(candidates, matchGroup, wrapCallback("loading people", newOnLoadPeopleCallback()));
+            dbManager.loadPeople(
+                candidates,
+                preferencesManager.getMatchGroup(),
+                loginInfoManager.getSignedInUserId(),
+                preferencesManager.getModuleId(),
+                wrapCallback("loading people", newOnLoadPeopleCallback()));
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             matchingView.launchAlert();
         }
     }
 
-    public DataCallback newOnLoadPeopleCallback() {
+    private DataCallback newOnLoadPeopleCallback() {
         return new DataCallback() {
             @Override
             public void onSuccess() {
