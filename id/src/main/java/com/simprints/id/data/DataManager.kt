@@ -34,8 +34,6 @@ interface DataManager : PreferencesManager, DbManager,
     fun logAuthStateChange(authenticated: Boolean)
 
     // Data transfer
-    fun savePerson(person: Person): Completable
-
     fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
     fun getPeopleCount(group: Constants.GROUP): Single<Int>
 

@@ -6,7 +6,6 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.domain.ALERT_TYPE
@@ -76,9 +75,6 @@ class DataManagerImpl(private val context: Context,
         analyticsManager.logAuthStateChange(authenticated, getSignedInProjectIdOrEmpty(), deviceId, sessionId)
 
     // Data transfer
-    override fun savePerson(person: Person): Completable =
-        dbManager.savePerson(fb_Person(person, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), moduleId))
-
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) =
         dbManager.loadPeople(destinationList, group, getSignedInUserIdOrEmpty(), moduleId, callback)
 
