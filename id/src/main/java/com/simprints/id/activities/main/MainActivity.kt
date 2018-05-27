@@ -44,6 +44,7 @@ import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
 import com.simprints.id.tools.extensions.isFingerNotCollectable
 import com.simprints.id.tools.extensions.isFingerRequired
+import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.libcommon.FingerConfig
 import com.simprints.libcommon.Fingerprint
@@ -73,7 +74,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             toggleContinuousCapture()
     }
 
+    //Array with all fingers, built based on defaultScanConfig
     private var fingers = ArrayList<Finger>(NB_OF_FINGERS)
+
+    //Array with only the active Fingers, used to populate the ViewPager
     private val activeFingers = ArrayList<Finger>()
     private var currentActiveFingerNo: Int = 0
 
@@ -154,6 +158,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         LanguageHelper.setLanguage(this, dataManager.language)
     }
 
+    // Reads the fingerStatus Map (from sharedPrefs) and "active" LEFT_THUMB and LEFT_INDEX_FINGER as
+    // default finger.
     private fun setFingerStatus() {
         // We set the two defaults in the config for the first reset.
         val fingerStatus = dataManager.fingerStatus as MutableMap
@@ -162,6 +168,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         dataManager.fingerStatus = fingerStatus
     }
 
+    // Builds the array of "fingers" and "activeFingers" based on the info from:
+    // FingerIdentifier values - all possible fingers
+    // defaultScanConfig - to find out if a finger is required or not, collectable or not, etc..
+    // fingerStatusPersist - to find out if a finger is active or not (added by user with "Add finger dialog" or defaults ones)
     private fun initActiveFingers() {
         FingerIdentifier.values().take(NB_OF_FINGERS).forEachIndexed { _, identifier ->
 
@@ -182,6 +192,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         updateLastFinger()
     }
 
+    // Creates a progress dialog when the scan gets disconnected
     private fun initUn20Dialog(): ProgressDialog {
         val dialog = ProgressDialog(this)
         dialog.isIndeterminate = true
@@ -194,6 +205,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return dialog
     }
 
+    // init the bars and drawers, in particular:
+    // 1) add listeners for drawer open/close
+    // 2) set the title based on the ColloutAction
     private fun initBarAndDrawer() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -219,6 +233,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // It adds an imageView for each bullet point (indicator) underneath the finger image.
+    // "Indicator" indicates the scan state (good scan/bad scan/ etc...) for a specific finger.
     private fun initIndicators() {
         val indicatorLayout = findViewById<LinearLayout>(R.id.indicator_layout)
         indicatorLayout.removeAllViewsInLayout()
@@ -233,6 +249,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // Init the scan button listener:
+    // Long click: it resets the state of the button (required for?)
+    // Single tap: it triggers the scan
     private fun initScanButton() {
         scan_button.setOnClickListener { toggleContinuousCapture() }
         scan_button.setOnLongClickListener {
@@ -245,6 +264,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // it start/stop the scan based on the activeFingers[currentActiveFingerNo] state
     private fun toggleContinuousCapture() {
         val finger = activeFingers[currentActiveFingerNo]
 
@@ -289,16 +309,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // Resets the UI:
+    // 1) set the right image for the current finger indicator (gray/green bullet point)
+    // 2) set the right UI for scan button based on current finger state.
+    // 3) set the direction for the ViewPager swipe.
+    // 4) set the UI for the top-right button (continueItem) based on the scan state.
+    //      interesting: promptContinue - it drives the arrow's UI, but it depends on
+    //                                    the last scan only.
     private fun refreshDisplay() {
         // Update indicators display
         var nbCollected = 0
 
         var promptContinue = true
 
-        for (i in activeFingers.indices) {
-            val selected = currentActiveFingerNo == i
-            val finger = activeFingers[i]
-            indicators[i].setImageResource(finger.status.getDrawableId(selected))
+        activeFingers.indices.forEach { fingerIndex ->
+            val selected = currentActiveFingerNo == fingerIndex
+            val finger = activeFingers[fingerIndex]
+            indicators[fingerIndex].setImageResource(finger.status.getDrawableId(selected))
 
             if (finger.template != null) {
                 nbCollected++
@@ -316,12 +343,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         timeoutBar.setProgressBar(activeStatus)
 
-        val fragment = pageAdapter.getFragment(currentActiveFingerNo)
-        if (fragment != null) {
-            if (rightToLeft && fragment.view != null) {
-                fragment.view!!.rotationY = 180f
+        pageAdapter.getFragment(currentActiveFingerNo)?.let {
+            if (rightToLeft) {
+                it.view?.rotationY = 180f
             }
-            fragment.updateTextAccordingToStatus()
+            it.updateTextAccordingToStatus()
         }
 
         buttonContinue = false
@@ -365,18 +391,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
     }
 
-    /**
-     * Start alert activity
-     */
-    private fun launchAlert(alertType: ALERT_TYPE) {
-        AlertLauncher(this).launch(alertType, ALERT_ACTIVITY_REQUEST_CODE)
-    }
-
     private fun handleUnexpectedError(error: SimprintsError) {
         dataManager.logError(error)
         launchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }
 
+    // Swipes ViewPager automatically when the scanner's button is pressed.
     private fun nudgeMode() {
         val nudge = dataManager.nudgeMode
 
@@ -391,6 +411,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // Executed either user presses the scanner button at the end of the scans or the top-right arrow
+    // It gathers all valid fingerprints and either it saves them in case of enrol or returns them
+    // for identifications/verifications
     private fun onActionForward() {
         // Gathers the fingerprints in a list
         activeFingers[currentActiveFingerNo]
@@ -424,6 +447,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // If the enrol succeed, the activity returns the result and finishes.
     private fun handleRegistrationSuccess() {
         registrationResult = Registration(dataManager.patientId)
 
@@ -433,6 +457,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         finish()
     }
 
+    // If the enrol fails, the activity shows an alert activity the finishes.
     private fun handleRegistrationFailure(throwable: Throwable) {
         dataManager.logError(SimprintsError(throwable))
         launchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
