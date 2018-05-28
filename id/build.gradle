@@ -151,7 +151,6 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.github.triplet.gradle:play-publisher:1.2.2'
     }
 }
 
@@ -169,7 +168,7 @@ android {
         }
     }
 }
-
+// ./gradlew publishApkRelease to publish on internal channel
 play {
     track = 'internal'
     jsonFile = file(SIMPRINTSID_PUBLISH_KEY_FILE)
