@@ -15,6 +15,8 @@ Add in ~/.gradle/gradle.properties:
 
 `SIMPRINTSID_DEV_GCP_PROJECT=simprints-dev`
 
+`SIMPRINTSID_PUBLISH_KEY_FILE=` leave with empty string
+
 `SIMPRINTSID_RELEASE_STORE_FILE=`
 
 `SIMPRINTSID_RELEASE_STORE_PASSWORD=`
