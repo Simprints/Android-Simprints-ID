@@ -20,10 +20,10 @@ import org.junit.Test
 class AuthTestsNoWifi : FirstUseLocal, NoWifi {
 
     private val calloutCredentials = CalloutCredentials(
-        "EGkJFvCS7202A07I0fup",
+        "bWOFHInKA2YaQwrxZ7uJ",
         "the_one_and_only_module",
         "the_lone_user",
-        "ec9a52bf-6803-4237-a647-6e76b133fc29")
+        "d95bacc0-7acb-4ff0-98b3-ae6ecbf7398f")
 
     private val realmKey = Base64.decode("Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ==", Base64.NO_WRAP)
     private val localDbKey = LocalDbKey(
@@ -31,7 +31,7 @@ class AuthTestsNoWifi : FirstUseLocal, NoWifi {
         realmKey,
         calloutCredentials.legacyApiKey)
 
-    private val projectSecret = "orZje76yBgsjE2UWw/8jCtw/pBMgtURTfhO/4hZVP4vGnm1uji1OtwcRQkhn1MzQb5OoMjtu2xsbSIs40vSMEQ=="
+    private val projectSecret = "Z8nRspDoiQg1QpnDdKE6U7fQKa0GjpQOwnJ4OcSFWulAcIk4+LP9wrtDn8fRmqacLvkmtmOLl+Kxo1emXLsZ0Q=="
 
     override var realmConfiguration: RealmConfiguration? = null
 
