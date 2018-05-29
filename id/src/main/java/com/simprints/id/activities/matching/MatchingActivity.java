@@ -65,9 +65,6 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         viewPresenter = new MatchingPresenter(
                 this,
                 dataManager,
-                app.getDbManager(),
-                app.getLoginInfoManager(),
-                app.getPreferencesManager(),
                 app.getTimeHelper(),
                 probe);
     }

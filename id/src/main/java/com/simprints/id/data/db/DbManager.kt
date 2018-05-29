@@ -32,21 +32,18 @@ interface DbManager : RemoteDbManager {
     fun isDbInitialised(): Boolean
 
     // Data transfer
+    fun savePerson(person: Person): Completable
     fun savePerson(fbPerson: fb_Person): Completable
 
     fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
 
-    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
+    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
 
     fun loadProject(projectId: String): Single<Project>
 
     fun refreshProjectInfoWithServer(projectId: String): Single<Project>
 
-    fun getPeopleCount(personId: String? = null,
-                       projectId: String? = null,
-                       userId: String? = null,
-                       moduleId: String? = null,
-                       toSync: Boolean? = null): Single<Int>
+    fun getPeopleCount(group: Constants.GROUP): Single<Int>
 
     fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
 

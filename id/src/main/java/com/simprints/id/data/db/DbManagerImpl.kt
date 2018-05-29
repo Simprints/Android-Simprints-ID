@@ -72,6 +72,13 @@ class DbManagerImpl(override val local: LocalDbManager,
         remote.isRemoteDbInitialized()
 
     // Data transfer
+    override fun savePerson(person: Person): Completable =
+        savePerson(fb_Person(
+            person,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            loginInfoManager.getSignedInUserIdOrEmpty(),
+            preferencesManager.moduleId))
+
     override fun savePerson(fbPerson: fb_Person): Completable =
         local.insertOrUpdatePersonInLocal(rl_Person(fbPerson))
             .doOnComplete {
@@ -109,11 +116,11 @@ class DbManagerImpl(override val local: LocalDbManager,
         })
     }
 
-    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
+    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
         val result = when (group) {
             Constants.GROUP.GLOBAL -> local.loadPeopleFromLocal().blockingGet().map { it.libPerson }
-            Constants.GROUP.USER -> local.loadPeopleFromLocal(userId = userId).blockingGet().map { it.libPerson }
-            Constants.GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = moduleId).blockingGet().map { it.libPerson }
+            Constants.GROUP.USER -> local.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty()).blockingGet().map { it.libPerson }
+            Constants.GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = preferencesManager.moduleId).blockingGet().map { it.libPerson }
         }
         destinationList.addAll(result)
         callback?.onSuccess()
@@ -142,17 +149,15 @@ class DbManagerImpl(override val local: LocalDbManager,
             Math.max(nPatientsOnServerForSyncParam - it, 0)
         }
 
-    override fun getPeopleCount(personId: String?,
-                                projectId: String?,
-                                userId: String?,
-                                moduleId: String?,
-                                toSync: Boolean?): Single<Int> =
-        local.getPeopleCountFromLocal(
-            patientId = personId,
-            userId = userId,
-            moduleId = moduleId,
-            toSync = toSync
-        )
+    override fun getPeopleCount(group: Constants.GROUP): Single<Int> =
+        when (group) {
+            Constants.GROUP.GLOBAL ->
+                local.getPeopleCountFromLocal()
+            Constants.GROUP.USER ->
+                local.getPeopleCountFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
+            Constants.GROUP.MODULE ->
+                local.getPeopleCountFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty(), moduleId = preferencesManager.moduleId)
+        }
 
     override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
         preferencesManager.lastIdentificationDate = Date()
