@@ -57,7 +57,7 @@ abstract class CheckLoginPresenter(
         val isUserSignedIn =
             isEncryptedProjectSecretPresent() &&
             isProjectIdStoredAndMatches() &&
-            isLocalKeyValid(dataManager.getSignedInProjectIdOrEmpty()) &&
+            isLocalKeyValid(dataManager.loginInfo.getSignedInProjectIdOrEmpty()) &&
             isUserIdStoredAndMatches() &&
             isFirebaseTokenValid()
 
@@ -65,8 +65,8 @@ abstract class CheckLoginPresenter(
             throw NotSignedInException()
     }
 
-    private fun isEncryptedProjectSecretPresent(): Boolean = dataManager.getEncryptedProjectSecretOrEmpty().isNotEmpty()
-    private fun isFirebaseTokenValid(): Boolean = dataManager.db.isSignedIn(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
+    private fun isEncryptedProjectSecretPresent(): Boolean = dataManager.loginInfo.getEncryptedProjectSecretOrEmpty().isNotEmpty()
+    private fun isFirebaseTokenValid(): Boolean = dataManager.db.isSignedIn(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), dataManager.loginInfo.getSignedInUserIdOrEmpty())
     private fun isLocalKeyValid(projectId: String): Boolean = try {
         secureDataManager.getLocalDbKeyOrThrow(projectId)
         true

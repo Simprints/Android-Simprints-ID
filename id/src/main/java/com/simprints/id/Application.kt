@@ -187,7 +187,7 @@ open class Application : MultiDexApplication() {
     }
 
     var dataManager: DataManager by lazyVar {
-        DataManagerImpl(preferencesManager, dbManager, loginInfoManager, analyticsManager)
+        DataManagerImpl(preferencesManager, loginInfoManager, dbManager, analyticsManager)
     }
 
     val notificationFactory: NotificationFactory by lazy {

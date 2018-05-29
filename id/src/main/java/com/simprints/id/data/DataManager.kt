@@ -5,8 +5,9 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 
-interface DataManager : PreferencesManager, LoginInfoManager {
+interface DataManager : PreferencesManager {
 
+    val loginInfo: LoginInfoManager
     val analytics: AnalyticsManager
     val db: DbManager
 

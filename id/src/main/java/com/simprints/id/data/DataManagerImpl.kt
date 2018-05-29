@@ -7,12 +7,11 @@ import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.session.Session
 
 class DataManagerImpl(val preferencesManager: PreferencesManager,
+                      override val loginInfo: LoginInfoManager,
                       override val db: DbManager,
-                      val loginInfoManager: LoginInfoManager,
                       override val analytics: AnalyticsManager)
     : DataManager,
-    PreferencesManager by preferencesManager,
-    LoginInfoManager by loginInfoManager {
+    PreferencesManager by preferencesManager {
 
     override fun saveSession() {
         val session = Session(
@@ -23,9 +22,9 @@ class DataManagerImpl(val preferencesManager: PreferencesManager,
             preferencesManager.appVersionName,
             preferencesManager.libVersionName,
             preferencesManager.calloutAction.toString(),
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            loginInfo.getSignedInProjectIdOrEmpty(),
             preferencesManager.moduleId,
-            loginInfoManager.getSignedInUserIdOrEmpty(),
+            loginInfo.getSignedInUserIdOrEmpty(),
             preferencesManager.patientId,
             preferencesManager.callingPackage,
             preferencesManager.metadata,

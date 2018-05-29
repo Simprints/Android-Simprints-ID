@@ -34,7 +34,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         val selectedGuid = intent.parseSelectedGuid()
         val callbackSent = try {
             checkCalloutParameters(projectId, apiKey, sessionId, selectedGuid)
-            dataManager.db.updateIdentification(dataManager.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId?: "")
+            dataManager.db.updateIdentification(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId?: "")
             true
         } catch (error: InvalidCalloutParameterError) {
             dataManager.analytics.logError(error)
@@ -42,7 +42,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         } catch (e: NotSignedInException) {
             false
         }
-        dataManager.analytics.logGuidSelectionService(dataManager.getSignedInProjectIdOrEmpty(),
+        dataManager.analytics.logGuidSelectionService(dataManager.loginInfo.getSignedInProjectIdOrEmpty(),
             sessionId ?: "", selectedGuid, callbackSent)
     }
 
@@ -78,12 +78,12 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         }
 
     private fun checkProjectId(projectId: String) {
-        if (!dataManager.isProjectIdSignedIn(projectId)) throw NotSignedInException()
+        if (!dataManager.loginInfo.isProjectIdSignedIn(projectId)) throw NotSignedInException()
     }
 
     private fun checkApiKey(apiKey: String) {
-        val potentialProjectId = dataManager.getProjectIdForHashedLegacyProjectIdOrEmpty(Hasher().hash(apiKey))
-        if (!dataManager.isProjectIdSignedIn(potentialProjectId)) throw NotSignedInException()
+        val potentialProjectId = dataManager.loginInfo.getProjectIdForHashedLegacyProjectIdOrEmpty(Hasher().hash(apiKey))
+        if (!dataManager.loginInfo.isProjectIdSignedIn(potentialProjectId)) throw NotSignedInException()
     }
 
     @Suppress("UNUSED_PARAMETER")

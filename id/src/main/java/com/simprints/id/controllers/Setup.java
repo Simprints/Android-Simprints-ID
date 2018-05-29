@@ -212,7 +212,7 @@ public class Setup {
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = dataManager.getPatientId();
         try {
-            dataManager.getDb().loadPerson(loadedPerson, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people from db", newLoadPersonCallback(activity, guid)));
+            dataManager.getDb().loadPerson(loadedPerson, dataManager.getLoginInfo().getSignedInProjectId(), guid, wrapCallback("loading people from db", newLoadPersonCallback(activity, guid)));
         } catch (UninitializedDataManagerError error) {
             dataManager.getAnalytics().logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
