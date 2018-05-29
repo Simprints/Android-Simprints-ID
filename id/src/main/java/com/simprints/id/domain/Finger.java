@@ -138,6 +138,26 @@ public class Finger implements Parcelable, Comparable<Finger>{
         return order;
     }
 
+    public boolean isGoodScan(){
+        return status == Status.GOOD_SCAN;
+    }
+
+    public boolean isBadScan(){
+        return status == Status.BAD_SCAN;
+    }
+
+    public boolean isRescanGoodScan(){
+        return status == Status.RESCAN_GOOD_SCAN;
+    }
+
+    public boolean isCollecting(){
+        return status == Status.COLLECTING;
+    }
+
+    public boolean isNotCollected(){
+        return status == Status.NOT_COLLECTED;
+    }
+
     public enum Status {
         NOT_COLLECTED(R.drawable.ic_blank_selected, R.drawable.ic_blank_deselected,
                 R.string.scan_label, Color.GRAY, R.string.empty, Color.WHITE,
