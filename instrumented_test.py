@@ -148,13 +148,13 @@ class Run:
         self.run_and_log(cerberus_app_open_apk_command(device))
 
     def install_cerberus_apk(self, device: Device):
-        self.run_and_log(cerberus_app_install_apk_command('debug', device))
+        self.run_and_log(cerberus_app_install_apk_command(SIMPRINTS_ID_ANDROID_TESTS_VARIANT_NAME, device))
 
     def install_apk(self, device: Device):
-        self.run_and_log(simprints_id_install_apk_command('endToEndTesting', device))
+        self.run_and_log(simprints_id_install_apk_command(SIMPRINTS_ID_ANDROID_TESTS_VARIANT_NAME, device))
 
     def install_test_apk(self, device: Device):
-        self.run_and_log(simprints_id_install_android_test_apk_command('endToEndTesting', device))
+        self.run_and_log(simprints_id_install_android_test_apk_command(SIMPRINTS_ID_ANDROID_TESTS_VARIANT_NAME, device))
 
     def query_devices(self):
         lines = self.run_and_log(query_devices())

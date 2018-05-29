@@ -30,7 +30,7 @@ def install_android_test_apk_command(dir_path: str, module_name: str, build_type
            f'{module_name}/build/outputs/apk/androidTest/{build_type}/{module_name}-{build_type}-androidTest.apk'
 
 def run_instrumented_tests_command(dir_path: str, device: Device):
-    return f'{dir_path}/{GRADLEW} connectedAndroidTest mergeAndroidReports --continue -Pdevices={device.device_id}'
+    return f'{dir_path}/{GRADLEW} connected{SIMPRINTS_ID_ANDROID_TESTS_VARIANT_NAME.capitalize()}AndroidTest mergeAndroidReports --continue -Pdevices={device.device_id}'
 
 def query_devices():
     return f'{ADB} devices -l'
