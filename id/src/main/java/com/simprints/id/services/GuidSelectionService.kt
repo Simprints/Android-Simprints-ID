@@ -23,7 +23,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         if (intent != null) {
             onHandleNonNullIntent(intent)
         } else {
-            dataManager.logGuidSelectionService("", "", "", false)
+            dataManager.analytics.logGuidSelectionService("", "", "", false)
         }
     }
 
@@ -37,12 +37,12 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
             dataManager.updateIdentification(dataManager.getSignedInProjectIdOrEmpty(), selectedGuid)
             true
         } catch (error: InvalidCalloutParameterError) {
-            dataManager.logError(error)
+            dataManager.analytics.logError(error)
             false
         } catch (e: NotSignedInException) {
             false
         }
-        dataManager.logGuidSelectionService(dataManager.getSignedInProjectIdOrEmpty(),
+        dataManager.analytics.logGuidSelectionService(dataManager.getSignedInProjectIdOrEmpty(),
             sessionId ?: "", selectedGuid, callbackSent)
     }
 

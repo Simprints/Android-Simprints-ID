@@ -43,11 +43,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun extractSessionParameters() {
         val callout = view.parseCallout()
-        dataManager.logCallout(callout)
+        dataManager.analytics.logCallout(callout)
         val sessionParameters = sessionParametersExtractor.extractFrom(callout)
         possibleLegacyApiKey = sessionParameters.apiKey
         dataManager.sessionParameters = sessionParameters
-        dataManager.logUserProperties()
+        dataManager.analytics.logUserProperties()
     }
 
     override fun handleNotSignedInUser() {

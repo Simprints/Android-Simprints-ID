@@ -80,7 +80,7 @@ class SyncManager(private val dataManager: DataManager,
 
             override fun onError(throwable: Throwable) {
                 Timber.d("onError")
-                dataManager.logThrowable(throwable)
+                dataManager.analytics.logThrowable(throwable)
                 syncClient.stopListening()
                 syncClient.stop()
 
@@ -91,7 +91,7 @@ class SyncManager(private val dataManager: DataManager,
         }
 
     private fun handleUnexpectedError(error: Error) {
-        dataManager.logThrowable(error)
+        dataManager.analytics.logThrowable(error)
     }
 
     fun removeObservers() {

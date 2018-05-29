@@ -59,7 +59,7 @@ public class RefusalActivity extends AppCompatActivity {
                     try {
                         dataManager.saveRefusalForm(refusalForm);
                     } catch (UninitializedDataManagerError error) {
-                        dataManager.logError(error);
+                        dataManager.getAnalytics().logError(error);
                         alertLauncher.launch(ALERT_TYPE.UNEXPECTED_ERROR, 0);
                         return;
                     }
