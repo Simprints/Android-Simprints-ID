@@ -28,10 +28,10 @@ import org.junit.runner.RunWith
 class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
 
     private val calloutCredentials = CalloutCredentials(
-        "EGkJFvCS7202A07I0fup",
+        "bWOFHInKA2YaQwrxZ7uJ",
         "the_one_and_only_module",
         "the_lone_user",
-        "ec9a52bf-6803-4237-a647-6e76b133fc29")
+        "d95bacc0-7acb-4ff0-98b3-ae6ecbf7398f")
 
     private val realmKey = Base64.decode("Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ==", NO_WRAP)
     private val localDbKey = LocalDbKey(
@@ -46,7 +46,7 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
         "deadbeef-dead-beef-dead-deaddeadbeef"
     )
 
-    private val projectSecret = "orZje76yBgsjE2UWw/8jCtw/pBMgtURTfhO/4hZVP4vGnm1uji1OtwcRQkhn1MzQb5OoMjtu2xsbSIs40vSMEQ=="
+    private val projectSecret = "Z8nRspDoiQg1QpnDdKE6U7fQKa0GjpQOwnJ4OcSFWulAcIk4+LP9wrtDn8fRmqacLvkmtmOLl+Kxo1emXLsZ0Q=="
 
     private val invalidSecret = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
 

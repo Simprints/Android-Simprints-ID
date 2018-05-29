@@ -74,15 +74,18 @@ android {
         } else if (variant.buildType.name == "debug") {
             buildConfigField("String", "GCP_PROJECT", "\"${getDevProjectId()}\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
-        } else if (variant.buildType.name == "endToEndTesting") {
-            buildConfigField("String", "GCP_PROJECT", "\"simprints-testing\"")
-            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyA2v_PTWxcLGyvLwomhfbHDENaO2OZhxEU\"")
+        }
+    }
+
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == "$variant_for_android_tests") {
             buildConfigField("String", "SCANNER", "\"${SIMPRINTSID_TEST_SCANNER}\"")
             buildConfigField("String", "WIFI_NETWORK", "\"${SIMPRINTSID_TEST_WIFI}\"")
             buildConfigField("String", "WIFI_PASSWORD", "\"${SIMPRINTSID_TEST_WIFI_PASSWORD}\"")
         }
     }
-    testBuildType "endToEndTesting"
+
+    testBuildType "debug"
     productFlavors {
     }
 
@@ -99,8 +102,8 @@ android {
 
 //For Android tests, uninstall any previous apk
 afterEvaluate {
-    if (tasks.findByPath("assembleEndToEndTestingAndroidTest") != null) {
-        assembleEndToEndTestingAndroidTest.dependsOn uninstallAll
+    if (tasks.findByPath(assembleTaskForEndToEndTest()) != null) {
+        tasks.findByPath(assembleTaskForEndToEndTest()).dependsOn uninstallAll
     }
 }
 
@@ -112,9 +115,17 @@ def getDevProjectId() {
     }
 }
 
+def connectedTaskForEndToEndTest() {
+    return "connected${variant_for_android_tests.capitalize()}AndroidTest"
+}
+
+def assembleTaskForEndToEndTest() {
+    return "assemble${variant_for_android_tests.capitalize()}AndroidTest"
+}
+
 project.afterEvaluate {
-    if (gradle.startParameter.taskNames.contains("connectedEndToEndTestingAndroidTest")) {
-        project.("connectedEndToEndTestingAndroidTest").doFirst {
+    if (gradle.startParameter.taskNames.findAll {it.contains(connectedTaskForEndToEndTest())}.size() > 0) {
+        project.(connectedTaskForEndToEndTest()).doFirst {
             def originalProvider = deviceProvider
             deviceProvider = [
                 getName       : { originalProvider.getName() },
