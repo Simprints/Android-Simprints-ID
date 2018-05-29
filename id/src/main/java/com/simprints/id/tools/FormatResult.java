@@ -58,9 +58,9 @@ public class FormatResult {
 
     static public void put(Intent intent, ArrayList<Identification> identifications, DataManager dataManager) {
 
-        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, dataManager.getSessionId());
+        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, dataManager.getPreferences().getSessionId());
 
-        if (isODK(dataManager.getResultFormat())) {
+        if (isODK(dataManager.getPreferences().getResultFormat())) {
             // a bit inefficient to run through the array x times but there will be <= 20 objects in there
             String guids = constructString(identifications, new attributeGetter() {
                 @Override

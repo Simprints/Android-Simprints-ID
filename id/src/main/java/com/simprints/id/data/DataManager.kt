@@ -5,14 +5,12 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 
-interface DataManager : PreferencesManager {
+interface DataManager {
 
+    val preferences: PreferencesManager
     val loginInfo: LoginInfoManager
     val analytics: AnalyticsManager
     val db: DbManager
-
-    // Data transfer
-
 
     fun saveSession()
 }

@@ -100,8 +100,8 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         val controller = createRoboCheckLoginFromIntentViewActivity(intent).start()
         controller.resume().visible()
 
-        Assert.assertEquals(DEFAULT_PROJECT_ID, app.dataManager.projectId)
-        Assert.assertEquals(DEFAULT_USER_ID, app.dataManager.userId)
+        Assert.assertEquals(DEFAULT_PROJECT_ID, app.dataManager.preferences.projectId)
+        Assert.assertEquals(DEFAULT_USER_ID, app.dataManager.preferences.userId)
     }
 
     @Test

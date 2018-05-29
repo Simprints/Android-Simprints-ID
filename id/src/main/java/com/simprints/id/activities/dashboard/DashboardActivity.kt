@@ -42,7 +42,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
-        LanguageHelper.setLanguage(this, app.dataManager.language)
+        LanguageHelper.setLanguage(this, app.dataManager.preferences.language)
 
         val syncClient = SyncService.getClient(this)
         viewPresenter = DashboardPresenter(this, syncClient,

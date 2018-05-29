@@ -30,7 +30,6 @@ import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.domain.ALERT_TYPE
@@ -138,7 +137,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nav_view.itemIconTintList = null
 
-        dataManager.msSinceBootOnMainStart = timeHelper.msSinceBoot()
+        dataManager.preferences.msSinceBootOnMainStart = timeHelper.msSinceBoot()
 
         currentActiveFingerNo = 0
 
@@ -146,7 +145,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         un20WakeupDialog = initUn20Dialog()
         timeoutBar = TimeoutBar(applicationContext,
             findViewById<View>(R.id.pb_timeout) as ProgressBar,
-            dataManager.timeoutS * 1000)
+            dataManager.preferences.timeoutS * 1000)
 
         setFingerStatus()
         initActiveFingers()
@@ -165,17 +164,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     public override fun onResume() {
         super.onResume()
-        LanguageHelper.setLanguage(this, dataManager.language)
+        LanguageHelper.setLanguage(this, dataManager.preferences.language)
     }
 
     // Reads the fingerStatus Map (from sharedPrefs) and "active" LEFT_THUMB and LEFT_INDEX_FINGER as
     // default finger.
     private fun setFingerStatus() {
         // We set the two defaults in the config for the first reset.
-        val fingerStatus = dataManager.fingerStatus as MutableMap
+        val fingerStatus = dataManager.preferences.fingerStatus as MutableMap
         fingerStatus[FingerIdentifier.LEFT_THUMB] = true
         fingerStatus[FingerIdentifier.LEFT_INDEX_FINGER] = true
-        dataManager.fingerStatus = fingerStatus
+        dataManager.preferences.fingerStatus = fingerStatus
     }
 
     // Builds the array of "fingers" and "activeFingers" based on the info from:
@@ -185,7 +184,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun initActiveFingers() {
         FingerIdentifier.values().take(NB_OF_FINGERS).forEachIndexed { _, identifier ->
 
-            val wasFingerAddedByUser = { dataManager.fingerStatusPersist && dataManager.fingerStatus[identifier] == true }
+            val wasFingerAddedByUser = { dataManager.preferences.fingerStatusPersist && dataManager.preferences.fingerStatus[identifier] == true }
             val isFingerRequired = { defaultScanConfig.isFingerRequired(identifier) }
             val isFingerActive = isFingerRequired() || wasFingerAddedByUser()
 
@@ -233,7 +232,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         nav_view.setNavigationItemSelectedListener(this)
         supportActionBar?.let {
             it.show()
-            when (dataManager.calloutAction) {
+            when (dataManager.preferences.calloutAction) {
                 CalloutAction.REGISTER -> it.setTitle(R.string.register_title)
                 CalloutAction.IDENTIFY -> it.setTitle(R.string.identify_title)
                 CalloutAction.UPDATE -> it.setTitle(R.string.update_title)
@@ -408,7 +407,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // Swipes ViewPager automatically when the scanner's button is pressed.
     private fun nudgeMode() {
-        val nudge = dataManager.nudgeMode
+        val nudge = dataManager.preferences.nudgeMode
 
         if (nudge) {
             Handler().postDelayed({
@@ -442,11 +441,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (nbRequiredFingerprints < 1) {
             Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show()
         } else {
-            val person = Person(dataManager.patientId, fingerprints)
-            if (dataManager.calloutAction === CalloutAction.REGISTER || dataManager.calloutAction === CalloutAction.UPDATE) {
+            val person = Person(dataManager.preferences.patientId, fingerprints)
+            if (dataManager.preferences.calloutAction === CalloutAction.REGISTER || dataManager.preferences.calloutAction === CalloutAction.UPDATE) {
                 dbManager.savePerson(person)
                         .subscribe({
-                            dataManager.lastEnrolDate = Date()
+                            dataManager.preferences.lastEnrolDate = Date()
                             handleRegistrationSuccess()
                         }) { throwable -> handleRegistrationFailure(throwable) }
             } else {
@@ -459,10 +458,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // If the enrol succeed, the activity returns the result and finishes.
     private fun handleRegistrationSuccess() {
-        registrationResult = Registration(dataManager.patientId)
+        registrationResult = Registration(dataManager.preferences.patientId)
 
         val resultData = Intent(Constants.SIMPRINTS_REGISTER_INTENT)
-        FormatResult.put(resultData, registrationResult, dataManager.resultFormat)
+        FormatResult.put(resultData, registrationResult, dataManager.preferences.resultFormat)
         setResult(Activity.RESULT_OK, resultData)
         finish()
     }
@@ -545,16 +544,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        val dialog = AddFingerDialog(this, fingerOptions, dataManager.fingerStatusPersist) { persistFingerState, fingersDialogOptions ->
+        val dialog = AddFingerDialog(this, fingerOptions, dataManager.preferences.fingerStatusPersist) { persistFingerState, fingersDialogOptions ->
             val currentActiveFinger = activeFingers[currentActiveFingerNo]
 
-            val persistentFingerStatus = dataManager.fingerStatus as MutableMap
+            val persistentFingerStatus = dataManager.preferences.fingerStatus as MutableMap
 
             //updateFingersActiveState
             fingersDialogOptions.forEach { option ->
                 fingers.find { it.id == option.fingerId }?.isActive = option.active
             }
-            dataManager.fingerStatusPersist = persistFingerState
+            dataManager.preferences.fingerStatusPersist = persistFingerState
 
             //remove old active fingers from MainView
             fingers
@@ -572,7 +571,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     persistentFingerStatus[it.id] = false
                 }
 
-            dataManager.fingerStatus = persistentFingerStatus
+            dataManager.preferences.fingerStatus = persistentFingerStatus
             activeFingers.sort()
 
             currentActiveFingerNo = if (currentActiveFinger.isActive) {
@@ -660,8 +659,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun startContinuousCapture() {
         timeoutBar.startTimeoutBar()
 
-        appState.scanner.startContinuousCapture(dataManager.qualityThreshold,
-            (dataManager.timeoutS * 1000).toLong(), object : ScannerCallback {
+        appState.scanner.startContinuousCapture(dataManager.preferences.qualityThreshold,
+            (dataManager.preferences.timeoutS * 1000).toLong(), object : ScannerCallback {
             override fun onSuccess() {
                 timeoutBar.stopTimeoutBar()
                 captureSuccess()
@@ -680,7 +679,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun forceCapture() {
-        appState.scanner.forceCapture(dataManager.qualityThreshold, object : ScannerCallback {
+        appState.scanner.forceCapture(dataManager.preferences.qualityThreshold, object : ScannerCallback {
             override fun onSuccess() {
                 captureSuccess()
             }
@@ -696,7 +695,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      */
     private fun forceCaptureNotPossible() {
         activeFingers[currentActiveFingerNo].status = Status.BAD_SCAN
-        Vibrate.vibrate(this@MainActivity, dataManager.vibrateMode)
+        Vibrate.vibrate(this@MainActivity, dataManager.preferences.vibrateMode)
         refreshDisplay()
     }
 
@@ -724,7 +723,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        val qualityScore1 = dataManager.qualityThreshold
+        val qualityScore1 = dataManager.preferences.qualityThreshold
 
         if (quality >= qualityScore1) {
             activeFingers[currentActiveFingerNo].status = Status.GOOD_SCAN
@@ -733,7 +732,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             activeFingers[currentActiveFingerNo].status = Status.BAD_SCAN
         }
 
-        Vibrate.vibrate(this@MainActivity, dataManager.vibrateMode)
+        Vibrate.vibrate(this@MainActivity, dataManager.preferences.vibrateMode)
         refreshDisplay()
     }
 

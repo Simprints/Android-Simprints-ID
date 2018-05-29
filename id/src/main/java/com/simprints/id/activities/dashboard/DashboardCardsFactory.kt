@@ -42,9 +42,9 @@ class DashboardCardsFactory(private val dataManager: DataManager,
             }.doOnError { it.printStackTrace() }
 
     fun createLocalDbInfoCard(position: Int = 1): Single<DashboardCard> =
-        dataManager.db.getPeopleCount(dataManager.syncGroup).map {
+        dataManager.db.getPeopleCount(dataManager.preferences.syncGroup).map {
                 val titleRes =
-                    if (dataManager.syncGroup == Constants.GROUP.USER) {
+                    if (dataManager.preferences.syncGroup == Constants.GROUP.USER) {
                         R.string.dashboard_card_localdb_sync_user_title
                     } else {
                         R.string.dashboard_card_localdb_sync_project_title
@@ -70,13 +70,13 @@ class DashboardCardsFactory(private val dataManager: DataManager,
         )
 
     private fun createLastScannerInfoCard(position: Int = 3): Single<DashboardCard>? {
-        return if (dataManager.lastScannerUsed.isNotEmpty()) {
+        return if (dataManager.preferences.lastScannerUsed.isNotEmpty()) {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_SCANNER,
                 position,
                 R.drawable.scanner,
                 androidResourcesHelper.getString(R.string.dashboard_card_lastscanner_title),
-                dataManager.lastScannerUsed)
+                dataManager.preferences.lastScannerUsed)
             ).doOnError { it.printStackTrace() }
         } else {
             null
@@ -85,13 +85,13 @@ class DashboardCardsFactory(private val dataManager: DataManager,
 
     //TODO: think about the option to use Maybe
     private fun createLastUserInfoCard(position: Int = 4): Single<DashboardCard>? {
-        return if (dataManager.lastUserUsed.isNotEmpty()) {
+        return if (dataManager.preferences.lastUserUsed.isNotEmpty()) {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_USER,
                 position,
                 R.drawable.last_user,
                 androidResourcesHelper.getString(R.string.dashboard_card_lastuser_title),
-                dataManager.lastUserUsed)
+                dataManager.preferences.lastUserUsed)
             ).doOnError { it.printStackTrace() }
         } else {
             null
@@ -99,7 +99,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
     }
 
     private fun createLastEnrolInfoCard(position: Int = 5): Single<DashboardCard>? =
-        dataManager.lastEnrolDate?.let {
+        dataManager.preferences.lastEnrolDate?.let {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_ENROL,
                 position,
@@ -110,7 +110,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
         }
 
     private fun createLastVerificationInfoCard(position: Int = 6): Single<DashboardCard>? =
-        dataManager.lastVerificationDate?.let {
+        dataManager.preferences.lastVerificationDate?.let {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_VERIFICATION,
                 position,
@@ -121,7 +121,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
         }
 
     private fun createLastIdentificationInfoCard(position: Int = 7): Single<DashboardCard>? =
-        dataManager.lastIdentificationDate?.let {
+        dataManager.preferences.lastIdentificationDate?.let {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_IDENTIFICATION,
                 position,

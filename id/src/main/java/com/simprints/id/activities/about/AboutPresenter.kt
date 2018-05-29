@@ -19,9 +19,9 @@ internal class AboutPresenter(private val view: AboutContract.View,
 
     private fun initVersions() {
         view.setVersionData(
-            dataManager.appVersionName,
-            dataManager.libVersionName,
-            dataManager.hardwareVersionString)
+            dataManager.preferences.appVersionName,
+            dataManager.preferences.libVersionName,
+            dataManager.preferences.hardwareVersionString)
     }
 
     private fun initCounts() {

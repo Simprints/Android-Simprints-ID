@@ -87,7 +87,7 @@ public class Setup {
             return;
 
         // Step 1: check permissions. These can be revoked, so it has to be done every time
-        boolean permissionsReady = PermissionManager.checkAllPermissions(activity, dataManager.getCallingPackage());
+        boolean permissionsReady = PermissionManager.checkAllPermissions(activity, dataManager.getPreferences().getCallingPackage());
         if (!permissionsReady) {
             this.requestPermissions(activity);
             return;
@@ -126,7 +126,7 @@ public class Setup {
     // STEP 1
     private void requestPermissions(@NonNull Activity activity) {
         onProgress(15, R.string.launch_checking_permissions);
-        PermissionManager.requestAllPermissions(activity, dataManager.getCallingPackage());
+        PermissionManager.requestAllPermissions(activity, dataManager.getPreferences().getCallingPackage());
     }
 
     // STEP 2
@@ -142,11 +142,11 @@ public class Setup {
             return;
         }
         String macAddress = pairedScanners.get(0);
-        dataManager.setMacAddress(macAddress);
+        dataManager.getPreferences().setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
 
         //TODO: move convertAddressToSerial in libscanner
-        dataManager.setLastScannerUsed(com.simprints.id.tools.utils.ScannerUtils.convertAddressToSerial(macAddress));
+        dataManager.getPreferences().setLastScannerUsed(com.simprints.id.tools.utils.ScannerUtils.convertAddressToSerial(macAddress));
 
         Timber.d("Setup: Scanner initialized.");
         goOn(activity);
@@ -162,7 +162,7 @@ public class Setup {
                 if (appState != null && appState.getScanner() != null) {
                     Timber.d("Setup: Connected to Vero.");
                     uiResetSinceConnection = false;
-                    dataManager.setScannerId(appState.getScanner().getScannerId());
+                    dataManager.getPreferences().setScannerId(appState.getScanner().getScannerId());
                     dataManager.getAnalytics().logScannerProperties();
                     goOn(activity);
                 } else {
@@ -201,7 +201,7 @@ public class Setup {
 
     // STEP 4
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
-        if (dataManager.getCalloutAction() != CalloutAction.VERIFY) {
+        if (dataManager.getPreferences().getCalloutAction() != CalloutAction.VERIFY) {
             guidExists = true;
             goOn(activity);
             return;
@@ -210,7 +210,7 @@ public class Setup {
         onProgress(70, R.string.launch_checking_person_in_db);
 
         List<Person> loadedPerson = new ArrayList<>();
-        final String guid = dataManager.getPatientId();
+        final String guid = dataManager.getPreferences().getPatientId();
         try {
             dataManager.getDb().loadPerson(loadedPerson, dataManager.getLoginInfo().getSignedInProjectId(), guid, wrapCallback("loading people from db", newLoadPersonCallback(activity, guid)));
         } catch (UninitializedDataManagerError error) {
@@ -295,7 +295,7 @@ public class Setup {
             public void onSuccess() {
                 if (appState != null && appState.getScanner() != null) {
                     Timber.d("Setup: UN20 ready.");
-                    dataManager.setHardwareVersion(appState.getScanner().getUcVersion());
+                    dataManager.getPreferences().setHardwareVersion(appState.getScanner().getUcVersion());
                     Setup.this.onSuccess();
                 } else {
                     dataManager.getAnalytics().logError(new NullScannerError("Null values in onSuccess Setup.wakeUpUn20()"));

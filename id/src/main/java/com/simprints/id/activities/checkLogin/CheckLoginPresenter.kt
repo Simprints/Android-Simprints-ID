@@ -21,7 +21,7 @@ abstract class CheckLoginPresenter(
     }
 
     private fun initSession() {
-        dataManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
+        dataManager.preferences.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
     }
 
     private fun newSessionId(): String {

@@ -51,7 +51,7 @@ class LoginActivityTest : RxJavaTest() {
     @Test
     fun shouldUserIdPreFilled() {
         val userId = "some_user_id"
-        app.dataManager.userId = userId
+        app.dataManager.preferences.userId = userId
 
         val controller = createRoboLoginActivity().start().resume().visible()
         val activity = controller.get()

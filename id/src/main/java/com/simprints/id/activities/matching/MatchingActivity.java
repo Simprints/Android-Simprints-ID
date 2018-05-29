@@ -42,7 +42,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         Application app = ((Application) getApplication());
         DataManager dataManager = app.getDataManager();
 
-        LanguageHelper.setLanguage(this, dataManager.getLanguage());
+        LanguageHelper.setLanguage(this, dataManager.getPreferences().getLanguage());
         setContentView(R.layout.activity_matching);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 

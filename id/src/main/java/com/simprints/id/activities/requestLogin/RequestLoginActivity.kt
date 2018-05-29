@@ -18,11 +18,11 @@ open class RequestLoginActivity : AppCompatActivity() {
         app = application as Application
         dataManager = app.dataManager
 
-        LanguageHelper.setLanguage(this, dataManager.language)
+        LanguageHelper.setLanguage(this, dataManager.preferences.language)
         setContentView(R.layout.activity_front)
 
-        initSimprintsIdVersionTextView(dataManager.appVersionName)
-        initLibSimprintsVersionTextView(dataManager.libVersionName)
+        initSimprintsIdVersionTextView(dataManager.preferences.appVersionName)
+        initLibSimprintsVersionTextView(dataManager.preferences.libVersionName)
     }
 
     private fun initSimprintsIdVersionTextView(simprintsIdVersion: String) {

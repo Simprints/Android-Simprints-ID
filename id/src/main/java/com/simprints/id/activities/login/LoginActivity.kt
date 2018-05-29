@@ -59,7 +59,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     private fun initUI() {
         progressDialog = SimProgressDialog(this)
-        loginEditTextUserId.setText(app.dataManager.userId)
+        loginEditTextUserId.setText(app.dataManager.preferences.userId)
         loginButtonScanQr.setOnClickListener { viewPresenter.openScanQRApp() }
         loginButtonSignIn.setOnClickListener { handleSignInStart() }
     }
@@ -79,7 +79,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         val userId = loginEditTextUserId.text.toString()
         val projectId = loginEditTextProjectId.text.toString()
         val projectSecret = loginEditTextProjectSecret.text.toString()
-        viewPresenter.signIn(userId, projectId, projectSecret, app.dataManager.projectId, possibleLegacyProjectId)
+        viewPresenter.signIn(userId, projectId, projectSecret, app.dataManager.preferences.projectId, possibleLegacyProjectId)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -28,7 +28,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
         try {
             extractSessionParameters()
-            dataManager.lastUserUsed = dataManager.userId
+            dataManager.preferences.lastUserUsed = dataManager.preferences.userId
         } catch (exception: InvalidCalloutError) {
             view.openAlertActivityForError(exception.alertType)
             setupFailed = true
@@ -46,7 +46,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         dataManager.analytics.logCallout(callout)
         val sessionParameters = sessionParametersExtractor.extractFrom(callout)
         possibleLegacyApiKey = sessionParameters.apiKey
-        dataManager.sessionParameters = sessionParameters
+        dataManager.preferences.sessionParameters = sessionParameters
         dataManager.analytics.logUserProperties()
     }
 
@@ -66,7 +66,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun matchIntentAndStoredProjectIdsOrThrow(storedProjectId: String): Boolean =
         if (possibleLegacyApiKey.isEmpty()) {
-            matchProjectIdsOrThrow(storedProjectId, dataManager.projectId)
+            matchProjectIdsOrThrow(storedProjectId, dataManager.preferences.projectId)
         } else {
             val hashedLegacyApiKey = Hasher().hash(possibleLegacyApiKey)
             val storedProjectIdFromLegacyOrEmpty = dataManager.loginInfo.getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey)
@@ -79,7 +79,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     /** @throws DifferentUserIdSignedInException */
     override fun isUserIdStoredAndMatches() =
-        if (dataManager.userId != dataManager.loginInfo.getSignedInUserIdOrEmpty())
+        if (dataManager.preferences.userId != dataManager.loginInfo.getSignedInUserIdOrEmpty())
             throw DifferentUserIdSignedInException()
         else dataManager.loginInfo.getSignedInUserIdOrEmpty().isNotEmpty()
 

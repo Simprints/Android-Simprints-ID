@@ -65,7 +65,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     }
 
     private fun checkSessionId(sessionId: String?) {
-        if (sessionId == null || sessionId != dataManager.sessionId) {
+        if (sessionId == null || sessionId != dataManager.preferences.sessionId) {
             throw InvalidCalloutParameterError.forParameter(SIMPRINTS_SESSION_ID)
         }
     }

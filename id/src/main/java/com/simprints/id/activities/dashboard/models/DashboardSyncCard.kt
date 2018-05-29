@@ -17,7 +17,7 @@ class DashboardSyncCard(type: DashboardCardType,
                         var dataManager: DataManager,
                         private val dateFormat: DateFormat) : DashboardCard(type, position, imageRes, title, "") {
 
-    val syncParams = SyncTaskParameters.build(dataManager.syncGroup, dataManager)
+    val syncParams = SyncTaskParameters.build(dataManager.preferences.syncGroup, dataManager)
     var onSyncActionClicked: (cardModel: DashboardSyncCard) -> Unit = {}
     var peopleToUpload: Int = 0
     var peopleToDownload: Int? = null
