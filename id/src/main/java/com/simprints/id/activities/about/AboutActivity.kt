@@ -39,8 +39,7 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
 
         initUi()
 
-        viewPresenter = AboutPresenter(this,
-            app.dbManager, app.loginInfoManager, app.preferencesManager, app.analyticsManager)
+        viewPresenter = AboutPresenter(this, app.dataManager)
     }
 
     private fun initUi() {

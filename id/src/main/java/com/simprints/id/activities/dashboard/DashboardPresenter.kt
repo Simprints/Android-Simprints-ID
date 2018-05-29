@@ -33,7 +33,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private val syncManager = SyncManager(dataManager, syncClient)
 
-    private val cardsFactory = DashboardCardsFactory(dataManager, dbManager, loginInfoManager, preferencesManager, androidResourcesHelper)
+    private val cardsFactory = DashboardCardsFactory(dataManager, androidResourcesHelper)
 
     private var actualSyncParams: SyncTaskParameters =
         SyncTaskParameters.build(dataManager.syncGroup, dataManager)

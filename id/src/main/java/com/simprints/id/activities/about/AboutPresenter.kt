@@ -1,10 +1,7 @@
 package com.simprints.id.activities.about
 
 
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.data.DataManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.safe.SimprintsException
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -12,10 +9,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
 internal class AboutPresenter(private val view: AboutContract.View,
-                              private val dbManager: DbManager,
-                              private val loginInfoManager: LoginInfoManager,
-                              private val preferencesManager: PreferencesManager,
-                              private val analyticsManager: AnalyticsManager) : AboutContract.Presenter {
+                              private val dataManager: DataManager) : AboutContract.Presenter {
 
     override fun start() {
         initVersions()
@@ -25,28 +19,29 @@ internal class AboutPresenter(private val view: AboutContract.View,
 
     private fun initVersions() {
         view.setVersionData(
-            preferencesManager.appVersionName,
-            preferencesManager.libVersionName,
-            preferencesManager.hardwareVersionString)
+            dataManager.appVersionName,
+            dataManager.libVersionName,
+            dataManager.hardwareVersionString)
     }
 
     private fun initCounts() {
-        dbManager.getPeopleCount().subscribe({ count ->
+        dataManager.db.getPeopleCount(Constants.GROUP.GLOBAL).subscribe({ count ->
             view.setProjectCount(count.toString())
-        }, { analyticsManager.logSafeException(SimprintsException(it)) })
-        dbManager.getPeopleCount(moduleId = preferencesManager.moduleId).subscribe({ count ->
-            view.setModuleCount(count.toString())
-        }, { analyticsManager.logSafeException(SimprintsException(it)) })
+        }, { dataManager.analytics.logSafeException(SimprintsException(it)) })
 
-        dbManager.getPeopleCount(userId = loginInfoManager.getSignedInUserIdOrEmpty()).subscribe({ count ->
+        dataManager.db.getPeopleCount(Constants.GROUP.MODULE).subscribe({ count ->
+            view.setModuleCount(count.toString())
+        }, { dataManager.analytics.logSafeException(SimprintsException(it)) })
+
+        dataManager.db.getPeopleCount(Constants.GROUP.USER).subscribe({ count ->
             view.setUserCount(count.toString())
-        }, { analyticsManager.logSafeException(SimprintsException(it)) })
+        }, { dataManager.analytics.logSafeException(SimprintsException(it)) })
     }
 
     override fun recoverDb() {
         recoveryRunning = true
         view.setRecoveryInProgress()
-        dbManager.recoverLocalDb(Constants.GROUP.GLOBAL)
+        dataManager.db.recoverLocalDb(Constants.GROUP.GLOBAL)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribeBy(
@@ -61,7 +56,7 @@ internal class AboutPresenter(private val view: AboutContract.View,
 
     private fun handleRecoveryError(throwable: Throwable) {
         recoveryRunning = false
-        analyticsManager.logThrowable(throwable)
+        dataManager.analytics.logThrowable(throwable)
         view.setRecoveringFailed()
     }
 

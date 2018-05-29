@@ -444,12 +444,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             val person = Person(dataManager.patientId, fingerprints)
             if (dataManager.calloutAction === CalloutAction.REGISTER || dataManager.calloutAction === CalloutAction.UPDATE) {
-                val fbPerson = fb_Person(
-                    person,
-                    loginInfoManager.getSignedInProjectIdOrEmpty(),
-                    loginInfoManager.getSignedInUserIdOrEmpty(),
-                    preferencesManager.moduleId)
-                dbManager.savePerson(fbPerson)
+                dbManager.savePerson(person)
                         .subscribe({
                             dataManager.lastEnrolDate = Date()
                             handleRegistrationSuccess()
