@@ -23,7 +23,7 @@ class CheckLoginFromMainLauncherPresenter(
         view.openDashboardActivity()
     }
 
-    override fun isProjectIdStoredAndMatches(): Boolean = dataManager.getSignedInProjectIdOrEmpty().isNotEmpty()
+    override fun isProjectIdStoredAndMatches(): Boolean = dataManager.loginInfo.getSignedInProjectIdOrEmpty().isNotEmpty()
 
-    override fun isUserIdStoredAndMatches(): Boolean = dataManager.getSignedInUserIdOrEmpty().isNotEmpty()
+    override fun isUserIdStoredAndMatches(): Boolean = dataManager.loginInfo.getSignedInUserIdOrEmpty().isNotEmpty()
 }

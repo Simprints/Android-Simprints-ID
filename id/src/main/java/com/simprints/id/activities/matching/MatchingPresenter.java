@@ -166,7 +166,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     private void onVerifyStart() {
         final String guid = dataManager.getPatientId();
         try {
-            dataManager.getDb().loadPerson(candidates, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people", newOnLoadPersonCallback()));
+            dataManager.getDb().loadPerson(candidates, dataManager.getLoginInfo().getSignedInProjectId(), guid, wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {
             dataManager.getAnalytics().logError(error);
             matchingView.launchAlert();

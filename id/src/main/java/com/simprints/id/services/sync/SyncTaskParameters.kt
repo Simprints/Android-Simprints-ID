@@ -13,9 +13,9 @@ sealed class SyncTaskParameters(open val projectId: String, open val moduleId: S
 
         @JvmStatic fun build(group: Constants.GROUP, dataManager: DataManager): SyncTaskParameters {
             return when (group) {
-                Constants.GROUP.GLOBAL -> GlobalSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty())
-                Constants.GROUP.USER -> UserSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
-                Constants.GROUP.MODULE -> ModuleIdSyncTaskParameters(dataManager.getSignedInProjectIdOrEmpty(), dataManager.moduleId)
+                Constants.GROUP.GLOBAL -> GlobalSyncTaskParameters(dataManager.loginInfo.getSignedInProjectIdOrEmpty())
+                Constants.GROUP.USER -> UserSyncTaskParameters(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), dataManager.loginInfo.getSignedInUserIdOrEmpty())
+                Constants.GROUP.MODULE -> ModuleIdSyncTaskParameters(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), dataManager.moduleId)
             }
         }
     }

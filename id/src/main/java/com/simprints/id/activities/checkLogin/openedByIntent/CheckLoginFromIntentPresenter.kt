@@ -61,15 +61,15 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     /** @throws DifferentProjectIdSignedInException */
     override fun isProjectIdStoredAndMatches(): Boolean =
-        dataManager.getSignedInProjectIdOrEmpty().isNotEmpty() &&
-            matchIntentAndStoredProjectIdsOrThrow(dataManager.getSignedInProjectIdOrEmpty())
+        dataManager.loginInfo.getSignedInProjectIdOrEmpty().isNotEmpty() &&
+            matchIntentAndStoredProjectIdsOrThrow(dataManager.loginInfo.getSignedInProjectIdOrEmpty())
 
     private fun matchIntentAndStoredProjectIdsOrThrow(storedProjectId: String): Boolean =
         if (possibleLegacyApiKey.isEmpty()) {
             matchProjectIdsOrThrow(storedProjectId, dataManager.projectId)
         } else {
             val hashedLegacyApiKey = Hasher().hash(possibleLegacyApiKey)
-            val storedProjectIdFromLegacyOrEmpty = dataManager.getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey)
+            val storedProjectIdFromLegacyOrEmpty = dataManager.loginInfo.getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey)
             matchProjectIdsOrThrow(storedProjectId, storedProjectIdFromLegacyOrEmpty)
         }
 
@@ -79,9 +79,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     /** @throws DifferentUserIdSignedInException */
     override fun isUserIdStoredAndMatches() =
-        if (dataManager.userId != dataManager.getSignedInUserIdOrEmpty())
+        if (dataManager.userId != dataManager.loginInfo.getSignedInUserIdOrEmpty())
             throw DifferentUserIdSignedInException()
-        else dataManager.getSignedInUserIdOrEmpty().isNotEmpty()
+        else dataManager.loginInfo.getSignedInUserIdOrEmpty().isNotEmpty()
 
     override fun handleSignedInUser() {
         view.openLaunchActivity()
