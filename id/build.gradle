@@ -1,6 +1,7 @@
 import com.android.builder.testing.api.DeviceProvider
 
 apply plugin: "com.android.application"
+apply plugin: 'com.github.triplet.play'
 apply plugin: "kotlin-android"
 apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
@@ -22,7 +23,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 27
         multiDexEnabled true
-        versionCode 77
+        versionCode 78
         versionName "2018.2.0-rc8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -161,7 +162,6 @@ buildscript {
         google()
     }
     dependencies {
-
     }
 }
 
@@ -179,7 +179,11 @@ android {
         }
     }
 }
-
+// ./gradlew publishApkRelease to publish on internal channel
+play {
+    track = 'internal'
+    jsonFile = file(SIMPRINTSID_PUBLISH_KEY_FILE)
+}
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
