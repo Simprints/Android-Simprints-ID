@@ -4,11 +4,8 @@ import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.service.ProgressService
 import com.simprints.id.services.sync.SyncClient
@@ -24,9 +21,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 class DashboardPresenter(private val view: DashboardContract.View,
                          syncClient: SyncClient,
                          val dataManager: DataManager,
-                         val dbManager: DbManager,
-                         val loginInfoManager: LoginInfoManager,
-                         val preferencesManager: PreferencesManager,
                          androidResourcesHelper: AndroidResourcesHelper) : DashboardContract.Presenter {
 
     private var started: AtomicBoolean = AtomicBoolean(false)
@@ -162,5 +156,10 @@ class DashboardPresenter(private val view: DashboardContract.View,
         cardsModelsList.findLast { it.type == projectType }.also {
             cardsModelsList.remove(it)
         }
+    }
+
+    override fun logout() {
+        dataManager.loginInfo.cleanCredentials()
+        dataManager.db.signOut()
     }
 }

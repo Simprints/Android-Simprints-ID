@@ -29,9 +29,6 @@ import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.Finger.NB_OF_FINGERS
@@ -97,9 +94,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var un20WakeupDialog: ProgressDialog
     private lateinit var dataManager: DataManager
-    private lateinit var dbManager: DbManager
-    private lateinit var loginInfoManager: LoginInfoManager
-    private lateinit var preferencesManager: PreferencesManager
     private lateinit var syncHelper: MainActivitySyncHelper
 
     private val defaultScanConfig = ScanConfig().apply {
@@ -124,9 +118,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val app = application as Application
         dataManager = app.dataManager
-        dbManager = app.dbManager
-        loginInfoManager = app.loginInfoManager
-        preferencesManager = app.preferencesManager
         appState = app.appState
         setup = app.setup
         val syncClient = SyncService.getClient(this)
@@ -443,7 +434,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             val person = Person(dataManager.preferences.patientId, fingerprints)
             if (dataManager.preferences.calloutAction === CalloutAction.REGISTER || dataManager.preferences.calloutAction === CalloutAction.UPDATE) {
-                dbManager.savePerson(person)
+                dataManager.db.savePerson(person)
                         .subscribe({
                             dataManager.preferences.lastEnrolDate = Date()
                             handleRegistrationSuccess()
@@ -760,7 +751,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             SCANNER_ERROR.UN20_SDK_ERROR -> forceCaptureNotPossible()
 
-            SCANNER_ERROR.IO_ERROR, SCANNER_ERROR.NO_RESPONSE, SCANNER_ERROR.UNEXPECTED, SCANNER_ERROR.BLUETOOTH_DISABLED, SCANNER_ERROR.BLUETOOTH_NOT_SUPPORTED, SCANNER_ERROR.SCANNER_UNBONDED, SCANNER_ERROR.UN20_FAILURE, SCANNER_ERROR.UN20_LOW_VOLTAGE -> {
+            else -> {
                 cancelCaptureUI()
                 handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "MainActivity"))
             }

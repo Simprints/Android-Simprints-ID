@@ -3,13 +3,15 @@ package com.simprints.id.data
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.session.Session
 
 class DataManagerImpl(override val preferences: PreferencesManager,
                       override val loginInfo: LoginInfoManager,
-                      override val db: DbManager,
-                      override val analytics: AnalyticsManager) : DataManager {
+                      override val secure: SecureDataManager,
+                      override val analytics: AnalyticsManager,
+                      override val db: DbManager) : DataManager {
 
     override fun saveSession() {
         val session = Session(

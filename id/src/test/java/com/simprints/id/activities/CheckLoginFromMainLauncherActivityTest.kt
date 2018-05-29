@@ -6,7 +6,7 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
+import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.roboletric.*
 import org.junit.Before

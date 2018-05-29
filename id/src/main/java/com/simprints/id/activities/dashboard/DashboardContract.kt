@@ -21,5 +21,6 @@ interface DashboardContract {
         fun pause()
         fun userDidWantToRefreshCardsIfPossible()
         fun userDidWantToSync()
+        fun logout()
     }
 }

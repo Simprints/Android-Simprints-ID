@@ -1,6 +1,6 @@
 package com.simprints.id.secure
 
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.secure.cryptography.ProjectSecretEncrypter
 import com.simprints.id.secure.models.PublicKeyString
 

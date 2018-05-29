@@ -40,7 +40,6 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         viewPresenter = CheckLoginFromIntentPresenter(
             this,
             dataManager,
-            app.secureDataManager,
             app.sessionParametersExtractor,
             timeHelper)
 
@@ -58,7 +57,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     override fun checkCallingAppIsFromKnownSource() {
         dataManager.preferences.callingPackage = getCallingPackageName()
         if (app.packageManager.isCallingAppFromUnknownSource(dataManager.preferences.callingPackage)) {
-            app.analyticsManager.logSafeException(CallingAppFromUnknownSourceException())
+            dataManager.analytics.logSafeException(CallingAppFromUnknownSourceException())
         }
     }
 
