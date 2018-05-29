@@ -3,7 +3,7 @@ package com.simprints.id.activities
 import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.createMockForDbManager
@@ -42,7 +42,7 @@ class AboutActivityTest : RxJavaTest() {
     }
 
     private fun mockAnalyticsManager() {
-        analyticsManagerMock = Mockito.mock(FirebaseAnalyticsManager::class.java)
+        analyticsManagerMock = Mockito.mock(AnalyticsManagerImpl::class.java)
         app.analyticsManager = analyticsManagerMock
     }
 

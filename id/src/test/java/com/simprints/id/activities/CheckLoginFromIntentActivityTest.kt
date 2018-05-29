@@ -11,7 +11,7 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -69,7 +69,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
     }
 
     private fun mockAnalyticsManager() {
-        analyticsManagerMock = Mockito.mock(FirebaseAnalyticsManager::class.java)
+        analyticsManagerMock = Mockito.mock(AnalyticsManagerImpl::class.java)
         app.analyticsManager = analyticsManagerMock
     }
 
