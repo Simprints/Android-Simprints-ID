@@ -212,7 +212,7 @@ public class Setup {
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = dataManager.getPatientId();
         try {
-            dataManager.loadPerson(loadedPerson, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people from db", newLoadPersonCallback(activity, guid)));
+            dataManager.getDb().loadPerson(loadedPerson, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people from db", newLoadPersonCallback(activity, guid)));
         } catch (UninitializedDataManagerError error) {
             dataManager.getAnalytics().logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
@@ -251,11 +251,11 @@ public class Setup {
     private void saveNotFoundVerification(Person probe) {
         if (networkUtils.isConnected()) {
             // We've synced with the online db and they're not in the db
-            dataManager.saveVerification(probe, null, GUID_NOT_FOUND_ONLINE);
+            dataManager.getDb().saveVerification(probe, null, GUID_NOT_FOUND_ONLINE);
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
         } else {
             // We're offline but might find the person if we sync
-            dataManager.saveVerification(probe, null, GUID_NOT_FOUND_OFFLINE);
+            dataManager.getDb().saveVerification(probe, null, GUID_NOT_FOUND_OFFLINE);
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
         }
     }

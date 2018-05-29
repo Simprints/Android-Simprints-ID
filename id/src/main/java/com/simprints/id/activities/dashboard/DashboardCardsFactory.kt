@@ -36,7 +36,7 @@ class DashboardCardsFactory(private val dataManager: DataManager,
         ).filterNotNull()
 
     private fun createProjectInfoCard(position: Int = 0): Single<DashboardCard> =
-        dataManager
+        dataManager.db
             .loadProject(dataManager.getSignedInProjectIdOrEmpty())
             .map {
                 DashboardCard(

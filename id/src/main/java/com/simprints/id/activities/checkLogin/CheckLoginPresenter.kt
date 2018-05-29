@@ -66,7 +66,7 @@ abstract class CheckLoginPresenter(
     }
 
     private fun isEncryptedProjectSecretPresent(): Boolean = dataManager.getEncryptedProjectSecretOrEmpty().isNotEmpty()
-    private fun isFirebaseTokenValid(): Boolean = dataManager.isSignedIn(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
+    private fun isFirebaseTokenValid(): Boolean = dataManager.db.isSignedIn(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
     private fun isLocalKeyValid(projectId: String): Boolean = try {
         secureDataManager.getLocalDbKeyOrThrow(projectId)
         true

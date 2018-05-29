@@ -40,7 +40,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
 
         val authenticator = ProjectAuthenticator(
             mockLoginInfoManager(),
-            app.dataManager,
+            app.dataManager.db,
             SafetyNet.getClient(app),
             ApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
             getMockAttestationManager())
@@ -63,7 +63,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
 
         val testObserver = ProjectAuthenticator(
             mockLoginInfoManager(),
-            app.dataManager,
+            app.dataManager.db,
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(apiClient.retrofit))
 

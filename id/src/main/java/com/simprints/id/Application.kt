@@ -160,7 +160,7 @@ open class Application : MultiDexApplication() {
     }
 
     var dbManager: DbManager by lazyVar {
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager)
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager)
     }
 
     private val fabric: Fabric by lazy {

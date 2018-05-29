@@ -186,7 +186,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     private void onVerifyStart() {
         final String guid = dataManager.getPatientId();
         try {
-            dataManager.loadPerson(candidates, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people", newOnLoadPersonCallback()));
+            dataManager.getDb().loadPerson(candidates, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {
             dataManager.getAnalytics().logError(error);
             matchingView.launchAlert();
@@ -271,7 +271,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         }
 
                         try {
-                            dataManager.saveIdentification(probe, candidates.size(), topCandidates);
+                            dataManager.getDb().saveIdentification(probe, candidates.size(), topCandidates);
 
                         } catch (UninitializedDataManagerError error) {
                             dataManager.getAnalytics().logError(error);
@@ -323,7 +323,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         }
 
                         try {
-                            dataManager.saveVerification(probe, verification, guidExistsResult);
+                            dataManager.getDb().saveVerification(probe, verification, guidExistsResult);
                         } catch (UninitializedDataManagerError error) {
                             dataManager.getAnalytics().logError(error);
                             matchingView.launchAlert();
