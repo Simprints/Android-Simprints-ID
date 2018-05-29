@@ -15,6 +15,8 @@ Add in ~/.gradle/gradle.properties:
 
 `SIMPRINTSID_DEV_GCP_PROJECT=simprints-dev`
 
+`SIMPRINTSID_PUBLISH_KEY_FILE=some_string` required only to publish apks
+
 `SIMPRINTSID_RELEASE_STORE_FILE=`
 
 `SIMPRINTSID_RELEASE_STORE_PASSWORD=`
