@@ -25,7 +25,7 @@ public class PrivacyActivity extends AppCompatActivity {
         Application app = ((Application) getApplication());
         dataManager = app.getDataManager();
 
-        LanguageHelper.setLanguage(this, dataManager.getLanguage());
+        LanguageHelper.setLanguage(this, dataManager.getPreferences().getLanguage());
         setContentView(R.layout.activity_privacy);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -38,7 +38,7 @@ public class PrivacyActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        boolean consent = dataManager.getConsent();
+        boolean consent = dataManager.getPreferences().getConsent();
         CheckBox checkBox = findViewById(R.id.consentCheckBox);
 
         checkBox.setChecked(consent);
@@ -48,7 +48,7 @@ public class PrivacyActivity extends AppCompatActivity {
         // Check which checkbox was clicked
         switch (view.getId()) {
             case R.id.consentCheckBox:
-                dataManager.setConsent(true);
+                dataManager.getPreferences().setConsent(true);
                 ((CheckBox) view).setChecked(true);
                 break;
         }

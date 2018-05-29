@@ -36,7 +36,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     private val cardsFactory = DashboardCardsFactory(dataManager, androidResourcesHelper)
 
     private var actualSyncParams: SyncTaskParameters =
-        SyncTaskParameters.build(dataManager.syncGroup, dataManager)
+        SyncTaskParameters.build(dataManager.preferences.syncGroup, dataManager)
 
     override val cardsModelsList: ArrayList<DashboardCard> = arrayListOf()
 
@@ -55,7 +55,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun hasSyncGroupChangedSinceLastRun(): Boolean {
-        val syncParams = SyncTaskParameters.build(dataManager.syncGroup, dataManager)
+        val syncParams = SyncTaskParameters.build(dataManager.preferences.syncGroup, dataManager)
         return (actualSyncParams != syncParams).also {
             actualSyncParams = syncParams
         }
@@ -132,7 +132,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
             // The "sync" happens only once at time on Service, no matters how many times we call "sync".
             // When "sync" is called, syncManager connect to the Service and syncManager either starts
             // the sync or catch with the Sync state.
-            syncManager.sync(SyncTaskParameters.build(dataManager.syncGroup, dataManager))
+            syncManager.sync(SyncTaskParameters.build(dataManager.preferences.syncGroup, dataManager))
         }
     }
 
@@ -148,7 +148,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override fun userDidWantToSync() {
         setSyncingStartedInLocalDbCardView()
-        syncManager.sync(SyncTaskParameters.build(dataManager.syncGroup, dataManager))
+        syncManager.sync(SyncTaskParameters.build(dataManager.preferences.syncGroup, dataManager))
     }
 
     private fun setSyncingStartedInLocalDbCardView() {

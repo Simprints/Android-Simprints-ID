@@ -19,7 +19,7 @@ public class TutorialActivity extends AppCompatActivity {
         Application app = ((Application) getApplication());
         DataManager dataManager = app.getDataManager();
 
-        LanguageHelper.setLanguage(this, dataManager.getLanguage());
+        LanguageHelper.setLanguage(this, dataManager.getPreferences().getLanguage());
         setContentView(R.layout.activity_tutorial);
 
         Toolbar toolbar = findViewById(R.id.toolbar_tutorial);

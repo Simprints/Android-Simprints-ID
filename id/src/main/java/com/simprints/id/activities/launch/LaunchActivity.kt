@@ -75,7 +75,7 @@ open class LaunchActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        LanguageHelper.setLanguage(this, dataManager.language)
+        LanguageHelper.setLanguage(this, dataManager.preferences.language)
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
@@ -84,7 +84,7 @@ open class LaunchActivity : AppCompatActivity() {
     private fun getSetupCallback(): SetupCallback =
         object : SetupCallback {
             override fun onSuccess() {
-                dataManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
+                dataManager.preferences.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
                 // If it is the first time the launch process finishes, wait for consent confirmation
                 // Else, go directly to the main activity
                 if (!consentConfirmed) {
@@ -93,7 +93,7 @@ open class LaunchActivity : AppCompatActivity() {
                     loadingInfoTextView.visibility = View.INVISIBLE
                     waitingForConfirmation = true
                     appState.scanner.registerButtonListener(scannerButton)
-                    vibrate(this@LaunchActivity, dataManager.vibrateMode)
+                    vibrate(this@LaunchActivity, dataManager.preferences.vibrateMode)
                 } else {
                     finishLaunch()
                 }
@@ -172,7 +172,7 @@ open class LaunchActivity : AppCompatActivity() {
     private fun finishWith(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
         setResult(resultCode, resultData)
-        dataManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
+        dataManager.preferences.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
         dataManager.saveSession()
         finish()
     }

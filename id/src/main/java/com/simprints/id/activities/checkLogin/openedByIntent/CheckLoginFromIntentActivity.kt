@@ -56,8 +56,8 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         intent.toCallout()
 
     override fun checkCallingAppIsFromKnownSource() {
-        dataManager.callingPackage = getCallingPackageName()
-        if (app.packageManager.isCallingAppFromUnknownSource(dataManager.callingPackage)) {
+        dataManager.preferences.callingPackage = getCallingPackageName()
+        if (app.packageManager.isCallingAppFromUnknownSource(dataManager.preferences.callingPackage)) {
             app.analyticsManager.logSafeException(CallingAppFromUnknownSourceException())
         }
     }

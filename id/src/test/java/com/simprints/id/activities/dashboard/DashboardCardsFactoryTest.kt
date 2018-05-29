@@ -66,8 +66,8 @@ class DashboardCardsFactoryTest {
         val lastEnrolDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-            { factory.dateFormat.format(lastEnrolDate).also { app.dataManager.lastEnrolDate = lastEnrolDate } },
-            { app.dataManager.lastEnrolDate = null },
+            { factory.dateFormat.format(lastEnrolDate).also { app.dataManager.preferences.lastEnrolDate = lastEnrolDate } },
+            { app.dataManager.preferences.lastEnrolDate = null },
             app.getString(R.string.dashboard_card_enrol_title))
     }
 
@@ -77,8 +77,8 @@ class DashboardCardsFactoryTest {
         val lastIdentificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-            { factory.dateFormat.format(lastIdentificationDate).also { app.dataManager.lastIdentificationDate = lastIdentificationDate } },
-            { app.dataManager.lastIdentificationDate = null },
+            { factory.dateFormat.format(lastIdentificationDate).also { app.dataManager.preferences.lastIdentificationDate = lastIdentificationDate } },
+            { app.dataManager.preferences.lastIdentificationDate = null },
             app.getString(R.string.dashboard_card_identification_title))
     }
 
@@ -88,8 +88,8 @@ class DashboardCardsFactoryTest {
         val lastVerificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-            { factory.dateFormat.format(lastVerificationDate).also { app.dataManager.lastVerificationDate = lastVerificationDate } },
-            { app.dataManager.lastVerificationDate = null },
+            { factory.dateFormat.format(lastVerificationDate).also { app.dataManager.preferences.lastVerificationDate = lastVerificationDate } },
+            { app.dataManager.preferences.lastVerificationDate = null },
             app.getString(R.string.dashboard_card_verification_title))
     }
 
@@ -99,8 +99,8 @@ class DashboardCardsFactoryTest {
         val lastUser = "someone"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-            { lastUser.also { app.dataManager.lastUserUsed = lastUser } },
-            { app.dataManager.lastUserUsed = "" },
+            { lastUser.also { app.dataManager.preferences.lastUserUsed = lastUser } },
+            { app.dataManager.preferences.lastUserUsed = "" },
             app.getString(R.string.dashboard_card_lastuser_title))
     }
 
@@ -110,8 +110,8 @@ class DashboardCardsFactoryTest {
         val lastScanner = "SPXXXX"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-            { lastScanner.also { app.dataManager.lastScannerUsed = lastScanner } },
-            { app.dataManager.lastScannerUsed = "" },
+            { lastScanner.also { app.dataManager.preferences.lastScannerUsed = lastScanner } },
+            { app.dataManager.preferences.lastScannerUsed = "" },
             app.getString(R.string.dashboard_card_lastscanner_title))
     }
 

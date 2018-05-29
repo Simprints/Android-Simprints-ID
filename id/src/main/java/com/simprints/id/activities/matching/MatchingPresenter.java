@@ -65,9 +65,9 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
     @Override
     public void start() {
-        dataManager.setMsSinceBootOnMatchStart(timeHelper.msSinceBoot());
+        dataManager.getPreferences().setMsSinceBootOnMatchStart(timeHelper.msSinceBoot());
         // TODO : Use polymorphism
-        switch (dataManager.getCalloutAction()) {
+        switch (dataManager.getPreferences().getCalloutAction()) {
             case IDENTIFY:
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
@@ -114,7 +114,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         try {
             dataManager.getDb().loadPeople(
                 candidates,
-                dataManager.getMatchGroup(),
+                dataManager.getPreferences().getMatchGroup(),
                 wrapCallback("loading people", newOnLoadPeopleCallback()));
         } catch (UninitializedDataManagerError error) {
             dataManager.getAnalytics().logError(error);
@@ -130,7 +130,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
-                int matcherType = dataManager.getMatcherType();
+                int matcherType = dataManager.getPreferences().getMatcherType();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -164,7 +164,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     }
 
     private void onVerifyStart() {
-        final String guid = dataManager.getPatientId();
+        final String guid = dataManager.getPreferences().getPatientId();
         try {
             dataManager.getDb().loadPerson(candidates, dataManager.getLoginInfo().getSignedInProjectId(), guid, wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {
@@ -179,7 +179,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
             public void onSuccess() {
                 Log.INSTANCE.d(MatchingPresenter.this, "Successfully loaded candidate");
 
-                int matcherType = dataManager.getMatcherType();
+                int matcherType = dataManager.getPreferences().getMatcherType();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -221,12 +221,12 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 break;
             }
             case MATCH_COMPLETED: {
-                CalloutAction callout = dataManager.getCalloutAction();
+                CalloutAction callout = dataManager.getPreferences().getCalloutAction();
                 switch (callout) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();
                         matchingView.setIdentificationProgressReturningStart();
-                        int nbOfResults = dataManager.getReturnIdCount();
+                        int nbOfResults = dataManager.getPreferences().getReturnIdCount();
 
                         ArrayList<Identification> topCandidates = new ArrayList<>();
 
@@ -283,7 +283,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         FormatResult.put(resultData, topCandidates, dataManager);
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
-                                tier1Or2Matches, tier3Matches, tier4Matches, dataManager.getMatchingEndWaitTimeSeconds() * 1000);
+                                tier1Or2Matches, tier3Matches, tier4Matches, dataManager.getPreferences().getMatchingEndWaitTimeSeconds() * 1000);
                         break;
                     }
                     case VERIFY: {
@@ -293,7 +293,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
                         if (candidates.size() > 0 && scores.size() > 0) {
                             int score = scores.get(0).intValue();
-                            verification = new Verification(score, computeTier(score), dataManager.getPatientId());
+                            verification = new Verification(score, computeTier(score), dataManager.getPreferences().getPatientId());
                             guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_FOUND;
                             resultCode = RESULT_OK;
                         } else {
@@ -313,7 +313,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         // signOut
                         Intent resultData;
                         resultData = new Intent(com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_INTENT);
-                        FormatResult.put(resultData, verification, dataManager.getResultFormat());
+                        FormatResult.put(resultData, verification, dataManager.getPreferences().getResultFormat());
                         matchingView.doSetResult(resultCode, resultData);
                         matchingView.doFinish();
                         break;

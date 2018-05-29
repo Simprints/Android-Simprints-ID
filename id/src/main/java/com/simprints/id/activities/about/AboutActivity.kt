@@ -26,7 +26,7 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
 
         val app = application as Application
         val dataManager = app.dataManager
-        LanguageHelper.setLanguage(this, dataManager.language)
+        LanguageHelper.setLanguage(this, dataManager.preferences.language)
 
         setContentView(R.layout.activity_about)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

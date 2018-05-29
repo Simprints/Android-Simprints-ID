@@ -45,7 +45,7 @@ class MainActivitySyncHelper(private val activity: MainActivity, dataManager: Da
 
     fun sync(dataManager: DataManager) {
         setZeroProgressSyncItem()
-        syncManager.sync(SyncTaskParameters.build(dataManager.syncGroup, dataManager))
+        syncManager.sync(SyncTaskParameters.build(dataManager.preferences.syncGroup, dataManager))
     }
 
     private fun setProgressSyncItem(progress: Progress) {

@@ -161,7 +161,7 @@ public class PositionTracker implements
         {
             Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (lastLocation != null) {
-                dataManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(lastLocation));
+                dataManager.getPreferences().setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(lastLocation));
             }
             Log.INSTANCE.d(activity, String.format(Locale.UK, "Last location: %s", lastLocation));
         }
@@ -222,7 +222,7 @@ public class PositionTracker implements
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            dataManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(location));
+            dataManager.getPreferences().setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(location));
             Log.INSTANCE.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
                     location.getLatitude(), location.getLongitude()));
         }

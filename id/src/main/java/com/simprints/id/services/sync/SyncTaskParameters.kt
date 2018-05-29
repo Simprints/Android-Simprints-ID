@@ -15,7 +15,7 @@ sealed class SyncTaskParameters(open val projectId: String, open val moduleId: S
             return when (group) {
                 Constants.GROUP.GLOBAL -> GlobalSyncTaskParameters(dataManager.loginInfo.getSignedInProjectIdOrEmpty())
                 Constants.GROUP.USER -> UserSyncTaskParameters(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), dataManager.loginInfo.getSignedInUserIdOrEmpty())
-                Constants.GROUP.MODULE -> ModuleIdSyncTaskParameters(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), dataManager.moduleId)
+                Constants.GROUP.MODULE -> ModuleIdSyncTaskParameters(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), dataManager.preferences.moduleId)
             }
         }
     }
