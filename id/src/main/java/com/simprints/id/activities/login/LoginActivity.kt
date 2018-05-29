@@ -47,13 +47,9 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
             }
         }
 
-        val projectAuthenticator = LegacyCompatibleProjectAuthenticator(
-            app.loginInfoManager,
-            app.dbManager,
-            app.secureDataManager,
-            SafetyNet.getClient(this))
+        val projectAuthenticator = LegacyCompatibleProjectAuthenticator(app.dataManager, SafetyNet.getClient(this))
 
-        viewPresenter = LoginPresenter(this, app.loginInfoManager, app.analyticsManager, projectAuthenticator)
+        viewPresenter = LoginPresenter(this, app.dataManager, projectAuthenticator)
          viewPresenter.start()
     }
 

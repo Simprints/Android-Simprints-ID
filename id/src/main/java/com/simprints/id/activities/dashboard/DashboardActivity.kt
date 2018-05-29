@@ -45,9 +45,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
         LanguageHelper.setLanguage(this, app.dataManager.preferences.language)
 
         val syncClient = SyncService.getClient(this)
-        viewPresenter = DashboardPresenter(this, syncClient,
-            app.dataManager, app.dbManager, app.loginInfoManager, app.preferencesManager,
-            AndroidResourcesHelperImpl(app))
+        viewPresenter = DashboardPresenter(this, syncClient, app.dataManager, AndroidResourcesHelperImpl(app))
 
         initDrawer()
         initCards()
@@ -119,8 +117,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     }
 
     private fun logout() {
-        app.loginInfoManager.cleanCredentials()
-        app.dataManager.db.signOut()
+        viewPresenter.logout()
         startActivity(Intent(this, RequestLoginActivity::class.java))
         finish()
     }

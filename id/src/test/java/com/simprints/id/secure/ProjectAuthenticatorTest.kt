@@ -3,6 +3,8 @@ package com.simprints.id.secure
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
+import com.simprints.id.data.DataManager
+import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -39,8 +41,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
     fun successfulResponse_userShouldSignIn() {
 
         val authenticator = ProjectAuthenticator(
-            mockLoginInfoManager(),
-            app.dataManager.db,
+            mockLoginInfoForDataManager(),
             SafetyNet.getClient(app),
             ApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
             getMockAttestationManager())
@@ -62,8 +63,7 @@ class ProjectAuthenticatorTest : RxJavaTest() {
         val nonceScope = NonceScope("project_id", "user_id")
 
         val testObserver = ProjectAuthenticator(
-            mockLoginInfoManager(),
-            app.dataManager.db,
+            mockLoginInfoForDataManager(),
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(apiClient.retrofit))
 
@@ -75,4 +75,12 @@ class ProjectAuthenticatorTest : RxJavaTest() {
         testObserver
             .assertError(IOException::class.java)
     }
+
+    private fun mockLoginInfoForDataManager(): DataManager =
+        DataManagerImpl(
+            app.dataManager.preferences,
+            mockLoginInfoManager(),
+            app.dataManager.secure,
+            app.dataManager.analytics,
+            app.dbManager)
 }

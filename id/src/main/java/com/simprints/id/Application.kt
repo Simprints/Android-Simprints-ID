@@ -23,8 +23,8 @@ import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManagerImpl
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManager
@@ -187,7 +187,7 @@ open class Application : MultiDexApplication() {
     }
 
     var dataManager: DataManager by lazyVar {
-        DataManagerImpl(preferencesManager, loginInfoManager, dbManager, analyticsManager)
+        DataManagerImpl(preferencesManager, loginInfoManager, secureDataManager, analyticsManager, dbManager)
     }
 
     val notificationFactory: NotificationFactory by lazy {

@@ -1,7 +1,6 @@
 package com.simprints.id.activities.login
 
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.data.DataManager
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
@@ -17,10 +16,8 @@ import org.json.JSONObject
 import timber.log.Timber
 import java.io.IOException
 
-
 class LoginPresenter(val view: LoginContract.View,
-                     private val loginInfoManager: LoginInfoManager,
-                     private val analyticsManager: AnalyticsManager,
+                     private val dataManager: DataManager,
                      override var projectAuthenticator: LegacyCompatibleProjectAuthenticator) : LoginContract.Presenter {
 
     override fun start() {}
@@ -43,7 +40,7 @@ class LoginPresenter(val view: LoginContract.View,
         possibleProjectId.isNotEmpty() && possibleProjectSecret.isNotEmpty() && possibleUserId.isNotEmpty()
 
     private fun doAuthenticate(suppliedProjectId: String, suppliedUserId: String, suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
-        loginInfoManager.cleanCredentials()
+        dataManager.loginInfo.cleanCredentials()
         projectAuthenticator.authenticate(
             NonceScope(suppliedProjectId, suppliedUserId),
             suppliedProjectSecret,
@@ -76,7 +73,7 @@ class LoginPresenter(val view: LoginContract.View,
     private fun logSignInError(e: Throwable) {
         when (e) {
             is IOException -> Timber.d("Attempted login offline")
-            else -> analyticsManager.logThrowable(e)
+            else -> dataManager.analytics.logThrowable(e)
         }
     }
 
