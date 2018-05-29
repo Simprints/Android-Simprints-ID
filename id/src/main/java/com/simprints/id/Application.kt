@@ -10,7 +10,7 @@ import com.simprints.id.controllers.Setup
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
@@ -179,7 +179,7 @@ open class Application : MultiDexApplication() {
     }
 
     var analyticsManager: AnalyticsManager by lazyVar {
-        FirebaseAnalyticsManager(firebaseAnalytics)
+        AnalyticsManagerImpl(firebaseAnalytics)
     }
 
     val loginInfoManager: LoginInfoManager by lazy {

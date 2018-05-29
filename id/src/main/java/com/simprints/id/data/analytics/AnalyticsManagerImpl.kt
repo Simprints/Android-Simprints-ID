@@ -20,24 +20,24 @@ import kotlin.reflect.full.memberProperties
  * and reduces network data usage."
  */
 
-class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics) : AnalyticsManager {
+class AnalyticsManagerImpl(private val firebaseAnalytics: FirebaseAnalytics) : AnalyticsManager {
 
     override fun logAlert(alertName: String, apiKey: String, moduleId: String, userId: String,
                           deviceId: String) {
-        Timber.d("FirebaseAnalyticsManager.logAlert(alertName=$alertName, ...)")
+        Timber.d("AnalyticsManagerImpl.logAlert(alertName=$alertName, ...)")
         logAlertToCrashlytics(alertName)
         logAlertToFirebaseAnalytics(alertName, apiKey, moduleId, userId, deviceId)
     }
 
     private fun logAlertToCrashlytics(alertName: String) {
-        Timber.d("FirebaseAnalyticsManager.logAlertToCrashlytics(alertName=$alertName)")
+        Timber.d("AnalyticsManagerImpl.logAlertToCrashlytics(alertName=$alertName)")
         Crashlytics.log(alertName)
     }
 
     // TODO: Do we have to log things like api_key, user_id, etc to every firebase event? Or is it enough to log it once, and then we can link everything together in big query requests?
     private fun logAlertToFirebaseAnalytics(alertName: String, apiKey: String, moduleId: String,
                                             userId: String, deviceId: String) {
-        Timber.d("FirebaseAnalyticsManager.logAlertToFirebaseAnalytics(alertName=$alertName, ...)")
+        Timber.d("AnalyticsManagerImpl.logAlertToFirebaseAnalytics(alertName=$alertName, ...)")
         val bundle = Bundle()
         bundle.putString("alert_name", alertName)
         bundle.putString("api_key", apiKey)
@@ -63,7 +63,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
     }
 
     override fun logSafeException(exception: SimprintsException) {
-        Timber.d("FirebaseAnalyticsManager.logSafeException(description=$exception)")
+        Timber.d("AnalyticsManagerImpl.logSafeException(description=$exception)")
         val bundle = Bundle()
         bundle.putString("exception", exception.toString())
         bundle.putString("description", exception.message)
@@ -76,7 +76,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
     }
 
     override fun logCallout(callout: Callout) {
-        Timber.d("FirebaseAnalyticsManager.logCallout(callout=$callout)")
+        Timber.d("AnalyticsManagerImpl.logCallout(callout=$callout)")
         with(callout) {
             val bundle = Bundle()
             bundle.putString("action", action.toString())
@@ -88,7 +88,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
     }
 
     override fun logUserProperties(userId: String, apiKey: String, moduleId: String, deviceId: String) {
-        Timber.d("FirebaseAnalyticsManager.logUserProperties(userId=$userId, apiKey=$apiKey,moduleId=$moduleId, deviceIde=$deviceId)")
+        Timber.d("AnalyticsManagerImpl.logUserProperties(userId=$userId, apiKey=$apiKey,moduleId=$moduleId, deviceIde=$deviceId)")
         firebaseAnalytics.setUserId(userId)
         firebaseAnalytics.setUserProperty("api_key", apiKey)
         firebaseAnalytics.setUserProperty("module_id", moduleId)
@@ -96,14 +96,14 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
     }
 
     override fun logScannerProperties(macAddress: String, scannerId: String) {
-        Timber.d("FirebaseAnalyticsManager.logScannerProperties(macAddress=$macAddress, scannerId=$scannerId)")
+        Timber.d("AnalyticsManagerImpl.logScannerProperties(macAddress=$macAddress, scannerId=$scannerId)")
         firebaseAnalytics.setUserProperty("mac_address", macAddress)
         firebaseAnalytics.setUserProperty("scanner_id", scannerId)
     }
 
     override fun logGuidSelectionService(apiKey: String, sessionId: String,
                                          selectedGuid: String, callbackSent: Boolean, androidId: String) {
-        Timber.d("FirebaseAnalyticsManager.logGuidSelectionService(selectedGuid=$selectedGuid, callbackSent=$callbackSent)")
+        Timber.d("AnalyticsManagerImpl.logGuidSelectionService(selectedGuid=$selectedGuid, callbackSent=$callbackSent)")
         val bundle = Bundle()
         bundle.putString("api_key", apiKey)
         bundle.putString("selected_guid", selectedGuid)
@@ -115,7 +115,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
 
     override fun logConnectionStateChange(connected: Boolean, apiKey: String,
                                                   androidId: String, sessionId: String) {
-        Timber.d("FirebaseAnalyticsManager.logConnectionStateChange(connected=$connected)")
+        Timber.d("AnalyticsManagerImpl.logConnectionStateChange(connected=$connected)")
         val bundle = Bundle()
         bundle.putString("api_key", apiKey)
         bundle.putString("android_id", androidId)
@@ -125,7 +125,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
     }
 
     override fun logAuthStateChange(authenticated: Boolean, apiKey: String, androidId: String, sessionId: String) {
-        Timber.d("FirebaseAnalyticsManager.logAuthStateChange(authenticated=$authenticated)")
+        Timber.d("AnalyticsManagerImpl.logAuthStateChange(authenticated=$authenticated)")
         val bundle = Bundle()
         bundle.putString("api_key", apiKey)
         bundle.putString("android_id", androidId)
@@ -135,7 +135,7 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
     }
 
     override fun logSession(session: Session) {
-        Timber.d("FirebaseAnalyticsManager.logSession(session=$session)")
+        Timber.d("AnalyticsManagerImpl.logSession(session=$session)")
         val fbSession = session.toFirebaseSession()
         val bundle = Bundle()
         for (property in fb_Session::class.memberProperties) {
