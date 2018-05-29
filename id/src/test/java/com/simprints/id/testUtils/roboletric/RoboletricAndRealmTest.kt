@@ -116,6 +116,6 @@ fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer: MockWe
     val remoteDbManager = Mockito.spy(FirebaseManagerImpl(RuntimeEnvironment.application as Application))
     whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))
 
-    val dbManager = DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager)
+    val dbManager = DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager, app.preferencesManager)
     return Triple(dbManager, localDbManager, remoteDbManager)
 }

@@ -69,8 +69,7 @@ class DashboardSyncCard(type: DashboardCardType,
     }
 
     private fun updateLastSyncedTime() {
-        dataManager
-                .localDbManager
+        dataManager.db.local
                 .getSyncInfoFor(syncParams.toGroup())
                 .subscribeBy(
                     onSuccess = {
@@ -81,8 +80,7 @@ class DashboardSyncCard(type: DashboardCardType,
     }
 
     private fun updateLocalPeopleCount() {
-        dataManager
-                .localDbManager
+        dataManager.db.local
                 .getPeopleCountFromLocal(toSync = true)
             .subscribeBy(
                 onSuccess = {
@@ -93,9 +91,9 @@ class DashboardSyncCard(type: DashboardCardType,
     }
 
     private fun updateRemotePeopleCount() {
-        dataManager.getNumberOfPatientsForSyncParams(syncParams)
+        dataManager.db.getNumberOfPatientsForSyncParams(syncParams)
             .flatMap {
-                dataManager.calculateNPatientsToDownSync(it, syncParams)
+                dataManager.db.calculateNPatientsToDownSync(it, syncParams)
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

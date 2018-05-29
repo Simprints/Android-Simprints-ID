@@ -20,8 +20,8 @@ import io.reactivex.Single
 
 interface DbManager : RemoteDbManager {
 
-    val localDbManager: LocalDbManager
-    val remoteDbManager: RemoteDbManager
+    val local: LocalDbManager
+    val remote: RemoteDbManager
 
     // Lifecycle
     fun initialiseDb()
@@ -48,17 +48,19 @@ interface DbManager : RemoteDbManager {
                        moduleId: String? = null,
                        toSync: Boolean? = null): Single<Int>
 
+    fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
+
+    fun updateIdentification(projectId: String, selectedGuid: String, sessionId: String)
+
+    fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
+
+    fun saveRefusalForm(refusalForm: RefusalForm)
+
     fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int>
-
-    fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
-
-    fun saveVerification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
 
     fun saveSession(session: Session)
 
-    fun saveRefusalForm(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String)
-
     fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress>
 
-    fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP): Completable
+    fun recoverLocalDb(group: Constants.GROUP): Completable
 }

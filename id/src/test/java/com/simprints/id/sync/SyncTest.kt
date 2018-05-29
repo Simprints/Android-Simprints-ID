@@ -81,7 +81,7 @@ class SyncTest : RxJavaTest() {
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, PeopleRemoteInterface::class.java))
         whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager, app.preferencesManager), JsonHelper.gson)
 
         val testObserver = sync.uploadNewPatients({ false }, 10).test()
         testObserver.awaitTerminalEvent()
@@ -107,7 +107,7 @@ class SyncTest : RxJavaTest() {
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 50, PeopleRemoteInterface::class.java))
         whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager, app.preferencesManager), JsonHelper.gson)
 
         val count = AtomicInteger(0)
         val testObserver = sync.uploadNewPatients({ count.addAndGet(1) > 2 }, 10).test()
@@ -263,7 +263,7 @@ class SyncTest : RxJavaTest() {
         //Mock app RealmSyncInfo for syncParams
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup(), rl_Person(peopleToDownload.last()))) })
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManager, app.secureDataManager, app.loginInfoManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManager, app.secureDataManager, app.loginInfoManager, app.preferencesManager), JsonHelper.gson)
 
         return sync.downloadNewPatients({ false }, syncParams).test()
     }

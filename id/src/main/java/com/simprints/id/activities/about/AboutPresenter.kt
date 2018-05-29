@@ -46,12 +46,7 @@ internal class AboutPresenter(private val view: AboutContract.View,
     override fun recoverDb() {
         recoveryRunning = true
         view.setRecoveryInProgress()
-        dbManager.recoverLocalDb(
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            loginInfoManager.getSignedInUserIdOrEmpty(),
-            preferencesManager.deviceId,
-            preferencesManager.moduleId,
-            Constants.GROUP.GLOBAL)
+        dbManager.recoverLocalDb(Constants.GROUP.GLOBAL)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribeBy(

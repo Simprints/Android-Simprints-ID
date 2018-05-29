@@ -34,7 +34,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         val selectedGuid = intent.parseSelectedGuid()
         val callbackSent = try {
             checkCalloutParameters(projectId, apiKey, sessionId, selectedGuid)
-            dataManager.updateIdentification(dataManager.getSignedInProjectIdOrEmpty(), selectedGuid)
+            dataManager.db.updateIdentification(dataManager.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId?: "")
             true
         } catch (error: InvalidCalloutParameterError) {
             dataManager.analytics.logError(error)

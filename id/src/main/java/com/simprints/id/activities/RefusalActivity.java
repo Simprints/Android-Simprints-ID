@@ -57,7 +57,7 @@ public class RefusalActivity extends AppCompatActivity {
                 if (reason != null) {
                     RefusalForm refusalForm = new RefusalForm(reason.toString(), otherText.getText().toString());
                     try {
-                        dataManager.saveRefusalForm(refusalForm);
+                        dataManager.getDb().saveRefusalForm(refusalForm);
                     } catch (UninitializedDataManagerError error) {
                         dataManager.getAnalytics().logError(error);
                         alertLauncher.launch(ALERT_TYPE.UNEXPECTED_ERROR, 0);
