@@ -38,7 +38,7 @@ public class AlertActivity extends AppCompatActivity {
         assert alertType != null;
         this.alertType = alertType;
 
-        dataManager.logAlert(alertType);
+        dataManager.getAnalytics().logAlert(alertType);
 
         int color = ResourcesCompat.getColor(getResources(), alertType.getBackgroundColor(), null);
         findViewById(R.id.alertLayout).setBackgroundColor(color);

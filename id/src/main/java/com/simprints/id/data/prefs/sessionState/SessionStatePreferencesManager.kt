@@ -11,6 +11,8 @@ interface SessionStatePreferencesManager
     ScannerAttributesPreferencesManager,
     SessionTimestampsPreferencesManager {
 
+    val androidSdkVersion: Int
+    val deviceModel: String
     var sessionId: String
     var location: Location
     val deviceId: String

@@ -178,16 +178,16 @@ open class Application : MultiDexApplication() {
         }
     }
 
-    var analyticsManager: AnalyticsManager by lazyVar {
-        AnalyticsManagerImpl(firebaseAnalytics)
-    }
-
     val loginInfoManager: LoginInfoManager by lazy {
         LoginInfoManagerImpl(prefs)
     }
 
+    var analyticsManager: AnalyticsManager by lazyVar {
+        AnalyticsManagerImpl(loginInfoManager, preferencesManager, firebaseAnalytics)
+    }
+
     var dataManager: DataManager by lazyVar {
-        DataManagerImpl(this, preferencesManager, dbManager, analyticsManager, loginInfoManager)
+        DataManagerImpl(preferencesManager, dbManager, loginInfoManager, analyticsManager)
     }
 
     val notificationFactory: NotificationFactory by lazy {

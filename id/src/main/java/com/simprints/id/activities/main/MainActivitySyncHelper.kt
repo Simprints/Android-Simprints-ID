@@ -33,7 +33,7 @@ class MainActivitySyncHelper(private val activity: MainActivity, dataManager: Da
 
             override fun onError(t: Throwable) {
                 Timber.d("Sync failed")
-                dataManager.logThrowable(t)
+                dataManager.analytics.logThrowable(t)
                 setErrorSyncItem()
             }
 

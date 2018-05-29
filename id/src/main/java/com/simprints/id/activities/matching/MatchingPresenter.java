@@ -106,7 +106,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 onVerifyStart();
                 break;
             default:
-                dataManager.logError(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
+                dataManager.getAnalytics().logError(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
                 matchingView.launchAlert();
         }
     }
@@ -137,7 +137,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 preferencesManager.getModuleId(),
                 wrapCallback("loading people", newOnLoadPeopleCallback()));
         } catch (UninitializedDataManagerError error) {
-            dataManager.logError(error);
+            dataManager.getAnalytics().logError(error);
             matchingView.launchAlert();
         }
     }
@@ -177,7 +177,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                dataManager.logError(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
+                dataManager.getAnalytics().logError(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
                 matchingView.launchAlert();
             }
         };
@@ -188,7 +188,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         try {
             dataManager.loadPerson(candidates, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {
-            dataManager.logError(error);
+            dataManager.getAnalytics().logError(error);
             matchingView.launchAlert();
         }
     }
@@ -227,7 +227,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR dataError) {
-                dataManager.logError(UnexpectedDataError.forDataError(dataError,"MatchingActivity.onVerifyStart()"));
+                dataManager.getAnalytics().logError(UnexpectedDataError.forDataError(dataError,"MatchingActivity.onVerifyStart()"));
                 matchingView.launchAlert();
             }
         };
@@ -274,7 +274,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             dataManager.saveIdentification(probe, candidates.size(), topCandidates);
 
                         } catch (UninitializedDataManagerError error) {
-                            dataManager.logError(error);
+                            dataManager.getAnalytics().logError(error);
                             matchingView.launchAlert();
                             return;
                         }
@@ -325,7 +325,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         try {
                             dataManager.saveVerification(probe, verification, guidExistsResult);
                         } catch (UninitializedDataManagerError error) {
-                            dataManager.logError(error);
+                            dataManager.getAnalytics().logError(error);
                             matchingView.launchAlert();
                             return;
                         }

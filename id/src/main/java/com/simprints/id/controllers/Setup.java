@@ -163,10 +163,10 @@ public class Setup {
                     Timber.d("Setup: Connected to Vero.");
                     uiResetSinceConnection = false;
                     dataManager.setScannerId(appState.getScanner().getScannerId());
-                    dataManager.logScannerProperties();
+                    dataManager.getAnalytics().logScannerProperties();
                     goOn(activity);
                 } else {
-                    dataManager.logError(new NullScannerError("Null values in onSuccess Setup.connectToScanner()"));
+                    dataManager.getAnalytics().logError(new NullScannerError("Null values in onSuccess Setup.connectToScanner()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -214,7 +214,7 @@ public class Setup {
         try {
             dataManager.loadPerson(loadedPerson, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people from db", newLoadPersonCallback(activity, guid)));
         } catch (UninitializedDataManagerError error) {
-            dataManager.logError(error);
+            dataManager.getAnalytics().logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -236,12 +236,12 @@ public class Setup {
                         try {
                             saveNotFoundVerification(probe);
                         } catch (UninitializedDataManagerError error) {
-                            dataManager.logError(error);
+                            dataManager.getAnalytics().logError(error);
                             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                         }
                         break;
                     default:
-                        dataManager.logError(UnexpectedDataError.forDataError(data_error, "Setup.checkIfVerifyAndGuidExists()"));
+                        dataManager.getAnalytics().logError(UnexpectedDataError.forDataError(data_error, "Setup.checkIfVerifyAndGuidExists()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -298,7 +298,7 @@ public class Setup {
                     dataManager.setHardwareVersion(appState.getScanner().getUcVersion());
                     Setup.this.onSuccess();
                 } else {
-                    dataManager.logError(new NullScannerError("Null values in onSuccess Setup.wakeUpUn20()"));
+                    dataManager.getAnalytics().logError(new NullScannerError("Null values in onSuccess Setup.wakeUpUn20()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }

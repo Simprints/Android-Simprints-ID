@@ -1,6 +1,7 @@
 package com.simprints.id.data.prefs.sessionState
 
 import android.content.Context
+import android.os.Build
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManager
 import com.simprints.id.data.prefs.sessionState.sessionParameters.SessionParametersPreferencesManager
@@ -31,6 +32,12 @@ class SessionStatePreferencesManagerImpl(private val context: Context,
         private val LOCATION_KEY = "Location"
         private val LOCATION_DEFAULT = Location("", "")
     }
+
+    override val androidSdkVersion: Int
+        get() = Build.VERSION.SDK_INT
+
+    override val deviceModel: String
+        get() = "${Build.MANUFACTURER} ${Build.MODEL}"
 
     override val deviceId: String
         get() = context.deviceId

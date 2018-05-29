@@ -402,7 +402,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun handleUnexpectedError(error: SimprintsError) {
-        dataManager.logError(error)
+        dataManager.analytics.logError(error)
         launchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }
 
@@ -474,7 +474,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     // If the enrol fails, the activity shows an alert activity the finishes.
     private fun handleRegistrationFailure(throwable: Throwable) {
-        dataManager.logError(SimprintsError(throwable))
+        dataManager.analytics.logError(SimprintsError(throwable))
         launchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
         setResult(Activity.RESULT_CANCELED)
         finish()
@@ -722,7 +722,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     appState.scanner.template)
                 // TODO : change exceptions in libcommon
             } catch (ex: IllegalArgumentException) {
-                dataManager.logError(SimprintsError("IllegalArgumentException in MainActivity.captureSuccess()"))
+                dataManager.analytics.
+                    logError(SimprintsError("IllegalArgumentException in MainActivity.captureSuccess()"))
                 resetUIFromError()
                 return
             }

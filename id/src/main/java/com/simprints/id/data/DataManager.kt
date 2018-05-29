@@ -5,7 +5,6 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
-import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Constants
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
@@ -13,20 +12,9 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 
-interface DataManager : PreferencesManager, DbManager,
-    AnalyticsManager, LoginInfoManager {
+interface DataManager : PreferencesManager, DbManager, LoginInfoManager {
 
-    val androidSdkVersion: Int
-    val deviceModel: String
-
-    // Analytics
-    fun logAlert(alertType: ALERT_TYPE)
-
-    fun logUserProperties()
-    fun logScannerProperties()
-    fun logGuidSelectionService(apiKey: String, sessionId: String, selectedGuid: String, callbackSent: Boolean)
-    fun logConnectionStateChange(connected: Boolean)
-    fun logAuthStateChange(authenticated: Boolean)
+    val analytics: AnalyticsManager
 
     // Data transfer
     fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
