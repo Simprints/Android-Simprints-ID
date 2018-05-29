@@ -44,16 +44,12 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.session.callout.CalloutParameter
 import com.simprints.id.session.sessionParameters.SessionParameters
 import com.simprints.id.session.sessionParameters.extractors.ActionDependentExtractor
 import com.simprints.id.session.sessionParameters.extractors.Extractor
 import com.simprints.id.session.sessionParameters.extractors.ParameterExtractor
 import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractor
 import com.simprints.id.session.sessionParameters.readers.*
-import com.simprints.id.session.sessionParameters.readers.unexpectedParameters.ExpectedParametersLister
-import com.simprints.id.session.sessionParameters.readers.unexpectedParameters.ExpectedParametersListerImpl
-import com.simprints.id.session.sessionParameters.readers.unexpectedParameters.UnexpectedParametersReader
 import com.simprints.id.session.sessionParameters.validators.*
 import com.simprints.id.tools.AppState
 import com.simprints.id.tools.NotificationFactory
@@ -389,27 +385,6 @@ open class Application : MultiDexApplication() {
         ParameterExtractor(resultFormatReader, resultFormatValidator)
     }
 
-    private val expectedParametersLister: ExpectedParametersLister by lazy {
-        ExpectedParametersListerImpl()
-    }
-
-    private val unexpectedParametersReader: Reader<Set<CalloutParameter>> by lazy {
-        UnexpectedParametersReader(expectedParametersLister)
-    }
-
-    private val invalidUnexpectedParametersError: Error by lazy {
-        InvalidCalloutError(ALERT_TYPE.UNEXPECTED_PARAMETER)
-    }
-
-    private val unexpectedParametersValidator: Validator<Set<CalloutParameter>> by lazy {
-        val validUnexpectedParametersValues = listOf(emptySet<CalloutParameter>())
-        ValueValidator(validUnexpectedParametersValues, invalidUnexpectedParametersError)
-    }
-
-    private val unexpectedParametersExtractor: Extractor<Set<CalloutParameter>> by lazy {
-        ParameterExtractor(unexpectedParametersReader, unexpectedParametersValidator)
-    }
-
     private val missingApiKeyOrProjectIdError: Error by lazy {
         InvalidCalloutError(ALERT_TYPE.MISSING_PROJECT_ID_OR_API_KEY)
     }
@@ -421,7 +396,7 @@ open class Application : MultiDexApplication() {
     val sessionParametersExtractor: Extractor<SessionParameters> by lazy {
         SessionParametersExtractor(actionExtractor, apiKeyExtractor, projectIdExtractor, moduleIdExtractor,
             userIdExtractor, patientIdExtractor, callingPackageExtractor, metadataExtractor,
-            resultFormatExtractor, unexpectedParametersExtractor, sessionParametersValidator)
+            resultFormatExtractor, sessionParametersValidator)
     }
 
     val timeHelper: TimeHelper by lazy {
