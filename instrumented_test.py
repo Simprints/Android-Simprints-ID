@@ -148,13 +148,13 @@ class Run:
         self.run_and_log(cerberus_app_open_apk_command(device))
 
     def install_cerberus_apk(self, device: Device):
-        self.run_and_log(cerberus_app_install_apk_command('debug', device))
+        self.run_and_log(cerberus_app_install_apk_command(SIMPRINTS_ID_ANDROID_TESTS_VARIANT_NAME, device))
 
     def install_apk(self, device: Device):
-        self.run_and_log(simprints_id_install_apk_command('endToEndTesting', device))
+        self.run_and_log(simprints_id_install_apk_command(SIMPRINTS_ID_ANDROID_TESTS_VARIANT_NAME, device))
 
     def install_test_apk(self, device: Device):
-        self.run_and_log(simprints_id_install_android_test_apk_command('endToEndTesting', device))
+        self.run_and_log(simprints_id_install_android_test_apk_command(SIMPRINTS_ID_ANDROID_TESTS_VARIANT_NAME, device))
 
     def query_devices(self):
         lines = self.run_and_log(query_devices())
@@ -200,8 +200,11 @@ class Run:
         if not os.path.exists(dir_name_to_save_results_xml):
             os.makedirs(dir_name_to_save_results_xml)
 
-        shutil.move("build/reports/androidTests", dir_name_to_save_results_html)
-        shutil.move("id/build/outputs/androidTest-results/connected", dir_name_to_save_results_xml)
+        if os.path.exists("build/reports/androidTests"):
+            shutil.move("build/reports/androidTests", dir_name_to_save_results_html)
+
+        if os.path.exists("id/build/outputs/androidTest-results/connected"):
+            shutil.move("id/build/outputs/androidTest-results/connected", dir_name_to_save_results_xml)
 
 
 def main():
@@ -209,7 +212,6 @@ def main():
 
     run = Run('instrumented_test')
     run.update_log_format(LogState.default())
-    run.log("Hello world!")
 
     run.clean_cerberus_build()
     run.assemble_cerberus_apk()

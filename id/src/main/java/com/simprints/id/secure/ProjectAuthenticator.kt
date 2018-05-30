@@ -2,74 +2,88 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.domain.Project
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
+import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
+import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.Tokens
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.BiFunction
-import io.reactivex.internal.operators.single.SingleJust
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxkotlin.Singles
+import java.io.IOException
 
-class ProjectAuthenticator(secureDataManager: SecureDataManager,
-                           private val dataManager: DbManager,
-                           apiClient: ApiServiceInterface = ApiService().api) {
+open class ProjectAuthenticator(private val loginInfoManager: LoginInfoManager,
+                                private val dbManager: DbManager,
+                                private val safetyNetClient: SafetyNetClient,
+                                secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
+                                private val attestationManager: AttestationManager = AttestationManager()) {
 
-    private val projectSecretManager = ProjectSecretManager(secureDataManager)
-    private val publicKeyManager = PublicKeyManager(apiClient)
-    private val nonceManager = NonceManager(apiClient)
-    private val authManager = AuthManager(apiClient)
-    var attestationManager = AttestationManager()
+    private val projectSecretManager = ProjectSecretManager(loginInfoManager)
+    private val publicKeyManager = PublicKeyManager(secureApiClient)
+    private val nonceManager = NonceManager(secureApiClient)
+    private val authManager = AuthManager(secureApiClient)
 
-    fun authenticateWithNewCredentials(safetyNetClient: SafetyNetClient, nonceScope: NonceScope, projectSecret: String): Single<Tokens> =
-        authenticate(safetyNetClient, nonceScope, getEncryptedProjectSecret(projectSecret))
-
-    private fun authenticate(safetyNetClient: SafetyNetClient, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<Tokens> =
-        combineProjectSecretAndGoogleAttestationObservables(safetyNetClient, nonceScope, encryptedProjectSecret)
+    @Throws(
+        IOException::class,
+        DifferentProjectIdReceivedFromIntentException::class,
+        AuthRequestInvalidCredentialsException::class,
+        SimprintsInternalServerException::class)
+    fun authenticate(nonceScope: NonceScope, projectSecret: String): Completable =
+        prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
-            .initFirebase(nonceScope.projectId)
+            .signIn(nonceScope.projectId)
+            .fetchProjectInfo(nonceScope.projectId)
+            .storeCredentials(nonceScope.userId)
             .observeOn(AndroidSchedulers.mainThread())
 
-    private fun combineProjectSecretAndGoogleAttestationObservables(safetyNetClient: SafetyNetClient, nonceScope: NonceScope, encryptedProjectSecret: Single<String>): Single<AuthRequest> =
-        Single.zip(
-            encryptedProjectSecret.subscribeOn(Schedulers.io()),
-            getGoogleAttestation(safetyNetClient, nonceScope).subscribeOn(Schedulers.io()),
-            combineAuthRequestParameters(nonceScope.projectId, nonceScope.userId)
-        )
+    private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
+        val encryptedProjectSecret = getEncryptedProjectSecret(projectSecret)
+        val googleAttestation = getGoogleAttestation(safetyNetClient, nonceScope)
+        return zipAuthRequestParameters(encryptedProjectSecret, googleAttestation, nonceScope)
+    }
 
     private fun getEncryptedProjectSecret(projectSecret: String): Single<String> =
         publicKeyManager.requestPublicKey()
-            .flatMap { publicKey -> projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey) }
+            .flatMap { publicKey ->
+                Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey)) }
 
     private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, noneScope: NonceScope): Single<AttestToken> =
-        nonceManager.requestNonce(noneScope).flatMap { nonce ->
-            attestationManager
-                .requestAttestation(safetyNetClient, nonce)
-                .subscribeOn(Schedulers.io())
+        nonceManager.requestNonce(noneScope)
+            .flatMap { nonce -> attestationManager.requestAttestation(safetyNetClient, nonce)
         }
 
-    private fun combineAuthRequestParameters(projectId: String, userId: String): BiFunction<String, AttestToken, AuthRequest> =
-        BiFunction { encryptedProjectSecret: String, attestation: AttestToken ->
-            AuthRequest(encryptedProjectSecret, projectId, userId, attestation)
-        }
-
-    private fun Single<out Tokens>.initFirebase(projectId: String): Single<Tokens> =
-        flatMap { tokens ->
-            if (!dataManager.isDbInitialised(projectId)) {
-                dataManager.initialiseDb(projectId)
-            }
-
-            //TODO: Fix it when we implement the 2 firebase apps in FirebaseManager
-            dataManager.signIn(projectId, tokens)
-            SingleJust(tokens)
+    private fun zipAuthRequestParameters(encryptedProjectSecretSingle: Single<String>,
+                                         googleAttestationSingle: Single<AttestToken>,
+                                         nonceScope: NonceScope): Single<AuthRequest> =
+        Singles.zip(encryptedProjectSecretSingle, googleAttestationSingle) {
+            encryptedProjectSecret: String, googleAttestation: AttestToken ->
+            AuthRequest(encryptedProjectSecret, nonceScope.projectId, nonceScope.userId, googleAttestation)
         }
 
     private fun Single<out AuthRequest>.makeAuthRequest(): Single<Tokens> =
         flatMap { authRequest ->
-            authManager
-            .requestAuthToken(authRequest)
-            .subscribeOn(Schedulers.io())
+            authManager.requestAuthToken(authRequest)
+        }
+
+    private fun Single<out Tokens>.signIn(projectId: String): Completable =
+        flatMapCompletable { tokens ->
+            dbManager.signIn(projectId, tokens)
+        }
+
+    private fun Completable.fetchProjectInfo(projectId: String): Single<Project> =
+        andThen(
+            dbManager.refreshProjectInfoWithServer(projectId)
+        )
+
+    private fun Single<out Project>.storeCredentials(userId: String): Completable =
+        flatMapCompletable {
+            loginInfoManager.storeCredentials(it.id, it.legacyId, userId)
+            Completable.complete()
         }
 }

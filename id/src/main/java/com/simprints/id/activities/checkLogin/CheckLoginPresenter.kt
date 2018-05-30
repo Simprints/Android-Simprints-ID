@@ -1,121 +1,23 @@
 package com.simprints.id.activities.checkLogin
 
-import com.simprints.id.activities.dashboard.DashboardActivity
-import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.data.DataManager
-import com.simprints.id.domain.sessionParameters.SessionParameters
-import com.simprints.id.domain.sessionParameters.extractors.Extractor
-import com.simprints.id.exceptions.unsafe.InvalidCalloutError
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
+import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
+import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.tools.TimeHelper
-import java.util.*
+import com.simprints.id.tools.utils.StringsUtils
 
-class CheckLoginPresenter(val view: CheckLoginContract.View,
-                          val dataManager: DataManager,
-                          private val sessionParametersExtractor: Extractor<SessionParameters>,
-                          override var wasAppOpenedByIntent: Boolean,
-                          private val timeHelper: TimeHelper) : CheckLoginContract.Presenter {
-
-    private var started: Boolean = false
+abstract class CheckLoginPresenter(
+    private val view: CheckLoginContract.View,
+    private val dataManager: DataManager,
+    private val secureDataManager: SecureDataManager,
+    private val timeHelper: TimeHelper) {
 
     init {
-        view.setPresenter(this)
-    }
-
-    private val nextActivityClassAfterLogin by lazy {
-        if (wasAppOpenedByIntent /* FUTURE: && calloutAction != LOGIN */) {
-            LaunchActivity::class.java
-        } else {
-            DashboardActivity::class.java
-        }
-    }
-
-    override fun start() {
-        if (!started) {
-            started = true
-            initSession()
-
-            // If app was launched by intent, we extract the sessions Params (if not done before)
-            if (wasAppOpenedByIntent) {
-                try {
-                    extractSessionParameters()
-                } catch (exception: InvalidCalloutError) {
-                    view.launchAlertForError(exception.alertType)
-                    return
-                }
-            }
-            view.checkCallingApp()
-            checkIfUserIsLoggedIn()
-        }
-    }
-
-    override fun checkIfUserIsLoggedIn() {
-        if (isUserSignedIn()) {
-            initDbContext(dataManager.signedInProjectId)
-            startNormalFlow()
-        } else {
-            redirectUserForLogin()
-        }
-    }
-
-    private fun initDbContext(projectId: String) {
-        if (!dataManager.isDbInitialised(projectId)) {
-            try {
-                dataManager.initialiseDb(projectId)
-            } catch (error: UninitializedDataManagerError) {
-                dataManager.logError(error)
-                view.launchAlertForError(ALERT_TYPE.UNEXPECTED_ERROR)
-            }
-        }
-    }
-
-    private fun extractSessionParameters() {
-        val callout = view.parseCallout()
-        callout.apply {
-            dataManager.logCallout(this)
-        }
-        val sessionParameters = sessionParametersExtractor.extractFrom(callout)
-        dataManager.sessionParameters = sessionParameters
-        dataManager.calloutAction = sessionParameters.calloutAction
-        dataManager.logUserProperties()
-    }
-
-    private fun isUserSignedIn(): Boolean {
-        val encProjectSecret = dataManager.getEncryptedProjectSecretOrEmpty()
-        var storedProjectId = dataManager.getSignedInProjectIdOrEmpty()
-        //val isFirebaseTokenValid = dataManager.isSignedIn(storedProjectId)
-        val isFirebaseTokenValid = true
-
-        if (encProjectSecret.isEmpty() || storedProjectId.isEmpty() || !isFirebaseTokenValid) {
-            return false
-        }
-
-        return if (wasAppOpenedByIntent) {
-            var projectIdFromIntent = dataManager.projectId
-            if (projectIdFromIntent.isEmpty()) { //Legacy App with ApiKey
-                projectIdFromIntent = findProjectIdForApiKey(dataManager.apiKey)
-            }
-            projectIdFromIntent == storedProjectId
-        } else {
-            true
-        }
-    }
-
-    private fun findProjectIdForApiKey(legacyApiKey: String): String {
-        return dataManager.projectIdForLegacyApiKeyOrEmpty(legacyApiKey)
-    }
-
-    private fun startNormalFlow() {
-        view.startActivity(nextActivityClassAfterLogin)
-    }
-
-    private fun redirectUserForLogin() {
-        if (wasAppOpenedByIntent) {
-            view.openLoginActivity()
-        } else {
-            view.openRequestLoginActivity()
-        }
+        initSession()
     }
 
     private fun initSession() {
@@ -123,6 +25,58 @@ class CheckLoginPresenter(val view: CheckLoginContract.View,
     }
 
     private fun newSessionId(): String {
-        return UUID.randomUUID().toString()
+        return StringsUtils.randomUUID()
     }
+
+    protected fun checkSignedInStateAndMoveOn() {
+        try {
+            checkSignedInOrThrow()
+            handleSignedInUser()
+        } catch (e: Throwable) {
+            when (e) {
+                is DifferentProjectIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_PROJECT_ID)
+                is DifferentUserIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_USER_ID)
+                is NotSignedInException -> handleNotSignedInUser()
+                else -> {
+                    dataManager.logThrowable(e)
+                    view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
+                }
+            }
+        }
+    }
+
+    abstract fun handleSignedInUser()
+    abstract fun handleNotSignedInUser()
+
+    /**
+     * @throws DifferentProjectIdSignedInException
+     * @throws DifferentUserIdSignedInException
+     * @throws NotSignedInException
+     */
+    private fun checkSignedInOrThrow() {
+        val isUserSignedIn =
+            isEncryptedProjectSecretPresent() &&
+            isProjectIdStoredAndMatches() &&
+            isLocalKeyValid(dataManager.getSignedInProjectIdOrEmpty()) &&
+            isUserIdStoredAndMatches() &&
+            isFirebaseTokenValid()
+
+        if (!isUserSignedIn)
+            throw NotSignedInException()
+    }
+
+    private fun isEncryptedProjectSecretPresent(): Boolean = dataManager.getEncryptedProjectSecretOrEmpty().isNotEmpty()
+    private fun isFirebaseTokenValid(): Boolean = dataManager.isSignedIn(dataManager.getSignedInProjectIdOrEmpty(), dataManager.getSignedInUserIdOrEmpty())
+    private fun isLocalKeyValid(projectId: String): Boolean = try {
+        secureDataManager.getLocalDbKeyOrThrow(projectId)
+        true
+    } catch (t: Throwable) {
+        false
+    }
+
+    /** @throws DifferentProjectIdSignedInException */
+    abstract fun isProjectIdStoredAndMatches(): Boolean
+
+    /** @throws DifferentUserIdSignedInException */
+    abstract fun isUserIdStoredAndMatches(): Boolean
 }

@@ -1,6 +1,6 @@
 package com.simprints.id.services.progress.service
 
-import com.simprints.libcommon.Progress
+import com.simprints.id.services.progress.Progress
 import io.reactivex.Observable
 
 

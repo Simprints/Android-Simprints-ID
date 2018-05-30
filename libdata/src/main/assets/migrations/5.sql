@@ -1,1 +1,0 @@
-ALTER TABLE People ADD COLUMN UserId TEXT;

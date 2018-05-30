@@ -1,11 +1,10 @@
 package com.simprints.id.data.prefs.sessionState.sessionParameters
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.domain.callout.CalloutAction
+import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.delegates.ComplexPreference
 import com.simprints.id.tools.delegates.PrimitivePreference
 import com.simprints.id.tools.serializers.Serializer
-
 
 class SessionParametersPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                               calloutActionSerializer: Serializer<CalloutAction>)
@@ -15,9 +14,6 @@ class SessionParametersPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         private val CALLOUT_ACTION_KEY = "CalloutAction"
         private val CALLOUT_ACTION_DEFAULT = CalloutAction.MISSING
-
-        private val API_KEY = "ApiKey"
-        private val API_KEY_DEFAULT = ""
 
         private val PROJECT_ID_KEY = "ProjectId"
         private val PROJECT_ID_DEFAULT = ""
@@ -39,16 +35,11 @@ class SessionParametersPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         private val RESULT_FORMAT_KEY = "ResultFormat"
         private val RESULT_FORMAT_DEFAULT = ""
-
     }
 
     // CalloutAction of the current session
     override var calloutAction: CalloutAction
         by ComplexPreference(prefs, CALLOUT_ACTION_KEY, CALLOUT_ACTION_DEFAULT, calloutActionSerializer)
-
-    // Project Id
-    override var apiKey: String
-        by PrimitivePreference(prefs, API_KEY, API_KEY_DEFAULT)
 
     // Project Id
     override var projectId: String
@@ -87,5 +78,4 @@ class SessionParametersPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         metadata = METADATA_DEFAULT
         resultFormat = RESULT_FORMAT_DEFAULT
     }
-
 }

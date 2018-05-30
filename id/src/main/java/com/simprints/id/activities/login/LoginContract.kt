@@ -2,26 +2,40 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
-import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.secure.models.Tokens
+import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 
 interface LoginContract {
 
     interface View : BaseView<Presenter> {
-        fun openScanQRApp()
+
+        // QR code scanning
+
+        fun handleOpenScanQRApp()
+        fun handleMissingCredentials()
+        fun showErrorForInvalidQRCode()
         fun updateProjectSecretInTextView(projectSecret: String)
         fun updateProjectIdInTextView(projectId: String)
-        fun showToast(stringRes: Int)
-        fun showProgressDialog(title: Int, message: Int)
-        fun dismissProgressDialog()
-        fun returnSuccessfulResult(token: Tokens)
+
+        // Callbacks from signing in
+
+        fun handleSignInFailedNoConnection()
+        fun handleSignInFailedServerError()
+        fun handleSignInFailedInvalidCredentials()
+        fun handleSignInFailedProjectIdIntentMismatch()
+        fun handleSignInFailedUnknownReason()
+        fun handleSignInSuccess()
     }
 
     interface Presenter : BasePresenter {
-        var projectAuthenticator: ProjectAuthenticator
+        var projectAuthenticator: LegacyCompatibleProjectAuthenticator
 
-        fun userDidWantToOpenScanQRApp()
-        fun userDidWantToSignIn(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String, possibleLegacyApiKey: String? = null)
+        fun signIn(suppliedUserId: String,
+                   suppliedProjectId: String,
+                   suppliedProjectSecret: String,
+                   intentProjectId: String? = null,
+                   intentLegacyProjectId: String? = null)
+
+        fun openScanQRApp()
         fun processQRScannerAppResponse(scannedText: String)
     }
 }

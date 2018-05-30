@@ -90,7 +90,7 @@
     <string name="nav_sync_failed">Sync Failed</string>
     <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
     <string name="persistence_label">Remember these settings next time</string>
-    <!-- Sync Button Text -->
+    <!--SyncerSync Button Text -->
     <string name="sync_data">Sync Data</string>
     <string name="syncing">Syncing…</string>
     <string name="syncing_calculating">Syncing… Calculating</string>
@@ -110,7 +110,8 @@
     <string name="r_3_finger_name">RIGHT THIRD FINGER</string>
     <string name="r_4_finger_name">RIGHT FOURTH FINGER</string>
     <string name="r_5_finger_name">RIGHT FIFTH FINGER</string>
-
+    <!-- Content descriptions -->
+    <string name="navbar_simprints_logo">Simprints logo</string>
 
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
@@ -149,8 +150,11 @@
     <string name="low_battery_title">LOW BATTERY</string>
     <string name="alert_api_key_verify_failed">Failed to verify API key</string>
     <!-- Error Message Text -->
-    <string name="missing_apikey_message">A configuration error has occurred (missing API key), please contact your system administrator</string>
     <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
+    <string name="invalid_projectId_message">A configuration error has occurred (invalid Project Id), please contact your system administrator</string>
+    <string name="missing_projectId_or_apiKey_message">A configuration error has occurred (no project ID/API Key), please contact your system administrator</string>
+    <string name="different_projectId_message">A configuration error has occurred (different Project Id), please sign out from the home screen or contact your system administrator</string>
+    <string name="different_userId_message">A configuration error has occurred (different User Id), please sign out from the home screen or contact your system administrator</string>
     <string name="invalid_intentAction_message">A configuration error has occurred (invalid intent action), please contact your system administrator</string>
     <string name="unexpected_parameter_message">A configuration error has occurred (unexpected parameter), please contact your system administrator</string>
     <string name="invalid_metadata_message">A configuration error has occurred (invalid metadata), please contact your system administrator</string>
@@ -292,36 +296,67 @@
     <string name="notification_channel_id">SimprintsID</string>
     <string name="notification_channel_name">Simprints ID notifications</string>
     <string name="notification_channel_description">Notifications from Simprints ID</string>
-    <!-- Sync Notifications -->
+    <!--SyncerSync Notifications -->
     <string name="sync_notification_tag">SimprintsID_sync</string>
     <string name="sync_notification_title">Simprints ID Sync</string>
     <string name="sync_progress_notification_content">Syncing… %1$d/%2$d</string>
+    <string name="sync_progress_upload_notification_content">Uploading… %1$d/%2$d</string>
+    <string name="sync_progress_download_notification_content">Downloading… %1$d/%2$d</string>
+
     <string name="sync_error_notification_content">Sync failed.</string>
     <string name="sync_complete_notification_content">Sync completed.</string>
 
 
-    <!-- ApiKeyActivity -->
+    <!-- LoginActivity -->
     <!-- TODO: what about translation? -->
     <string name="empty" translatable="false" />
     <string name="simprints_logo">Simprints Logo</string>
-    <string name="login_enter_project_secret_id">Enter your project\'s id and key</string>
+    <string name="login_enter_project_secret_id">Enter your Project ID and key</string>
     <string name="scan_qr">Scan QR</string>
     <string name="enter">Enter</string>
-    <string name="login_id_hint">Project id</string>
+    <string name="login_id_hint">Project ID</string>
     <string name="login_secret_hint">Project key</string>
-    <string name="login_invalidCredentials">Invalid Login. Check Project\'s id or key</string>
-
+    <string name="login_user_id_hint">User ID</string>
     <string name="login_title">Request Project credentials</string>
     <string name="login_type_project_details">Type manually</string>
-    <string name="login_invalidQrCode">The scanned QR code is invalid.</string>
-    <string name="progress_title">Signing in</string>
-    <string name="login_progress_message">Please wait ...</string>
-    <string name="check_login_label">Check login</string>
-    <string name="dashboard_label">Dashboad</string>
-    <string name="requestLogin_message">You need to login in. Please use your client App to open Simprints ID and log in.</string>
+    <string name="requestLogin_message">You need to login in. Please use your client app to open Simprints ID and log in.</string>
     <string name="requestLogin_title">Login Required</string>
     <string name="login">Login</string>
-    <string name="invalid_projectId_message">A configuration error has occurred (Project Id), please contact your system administrator</string>
-    <string name="login_missing_credentials">Missing credentials. Please check user id, project\'s id and key again.</string>
+    <!-- QR code scanning messages -->
+    <string name="login_qr_code_scanning_problem">A problem occurred while scanning the QR code</string>
+    <string name="login_invalid_qr_code">The scanned QR code is invalid.</string>
+    <!-- sign-in toast messages -->
+    <string name="login_missing_credentials">Missing credentials. Please check the User ID, Project ID, and key, and try again.</string>
+    <string name="login_invalid_credentials">Invalid credentials. Please check the Project ID and key</string>
+    <string name="login_project_id_intent_mismatch">Project ID different from that supplied in intent. Please contact your system administrator.</string>
+    <string name="login_no_network">Currently offline. Please check your internet connection.</string>
+    <string name="login_server_error">A problem occurred trying to contact the server. Please try again later.</string>
+
+
+    <!-- Dashboard Activity -->
+    <string name="dashboard_label">Dashboard</string>
+    <string name="logout">Logout</string>
+    <string name="hint_graphic">Hint graphic</string>
+    <string name="dashboard_sync_status_icon">Synchronisation status icon</string>
+    <string name="dashboard_sync_icon">Synchronisation icon</string>
+    <string name="zero">0</string>
+    <string name="account_menu">Account</string>
+    <string name="nav_logout">Logout</string>
+    <string name="dashboard_card_project_title">Project</string>
+
+    <string name="dashboard_card_localdb_sync_user_title">People enrolled by last user</string>
+    <string name="dashboard_card_localdb_sync_project_title">People enrolled in project</string>
+
+    <string name="dashboard_card_sync_title">Sync info</string>
+    <string name="dashboard_card_sync_needed">you may need to sync</string>
+    <string name="dashboard_card_sync_last_sync">Last sync: %1$s</string>
+    <string name="dashboard_card_sync_action">SYNC</string>
+
+    <string name="dashboard_card_remotedb_title">People saved on server</string>
+    <string name="dashboard_card_lastscanner_title">Last scanner used</string>
+    <string name="dashboard_card_enrol_title">Last Enrol</string>
+    <string name="dashboard_card_verification_title">Last Verification</string>
+    <string name="dashboard_card_identification_title">Last Identification</string>
+    <string name="dashboard_card_lastuser_title">Last user</string>
 
 </resources>

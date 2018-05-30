@@ -1,22 +1,23 @@
 package com.simprints.id.di
 
 import com.google.gson.Gson
+import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
-import com.simprints.id.domain.callout.CalloutAction
-import com.simprints.id.domain.callout.CalloutParameter
-import com.simprints.id.domain.sessionParameters.extractors.ActionDependentExtractor
-import com.simprints.id.domain.sessionParameters.extractors.Extractor
-import com.simprints.id.domain.sessionParameters.extractors.ParameterExtractor
-import com.simprints.id.domain.sessionParameters.extractors.SessionParametersExtractor
-import com.simprints.id.domain.sessionParameters.readers.*
-import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.ExpectedParametersLister
-import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.ExpectedParametersListerImpl
-import com.simprints.id.domain.sessionParameters.readers.unexpectedParameters.UnexpectedParametersReader
-import com.simprints.id.domain.sessionParameters.validators.*
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.session.callout.CalloutParameter
+import com.simprints.id.session.sessionParameters.SessionParameters
+import com.simprints.id.session.sessionParameters.extractors.ActionDependentExtractor
+import com.simprints.id.session.sessionParameters.extractors.Extractor
+import com.simprints.id.session.sessionParameters.extractors.ParameterExtractor
+import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractor
+import com.simprints.id.session.sessionParameters.readers.*
+import com.simprints.id.session.sessionParameters.readers.unexpectedParameters.ExpectedParametersLister
+import com.simprints.id.session.sessionParameters.readers.unexpectedParameters.ExpectedParametersListerImpl
+import com.simprints.id.session.sessionParameters.readers.unexpectedParameters.UnexpectedParametersReader
+import com.simprints.id.session.sessionParameters.validators.*
 import com.simprints.id.tools.serializers.*
-import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.FingerIdentifier
 import dagger.Module
@@ -58,12 +59,11 @@ class SerializerModule {
         MandatoryParameterReader(SIMPRINTS_MODULE_ID, String::class, missingModuleIdError, invalidModuleIdError)
 
     //APIKey
-    @Provides @Singleton @Named("MissingApiKeyError") fun provideMissingApiKeyError(): Error = InvalidCalloutError(ALERT_TYPE.MISSING_API_KEY)
     @Provides @Singleton @Named("InvalidApiKeyError") fun provideInvalidApiKeyError(): Error = InvalidCalloutError(ALERT_TYPE.INVALID_API_KEY)
     @Provides @Singleton @Named("ApiKeyValidator") fun provideApiKeyValidator(@Named("InvalidApiKeyError") invalidApiKeyError: Error): Validator<String> = GuidValidator(invalidApiKeyError)
     @Provides @Singleton @Named("ApiKeyExtractor") fun provideApiKeyExtractor(@Named("ApiKeyReader") apiKeyReader: Reader<String>, @Named("ApiKeyValidator") apiKeyValidator: Validator<String>): Extractor<String> = ParameterExtractor(apiKeyReader, apiKeyValidator)
-    @Provides @Singleton @Named("ApiKeyReader") fun provideApiKeyReader(@Named("MissingApiKeyError") missingApiKeyError: Error, @Named("InvalidApiKeyError") invalidApiKeyError: Error): Reader<String> =
-        MandatoryParameterReader(com.simprints.libsimprints.Constants.SIMPRINTS_API_KEY, String::class, missingApiKeyError, invalidApiKeyError)
+    @Provides @Singleton @Named("ApiKeyReader") fun provideApiKeyReader(@Named("InvalidApiKeyError") invalidApiKeyError: Error): Reader<String> =
+        OptionalParameterReader(SIMPRINTS_API_KEY, "", invalidApiKeyError)
 
     //ProjectId
     @Provides @Singleton @Named("InvalidProjectIdError") fun provideInvalidProjectIdError(): Error = InvalidCalloutError(ALERT_TYPE.INVALID_API_KEY)
@@ -75,10 +75,10 @@ class SerializerModule {
     //UserId
     @Provides @Singleton @Named("InvalidUserIdError") fun provideInvalidUserIdError(): Error = InvalidCalloutError(ALERT_TYPE.INVALID_USER_ID)
     @Provides @Singleton @Named("MissingUserIdError") fun provideMissingUserIdError(): Error = InvalidCalloutError(ALERT_TYPE.MISSING_USER_ID)
-    @Provides @Singleton @Named("UserIdValidator") fun provideUserIdValidator(): Validator<String> = NoOpValidator<String>()
+    @Provides @Singleton @Named("UserIdValidator") fun provideUserIdValidator(): Validator<String> = NoOpValidator()
     @Provides @Singleton @Named("UserIdExtractor") fun provideUserIdExtractor(@Named("UserIdReader") userIdReader: Reader<String>, @Named("UserIdValidator") userIdValidator: Validator<String>): Extractor<String> = ParameterExtractor(userIdReader, userIdValidator)
     @Provides @Singleton @Named("UserIdReader") fun provideUserIdReader(@Named("MissingUserIdError") missingUserIdError: Error, @Named("InvalidUserIdError") invalidUserIdError: Error): Reader<String> =
-        MandatoryParameterReader(com.simprints.libsimprints.Constants.SIMPRINTS_USER_ID, String::class, missingUserIdError, invalidUserIdError)
+        MandatoryParameterReader(SIMPRINTS_USER_ID, String::class, missingUserIdError, invalidUserIdError)
 
     //VerifyId
     @Provides @Singleton @Named("MissingVerifyIdError") fun provideMissingVerifyIdError(): Error = InvalidCalloutError(ALERT_TYPE.MISSING_VERIFY_GUID)
@@ -86,7 +86,7 @@ class SerializerModule {
     @Provides @Singleton @Named("VerifyIdValidator") fun provideVerifyIdValidator(@Named("InvalidVerifyIdError") invalidVerifyIdError: Error): Validator<String> = GuidValidator(invalidVerifyIdError)
     @Provides @Singleton @Named("VerifyIdExtractor") fun provideVerifyIdExtractor(@Named("VerifyIdReader") verifyIdReader: Reader<String>, @Named("VerifyIdValidator") verifyIdValidator: Validator<String>): Extractor<String> = ParameterExtractor(verifyIdReader, verifyIdValidator)
     @Provides @Singleton @Named("VerifyIdReader") fun provideVerifyIdReader(@Named("MissingVerifyIdError") missingVerifyIdError: Error, @Named("InvalidVerifyIdError") invalidVerifyIdError: Error): Reader<String> =
-        MandatoryParameterReader(com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_GUID, String::class, missingVerifyIdError, invalidVerifyIdError)
+        MandatoryParameterReader(SIMPRINTS_VERIFY_GUID, String::class, missingVerifyIdError, invalidVerifyIdError)
 
     //UpdateId
     @Provides @Singleton @Named("MissingUpdateIdError") fun provideMissingUpdateIdError(): Error = InvalidCalloutError(ALERT_TYPE.MISSING_UPDATE_GUID)
@@ -94,7 +94,7 @@ class SerializerModule {
     @Provides @Singleton @Named("UpdateIdValidator") fun provideUpdateIdValidator(@Named("InvalidUpdateIdError") invalidUpdateIdError: Error): Validator<String> = GuidValidator(invalidUpdateIdError)
     @Provides @Singleton @Named("UpdateIdExtractor") fun provideUpdateIdExtractor(@Named("UpdateIdReader") updateIdReader: Reader<String> , @Named("UpdateIdValidator") updateIdValidator: Validator<String>): Extractor<String> = ParameterExtractor(updateIdReader, updateIdValidator)
     @Provides @Singleton @Named("UpdateIdReader") fun provideUpdateIdReader(@Named("MissingUpdateIdError") missingUpdateIdError: Error, @Named("InvalidUpdateIdError") invalidUpdateIdError: Error): Reader<String> =
-        MandatoryParameterReader(com.simprints.libsimprints.Constants.SIMPRINTS_UPDATE_GUID, String::class, missingUpdateIdError, invalidUpdateIdError)
+        MandatoryParameterReader(SIMPRINTS_UPDATE_GUID, String::class, missingUpdateIdError, invalidUpdateIdError)
 
     //CallingPackage
     @Provides @Singleton @Named("InvalidCallingPackageError") fun provideInvalidCallingPackageError(): Error = InvalidCalloutError(ALERT_TYPE.INVALID_CALLING_PACKAGE)
@@ -119,16 +119,8 @@ class SerializerModule {
 
 
     @Provides @Singleton fun provideParametersLister(): ExpectedParametersLister = ExpectedParametersListerImpl()
-    @Provides @Singleton @Named("UnexpectedParametersReader") fun provideUnexpectedParametersReader(expectedParametersLister: ExpectedParametersLister): Reader<Set<CalloutParameter>> = UnexpectedParametersReader(expectedParametersLister)
 
     @Provides @Singleton @Named("ParametersReader") fun provideParametersReader(@Named("ExpectedParametersLister") expectedParametersLister: ExpectedParametersLister): Reader<Set<CalloutParameter>> = UnexpectedParametersReader(expectedParametersLister)
-    @Provides @Singleton @Named("InvalidUnexpectedParametersError") fun provideInvalidUnexpectedParametersError(): Error = InvalidCalloutError(ALERT_TYPE.UNEXPECTED_PARAMETER)
-    @Provides @Singleton @Named("UnexpectedParametersValidator") fun provideUnexpectedParametersValidator(@Named("InvalidUnexpectedParametersError") invalidUnexpectedParametersError: Error): Validator<Set<CalloutParameter>> {
-        val validUnexpectedParametersValues = listOf(emptySet<CalloutParameter>())
-        return ValueValidator(validUnexpectedParametersValues, invalidUnexpectedParametersError)
-    }
-    @Provides @Singleton @Named("UnexpectedParametersExtractor") fun provideUnexpectedParametersExtractor(@Named("UnexpectedParametersReader") unexpectedParametersReader: Reader<Set<CalloutParameter>>, @Named("UnexpectedParametersValidator") unexpectedParametersValidator: Validator<Set<CalloutParameter>>): Extractor<Set<CalloutParameter>> = ParameterExtractor(unexpectedParametersReader, unexpectedParametersValidator)
-
 
     @Provides @Singleton @Named("GuidGenerator")  fun provideGuidGenerator(): Extractor<String> = ParameterExtractor(GeneratorReader({ UUID.randomUUID().toString() }), NoOpValidator())
     @Provides @Singleton @Named("PatientIdExtractor") fun providePatientIdExtractor(@Named("UpdateIdExtractor") updateIdExtractor:Extractor<String>, @Named("VerifyIdExtractor") verifyIdExtractor: Extractor<String>, @Named("GuidGenerator") guidGenerator: Extractor<String>): Extractor<String> {
@@ -139,6 +131,8 @@ class SerializerModule {
         return ActionDependentExtractor(patientIdSwitch, "")
     }
 
+    @Provides @Singleton @Named("MissingApiKeyOrProjectIdError")  fun provideMissingApiKeyOrProjectIdError(): Error = InvalidCalloutError(ALERT_TYPE.MISSING_PROJECT_ID_OR_API_KEY)
+    @Provides @Singleton @Named("SessionParametersValidator")  fun provideSessionParametersValidator(@Named("MissingApiKeyOrProjectIdError") missingApiKeyOrProjectIdError: Error): Set<Validator<SessionParameters>> = setOf(ProjectIdOrApiKeyValidator(missingApiKeyOrProjectIdError))
 
     @Provides @Singleton fun provideSessionParametersExtractor(@Named("ActionExtractor") actionExtractor: Extractor<CalloutAction>,
                                                                @Named("ApiKeyExtractor") apiKeyExtractor: Extractor<String>,
@@ -149,9 +143,9 @@ class SerializerModule {
                                                                @Named("CallingPackageExtractor") callingPackageExtractor: Extractor<String>,
                                                                @Named("MetadataExtractor") metadataExtractor: Extractor<String>,
                                                                @Named("ResultFormatExtractor") resultFormatExtractor: Extractor<String>,
-                                                               @Named("UnexpectedParametersExtractor") unexpectedParametersExtractor: Extractor<Set<CalloutParameter>>): SessionParametersExtractor =
+                                                               @Named("SessionParametersValidator") sessionParametersValidator: Set<Validator<SessionParameters>>): SessionParametersExtractor =
     SessionParametersExtractor(actionExtractor, apiKeyExtractor, projectIdExtractor, moduleIdExtractor,
         userIdExtractor, patientIdExtractor, callingPackageExtractor, metadataExtractor,
-        resultFormatExtractor, unexpectedParametersExtractor)
+        resultFormatExtractor, sessionParametersValidator)
 
 }

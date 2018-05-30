@@ -1,3 +1,5 @@
 package com.simprints.id.secure.models
 
-class Tokens(val firestoreToken: String = "", val legacyToken: String = "")
+import java.io.Serializable
+
+data class Tokens(val firestoreToken: String = "", val legacyToken: String = ""): Serializable

@@ -1,59 +1,107 @@
 package com.simprints.id.activities.login
 
-import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.id.R
-import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.secure.ProjectAuthenticator
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
+import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
+import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
+import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
+import com.simprints.id.tools.extensions.trace
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
+import org.json.JSONException
+import org.json.JSONObject
+import timber.log.Timber
+import java.io.IOException
 
-@Suppress("UnnecessaryVariable")
+
 class LoginPresenter(val view: LoginContract.View,
-                     private val secureDataManager: SecureDataManager,
-                     override var projectAuthenticator: ProjectAuthenticator,
-                     private val safetyNetClient: SafetyNetClient) : LoginContract.Presenter {
-    init {
-        view.setPresenter(this)
+                     private val loginInfoManager: LoginInfoManager,
+                     private val analyticsManager: AnalyticsManager,
+                     override var projectAuthenticator: LegacyCompatibleProjectAuthenticator) : LoginContract.Presenter {
+
+    override fun start() {}
+
+    override fun signIn(suppliedUserId: String,
+                        suppliedProjectId: String,
+                        suppliedProjectSecret: String,
+                        intentProjectId: String?,
+                        intentLegacyProjectId: String?) =
+        if (areMandatoryCredentialsPresent(suppliedProjectId, suppliedProjectSecret, suppliedUserId))
+            doAuthenticate(
+                suppliedProjectId,
+                suppliedUserId,
+                suppliedProjectSecret,
+                intentProjectId,
+                intentLegacyProjectId)
+        else view.handleMissingCredentials()
+
+    private fun areMandatoryCredentialsPresent(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String) =
+        possibleProjectId.isNotEmpty() && possibleProjectSecret.isNotEmpty() && possibleUserId.isNotEmpty()
+
+    private fun doAuthenticate(suppliedProjectId: String, suppliedUserId: String, suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
+        loginInfoManager.cleanCredentials()
+        projectAuthenticator.authenticate(
+            NonceScope(suppliedProjectId, suppliedUserId),
+            suppliedProjectSecret,
+            intentProjectId,
+            intentLegacyProjectId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .trace("doAuthenticate")
+            .subscribeBy(
+                onComplete = { handleSignInSuccess() },
+                onError = { e -> handleSignInError(e) })
     }
 
-    override fun start() {
+    private fun handleSignInSuccess() {
+        view.handleSignInSuccess()
     }
 
-    override fun userDidWantToOpenScanQRApp() {
-        view.openScanQRApp()
-    }
-
-    override fun userDidWantToSignIn(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String, possibleLegacyApiKey: String?) {
-
-        if (!possibleProjectId.isEmpty() && !possibleProjectSecret.isEmpty() && !possibleUserId.isEmpty()) {
-            view.showProgressDialog(R.string.progress_title, R.string.login_progress_message)
-            projectAuthenticator.authenticateWithNewCredentials(
-                safetyNetClient,
-                NonceScope(possibleProjectId, possibleUserId),
-                possibleProjectSecret)
-                .subscribe(
-                    { token ->
-                        secureDataManager.storeProjectIdWithLegacyApiKeyPair(possibleProjectId, possibleLegacyApiKey)
-                        secureDataManager.signedInProjectId = possibleProjectId
-                        view.dismissProgressDialog()
-                        view.returnSuccessfulResult(token)
-                    },
-                    { e ->
-                        e.printStackTrace()
-                        view.dismissProgressDialog()
-                        view.showToast(R.string.login_invalidCredentials)
-                        secureDataManager.cleanCredentials()
-                    })
-        } else {
-            view.showToast(R.string.login_missing_credentials)
+    private fun handleSignInError(e: Throwable) {
+        logSignInError(e)
+        when (e) {
+            is IOException -> view.handleSignInFailedNoConnection()
+            is DifferentProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch()
+            is InvalidLegacyProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch()
+            is AuthRequestInvalidCredentialsException -> view.handleSignInFailedInvalidCredentials()
+            is SimprintsInternalServerException -> view.handleSignInFailedServerError()
+            else -> view.handleSignInFailedUnknownReason()
         }
     }
 
-    override fun processQRScannerAppResponse(scannedText: String) {
-        val potentialProjectId = scannedText.substring(scannedText.indexOf("id:") + "id:".length, scannedText.indexOf("\n"))
-        val nextParam = scannedText.substring(scannedText.indexOf("\n") + 1)
-        val potentialProjectSecret = nextParam.substring(nextParam.indexOf("secret:") + "secret:".length)
+    private fun logSignInError(e: Throwable) {
+        when (e) {
+            is IOException -> Timber.d("Attempted login offline")
+            else -> analyticsManager.logThrowable(e)
+        }
+    }
 
-        view.updateProjectIdInTextView(potentialProjectId)
-        view.updateProjectSecretInTextView(potentialProjectSecret)
+    override fun openScanQRApp() {
+        view.handleOpenScanQRApp()
+    }
+
+    /**
+     * Valid Scanned Text Format:
+     * {"projectId":"someProjectId","projectSecret":"someSecret"}
+     **/
+    override fun processQRScannerAppResponse(scannedText: String) {
+        try {
+            val scannedJson = JSONObject(scannedText)
+            val potentialProjectId = scannedJson.getString(PROJECT_ID_JSON_KEY)
+            val potentialProjectSecret = scannedJson.getString(PROJECT_SECRET_JSON_KEY)
+            view.updateProjectIdInTextView(potentialProjectId)
+            view.updateProjectSecretInTextView(potentialProjectSecret)
+        } catch (e: JSONException) {
+            view.showErrorForInvalidQRCode()
+        }
+    }
+
+    companion object {
+        private const val PROJECT_ID_JSON_KEY = "projectId"
+        private const val PROJECT_SECRET_JSON_KEY = "projectSecret"
     }
 }
