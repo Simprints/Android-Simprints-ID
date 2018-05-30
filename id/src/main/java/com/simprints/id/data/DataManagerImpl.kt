@@ -39,7 +39,7 @@ class DataManagerImpl(override val preferences: PreferencesManager,
             preferences.msSinceBootOnMainStart,
             preferences.msSinceBootOnMatchStart,
             preferences.msSinceBootOnSessionEnd)
-        db.saveSessionInRemote(session)
+        db.remote.saveSessionInRemote(session)
         analytics.logSession(session)
     }
 }

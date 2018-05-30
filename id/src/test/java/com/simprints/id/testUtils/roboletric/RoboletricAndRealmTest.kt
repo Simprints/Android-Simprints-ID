@@ -66,7 +66,7 @@ fun mockLoadProject(app: Application) {
 
 fun createMockForDbManager(app: Application) {
     val spy = Mockito.spy(app.dbManager)
-    Mockito.doNothing().`when`(spy).initialiseRemoteDb()
+    Mockito.doNothing().`when`(spy).initialiseDb()
     Mockito.doReturn(Completable.complete()).`when`(spy).signIn(anyNotNull(), anyNotNull())
     app.dbManager = spy
 }

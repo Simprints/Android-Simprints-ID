@@ -36,9 +36,7 @@ class DbManagerImpl(override val local: LocalDbManager,
                     override val remote: RemoteDbManager,
                     private val secureDataManager: SecureDataManager,
                     private val loginInfoManager: LoginInfoManager,
-                    private val preferencesManager: PreferencesManager) :
-    DbManager,
-    RemoteDbManager by remote {
+                    private val preferencesManager: PreferencesManager) : DbManager {
 
     override fun initialiseDb() {
         remote.initialiseRemoteDb()
