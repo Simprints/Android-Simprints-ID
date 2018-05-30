@@ -18,7 +18,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
-interface DbManager : RemoteDbManager {
+interface DbManager {
 
     val local: LocalDbManager
     val remote: RemoteDbManager

@@ -29,7 +29,7 @@ open class SyncExecutor(private val dbManager: DbManager,
     }
 
     private val syncApi: PeopleRemoteInterface by lazy {
-        dbManager.getPeopleApiClient().blockingGet()
+        dbManager.remote.getPeopleApiClient().blockingGet()
     }
 
     fun sync(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
@@ -53,7 +53,7 @@ open class SyncExecutor(private val dbManager: DbManager,
 
     private fun Flowable<out MutableList<fb_Person>>.uploadEachBatch(): Flowable<Int> =
         flatMap { batch ->
-            dbManager
+            dbManager.remote
                 .uploadPeople(ArrayList(batch))
                 .andThen(Flowable.just(batch.size))
         }
@@ -75,7 +75,7 @@ open class SyncExecutor(private val dbManager: DbManager,
         dbManager.local.getPeopleCountFromLocal(toSync = true)
 
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> =
-        dbManager.getNumberOfPatientsForSyncParams(syncParams).flatMap {
+        dbManager.remote.getNumberOfPatientsForSyncParams(syncParams).flatMap {
             dbManager.calculateNPatientsToDownSync(it, syncParams)
         }.flatMapObservable { nPeopleToDownload ->
             Timber.d("Downloading batch $nPeopleToDownload people")

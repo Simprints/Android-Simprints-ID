@@ -91,7 +91,7 @@ class DashboardSyncCard(type: DashboardCardType,
     }
 
     private fun updateRemotePeopleCount() {
-        dataManager.db.getNumberOfPatientsForSyncParams(syncParams)
+        dataManager.db.remote.getNumberOfPatientsForSyncParams(syncParams)
             .flatMap {
                 dataManager.db.calculateNPatientsToDownSync(it, syncParams)
             }
