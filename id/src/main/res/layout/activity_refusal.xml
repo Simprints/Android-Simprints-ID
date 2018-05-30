@@ -109,7 +109,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/button_scan_prints" />
+            android:text="@string/button_scan_prints"
+            tools:ignore="ButtonStyle" />
 
         <Button
             android:id="@+id/bt_submit_refusal_form"
@@ -117,7 +118,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:enabled="false"
-            android:text="@string/button_submit" />
+            android:text="@string/button_submit"
+            tools:ignore="ButtonStyle" />
 
     </LinearLayout>
 

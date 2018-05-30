@@ -9,8 +9,7 @@ import com.simprints.id.services.progress.service.ProgressTask
 import com.simprints.id.tools.NotificationFactory
 import javax.inject.Inject
 
-
-class SyncService: ProgressService<SyncTaskParameters>() {
+class SyncService : ProgressService<SyncTaskParameters>() {
 
     @Inject lateinit var notificationFactory: NotificationFactory
     @Inject lateinit var dataManager: DataManager
@@ -19,7 +18,6 @@ class SyncService: ProgressService<SyncTaskParameters>() {
 
         fun getClient(context: Context): SyncClient =
                 SyncClient(context)
-
     }
 
     override fun onCreate() {
@@ -38,5 +36,4 @@ class SyncService: ProgressService<SyncTaskParameters>() {
 
     override fun getErrorNotificationBuilder(taskParameters: SyncTaskParameters): NotificationBuilder =
         notificationFactory.syncErrorNotification()
-
 }

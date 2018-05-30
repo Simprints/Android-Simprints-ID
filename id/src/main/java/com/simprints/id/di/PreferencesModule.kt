@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.simprints.id.Application
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
@@ -16,10 +17,10 @@ import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimesta
 import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimestampsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
-import com.simprints.id.domain.callout.CalloutAction
+import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.serializers.Serializer
-import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.FingerIdentifier
 import dagger.Module
 import dagger.Provides
@@ -62,7 +63,9 @@ open class PreferencesModule {
 
 
     @Provides @Singleton fun providePreferencesManager(sessionStatePreferencesManager: SessionStatePreferencesManager,
-                                                       settingsPreferencesManager: SettingsPreferencesManager): PreferencesManager =
-        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager)
+                                                       settingsPreferencesManager: SettingsPreferencesManager,
+                                                       lastEventsPreferencesManager: RecentEventsPreferencesManager,
+                                                       app: Application): PreferencesManager =
+        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, lastEventsPreferencesManager, app)
 
 }

@@ -37,6 +37,7 @@ Thumbs.db
 .gradle
 build/
 **/output.json
+projectFilesBackup/
 
 # PyCharm
 testing/__pycache__/
@@ -47,3 +48,6 @@ obj/
 
 # Test Log Files
 testing/logs/
+
+.idea/codeStyles/
+.idea/caches/

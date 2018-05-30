@@ -19,8 +19,8 @@ import android.widget.ToggleButton;
 import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.domain.Constants;
 import com.simprints.id.tools.LanguageHelper;
-import com.simprints.libdata.tools.Constants;
 
 import javax.inject.Inject;
 
@@ -254,14 +254,12 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             case 0:
                 dataManager.setLanguage("");
                 dataManager.setLanguagePosition(0);
-
                 break;
             case 1:
                 dataManager.setLanguage("ne");
                 dataManager.setLanguagePosition(1);
                 break;
             case 2:
-
                 dataManager.setLanguage("bn");
                 dataManager.setLanguagePosition(2);
                 break;
@@ -272,6 +270,19 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             case 4:
                 dataManager.setLanguage("fa-rAF");
                 dataManager.setLanguagePosition(4);
+                break;
+            case 5:
+                dataManager.setLanguage("so");
+                dataManager.setLanguagePosition(5);
+                break;
+            case 6:
+                dataManager.setLanguage("ha");
+                dataManager.setLanguagePosition(6);
+                break;
+            case 7:
+                dataManager.setLanguage("ny");
+                dataManager.setLanguagePosition(7);
+                break;
         }
     }
 

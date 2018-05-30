@@ -1,80 +1,68 @@
 package com.simprints.id.data.secure
 
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.exceptions.safe.ProjectCredentialsMissingException
+import android.util.Base64
+import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.secure.keystore.KeystoreManager
+import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
+import com.simprints.id.tools.RandomGenerator
+import com.simprints.id.tools.RandomGeneratorImpl
 
-class SecureDataManagerImpl(override var prefs: ImprovedSharedPreferences) : SecureDataManager {
+class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
+                            private val prefsManager: PreferencesManager,
+                            private val randomGenerator: RandomGenerator = RandomGeneratorImpl())
+    : SecureDataManager {
 
     companion object {
-        private const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
-        private const val PROJECT_ID: String = "PROJECT_ID"
-        private const val PROJECT_SECRET_AND_ID_DEFAULT: String = ""
+        private const val PROJECT_ID_ENC_DATA = "ProjectIdEncData"
+        const val SHARED_PREFS_KEY_FOR_REALM_KEY = "${PROJECT_ID_ENC_DATA}_realmKey_"
+        const val SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY = "${PROJECT_ID_ENC_DATA}_legacyRealmKey_"
     }
 
-    override var encryptedProjectSecret: String = ""
-        get() {
-            val value = prefs.getPrimitive(ENCRYPTED_PROJECT_SECRET, PROJECT_SECRET_AND_ID_DEFAULT)
-            if (value.isBlank()) {
-                throw ProjectCredentialsMissingException()
+    override fun setLocalDatabaseKey(projectId: String, legacyApiKey: String?) {
+        getSharedKeyForProjectId(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId).let {
+            val possibleEncRealmKey = prefsManager.getSharedPreference(it, "")
+            if (possibleEncRealmKey.isEmpty()) {
+                generateAndSaveRealmKeyInSharedPrefs(projectId)
             }
-            return value
-        }
-        set(value) {
-            field = value
-            prefs.edit().putPrimitive(ENCRYPTED_PROJECT_SECRET, field).commit()
         }
 
-    override var signedInProjectId: String = ""
-        get() {
-            val value = prefs.getPrimitive(PROJECT_ID, PROJECT_SECRET_AND_ID_DEFAULT)
-            if (value.isBlank()) {
-                throw ProjectCredentialsMissingException()
-            }
-            return value
-        }
-        set(value) {
-            field = value
-            prefs.edit().putPrimitive(PROJECT_ID, field).commit()
-        }
-
-    override fun getEncryptedProjectSecretOrEmpty(): String =
-        try {
-            encryptedProjectSecret
-        } catch (e: ProjectCredentialsMissingException) {
-            ""
-        }
-
-    override fun getSignedInProjectIdOrEmpty(): String =
-        try {
-            signedInProjectId
-        } catch (e: ProjectCredentialsMissingException) {
-            ""
-        }
-
-    override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
-        !getSignedInProjectIdOrEmpty().isEmpty() && getSignedInProjectIdOrEmpty() == possibleProjectId && !getEncryptedProjectSecretOrEmpty().isEmpty()
-
-    override fun cleanCredentials() {
-
-        //TODO: SecureDataManager doesn't support multiple projects signed in.
-        val possibleLegacyApiKey = prefs.getPrimitive(signedInProjectId, "")
-        prefs.edit().putPrimitive(signedInProjectId, "").commit()
-        prefs.edit().putPrimitive(possibleLegacyApiKey, "").commit()
-
-        encryptedProjectSecret = ""
-        signedInProjectId = ""
-    }
-
-    override fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?) {
-        if (legacyApiKey != null && legacyApiKey.isNotEmpty()) {
-
-            //TODO: to be refactored when SecureDataManager will support multiple projects
-            prefs.edit().putPrimitive(legacyApiKey, projectId).commit()
-            prefs.edit().putPrimitive(projectId, legacyApiKey).commit()
+        legacyApiKey?.let {
+            generateAndSaveLegacyRealmKeyInSharedPrefs(projectId, it)
         }
     }
 
-    override fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String {
-        return prefs.getString(legacyApiKey, "")
+    override fun getLocalDbKeyOrThrow(projectId: String): LocalDbKey {
+        val realmKey = readFromSharedPrefsAndDecrypt(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId)
+            ?: throw MissingLocalDatabaseKeyException()
+
+        val possibleLegacyRealmKey = readFromSharedPrefsAndDecrypt(SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY, projectId)
+        return LocalDbKey(projectId, Base64.decode(realmKey, Base64.DEFAULT) , possibleLegacyRealmKey ?: "")
+    }
+
+    private fun generateAndSaveLegacyRealmKeyInSharedPrefs(projectId: String, legacyApiKey: String) {
+        val encLegacyRealmKey = keystoreManager.encryptString(legacyApiKey)
+        val sharedPrefKeyForLegacyRealmKey = getSharedKeyForProjectId(SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY, projectId)
+        prefsManager.setSharedPreference(sharedPrefKeyForLegacyRealmKey, encLegacyRealmKey)
+    }
+
+    private fun generateAndSaveRealmKeyInSharedPrefs(projectId: String) {
+        val realmKey = randomGenerator.generateByteArray(64)
+        val encryptedRealmKey = keystoreManager.encryptString(Base64.encodeToString(realmKey, Base64.DEFAULT))
+
+        val sharedPrefKeyForRealmKey = getSharedKeyForProjectId(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId)
+        prefsManager.setSharedPreference(sharedPrefKeyForRealmKey, encryptedRealmKey)
+    }
+
+    private fun getSharedKeyForProjectId(key: String, projectId: String) = key + projectId
+
+    private fun readFromSharedPrefsAndDecrypt(sharedPrefsKey: String, projectId: String): String? {
+        val sharedPrefKeyForRealmKey = getSharedKeyForProjectId(sharedPrefsKey, projectId)
+        val encryptedSharePrefValue = prefsManager.getSharedPreference(sharedPrefKeyForRealmKey, "")
+        return if (encryptedSharePrefValue.isNotEmpty()) {
+            keystoreManager.decryptString(encryptedSharePrefValue)
+        } else {
+            return null
+        }
     }
 }

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- SetupActivity : the loading screen -->
+    <!-- Consent Text -->
+    <string name="short_consent">Waxaan jeclaan lahaa inaan isticmaalo farahaaga iyo meesha lagaa saaro si loo yareeyo rikoodhadaada. Haddii taasi aysan sax ahayn ama aad hayso wax su\'aalo ah oo aan u sheego, fadlan  fadlan saar suulka bidix  dareeraha.</string>
+    <string name="confirm_consent">Taabo halkan si aad u xaqiijiso ogolaanshaha</string>
+
+    <!-- PrivacyActivity : the screen where the user can find the long consent form -->
+    <!-- Long Consent -->
+    <string name="long_consent">
+        <b><u>Qoraalka ogolaanshaha dheer</u></b>\n\n
+        Haddii aad fartaada saartomuujiyaha, waxay diiwaangelin doontaa macluumaadka ku saabsan farahaaga. Waxay sidoo kale qori doontaa meesha muujintan lagu  sameeyey, iyo waqtiga iyo taariikhda faraha.\n\n
+        Macluumaadkan oo dhan waxa lagu kaydin doonaa Simprints Technology Limited, oo ah NGO NGO  Ingiriis ah.\n\n
+        Simprints waxa ay  adeegsanan doontaa macluumaadkaaga si ay laguu aqoosado mustaqbalka, oo ay kuula socdaan xogtaada.\n\n
+        Simprints  waxa ay  sidoo kale adeegsanaysaa macluumaadkaaga si loo hagaajiyo saxsanaanta adeeggeeda, waxana laga yaabaa in ay la wadaagto khubarada kale ujeedadaas.\n\n
+        Simprints  ayaa sidoo kale isticmaali kara macluumaadkaaga si aad u hesho faham wanaagsan ee adeeg bixinta goobtaada.\n\n
+        Simprints waxa ay filaysaa in shaqadooda halkan ay sii socon doonto ugu yaraan lix bilood. Waxyaabaha lagu kalsoon yahay waxay sii wadi doonaan macluumaadkaaga muddada uu shaqeynayo, iyo 2 sanadood ka dib shaqadani marka shaqadu dhammaato. Simprints ayaa markaa tirtiri doonta macluumaadkaaga.\n\n
+
+        Simprints  ma kaydin doonaan sawirrada faraha.\n\n
+        Simprints  ma siin doonaan wax macluumaad ah oo ay kaa hayaan dowlad-goboleed, haddii aan loogu baahando si sharciga waafaqsan.\n\n
+        Uma baahnid inaad ogolaato inaad siiso Simprints wixii macluumaad ah si aad u hesho adeegyada. Laakiin haddii aadan sidaas samayn ururada horumarinta ayaa laga yaabaa inay ku adkaato helitaanka diiwaannadaada mustaqbalka.\n\n
+        Haddii aad hore uugu faraxsaneyd Simprints si aad u keydiso oo aad u isticmaasho\n\n
+        macluumaadkaaga, laakiin aad bedeshay maskaxdaada oo aadan rabin inaad tan sii wado,  fadlan ila soo hadal.\n\n
+
+        <b><u>Qoraalka  - Su\'aalo iyo Jawaab</u></b> \n\n
+        <b>\'Mar dambe kuma faraxsaneyn\' Simprints \'si aan u isticmaalo macluumaadkayga. Maxaan sameeyaa?</b>\n\n
+        Waxa aad xor u tahay inaad waydiiso Simprints si aad u tirtirto macluumaadkaaga waqtii kasta. Si aad sidaas u yeeshid, waa inaad farahaaga siisaa shaqaalaha horumarinta hal mar oo kama dambays ah, si Simprints kuu tilmaami karo. Marka aad sidan samayso, Simprints way tirtiri doontaa dhammaan macluumaadka ay ku leedahay.\n\n
+        <b>Yay yihiin Simprints?</b>\n\n
+        Simprints Technology Limited waa hay\'ad NGO ah oo Ingiriis ah taas oo gacan ka geysanaysa si ay ula tacaalaan ururrada horumarinta ka-faa\'iideystayaasha sida adiga ee u diiwaangashan.\n\n
+        <b>Macluumaadkee ayaa Simprints ii kaydin doonaa aniga?</b>\n\n
+        Simprints waxa ay kuu kaydinayaan macluumaadka ku saabsan farahaaga la sawiray. Waxay sidoo kale kuu keydineysaa meesha muuqaal kasta lagu sameeyey, oo ay weheliso waqtiga iyo taariikhda sawir kasta.\n\n
+        Simprints ma kaydin doonaan wixii macluumaad kale oo aqoonsi ah oo adiga kugu saabsan, sida magacaaga ama taariikhda dhalashada. Simprints ma kaydin doonaan mid kasta oo ka mid ah diiwaannadaada shakhsi ahaaneed. Simprints ma kaydin doonaan sawirrada farahaaga.\n\n
+        <b>Maxay sujiyeyaashu ku samayn doonaan xogtayda?</b>\n\n
+        Simprints waxa laga yaabaa in ay adeegsato macluumaadkaaga macluumaadkaaga si loo hagaajiyo saxsanaanta adeeggeeda, waxaana laga yaabaa inay la wadaagaan khubarada kale ujeedadaas.\n\n
+        Simprints ayaa sidoo kale isticmaali doona macluumaadkaaga si aad u hesho faham wanaagsan oo ah bixinta adeegga goobtaada.\n\n
+        <b>Muddo intee le\'eg ayaa Iskuduwuhu ku hayaan macluumaadkayga?</b>\n\n
+        Simprints waxa ay filaysaa in shaqadooda halkan ay socon doonto ugu yaraan 6 bilood. Simprints waxa ay kaydin doontaa macluumaadkaaga muddada ay shaqadu ka socoto halkan, iyo 2 sano ka dib marka shaqadu dhammaato. Simprints ayaa markaa tirtiri doona macluumaadkaaga.\n\n
+        <b>Miyuu tijaabooyinka ku duubi doonaa sawirrada faraha?</b>\n\n
+        Simprints  ma kaydin doonaan sawirrada faraha.\n\n
+        <b>Simprints ma siin doonaa macluumaadkayga xukuumadda?</b>\n\n
+        Simprints ma siin doono wax macluumaad ah oo ay ku hayaan dowlad-goboleed, haddii aan loo baahan si sharciga waafaqsan.\n\n
+        <b>Miyay tahay in aan ogolaado in aad faraha iga qaadaan?</b>\n\n
+        Uma baahnid inaad ogolaato inaad siiso wixii macluumaad ah si aad u hesho adeegyada. Laakiin haddii aadan sidaas samayn ururada horumarinta ayaa laga yaabaa inay ku adkaato helitaanka diiwaannadaada mustaqbalka.\n\n
+
+        <b><u>Development Worker Consent</u></b>\n\n
+        Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
+    </string>
+
+</resources>

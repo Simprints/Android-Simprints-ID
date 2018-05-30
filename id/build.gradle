@@ -1,11 +1,13 @@
 import com.android.builder.testing.api.DeviceProvider
 
 apply plugin: "com.android.application"
+apply plugin: 'com.github.triplet.play'
 apply plugin: "kotlin-android"
 apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 apply plugin: "io.fabric"
 apply plugin: "com.google.firebase.firebase-crash"
+apply plugin: 'com.google.firebase.firebase-perf'
 apply plugin: "realm-android"
 
 kotlin {
@@ -20,79 +22,115 @@ kapt {
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "27.0.2"
-
+    buildToolsVersion "27.0.3"
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 19
         targetSdkVersion 27
         multiDexEnabled true
-        versionCode 56
-        versionName "2017.4.2"
-
+        versionCode 79  
+        versionName "2018.2.0-rc10"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    //Add those properties in ~/.gradle/gradle.properties
+    signingConfigs {
+        release {
+            storeFile file(SIMPRINTSID_RELEASE_STORE_FILE)
+            storePassword SIMPRINTSID_RELEASE_STORE_PASSWORD
+            keyAlias SIMPRINTSID_RELEASE_KEY_ALIAS
+            keyPassword SIMPRINTSID_RELEASE_KEY_PASSWORD
+        }
+    }
+    
     buildTypes {
         release {
             lintOptions {
                 // TODO : Remove whenever possible
                 // Check in the Translations Editor for crucial translations that may be missing
                 disable "MissingTranslation"
+                abortOnError true
+                fatal 'StopShip'
+                checkReleaseBuilds true
             }
             minifyEnabled true
+            ext.enableCrashlytics = true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
+            manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
         }
         debug {
             minifyEnabled false
+            ext.enableCrashlytics = false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
+            manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: false]
         }
         endToEndTesting {
             initWith debug
             versionNameSuffix "-test"
-            testCoverageEnabled true
+            testCoverageEnabled false
+        }
+    }
+    
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == "release") {
+            buildConfigField("String", "GCP_PROJECT", "\"simprints-152315\"")
+            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
+        } else if (variant.buildType.name == "debug") {
+            buildConfigField("String", "GCP_PROJECT", "\"${getDevProjectId()}\"")
+            buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
         }
     }
 
     applicationVariants.all { variant ->
-        if (variant.buildType.name == "release") {
-            buildConfigField("String", "GCP_PROJECT", "\"simprints-152315\"")
-        } else if (variant.buildType.name == "debug") {
-            buildConfigField("String", "GCP_PROJECT", "\"${getDevProjectId()}\"")
-        } else if (variant.buildType.name == "endToEndTesting") {
-            buildConfigField("String", "GCP_PROJECT", "\"simprints-testing\"")
-            buildConfigField("String", "SCANNER", getLocalPropertyForTesting('ext.scanner'))
-            buildConfigField("String", "WIFI_NETWORK", getLocalPropertyForTesting('ext.wifiNetwork'))
-            buildConfigField("String", "WIFI_PASSWORD", getLocalPropertyForTesting('ext.wifiPassword'))
+        if (variant.buildType.name == "$variant_for_android_tests") {
+            buildConfigField("String", "SCANNER", "\"${SIMPRINTSID_TEST_SCANNER}\"")
+            buildConfigField("String", "WIFI_NETWORK", "\"${SIMPRINTSID_TEST_WIFI}\"")
+            buildConfigField("String", "WIFI_PASSWORD", "\"${SIMPRINTSID_TEST_WIFI_PASSWORD}\"")
         }
     }
 
-    testBuildType "endToEndTesting"
+    testBuildType "debug"
+    productFlavors {
+    }
 
-    testOptions {
-        unitTests {
-            returnDefaultValues = true
+    sourceSets {
+        String sharedTestDir = 'src/sharedTest/java'
+        test {
+            java.srcDir sharedTestDir
+        }
+        androidTest {
+            java.srcDir sharedTestDir
         }
     }
 }
 
+//For Android tests, uninstall any previous apk
+afterEvaluate {
+    if (tasks.findByPath(assembleTaskForEndToEndTest()) != null) {
+        tasks.findByPath(assembleTaskForEndToEndTest()).dependsOn uninstallAll
+    }
+}
+
 def getDevProjectId() {
-    if (project.hasProperty('development_gcp_project')) {
+    if (project.hasProperty("development_gcp_project")) {
         return development_gcp_project
     } else {
         return "simprints-dev"
     }
 }
 
-def getLocalPropertyForTesting(name) {
-    Properties properties = new Properties()
-    properties.load(new File(rootDir.absolutePath + "/local.properties").newDataInputStream())
-    def externalModuleDir = properties.getProperty(name, "")
-    return externalModuleDir
+def connectedTaskForEndToEndTest() {
+    return "connected${variant_for_android_tests.capitalize()}AndroidTest"
+}
+
+def assembleTaskForEndToEndTest() {
+    return "assemble${variant_for_android_tests.capitalize()}AndroidTest"
 }
 
 project.afterEvaluate {
-    if (gradle.startParameter.taskNames.contains("connectedEndToEndTestingAndroidTest")) {
-        project.("connectedEndToEndTestingAndroidTest").doFirst {
+    if (gradle.startParameter.taskNames.findAll {it.contains(connectedTaskForEndToEndTest())}.size() > 0) {
+        project.(connectedTaskForEndToEndTest()).doFirst {
             def originalProvider = deviceProvider
             deviceProvider = [
                 getName       : { originalProvider.getName() },
@@ -103,17 +141,6 @@ project.afterEvaluate {
                 isConfigured  : { originalProvider.isConfigured() },
                 getMaxThreads : { originalProvider.getMaxThreads() }
             ] as DeviceProvider
-        }
-    }
-
-    if (gradle.startParameter.taskNames.contains("kaptEndToEndTestingKotlin")) {
-        project.("kaptEndToEndTestingKotlin").doFirst {
-            ["ext.scanner", "ext.wifiNetwork", "ext.wifiNetwork"].each { paramName ->
-                if (getLocalPropertyForTesting(paramName) == "") {
-                    throw new GradleException(
-                        paramName + " not found and it's required to run the instrumented tests. Please add " + paramName + " in your local.properties file.")
-                }
-            }
         }
     }
 }
@@ -139,12 +166,12 @@ buildscript {
         google()
     }
     dependencies {
-
     }
 }
 
 repositories {
     mavenCentral()
+    maven { url "https://jitpack.io" }
     maven { url "https://maven.google.com" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://maven.fabric.io/public" }
@@ -157,13 +184,16 @@ android {
         }
     }
 }
-
+// ./gradlew publishApkRelease to publish on internal channel
+play {
+    track = 'internal'
+    jsonFile = file(SIMPRINTSID_PUBLISH_KEY_FILE)
+}
 
 dependencies {
-    implementation fileTree(include: ["*.jar"], dir: "libs")
-    implementation project(":libdata")
-    implementation project(":libcommon")
-    implementation project(":libsimprints")
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':libcommon')
+    implementation project(':libsimprints')
 
     // dagger
     compile 'com.google.dagger:dagger-android:2.13'
@@ -176,26 +206,29 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "org.jetbrains.anko:anko:$anko_version"
+    //implementation 'androidx.core:core-ktx:1.0.0-alpha1'
 
     // Support libraries
-    implementation "com.android.support:multidex:1.0.2"
+    implementation 'com.android.support:multidex:1.0.2'
     implementation "com.android.support:appcompat-v7:$support_version"
     implementation "com.android.support:design:$support_version"
     implementation "com.android.support:support-v4:$support_version"
 
-
     // Google
     implementation "com.google.android.gms:play-services-location:$google_version"
-    implementation "com.google.guava:guava:23.6-android"
     implementation "com.google.android.gms:play-services-safetynet:$google_version"
 
     // Databases
     implementation "com.michaelpardo:activeandroid:$active_android_version"
-    implementation "com.google.firebase:firebase-core:$google_version"
     implementation "com.google.firebase:firebase-database:$google_version"
-    implementation "com.google.firebase:firebase-storage:$google_version"
+    implementation "com.google.firebase:firebase-firestore:$google_version"
+
+    // Firebase
+    implementation "com.google.firebase:firebase-core:$google_version"
     implementation "com.google.firebase:firebase-auth:$google_version"
     implementation "com.google.firebase:firebase-config:$google_version"
+    implementation "com.google.firebase:firebase-perf:$google_version"
+    implementation "com.google.firebase:firebase-storage:$google_version"
 
     // Analytics
     implementation("com.crashlytics.sdk.android:crashlytics:$crashlytics_version@aar") {
@@ -212,62 +245,81 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
 
     // Network - Gson
-    implementation "com.google.code.gson:gson:2.8.2"
+    implementation 'com.google.code.gson:gson:2.8.2'
 
     // Logging
-    implementation "com.jakewharton.timber:timber:4.6.0"
+    implementation 'com.jakewharton.timber:timber:4.6.0'
 
     // Reactive
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
     implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
+    implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin_version"
 
     // Simprints
-    implementation "com.simprints:libscanner:1.3.1"
-    implementation "com.simprints:libmatcher:1.3.2"
+    implementation 'com.simprints:libscanner:1.3.1'
+    implementation 'com.simprints:libmatcher:1.3.2'
 
     // Test
+
     // TODO: migrate to JUnit 5. Tried https://github.com/mannodermaus/android-junit5 on 03/12/17 and it did not work out of the box.
     testImplementation("junit:junit:$junit_version") {
         exclude group: "com.android.support"
     }
-    testImplementation 'org.robolectric:robolectric:3.6.1'
-    testImplementation "org.robolectric:shadows-multidex:3.6.1"
+    testImplementation 'org.robolectric:robolectric:3.9-SNAPSHOT'
+    testImplementation 'org.robolectric:shadows-multidex:3.7.1'
+    testImplementation 'com.android.support.test:monitor:1.0.2'
 
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"
+    testImplementation 'com.squareup.okhttp3:mockwebserver:3.9.1'
+
+    // 3.10 hangs around with roboeletric
+    testImplementation 'com.nhaarman:mockito-kotlin:1.5.0'
 
     // Android test
-    androidTestImplementation "org.mockito:mockito-core:2.8.9"
-    androidTestImplementation("com.schibsted.spain:barista:1.7.0") {
-        exclude group: "com.android.support"
-        exclude group: 'com.google.code.findbugs'
-    }
+    androidTestImplementation 'org.mockito:mockito-core:2.15.0'
+    androidTestImplementation 'org.mockito:mockito-android:2.18.3'
 
-    androidTestImplementation "com.simprints:cerberus-library:2018.1.1-dev-1"
-    androidTestImplementation "com.simprints:remote-admin-client:2017.4.0-dev-5"
-    androidTestImplementation "com.squareup.okhttp:okhttp:2.7.5" // TODO : Update to okhttp3 in remote-admin-client
-    androidTestImplementation "joda-time:joda-time:2.9.9"
+    androidTestImplementation('com.schibsted.spain:barista:1.7.0') {
+        exclude group: "com.android.support"
+        exclude group: "com.google.code.findbugs"
+    }
+    androidTestImplementation 'com.simprints:cerberus-library:2018.1.1-dev-1'
+    androidTestImplementation 'com.simprints:remote-admin-client:2017.4.0-dev-5'
+    androidTestImplementation 'joda-time:joda-time:2.9.9'
+
+    //UI
+    implementation 'com.github.michael-rapp:android-material-dialog:4.3.3'
+    implementation "com.android.support:cardview-v7:$support_version"
+
+
+    //Inject in tests
+    testImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.4'
+    androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.4'
+    testImplementation 'com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4'
+    androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4'
 }
+
+def copyGoogleServicesJsonTask(variantName, gcpProject) {
+    return tasks.create("copyGoogleServicesJson${variantName.capitalize()}", Copy) {
+        def jsonName = "${gcpProject}-google-services.json".replaceAll("-", "_")
+        from "${project.rootDir}/id/src/${variantName}/res/raw/${jsonName}"
+        into "${project.rootDir}/id/src/${variantName}/"
+        rename { filename -> "google-services.json" }
+    }
+}
+
+copyGoogleServicesJsonTask("debug", getDevProjectId())
+copyGoogleServicesJsonTask("release", "simprints-152315")
+copyGoogleServicesJsonTask("endToEndTesting", "simprints-testing")
 
 crashlytics {
     enableNdk true
     androidNdkOut "src/main/obj"
     androidNdkLibsOut "src/main/libs"
-}
-
-task copyDevGoogleServicesJson(type: Copy) {
-    def jsonName = "${getDevProjectId()}-google-services.json"
-    from "${project.rootDir}/id/src/debug/googleServicesJsons/${jsonName}"
-    into "${project.rootDir}/id/src/debug/"
-    rename { filename -> "google-services.json" }
-}
-
-tasks.whenTaskAdded { task ->
-    if (task.name == 'preDebugBuild') {
-        preDebugBuild.dependsOn(copyDevGoogleServicesJson)
-    }
 }
 
 apply plugin: "com.google.gms.google-services"

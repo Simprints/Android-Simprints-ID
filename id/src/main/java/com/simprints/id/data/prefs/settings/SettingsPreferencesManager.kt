@@ -1,6 +1,6 @@
 package com.simprints.id.data.prefs.settings
 
-import com.simprints.libdata.tools.Constants
+import com.simprints.id.domain.Constants
 import com.simprints.libsimprints.FingerIdentifier
 
 

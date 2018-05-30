@@ -1,16 +1,11 @@
 package com.simprints.id.data.secure
 
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.db.local.LocalDbKeyProvider
+import com.simprints.id.data.db.local.models.LocalDbKey
 
-interface SecureDataManager {
+interface SecureDataManager : LocalDbKeyProvider {
 
-    var encryptedProjectSecret: String
-    var signedInProjectId: String
-    var prefs: ImprovedSharedPreferences
-    fun getEncryptedProjectSecretOrEmpty(): String
-    fun getSignedInProjectIdOrEmpty(): String
-    fun isProjectIdSignedIn(possibleProjectId: String): Boolean
-    fun cleanCredentials()
-    fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?)
-    fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String
+    fun setLocalDatabaseKey(projectId: String, legacyApiKey: String?)
+
+    override fun getLocalDbKeyOrThrow(projectId: String): LocalDbKey
 }

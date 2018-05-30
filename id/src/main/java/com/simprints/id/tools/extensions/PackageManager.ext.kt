@@ -10,7 +10,6 @@ fun PackageManager.isCallingAppFromUnknownSource(packageName: String): Boolean =
     try {
         this.getInstallerPackageName(packageName) == null
     } catch (e: Exception) {
-        e.printStackTrace()
         // Android doesn't recognise the packageName. We loosely pretend
         // packageName comes from the Google Play Store
         false

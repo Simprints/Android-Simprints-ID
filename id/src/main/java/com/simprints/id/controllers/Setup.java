@@ -1,24 +1,24 @@
 package com.simprints.id.controllers;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
-import com.simprints.id.domain.callout.CalloutAction;
+import com.simprints.id.data.db.DATA_ERROR;
+import com.simprints.id.data.db.DataCallback;
+import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.exceptions.unsafe.NullScannerError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
-import com.simprints.id.model.ALERT_TYPE;
+import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
+import com.simprints.id.tools.utils.NetworkUtils;
 import com.simprints.libcommon.Person;
-import com.simprints.libdata.DATA_ERROR;
-import com.simprints.libdata.DataCallback;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
@@ -29,31 +29,30 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static android.app.Activity.RESULT_CANCELED;
-import static com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE;
-import static com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE;
+import static com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE;
+import static com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE;
+import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
 
 public class Setup {
 
     private static Setup singleton;
+    private final NetworkUtils networkUtils;
 
-    public synchronized static Setup getInstance(DataManager dataManager, AppState appState) {
+    public synchronized static Setup getInstance(DataManager dataManager, AppState appState, NetworkUtils networkUtils) {
         if (singleton == null) {
-            singleton = new Setup(dataManager, appState);
+            singleton = new Setup(dataManager, appState, networkUtils);
         }
         return singleton;
     }
 
-    private Setup(DataManager dataManager, AppState appState) {
+    private Setup(DataManager dataManager, AppState appState, NetworkUtils networkUtils) {
         this.dataManager = dataManager;
         this.appState = appState;
+        this.networkUtils = networkUtils;
     }
 
 
     private SetupCallback callback;
-
-    // True iff the api key was validated successfully
-    private boolean apiKeyValidated = false;
 
     // True iff it is not a verify intent || or the GUID in the verify intent was found
     private boolean guidExists = false;
@@ -131,19 +130,8 @@ public class Setup {
     }
 
     // STEP 2
-    private void initDbContext(@NonNull final Activity activity) {
-        onProgress(30, R.string.updating_database);
-        try {
-            dataManager.initialiseDb(dataManager.getProjectId());
-        } catch (UninitializedDataManagerError error) {
-            dataManager.logError(error);
-            onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-        }
-    }
-
-    // STEP 3
     private void initScanner(@NonNull final Activity activity) {
-        callback.onProgress(45, R.string.launch_bt_connect);
+        onProgress(45, R.string.launch_bt_connect);
         List<String> pairedScanners = ScannerUtils.getPairedScanners();
         if (pairedScanners.size() == 0) {
             onAlert(ALERT_TYPE.NOT_PAIRED);
@@ -157,13 +145,16 @@ public class Setup {
         dataManager.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
 
+        //TODO: move convertAddressToSerial in libscanner
+        dataManager.setLastScannerUsed(com.simprints.id.tools.utils.ScannerUtils.convertAddressToSerial(macAddress));
+
         Timber.d("Setup: Scanner initialized.");
         goOn(activity);
     }
 
-    // STEP 4
+    // STEP 3
     private void connectToScanner(@NonNull final Activity activity) {
-        callback.onProgress(60, R.string.launch_bt_connect);
+        onProgress(60, R.string.launch_bt_connect);
 
         appState.getScanner().connect(new ScannerCallback() {
             @Override
@@ -208,7 +199,7 @@ public class Setup {
         });
     }
 
-    // STEP 5
+    // STEP 4
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
         if (dataManager.getCalloutAction() != CalloutAction.VERIFY) {
             guidExists = true;
@@ -216,12 +207,12 @@ public class Setup {
             return;
         }
 
-        callback.onProgress(70, R.string.launch_checking_person_in_db);
+        onProgress(70, R.string.launch_checking_person_in_db);
 
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = dataManager.getPatientId();
         try {
-            dataManager.loadPerson(loadedPerson, guid, newLoadPersonCallback(activity, guid));
+            dataManager.loadPerson(loadedPerson, dataManager.getSignedInProjectId(), guid, wrapCallback("loading people from db", newLoadPersonCallback(activity, guid)));
         } catch (UninitializedDataManagerError error) {
             dataManager.logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
@@ -258,7 +249,7 @@ public class Setup {
     }
 
     private void saveNotFoundVerification(Person probe) {
-        if (dataManager.isRemoteConnected()) {
+        if (networkUtils.isConnected()) {
             // We've synced with the online db and they're not in the db
             dataManager.saveVerification(probe, null, GUID_NOT_FOUND_ONLINE);
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
@@ -269,9 +260,9 @@ public class Setup {
         }
     }
 
-    // STEP 6
+    // STEP 5
     private void resetUi(@NonNull final Activity activity) {
-        callback.onProgress(80, R.string.launch_setup);
+        onProgress(80, R.string.launch_setup);
 
         appState.getScanner().resetUI(new ScannerCallback() {
             @Override
@@ -295,9 +286,9 @@ public class Setup {
         });
     }
 
-    // STEP 7
+    // STEP 6
     private void wakeUpUn20(@NonNull final Activity activity) {
-        callback.onProgress(90, R.string.launch_wake_un20);
+        onProgress(90, R.string.launch_wake_un20);
 
         appState.getScanner().un20Wakeup(new ScannerCallback() {
             @Override
@@ -337,7 +328,7 @@ public class Setup {
         if (requestCode == InternalConstants.ALL_PERMISSIONS_REQUEST) {
             for (int i = 0; i < permissions.length; i++) {
                 if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                    onError(RESULT_CANCELED, null);
+                    onError();
                     return;
                 }
             }
@@ -357,10 +348,10 @@ public class Setup {
             callback.onProgress(progress, detailsId);
     }
 
-    private void onError(int resultCode, Intent resultData) {
+    private void onError() {
         paused = true;
         if (callback != null)
-            callback.onError(resultCode, resultData);
+            callback.onError(Activity.RESULT_CANCELED);
     }
 
     private void onAlert(@NonNull ALERT_TYPE alertType) {

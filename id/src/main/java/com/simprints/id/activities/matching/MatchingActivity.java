@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,21 +16,21 @@ import com.simprints.id.R;
 import com.simprints.id.activities.AlertActivity;
 import com.simprints.id.activities.IntentKeys;
 import com.simprints.id.data.DataManager;
+import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
-import com.simprints.id.model.ALERT_TYPE;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.TimeHelper;
 import com.simprints.libcommon.Person;
 
 import javax.inject.Inject;
 
-import static com.simprints.id.tools.ResourceHelper.getStringPlural;
+import static com.simprints.id.tools.utils.AndroidResourcesHelperImpl.getStringPlural;
 
-public class MatchingActivity extends AppCompatActivity implements MatchingContract.View{
+public class MatchingActivity extends AppCompatActivity implements MatchingContract.View {
 
     private final static int ALERT_ACTIVITY_REQUEST_CODE = 0;
 
-    private MatchingContract.Presenter matchingPresenter;
+    private MatchingContract.Presenter viewPresenter;
 
     private ProgressBar progressBar;
     private TextView progressText1;
@@ -63,12 +62,12 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         final Bundle extras = getIntent().getExtras();
         if (extras == null) {
             dataManager.logError(new NoIntentExtrasError("Null extras passed to MatchingActivity"));
-            launchAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+            launchAlert();
             finish();
             return;
         }
         Person probe = extras.getParcelable(IntentKeys.matchingActivityProbePersonKey);
-        matchingPresenter = new MatchingPresenter(
+        viewPresenter = new MatchingPresenter(
                 this,
                 dataManager,
                 timeHelper,
@@ -79,12 +78,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     @Override
     protected void onResume() {
         super.onResume();
-        matchingPresenter.start();
-    }
-
-    @Override
-    public void setPresenter(@NonNull MatchingContract.Presenter presenter) {
-        matchingPresenter = presenter;
+        viewPresenter.start();
     }
 
     @Override
@@ -150,9 +144,9 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     }
 
     @Override
-    public void launchAlert(ALERT_TYPE alertType) {
+    public void launchAlert() {
         Intent intent = new Intent(this, AlertActivity.class);
-        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType);
+        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, ALERT_TYPE.UNEXPECTED_ERROR);
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE);
     }
 
@@ -169,5 +163,15 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     @Override
     public void doFinish() {
         finish();
+    }
+
+    @Override
+    public MatchingContract.Presenter getViewPresenter() {
+        return viewPresenter;
+    }
+
+    @Override
+    public void setViewPresenter(MatchingContract.Presenter presenter) {
+        viewPresenter = presenter;
     }
 }

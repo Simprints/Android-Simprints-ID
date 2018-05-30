@@ -4,21 +4,24 @@ import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import com.simprints.libcommon.Progress
-import com.simprints.id.services.progress.notifications.NotificationBuilder
 import com.simprints.id.exceptions.safe.TaskInProgressException
+import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.progress.notifications.NotificationBuilder
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.ReplaySubject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
-
 @SuppressLint("Registered")
 abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
 
+    companion object {
+        val isRunning: AtomicBoolean = AtomicBoolean(false)
+    }
 
     private val isInterrupted: AtomicBoolean = AtomicBoolean(false)
 
@@ -36,7 +39,7 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         }
 
         override fun onNext(progress: Progress) {
-            Timber.d("onNext($progress)")
+            Timber.d("onSyncProgress($progress)")
         }
     }
 
@@ -65,10 +68,10 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
     inner class ProgressServiceBinderImpl : android.os.Binder(), ProgressServiceBinder<T> {
 
         override val progressReplayObservable: Observable<Progress> =
-                this@ProgressService.progressReplayObservable
+            this@ProgressService.progressReplayObservable
 
         override fun execute(taskParameters: T) =
-                this@ProgressService.execute(taskParameters)
+            this@ProgressService.execute(taskParameters)
 
         override fun startForeground() {
             startForeground(progressNotificationBuilder.id, progressNotificationBuilder.build())
@@ -78,18 +81,19 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         override fun stopForeground() {
             stopForeground(true)
             setNotificationVisibility(false)
+            isRunning.set(false)
         }
 
         private fun setNotificationVisibility(visible: Boolean) {
             progressNotificationBuilder.setVisibility(visible)
             completeNotificationBuilder.setVisibility(visible)
             errorNotificationBuilder.setVisibility(visible)
-
         }
-
     }
 
     private fun execute(taskParameters: T) {
+        isRunning.set(true)
+
         if (executing.getAndSet(true)) {
             checkTaskOverlap(taskParameters)
         } else {
@@ -113,12 +117,14 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
     private fun initTask(taskParameters: T) {
         this.taskParameters = taskParameters
         task = getTask(taskParameters)
-        progressLiveObservable = wrapTaskInObservable()
+        progressLiveObservable = task.run({ isInterrupted.get() })
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
     }
 
     private fun subscribeCoreObservers() {
-        progressLiveObservable.subscribe(progressReplayObservable)
         progressReplayObservable.subscribe(finishObserver)
+        progressLiveObservable.subscribe(progressReplayObservable)
     }
 
     private fun initNotificationBuilders() {
@@ -134,7 +140,6 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
         val delayedProgressReplayObservable = progressReplayObservable.delay(100, TimeUnit.MILLISECONDS)
         delayedProgressReplayObservable.subscribe(completeNotificationBuilder.progressObserver)
         delayedProgressReplayObservable.subscribe(errorNotificationBuilder.progressObserver)
-
     }
 
     abstract fun getTask(taskParameters: T): ProgressTask
@@ -145,16 +150,10 @@ abstract class ProgressService<in T : ProgressTaskParameters> : Service() {
 
     abstract fun getErrorNotificationBuilder(taskParameters: T): NotificationBuilder
 
-    private fun wrapTaskInObservable(): Observable<Progress> =
-            Observable.create<Progress>({ emitter ->
-                task.run({ isInterrupted.get() }, emitter)
-            })
-                    .subscribeOn(AndroidSchedulers.mainThread())
-
     override fun onDestroy() {
         Timber.d("ProgressService: onDestroy()")
         super.onDestroy()
         isInterrupted.set(true)
+        isRunning.set(false)
     }
-
 }

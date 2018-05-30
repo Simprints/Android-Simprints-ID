@@ -7,43 +7,21 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# Add any project specific keep options here:
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
-#Firebase rules
--keepattributes Signature
--keepclassmembers class com.simprints.libdata.models.firebase** {
-    *;
+# Kotlin
+-keep class kotlin.** { *; }
+-keep class kotlin.Metadata { *; }
+-dontwarn kotlin.**
+-keepclassmembers class **$WhenMappings {
+    <fields>;
+}
+-keepclassmembers class kotlin.Metadata {
+    public <methods>;
+}
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+    static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
 }
 
-#Activeandroid rules
--keepattributes *Annotation*
--keep class com.activeandroid.** {
-    *;
-}
--keepclassmembers class com.simprints.libdata.models.sql_OLD** {
-    *;
-}
-
-#These three cause a crash
--keep class com.simprints.libsimprints.** {
-    *;
-}
-
--keep class com.simprints.libcommon.** {
-    *;
-}
-
-#Print mapping
--printmapping mapping.txt
-
-# Retrofit
+# Platform calls Class.forName on types which do not exist on Android to determine platform.
 -dontnote retrofit2.Platform
 # Platform used when running on Java 8 VMs. Will not be used at runtime.
 -dontwarn retrofit2.Platform$Java8
@@ -51,3 +29,42 @@
 -keepattributes Signature
 # Retain declared checked exceptions for use by a Proxy instance.
 -keepattributes Exceptions
+
+#okhttp3
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-dontwarn org.conscrypt.**
+# A resource is loaded with a relative path so the package of this class must be preserved.
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
+
+# Gson uses generic type information stored in a class file when working with fields. Proguard
+# removes such information by default, so configure it to keep all of it.
+-keepattributes Signature
+
+# Gson specific classes
+-keep class sun.misc.Unsafe { *; }
+-keep class com.google.gson.stream.** { *; }
+
+# Application classes that will be serialized/deserialized over Gson
+-keep class com.simprints.id.secure.models.** { *; }
+-keep class com.simprints.id.domain.Project { *; }
+-keep class com.simprints.id.session.Session { *; }
+-keep class com.simprints.id.data.db.remote.models.** { *; }
+-keep class com.simprints.id.data.db.sync.models** { *; }
+
+# For Realm
+-keepnames public class * extends io.realm.RealmObject
+
+# These contain serialised models
+-keep class com.simprints.libsimprints.** { *; }
+-keep class com.simprints.libcommon.** { *; }
+
+# Deobfuscations for Crashlytics:
+# https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception
+-keep public class * extends java.lang.Throwable
+-keep class com.crashlytics.** { *; }
+-dontwarn com.crashlytics.**

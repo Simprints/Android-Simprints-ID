@@ -1,17 +1,21 @@
 package com.simprints.id.data.analytics
 
-import com.simprints.id.data.models.Session
-import com.simprints.id.domain.callout.Callout
+import com.simprints.id.exceptions.safe.SimprintsException
+import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.session.Session
+import com.simprints.id.session.callout.Callout
 
 
 interface AnalyticsManager {
 
-    fun logError(error: Error)
+    fun logThrowable(throwable: Throwable)
+
+    fun logError(error: SimprintsError)
+
+    fun logSafeException(exception: SimprintsException)
 
     fun logAlert(alertName: String, apiKey: String, moduleId: String, userId: String,
                  deviceId: String)
-
-    fun logSafeException(exception: RuntimeException)
 
     fun logCallout(callout: Callout)
 

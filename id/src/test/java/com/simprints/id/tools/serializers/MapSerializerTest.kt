@@ -1,11 +1,10 @@
 package com.simprints.id.tools.serializers
 
 import com.google.gson.Gson
-import com.simprints.id.testUtils.mock
-import com.simprints.id.testUtils.whenever
-import junit.framework.Assert
+import com.simprints.id.shared.mock
+import com.simprints.id.shared.whenever
+import org.junit.Assert
 import org.junit.Test
-
 
 class MapSerializerTest {
 
@@ -35,13 +34,10 @@ class MapSerializerTest {
         return serializer
     }
 
-
     @Test
     fun testSerializeThenDeserializeGivesOriginalEnumValue() {
         val serializedMap = mapSerializer.serialize(originalMap)
         val deserializedMap = mapSerializer.deserialize(serializedMap)
         Assert.assertEquals(originalMap, deserializedMap)
     }
-
-
 }

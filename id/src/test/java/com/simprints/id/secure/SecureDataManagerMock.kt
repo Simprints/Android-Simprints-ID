@@ -1,43 +1,16 @@
 package com.simprints.id.secure
 
-import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.shared.whenever
+import org.mockito.Mockito
 
-class SecureDataManagerMock : SecureDataManager {
+inline fun mockLoginInfoManager(encryptedProjectSecret: String = "encryptedProjectSecret",
+                                projectId: String = "project_id",
+                                signedInUserId: String = "signedInUserId"): LoginInfoManager {
 
-    override fun getSignedInProjectIdOrEmpty(): String {
-        throw RuntimeException("Not mocked!!!")
-    }
-
-    override fun isProjectIdSignedIn(projectId: String): Boolean {
-        throw RuntimeException("Not mocked!!!")
-    }
-
-    override fun cleanCredentials() {
-        throw RuntimeException("Not mocked!!!")
-    }
-
-    override var encryptedProjectSecret: String
-        get() = "encrypted_project_secret"
-        set(value) {}
-
-    override var signedInProjectId: String
-        get() = "project_id"
-        set(value) {}
-
-    override var prefs: ImprovedSharedPreferences
-        get() = throw RuntimeException("Not mocked!!!")
-        set(value) {}
-
-    override fun getEncryptedProjectSecretOrEmpty(): String {
-        throw RuntimeException("Not mocked!!!")
-    }
-
-    override fun storeProjectIdWithLegacyApiKeyPair(projectId: String, legacyApiKey: String?) {
-        throw RuntimeException("Not mocked!!!")
-    }
-
-    override fun projectIdForLegacyApiKeyOrEmpty(legacyApiKey: String): String {
-        throw RuntimeException("Not mocked!!!")
-    }
+    val mockLoginInfoManager = Mockito.spy(LoginInfoManager::class.java)
+    whenever(mockLoginInfoManager.encryptedProjectSecret).thenReturn(encryptedProjectSecret)
+    whenever(mockLoginInfoManager.signedInProjectId).thenReturn(projectId)
+    whenever(mockLoginInfoManager.signedInUserId).thenReturn(signedInUserId)
+    return mockLoginInfoManager
 }

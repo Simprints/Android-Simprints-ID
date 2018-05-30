@@ -10,17 +10,12 @@ import android.view.View
 import android.view.WindowManager
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.MainActivity
 import com.simprints.id.activities.RefusalActivity
+import com.simprints.id.activities.main.MainActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
-import com.simprints.id.domain.callout.Callout
-import com.simprints.id.domain.callout.Callout.Companion.toCallout
-import com.simprints.id.domain.sessionParameters.extractors.SessionParametersExtractor
-import com.simprints.id.exceptions.unsafe.InvalidCalloutError
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.Vibrate.vibrate
@@ -29,14 +24,14 @@ import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
 import kotlinx.android.synthetic.main.activity_launch.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import org.jetbrains.anko.coroutines.experimental.bg
-import java.util.*
 import javax.inject.Inject
 
 @SuppressLint("HardwareIds")
 open class LaunchActivity : AppCompatActivity() {
+
+    companion object {
+        const val MAIN_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1
+    }
 
     // Scanner button callback
     private val scannerButton = ButtonListener {
@@ -55,17 +50,17 @@ open class LaunchActivity : AppCompatActivity() {
     private var launchOutOfFocus = false
 
     private lateinit var app: Application
+
     @Inject lateinit var dataManager: DataManager
     private lateinit var positionTracker: PositionTracker
     @Inject lateinit var appState: AppState
     @Inject lateinit var setup: Setup
-    @Inject lateinit var timeHelper:TimeHelper
+    @Inject lateinit var timeHelper: TimeHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injectDependencies()
         initView()
-        RemoteConfig.init()
         positionTracker.start()
         setup.start(this, getSetupCallback())
     }
@@ -95,7 +90,7 @@ open class LaunchActivity : AppCompatActivity() {
                     loadingInfoTextView.visibility = View.INVISIBLE
                     waitingForConfirmation = true
                     appState.scanner.registerButtonListener(scannerButton)
-                    vibrate(this@LaunchActivity, dataManager.vibrateMode, 100)
+                    vibrate(this@LaunchActivity, dataManager.vibrateMode)
                 } else {
                     finishLaunch()
                 }
@@ -107,8 +102,8 @@ open class LaunchActivity : AppCompatActivity() {
                 loadingInfoTextView.setText(detailsId)
             }
 
-            override fun onError(resultCode: Int, resultData: Intent) {
-                finishWith(resultCode, resultData)
+            override fun onError(resultCode: Int) {
+                finishWith(resultCode, null)
             }
 
             override fun onAlert(alertType: ALERT_TYPE) {
@@ -147,7 +142,7 @@ open class LaunchActivity : AppCompatActivity() {
 
         when (requestCode) {
             RESOLUTION_REQUEST, GOOGLE_SERVICE_UPDATE_REQUEST -> positionTracker.onActivityResult(requestCode, resultCode, data)
-            MAIN_ACTIVITY_REQUEST -> when (resultCode) {
+            MAIN_ACTIVITY_REQUEST_CODE -> when (resultCode) {
                 RESULT_TRY_AGAIN -> tryAgain()
 
                 Activity.RESULT_CANCELED, Activity.RESULT_OK -> finishWith(resultCode, data)
@@ -175,25 +170,11 @@ open class LaunchActivity : AppCompatActivity() {
         waitingForConfirmation = false
         setResult(resultCode, resultData)
         dataManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
-        async(UI) {
-            try {
-                bg { dataManager.saveSession() }.await()
-            } catch (exception: Throwable) {
-                Log.d(this@LaunchActivity, exception.message ?: "")
-            }
-            finish()
-        }
+        dataManager.saveSession()
+        finish()
     }
 
     override fun onDestroy() {
-        if (dataManager.isDbInitialised(dataManager.signedInProjectId)) {
-            try {
-                dataManager.signOut(dataManager.signedInProjectId)
-            } catch (error: UninitializedDataManagerError) {
-                dataManager.logError(error)
-            }
-        }
-
         positionTracker.finish()
 
         if (appState.scanner != null) {
@@ -206,7 +187,7 @@ open class LaunchActivity : AppCompatActivity() {
                     appState.destroy()
                 }
             })
-            appState.scanner = null
+            //appState.scanner = null
         }
 
         setup.destroy()
@@ -217,7 +198,7 @@ open class LaunchActivity : AppCompatActivity() {
         consentConfirmed = true
         waitingForConfirmation = false
         appState.scanner.unregisterButtonListener(scannerButton)
-        startActivityForResult(Intent(this@LaunchActivity, MainActivity::class.java), MAIN_ACTIVITY_REQUEST)
+        startActivityForResult(Intent(this@LaunchActivity, MainActivity::class.java), MAIN_ACTIVITY_REQUEST_CODE)
         launchLayout.visibility = View.INVISIBLE
     }
 }
