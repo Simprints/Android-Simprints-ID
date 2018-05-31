@@ -43,7 +43,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_login)
-        Application.component.inject(this)
+        (application as Application).component.inject(this)
 
         viewPresenter = CheckLoginFromIntentPresenter(
             this,

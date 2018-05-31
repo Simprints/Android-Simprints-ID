@@ -18,7 +18,6 @@ import javax.inject.Inject
 // App launched when user open SimprintsID using the Home button
 open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginFromMainLauncherContract.View {
 
-
     @Inject lateinit var dataManager: DataManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var secureDataManager: SecureDataManager
@@ -28,7 +27,7 @@ open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginF
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_login)
-        Application.component.inject(this)
+        (application as Application).component.inject(this)
 
         viewPresenter = CheckLoginFromMainLauncherPresenter(
             this,

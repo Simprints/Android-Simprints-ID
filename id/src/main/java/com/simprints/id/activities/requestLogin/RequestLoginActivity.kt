@@ -17,7 +17,7 @@ open class RequestLoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Application.component.inject(this)
+        (application as Application).component.inject(this)
 
         app = application as Application
 

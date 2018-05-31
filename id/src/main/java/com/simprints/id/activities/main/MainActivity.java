@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Application.component.inject(this);
+        ((Application) getApplication()).getComponent().inject(this);
 
         Application app = ((Application) getApplication());
         SyncClient syncClient = SyncService.Companion.getClient(this);

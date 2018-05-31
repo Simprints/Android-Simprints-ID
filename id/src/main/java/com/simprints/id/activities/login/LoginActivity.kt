@@ -53,7 +53,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        Application.component.inject(this)
+        (application as Application).component.inject(this)
 
         initUI()
 

@@ -16,16 +16,15 @@ import javax.inject.Inject
 
 open class Application : MultiDexApplication() {
 
-    companion object {
-        lateinit var component: AppComponent
-    }
+    lateinit var component: AppComponent
 
-    @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject
+    lateinit var dbManager: DbManager
+    @Inject
+    lateinit var loginInfoManager: LoginInfoManager
 
-
-    fun createComponent() {
-        Application.component = DaggerAppComponent
+    open fun createComponent() {
+        component = DaggerAppComponent
             .builder()
             .appModule(AppModule(this))
             .build()
@@ -34,9 +33,12 @@ open class Application : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         createComponent()
-        Application.component.inject(this)
-
+        injectDependencies()
         initModules()
+    }
+
+    open fun injectDependencies() {
+        component.inject(this)
     }
 
     open fun initModules() {

@@ -22,7 +22,7 @@ class SyncService : ProgressService<SyncTaskParameters>() {
 
     override fun onCreate() {
         super.onCreate()
-        Application.component.inject(this)
+        (application as Application).component.inject(this)
     }
 
     override fun getTask(taskParameters: SyncTaskParameters): ProgressTask =

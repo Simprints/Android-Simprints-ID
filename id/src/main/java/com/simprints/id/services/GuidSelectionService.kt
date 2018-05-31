@@ -16,7 +16,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
     override fun onCreate() {
         super.onCreate()
-        Application.component.inject(this)
+        (application as Application).component.inject(this)
     }
 
     override fun onHandleIntent(intent: Intent?) {
