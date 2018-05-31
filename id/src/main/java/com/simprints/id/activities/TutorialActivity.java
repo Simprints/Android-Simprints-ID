@@ -19,7 +19,7 @@ public class TutorialActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Application.component.inject(this);
+        ((Application) getApplication()).getComponent().inject(this);
 
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_tutorial);

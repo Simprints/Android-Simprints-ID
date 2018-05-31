@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 class AboutActivity : AppCompatActivity(), AboutContract.View {
 
-    @Inject lateinit var dataManager:DataManager
+    @Inject lateinit var dataManager: DataManager
 
     override lateinit var viewPresenter: AboutContract.Presenter
 
@@ -27,7 +27,7 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Application.component.inject(this)
+        (application as Application).component.inject(this)
 
         LanguageHelper.setLanguage(this, dataManager.language)
 

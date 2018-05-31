@@ -46,7 +46,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Application.component.inject(this);
+        ((Application) getApplication()).getComponent().inject(this);
 
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_settings);

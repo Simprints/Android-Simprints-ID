@@ -67,7 +67,7 @@ open class LaunchActivity : AppCompatActivity() {
 
     private fun injectDependencies() {
         app = application as Application
-        Application.component.inject(this)
+        (application as Application).component.inject(this)
         positionTracker = PositionTracker(this, dataManager)
     }
 

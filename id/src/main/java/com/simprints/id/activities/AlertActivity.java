@@ -28,7 +28,7 @@ public class AlertActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Application.component.inject(this);
+        ((Application) getApplication()).getComponent().inject(this);
 
         setContentView(R.layout.activity_alert);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

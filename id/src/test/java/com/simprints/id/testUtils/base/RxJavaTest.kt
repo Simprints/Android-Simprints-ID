@@ -5,7 +5,7 @@ import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import org.junit.Before
 
-open class RxJavaTest {
+interface RxJavaTest {
 
     @Before
     fun setupClass() {

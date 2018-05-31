@@ -39,41 +39,81 @@ import javax.inject.Singleton
 @Module
 open class AppModule(val app: Application) {
 
-    @Provides @Singleton fun provideApplication(): Application = app
-    @Provides @Singleton fun provideContext(): Context = app
+    @Provides
+    @Singleton
+    fun provideApplication(): Application = app
 
-    @Provides @Singleton fun provideLocalDbManager(ctx: Context): LocalDbManager = RealmDbManagerImpl(ctx)
-    @Provides @Singleton fun provideRemoteDbManager(ctx: Context): RemoteDbManager = FirebaseManagerImpl(ctx)
-    @Provides @Singleton fun provideDbManager(localDbManager: LocalDbManager, remoteDbManager: RemoteDbManager, secureDataManager: SecureDataManager, loginInfoManager: LoginInfoManager): DbManager = DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager)
+    @Provides
+    @Singleton
+    fun provideContext(): Context = app
 
-    @Provides @Singleton fun provideFirebaseAnalytics(app: Application): FirebaseAnalytics =
+    @Provides
+    @Singleton
+    open fun provideLocalDbManager(ctx: Context): LocalDbManager = RealmDbManagerImpl(ctx)
+
+    @Provides
+    @Singleton
+    open fun provideRemoteDbManager(ctx: Context): RemoteDbManager = FirebaseManagerImpl(ctx)
+
+    @Provides
+    @Singleton
+    open fun provideDbManager(localDbManager: LocalDbManager, remoteDbManager: RemoteDbManager, secureDataManager: SecureDataManager, loginInfoManager: LoginInfoManager): DbManager = DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager)
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAnalytics(app: Application): FirebaseAnalytics =
         FirebaseAnalytics.getInstance(app).apply {
             setMinimumSessionDuration(0)
         }
 
-
-    @Provides @Singleton fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager = RecentEventsPreferencesManagerImpl(prefs)
-    @Provides @Singleton fun provideAnalyticsManager(firebaseAnalytics: FirebaseAnalytics): AnalyticsManager = FirebaseAnalyticsManager(firebaseAnalytics)
-    @Provides @Singleton fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl(app)
-    @Provides @Singleton fun provideSecureDataManager(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager): SecureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
-    @Provides @Singleton fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager = LoginInfoManagerImpl(improvedSharedPreferences)
-    @Provides @Singleton fun provideDataManager(app: Application,
-                                                preferencesManager: PreferencesManager,
-                                                dbManager: DbManager,
-                                                analyticsManager: AnalyticsManager,
-                                                loginInfoManager: LoginInfoManager): DataManager =
-        DataManagerImpl(app, preferencesManager, dbManager, analyticsManager, loginInfoManager)
-
-
-    @Provides @Singleton fun provideAppState(): AppState = AppState()
-    @Provides @Singleton fun provideNetworkUtils(): NetworkUtils = NetworkUtils(app)
-    @Provides @Singleton fun provideSetup(dataManager: DataManager, appState: AppState, networkUtils: NetworkUtils): Setup = Setup.getInstance(dataManager, appState, networkUtils)
-
-    @Provides @Singleton fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
+    @Provides
+    @Singleton
+    fun provideRecentEventsPreferencesManager(prefs: ImprovedSharedPreferences): RecentEventsPreferencesManager = RecentEventsPreferencesManagerImpl(prefs)
 
     @Provides
     @Singleton
-    fun provideNotificationFactory(app: Application):NotificationFactory {
+    open fun provideAnalyticsManager(firebaseAnalytics: FirebaseAnalytics): AnalyticsManager = FirebaseAnalyticsManager(firebaseAnalytics)
+
+    @Provides
+    @Singleton
+    open fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl(app)
+
+    @Provides
+    @Singleton
+    open fun provideSecureDataManager(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager): SecureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
+
+    @Provides
+    @Singleton
+    open fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager = LoginInfoManagerImpl(improvedSharedPreferences)
+
+    @Provides
+    @Singleton
+    open fun provideDataManager(app: Application,
+                                preferencesManager: PreferencesManager,
+                                dbManager: DbManager,
+                                analyticsManager: AnalyticsManager,
+                                loginInfoManager: LoginInfoManager): DataManager =
+        DataManagerImpl(app, preferencesManager, dbManager, analyticsManager, loginInfoManager)
+
+    @Provides
+    @Singleton
+    fun provideAppState(): AppState = AppState()
+
+    @Provides
+    @Singleton
+    fun provideNetworkUtils(): NetworkUtils = NetworkUtils(app)
+
+    @Provides
+    @Singleton
+    fun provideSetup(dataManager: DataManager, appState: AppState, networkUtils: NetworkUtils): Setup = Setup.getInstance(dataManager, appState, networkUtils)
+
+    @Provides
+    @Singleton
+    fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
+
+    @Provides
+    @Singleton
+    fun provideNotificationFactory(app: Application): NotificationFactory {
         val factory = NotificationFactory(app)
         factory.initSyncNotificationChannel()
         return factory
