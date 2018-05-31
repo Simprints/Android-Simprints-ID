@@ -24,10 +24,7 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.tools.AppState
-import com.simprints.id.tools.NotificationFactory
-import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.tools.*
 import com.simprints.id.tools.utils.NetworkUtils
 import dagger.Module
 import dagger.Provides
@@ -80,7 +77,12 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideSecureDataManager(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager): SecureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
+    open fun provideRandomGenerator(): RandomGenerator = RandomGeneratorImpl()
+
+    @Provides
+    @Singleton
+    open fun provideSecureDataManager(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager, randomGenerator: RandomGenerator): SecureDataManager =
+        SecureDataManagerImpl(keystoreManager, preferencesManager, randomGenerator)
 
     @Provides
     @Singleton

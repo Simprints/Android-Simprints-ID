@@ -2,8 +2,8 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.firebase.FirebaseApp
-import com.simprints.id.DaggerTest
-import com.simprints.id.TestAppModule
+import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class ProjectAuthenticatorTest : RxJavaTest, DaggerTest() {
+class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
 
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
@@ -42,7 +42,7 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerTest() {
     @Inject lateinit var secureDataManager: SecureDataManager
 
     override var module by lazyVar {
-        TestAppModule(app, localDbManagerSpy = false, remoteDbManagerSpy = false, loginInfoManagerSpy = false)
+        AppModuleForTests(app, localDbManagerSpy = false, remoteDbManagerSpy = false, loginInfoManagerSpy = false)
     }
 
     @Before

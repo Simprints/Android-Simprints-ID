@@ -9,7 +9,6 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.SecureDataManagerImpl
-import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.shared.anyNotNull
@@ -18,24 +17,11 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
 import org.mockito.Mockito
-import org.mockito.Mockito.mock
 import org.mockito.stubbing.Answer
 import org.robolectric.RuntimeEnvironment
 
 const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
 const val SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY = "SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY"
-
-fun setupFakeKeyStore(): KeystoreManager = mock(KeystoreManager::class.java).also {
-    val encryptAnswer = Answer<String> {
-        "enc_" + it.arguments[0] as String
-    }
-    Mockito.doAnswer(encryptAnswer).`when`(it).encryptString(anyNotNull())
-
-    val decryptAnswer = Answer<String> {
-        (it.arguments[0] as String).replace("enc_", "")
-    }
-    Mockito.doAnswer(decryptAnswer).`when`(it).decryptString(anyNotNull())
-}
 
 fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteDbManagerMock: RemoteDbManager) {
     val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }

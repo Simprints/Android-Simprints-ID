@@ -75,7 +75,9 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
 
     private fun logUnsafeThrowable(e: Throwable) {
         Timber.d(e)
-        Crashlytics.logException(e)
+        if (Fabric.isInitialized()) {
+            Crashlytics.logException(e)
+        }
     }
 
     override fun logCallout(callout: Callout) {

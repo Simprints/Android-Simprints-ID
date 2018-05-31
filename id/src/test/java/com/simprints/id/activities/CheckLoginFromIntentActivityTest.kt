@@ -4,8 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
-import com.simprints.id.DaggerTest
-import com.simprints.id.TestAppModule
+import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
 import com.simprints.id.activities.launch.LaunchActivity
@@ -37,7 +37,7 @@ import javax.inject.Inject
 @Config(
     application = TestApplication::class,
     sdk = [Build.VERSION_CODES.N_MR1])
-class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerTest() {
+class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
     companion object {
         const val DEFAULT_ACTION = "com.simprints.id.REGISTER"
@@ -57,7 +57,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerTest() {
     @Inject lateinit var dbManager: DataManager
 
     override var module by lazyVar {
-        TestAppModule(app,
+        AppModuleForTests(app,
             analyticsManagerSpy = true,
             localDbManagerSpy = false,
             remoteDbManagerSpy = false)

@@ -2,8 +2,8 @@ package com.simprints.id.secure
 
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
-import com.simprints.id.DaggerTest
-import com.simprints.id.TestAppModule
+import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -21,12 +21,12 @@ import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class ProjectSecretManagerTest : RxJavaTest, DaggerTest() {
+class ProjectSecretManagerTest : RxJavaTest, DaggerForTests() {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
 
     override var module by lazyVar {
-        TestAppModule(app,
+        AppModuleForTests(app,
             remoteDbManagerSpy = true)
     }
 

@@ -21,7 +21,7 @@ import javax.inject.Singleton
  * Created by fabiotuzza on 16/01/2018.
  */
 @Singleton
-@Component(modules = arrayOf(AppModule::class, PreferencesModule::class, SerializerModule::class, AndroidInjectionModule::class))
+@Component(modules = [(AppModule::class), (PreferencesModule::class), (SerializerModule::class), (AndroidInjectionModule::class)])
 interface AppComponent {
     fun inject(app: Application)
     fun inject(app: SyncService) 
@@ -39,6 +39,5 @@ interface AppComponent {
     fun inject(requestLoginActivity: RequestLoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
     fun inject(checkLoginActivity: CheckLoginFromMainLauncherActivity)
-    fun inject(dashboardActivity: DashboardActivity) 
-
+    fun inject(dashboardActivity: DashboardActivity)
 }

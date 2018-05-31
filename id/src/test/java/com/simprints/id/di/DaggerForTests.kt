@@ -1,18 +1,18 @@
-package com.simprints.id
+package com.simprints.id.di
 
 import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Before
 
-open class DaggerTest {
+open class DaggerForTests {
 
-    open lateinit var module: TestAppModule
-    lateinit var testAppComponent: TestAppComponent
+    open lateinit var module: AppModuleForTests
+    lateinit var testAppComponent: AppComponentForTests
     lateinit var app: TestApplication
 
     @Before
     open fun setUp() {
 
-        testAppComponent = DaggerTestAppComponent
+        testAppComponent = DaggerAppComponentForTests
             .builder()
             .appModule(module)
             .build()
