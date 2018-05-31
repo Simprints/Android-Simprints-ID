@@ -2,14 +2,22 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.firebase.FirebaseApp
-import com.simprints.id.Application
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.DataManagerImpl
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.di.AppModuleForTests
+import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.retrofit.createMockBehaviorService
-import com.simprints.id.testUtils.roboletric.*
+import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testUtils.roboletric.getRoboSharedPreferences
+import com.simprints.id.testUtils.roboletric.initLogInStateMock
+import com.simprints.id.testUtils.roboletric.mockLoadProject
+import com.simprints.id.tools.delegates.lazyVar
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,37 +25,50 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.io.IOException
+import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class ProjectAuthenticatorTest : RxJavaTest() {
+class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
 
-    private lateinit var app: Application
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
-    @Before
-    fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as Application)
-        createMockForLocalDbManager(app)
-        createMockForRemoteDbManager(app)
-        createMockForDbManager(app)
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var localDbManagerMock: LocalDbManager
+    @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var loginInfoManagerMock: LoginInfoManager
+    @Inject lateinit var dbManager: DbManager
 
-        mockLoadProject(app)
+    override var module by lazyVar {
+        AppModuleForTests(app, localDbManagerSpy = false, remoteDbManagerSpy = false, loginInfoManagerSpy = false)
+    }
+
+    @Before
+    override fun setUp() {
+        FirebaseApp.initializeApp(RuntimeEnvironment.application)
+        app = (RuntimeEnvironment.application as TestApplication)
+        super.setUp()
+        testAppComponent.inject(this)
+
+        initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
+
+        mockLoadProject(localDbManagerMock, remoteDbManagerMock)
+        mockLoginInfoManager(loginInfoManagerMock)
+
         apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
     }
 
     @Test
     fun successfulResponse_userShouldSignIn() {
 
-        val authenticator = ProjectAuthenticator(
-            mockLoginInfoForDataManager(),
+        val authenticator = LegacyCompatibleProjectAuthenticator(
+            dataManager,
             SafetyNet.getClient(app),
             ApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
             getMockAttestationManager())
 
         val testObserver = authenticator
-            .authenticate(NonceScope("project_id", "user_id"), "encrypted_project_secret")
+            .authenticate(NonceScope("project_id", "user_id"), "encrypted_project_secret", "project_id", null)
             .test()
 
         testObserver.awaitTerminalEvent()
@@ -62,12 +83,11 @@ class ProjectAuthenticatorTest : RxJavaTest() {
 
         val nonceScope = NonceScope("project_id", "user_id")
 
-        val testObserver = ProjectAuthenticator(
-            mockLoginInfoForDataManager(),
+        val testObserver = LegacyCompatibleProjectAuthenticator(
+            dataManager,
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(apiClient.retrofit))
-
-            .authenticate(nonceScope, "encrypted_project_secret")
+            .authenticate(nonceScope, "encrypted_project_secret", "project_id", null)
             .test()
 
         testObserver.awaitTerminalEvent()
@@ -75,12 +95,4 @@ class ProjectAuthenticatorTest : RxJavaTest() {
         testObserver
             .assertError(IOException::class.java)
     }
-
-    private fun mockLoginInfoForDataManager(): DataManager =
-        DataManagerImpl(
-            app.dataManager.preferences,
-            mockLoginInfoManager(),
-            app.dataManager.secure,
-            app.dataManager.analytics,
-            app.dbManager)
 }

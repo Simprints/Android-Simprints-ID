@@ -1,24 +1,39 @@
 package com.simprints.id.activities.checkLogin
 
-import com.simprints.id.data.DataManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractor
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.StringsUtils
+import javax.inject.Inject
 
 abstract class CheckLoginPresenter(
     private val view: CheckLoginContract.View,
-    private val dataManager: DataManager,
-    private val timeHelper: TimeHelper) {
+    component: AppComponent) {
+
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var secureDataManager: SecureDataManager
+    @Inject lateinit var sessionParametersExtractor: SessionParametersExtractor
 
     init {
+        component.inject(this)
         initSession()
     }
 
     private fun initSession() {
-        dataManager.preferences.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
+        preferencesManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
     }
 
     private fun newSessionId(): String {
@@ -35,7 +50,7 @@ abstract class CheckLoginPresenter(
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_USER_ID)
                 is NotSignedInException -> handleNotSignedInUser()
                 else -> {
-                    dataManager.analytics.logThrowable(e)
+                    analyticsManager.logThrowable(e)
                     view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
                 }
             }
@@ -54,7 +69,7 @@ abstract class CheckLoginPresenter(
         val isUserSignedIn =
             isEncryptedProjectSecretPresent() &&
             isProjectIdStoredAndMatches() &&
-            isLocalKeyValid(dataManager.loginInfo.getSignedInProjectIdOrEmpty()) &&
+            isLocalKeyValid(loginInfoManager.getSignedInProjectIdOrEmpty()) &&
             isUserIdStoredAndMatches() &&
             isFirebaseTokenValid()
 
@@ -62,10 +77,10 @@ abstract class CheckLoginPresenter(
             throw NotSignedInException()
     }
 
-    private fun isEncryptedProjectSecretPresent(): Boolean = dataManager.loginInfo.getEncryptedProjectSecretOrEmpty().isNotEmpty()
-    private fun isFirebaseTokenValid(): Boolean = dataManager.db.isSignedIn(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), dataManager.loginInfo.getSignedInUserIdOrEmpty())
+    private fun isEncryptedProjectSecretPresent(): Boolean = loginInfoManager.getEncryptedProjectSecretOrEmpty().isNotEmpty()
+    private fun isFirebaseTokenValid(): Boolean = dbManager.isSignedIn(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
     private fun isLocalKeyValid(projectId: String): Boolean = try {
-        dataManager.secure.getLocalDbKeyOrThrow(projectId)
+        secureDataManager.getLocalDbKeyOrThrow(projectId)
         true
     } catch (t: Throwable) {
         false

@@ -5,14 +5,15 @@ import com.crashlytics.android.Crashlytics
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.models.fb_Session
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.SimprintsException
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.extensions.fromLowerCamelToLowerUnderscore
+import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 import kotlin.reflect.full.memberProperties
 
@@ -45,7 +46,9 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
 
     private fun logAlertToCrashlytics(alertName: String) {
         Timber.d("AnalyticsManagerImpl.logAlertToCrashlytics(alertName=$alertName)")
-        Crashlytics.log(alertName)
+        if (Fabric.isInitialized()) {
+            Crashlytics.log(alertName)
+        }
     }
 
     private fun logAlertToFirebaseAnalytics(alertName: String, apiKey: String, moduleId: String,
@@ -85,7 +88,9 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
 
     private fun logUnsafeThrowable(e: Throwable) {
         Timber.d(e)
-        Crashlytics.logException(e)
+        if (Fabric.isInitialized()) {
+            Crashlytics.logException(e)
+        }
     }
 
     override fun logCallout(callout: Callout) {

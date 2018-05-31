@@ -7,17 +7,22 @@ import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmConfig
+import com.simprints.id.di.AppModuleForAndroidTests
+import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.NoWifi
 import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.tools.RandomGenerator
+import com.simprints.id.tools.delegates.lazyVar
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
 
-class AuthTestsNoWifi : FirstUseLocal, NoWifi {
+class AuthTestsNoWifi : FirstUseLocal, NoWifi, DaggerForAndroidTests() {
 
     private val calloutCredentials = CalloutCredentials(
         "bWOFHInKA2YaQwrxZ7uJ",
@@ -39,16 +44,24 @@ class AuthTestsNoWifi : FirstUseLocal, NoWifi {
     @JvmField
     val loginTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
+    @Inject lateinit var randomGeneratorMock: RandomGenerator
+
+    override var module by lazyVar {
+        AppModuleForAndroidTests(app, randomGeneratorSpy = false)
+    }
+
     @Before
     override fun setUp() {
         super<NoWifi>.setUp()
-        val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
+        app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
+        super<DaggerForAndroidTests>.setUp()
+        testAppComponent.inject(this)
+        setupRandomGeneratorToGenerateKey(realmKey, randomGeneratorMock)
+
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
         realmConfiguration = RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
         super<FirstUseLocal>.setUp()
-
-        mockSecureDataManagerToGenerateKey(app, realmKey)
     }
 
     @Test
