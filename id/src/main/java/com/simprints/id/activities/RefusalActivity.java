@@ -25,22 +25,23 @@ import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.RefusalForm;
 
+import javax.inject.Inject;
+
 public class RefusalActivity extends AppCompatActivity {
 
     private Button submit;
     private REFUSAL_FORM_REASON reason;
     private EditText otherText;
     private AlertLauncher alertLauncher;
-    private DataManager dataManager;
+    @Inject DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((Application) getApplication()).getComponent().inject(this);
+
         setContentView(R.layout.activity_refusal);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        Application app = ((Application) getApplication());
-        dataManager = app.getDataManager();
 
         alertLauncher = new AlertLauncher(this);
         submit = findViewById(R.id.bt_submit_refusal_form);

@@ -9,6 +9,8 @@ import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
+import com.simprints.id.data.DataManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.tools.SimProgressDialog
@@ -16,6 +18,7 @@ import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
+import javax.inject.Inject
 
 class LoginActivity : AppCompatActivity(), LoginContract.View {
 
@@ -28,6 +31,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     override lateinit var viewPresenter: LoginContract.Presenter
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var preferences: PreferencesManager
 
     private var possibleLegacyProjectId: String? = null
     val app by lazy {
@@ -39,6 +44,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        (application as Application).component.inject(this)
+
         initUI()
 
         intent.getStringExtra(IntentKeys.loginActivityLegacyProjectIdKey)?.let {
@@ -47,15 +54,17 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
             }
         }
 
-        val projectAuthenticator = LegacyCompatibleProjectAuthenticator(app.dataManager, SafetyNet.getClient(this))
+        val projectAuthenticator = LegacyCompatibleProjectAuthenticator(
+            dataManager,
+            SafetyNet.getClient(this))
 
-        viewPresenter = LoginPresenter(this, app.dataManager, projectAuthenticator)
+        viewPresenter = LoginPresenter(this, dataManager, projectAuthenticator)
          viewPresenter.start()
     }
 
     private fun initUI() {
         progressDialog = SimProgressDialog(this)
-        loginEditTextUserId.setText(app.dataManager.preferences.userId)
+        loginEditTextUserId.setText(preferences.userId)
         loginButtonScanQr.setOnClickListener { viewPresenter.openScanQRApp() }
         loginButtonSignIn.setOnClickListener { handleSignInStart() }
     }
@@ -75,7 +84,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         val userId = loginEditTextUserId.text.toString()
         val projectId = loginEditTextProjectId.text.toString()
         val projectSecret = loginEditTextProjectSecret.text.toString()
-        viewPresenter.signIn(userId, projectId, projectSecret, app.dataManager.preferences.projectId, possibleLegacyProjectId)
+        viewPresenter.signIn(userId, projectId, projectSecret, preferences.projectId, possibleLegacyProjectId)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

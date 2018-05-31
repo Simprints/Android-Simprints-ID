@@ -16,17 +16,15 @@ import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.tools.AppState
+import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.*
-import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.Log
-import com.simprints.id.tools.PositionTracker
 import com.simprints.id.tools.Vibrate.vibrate
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
 import kotlinx.android.synthetic.main.activity_launch.*
+import javax.inject.Inject
 
 @SuppressLint("HardwareIds")
 open class LaunchActivity : AppCompatActivity() {
@@ -52,11 +50,12 @@ open class LaunchActivity : AppCompatActivity() {
     private var launchOutOfFocus = false
 
     private lateinit var app: Application
-    private lateinit var dataManager: DataManager
+
+    @Inject lateinit var dataManager: DataManager
     private lateinit var positionTracker: PositionTracker
-    private lateinit var appState: AppState
-    private lateinit var setup: Setup
-    private val timeHelper by lazy { app.timeHelper }
+    @Inject lateinit var appState: AppState
+    @Inject lateinit var setup: Setup
+    @Inject lateinit var timeHelper: TimeHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,10 +67,8 @@ open class LaunchActivity : AppCompatActivity() {
 
     private fun injectDependencies() {
         app = application as Application
-        dataManager = app.dataManager
+        (application as Application).component.inject(this)
         positionTracker = PositionTracker(this, dataManager)
-        appState = app.appState
-        setup = app.setup
     }
 
     private fun initView() {
@@ -183,11 +180,11 @@ open class LaunchActivity : AppCompatActivity() {
         if (appState.scanner != null) {
             appState.scanner.disconnect(object : ScannerCallback {
                 override fun onSuccess() {
-                    appState.destroy()
+                    //appState.destroy()
                 }
 
                 override fun onFailure(scanner_error: SCANNER_ERROR) {
-                    appState.destroy()
+                    //appState.destroy()
                 }
             })
             //appState.scanner = null

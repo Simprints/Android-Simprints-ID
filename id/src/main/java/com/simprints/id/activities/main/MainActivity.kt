@@ -59,6 +59,7 @@ import com.simprints.libsimprints.Registration
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -93,7 +94,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var syncItem: MenuItem
 
     private lateinit var un20WakeupDialog: ProgressDialog
-    private lateinit var dataManager: DataManager
     private lateinit var syncHelper: MainActivitySyncHelper
 
     private val defaultScanConfig = ScanConfig().apply {
@@ -110,18 +110,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     // Singletons
-    private lateinit var appState: AppState
-    private lateinit var setup: Setup
+    @Inject lateinit var appState: AppState
+    @Inject lateinit var setup: Setup
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var timeHelper: TimeHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val app = application as Application
-        dataManager = app.dataManager
-        appState = app.appState
-        setup = app.setup
+        app.component.inject(this)
         val syncClient = SyncService.getClient(this)
-        val timeHelper = app.timeHelper
 
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -707,8 +705,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     appState.scanner.template)
                 // TODO : change exceptions in libcommon
             } catch (ex: IllegalArgumentException) {
-                dataManager.analytics.
-                    logError(SimprintsError("IllegalArgumentException in MainActivity.captureSuccess()"))
+                dataManager.analytics
+                    .logError(SimprintsError("IllegalArgumentException in MainActivity.captureSuccess()"))
                 resetUIFromError()
                 return
             }

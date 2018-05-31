@@ -8,15 +8,15 @@ import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.libsimprints.Constants.*
+import javax.inject.Inject
 
 class GuidSelectionService : IntentService("GuidSelectionService") {
 
-    private lateinit var dataManager: DataManager
+    @Inject lateinit var dataManager: DataManager
 
     override fun onCreate() {
         super.onCreate()
-        val app = application as Application
-        dataManager = app.dataManager
+        (application as Application).component.inject(this)
     }
 
     override fun onHandleIntent(intent: Intent?) {
@@ -34,7 +34,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         val selectedGuid = intent.parseSelectedGuid()
         val callbackSent = try {
             checkCalloutParameters(projectId, apiKey, sessionId, selectedGuid)
-            dataManager.db.updateIdentification(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId?: "")
+            dataManager.db.updateIdentification(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId ?: "")
             true
         } catch (error: InvalidCalloutParameterError) {
             dataManager.analytics.logError(error)

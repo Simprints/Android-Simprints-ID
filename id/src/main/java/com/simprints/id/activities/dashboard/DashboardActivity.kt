@@ -16,6 +16,8 @@ import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.about.AboutActivity
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.data.DataManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.LanguageHelper
@@ -25,8 +27,12 @@ import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.app_bar_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
 import org.jetbrains.anko.support.v4.onRefresh
+import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View, NavigationView.OnNavigationItemSelectedListener {
+
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var preferences: PreferencesManager
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -42,10 +48,12 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
-        LanguageHelper.setLanguage(this, app.dataManager.preferences.language)
+
+        (application as Application).component.inject(this)
+        LanguageHelper.setLanguage(this, preferences.language)
 
         val syncClient = SyncService.getClient(this)
-        viewPresenter = DashboardPresenter(this, syncClient, app.dataManager, AndroidResourcesHelperImpl(app))
+        viewPresenter = DashboardPresenter(this, syncClient, dataManager, AndroidResourcesHelperImpl(app))
 
         initDrawer()
         initCards()

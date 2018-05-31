@@ -19,7 +19,11 @@ import com.simprints.id.data.DataManager;
 import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
 import com.simprints.id.tools.LanguageHelper;
+import com.simprints.id.tools.TimeHelper;
 import com.simprints.libcommon.Person;
+
+import javax.inject.Inject;
+
 import static com.simprints.id.tools.utils.AndroidResourcesHelperImpl.getStringPlural;
 
 public class MatchingActivity extends AppCompatActivity implements MatchingContract.View {
@@ -35,12 +39,13 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     private TextView resultText2;
     private TextView resultText3;
 
+    @Inject DataManager dataManager;
+    @Inject TimeHelper timeHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Application app = ((Application) getApplication());
-        DataManager dataManager = app.getDataManager();
+        ((Application) getApplication()).getComponent().inject(this);
 
         LanguageHelper.setLanguage(this, dataManager.getPreferences().getLanguage());
         setContentView(R.layout.activity_matching);
@@ -65,8 +70,9 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         viewPresenter = new MatchingPresenter(
                 this,
                 dataManager,
-                app.getTimeHelper(),
-                probe);
+                timeHelper,
+                probe
+        );
     }
 
     @Override

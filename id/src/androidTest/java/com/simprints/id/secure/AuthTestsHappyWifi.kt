@@ -10,22 +10,27 @@ import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmConfig
+import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.di.AppModuleForAndroidTests
+import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.HappyBluetooth
 import com.simprints.id.testTemplates.HappyWifi
-import com.simprints.id.testTools.AppUtils.getApp
 import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.tools.RandomGenerator
+import com.simprints.id.tools.delegates.lazyVar
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
+class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth, DaggerForAndroidTests() {
 
     private val calloutCredentials = CalloutCredentials(
         "bWOFHInKA2YaQwrxZ7uJ",
@@ -56,16 +61,29 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
     @JvmField
     val loginTestRule = ActivityTestRule<CheckLoginFromIntentActivity>(CheckLoginFromIntentActivity::class.java, false, false)
 
+    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var randomGeneratorMock: RandomGenerator
+
+    override var module by lazyVar {
+        AppModuleForAndroidTests(app, randomGeneratorSpy = false)
+    }
+
     @Before
     override fun setUp() {
         super<HappyBluetooth>.setUp()
         super<HappyWifi>.setUp()
-        val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
+        app = InstrumentationRegistry.getTargetContext().applicationContext as Application
+        super<DaggerForAndroidTests>.setUp()
+        testAppComponent.inject(this)
+        setupRandomGeneratorToGenerateKey(realmKey, randomGeneratorMock)
+
+        app.initDependencies()
+
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
         realmConfiguration = RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
         super<FirstUseLocal>.setUp()
 
-        mockSecureDataManagerToGenerateKey(app, realmKey)
+        signOut()
     }
 
     @Test
@@ -74,7 +92,7 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
         ensureSignInSuccess()
-        signOut(loginTestRule)
+        signOut()
     }
 
     @Test
@@ -83,7 +101,7 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
         ensureSignInSuccess()
-        signOut(loginTestRule)
+        signOut()
     }
 
     @Test
@@ -156,7 +174,7 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
 
         launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
         ensureSignInSuccess()
-        signOut(loginTestRule)
+        signOut()
     }
 
     @Test
@@ -168,7 +186,7 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
 
         launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
         ensureSignInSuccess()
-        signOut(loginTestRule)
+        signOut()
     }
 
     @Test
@@ -177,7 +195,7 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
 
         launchAppFromIntentEnrol(invalidCredentials, loginTestRule)
         ensureConfigError()
-        signOut(loginTestRule)
+        signOut()
     }
 
     @Test
@@ -189,10 +207,10 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth {
 
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
         ensureConfigError()
-        signOut(loginTestRule)
+        signOut()
     }
 
-    private fun signOut(activityTestRule: ActivityTestRule<*>) {
-        getApp(activityTestRule).dataManager.remoteDbManager.signOutOfRemoteDb()
+    private fun signOut() {
+        remoteDbManager.signOutOfRemoteDb()
     }
 }

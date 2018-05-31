@@ -20,7 +20,7 @@ import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class NonceManagerTest : RxJavaTest() {
+class NonceManagerTest : RxJavaTest {
 
     private val validNonceJsonResponse = "{\"value\":\"nonce_from_server\"}"
     private lateinit var apiClient: SimApiClient<SecureApiInterface>

@@ -18,9 +18,12 @@ import android.widget.ToggleButton;
 
 import com.simprints.id.Application;
 import com.simprints.id.R;
+import com.simprints.id.data.DataManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.domain.Constants;
 import com.simprints.id.tools.LanguageHelper;
+
+import javax.inject.Inject;
 
 public class SettingsActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -39,14 +42,13 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     SeekBar timeoutSeekBar;
     SeekBar idWaitTimeSeekBar;
 
-    private PreferencesManager preferencesManager;
+    @Inject DataManager dataManager;
+    @Inject PreferencesManager preferencesManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Application app = ((Application) getApplication());
-        preferencesManager = app.getDataManager().getPreferences();
+        ((Application) getApplication()).getComponent().inject(this);
 
         LanguageHelper.setLanguage(this, preferencesManager.getLanguage());
         setContentView(R.layout.activity_settings);

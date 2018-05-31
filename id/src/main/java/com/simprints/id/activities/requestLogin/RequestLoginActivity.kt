@@ -7,16 +7,19 @@ import com.simprints.id.R
 import com.simprints.id.data.DataManager
 import com.simprints.id.tools.LanguageHelper
 import kotlinx.android.synthetic.main.activity_front.*
+import javax.inject.Inject
 
 open class RequestLoginActivity : AppCompatActivity() {
 
+    @Inject lateinit var dataManager: DataManager
+
     lateinit var app: Application
-    lateinit var dataManager: DataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (application as Application).component.inject(this)
+
         app = application as Application
-        dataManager = app.dataManager
 
         LanguageHelper.setLanguage(this, dataManager.preferences.language)
         setContentView(R.layout.activity_front)

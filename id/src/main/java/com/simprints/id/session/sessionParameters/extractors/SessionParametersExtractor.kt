@@ -2,7 +2,6 @@ package com.simprints.id.session.sessionParameters.extractors
 
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.session.callout.CalloutParameter
 import com.simprints.id.session.sessionParameters.SessionParameters
 import com.simprints.id.session.sessionParameters.validators.Validator
 
@@ -15,7 +14,6 @@ class SessionParametersExtractor(private val actionExtractor: Extractor<CalloutA
                                  private val callingPackageExtractor: Extractor<String>,
                                  private val metadataExtractor: Extractor<String>,
                                  private val resultFormatExtractor: Extractor<String>,
-                                 private val unexpectedParametersExtractor: Extractor<Set<CalloutParameter>>,
                                  private val sessionParametersValidators: Set<Validator<SessionParameters>>)
     : Extractor<SessionParameters> {
 
@@ -29,7 +27,6 @@ class SessionParametersExtractor(private val actionExtractor: Extractor<CalloutA
         val callingPackage = callingPackageExtractor.extractFrom(callout)
         val metadata = metadataExtractor.extractFrom(callout)
         val resultFormat = resultFormatExtractor.extractFrom(callout)
-        unexpectedParametersExtractor.extractFrom(callout)
 
         val sessionParameters = SessionParameters(action, apiKey, projectId, moduleId, userId, patientId, callingPackage, metadata, resultFormat)
         sessionParametersValidators.forEach { it.validate(sessionParameters) }

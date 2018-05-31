@@ -32,7 +32,7 @@ open class ProjectAuthenticator(private val dataManager: DataManager,
         DifferentProjectIdReceivedFromIntentException::class,
         AuthRequestInvalidCredentialsException::class,
         SimprintsInternalServerException::class)
-    fun authenticate(nonceScope: NonceScope, projectSecret: String): Completable =
+    protected fun authenticate(nonceScope: NonceScope, projectSecret: String): Completable =
         prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
             .signIn(nonceScope.projectId)

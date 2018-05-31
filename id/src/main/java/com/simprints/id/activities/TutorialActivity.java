@@ -10,14 +10,16 @@ import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.tools.LanguageHelper;
 
+import javax.inject.Inject;
+
 public class TutorialActivity extends AppCompatActivity {
+
+    @Inject DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Application app = ((Application) getApplication());
-        DataManager dataManager = app.getDataManager();
+        ((Application) getApplication()).getComponent().inject(this);
 
         LanguageHelper.setLanguage(this, dataManager.getPreferences().getLanguage());
         setContentView(R.layout.activity_tutorial);

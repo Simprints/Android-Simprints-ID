@@ -6,15 +6,6 @@ import com.simprints.libscanner.Scanner;
 @SuppressWarnings("ConstantConditions")
 public class AppState {
 
-    private static AppState singleton;
-
-    public synchronized static AppState getInstance() {
-        if (singleton == null) {
-            singleton = new AppState();
-        }
-        return singleton;
-    }
-
     private Scanner scanner = null;
 
     public void setScanner(Scanner scanner) {
@@ -26,7 +17,6 @@ public class AppState {
     }
 
     public void destroy() {
-        singleton = null;
+        scanner = null;
     }
-
 }
