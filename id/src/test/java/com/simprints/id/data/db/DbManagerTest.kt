@@ -3,8 +3,8 @@ package com.simprints.id.data.db
 import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.simprints.id.DaggerTest
-import com.simprints.id.TestAppModule
+import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -36,7 +36,7 @@ import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class DbManagerTest : RxJavaTest, DaggerTest() {
+class DbManagerTest : RxJavaTest, DaggerForTests() {
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
@@ -45,8 +45,8 @@ class DbManagerTest : RxJavaTest, DaggerTest() {
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
     @Inject lateinit var dbManager: DbManager
 
-    override var module: TestAppModule by lazyVar {
-        object : TestAppModule(app, localDbManagerSpy = true, remoteDbManagerSpy = true) {
+    override var module: AppModuleForTests by lazyVar {
+        object : AppModuleForTests(app, localDbManagerSpy = true, remoteDbManagerSpy = true) {
             override fun provideLocalDbManager(ctx: Context): LocalDbManager {
                 return spy(LocalDbManager::class.java)
             }

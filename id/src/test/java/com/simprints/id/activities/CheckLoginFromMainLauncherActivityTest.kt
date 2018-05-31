@@ -3,8 +3,8 @@ package com.simprints.id.activities
 import android.app.Activity
 import android.content.SharedPreferences
 import com.google.firebase.FirebaseApp
-import com.simprints.id.DaggerTest
-import com.simprints.id.TestAppModule
+import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class CheckLoginFromMainLauncherActivityTest : DaggerTest() {
+class CheckLoginFromMainLauncherActivityTest : DaggerForTests() {
 
     private lateinit var editor: SharedPreferences.Editor
 
@@ -38,7 +38,7 @@ class CheckLoginFromMainLauncherActivityTest : DaggerTest() {
     lateinit var dataManager: DataManager
 
     override var module by lazyVar {
-        TestAppModule(app,
+        AppModuleForTests(app,
             localDbManagerSpy = false,
             remoteDbManagerSpy = false,
             secureDataManagerSpy = false)

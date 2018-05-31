@@ -180,11 +180,11 @@ open class LaunchActivity : AppCompatActivity() {
         if (appState.scanner != null) {
             appState.scanner.disconnect(object : ScannerCallback {
                 override fun onSuccess() {
-                    appState.destroy()
+                    //appState.destroy()
                 }
 
                 override fun onFailure(scanner_error: SCANNER_ERROR) {
-                    appState.destroy()
+                    //appState.destroy()
                 }
             })
             //appState.scanner = null

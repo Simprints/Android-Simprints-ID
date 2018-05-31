@@ -1,9 +1,9 @@
 package com.simprints.id.activities.dashboard
 
 import com.google.firebase.FirebaseApp
-import com.simprints.id.DaggerTest
+import com.simprints.id.di.DaggerForTests
 import com.simprints.id.R
-import com.simprints.id.TestAppModule
+import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.data.DataManager
@@ -29,14 +29,14 @@ import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class DashboardCardsFactoryTest : DaggerTest() {
+class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Inject lateinit var dataManager: DataManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
 
     override var module by lazyVar {
-        TestAppModule(app,
+        AppModuleForTests(app,
             remoteDbManagerSpy = false,
             localDbManagerSpy = false)
     }

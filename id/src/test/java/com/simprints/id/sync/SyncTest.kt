@@ -3,8 +3,8 @@ package com.simprints.id.sync
 import com.google.firebase.FirebaseApp
 import com.google.gson.stream.JsonReader
 import com.simprints.id.Application
-import com.simprints.id.DaggerTest
-import com.simprints.id.TestAppModule
+import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
@@ -53,7 +53,7 @@ import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class SyncTest : RxJavaTest, DaggerTest() {
+class SyncTest : RxJavaTest, DaggerForTests() {
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
@@ -64,7 +64,7 @@ class SyncTest : RxJavaTest, DaggerTest() {
     @Inject lateinit var loginInfoManager: LoginInfoManager
 
     override var module by lazyVar {
-        TestAppModule(app,
+        AppModuleForTests(app,
             remoteDbManagerSpy = true,
             localDbManagerSpy = false)
     }

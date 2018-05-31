@@ -32,7 +32,15 @@ open class Application : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
+        initApplication()
+    }
+
+    open fun initApplication() {
         createComponent()
+        initDependencies()
+    }
+
+    fun initDependencies() {
         injectDependencies()
         initModules()
     }

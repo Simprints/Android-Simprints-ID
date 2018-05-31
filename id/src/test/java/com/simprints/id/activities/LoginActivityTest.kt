@@ -4,9 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
-import com.simprints.id.DaggerTest
+import com.simprints.id.di.DaggerForTests
 import com.simprints.id.R
-import com.simprints.id.TestAppModule
+import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.data.DataManager
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
@@ -37,7 +37,7 @@ import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class LoginActivityTest : RxJavaTest, DaggerTest() {
+class LoginActivityTest : RxJavaTest, DaggerForTests() {
 
     companion object {
         const val DEFAULT_PROJECT_ID = "some_project_id"
@@ -49,7 +49,7 @@ class LoginActivityTest : RxJavaTest, DaggerTest() {
     lateinit var dataManager: DataManager
 
     override var module by lazyVar {
-        TestAppModule(app,
+        AppModuleForTests(app,
             localDbManagerSpy = false,
             dbManagerSpy = false)
     }

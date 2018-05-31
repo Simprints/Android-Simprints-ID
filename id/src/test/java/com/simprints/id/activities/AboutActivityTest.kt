@@ -1,10 +1,10 @@
 package com.simprints.id.activities
 
 import com.nhaarman.mockito_kotlin.doReturn
-import com.simprints.id.DaggerTest
-import com.simprints.id.TestAppModule
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class AboutActivityTest : RxJavaTest, DaggerTest() {
+class AboutActivityTest : RxJavaTest, DaggerForTests() {
 
     @Inject
     lateinit var dbManager: DbManager
@@ -34,7 +34,7 @@ class AboutActivityTest : RxJavaTest, DaggerTest() {
     lateinit var dataManager: DataManager
 
     override var module by lazyVar {
-        TestAppModule(app,
+        AppModuleForTests(app,
             dbManagerSpy = false,
             dataManagerSpy = true,
             localDbManagerSpy = false)
