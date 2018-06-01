@@ -3,13 +3,13 @@ package com.simprints.id.data.db
 import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.simprints.id.di.DaggerForTests
-import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.di.AppModuleForTests
+import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.retrofit.mockServer.mockFailingResponse
@@ -92,7 +92,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
         val argument = argumentCaptor<rl_Person>()
         verify(localDbManagerSpy, times(2)).insertOrUpdatePersonInLocal(argument.capture())
 
-        // First time we save the person in the local db, it doesn't have times and it needs to be sync
+        // First time we save the person in the local dbManager, it doesn't have times and it needs to be sync
         Assert.assertNull(argument.firstValue.createdAt)
         Assert.assertNull(argument.firstValue.updatedAt)
         Assert.assertTrue(argument.firstValue.toSync)

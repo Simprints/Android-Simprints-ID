@@ -58,19 +58,18 @@ open class AppModuleForAnyTests(app: Application,
 
     override fun provideDataManager(preferencesManager: PreferencesManager,
                                 loginInfoManager: LoginInfoManager,
-                                secureDataManager: SecureDataManager,
                                 analyticsManager: AnalyticsManager,
                                 dbManager: DbManager): DataManager =
-        buildSpyIsRequired(dataManagerSpy, { super.provideDataManager(preferencesManager, loginInfoManager, secureDataManager, analyticsManager, dbManager) })
+        buildSpyIsRequired(dataManagerSpy, { super.provideDataManager(preferencesManager, loginInfoManager, analyticsManager, dbManager) })
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
 
-    private inline fun <reified T> buildSpyIsRequired(spyRequired: Boolean?, builder: () -> T): T =
+    private inline fun <reified T> buildSpyIsRequired(spyRequired: Boolean?, provider: () -> T): T =
         spyRequired?.let {
             if (it) {
-                spy(builder())
+                spy(provider())
             } else {
                 mock()
             }
-        } ?: builder()
+        } ?: provider()
 }

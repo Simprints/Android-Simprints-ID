@@ -61,7 +61,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheProjectCard_onlyWhenItHasAValidProject() {
-        val factory = DashboardCardsFactory(dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent, AndroidResourcesHelperImpl(app))
         val card = getCardIfCreated(factory, "project name")
         Assert.assertEquals(card?.description, "project desc")
 
@@ -79,7 +79,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastEnrolCard_onlyWhenAnEnrolEventHappened() {
-        val factory = DashboardCardsFactory(dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent, AndroidResourcesHelperImpl(app))
         val lastEnrolDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -91,7 +91,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastIdentificationCard_onlyWhenAnIdentificationEventHappened() {
-        val factory = DashboardCardsFactory(dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent, AndroidResourcesHelperImpl(app))
         val lastIdentificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -102,7 +102,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastVerificationCard_onlyWhenAnVerificationEventHappened() {
-        val factory = DashboardCardsFactory(dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent, AndroidResourcesHelperImpl(app))
         val lastVerificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -113,7 +113,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastUserCard_onlyWhenAnLastUserEventHappened() {
-        val factory = DashboardCardsFactory(dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent, AndroidResourcesHelperImpl(app))
         val lastUser = "someone"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -124,7 +124,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLasScannerCard_onlyWhenAnLasScannerEventHappened() {
-        val factory = DashboardCardsFactory(dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent, AndroidResourcesHelperImpl(app))
         val lastScanner = "SPXXXX"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,

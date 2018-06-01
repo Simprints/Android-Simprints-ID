@@ -2,44 +2,42 @@ package com.simprints.id.data
 
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.session.Session
 
-class DataManagerImpl(override val preferences: PreferencesManager,
-                      override val loginInfo: LoginInfoManager,
-                      override val secure: SecureDataManager,
-                      override val analytics: AnalyticsManager,
-                      override val db: DbManager) : DataManager {
+class DataManagerImpl(val preferencesManager: PreferencesManager,
+                      val loginInfoManager: LoginInfoManager,
+                      val analyticsManager: AnalyticsManager,
+                      val dbManager: DbManager) : DataManager {
 
     override fun saveSession() {
         val session = Session(
-            preferences.sessionId,
-            preferences.androidSdkVersion,
-            preferences.deviceModel,
-            preferences.deviceId,
-            preferences.appVersionName,
-            preferences.libVersionName,
-            preferences.calloutAction.toString(),
-            loginInfo.getSignedInProjectIdOrEmpty(),
-            preferences.moduleId,
-            loginInfo.getSignedInUserIdOrEmpty(),
-            preferences.patientId,
-            preferences.callingPackage,
-            preferences.metadata,
-            preferences.resultFormat,
-            preferences.macAddress,
-            preferences.scannerId,
-            preferences.hardwareVersion.toInt(),
-            preferences.location.latitude,
-            preferences.location.longitude,
-            preferences.msSinceBootOnSessionStart,
-            preferences.msSinceBootOnLoadEnd,
-            preferences.msSinceBootOnMainStart,
-            preferences.msSinceBootOnMatchStart,
-            preferences.msSinceBootOnSessionEnd)
-        db.saveSessionInRemote(session)
-        analytics.logSession(session)
+            preferencesManager.sessionId,
+            preferencesManager.androidSdkVersion,
+            preferencesManager.deviceModel,
+            preferencesManager.deviceId,
+            preferencesManager.appVersionName,
+            preferencesManager.libVersionName,
+            preferencesManager.calloutAction.toString(),
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            preferencesManager.moduleId,
+            loginInfoManager.getSignedInUserIdOrEmpty(),
+            preferencesManager.patientId,
+            preferencesManager.callingPackage,
+            preferencesManager.metadata,
+            preferencesManager.resultFormat,
+            preferencesManager.macAddress,
+            preferencesManager.scannerId,
+            preferencesManager.hardwareVersion.toInt(),
+            preferencesManager.location.latitude,
+            preferencesManager.location.longitude,
+            preferencesManager.msSinceBootOnSessionStart,
+            preferencesManager.msSinceBootOnLoadEnd,
+            preferencesManager.msSinceBootOnMainStart,
+            preferencesManager.msSinceBootOnMatchStart,
+            preferencesManager.msSinceBootOnSessionEnd)
+        dbManager.saveSessionInRemote(session)
+        analyticsManager.logSession(session)
     }
 }

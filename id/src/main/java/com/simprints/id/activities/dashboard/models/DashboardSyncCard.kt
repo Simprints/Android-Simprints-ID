@@ -1,23 +1,35 @@
 package com.simprints.id.activities.dashboard.models
 
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
-import com.simprints.id.data.DataManager
+import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.rxkotlin.subscribeBy
 import java.text.DateFormat
+import javax.inject.Inject
 
-class DashboardSyncCard(type: DashboardCardType,
+class DashboardSyncCard(component: AppComponent,
+                        type: DashboardCardType,
                         position: Int,
                         imageRes: Int,
                         title: String,
-                        var dataManager: DataManager,
                         private val dateFormat: DateFormat) : DashboardCard(type, position, imageRes, title, "") {
 
-    val syncParams = SyncTaskParameters.build(dataManager.preferences.syncGroup, dataManager)
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var dbManager: DbManager
+
+    var syncParams by lazyVar {
+        SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
+    }
+
     var onSyncActionClicked: (cardModel: DashboardSyncCard) -> Unit = {}
     var peopleToUpload: Int = 0
     var peopleToDownload: Int? = null
@@ -59,6 +71,7 @@ class DashboardSyncCard(type: DashboardCardType,
     }
 
     init {
+        component.inject(this)
         updateSyncInfo()
     }
 
@@ -69,7 +82,7 @@ class DashboardSyncCard(type: DashboardCardType,
     }
 
     private fun updateLastSyncedTime() {
-        dataManager.db.local
+        dbManager.local
                 .getSyncInfoFor(syncParams.toGroup())
                 .subscribeBy(
                     onSuccess = {
@@ -80,7 +93,7 @@ class DashboardSyncCard(type: DashboardCardType,
     }
 
     private fun updateLocalPeopleCount() {
-        dataManager.db.local
+        dbManager.local
                 .getPeopleCountFromLocal(toSync = true)
             .subscribeBy(
                 onSuccess = {
@@ -91,9 +104,9 @@ class DashboardSyncCard(type: DashboardCardType,
     }
 
     private fun updateRemotePeopleCount() {
-        dataManager.db.getNumberOfPatientsForSyncParams(syncParams)
+        dbManager.getNumberOfPatientsForSyncParams(syncParams)
             .flatMap {
-                dataManager.db.calculateNPatientsToDownSync(it, syncParams)
+                dbManager.calculateNPatientsToDownSync(it, syncParams)
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

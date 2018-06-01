@@ -48,12 +48,12 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
-
-        (application as Application).component.inject(this)
+        val component = (application as Application).component
+        component.inject(this)
         LanguageHelper.setLanguage(this, preferences.language)
 
         val syncClient = SyncService.getClient(this)
-        viewPresenter = DashboardPresenter(this, syncClient, dataManager, AndroidResourcesHelperImpl(app))
+        viewPresenter = DashboardPresenter(this, syncClient, component, AndroidResourcesHelperImpl(app))
 
         initDrawer()
         initCards()

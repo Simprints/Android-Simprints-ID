@@ -6,10 +6,14 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
-import com.simprints.id.data.DataManager;
+import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
+import com.simprints.id.data.db.DbManager;
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
+import com.simprints.id.data.loginInfo.LoginInfoManager;
+import com.simprints.id.data.prefs.PreferencesManager;
+import com.simprints.id.di.AppComponent;
 import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
@@ -32,6 +36,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import static android.app.Activity.RESULT_OK;
 import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
 import static com.simprints.id.tools.TierHelper.computeTier;
@@ -47,27 +53,25 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     private Handler handler = new Handler();
     private OnMatchStartHandlerThread onMatchStartHandlerThread;
 
-    @NonNull
-    private DataManager dataManager;
-
-    @NonNull
-    private TimeHelper timeHelper;
+    @NonNull @Inject PreferencesManager preferencesManager;
+    @NonNull @Inject LoginInfoManager loginInfoManager;
+    @NonNull @Inject TimeHelper timeHelper;
+    @NonNull @Inject AnalyticsManager analyticsManager;
+    @NonNull @Inject DbManager dbManager;
 
     MatchingPresenter(@NonNull MatchingContract.View matchingView,
-                      @NonNull DataManager dataManager,
-                      @NonNull TimeHelper timeHelper,
+                      @NonNull AppComponent component,
                       Person probe) {
+        component.inject(this);
         this.matchingView = matchingView;
-        this.dataManager = dataManager;
-        this.timeHelper = timeHelper;
         this.probe = probe;
     }
 
     @Override
     public void start() {
-        dataManager.getPreferences().setMsSinceBootOnMatchStart(timeHelper.msSinceBoot());
+        preferencesManager.setMsSinceBootOnMatchStart(timeHelper.msSinceBoot());
         // TODO : Use polymorphism
-        switch (dataManager.getPreferences().getCalloutAction()) {
+        switch (preferencesManager.getCalloutAction()) {
             case IDENTIFY:
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
@@ -88,7 +92,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 onVerifyStart();
                 break;
             default:
-                dataManager.getAnalytics().logError(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
+                analyticsManager.logError(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
                 matchingView.launchAlert();
         }
     }
@@ -112,12 +116,12 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
     private void onIdentifyStart() {
         try {
-            dataManager.getDb().loadPeople(
+            dbManager.loadPeople(
                 candidates,
-                dataManager.getPreferences().getMatchGroup(),
+                preferencesManager.getMatchGroup(),
                 wrapCallback("loading people", newOnLoadPeopleCallback()));
         } catch (UninitializedDataManagerError error) {
-            dataManager.getAnalytics().logError(error);
+            analyticsManager.logError(error);
             matchingView.launchAlert();
         }
     }
@@ -130,7 +134,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
-                int matcherType = dataManager.getPreferences().getMatcherType();
+                int matcherType = preferencesManager.getMatcherType();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -157,18 +161,18 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                dataManager.getAnalytics().logError(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
+                analyticsManager.logError(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
                 matchingView.launchAlert();
             }
         };
     }
 
     private void onVerifyStart() {
-        final String guid = dataManager.getPreferences().getPatientId();
+        final String guid = preferencesManager.getPatientId();
         try {
-            dataManager.getDb().loadPerson(candidates, dataManager.getLoginInfo().getSignedInProjectId(), guid, wrapCallback("loading people", newOnLoadPersonCallback()));
+            dbManager.loadPerson(candidates, loginInfoManager.getSignedInProjectId(), guid, wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {
-            dataManager.getAnalytics().logError(error);
+            analyticsManager.logError(error);
             matchingView.launchAlert();
         }
     }
@@ -179,7 +183,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
             public void onSuccess() {
                 Log.INSTANCE.d(MatchingPresenter.this, "Successfully loaded candidate");
 
-                int matcherType = dataManager.getPreferences().getMatcherType();
+                int matcherType = preferencesManager.getMatcherType();
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -207,7 +211,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR dataError) {
-                dataManager.getAnalytics().logError(UnexpectedDataError.forDataError(dataError,"MatchingActivity.onVerifyStart()"));
+                analyticsManager.logError(UnexpectedDataError.forDataError(dataError,"MatchingActivity.onVerifyStart()"));
                 matchingView.launchAlert();
             }
         };
@@ -221,12 +225,12 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 break;
             }
             case MATCH_COMPLETED: {
-                CalloutAction callout = dataManager.getPreferences().getCalloutAction();
+                CalloutAction callout = preferencesManager.getCalloutAction();
                 switch (callout) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();
                         matchingView.setIdentificationProgressReturningStart();
-                        int nbOfResults = dataManager.getPreferences().getReturnIdCount();
+                        int nbOfResults = preferencesManager.getReturnIdCount();
 
                         ArrayList<Identification> topCandidates = new ArrayList<>();
 
@@ -251,10 +255,10 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         }
 
                         try {
-                            dataManager.getDb().saveIdentification(probe, candidates.size(), topCandidates);
+                            dbManager.saveIdentification(probe, candidates.size(), topCandidates);
 
                         } catch (UninitializedDataManagerError error) {
-                            dataManager.getAnalytics().logError(error);
+                            analyticsManager.logError(error);
                             matchingView.launchAlert();
                             return;
                         }
@@ -280,10 +284,10 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
                         Intent resultData;
                         resultData = new Intent(com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFY_INTENT);
-                        FormatResult.put(resultData, topCandidates, dataManager);
+                        FormatResult.put(resultData, topCandidates, preferencesManager);
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
-                                tier1Or2Matches, tier3Matches, tier4Matches, dataManager.getPreferences().getMatchingEndWaitTimeSeconds() * 1000);
+                                tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.getMatchingEndWaitTimeSeconds() * 1000);
                         break;
                     }
                     case VERIFY: {
@@ -293,7 +297,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
                         if (candidates.size() > 0 && scores.size() > 0) {
                             int score = scores.get(0).intValue();
-                            verification = new Verification(score, computeTier(score), dataManager.getPreferences().getPatientId());
+                            verification = new Verification(score, computeTier(score), preferencesManager.getPatientId());
                             guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_FOUND;
                             resultCode = RESULT_OK;
                         } else {
@@ -303,9 +307,9 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         }
 
                         try {
-                            dataManager.getDb().saveVerification(probe, verification, guidExistsResult);
+                            dbManager.saveVerification(probe, verification, guidExistsResult);
                         } catch (UninitializedDataManagerError error) {
-                            dataManager.getAnalytics().logError(error);
+                            analyticsManager.logError(error);
                             matchingView.launchAlert();
                             return;
                         }
@@ -313,7 +317,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         // signOut
                         Intent resultData;
                         resultData = new Intent(com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_INTENT);
-                        FormatResult.put(resultData, verification, dataManager.getPreferences().getResultFormat());
+                        FormatResult.put(resultData, verification, preferencesManager.getResultFormat());
                         matchingView.doSetResult(resultCode, resultData);
                         matchingView.doFinish();
                         break;

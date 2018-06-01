@@ -62,7 +62,7 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
     fun successfulResponse_userShouldSignIn() {
 
         val authenticator = LegacyCompatibleProjectAuthenticator(
-            dataManager,
+            testAppComponent,
             SafetyNet.getClient(app),
             ApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
             getMockAttestationManager())
@@ -84,7 +84,7 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
         val nonceScope = NonceScope("project_id", "user_id")
 
         val testObserver = LegacyCompatibleProjectAuthenticator(
-            dataManager,
+            testAppComponent,
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(apiClient.retrofit))
             .authenticate(nonceScope, "encrypted_project_secret", "project_id", null)
