@@ -99,10 +99,9 @@ open class AppModule(val app: Application) {
     @Singleton
     open fun provideDataManager(preferencesManager: PreferencesManager,
                                 loginInfoManager: LoginInfoManager,
-                                secureDataManager: SecureDataManager,
                                 analyticsManager: AnalyticsManager,
                                 dbManager: DbManager): DataManager =
-        DataManagerImpl(preferencesManager, loginInfoManager, secureDataManager, analyticsManager, dbManager)
+        DataManagerImpl(preferencesManager, loginInfoManager, analyticsManager, dbManager)
 
     @Provides
     @Singleton
@@ -114,7 +113,12 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    fun provideSetup(dataManager: DataManager, appState: AppState, networkUtils: NetworkUtils): Setup = Setup.getInstance(dataManager, appState, networkUtils)
+    fun provideSetup(preferencesManager: PreferencesManager,
+                     dbManager: DbManager,
+                     loginInfoManager: LoginInfoManager,
+                     analyticsManager: AnalyticsManager,
+                     appState: AppState,
+                     networkUtils: NetworkUtils): Setup = Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, networkUtils)
 
     @Provides
     @Singleton

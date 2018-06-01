@@ -1,7 +1,10 @@
 package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.id.data.DataManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
@@ -16,16 +19,25 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
 import java.io.IOException
+import javax.inject.Inject
 
-open class ProjectAuthenticator(private val dataManager: DataManager,
+open class ProjectAuthenticator(component: AppComponent,
                                 private val safetyNetClient: SafetyNetClient,
                                 secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
                                 private val attestationManager: AttestationManager = AttestationManager()) {
 
-    private val projectSecretManager = ProjectSecretManager(dataManager.loginInfo)
+    @Inject lateinit var secureDataManager: SecureDataManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var dbManager: DbManager
+
+    private val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
     private val publicKeyManager = PublicKeyManager(secureApiClient)
     private val nonceManager = NonceManager(secureApiClient)
     private val authManager = AuthManager(secureApiClient)
+
+    init {
+        component.inject(this)
+    }
 
     @Throws(
         IOException::class,
@@ -71,17 +83,17 @@ open class ProjectAuthenticator(private val dataManager: DataManager,
 
     private fun Single<out Tokens>.signIn(projectId: String): Completable =
         flatMapCompletable { tokens ->
-            dataManager.db.signIn(projectId, tokens)
+            dbManager.signIn(projectId, tokens)
         }
 
     private fun Completable.fetchProjectInfo(projectId: String): Single<Project> =
         andThen(
-            dataManager.db.refreshProjectInfoWithServer(projectId)
+            dbManager.refreshProjectInfoWithServer(projectId)
         )
 
     private fun Single<out Project>.storeCredentials(userId: String): Completable =
         flatMapCompletable {
-            dataManager.loginInfo.storeCredentials(it.id, it.legacyId, userId)
+            loginInfoManager.storeCredentials(it.id, it.legacyId, userId)
             Completable.complete()
         }
 }

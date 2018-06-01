@@ -9,7 +9,6 @@ import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
-import com.simprints.id.data.DataManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
@@ -31,7 +30,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     override lateinit var viewPresenter: LoginContract.Presenter
-    @Inject lateinit var dataManager: DataManager
     @Inject lateinit var preferences: PreferencesManager
 
     private var possibleLegacyProjectId: String? = null
@@ -44,7 +42,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        (application as Application).component.inject(this)
+        val component = (application as Application).component
+        component.inject(this)
 
         initUI()
 
@@ -55,11 +54,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         }
 
         val projectAuthenticator = LegacyCompatibleProjectAuthenticator(
-            dataManager,
+            component,
             SafetyNet.getClient(this))
 
-        viewPresenter = LoginPresenter(this, dataManager, projectAuthenticator)
-         viewPresenter.start()
+        viewPresenter = LoginPresenter(this, component, projectAuthenticator)
+        viewPresenter.start()
     }
 
     private fun initUI() {

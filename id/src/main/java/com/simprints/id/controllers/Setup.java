@@ -6,9 +6,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.simprints.id.R;
-import com.simprints.id.data.DataManager;
+import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
+import com.simprints.id.data.db.DbManager;
+import com.simprints.id.data.loginInfo.LoginInfoManager;
+import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.exceptions.unsafe.NullScannerError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
@@ -35,18 +38,18 @@ import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
 
 public class Setup {
 
-    private static Setup singleton;
     private final NetworkUtils networkUtils;
 
-    public synchronized static Setup getInstance(DataManager dataManager, AppState appState, NetworkUtils networkUtils) {
-        if (singleton == null) {
-            singleton = new Setup(dataManager, appState, networkUtils);
-        }
-        return singleton;
-    }
-
-    private Setup(DataManager dataManager, AppState appState, NetworkUtils networkUtils) {
-        this.dataManager = dataManager;
+    public Setup(PreferencesManager preferencesManager,
+                  DbManager dbManager,
+                  LoginInfoManager loginInfoManager,
+                  AnalyticsManager analyticsManager,
+                  AppState appState,
+                  NetworkUtils networkUtils) {
+        this.analyticsManager = analyticsManager;
+        this.loginInfoManager = loginInfoManager;
+        this.dbManager = dbManager;
+        this.preferencesManager = preferencesManager;
         this.appState = appState;
         this.networkUtils = networkUtils;
     }
@@ -62,7 +65,10 @@ public class Setup {
 
     private volatile Boolean paused = false;
 
-    private DataManager dataManager;
+    private PreferencesManager preferencesManager;
+    private LoginInfoManager loginInfoManager;
+    private DbManager dbManager;
+    private AnalyticsManager analyticsManager;
 
     // Singletons
     private AppState appState;
@@ -77,17 +83,12 @@ public class Setup {
         goOn(activity);
     }
 
-    public void destroy() {
-        singleton = null;
-    }
-
-
     private void goOn(@NonNull final Activity activity) {
         if (this.paused)
             return;
 
         // Step 1: check permissions. These can be revoked, so it has to be done every time
-        boolean permissionsReady = PermissionManager.checkAllPermissions(activity, dataManager.getPreferences().getCallingPackage());
+        boolean permissionsReady = PermissionManager.checkAllPermissions(activity, preferencesManager.getCallingPackage());
         if (!permissionsReady) {
             this.requestPermissions(activity);
             return;
@@ -126,7 +127,7 @@ public class Setup {
     // STEP 1
     private void requestPermissions(@NonNull Activity activity) {
         onProgress(15, R.string.launch_checking_permissions);
-        PermissionManager.requestAllPermissions(activity, dataManager.getPreferences().getCallingPackage());
+        PermissionManager.requestAllPermissions(activity, preferencesManager.getCallingPackage());
     }
 
     // STEP 2
@@ -142,11 +143,11 @@ public class Setup {
             return;
         }
         String macAddress = pairedScanners.get(0);
-        dataManager.getPreferences().setMacAddress(macAddress);
+        preferencesManager.setMacAddress(macAddress);
         appState.setScanner(new Scanner(macAddress));
 
         //TODO: move convertAddressToSerial in libscanner
-        dataManager.getPreferences().setLastScannerUsed(com.simprints.id.tools.utils.ScannerUtils.convertAddressToSerial(macAddress));
+        preferencesManager.setLastScannerUsed(com.simprints.id.tools.utils.ScannerUtils.convertAddressToSerial(macAddress));
 
         Timber.d("Setup: Scanner initialized.");
         goOn(activity);
@@ -162,11 +163,11 @@ public class Setup {
                 if (appState != null && appState.getScanner() != null) {
                     Timber.d("Setup: Connected to Vero.");
                     uiResetSinceConnection = false;
-                    dataManager.getPreferences().setScannerId(appState.getScanner().getScannerId());
-                    dataManager.getAnalytics().logScannerProperties();
+                    preferencesManager.setScannerId(appState.getScanner().getScannerId());
+                    analyticsManager.logScannerProperties();
                     goOn(activity);
                 } else {
-                    dataManager.getAnalytics().logError(new NullScannerError("Null values in onSuccess Setup.connectToScanner()"));
+                    analyticsManager.logError(new NullScannerError("Null values in onSuccess Setup.connectToScanner()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -201,7 +202,7 @@ public class Setup {
 
     // STEP 4
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
-        if (dataManager.getPreferences().getCalloutAction() != CalloutAction.VERIFY) {
+        if (preferencesManager.getCalloutAction() != CalloutAction.VERIFY) {
             guidExists = true;
             goOn(activity);
             return;
@@ -210,11 +211,11 @@ public class Setup {
         onProgress(70, R.string.launch_checking_person_in_db);
 
         List<Person> loadedPerson = new ArrayList<>();
-        final String guid = dataManager.getPreferences().getPatientId();
+        final String guid = preferencesManager.getPatientId();
         try {
-            dataManager.getDb().loadPerson(loadedPerson, dataManager.getLoginInfo().getSignedInProjectId(), guid, wrapCallback("loading people from db", newLoadPersonCallback(activity, guid)));
+            dbManager.loadPerson(loadedPerson, loginInfoManager.getSignedInProjectId(), guid, wrapCallback("loading people from dbManager", newLoadPersonCallback(activity, guid)));
         } catch (UninitializedDataManagerError error) {
-            dataManager.getAnalytics().logError(error);
+            analyticsManager.logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
         }
     }
@@ -236,12 +237,12 @@ public class Setup {
                         try {
                             saveNotFoundVerification(probe);
                         } catch (UninitializedDataManagerError error) {
-                            dataManager.getAnalytics().logError(error);
+                            analyticsManager.logError(error);
                             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                         }
                         break;
                     default:
-                        dataManager.getAnalytics().logError(UnexpectedDataError.forDataError(data_error, "Setup.checkIfVerifyAndGuidExists()"));
+                        analyticsManager.logError(UnexpectedDataError.forDataError(data_error, "Setup.checkIfVerifyAndGuidExists()"));
                         onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }
@@ -250,12 +251,12 @@ public class Setup {
 
     private void saveNotFoundVerification(Person probe) {
         if (networkUtils.isConnected()) {
-            // We've synced with the online db and they're not in the db
-            dataManager.getDb().saveVerification(probe, null, GUID_NOT_FOUND_ONLINE);
+            // We've synced with the online dbManager and they're not in the dbManager
+            dbManager.saveVerification(probe, null, GUID_NOT_FOUND_ONLINE);
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
         } else {
             // We're offline but might find the person if we sync
-            dataManager.getDb().saveVerification(probe, null, GUID_NOT_FOUND_OFFLINE);
+            dbManager.saveVerification(probe, null, GUID_NOT_FOUND_OFFLINE);
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
         }
     }
@@ -295,10 +296,10 @@ public class Setup {
             public void onSuccess() {
                 if (appState != null && appState.getScanner() != null) {
                     Timber.d("Setup: UN20 ready.");
-                    dataManager.getPreferences().setHardwareVersion(appState.getScanner().getUcVersion());
+                    preferencesManager.setHardwareVersion(appState.getScanner().getUcVersion());
                     Setup.this.onSuccess();
                 } else {
-                    dataManager.getAnalytics().logError(new NullScannerError("Null values in onSuccess Setup.wakeUpUn20()"));
+                    analyticsManager.logError(new NullScannerError("Null values in onSuccess Setup.wakeUpUn20()"));
                     onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
                 }
             }

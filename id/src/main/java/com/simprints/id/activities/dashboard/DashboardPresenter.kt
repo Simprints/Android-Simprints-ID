@@ -3,13 +3,18 @@ package com.simprints.id.activities.dashboard
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
-import com.simprints.id.data.DataManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.service.ProgressService
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -17,20 +22,29 @@ import io.reactivex.observers.DisposableObserver
 import io.reactivex.rxkotlin.subscribeBy
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
 class DashboardPresenter(private val view: DashboardContract.View,
                          syncClient: SyncClient,
-                         val dataManager: DataManager,
+                         val component: AppComponent,
                          androidResourcesHelper: AndroidResourcesHelper) : DashboardContract.Presenter {
+
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var dbManager: DbManager
 
     private var started: AtomicBoolean = AtomicBoolean(false)
 
-    private val syncManager = SyncManager(dataManager, syncClient)
+    private val syncManager by lazy {
+        SyncManager(analyticsManager, syncClient)
+    }
 
-    private val cardsFactory = DashboardCardsFactory(dataManager, androidResourcesHelper)
+    private val cardsFactory = DashboardCardsFactory(component, androidResourcesHelper)
 
-    private var actualSyncParams: SyncTaskParameters =
-        SyncTaskParameters.build(dataManager.preferences.syncGroup, dataManager)
+    private var actualSyncParams: SyncTaskParameters by lazyVar {
+        SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
+    }
 
     override val cardsModelsList: ArrayList<DashboardCard> = arrayListOf()
 
@@ -49,7 +63,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun hasSyncGroupChangedSinceLastRun(): Boolean {
-        val syncParams = SyncTaskParameters.build(dataManager.preferences.syncGroup, dataManager)
+        val syncParams = SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
         return (actualSyncParams != syncParams).also {
             actualSyncParams = syncParams
         }
@@ -126,7 +140,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
             // The "sync" happens only once at time on Service, no matters how many times we call "sync".
             // When "sync" is called, syncManager connect to the Service and syncManager either starts
             // the sync or catch with the Sync state.
-            syncManager.sync(SyncTaskParameters.build(dataManager.preferences.syncGroup, dataManager))
+            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager))
         }
     }
 
@@ -142,7 +156,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override fun userDidWantToSync() {
         setSyncingStartedInLocalDbCardView()
-        syncManager.sync(SyncTaskParameters.build(dataManager.preferences.syncGroup, dataManager))
+        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager))
     }
 
     private fun setSyncingStartedInLocalDbCardView() {
@@ -159,7 +173,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun logout() {
-        dataManager.loginInfo.cleanCredentials()
-        dataManager.db.signOut()
+        loginInfoManager.cleanCredentials()
+        dbManager.signOut()
     }
 }

@@ -16,12 +16,13 @@ import android.widget.TextView;
 
 import com.simprints.id.Application;
 import com.simprints.id.R;
-import com.simprints.id.data.DataManager;
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
+import com.simprints.id.data.analytics.AnalyticsManager;
+import com.simprints.id.data.db.DbManager;
+import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON;
 import com.simprints.id.domain.ALERT_TYPE;
+import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.InternalConstants;
-import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.RefusalForm;
 
@@ -33,7 +34,8 @@ public class RefusalActivity extends AppCompatActivity {
     private REFUSAL_FORM_REASON reason;
     private EditText otherText;
     private AlertLauncher alertLauncher;
-    @Inject DataManager dataManager;
+    @Inject DbManager dbManager;
+    @Inject AnalyticsManager analyticsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +60,9 @@ public class RefusalActivity extends AppCompatActivity {
                 if (reason != null) {
                     RefusalForm refusalForm = new RefusalForm(reason.toString(), otherText.getText().toString());
                     try {
-                        dataManager.getDb().saveRefusalForm(refusalForm);
+                        dbManager.saveRefusalForm(refusalForm);
                     } catch (UninitializedDataManagerError error) {
-                        dataManager.getAnalytics().logError(error);
+                        analyticsManager.logError(error);
                         alertLauncher.launch(ALERT_TYPE.UNEXPECTED_ERROR, 0);
                         return;
                     }

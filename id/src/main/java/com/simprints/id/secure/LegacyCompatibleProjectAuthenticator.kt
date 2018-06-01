@@ -1,10 +1,7 @@
 package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.id.data.DataManager
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
@@ -17,11 +14,11 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import java.io.IOException
 
-class LegacyCompatibleProjectAuthenticator(val dataManager: DataManager,
+class LegacyCompatibleProjectAuthenticator(component: AppComponent,
                                            safetyNetClient: SafetyNetClient,
                                            secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
                                            attestationManager: AttestationManager = AttestationManager()
-) : ProjectAuthenticator(dataManager, safetyNetClient, secureApiClient, attestationManager) {
+) : ProjectAuthenticator(component, safetyNetClient, secureApiClient, attestationManager) {
 
     private val legacyProjectIdManager = LegacyProjectIdManager(secureApiClient)
 
@@ -41,7 +38,7 @@ class LegacyCompatibleProjectAuthenticator(val dataManager: DataManager,
         .andThen(authenticate(nonceScope, projectSecret))
 
     private fun createLocalDbKeyForProject(projectId: String, legacyProjectId: String?): Completable {
-        dataManager.secure.setLocalDatabaseKey(projectId, legacyProjectId)
+        secureDataManager.setLocalDatabaseKey(projectId, legacyProjectId)
         return Completable.complete()
     }
 

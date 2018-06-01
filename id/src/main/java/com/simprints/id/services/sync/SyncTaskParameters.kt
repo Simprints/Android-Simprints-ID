@@ -1,6 +1,6 @@
 package com.simprints.id.services.sync
 
-import com.simprints.id.data.DataManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.progress.service.ProgressTaskParameters
 
@@ -11,11 +11,13 @@ sealed class SyncTaskParameters(open val projectId: String, open val moduleId: S
         const val USER_ID_FIELD = "userId"
         const val MODULE_ID_FIELD = "moduleId"
 
-        @JvmStatic fun build(group: Constants.GROUP, dataManager: DataManager): SyncTaskParameters {
+        @JvmStatic fun build(group: Constants.GROUP,
+                             moduleId: String,
+                             loginInfoManager: LoginInfoManager): SyncTaskParameters {
             return when (group) {
-                Constants.GROUP.GLOBAL -> GlobalSyncTaskParameters(dataManager.loginInfo.getSignedInProjectIdOrEmpty())
-                Constants.GROUP.USER -> UserSyncTaskParameters(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), dataManager.loginInfo.getSignedInUserIdOrEmpty())
-                Constants.GROUP.MODULE -> ModuleIdSyncTaskParameters(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), dataManager.preferences.moduleId)
+                Constants.GROUP.GLOBAL -> GlobalSyncTaskParameters(loginInfoManager.getSignedInProjectIdOrEmpty())
+                Constants.GROUP.USER -> UserSyncTaskParameters(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
+                Constants.GROUP.MODULE -> ModuleIdSyncTaskParameters(loginInfoManager.getSignedInProjectIdOrEmpty(), moduleId)
             }
         }
     }

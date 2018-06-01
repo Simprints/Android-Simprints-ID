@@ -29,7 +29,8 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as Application).component.inject(this)
+        val component = (application as Application).component
+        component.inject(this)
         LanguageHelper.setLanguage(this, preferencesManager.language)
 
         setContentView(R.layout.activity_about)
@@ -43,7 +44,7 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
 
         initUi()
 
-        viewPresenter = AboutPresenter(this, dataManager)
+        viewPresenter = AboutPresenter(this, component)
     }
 
     private fun initUi() {

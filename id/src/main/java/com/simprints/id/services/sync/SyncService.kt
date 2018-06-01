@@ -2,7 +2,7 @@ package com.simprints.id.services.sync
 
 import android.content.Context
 import com.simprints.id.Application
-import com.simprints.id.data.DataManager
+import com.simprints.id.data.db.DbManager
 import com.simprints.id.services.progress.notifications.NotificationBuilder
 import com.simprints.id.services.progress.service.ProgressService
 import com.simprints.id.services.progress.service.ProgressTask
@@ -12,7 +12,7 @@ import javax.inject.Inject
 class SyncService : ProgressService<SyncTaskParameters>() {
 
     @Inject lateinit var notificationFactory: NotificationFactory
-    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var dbManager: DbManager
 
     companion object {
 
@@ -26,7 +26,7 @@ class SyncService : ProgressService<SyncTaskParameters>() {
     }
 
     override fun getTask(taskParameters: SyncTaskParameters): ProgressTask =
-            SyncTask(dataManager, taskParameters)
+            SyncTask(dbManager, taskParameters)
 
     override fun getProgressNotificationBuilder(taskParameters: SyncTaskParameters): NotificationBuilder =
         notificationFactory.syncProgressNotification()

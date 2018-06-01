@@ -3,7 +3,10 @@ package com.simprints.id.services
 import android.app.IntentService
 import android.content.Intent
 import com.simprints.id.Application
-import com.simprints.id.data.DataManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.secure.cryptography.Hasher
@@ -12,7 +15,10 @@ import javax.inject.Inject
 
 class GuidSelectionService : IntentService("GuidSelectionService") {
 
-    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var preferencesManager: PreferencesManager
 
     override fun onCreate() {
         super.onCreate()
@@ -23,7 +29,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         if (intent != null) {
             onHandleNonNullIntent(intent)
         } else {
-            dataManager.analytics.logGuidSelectionService("", "", "", false)
+            analyticsManager.logGuidSelectionService("", "", "", false)
         }
     }
 
@@ -34,15 +40,15 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         val selectedGuid = intent.parseSelectedGuid()
         val callbackSent = try {
             checkCalloutParameters(projectId, apiKey, sessionId, selectedGuid)
-            dataManager.db.updateIdentification(dataManager.loginInfo.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId ?: "")
+            dbManager.updateIdentification(loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId ?: "")
             true
         } catch (error: InvalidCalloutParameterError) {
-            dataManager.analytics.logError(error)
+            analyticsManager.logError(error)
             false
         } catch (e: NotSignedInException) {
             false
         }
-        dataManager.analytics.logGuidSelectionService(dataManager.loginInfo.getSignedInProjectIdOrEmpty(),
+        analyticsManager.logGuidSelectionService(loginInfoManager.getSignedInProjectIdOrEmpty(),
             sessionId ?: "", selectedGuid, callbackSent)
     }
 
@@ -65,7 +71,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     }
 
     private fun checkSessionId(sessionId: String?) {
-        if (sessionId == null || sessionId != dataManager.preferences.sessionId) {
+        if (sessionId == null || sessionId != preferencesManager.sessionId) {
             throw InvalidCalloutParameterError.forParameter(SIMPRINTS_SESSION_ID)
         }
     }
@@ -78,12 +84,12 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         }
 
     private fun checkProjectId(projectId: String) {
-        if (!dataManager.loginInfo.isProjectIdSignedIn(projectId)) throw NotSignedInException()
+        if (!loginInfoManager.isProjectIdSignedIn(projectId)) throw NotSignedInException()
     }
 
     private fun checkApiKey(apiKey: String) {
-        val potentialProjectId = dataManager.loginInfo.getProjectIdForHashedLegacyProjectIdOrEmpty(Hasher().hash(apiKey))
-        if (!dataManager.loginInfo.isProjectIdSignedIn(potentialProjectId)) throw NotSignedInException()
+        val potentialProjectId = loginInfoManager.getProjectIdForHashedLegacyProjectIdOrEmpty(Hasher().hash(apiKey))
+        if (!loginInfoManager.isProjectIdSignedIn(potentialProjectId)) throw NotSignedInException()
     }
 
     @Suppress("UNUSED_PARAMETER")

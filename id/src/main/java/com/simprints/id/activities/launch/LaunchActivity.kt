@@ -15,6 +15,7 @@ import com.simprints.id.activities.main.MainActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.*
@@ -52,6 +53,7 @@ open class LaunchActivity : AppCompatActivity() {
     private lateinit var app: Application
 
     @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var preferencesManager: PreferencesManager
     private lateinit var positionTracker: PositionTracker
     @Inject lateinit var appState: AppState
     @Inject lateinit var setup: Setup
@@ -68,11 +70,11 @@ open class LaunchActivity : AppCompatActivity() {
     private fun injectDependencies() {
         app = application as Application
         (application as Application).component.inject(this)
-        positionTracker = PositionTracker(this, dataManager)
+        positionTracker = PositionTracker(this, preferencesManager)
     }
 
     private fun initView() {
-        LanguageHelper.setLanguage(this, dataManager.preferences.language)
+        LanguageHelper.setLanguage(this, preferencesManager.language)
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
@@ -81,7 +83,7 @@ open class LaunchActivity : AppCompatActivity() {
     private fun getSetupCallback(): SetupCallback =
         object : SetupCallback {
             override fun onSuccess() {
-                dataManager.preferences.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
+                preferencesManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
                 // If it is the first time the launch process finishes, wait for consent confirmation
                 // Else, go directly to the main activity
                 if (!consentConfirmed) {
@@ -90,7 +92,7 @@ open class LaunchActivity : AppCompatActivity() {
                     loadingInfoTextView.visibility = View.INVISIBLE
                     waitingForConfirmation = true
                     appState.scanner.registerButtonListener(scannerButton)
-                    vibrate(this@LaunchActivity, dataManager.preferences.vibrateMode)
+                    vibrate(this@LaunchActivity, preferencesManager.vibrateMode)
                 } else {
                     finishLaunch()
                 }
@@ -169,7 +171,7 @@ open class LaunchActivity : AppCompatActivity() {
     private fun finishWith(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
         setResult(resultCode, resultData)
-        dataManager.preferences.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
+        preferencesManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
         dataManager.saveSession()
         finish()
     }
@@ -189,8 +191,6 @@ open class LaunchActivity : AppCompatActivity() {
             })
             //appState.scanner = null
         }
-
-        setup.destroy()
         super.onDestroy()
     }
 
