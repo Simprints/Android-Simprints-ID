@@ -1,6 +1,7 @@
 package com.simprints.id.controllers;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,6 +24,9 @@ import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.ScannerUtils;
+import com.simprints.libscanner.bluetooth.android.record.AndroidRecordBluetoothAdapter;
+import com.simprints.libscanner.bluetooth.mock.MockBluetoothAdapter;
+import com.simprints.libscanner.bluetooth.mock.MockScannerManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,7 +147,22 @@ public class Setup {
         }
         String macAddress = pairedScanners.get(0);
         dataManager.setMacAddress(macAddress);
-        appState.setScanner(new Scanner(macAddress));
+
+        // We have recording or mocking mode
+        boolean isRecordingMode = false;
+        Scanner scanner;
+         if(isRecordingMode) {
+             scanner = new Scanner(macAddress, new AndroidRecordBluetoothAdapter(
+                 BluetoothAdapter.getDefaultAdapter(),
+                 activity.getFilesDir().getAbsolutePath() + "enrol_with_2_good_scans"));
+         } else {
+             scanner = new Scanner(macAddress, new MockBluetoothAdapter(new MockScannerManager(
+                 activity.getFilesDir().getAbsolutePath() + "enrol_with_2_good_scans",
+                 false,
+                 true,
+                 true, "")));
+         }
+         appState.setScanner(scanner);
 
         //TODO: move convertAddressToSerial in libscanner
         dataManager.setLastScannerUsed(com.simprints.id.tools.utils.ScannerUtils.convertAddressToSerial(macAddress));
