@@ -179,7 +179,7 @@ class FirebaseManagerImpl(private val appContext: Context,
     override fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable =
         getPeopleApiClient().flatMapCompletable {
             it.uploadPeople(hashMapOf("patients" to patientsToUpload))
-                .retryResultIfNecessary(::retryCriteria)
+                .retry(::retryCriteria)
                 .handleResult(::defaultResponseErrorHandling)
         }
 
@@ -190,7 +190,7 @@ class FirebaseManagerImpl(private val appContext: Context,
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getPeopleApiClient().flatMap {
             it.person(patientId, projectId)
-                .retryIfNecessary(::retryCriteria)
+                .retry(::retryCriteria)
                 .handleResponse {
                     when (it.code()) {
                         404 -> throw DownloadingAPersonWhoDoesntExistOnServerException()
@@ -203,7 +203,7 @@ class FirebaseManagerImpl(private val appContext: Context,
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
         getPeopleApiClient().flatMap {
             it.peopleCount(syncParams.toMap())
-                .retryIfNecessary(::retryCriteria)
+                .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .map { it.count }
         }
@@ -211,7 +211,7 @@ class FirebaseManagerImpl(private val appContext: Context,
     override fun loadProjectFromRemote(projectId: String): Single<Project> =
         getProjectApiClient().flatMap {
             it.project(projectId)
-                .retryIfNecessary(::retryCriteria)
+                .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
         }
 
