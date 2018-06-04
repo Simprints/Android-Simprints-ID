@@ -29,11 +29,12 @@ open class ProjectAuthenticator(private val loginInfoManager: LoginInfoManager,
     private val nonceManager = NonceManager(secureApiClient)
     private val authManager = AuthManager(secureApiClient)
 
-    @Throws(
-        IOException::class,
-        DifferentProjectIdReceivedFromIntentException::class,
-        AuthRequestInvalidCredentialsException::class,
-        SimprintsInternalServerException::class)
+    /**
+     * @throws IOException
+     * @throws DifferentProjectIdReceivedFromIntentException
+     * @throws AuthRequestInvalidCredentialsException
+     * @throws SimprintsInternalServerException
+     */
     fun authenticate(nonceScope: NonceScope, projectSecret: String): Completable =
         prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
@@ -51,12 +52,14 @@ open class ProjectAuthenticator(private val loginInfoManager: LoginInfoManager,
     private fun getEncryptedProjectSecret(projectSecret: String): Single<String> =
         publicKeyManager.requestPublicKey()
             .flatMap { publicKey ->
-                Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey)) }
+                Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey))
+            }
 
     private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, noneScope: NonceScope): Single<AttestToken> =
         nonceManager.requestNonce(noneScope)
-            .flatMap { nonce -> attestationManager.requestAttestation(safetyNetClient, nonce)
-        }
+            .flatMap { nonce ->
+                attestationManager.requestAttestation(safetyNetClient, nonce)
+            }
 
     private fun zipAuthRequestParameters(encryptedProjectSecretSingle: Single<String>,
                                          googleAttestationSingle: Single<AttestToken>,
