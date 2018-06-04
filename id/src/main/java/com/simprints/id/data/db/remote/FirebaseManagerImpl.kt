@@ -173,6 +173,7 @@ class FirebaseManagerImpl(private val appContext: Context,
     }
 
     // API
+
     override fun uploadPerson(fbPerson: fb_Person): Completable =
         uploadPeople(arrayListOf(fbPerson))
 
@@ -183,10 +184,7 @@ class FirebaseManagerImpl(private val appContext: Context,
                 .handleResult(::defaultResponseErrorHandling)
         }
 
-    /**
-     * @throws DownloadingAPersonWhoDoesntExistOnServerException
-     * @throws SimprintsInternalServerException
-     */
+    /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getPeopleApiClient().flatMap {
             it.person(patientId, projectId)
