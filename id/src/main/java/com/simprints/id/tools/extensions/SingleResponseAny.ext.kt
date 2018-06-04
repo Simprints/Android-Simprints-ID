@@ -20,9 +20,3 @@ fun Single<out Result<Unit>>.handleResult(handleResponseError: (HttpException) -
             }
         Completable.complete()
     }
-
-fun <T> Single<Response<T>>.retryIfNecessary(retryCriteria: (Int, Throwable) -> Boolean): Single<Response<T>> =
-    retry(retryCriteria)
-
-fun <T> Single<Result<T>>.retryResultIfNecessary(retryCriteria: (Int, Throwable) -> Boolean): Single<Result<T>> =
-    retry(retryCriteria)
