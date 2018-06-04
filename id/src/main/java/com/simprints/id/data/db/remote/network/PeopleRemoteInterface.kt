@@ -6,6 +6,8 @@ import com.simprints.id.data.db.sync.models.PeopleCount
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.ResponseBody
+import retrofit2.Response
+import retrofit2.adapter.rxjava2.Result
 import retrofit2.http.*
 
 interface PeopleRemoteInterface {
@@ -23,14 +25,14 @@ interface PeopleRemoteInterface {
         @Query("batchSize") batchSize: Int = 5000): Single<ResponseBody>
 
     @POST("/patients")
-    fun uploadPeople(@Body patientsJson: HashMap<String, ArrayList<fb_Person>>): Completable
+    fun uploadPeople(@Body patientsJson: HashMap<String, ArrayList<fb_Person>>): Single<Result<Unit>>
 
     @GET("/patients/{projectId}/{patientId}")
     fun person(
         @Path("patientId") patientId: String,
-        @Path("projectId") projectId: String): Single<fb_Person>
+        @Path("projectId") projectId: String): Single<Response<fb_Person>>
 
     @GET("/patient-counts")
     fun peopleCount(
-        @QueryMap(encoded = true) syncParams: Map<String, String>): Single<PeopleCount>
+        @QueryMap(encoded = true) syncParams: Map<String, String>): Single<Response<PeopleCount>>
 }

@@ -15,6 +15,7 @@ import com.simprints.id.data.db.remote.tools.Routes
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
+import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
@@ -22,8 +23,7 @@ import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.id.tools.extensions.toMap
-import com.simprints.id.tools.extensions.trace
+import com.simprints.id.tools.extensions.*
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -33,6 +33,7 @@ import io.reactivex.Single
 import org.jetbrains.anko.doAsync
 import retrofit2.HttpException
 import timber.log.Timber
+import java.io.IOException
 
 class FirebaseManagerImpl(private val appContext: Context,
                           private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
@@ -178,33 +179,40 @@ class FirebaseManagerImpl(private val appContext: Context,
     override fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable =
         getPeopleApiClient().flatMapCompletable {
             it.uploadPeople(hashMapOf("patients" to patientsToUpload))
-                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+                .retryResultIfNecessary(::retryCriteria)
+                .handleResult(::defaultResponseErrorHandling)
         }
 
+    /**
+     * @throws DownloadingAPersonWhoDoesntExistOnServerException
+     * @throws SimprintsInternalServerException
+     */
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getPeopleApiClient().flatMap {
-            it.person(patientId, projectId).retry({ attempts, error ->
-                attempts < RETRY_ATTEMPTS_FOR_NETWORK_CALLS && (error is HttpException && error.code() != 404)
-            }).onErrorResumeNext {
-                if (it is HttpException && it.code() == 404) {
-                    Single.error(DownloadingAPersonWhoDoesntExistOnServerException())
-                } else {
-                    Single.error(it)
+            it.person(patientId, projectId)
+                .retryIfNecessary(::retryCriteria)
+                .handleResponse {
+                    when (it.code()) {
+                        404 -> throw DownloadingAPersonWhoDoesntExistOnServerException()
+                        in 500..599 -> throw SimprintsInternalServerException()
+                        else -> throw it
+                    }
                 }
-            }
         }
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
         getPeopleApiClient().flatMap {
             it.peopleCount(syncParams.toMap())
-                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+                .retryIfNecessary(::retryCriteria)
+                .handleResponse(::defaultResponseErrorHandling)
                 .map { it.count }
         }
 
     override fun loadProjectFromRemote(projectId: String): Single<Project> =
         getProjectApiClient().flatMap {
             it.project(projectId)
-                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS)
+                .retryIfNecessary(::retryCriteria)
+                .handleResponse(::defaultResponseErrorHandling)
         }
 
     override fun getPeopleApiClient(): Single<PeopleRemoteInterface> =
@@ -222,6 +230,19 @@ class FirebaseManagerImpl(private val appContext: Context,
             }
 
     private fun buildProjectApi(authToken: String): ProjectRemoteInterface = SimApiClient(ProjectRemoteInterface::class.java, ProjectRemoteInterface.baseUrl, authToken).api
+
+    private fun retryCriteria(attempts: Int, error: Throwable): Boolean =
+        attempts < RETRY_ATTEMPTS_FOR_NETWORK_CALLS && errorIsWorthRetrying(error)
+
+    private fun errorIsWorthRetrying(error: Throwable): Boolean =
+        error is IOException ||
+            error is HttpException && error.code() != 404 && error.code() !in 500..599
+
+    private fun defaultResponseErrorHandling(e: HttpException): Nothing =
+        when (e.code()) {
+            in 500..599 -> throw SimprintsInternalServerException()
+            else -> throw e
+        }
 
     companion object {
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
