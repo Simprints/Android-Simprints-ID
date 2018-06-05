@@ -34,7 +34,7 @@ import javax.inject.Inject
 class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Inject lateinit var dataManager: DataManager
-    @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var remoteDbManagerMock: : RemoteDbManager: RemoteDbManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var dbManager: DbManager

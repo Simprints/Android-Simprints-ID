@@ -59,8 +59,8 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideDataManager(preferencesManager: PreferencesManager,
                                 loginInfoManager: LoginInfoManager,
                                 analyticsManager: AnalyticsManager,
-                                dbManager: DbManager): DataManager =
-        buildSpyIsRequired(dataManagerSpy, { super.provideDataManager(preferencesManager, loginInfoManager, analyticsManager, dbManager) })
+                                remoteDbManager: RemoteDbManager): DataManager =
+        buildSpyIsRequired(dataManagerSpy, { super.provideDataManager(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager) })
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
 

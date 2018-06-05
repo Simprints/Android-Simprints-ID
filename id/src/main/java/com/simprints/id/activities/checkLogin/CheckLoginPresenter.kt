@@ -1,7 +1,7 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
@@ -23,7 +23,7 @@ abstract class CheckLoginPresenter(
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var sessionParametersExtractor: SessionParametersExtractor
 
@@ -78,7 +78,7 @@ abstract class CheckLoginPresenter(
     }
 
     private fun isEncryptedProjectSecretPresent(): Boolean = loginInfoManager.getEncryptedProjectSecretOrEmpty().isNotEmpty()
-    private fun isFirebaseTokenValid(): Boolean = dbManager.isSignedIn(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
+    private fun isFirebaseTokenValid(): Boolean = remoteDbManager.isSignedIn(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
     private fun isLocalKeyValid(projectId: String): Boolean = try {
         secureDataManager.getLocalDbKeyOrThrow(projectId)
         true
