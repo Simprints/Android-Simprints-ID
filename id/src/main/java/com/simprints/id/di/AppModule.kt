@@ -100,8 +100,8 @@ open class AppModule(val app: Application) {
     open fun provideDataManager(preferencesManager: PreferencesManager,
                                 loginInfoManager: LoginInfoManager,
                                 analyticsManager: AnalyticsManager,
-                                dbManager: DbManager): DataManager =
-        DataManagerImpl(preferencesManager, loginInfoManager, analyticsManager, dbManager)
+                                remoteDbManager: RemoteDbManager): DataManager =
+        DataManagerImpl(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager)
 
     @Provides
     @Singleton

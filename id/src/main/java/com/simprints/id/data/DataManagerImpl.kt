@@ -1,7 +1,7 @@
 package com.simprints.id.data
 
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.session.Session
@@ -9,7 +9,7 @@ import com.simprints.id.session.Session
 class DataManagerImpl(val preferencesManager: PreferencesManager,
                       val loginInfoManager: LoginInfoManager,
                       val analyticsManager: AnalyticsManager,
-                      val dbManager: DbManager) : DataManager {
+                      val remoteDbManager: RemoteDbManager) : DataManager {
 
     override fun saveSession() {
         val session = Session(
@@ -37,7 +37,7 @@ class DataManagerImpl(val preferencesManager: PreferencesManager,
             preferencesManager.msSinceBootOnMainStart,
             preferencesManager.msSinceBootOnMatchStart,
             preferencesManager.msSinceBootOnSessionEnd)
-        dbManager.saveSessionInRemote(session)
+        remoteDbManager.saveSessionInRemote(session)
         analyticsManager.logSession(session)
     }
 }
