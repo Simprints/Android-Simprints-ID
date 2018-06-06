@@ -14,6 +14,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -24,7 +25,11 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
+import com.simprints.id.services.sync.SyncClient
+import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.*
+import com.simprints.id.tools.utils.AndroidResourcesHelper
+import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import com.simprints.id.tools.utils.NetworkUtils
 import dagger.Module
 import dagger.Provides
@@ -131,4 +136,16 @@ open class AppModule(val app: Application) {
         factory.initSyncNotificationChannel()
         return factory
     }
+
+    @Provides
+    fun provideAndroidResourcesHelper(ctx: Context): AndroidResourcesHelper =
+        AndroidResourcesHelperImpl(ctx)
+
+    @Provides
+    fun provideSyncClient(app: Application): SyncClient =
+        SyncService.getClient(app)
+
+    @Provides
+    fun provideSyncManager(analyticsManager: AnalyticsManager, syncClient: SyncClient): SyncManager =
+        SyncManager(analyticsManager, syncClient)
 }

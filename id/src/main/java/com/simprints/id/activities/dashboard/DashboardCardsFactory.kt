@@ -16,8 +16,7 @@ import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
 
-class DashboardCardsFactory(private val component: AppComponent,
-                            private val androidResourcesHelper: AndroidResourcesHelper) {
+class DashboardCardsFactory(private val component: AppComponent) {
 
     val dateFormat: DateFormat by lazy {
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
@@ -27,6 +26,7 @@ class DashboardCardsFactory(private val component: AppComponent,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     init {
         component.inject(this)

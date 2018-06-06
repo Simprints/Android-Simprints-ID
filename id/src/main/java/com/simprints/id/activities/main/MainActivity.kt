@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         initIndicators()
         initScanButton()
         initViewPager()
-        syncHelper = MainActivitySyncHelper(this, syncClient, syncItem)
+        syncHelper = MainActivitySyncHelper(this, syncItem)
         refreshDisplay()
     }
 

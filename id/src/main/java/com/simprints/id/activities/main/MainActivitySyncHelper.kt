@@ -11,7 +11,6 @@ import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.progress.Progress
-import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import io.reactivex.observers.DisposableObserver
@@ -20,13 +19,12 @@ import javax.inject.Inject
 
 // Because who in their right mind would want to write in Java
 class MainActivitySyncHelper(private val activity: MainActivity,
-                             syncClient: SyncClient, private val syncItem: MenuItem) {
+                             private val syncItem: MenuItem) {
 
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
-
-    val syncManager: SyncManager = SyncManager(analyticsManager, syncClient)
+    @Inject lateinit var syncManager: SyncManager
 
     init {
         (activity.application as Application).component.inject(this)
