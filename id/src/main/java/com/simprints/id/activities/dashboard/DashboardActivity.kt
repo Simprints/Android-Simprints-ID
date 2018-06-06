@@ -19,10 +19,8 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.launchAlert
-import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.app_bar_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
@@ -41,8 +39,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     }
 
     override lateinit var viewPresenter: DashboardContract.Presenter
-    private val app: Application by lazy { application as Application }
-
     private lateinit var cardsViewAdapter: DashboardCardAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,8 +48,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
         component.inject(this)
         LanguageHelper.setLanguage(this, preferences.language)
 
-        val syncClient = SyncService.getClient(this)
-        viewPresenter = DashboardPresenter(this, syncClient, component, AndroidResourcesHelperImpl(app))
+        viewPresenter = DashboardPresenter(this, component)
 
         initDrawer()
         initCards()

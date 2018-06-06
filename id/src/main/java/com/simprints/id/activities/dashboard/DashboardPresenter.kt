@@ -12,10 +12,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.service.ProgressService
-import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.tools.utils.AndroidResourcesHelper
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver
@@ -25,22 +23,17 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class DashboardPresenter(private val view: DashboardContract.View,
-                         syncClient: SyncClient,
-                         val component: AppComponent,
-                         androidResourcesHelper: AndroidResourcesHelper) : DashboardContract.Presenter {
+                         val component: AppComponent) : DashboardContract.Presenter {
 
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var syncManager: SyncManager
 
     private var started: AtomicBoolean = AtomicBoolean(false)
 
-    private val syncManager by lazy {
-        SyncManager(analyticsManager, syncClient)
-    }
-
-    private val cardsFactory = DashboardCardsFactory(component, androidResourcesHelper)
+    private val cardsFactory = DashboardCardsFactory(component)
 
     private var actualSyncParams: SyncTaskParameters by lazyVar {
         SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
@@ -52,6 +45,10 @@ class DashboardPresenter(private val view: DashboardContract.View,
         get() {
             return cardsModelsList.first { it is DashboardSyncCard } as DashboardSyncCard?
         }
+
+    init {
+        component.inject(this)
+    }
 
     override fun start() {
 

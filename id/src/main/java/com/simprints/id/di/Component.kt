@@ -11,6 +11,7 @@ import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFro
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherPresenter
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
+import com.simprints.id.activities.dashboard.DashboardPresenter
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
@@ -60,4 +61,5 @@ interface AppComponent {
     fun inject(mainActivitySyncHelper: MainActivitySyncHelper)
     fun inject(requestLoginActivity: RequestLoginActivity)
     fun inject(projectAuthenticator: ProjectAuthenticator)
+    fun inject(dashboardPresenter: DashboardPresenter)
 }
