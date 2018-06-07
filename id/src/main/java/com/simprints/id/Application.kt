@@ -1,5 +1,6 @@
 package com.simprints.id
 
+import android.bluetooth.BluetoothAdapter
 import android.content.SharedPreferences
 import android.support.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
@@ -58,6 +59,8 @@ import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.serializers.*
 import com.simprints.id.tools.utils.NetworkUtils
+import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
+import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
@@ -408,8 +411,12 @@ open class Application : MultiDexApplication() {
         AppState.getInstance()
     }
 
+    var bluetoothAdapter: BluetoothComponentAdapter by lazyVar {
+        AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
+    }
+
     val setup: Setup by lazy {
-        Setup.getInstance(dataManager, appState, NetworkUtils(this))
+        Setup.getInstance(dataManager, appState, NetworkUtils(this), bluetoothAdapter)
     }
 
     override fun onCreate() {
