@@ -65,11 +65,11 @@ android {
             versionNameSuffix "-dev"
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: false]
         }
-        endToEndTesting {
-            initWith debug
-            versionNameSuffix "-test"
-            testCoverageEnabled false
-        }
+//        endToEndTesting {
+//            initWith debug
+//            versionNameSuffix "-test"
+//            testCoverageEnabled false
+//        }
     }
     
     applicationVariants.all { variant ->
@@ -212,7 +212,7 @@ dependencies {
     //implementation 'androidx.core:core-ktx:1.0.0-alpha1'
 
     // Support libraries
-    implementation 'com.android.support:multidex:1.0.2'
+    implementation 'com.android.support:multidex:1.0.3'
     implementation "com.android.support:appcompat-v7:$support_version"
     implementation "com.android.support:design:$support_version"
     implementation "com.android.support:support-v4:$support_version"
@@ -262,7 +262,9 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin_version"
 
     // Simprints
-    implementation 'com.simprints:libscanner:1.3.1'
+    //implementation 'com.simprints:libscanner:1.3.1'
+    implementation project(':libscanner')
+
     implementation 'com.simprints:libmatcher:1.3.2'
 
     // Test
