@@ -5,14 +5,19 @@ import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.network.SimApiClient
+import com.simprints.id.shared.whenever
+import com.simprints.id.sync.SimApiMock
 import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.retrofit.mockServer.mockFailingResponse
+import com.simprints.id.testUtils.retrofit.createMockBehaviorService
+import com.simprints.id.testUtils.retrofit.mockServer.mockNotFoundResponse
+import com.simprints.id.testUtils.retrofit.mockServer.mockServerProblemResponse
 import com.simprints.id.testUtils.retrofit.mockServer.mockResponseForDownloadPatient
 import com.simprints.id.testUtils.retrofit.mockServer.mockResponseForUploadPatient
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.getDbManagerWithMockedLocalAndRemoteManagersForApiTesting
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import com.simprints.libcommon.Person
+import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Assert
@@ -61,7 +66,7 @@ class DbManagerTest : RxJavaTest() {
             .assertComplete()
 
         // savePerson makes an async task in the OnComplete, we need to wait it finishes.
-        Thread.sleep(4000)
+        Thread.sleep(1000)
 
         val argument = argumentCaptor<rl_Person>()
         verify(localDbManager, times(2)).insertOrUpdatePersonInLocal(argument.capture())
@@ -111,7 +116,7 @@ class DbManagerTest : RxJavaTest() {
             createdAt = null
         })
 
-        for (i in 0..20) mockServer.enqueue(mockFailingResponse())
+        for (i in 0..20) mockServer.enqueue(mockServerProblemResponse())
 
         val testObservable = dbManager.savePerson(fakePerson).test()
 
@@ -123,6 +128,91 @@ class DbManagerTest : RxJavaTest() {
         Assert.assertNull(argument.firstValue.createdAt)
         Assert.assertNull(argument.firstValue.updatedAt)
         Assert.assertTrue(argument.firstValue.toSync)
+    }
+
+    @Test
+    fun savingPerson_noConnectionStillSavesPerson() {
+        val (dbManager, localDbManager, remoteDbManager) = getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer)
+        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().apply {
+            updatedAt = null
+            createdAt = null
+        })
+
+        val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
+        whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
+
+        val testObservable = dbManager.savePerson(fakePerson).test()
+
+        testObservable.awaitTerminalEvent()
+        testObservable.assertNoErrors()
+
+        val argument = argumentCaptor<rl_Person>()
+        verify(localDbManager, times(1)).insertOrUpdatePersonInLocal(argument.capture())
+
+        Assert.assertNull(argument.firstValue.createdAt)
+        Assert.assertNull(argument.firstValue.updatedAt)
+        Assert.assertTrue(argument.firstValue.toSync)
+    }
+
+    @Test
+    fun loadingPersonMissingInLocalAndRemoteDbs_shouldTriggerDataError() {
+        val (dbManager, _, dbRemoteManager) = getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer)
+
+        val person = PeopleGeneratorUtils.getRandomPerson()
+
+        mockServer.enqueue(mockNotFoundResponse())
+
+        val result = mutableListOf<Person>()
+
+        val futurePersonExists = CompletableFuture<Boolean>()
+        val futureDataErrorExistsAndIsPersonNotFound = CompletableFuture<Boolean>()
+        val callback = object : DataCallback {
+            override fun onSuccess() {
+                futurePersonExists.complete(true)
+            }
+
+            override fun onFailure(data_error: DATA_ERROR) {
+                futurePersonExists.complete(false)
+                futureDataErrorExistsAndIsPersonNotFound.complete(data_error == DATA_ERROR.NOT_FOUND)
+            }
+        }
+
+        dbManager.loadPerson(result, person.projectId, person.patientId, callback = callback)
+
+        Assert.assertFalse(futurePersonExists.get())
+        Assert.assertTrue(futureDataErrorExistsAndIsPersonNotFound.get())
+        verify(dbRemoteManager, times(1)).downloadPerson(person.patientId, person.projectId)
+    }
+
+    @Test
+    fun loadingPersonMissingInLocalAndWithNoConnection_shouldTriggerDataError() {
+        val (dbManager, _, remoteDbManager) = getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer)
+
+        val person = PeopleGeneratorUtils.getRandomPerson()
+
+        val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
+        whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
+
+        val result = mutableListOf<Person>()
+
+        val futurePersonExists = CompletableFuture<Boolean>()
+        val futureDataErrorExistsAndIsPersonNotFound = CompletableFuture<Boolean>()
+        val callback = object : DataCallback {
+            override fun onSuccess() {
+                futurePersonExists.complete(true)
+            }
+
+            override fun onFailure(data_error: DATA_ERROR) {
+                futurePersonExists.complete(false)
+                futureDataErrorExistsAndIsPersonNotFound.complete(data_error == DATA_ERROR.NOT_FOUND)
+            }
+        }
+
+        dbManager.loadPerson(result, person.projectId, person.patientId, callback = callback)
+
+        Assert.assertFalse(futurePersonExists.get())
+        Assert.assertTrue(futureDataErrorExistsAndIsPersonNotFound.get())
+        verify(remoteDbManager, times(1)).downloadPerson(person.patientId, person.projectId)
     }
 
     @After

@@ -8,6 +8,7 @@ import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
+import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
@@ -17,6 +18,7 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
+import java.io.IOException
 
 interface RemoteDbManager {
     // TODO : agree on consistent method naming for load/save vs get/put etc
@@ -27,7 +29,8 @@ interface RemoteDbManager {
     fun signOutOfRemoteDb()
 
     fun isRemoteDbInitialized(): Boolean
-    @Throws(DifferentProjectIdSignedInException::class)
+
+    /** @throws DifferentProjectIdSignedInException */
     fun isSignedIn(projectId: String, userId: String): Boolean
 
     // Data transfer
@@ -46,14 +49,24 @@ interface RemoteDbManager {
     fun getCurrentFirestoreToken(): Single<String>
 
     // API
-    fun uploadPerson(fbPerson: fb_Person): Completable
-    fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable
+    /**
+     * Following methods can throw:
+     * [IOException] - when the network cuts out
+     * [SimprintsInternalServerException] - when receiving a 5xx HTTP response
+     */
 
-    @Throws(DownloadingAPersonWhoDoesntExistOnServerException::class)
+    /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
     fun downloadPerson(patientId: String, projectId: String): Single<fb_Person>
 
-    fun getPeopleApiClient(): Single<PeopleRemoteInterface>
+    fun uploadPerson(fbPerson: fb_Person): Completable
+
+    fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable
+
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
+
     fun loadProjectFromRemote(projectId: String): Single<Project>
+
+    fun getPeopleApiClient(): Single<PeopleRemoteInterface>
+
     fun getProjectApiClient(): Single<ProjectRemoteInterface>
 }
