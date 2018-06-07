@@ -6,7 +6,6 @@ import com.simprints.id.activities.AlertActivity
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.domain.ALERT_TYPE
 
-
 class AlertLauncher(private val activity: Activity) {
 
     fun launch(alertType: ALERT_TYPE, requestCode: Int) {
@@ -14,5 +13,4 @@ class AlertLauncher(private val activity: Activity) {
         intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType)
         activity.startActivityForResult(intent, requestCode)
     }
-
 }

@@ -1,15 +1,15 @@
 package com.simprints.id.activities.checkLogin.openedByMainLauncher
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.DataManager
-import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.di.AppComponent
 
 class CheckLoginFromMainLauncherPresenter(
     val view: CheckLoginFromMainLauncherContract.View,
-    val dataManager: DataManager,
-    secureDataManager: SecureDataManager,
-    timeHelper: TimeHelper) : CheckLoginPresenter(view, dataManager, secureDataManager, timeHelper), CheckLoginFromMainLauncherContract.Presenter {
+    component: AppComponent) : CheckLoginPresenter(view, component), CheckLoginFromMainLauncherContract.Presenter {
+
+    init {
+        component.inject(this)
+    }
 
     override fun start() {
         checkSignedInStateAndMoveOn()
@@ -23,7 +23,7 @@ class CheckLoginFromMainLauncherPresenter(
         view.openDashboardActivity()
     }
 
-    override fun isProjectIdStoredAndMatches(): Boolean = dataManager.getSignedInProjectIdOrEmpty().isNotEmpty()
+    override fun isProjectIdStoredAndMatches(): Boolean = loginInfoManager.getSignedInProjectIdOrEmpty().isNotEmpty()
 
-    override fun isUserIdStoredAndMatches(): Boolean = dataManager.getSignedInUserIdOrEmpty().isNotEmpty()
+    override fun isUserIdStoredAndMatches(): Boolean = loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()
 }

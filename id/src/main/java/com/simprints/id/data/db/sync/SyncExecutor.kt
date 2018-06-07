@@ -29,7 +29,7 @@ open class SyncExecutor(private val dbManager: DbManager,
     }
 
     private val syncApi: PeopleRemoteInterface by lazy {
-        dbManager.getPeopleApiClient().blockingGet()
+        dbManager.remote.getPeopleApiClient().blockingGet()
     }
 
     fun sync(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
@@ -53,7 +53,7 @@ open class SyncExecutor(private val dbManager: DbManager,
 
     private fun Flowable<out MutableList<fb_Person>>.uploadEachBatch(): Flowable<Int> =
         flatMap { batch ->
-            dbManager
+            dbManager.remote
                 .uploadPeople(ArrayList(batch))
                 .andThen(Flowable.just(batch.size))
         }
@@ -66,22 +66,22 @@ open class SyncExecutor(private val dbManager: DbManager,
 
     private fun getPeopleInBatches(isInterrupted: () -> Boolean,
                                    batchSize: Int): Flowable<MutableList<fb_Person>> =
-        dbManager.localDbManager.loadPeopleFromLocalRx(toSync = true)
+        dbManager.local.loadPeopleFromLocalRx(toSync = true)
             .takeUntil { isInterrupted() }
             .map { fb_Person(it) }
             .buffer(batchSize)
 
     private fun getPeopleCountToSync(): Single<Int> =
-        dbManager.localDbManager.getPeopleCountFromLocal(toSync = true)
+        dbManager.local.getPeopleCountFromLocal(toSync = true)
 
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> =
-        dbManager.getNumberOfPatientsForSyncParams(syncParams).flatMap {
+        dbManager.remote.getNumberOfPatientsForSyncParams(syncParams).flatMap {
             dbManager.calculateNPatientsToDownSync(it, syncParams)
         }.flatMapObservable { nPeopleToDownload ->
             Timber.d("Downloading batch $nPeopleToDownload people")
             syncApi.downSync(
                 syncParams.projectId,
-                DownSyncParams(syncParams, dbManager.localDbManager))
+                DownSyncParams(syncParams, dbManager.local))
                 .flatMapObservable {
                     savePeopleFromStream(
                         isInterrupted,
@@ -103,7 +103,7 @@ open class SyncExecutor(private val dbManager: DbManager,
                 reader.beginArray()
                 var totalDownloaded = 0
                 while (reader.hasNext() && !isInterrupted()) {
-                    dbManager.localDbManager.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
+                    dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
                         totalDownloaded++
                         emitResultProgressIfRequired(result, totalDownloaded, DOWN_BATCH_SIZE_FOR_UPDATING_UI)
                         val shouldDownloadingBatchStop = isInterrupted() ||

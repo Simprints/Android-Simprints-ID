@@ -11,21 +11,21 @@ import android.widget.CheckBox;
 
 import com.simprints.id.Application;
 import com.simprints.id.R;
-import com.simprints.id.data.DataManager;
+import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.tools.LanguageHelper;
+
+import javax.inject.Inject;
 
 public class PrivacyActivity extends AppCompatActivity {
 
-    private DataManager dataManager;
+    @Inject PreferencesManager preferencesManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((Application) getApplication()).getComponent().inject(this);
 
-        Application app = ((Application) getApplication());
-        dataManager = app.getDataManager();
-
-        LanguageHelper.setLanguage(this, dataManager.getLanguage());
+        LanguageHelper.setLanguage(this, preferencesManager.getLanguage());
         setContentView(R.layout.activity_privacy);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -38,7 +38,7 @@ public class PrivacyActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        boolean consent = dataManager.getConsent();
+        boolean consent = preferencesManager.getConsent();
         CheckBox checkBox = findViewById(R.id.consentCheckBox);
 
         checkBox.setChecked(consent);
@@ -48,7 +48,7 @@ public class PrivacyActivity extends AppCompatActivity {
         // Check which checkbox was clicked
         switch (view.getId()) {
             case R.id.consentCheckBox:
-                dataManager.setConsent(true);
+                preferencesManager.setConsent(true);
                 ((CheckBox) view).setChecked(true);
                 break;
         }

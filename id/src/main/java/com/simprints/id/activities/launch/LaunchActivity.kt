@@ -15,18 +15,17 @@ import com.simprints.id.activities.main.MainActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.tools.AppState
+import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.*
-import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.Log
-import com.simprints.id.tools.PositionTracker
 import com.simprints.id.tools.Vibrate.vibrate
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
 import kotlinx.android.synthetic.main.activity_launch.*
+import javax.inject.Inject
 
 @SuppressLint("HardwareIds")
 open class LaunchActivity : AppCompatActivity() {
@@ -52,11 +51,13 @@ open class LaunchActivity : AppCompatActivity() {
     private var launchOutOfFocus = false
 
     private lateinit var app: Application
-    private lateinit var dataManager: DataManager
+
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var preferencesManager: PreferencesManager
     private lateinit var positionTracker: PositionTracker
-    private lateinit var appState: AppState
-    private lateinit var setup: Setup
-    private val timeHelper by lazy { app.timeHelper }
+    @Inject lateinit var appState: AppState
+    @Inject lateinit var setup: Setup
+    @Inject lateinit var timeHelper: TimeHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,14 +69,12 @@ open class LaunchActivity : AppCompatActivity() {
 
     private fun injectDependencies() {
         app = application as Application
-        dataManager = app.dataManager
-        positionTracker = PositionTracker(this, dataManager)
-        appState = app.appState
-        setup = app.setup
+        (application as Application).component.inject(this)
+        positionTracker = PositionTracker(this, preferencesManager)
     }
 
     private fun initView() {
-        LanguageHelper.setLanguage(this, dataManager.language)
+        LanguageHelper.setLanguage(this, preferencesManager.language)
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
@@ -84,7 +83,7 @@ open class LaunchActivity : AppCompatActivity() {
     private fun getSetupCallback(): SetupCallback =
         object : SetupCallback {
             override fun onSuccess() {
-                dataManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
+                preferencesManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
                 // If it is the first time the launch process finishes, wait for consent confirmation
                 // Else, go directly to the main activity
                 if (!consentConfirmed) {
@@ -93,7 +92,7 @@ open class LaunchActivity : AppCompatActivity() {
                     loadingInfoTextView.visibility = View.INVISIBLE
                     waitingForConfirmation = true
                     appState.scanner.registerButtonListener(scannerButton)
-                    vibrate(this@LaunchActivity, dataManager.vibrateMode)
+                    vibrate(this@LaunchActivity, preferencesManager.vibrateMode)
                 } else {
                     finishLaunch()
                 }
@@ -172,7 +171,7 @@ open class LaunchActivity : AppCompatActivity() {
     private fun finishWith(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
         setResult(resultCode, resultData)
-        dataManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
+        preferencesManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
         dataManager.saveSession()
         finish()
     }
@@ -183,17 +182,15 @@ open class LaunchActivity : AppCompatActivity() {
         if (appState.scanner != null) {
             appState.scanner.disconnect(object : ScannerCallback {
                 override fun onSuccess() {
-                    appState.destroy()
+                    //appState.destroy()
                 }
 
                 override fun onFailure(scanner_error: SCANNER_ERROR) {
-                    appState.destroy()
+                    //appState.destroy()
                 }
             })
             //appState.scanner = null
         }
-
-        setup.destroy()
         super.onDestroy()
     }
 

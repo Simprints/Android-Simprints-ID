@@ -4,18 +4,21 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
-import com.google.firebase.FirebaseApp
-import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.di.AppModuleForTests
+import com.simprints.id.di.DaggerForTests
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
+import com.simprints.id.tools.delegates.lazyVar
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
@@ -27,14 +30,15 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
+import javax.inject.Inject
 
+// for O_MR1 = 27, Roboletric hangs around after it calls SharedPrefs.'apply' and then it accesses to
+// the SharedPrefs again. https://github.com/robolectric/robolectric/issues/3641
 @RunWith(RobolectricTestRunner::class)
 @Config(
     application = TestApplication::class,
     sdk = [Build.VERSION_CODES.N_MR1])
-// for O_MR1 = 27, Roboletric hangs around after it calls SharedPrefs.'apply' and then it accesses to
-// the SharedPrefs again. https://github.com/robolectric/robolectric/issues/3641
-class CheckLoginFromIntentActivityTest : RxJavaTest() {
+class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
     companion object {
         const val DEFAULT_ACTION = "com.simprints.id.REGISTER"
@@ -46,31 +50,29 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         const val DEFAULT_LEGACY_API_KEY = "96307ff9-873b-45e0-8ef0-b2efd5bef12d"
     }
 
-    private lateinit var analyticsManagerMock: AnalyticsManager
-    private lateinit var app: Application
     private lateinit var sharedPrefs: SharedPreferences
 
-    @Before
-    fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as Application)
+    @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var analyticsManagerSpy: AnalyticsManager
+    @Inject lateinit var preferences: PreferencesManager
+    @Inject lateinit var dbManager: DbManager
 
-        sharedPrefs = getRoboSharedPreferences()
-
-        createMockForLocalDbManager(app)
-        createMockForRemoteDbManager(app)
-        createMockForSecureDataManager(app)
-
-        initLogInStateMock(app, sharedPrefs)
-        mockAnalyticsManager()
-
-        createMockForDbManager(app)
-        app.dbManager.initialiseDb()
+    override var module by lazyVar {
+        AppModuleForTests(app,
+            analyticsManagerSpy = true,
+            localDbManagerSpy = false,
+            remoteDbManagerSpy = false)
     }
 
-    private fun mockAnalyticsManager() {
-        analyticsManagerMock = Mockito.mock(FirebaseAnalyticsManager::class.java)
-        app.analyticsManager = analyticsManagerMock
+    @Before
+    override fun setUp() {
+        app = (RuntimeEnvironment.application as TestApplication)
+        super.setUp()
+        testAppComponent.inject(this)
+        dbManager.initialiseDb()
+
+        sharedPrefs = getRoboSharedPreferences()
+        initLogInStateMock(sharedPrefs, remoteDbManagerMock)
     }
 
     @Test
@@ -89,7 +91,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
     }
 
     private fun verifyALogSafeExceptionWasThrown(times: Int) {
-        Mockito.verify(analyticsManagerMock, Mockito.times(times)).logSafeException(anyNotNull())
+        Mockito.verify(analyticsManagerSpy, Mockito.times(times)).logSafeException(anyNotNull())
     }
 
     @Test
@@ -100,8 +102,8 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
         val controller = createRoboCheckLoginFromIntentViewActivity(intent).start()
         controller.resume().visible()
 
-        Assert.assertEquals(DEFAULT_PROJECT_ID, app.dataManager.projectId)
-        Assert.assertEquals(DEFAULT_USER_ID, app.dataManager.userId)
+        Assert.assertEquals(DEFAULT_PROJECT_ID, preferences.projectId)
+        Assert.assertEquals(DEFAULT_USER_ID, preferences.userId)
     }
 
     @Test
@@ -248,18 +250,18 @@ class CheckLoginFromIntentActivityTest : RxJavaTest() {
             putExtra("moduleId", moduleId)
         }
     }
-}
 
-class CheckLoginFromIntentActivityWithInvalidCallingPackage : CheckLoginFromIntentActivity() {
+    class CheckLoginFromIntentActivityWithInvalidCallingPackage : CheckLoginFromIntentActivity() {
 
-    override fun getCallingPackageName(): String {
-        return "com.app.installed.manually"
+        override fun getCallingPackageName(): String {
+            return "com.app.installed.manually"
+        }
     }
-}
 
-class CheckLoginFromIntentActivityWithValidCallingPackage : CheckLoginFromIntentActivity() {
+    class CheckLoginFromIntentActivityWithValidCallingPackage : CheckLoginFromIntentActivity() {
 
-    override fun getCallingPackageName(): String {
-        return "com.app.installed.from.playstore"
+        override fun getCallingPackageName(): String {
+            return "com.app.installed.from.playstore"
+        }
     }
 }

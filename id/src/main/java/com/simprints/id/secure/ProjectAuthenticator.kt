@@ -2,8 +2,10 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Project
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
@@ -17,17 +19,25 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
 import java.io.IOException
+import javax.inject.Inject
 
-open class ProjectAuthenticator(private val loginInfoManager: LoginInfoManager,
-                                private val dbManager: DbManager,
+open class ProjectAuthenticator(component: AppComponent,
                                 private val safetyNetClient: SafetyNetClient,
                                 secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
                                 private val attestationManager: AttestationManager = AttestationManager()) {
 
-    private val projectSecretManager = ProjectSecretManager(loginInfoManager)
+    @Inject lateinit var secureDataManager: SecureDataManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var dbManager: DbManager
+
+    private val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
     private val publicKeyManager = PublicKeyManager(secureApiClient)
     private val nonceManager = NonceManager(secureApiClient)
     private val authManager = AuthManager(secureApiClient)
+
+ 	init {
+        component.inject(this)
+    }
 
     /**
      * @throws IOException

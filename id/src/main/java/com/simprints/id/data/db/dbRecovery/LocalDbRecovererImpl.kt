@@ -104,7 +104,7 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
         write(string.toByteArray())
 
     private fun generateFirebaseStorageFileReference(): StorageReference {
-        // Get a reference to [bucket]/recovered-realm-dbs/[projectId]/[userId]/[db-name].json
+        // Get a reference to [bucket]/recovered-realm-dbs/[projectId]/[userId]/[dbManager-name].json
         val storage = firebaseManagerImpl.getFirebaseStorageInstance()
         val rootRef = storage.getReferenceFromUrl(storageBucketUrl)
         val recoveredRealmDbsRef = rootRef.child(recoveredDbDirName)
@@ -151,7 +151,7 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
     companion object {
         private const val storageBucketUrl = "gs://${BuildConfig.GCP_PROJECT}-firebase-storage/"
         private const val recoveredDbDirName = "recovered-realm-dbs"
-        private const val recoveredDbFileName = "recovered-realm-db"
+        private const val recoveredDbFileName = "recovered-realm-dbManager"
         private fun getRecoveredDbFileName() = "$recoveredDbFileName-${Utils.now().time}"
 
         private const val metaDataProjectIdKey = "projectId"

@@ -1,16 +1,21 @@
 package com.simprints.id.activities.dashboard
 
-import com.simprints.id.Application
+import com.google.firebase.FirebaseApp
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
+import com.simprints.id.data.DataManager
+import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.di.AppModuleForTests
+import com.simprints.id.di.DaggerForTests
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.*
-import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
+import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
 import junit.framework.Assert
 import org.junit.Before
@@ -21,35 +26,46 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.util.*
+import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class DashboardCardsFactoryTest {
+class DashboardCardsFactoryTest : DaggerForTests() {
 
-    private lateinit var app: Application
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var localDbManagerMock: LocalDbManager
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var dbManager: DbManager
+
+    override var module by lazyVar {
+        AppModuleForTests(app,
+            remoteDbManagerSpy = false,
+            localDbManagerSpy = false)
+    }
 
     @Before
-    fun setUp() {
-        app = (RuntimeEnvironment.application as Application)
-        createMockForLocalDbManager(app)
-        createMockForRemoteDbManager(app)
-        createMockForSecureDataManager(app)
+    override fun setUp() {
+        FirebaseApp.initializeApp(RuntimeEnvironment.application)
+        app = (RuntimeEnvironment.application as TestApplication)
+        super.setUp()
+        testAppComponent.inject(this)
+        dbManager.initialiseDb()
 
-        initLogInStateMock(app, getRoboSharedPreferences())
+        initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
         setUserLogInState(true, getRoboSharedPreferences())
 
-        createMockForDbManager(app)
-        mockLoadProject(app)
+        mockLoadProject(localDbManagerMock, remoteDbManagerMock)
     }
 
     @Test
     fun shouldCreateTheProjectCard_onlyWhenItHasAValidProject() {
-        val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent)
         val card = getCardIfCreated(factory, "project name")
         Assert.assertEquals(card?.description, "project desc")
 
-        whenever(app.localDbManager.loadProjectFromLocal(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
-        whenever(app.remoteDbManager.loadProjectFromRemote(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
+        whenever(localDbManagerMock.loadProjectFromLocal(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
+        whenever(remoteDbManagerMock.loadProjectFromRemote(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
 
         val testObserver = Single.merge(factory.createCards()).test()
         testObserver.awaitTerminalEvent()
@@ -62,56 +78,57 @@ class DashboardCardsFactoryTest {
 
     @Test
     fun shouldCreateTheLastEnrolCard_onlyWhenAnEnrolEventHappened() {
-        val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent)
         val lastEnrolDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-            { factory.dateFormat.format(lastEnrolDate).also { app.dataManager.lastEnrolDate = lastEnrolDate } },
-            { app.dataManager.lastEnrolDate = null },
+
+            { factory.dateFormat.format(lastEnrolDate).also { preferencesManager.lastEnrolDate = lastEnrolDate } },
+            { preferencesManager.lastEnrolDate = null },
             app.getString(R.string.dashboard_card_enrol_title))
     }
 
     @Test
     fun shouldCreateTheLastIdentificationCard_onlyWhenAnIdentificationEventHappened() {
-        val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent)
         val lastIdentificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-            { factory.dateFormat.format(lastIdentificationDate).also { app.dataManager.lastIdentificationDate = lastIdentificationDate } },
-            { app.dataManager.lastIdentificationDate = null },
+            { factory.dateFormat.format(lastIdentificationDate).also { preferencesManager.lastIdentificationDate = lastIdentificationDate } },
+            { preferencesManager.lastIdentificationDate = null },
             app.getString(R.string.dashboard_card_identification_title))
     }
 
     @Test
     fun shouldCreateTheLastVerificationCard_onlyWhenAnVerificationEventHappened() {
-        val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent)
         val lastVerificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-            { factory.dateFormat.format(lastVerificationDate).also { app.dataManager.lastVerificationDate = lastVerificationDate } },
-            { app.dataManager.lastVerificationDate = null },
+            { factory.dateFormat.format(lastVerificationDate).also { preferencesManager.lastVerificationDate = lastVerificationDate } },
+            { preferencesManager.lastVerificationDate = null },
             app.getString(R.string.dashboard_card_verification_title))
     }
 
     @Test
     fun shouldCreateTheLastUserCard_onlyWhenAnLastUserEventHappened() {
-        val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent)
         val lastUser = "someone"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-            { lastUser.also { app.dataManager.lastUserUsed = lastUser } },
-            { app.dataManager.lastUserUsed = "" },
+            { lastUser.also { preferencesManager.lastUserUsed = lastUser } },
+            { preferencesManager.lastUserUsed = "" },
             app.getString(R.string.dashboard_card_lastuser_title))
     }
 
     @Test
     fun shouldCreateTheLasScannerCard_onlyWhenAnLasScannerEventHappened() {
-        val factory = DashboardCardsFactory(app.dataManager, AndroidResourcesHelperImpl(app))
+        val factory = DashboardCardsFactory(testAppComponent)
         val lastScanner = "SPXXXX"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-            { lastScanner.also { app.dataManager.lastScannerUsed = lastScanner } },
-            { app.dataManager.lastScannerUsed = "" },
+            { lastScanner.also { preferencesManager.lastScannerUsed = lastScanner } },
+            { preferencesManager.lastScannerUsed = "" },
             app.getString(R.string.dashboard_card_lastscanner_title))
     }
 
@@ -120,7 +137,7 @@ class DashboardCardsFactoryTest {
                                                                deleteEvent: () -> Unit,
                                                                cardTitle: String) {
         val event = createEvent()
-        mockNPeopleForSyncRequest(app.remoteDbManager, 0)
+        mockNPeopleForSyncRequest(remoteDbManagerMock, 0)
 
         var card = getCardIfCreated(
             cardsFactory,
@@ -135,9 +152,9 @@ class DashboardCardsFactoryTest {
     }
 
     private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCard? {
-        mockNPeopleForSyncRequest(app.remoteDbManager, 0)
-        mockNLocalPeople(app.localDbManager, 0)
-        mockGetSyncInfoFor(app.localDbManager)
+        mockNPeopleForSyncRequest(remoteDbManagerMock, 0)
+        mockNLocalPeople(localDbManagerMock, 0)
+        mockGetSyncInfoFor(localDbManagerMock)
 
         val testObserver = Single.merge(cardsFactory.createCards()).test()
         testObserver.awaitTerminalEvent()

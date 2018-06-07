@@ -18,10 +18,10 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
-interface DbManager : RemoteDbManager {
+interface DbManager {
 
-    val localDbManager: LocalDbManager
-    val remoteDbManager: RemoteDbManager
+    val local: LocalDbManager
+    val remote: RemoteDbManager
 
     // Lifecycle
     fun initialiseDb()
@@ -32,33 +32,32 @@ interface DbManager : RemoteDbManager {
     fun isDbInitialised(): Boolean
 
     // Data transfer
+    fun savePerson(person: Person): Completable
     fun savePerson(fbPerson: fb_Person): Completable
 
     fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
 
-    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
+    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
 
     fun loadProject(projectId: String): Single<Project>
 
     fun refreshProjectInfoWithServer(projectId: String): Single<Project>
 
-    fun getPeopleCount(personId: String? = null,
-                       projectId: String? = null,
-                       userId: String? = null,
-                       moduleId: String? = null,
-                       toSync: Boolean? = null): Single<Int>
+    fun getPeopleCount(group: Constants.GROUP): Single<Int>
+
+    fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
+
+    fun updateIdentification(projectId: String, selectedGuid: String, sessionId: String)
+
+    fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
+
+    fun saveRefusalForm(refusalForm: RefusalForm)
 
     fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int>
 
-    fun saveIdentification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
-
-    fun saveVerification(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
-
     fun saveSession(session: Session)
-
-    fun saveRefusalForm(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String)
 
     fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress>
 
-    fun recoverLocalDb(projectId: String, userId: String, androidId: String, moduleId: String, group: Constants.GROUP): Completable
+    fun recoverLocalDb(group: Constants.GROUP): Completable
 }

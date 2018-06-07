@@ -11,26 +11,27 @@ import android.widget.TextView;
 
 import com.simprints.id.Application;
 import com.simprints.id.R;
-import com.simprints.id.data.DataManager;
+import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.tools.AppState;
+
+import javax.inject.Inject;
 
 public class AlertActivity extends AppCompatActivity {
 
     ALERT_TYPE alertType;
 
     // Singletons
-    AppState appState;
+    @Inject AppState appState;
+    @Inject AnalyticsManager analyticsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ((Application) getApplication()).getComponent().inject(this);
+
         setContentView(R.layout.activity_alert);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        Application app = ((Application) getApplication());
-        DataManager dataManager = app.getDataManager();
-        appState = app.getAppState();
 
         Bundle extras = getIntent().getExtras();
         assert extras != null;
@@ -38,7 +39,7 @@ public class AlertActivity extends AppCompatActivity {
         assert alertType != null;
         this.alertType = alertType;
 
-        dataManager.logAlert(alertType);
+        analyticsManager.logAlert(alertType);
 
         int color = ResourcesCompat.getColor(getResources(), alertType.getBackgroundColor(), null);
         findViewById(R.id.alertLayout).setBackgroundColor(color);

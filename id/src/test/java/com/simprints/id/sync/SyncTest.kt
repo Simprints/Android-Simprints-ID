@@ -1,20 +1,25 @@
 package com.simprints.id.sync
 
-import android.content.Context
+import com.google.firebase.FirebaseApp
 import com.google.gson.stream.JsonReader
 import com.simprints.id.Application
+import com.simprints.id.data.DataManager
+import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
-import com.simprints.id.data.db.remote.FirebaseManagerImpl
-import com.simprints.id.data.db.remote.FirebaseOptionsHelper
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.DownSyncParams.Companion.LAST_KNOWN_PATIENT_AT
 import com.simprints.id.data.db.remote.network.DownSyncParams.Companion.LAST_KNOWN_PATIENT_ID
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.sync.SyncExecutor
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.di.AppModuleForTests
+import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
@@ -26,6 +31,7 @@ import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.mockServer.assertUrlParam
 import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople
@@ -41,27 +47,41 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.spy
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.util.concurrent.atomic.AtomicInteger
+import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class SyncTest : RxJavaTest() {
+class SyncTest : RxJavaTest, DaggerForTests() {
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
-    val app = RuntimeEnvironment.application as Application
 
-    private var remoteDbManager: RemoteDbManager = spy(FirebaseManagerImpl(mock(Context::class.java),
-        mock(FirebaseOptionsHelper::class.java)))
+    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
+    @Inject lateinit var secureDataManager: SecureDataManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var preferencesManager: PreferencesManager
+
+    override var module by lazyVar {
+        AppModuleForTests(app,
+            remoteDbManagerSpy = true,
+            localDbManagerSpy = false)
+    }
 
     @Before
-    fun setUp() {
-        whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just(""))
+    override fun setUp() {
+        FirebaseApp.initializeApp(RuntimeEnvironment.application)
+        app = (RuntimeEnvironment.application as TestApplication)
+        super.setUp()
+        testAppComponent.inject(this)
+        dbManager.initialiseDb()
+
+        whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just(""))
 
         mockServer.start()
         apiClient = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl)
@@ -78,9 +98,9 @@ class SyncTest : RxJavaTest() {
         whenever(localDbManager.getPeopleCountFromLocal(toSync = true)).thenReturn(Single.just(patientsToUpload.count()))
 
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 25, PeopleRemoteInterface::class.java))
-        whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
+        whenever(remoteDbManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager), JsonHelper.gson)
 
         val testObserver = sync.uploadNewPatients({ false }, 10).test()
         testObserver.awaitTerminalEvent()
@@ -104,9 +124,9 @@ class SyncTest : RxJavaTest() {
         whenever(localDbManager.getPeopleCountFromLocal(toSync = true)).thenReturn(Single.just(peopleToUpload.count()))
 
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 25, PeopleRemoteInterface::class.java))
-        whenever(remoteDbManager.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
+        whenever(remoteDbManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager), JsonHelper.gson)
 
         val count = AtomicInteger(0)
         val testObserver = sync.uploadNewPatients({ count.addAndGet(1) > 2 }, 10).test()
@@ -262,7 +282,7 @@ class SyncTest : RxJavaTest() {
         //Mock app RealmSyncInfo for syncParams
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup(), rl_Person(peopleToDownload.last()))) })
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManager, app.secureDataManager, app.loginInfoManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager), JsonHelper.gson)
 
         return sync.downloadNewPatients({ false }, syncParams).test()
     }

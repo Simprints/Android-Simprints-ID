@@ -1,14 +1,15 @@
 package com.simprints.id.activities
 
 import com.nhaarman.mockito_kotlin.doReturn
-import com.simprints.id.Application
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.FirebaseAnalyticsManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.di.AppModuleForTests
+import com.simprints.id.di.DaggerForTests
+import com.simprints.id.shared.anyNotNull
+import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.createMockForDbManager
-import com.simprints.id.testUtils.roboletric.createMockForLocalDbManager
 import com.simprints.id.testUtils.roboletric.createRoboAboutActivity
+import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Completable
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.activity_about.*
@@ -16,34 +17,33 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
-import org.mockito.Mockito.spy
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.whenever
+import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class AboutActivityTest : RxJavaTest() {
+class AboutActivityTest : RxJavaTest, DaggerForTests() {
 
-    private lateinit var analyticsManagerMock: AnalyticsManager
-    private lateinit var app: Application
+    @Inject
+    lateinit var dbManagerMock: DbManager
 
-    @Before
-    fun setUp() {
-        app = (RuntimeEnvironment.application as Application)
-        createMockForLocalDbManager(app)
-        whenever(app.dbManager.getPeopleCount(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(0))
-
-        createMockForDbManager(app)
-        mockAnalyticsManager()
+    override var module by lazyVar {
+        AppModuleForTests(app,
+            dbManagerSpy = false,
+            dataManagerSpy = true,
+            localDbManagerSpy = false)
     }
 
-    private fun mockAnalyticsManager() {
-        analyticsManagerMock = Mockito.mock(FirebaseAnalyticsManager::class.java)
-        app.analyticsManager = analyticsManagerMock
+    @Before
+    override fun setUp() {
+        app = (RuntimeEnvironment.application as TestApplication)
+        super.setUp()
+        testAppComponent.inject(this)
+        dbManagerMock.initialiseDb()
+
+        whenever(dbManagerMock.getPeopleCount(anyNotNull())).thenReturn(Single.just(0))
     }
 
     @Test
@@ -68,9 +68,7 @@ class AboutActivityTest : RxJavaTest() {
 
     @Test
     fun recoverDbButton_disablesOncePressed() {
-        val dataManagerMock = spy(app.dataManager)
-        doReturn(Completable.create { }).`when`(dataManagerMock).recoverRealmDb(anyNotNull())
-        app.dataManager = dataManagerMock
+        doReturn(Completable.create { }).`when`(dbManagerMock).recoverLocalDb(anyNotNull())
 
         val controller = createRoboAboutActivity().start().resume().visible()
         val activity = controller.get()
