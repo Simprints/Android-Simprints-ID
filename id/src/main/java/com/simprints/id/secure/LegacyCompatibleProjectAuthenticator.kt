@@ -26,12 +26,13 @@ class LegacyCompatibleProjectAuthenticator(loginInfoManager: LoginInfoManager,
 
     private val legacyProjectIdManager = LegacyProjectIdManager(secureApiClient)
 
-    @Throws(
-        IOException::class,
-        DifferentProjectIdReceivedFromIntentException::class,
-        InvalidLegacyProjectIdReceivedFromIntentException::class,
-        AuthRequestInvalidCredentialsException::class,
-        SimprintsInternalServerException::class)
+    /**
+     * @throws IOException
+     * @throws DifferentProjectIdReceivedFromIntentException
+     * @throws InvalidLegacyProjectIdReceivedFromIntentException
+     * @throws AuthRequestInvalidCredentialsException
+     * @throws SimprintsInternalServerException
+     */
     fun authenticate(nonceScope: NonceScope, projectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?): Completable =
         when {
             intentLegacyProjectId != null -> checkLegacyProjectIdMatchesProjectId(nonceScope.projectId, intentLegacyProjectId)
