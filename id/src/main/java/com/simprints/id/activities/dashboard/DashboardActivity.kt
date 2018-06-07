@@ -16,17 +16,21 @@ import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.about.AboutActivity
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.data.DataManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.launchAlert
-import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.app_bar_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
 import org.jetbrains.anko.support.v4.onRefresh
+import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View, NavigationView.OnNavigationItemSelectedListener {
+
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var preferences: PreferencesManager
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -35,17 +39,16 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     }
 
     override lateinit var viewPresenter: DashboardContract.Presenter
-    private val app: Application by lazy { application as Application }
-
     private lateinit var cardsViewAdapter: DashboardCardAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
-        LanguageHelper.setLanguage(this, app.dataManager.language)
+        val component = (application as Application).component
+        component.inject(this)
+        LanguageHelper.setLanguage(this, preferences.language)
 
-        val syncClient = SyncService.getClient(this)
-        viewPresenter = DashboardPresenter(this, syncClient, app.dataManager, AndroidResourcesHelperImpl(app))
+        viewPresenter = DashboardPresenter(this, component)
 
         initDrawer()
         initCards()
@@ -117,8 +120,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View, Navigatio
     }
 
     private fun logout() {
-        app.loginInfoManager.cleanCredentials()
-        app.dataManager.signOut()
+        viewPresenter.logout()
         startActivity(Intent(this, RequestLoginActivity::class.java))
         finish()
     }

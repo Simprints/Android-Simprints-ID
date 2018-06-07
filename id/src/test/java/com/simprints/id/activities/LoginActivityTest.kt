@@ -6,11 +6,19 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
+import com.simprints.id.data.DataManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.di.AppModuleForTests
+import com.simprints.id.di.DaggerForTests
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.shared.anyNotNull
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.shared.whenever
+import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testUtils.roboletric.createRoboLoginActivity
+import com.simprints.id.testUtils.roboletric.injectHowToResolveScannerAppIntent
+import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.scannerAppIntent
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
@@ -27,10 +35,11 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowToast
+import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class LoginActivityTest : RxJavaTest() {
+class LoginActivityTest : RxJavaTest, DaggerForTests() {
 
     companion object {
         const val DEFAULT_PROJECT_ID = "some_project_id"
@@ -38,20 +47,29 @@ class LoginActivityTest : RxJavaTest() {
         const val DEFAULT_USER_ID = "some_user_id"
     }
 
-    private lateinit var app: Application
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var dbManagerSpy: DbManager
+    @Inject lateinit var preferencesManager: PreferencesManager
+
+    override var module by lazyVar {
+        AppModuleForTests(app,
+            localDbManagerSpy = false,
+            dbManagerSpy = false)
+    }
 
     @Before
-    fun setUp() {
+    override fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as Application)
-        createMockForLocalDbManager(app)
-        createMockForDbManager(app)
+        app = (RuntimeEnvironment.application as TestApplication)
+        super.setUp()
+        testAppComponent.inject(this)
+        dbManagerSpy.initialiseDb()
     }
 
     @Test
     fun shouldUserIdPreFilled() {
         val userId = "some_user_id"
-        app.dataManager.userId = userId
+        preferencesManager.userId = userId
 
         val controller = createRoboLoginActivity().start().resume().visible()
         val activity = controller.get()
@@ -100,7 +118,6 @@ class LoginActivityTest : RxJavaTest() {
     fun qrScanPressedAndScannerAppIsAvailable_shouldOpenScannerApp() {
 
         val app = RuntimeEnvironment.application as Application
-        FirebaseApp.initializeApp(app)
         val pm = app.packageManager
 
         val controller = createRoboLoginActivity()

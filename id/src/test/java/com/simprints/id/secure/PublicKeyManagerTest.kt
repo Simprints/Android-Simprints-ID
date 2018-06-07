@@ -23,7 +23,7 @@ import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class PublicKeyManagerTest : RxJavaTest() {
+class PublicKeyManagerTest : RxJavaTest {
 
     private val validPublicKeyJsonResponse = "{\"value\":\"public_key_from_server\"}"
     private lateinit var apiClient: SimApiClient<SecureApiInterface>

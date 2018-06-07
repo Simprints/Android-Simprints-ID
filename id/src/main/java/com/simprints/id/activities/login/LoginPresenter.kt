@@ -1,7 +1,8 @@
 package com.simprints.id.activities.login
 
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
@@ -16,12 +17,18 @@ import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
 import java.io.IOException
-
+import javax.inject.Inject
 
 class LoginPresenter(val view: LoginContract.View,
-                     private val loginInfoManager: LoginInfoManager,
-                     private val analyticsManager: AnalyticsManager,
+                     private val component: AppComponent,
                      override var projectAuthenticator: LegacyCompatibleProjectAuthenticator) : LoginContract.Presenter {
+
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
+
+    init {
+        component.inject(this)
+    }
 
     override fun start() {}
 

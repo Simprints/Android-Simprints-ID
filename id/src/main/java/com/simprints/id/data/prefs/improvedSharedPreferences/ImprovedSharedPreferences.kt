@@ -20,24 +20,24 @@ interface ImprovedSharedPreferences : SharedPreferences {
      * Throw a [MismatchedTypeException] if an exception occurred during retrieval due to the
      * stored value type being different from the requested type.
      */
-    fun <T: Any> getPrimitive(key: String, defaultValue: T): T
+    fun <T : Any> getPrimitive(key: String, defaultValue: T): T
 
     /**
-     * Create a new [ImprovedSharedPreferences.Editor] for these preferences, through which you can
-     * make modifications to the data in the preferences and atomically commit those changes back
-     * to the preferences.
+     * Create a new [ImprovedSharedPreferences.Editor] for these preferencesManager, through which you can
+     * make modifications to the data in the preferencesManager and atomically commit those changes back
+     * to the preferencesManager.
      *
      * Note that you must call [Editor.commit] or [Editor.apply] to have any
-     * changes you perform in the Editor actually show up in the preferences.
+     * changes you perform in the Editor actually show up in the preferencesManager.
      */
     override fun edit(): ImprovedSharedPreferences.Editor
 
     /**
-     * Interface used for modifying values in preferences. All changes you make in an editor are
-     * batched, and will not actually show up in the preferences until you call [Editor.commit] or
+     * Interface used for modifying values in preferencesManager. All changes you make in an editor are
+     * batched, and will not actually show up in the preferencesManager until you call [Editor.commit] or
      * [Editor.apply]
      */
-    interface Editor: SharedPreferences.Editor {
+    interface Editor : SharedPreferences.Editor {
 
         /**
          * Set a value of primitive type ([Byte], [Short], [Int], [Long], [Float], [Double],
@@ -49,8 +49,6 @@ interface ImprovedSharedPreferences : SharedPreferences {
          *
          * Throw a [NonPrimitiveTypeException] if T is not a primitive type.
          */
-        fun <T: Any> putPrimitive(key: String, value: T): ImprovedSharedPreferences.Editor
-
+        fun <T : Any> putPrimitive(key: String, value: T): ImprovedSharedPreferences.Editor
     }
-
 }

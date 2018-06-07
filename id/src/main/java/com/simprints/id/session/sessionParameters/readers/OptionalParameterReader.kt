@@ -1,13 +1,12 @@
 package com.simprints.id.session.sessionParameters.readers
 
+import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterTypeError
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutParameter
-import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterTypeError
 
-
-class OptionalParameterReader<out T: Any>(private val key: String,
+class OptionalParameterReader<out T : Any>(private val key: String,
                                           private val defaultValue: T,
-                                          private val errorWhenInvalidType: Error): Reader<T> {
+                                          private val errorWhenInvalidType: Error) : Reader<T> {
 
     override fun readFrom(callout: Callout): T =
         callout.parameters
@@ -20,5 +19,4 @@ class OptionalParameterReader<out T: Any>(private val key: String,
         } catch (error: InvalidCalloutParameterTypeError) {
             throw errorWhenInvalidType
         }
-
 }

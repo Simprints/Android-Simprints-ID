@@ -3,43 +3,60 @@ package com.simprints.id.activities
 import android.app.Activity
 import android.content.SharedPreferences
 import com.google.firebase.FirebaseApp
-import com.simprints.id.Application
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
+import com.simprints.id.data.DataManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
+import com.simprints.id.di.AppModuleForTests
+import com.simprints.id.di.DaggerForTests
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.roboletric.*
+import com.simprints.id.tools.delegates.lazyVar
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class CheckLoginFromMainLauncherActivityTest {
+class CheckLoginFromMainLauncherActivityTest : DaggerForTests() {
 
-    private lateinit var app: Application
     private lateinit var editor: SharedPreferences.Editor
 
+    @Inject
+    lateinit var remoteDbManagerMock: RemoteDbManager
+
+    @Inject
+    lateinit var dbManager: DbManager
+
+    @Inject
+    lateinit var dataManager: DataManager
+
+    override var module by lazyVar {
+        AppModuleForTests(app,
+            localDbManagerSpy = false,
+            remoteDbManagerSpy = false,
+            secureDataManagerSpy = false)
+    }
+
     @Before
-    fun setUp() {
+    override fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as Application)
+        app = (RuntimeEnvironment.application as TestApplication)
+        super.setUp()
+        testAppComponent.inject(this)
+        dbManager.initialiseDb()
 
         val sharedPrefs = getRoboSharedPreferences()
         editor = sharedPrefs.edit()
 
-        createMockForLocalDbManager(app)
-        createMockForRemoteDbManager(app)
-        createMockForSecureDataManager(app)
-
-        initLogInStateMock(app, sharedPrefs)
+        initLogInStateMock(sharedPrefs, remoteDbManagerMock)
         setUserLogInState(true, sharedPrefs)
-
-        createMockForDbManager(app)
-        app.dbManager.initialiseDb()
     }
 
     @Test

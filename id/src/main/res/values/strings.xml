@@ -358,5 +358,6 @@
     <string name="dashboard_card_verification_title">Last Verification</string>
     <string name="dashboard_card_identification_title">Last Identification</string>
     <string name="dashboard_card_lastuser_title">Last user</string>
+    <string name="add_finger_dialog_title">Add Finger(s)</string>
 
 </resources>

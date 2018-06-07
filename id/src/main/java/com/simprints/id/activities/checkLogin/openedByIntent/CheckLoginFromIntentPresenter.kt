@@ -1,34 +1,30 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.DataManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
-import com.simprints.id.session.sessionParameters.SessionParameters
-import com.simprints.id.session.sessionParameters.extractors.Extractor
-import com.simprints.id.tools.TimeHelper
 import java.util.concurrent.atomic.AtomicBoolean
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
-                                    val dataManager: DataManager,
-                                    secureDataManager: SecureDataManager,
-                                    private val sessionParametersExtractor: Extractor<SessionParameters>,
-                                    timeHelper: TimeHelper) :
-    CheckLoginPresenter(view, dataManager, secureDataManager, timeHelper), CheckLoginFromIntentContract.Presenter {
+                                    component: AppComponent) : CheckLoginPresenter(view, component), CheckLoginFromIntentContract.Presenter {
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var possibleLegacyApiKey: String = ""
     private var setupFailed: Boolean = false
+
+    init {
+        component.inject(this)
+    }
 
     override fun setup() {
         view.checkCallingAppIsFromKnownSource()
 
         try {
             extractSessionParameters()
-            dataManager.lastUserUsed = dataManager.userId
+            preferencesManager.lastUserUsed = preferencesManager.userId
         } catch (exception: InvalidCalloutError) {
             view.openAlertActivityForError(exception.alertType)
             setupFailed = true
@@ -43,11 +39,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun extractSessionParameters() {
         val callout = view.parseCallout()
-        dataManager.logCallout(callout)
+        analyticsManager.logCallout(callout)
         val sessionParameters = sessionParametersExtractor.extractFrom(callout)
         possibleLegacyApiKey = sessionParameters.apiKey
-        dataManager.sessionParameters = sessionParameters
-        dataManager.logUserProperties()
+        preferencesManager.sessionParameters = sessionParameters
+        analyticsManager.logUserProperties()
     }
 
     override fun handleNotSignedInUser() {
@@ -61,15 +57,15 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     /** @throws DifferentProjectIdSignedInException */
     override fun isProjectIdStoredAndMatches(): Boolean =
-        dataManager.getSignedInProjectIdOrEmpty().isNotEmpty() &&
-            matchIntentAndStoredProjectIdsOrThrow(dataManager.getSignedInProjectIdOrEmpty())
+        loginInfoManager.getSignedInProjectIdOrEmpty().isNotEmpty() &&
+            matchIntentAndStoredProjectIdsOrThrow(loginInfoManager.getSignedInProjectIdOrEmpty())
 
     private fun matchIntentAndStoredProjectIdsOrThrow(storedProjectId: String): Boolean =
         if (possibleLegacyApiKey.isEmpty()) {
-            matchProjectIdsOrThrow(storedProjectId, dataManager.projectId)
+            matchProjectIdsOrThrow(storedProjectId, preferencesManager.projectId)
         } else {
             val hashedLegacyApiKey = Hasher().hash(possibleLegacyApiKey)
-            val storedProjectIdFromLegacyOrEmpty = dataManager.getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey)
+            val storedProjectIdFromLegacyOrEmpty = loginInfoManager.getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey)
             matchProjectIdsOrThrow(storedProjectId, storedProjectIdFromLegacyOrEmpty)
         }
 
@@ -79,9 +75,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     /** @throws DifferentUserIdSignedInException */
     override fun isUserIdStoredAndMatches() =
-        if (dataManager.userId != dataManager.getSignedInUserIdOrEmpty())
+        if (preferencesManager.userId != loginInfoManager.getSignedInUserIdOrEmpty())
             throw DifferentUserIdSignedInException()
-        else dataManager.getSignedInUserIdOrEmpty().isNotEmpty()
+        else loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()
 
     override fun handleSignedInUser() {
         view.openLaunchActivity()

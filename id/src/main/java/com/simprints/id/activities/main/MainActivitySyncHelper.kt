@@ -3,27 +3,37 @@ package com.simprints.id.activities.main
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import android.view.MenuItem
+import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.sync.SyncManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.progress.Progress
-import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
+import javax.inject.Inject
 
 // Because who in their right mind would want to write in Java
-class MainActivitySyncHelper(private val activity: MainActivity, dataManager: DataManager, syncClient: SyncClient, private val syncItem: MenuItem) {
+class MainActivitySyncHelper(private val activity: MainActivity,
+                             private val syncItem: MenuItem) {
 
-    val syncManager: SyncManager = SyncManager(dataManager, syncClient)
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var syncManager: SyncManager
 
     init {
-        syncManager.addObserver(mainActivitySyncObserver(dataManager))
+        (activity.application as Application).component.inject(this)
+
+        syncManager.addObserver(mainActivitySyncObserver())
         setReadySyncItem()
     }
 
-    private fun mainActivitySyncObserver(dataManager: DataManager): DisposableObserver<Progress> =
+    private fun mainActivitySyncObserver(): DisposableObserver<Progress> =
         object : DisposableObserver<Progress>() {
 
             override fun onNext(progress: Progress) {
@@ -33,7 +43,7 @@ class MainActivitySyncHelper(private val activity: MainActivity, dataManager: Da
 
             override fun onError(t: Throwable) {
                 Timber.d("Sync failed")
-                dataManager.logThrowable(t)
+                analyticsManager.logThrowable(t)
                 setErrorSyncItem()
             }
 
@@ -45,14 +55,13 @@ class MainActivitySyncHelper(private val activity: MainActivity, dataManager: Da
 
     fun sync(dataManager: DataManager) {
         setZeroProgressSyncItem()
-        syncManager.sync(SyncTaskParameters.build(dataManager.syncGroup, dataManager))
+        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager))
     }
 
     private fun setProgressSyncItem(progress: Progress) {
         if (isProgressZero(progress))
             setZeroProgressSyncItem()
-        else
-            setSyncItem(false,
+        else setSyncItem(false,
                 activity.getString(R.string.syncing_with_progress, progress.currentValue, progress.maxValue),
                 R.drawable.ic_syncing)
     }
