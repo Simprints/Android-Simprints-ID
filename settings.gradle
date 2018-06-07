@@ -1,1 +1,2 @@
-include ':id', ':libcommon', ':libsimprints'
+include ':id', ':libcommon', ':libsimprints', ':libscanner'
+project(':libscanner').projectDir = new File(settingsDir, '../Android-LibScanner/libscanner/')
