@@ -1,7 +1,6 @@
 package com.simprints.id.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
-import com.simprints.id.R
 import com.simprints.id.data.DataManager
 import com.simprints.id.domain.ALERT_TYPE
 
@@ -53,7 +52,7 @@ class AlertPresenter(val view: AlertContract.View,
         }
     }
 
-    private fun isACriticalError(): Boolean = alertType.backgroundColor == R.color.simprints_red
+    private fun isACriticalError(): Boolean = alertType == ALERT_TYPE.UNEXPECTED_ERROR
 
     override fun handleBackButton() {
         view.setResult(RESULT_CANCELED)
