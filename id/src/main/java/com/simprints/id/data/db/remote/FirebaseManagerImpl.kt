@@ -23,7 +23,10 @@ import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.id.tools.extensions.*
+import com.simprints.id.tools.extensions.handleResponse
+import com.simprints.id.tools.extensions.handleResult
+import com.simprints.id.tools.extensions.toMap
+import com.simprints.id.tools.extensions.trace
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -200,7 +203,7 @@ class FirebaseManagerImpl(private val appContext: Context,
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
         getPeopleApiClient().flatMap {
-            it.peopleCount(syncParams.toMap())
+            it.peopleCount(syncParams.projectId, syncParams.toMap())
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .map { it.count }
