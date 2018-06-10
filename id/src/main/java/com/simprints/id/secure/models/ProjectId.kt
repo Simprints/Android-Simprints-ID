@@ -1,4 +1,4 @@
 package com.simprints.id.secure.models
 
-
-data class ProjectId(val value: String)
+data class LegacyProject(val projectId: String,
+                         val legacyProjectId: String)

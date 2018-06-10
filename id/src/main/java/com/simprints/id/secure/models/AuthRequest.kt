@@ -1,7 +1,9 @@
 package com.simprints.id.secure.models
 
 data class AuthRequest(
-    var encryptedProjectSecret: String = "",
     var projectId: String = "",
     var userId: String = "",
-    var attestation: AttestToken = AttestToken(""))
+    var authRequestBody: AuthRequestBody)
+
+data class AuthRequestBody(var encryptedProjectSecret: String = "",
+                           var safetyNetAttestationResult: String = "")

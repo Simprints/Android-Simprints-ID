@@ -1,36 +1,35 @@
 package com.simprints.id.secure
 
 import com.simprints.id.BuildConfig
-import com.simprints.id.secure.models.Nonce
-import com.simprints.id.secure.models.ProjectId
-import com.simprints.id.secure.models.PublicKeyString
-import com.simprints.id.secure.models.Tokens
+import com.simprints.id.network.NetworkConstants
+import com.simprints.id.secure.models.*
 import io.reactivex.Single
 import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.HeaderMap
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface SecureApiInterface {
-
     companion object {
-        private const val apiVersion = "2018-2-0"
-        const val baseUrl = "https://$apiVersion-dot-android-auth-dot-${BuildConfig.GCP_PROJECT}.appspot.com"
-        private const val apiKey: String = BuildConfig.ANDROID_AUTH_API_KEY
+        const val baseUrl = NetworkConstants.baseUrl
+        const val apiKey: String = BuildConfig.ANDROID_AUTH_API_KEY
     }
 
-    @GET("/project-ids")
-    fun projectId(@HeaderMap headers: Map<String, String>, //legacyIdMd5
-                  @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<ProjectId>>
+    @GET("legacy-projects/{legacyIdMD5}")
+    fun legacyProject(@Path("legacyIdMD5") legacyIdMD5: String, //legacyIdMd5
+                      @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<LegacyProject>>
 
-    @GET("/nonces")
-    fun nonce(@HeaderMap headers: Map<String, String>,
+    @POST("projects/{projectId}/users/{userId}/nonces")
+    fun nonce(@Path("projectId") projectId: String,
+              @Path("userId") userId: String,
               @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<Nonce>>
 
-    @GET("/public-key")
-    fun publicKey(@Query("key") key: String = SecureApiInterface.apiKey): Single<Response<PublicKeyString>>
+    @GET("projects/{projectId}/users/{userId}/public-key")
+    fun publicKey(@Path("projectId") projectId: String,
+                  @Path("userId") userId: String,
+                  @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<PublicKeyString>>
 
-    @GET("/tokens")
-    fun auth(@HeaderMap headers: Map<String, String>,
-             @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<Tokens>>
+    @POST("projects/{projectId}/users/{userId}/custom-tokens")
+    fun customTokens(@Path("projectId") projectId: String,
+                     @Path("userId") userId: String,
+                     @Body credentials: AuthRequestBody,
+                     @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<Tokens>>
 }

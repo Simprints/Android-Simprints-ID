@@ -76,9 +76,11 @@ android {
         if (variant.buildType.name == "release") {
             buildConfigField("String", "GCP_PROJECT", "\"simprints-152315\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
+            buildConfigField("String", "END_POINT", "\"prod\"")
         } else if (variant.buildType.name == "debug") {
             buildConfigField("String", "GCP_PROJECT", "\"${getDevProjectId()}\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
+            buildConfigField("String", "END_POINT", "\"dev\"")
         }
     }
 
