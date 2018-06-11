@@ -5,8 +5,9 @@
       <module fileurl="file://$PROJECT_DIR$/Android-Simprints-ID.iml" filepath="$PROJECT_DIR$/Android-Simprints-ID.iml" />
       <module fileurl="file://$PROJECT_DIR$/id/id.iml" filepath="$PROJECT_DIR$/id/id.iml" />
       <module fileurl="file://$PROJECT_DIR$/libcommon/libcommon.iml" filepath="$PROJECT_DIR$/libcommon/libcommon.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Android-LibScanner/libscanner/libscanner.iml" filepath="$PROJECT_DIR$/../Android-LibScanner/libscanner/libscanner.iml" />
+      <module fileurl="file://$USER_HOME$/Android-LibScanner/libscanner/libscanner.iml" filepath="$USER_HOME$/Android-LibScanner/libscanner/libscanner.iml" />
       <module fileurl="file://$PROJECT_DIR$/libsimprints/libsimprints.iml" filepath="$PROJECT_DIR$/libsimprints/libsimprints.iml" />
+      <module fileurl="file://$USER_HOME$/Android-LibScanner/mockscanner/mockscanner.iml" filepath="$USER_HOME$/Android-LibScanner/mockscanner/mockscanner.iml" />
     </modules>
   </component>
 </project>
