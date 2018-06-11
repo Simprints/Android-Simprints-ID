@@ -15,6 +15,7 @@ import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.shared.MockRule
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.HappyWifi
@@ -67,7 +68,7 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, DaggerForAndroidTests() {
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
     override var module: AppModuleForAndroidTests by lazyVar {
-        object : AppModuleForAndroidTests(app, randomGeneratorSpy = false) {
+        object : AppModuleForAndroidTests(app, randomGeneratorRule = MockRule.MOCK) {
             override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter = mockScannerManager
         }
     }
