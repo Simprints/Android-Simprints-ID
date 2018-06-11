@@ -118,7 +118,7 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter = AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
+    open fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter = AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
 
     @Provides
     @Singleton
