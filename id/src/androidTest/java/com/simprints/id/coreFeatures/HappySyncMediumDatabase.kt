@@ -6,12 +6,10 @@ import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.FirstUseRemote
-import com.simprints.id.testTemplates.HappyBluetooth
 import com.simprints.id.testTemplates.HappyWifi
 import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.remoteadminclient.ApiException
 import io.realm.RealmConfiguration
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -19,7 +17,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class HappySyncMediumDatabase : FirstUseLocal, FirstUseRemote, HappyWifi, HappyBluetooth {
+class HappySyncMediumDatabase : FirstUseLocal, FirstUseRemote, HappyWifi {
 
     override val calloutCredentials: CalloutCredentials = CalloutCredentials(
         "00000002-0000-0000-0000-000000000000",
@@ -53,11 +51,5 @@ class HappySyncMediumDatabase : FirstUseLocal, FirstUseRemote, HappyWifi, HappyB
     fun happySyncMediumDatabase() {
 //        log("bucket01.HappySyncMediumDatabase.happySyncMediumDatabase")
 //        testHappySync(calloutCredentials, identifyTestRule)
-    }
-
-    @After
-    override fun tearDown() {
-//        log("bucket01.HappySyncMediumDatabase.tearDown()")
-//        super<HappyBluetooth>.tearDown()
     }
 }
