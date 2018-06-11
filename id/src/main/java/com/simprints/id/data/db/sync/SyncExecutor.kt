@@ -35,26 +35,27 @@ open class SyncExecutor(private val dbManager: DbManager,
     fun sync(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
         Timber.d("Sync Started")
         return Observable.concat(
-            uploadNewPatients(isInterrupted),
+            uploadNewPatients(isInterrupted, syncParams),
             downloadNewPatients(isInterrupted, syncParams))
     }
 
     protected open fun uploadNewPatients(isInterrupted: () -> Boolean,
+                                         syncParams: SyncTaskParameters,
                                          batchSize: Int = UP_BATCH_SIZE): Observable<Progress> =
         getPeopleCountToSync().flatMapObservable {
             val counter = AtomicInteger(0)
 
             Timber.d("Uploading $it people")
             getPeopleInBatches(isInterrupted, batchSize)
-                .uploadEachBatch()
+                .uploadEachBatch(syncParams.projectId)
                 .updateUploadCounterAndConvertItToProgress(counter, it)
                 .toObservable()
         }
 
-    private fun Flowable<out MutableList<fb_Person>>.uploadEachBatch(): Flowable<Int> =
+    private fun Flowable<out MutableList<fb_Person>>.uploadEachBatch(projectId: String): Flowable<Int> =
         flatMap { batch ->
             dbManager.remote
-                .uploadPeople(ArrayList(batch))
+                .uploadPeople(projectId, ArrayList(batch))
                 .andThen(Flowable.just(batch.size))
         }
 
