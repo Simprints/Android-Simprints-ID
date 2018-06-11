@@ -170,6 +170,15 @@ fun verificationSuccessful(verifyTestRule: ActivityTestRule<CheckLoginFromIntent
     assertNotEquals(Tier.TIER_5, verification.tier)
 }
 
+fun verificationNotAMatch(verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>, guid: String) {
+    log("verificationSuccessful")
+    val verification = verifyTestRule.activityResult
+        .resultData.getParcelableExtra<Verification>(Constants.SIMPRINTS_VERIFICATION)
+    assertEquals(guid, verification.guid)
+    assertTrue(verification.confidence > 0)
+    assertEquals(Tier.TIER_5, verification.tier)
+}
+
 fun happySync(calloutCredentials: CalloutCredentials, identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("happySync")
     launchActivityIdentify(calloutCredentials, identifyTestRule)
