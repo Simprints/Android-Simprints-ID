@@ -72,14 +72,11 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
 
     override var module: AppModuleForAndroidTests by lazyVar {
         object : AppModuleForAndroidTests(app, randomGeneratorRule = MockRule.MOCK) {
-            override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter = mockScannerManager
+            override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter = mockBluetoothAdapter
         }
     }
 
-    var mockScannerManager = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
-        *MockFinger.person1TwoFingersGoodScan(),
-        *MockFinger.person1TwoFingersAgainGoodScan(),
-        *MockFinger.person1TwoFingersAgainGoodScan())))
+    lateinit var mockBluetoothAdapter: MockBluetoothAdapter
 
     @Before
     @Throws(ApiException::class)
@@ -105,6 +102,12 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
     fun happyWorkflowAllMainFeatures() {
         log("bucket01.HappyWorkflowAllMainFeatures.happyWorkflowAllMainFeatures")
 
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
+            *MockFinger.person1TwoFingersGoodScan,
+            *MockFinger.person1TwoFingersAgainGoodScan,
+            *MockFinger.person1TwoFingersAgainGoodScan,
+            *MockFinger.person2TwoFingersAgainGoodScan)))
+
         // Launch and sign in
         launchActivityEnrol(calloutCredentials, enrolTestRule)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
@@ -125,6 +128,12 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
         fullHappyWorkflow()
         matchingActivityVerificationCheckFinished(verifyTestRule)
         verificationSuccessful(verifyTestRule, guid)
+
+        // Launch app and do a verification workflow with a different person, should not match
+        launchActivityVerify(calloutCredentials, verifyTestRule, guid)
+        fullHappyWorkflow()
+        matchingActivityVerificationCheckFinished(verifyTestRule)
+        verificationNotAMatch(verifyTestRule, guid)
     }
 
     private fun signOut() {
