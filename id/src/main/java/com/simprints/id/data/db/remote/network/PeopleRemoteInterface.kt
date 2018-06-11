@@ -22,7 +22,8 @@ interface PeopleRemoteInterface {
         @QueryMap(encoded = true) syncParams: DownSyncParams): Single<ResponseBody>
 
     @POST("projects/{projectId}/patients")
-    fun uploadPeople(@Body patientsJson: HashMap<String, ArrayList<fb_Person>>): Single<Result<Unit>>
+    fun uploadPeople(@Path("projectId") projectId: String,
+                     @Body patientsJson: HashMap<String, ArrayList<fb_Person>>): Single<Result<Unit>>
 
     @GET("projects/{projectId}/patients/{patientId}")
     fun person(

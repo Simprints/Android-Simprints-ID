@@ -178,11 +178,11 @@ class FirebaseManagerImpl(private val appContext: Context,
     // API
 
     override fun uploadPerson(fbPerson: fb_Person): Completable =
-        uploadPeople(arrayListOf(fbPerson))
+        uploadPeople(fbPerson.projectId, arrayListOf(fbPerson))
 
-    override fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable =
+    override fun uploadPeople(projectId: String, patientsToUpload: ArrayList<fb_Person>): Completable =
         getPeopleApiClient().flatMapCompletable {
-            it.uploadPeople(hashMapOf("patients" to patientsToUpload))
+            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload))
                 .retry(::retryCriteria)
                 .handleResult(::defaultResponseErrorHandling)
         }
