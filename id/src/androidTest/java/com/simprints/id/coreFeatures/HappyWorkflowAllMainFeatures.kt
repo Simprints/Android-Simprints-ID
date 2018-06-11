@@ -24,7 +24,6 @@ import com.simprints.id.testTools.log
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
-import com.simprints.remoteadminclient.ApiException
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Before
@@ -79,9 +78,8 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
     lateinit var mockBluetoothAdapter: MockBluetoothAdapter
 
     @Before
-    @Throws(ApiException::class)
     override fun setUp() {
-        log("bucket01.HappyWorkflowAllMainFeatures.setUp()")
+        log("HappyWorkflowAllMainFeatures.setUp()")
         super<HappyWifi>.setUp()
         app = InstrumentationRegistry.getTargetContext().applicationContext as Application
         super<DaggerForAndroidTests>.setUp()
