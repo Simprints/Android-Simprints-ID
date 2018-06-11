@@ -154,6 +154,23 @@ fun guidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTestRule<Check
     assertNotEquals(Tier.TIER_5, identifications[0].tier)
 }
 
+fun twoReturnedIdentificationsOneMatchOneNotMatch(identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>,
+                                            matchGuid: String,
+                                            notMatchGuid: String) {
+    log("twoReturnedIdentificationsOneMatchOneNotMatch")
+    val identifications = identifyTestRule.activityResult
+        .resultData.getParcelableArrayListExtra<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS)
+    assertEquals(2, identifications.size.toLong())
+
+    assertEquals(matchGuid, identifications[0].guid)
+    assertTrue(identifications[0].confidence > 0)
+    assertNotEquals(Tier.TIER_5, identifications[0].tier)
+
+    assertEquals(notMatchGuid, identifications[1].guid)
+    assertTrue(identifications[1].confidence > 0)
+    assertEquals(Tier.TIER_5, identifications[1].tier)
+}
+
 fun matchingActivityVerificationCheckFinished(verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("matchingActivityVerificationCheckFinished")
     WaitingUtils.tryOnSystemUntilTimeout(5000, 500, {

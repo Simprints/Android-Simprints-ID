@@ -99,14 +99,13 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
     }
 
     @Test
-    fun happyWorkflowAllMainFeatures() {
-        log("bucket01.HappyWorkflowAllMainFeatures.happyWorkflowAllMainFeatures")
+    fun happyWorkflowMainFeatures() {
+        log("bucket01.HappyWorkflowAllMainFeatures.happyWorkflowMainFeatures")
 
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
             *MockFinger.person1TwoFingersGoodScan,
             *MockFinger.person1TwoFingersAgainGoodScan,
-            *MockFinger.person1TwoFingersAgainGoodScan,
-            *MockFinger.person2TwoFingersAgainGoodScan)))
+            *MockFinger.person1TwoFingersAgainGoodScan)))
 
         // Launch and sign in
         launchActivityEnrol(calloutCredentials, enrolTestRule)
@@ -128,12 +127,72 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
         fullHappyWorkflow()
         matchingActivityVerificationCheckFinished(verifyTestRule)
         verificationSuccessful(verifyTestRule, guid)
+    }
 
-        // Launch app and do a verification workflow with a different person, should not match
-        launchActivityVerify(calloutCredentials, verifyTestRule, guid)
+    @Test
+    fun happyWorkflowTwoPeopleMainFeatures() {
+        log("bucket01.HappyWorkflowAllMainFeatures.happyWorkflowTwoPeopleMainFeatures")
+
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
+            *MockFinger.person1TwoFingersGoodScan,
+            *MockFinger.person2TwoFingersGoodScan,
+            *MockFinger.person1TwoFingersAgainGoodScan,
+            *MockFinger.person2TwoFingersAgainGoodScan,
+            *MockFinger.person1TwoFingersAgainGoodScan,
+            *MockFinger.person2TwoFingersAgainGoodScan,
+            *MockFinger.person1TwoFingersAgainGoodScan,
+            *MockFinger.person2TwoFingersAgainGoodScan)))
+
+        // Launch and sign in
+        launchActivityEnrol(calloutCredentials, enrolTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        // Once signed in proceed to enrol person1
+        fullHappyWorkflow()
+        mainActivityEnrolmentCheckFinished(enrolTestRule)
+        val person1 = enrolmentReturnedResult(enrolTestRule)
+
+        // Launch app and enrol person2
+        launchActivityEnrol(calloutCredentials, enrolTestRule)
+        fullHappyWorkflow()
+        mainActivityEnrolmentCheckFinished(enrolTestRule)
+        val person2 = enrolmentReturnedResult(enrolTestRule)
+
+        // Launch app and do an identification with person 1
+        launchActivityIdentify(calloutCredentials, identifyTestRule)
+        fullHappyWorkflow()
+        matchingActivityIdentificationCheckFinished(identifyTestRule)
+        twoReturnedIdentificationsOneMatchOneNotMatch(identifyTestRule, person1, person2)
+
+        // Launch app and do an identification with person 2
+        launchActivityIdentify(calloutCredentials, identifyTestRule)
+        fullHappyWorkflow()
+        matchingActivityIdentificationCheckFinished(identifyTestRule)
+        twoReturnedIdentificationsOneMatchOneNotMatch(identifyTestRule, person2, person1)
+
+        // Launch app and do a verification with person 1, should match
+        launchActivityVerify(calloutCredentials, verifyTestRule, person1)
         fullHappyWorkflow()
         matchingActivityVerificationCheckFinished(verifyTestRule)
-        verificationNotAMatch(verifyTestRule, guid)
+        verificationSuccessful(verifyTestRule, person1)
+
+        // Launch app and do a verification with person 2, should match
+        launchActivityVerify(calloutCredentials, verifyTestRule, person2)
+        fullHappyWorkflow()
+        matchingActivityVerificationCheckFinished(verifyTestRule)
+        verificationSuccessful(verifyTestRule, person2)
+
+        // Launch app and do a verification with person 1 pretending to be person 2, should not match
+        launchActivityVerify(calloutCredentials, verifyTestRule, person2)
+        fullHappyWorkflow()
+        matchingActivityVerificationCheckFinished(verifyTestRule)
+        verificationNotAMatch(verifyTestRule, person2)
+
+        // Launch app and do a verification with person 2 pretending to be person 1, should not match
+        launchActivityVerify(calloutCredentials, verifyTestRule, person1)
+        fullHappyWorkflow()
+        matchingActivityVerificationCheckFinished(verifyTestRule)
+        verificationNotAMatch(verifyTestRule, person1)
     }
 
     private fun signOut() {
