@@ -137,17 +137,6 @@ public class Setup {
 
     // STEP 2
     private void initScanner(@NonNull final Activity activity) {
-//        BluetoothComponentAdapter mockAdapter = new MockBluetoothAdapter(new MockScannerManager(
-//            MockFinger.Companion.person1TwoFingersGoodScan(),
-//            new HashSet<>(Collections.singletonList(MockScannerManager.DEFAULT_MAC_ADDRESS)),
-//            false,
-//            true,
-//            true, ""));
-
-//        BluetoothComponentAdapter recordAdapter = new AndroidRecordBluetoothAdapter(
-//            BluetoothAdapter.getDefaultAdapter(),
-//            activity.getFilesDir().getAbsolutePath() + "enrol_with_2_good_scans");
-
         onProgress(45, R.string.launch_bt_connect);
         List<String> pairedScanners = ScannerUtils.getPairedScanners(bluetoothAdapter);
         if (pairedScanners.size() == 0) {
