@@ -11,6 +11,7 @@ import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
+import com.simprints.id.shared.MockRule.*
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
@@ -40,7 +41,7 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var dbManager: DbManager
 
     override var module by lazyVar {
-        AppModuleForTests(app, localDbManagerSpy = false, remoteDbManagerSpy = false, loginInfoManagerSpy = false)
+        AppModuleForTests(app, localDbManagerRule = MOCK, remoteDbManagerRule = MOCK, loginInfoManagerRule = MOCK)
     }
 
     @Before

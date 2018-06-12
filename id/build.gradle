@@ -203,7 +203,7 @@ dependencies {
     kaptAndroidTest 'com.google.dagger:dagger-compiler:2.13'
     kaptTest 'com.google.dagger:dagger-compiler:2.13'
 
-    provided 'org.glassfish:javax.annotation:10.0-b28'
+    compileOnly 'org.glassfish:javax.annotation:10.0-b28'
 
     // Kotlin awesomeness
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

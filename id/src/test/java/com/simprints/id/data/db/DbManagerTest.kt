@@ -11,6 +11,7 @@ import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
+import com.simprints.id.shared.MockRule.*
 import com.simprints.id.shared.whenever
 import com.simprints.id.sync.SimApiMock
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -51,7 +52,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var dbManager: DbManager
 
     override var module: AppModuleForTests by lazyVar {
-        object : AppModuleForTests(app, localDbManagerSpy = true, remoteDbManagerSpy = true) {
+        object : AppModuleForTests(app, localDbManagerRule = SPY, remoteDbManagerRule = SPY) {
             override fun provideLocalDbManager(ctx: Context): LocalDbManager {
                 return spy(LocalDbManager::class.java)
             }
