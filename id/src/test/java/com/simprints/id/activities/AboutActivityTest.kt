@@ -4,8 +4,7 @@ import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
-import com.simprints.id.shared.MockRule
-import com.simprints.id.shared.MockRule.*
+import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -14,7 +13,6 @@ import com.simprints.id.testUtils.roboletric.createRoboAboutActivity
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Completable
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.activity_about.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -33,9 +31,9 @@ class AboutActivityTest : RxJavaTest, DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            dbManagerRule = MOCK,
-            dataManagerRule = SPY,
-            localDbManagerRule = MOCK)
+            dbManagerRule = MockRule(),
+            dataManagerRule = SpyRule(),
+            localDbManagerRule = MockRule())
     }
 
     @Before

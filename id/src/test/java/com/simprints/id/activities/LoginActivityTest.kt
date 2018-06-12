@@ -12,7 +12,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
-import com.simprints.id.shared.MockRule.*
+import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -22,7 +22,6 @@ import com.simprints.id.testUtils.roboletric.injectHowToResolveScannerAppIntent
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.scannerAppIntent
 import io.reactivex.Completable
-import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
@@ -54,8 +53,8 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            localDbManagerRule = MOCK,
-            dbManagerRule = MOCK)
+            localDbManagerRule = MockRule(),
+            dbManagerRule = MockRule())
     }
 
     @Before

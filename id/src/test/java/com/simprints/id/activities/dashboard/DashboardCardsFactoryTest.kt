@@ -12,7 +12,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
-import com.simprints.id.shared.MockRule.*
+import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.*
@@ -41,8 +41,8 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            remoteDbManagerRule = MOCK,
-            localDbManagerRule = MOCK)
+            remoteDbManagerRule = MockRule(),
+            localDbManagerRule = MockRule())
     }
 
     @Before
