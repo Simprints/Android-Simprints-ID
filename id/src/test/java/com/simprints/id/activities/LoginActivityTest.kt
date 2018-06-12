@@ -22,6 +22,7 @@ import com.simprints.id.testUtils.roboletric.injectHowToResolveScannerAppIntent
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.scannerAppIntent
 import io.reactivex.Completable
+import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before

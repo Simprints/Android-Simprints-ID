@@ -31,46 +31,46 @@ open class AppModuleForAnyTests(app: Application,
                                 open var bluetoothComponentAdapterRule: DependencyRule = RealRule()) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
-        resolveMockRule(localDbManagerRule, { super.provideLocalDbManager(ctx) })
+        resolveDependencyRule(localDbManagerRule, { super.provideLocalDbManager(ctx) })
 
     override fun provideAnalyticsManager(loginInfoManager: LoginInfoManager,
                                          preferencesManager: PreferencesManager,
                                          firebaseAnalytics: FirebaseAnalytics): AnalyticsManager =
-        resolveMockRule(analyticsManagerRule, { super.provideAnalyticsManager(loginInfoManager, preferencesManager, firebaseAnalytics) })
+        resolveDependencyRule(analyticsManagerRule, { super.provideAnalyticsManager(loginInfoManager, preferencesManager, firebaseAnalytics) })
 
     override fun provideRemoteDbManager(ctx: Context): RemoteDbManager =
-        resolveMockRule(remoteDbManagerRule, { super.provideRemoteDbManager(ctx) })
+        resolveDependencyRule(remoteDbManagerRule, { super.provideRemoteDbManager(ctx) })
 
     override fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager =
-        resolveMockRule(loginInfoManagerRule, { super.provideLoginInfoManager(improvedSharedPreferences) })
+        resolveDependencyRule(loginInfoManagerRule, { super.provideLoginInfoManager(improvedSharedPreferences) })
 
     override fun provideRandomGenerator(): RandomGenerator =
-        resolveMockRule(randomGeneratorRule, { super.provideRandomGenerator() })
+        resolveDependencyRule(randomGeneratorRule, { super.provideRandomGenerator() })
 
     override fun provideDbManager(localDbManager: LocalDbManager,
                                   remoteDbManager: RemoteDbManager,
                                   secureDataManager: SecureDataManager,
                                   loginInfoManager: LoginInfoManager,
                                   preferencesManager: PreferencesManager): DbManager =
-        resolveMockRule(dbManagerRule, { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager) })
+        resolveDependencyRule(dbManagerRule, { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager) })
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,
                                           randomGenerator: RandomGenerator): SecureDataManager =
-        resolveMockRule(secureDataManagerRule, { super.provideSecureDataManager(preferencesManager, keystoreManager, randomGenerator) })
+        resolveDependencyRule(secureDataManagerRule, { super.provideSecureDataManager(preferencesManager, keystoreManager, randomGenerator) })
 
     override fun provideDataManager(preferencesManager: PreferencesManager,
                                     loginInfoManager: LoginInfoManager,
                                     analyticsManager: AnalyticsManager,
                                     remoteDbManager: RemoteDbManager): DataManager =
-        resolveMockRule(dataManagerRule, { super.provideDataManager(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager) })
+        resolveDependencyRule(dataManagerRule, { super.provideDataManager(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager) })
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
 
     override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
-        resolveMockRule(bluetoothComponentAdapterRule, { super.provideBluetoothComponentAdapter() })
+        resolveDependencyRule(bluetoothComponentAdapterRule, { super.provideBluetoothComponentAdapter() })
 
-    private inline fun <reified T> resolveMockRule(dependencyRule: DependencyRule, provider: () -> T): T =
+    private inline fun <reified T> resolveDependencyRule(dependencyRule: DependencyRule, provider: () -> T): T =
         when (dependencyRule) {
             is RealRule -> provider()
             is MockRule -> mock()
