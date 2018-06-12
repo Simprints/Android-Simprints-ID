@@ -12,6 +12,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
+import com.simprints.id.shared.MockRule.*
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -53,8 +54,8 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            localDbManagerSpy = false,
-            dbManagerSpy = false)
+            localDbManagerRule = MOCK,
+            dbManagerRule = MOCK)
     }
 
     @Before

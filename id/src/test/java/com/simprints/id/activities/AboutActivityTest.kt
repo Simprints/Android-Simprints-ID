@@ -4,6 +4,8 @@ import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
+import com.simprints.id.shared.MockRule
+import com.simprints.id.shared.MockRule.*
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -31,9 +33,9 @@ class AboutActivityTest : RxJavaTest, DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            dbManagerSpy = false,
-            dataManagerSpy = true,
-            localDbManagerSpy = false)
+            dbManagerRule = MOCK,
+            dataManagerRule = SPY,
+            localDbManagerRule = MOCK)
     }
 
     @Before
