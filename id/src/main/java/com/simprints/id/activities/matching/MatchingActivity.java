@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.simprints.id.Application;
 import com.simprints.id.R;
-import com.simprints.id.activities.AlertActivity;
+import com.simprints.id.activities.alert.AlertActivity;
 import com.simprints.id.activities.IntentKeys;
 import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.data.prefs.PreferencesManager;

@@ -1,9 +1,14 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.activities.*
+import com.simprints.id.activities.PrivacyActivity
+import com.simprints.id.activities.RefusalActivity
+import com.simprints.id.activities.SettingsActivity
+import com.simprints.id.activities.TutorialActivity
 import com.simprints.id.activities.about.AboutActivity
 import com.simprints.id.activities.about.AboutPresenter
+import com.simprints.id.activities.alert.AlertActivity
+import com.simprints.id.activities.alert.AlertPresenter
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenter
@@ -62,4 +67,5 @@ interface AppComponent {
     fun inject(requestLoginActivity: RequestLoginActivity)
     fun inject(projectAuthenticator: ProjectAuthenticator)
     fun inject(dashboardPresenter: DashboardPresenter)
+    fun inject(alertPresenter: AlertPresenter)
 }
