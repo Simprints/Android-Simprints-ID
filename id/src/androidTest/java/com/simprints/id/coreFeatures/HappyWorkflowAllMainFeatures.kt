@@ -15,7 +15,8 @@ import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
-import com.simprints.id.shared.MockRule
+import com.simprints.id.shared.DependencyRule.MockRule
+import com.simprints.id.shared.DependencyRule.ReplaceRule
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.HappyWifi
@@ -23,7 +24,6 @@ import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.testTools.log
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Before
@@ -69,10 +69,10 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
     @Inject
     lateinit var randomGeneratorMock: RandomGenerator
 
-    override var module: AppModuleForAndroidTests by lazyVar {
-        object : AppModuleForAndroidTests(app, randomGeneratorRule = MockRule.MOCK) {
-            override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter = mockBluetoothAdapter
-        }
+    override var module by lazyVar {
+        AppModuleForAndroidTests(app,
+            randomGeneratorRule = MockRule(),
+            bluetoothComponentAdapterRule = ReplaceRule({ mockBluetoothAdapter }))
     }
 
     lateinit var mockBluetoothAdapter: MockBluetoothAdapter
