@@ -11,7 +11,7 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
-import com.simprints.id.shared.DependencyRule
+import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.NoWifi
@@ -53,7 +53,7 @@ class AuthTestsNoWifi : FirstUseLocal, NoWifi, DaggerForAndroidTests() {
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
     override var module by lazyVar {
-        AppModuleForAndroidTests(app, randomGeneratorRule = DependencyRule.MockRule())
+        AppModuleForAndroidTests(app, randomGeneratorRule = MockRule())
     }
 
     @Before
