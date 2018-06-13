@@ -21,8 +21,8 @@ import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
-import com.simprints.id.activities.main.MainActivity
-import com.simprints.id.activities.main.MainActivitySyncHelper
+import com.simprints.id.activities.collectFingerprints.MainActivity
+import com.simprints.id.activities.collectFingerprints.MainActivitySyncHelper
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.activities.matching.MatchingPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity

@@ -1,4 +1,4 @@
-package com.simprints.id.fragments;
+package com.simprints.id.activities.collectFingerprints;
 
 import android.graphics.Color;
 import android.os.Bundle;

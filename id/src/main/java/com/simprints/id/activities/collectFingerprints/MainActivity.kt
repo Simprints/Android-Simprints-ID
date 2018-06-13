@@ -1,4 +1,4 @@
-package com.simprints.id.activities.main
+package com.simprints.id.activities.collectFingerprints
 
 import android.annotation.SuppressLint
 import android.app.Activity
