@@ -40,7 +40,7 @@ open class SimApiClient<T>(val service: Class<T>,
                     it.addInterceptor(logger)
                 }
             }
-            .addInterceptor(followPostsFor307codes)
+            .addInterceptor(followTemporaryRedirectResponses)
     }
 
     private val authenticator = Interceptor { chain ->
@@ -49,7 +49,8 @@ open class SimApiClient<T>(val service: Class<T>,
         return@Interceptor chain.proceed(newRequest.build())
     }
 
-    private val followPostsFor307codes = Interceptor { chain ->
+    // if the server returns 307, we follow the url in the "Location" header field.
+    private val followTemporaryRedirectResponses = Interceptor { chain ->
         val newRequest = chain.request().newBuilder()
         val response = chain.proceed(newRequest.build())
 
