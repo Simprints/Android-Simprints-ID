@@ -65,7 +65,12 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class CollectFingerprintsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class CollectFingerprintsActivity :
+    AppCompatActivity(),
+    CollectFingerprintsContract.View,
+    NavigationView.OnNavigationItemSelectedListener {
+
+    override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
 
     private var buttonContinue = false
 
