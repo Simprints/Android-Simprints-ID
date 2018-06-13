@@ -21,8 +21,8 @@ import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
-import com.simprints.id.activities.collectFingerprints.MainActivity
-import com.simprints.id.activities.collectFingerprints.MainActivitySyncHelper
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsSyncHelper
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.activities.matching.MatchingPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -42,7 +42,7 @@ interface AppComponent {
     fun inject(app: Application)
     fun inject(launchActivity: LaunchActivity)
     fun inject(guidSelectionService: GuidSelectionService)
-    fun inject(mainActivity: MainActivity)
+    fun inject(collectFingerprintsActivity: CollectFingerprintsActivity)
     fun inject(alertActivity: AlertActivity)
     fun inject(aboutActivity: AboutActivity)
     fun inject(refusalActivity: RefusalActivity)
@@ -63,7 +63,7 @@ interface AppComponent {
     fun inject(dashboardCardsFactory: DashboardCardsFactory)
     fun inject(dashboardSyncCard: DashboardSyncCard)
     fun inject(loginPresenter: LoginPresenter)
-    fun inject(mainActivitySyncHelper: MainActivitySyncHelper)
+    fun inject(collectFingerprintsSyncHelper: CollectFingerprintsSyncHelper)
     fun inject(requestLoginActivity: RequestLoginActivity)
     fun inject(projectAuthenticator: ProjectAuthenticator)
     fun inject(dashboardPresenter: DashboardPresenter)

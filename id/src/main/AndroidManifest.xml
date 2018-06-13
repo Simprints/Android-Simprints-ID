@@ -78,7 +78,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.collectFingerprints.MainActivity"
+            android:name=".activities.collectFingerprints.CollectFingerprintsActivity"
             android:label="Main"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
@@ -151,7 +151,7 @@
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value=".activities.collectFingerprints.MainActivity" />
+            android:value=".activities.collectFingerprints.CollectFingerprintsActivity" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="897ed2ef7a2d43e09bcd42998f2533acbb9657e7" />

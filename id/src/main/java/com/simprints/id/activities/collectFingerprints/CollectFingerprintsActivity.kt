@@ -65,7 +65,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class CollectFingerprintsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private var buttonContinue = false
 
@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var syncItem: MenuItem
 
     private lateinit var un20WakeupDialog: ProgressDialog
-    private lateinit var syncHelper: MainActivitySyncHelper
+    private lateinit var syncHelper: CollectFingerprintsSyncHelper
 
     private val defaultScanConfig = ScanConfig().apply {
         set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0, 0)
@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         initIndicators()
         initScanButton()
         initViewPager()
-        syncHelper = MainActivitySyncHelper(this, syncItem)
+        syncHelper = CollectFingerprintsSyncHelper(this, syncItem)
         refreshDisplay()
     }
 
@@ -389,7 +389,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 when (scanner_error) {
                     SCANNER_ERROR.BUSY -> resetUIFromError()
                     SCANNER_ERROR.INVALID_STATE -> reconnect()
-                    else -> handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "MainActivity"))
+                    else -> handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "CollectFingerprintsActivity"))
                 }
             }
         })
@@ -690,7 +690,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      */
     private fun forceCaptureNotPossible() {
         activeFingers[currentActiveFingerNo].status = Status.BAD_SCAN
-        Vibrate.vibrate(this@MainActivity, preferencesManager.vibrateMode)
+        Vibrate.vibrate(this@CollectFingerprintsActivity, preferencesManager.vibrateMode)
         refreshDisplay()
     }
 
@@ -712,7 +712,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 // TODO : change exceptions in libcommon
             } catch (ex: IllegalArgumentException) {
                 analyticsManager
-                    .logError(SimprintsError("IllegalArgumentException in MainActivity.captureSuccess()"))
+                    .logError(SimprintsError("IllegalArgumentException in CollectFingerprintsActivity.captureSuccess()"))
                 resetUIFromError()
                 return
             }
@@ -727,7 +727,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             activeFingers[currentActiveFingerNo].status = Status.BAD_SCAN
         }
 
-        Vibrate.vibrate(this@MainActivity, preferencesManager.vibrateMode)
+        Vibrate.vibrate(this@CollectFingerprintsActivity, preferencesManager.vibrateMode)
         refreshDisplay()
     }
 
@@ -757,7 +757,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             else -> {
                 cancelCaptureUI()
-                handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "MainActivity"))
+                handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "CollectFingerprintsActivity"))
             }
         }
     }
@@ -767,23 +767,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val setupCallback = object : SetupCallback {
             override fun onSuccess() {
-                Log.d(this@MainActivity, "reconnect.onSuccess()")
+                Log.d(this@CollectFingerprintsActivity, "reconnect.onSuccess()")
                 un20WakeupDialog.dismiss()
                 appState.scanner.registerButtonListener(scannerButtonListener)
             }
 
             override fun onProgress(progress: Int, detailsId: Int) {
-                Log.d(this@MainActivity, "reconnect.onProgress()")
+                Log.d(this@CollectFingerprintsActivity, "reconnect.onProgress()")
             }
 
             override fun onError(resultCode: Int) {
-                Log.d(this@MainActivity, "reconnect.onError()")
+                Log.d(this@CollectFingerprintsActivity, "reconnect.onError()")
                 un20WakeupDialog.dismiss()
                 launchAlert(ALERT_TYPE.DISCONNECTED)
             }
 
             override fun onAlert(alertType: ALERT_TYPE) {
-                Log.d(this@MainActivity, "reconnect.onAlert()")
+                Log.d(this@CollectFingerprintsActivity, "reconnect.onAlert()")
                 un20WakeupDialog.dismiss()
                 launchAlert(alertType)
             }
