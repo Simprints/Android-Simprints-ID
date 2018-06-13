@@ -11,7 +11,7 @@ import android.view.WindowManager
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.RefusalActivity
-import com.simprints.id.activities.collectFingerprints.MainActivity
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
@@ -31,7 +31,7 @@ import javax.inject.Inject
 open class LaunchActivity : AppCompatActivity() {
 
     companion object {
-        const val MAIN_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1
+        const val COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1
     }
 
     // Scanner button callback
@@ -85,7 +85,7 @@ open class LaunchActivity : AppCompatActivity() {
             override fun onSuccess() {
                 preferencesManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
                 // If it is the first time the launch process finishes, wait for consent confirmation
-                // Else, go directly to the main activity
+                // Else, go directly to the collectFingerprintsActivity
                 if (!consentConfirmed) {
                     launchProgressBar.progress = 100
                     confirmConsentTextView.visibility = View.VISIBLE
@@ -144,7 +144,7 @@ open class LaunchActivity : AppCompatActivity() {
 
         when (requestCode) {
             RESOLUTION_REQUEST, GOOGLE_SERVICE_UPDATE_REQUEST -> positionTracker.onActivityResult(requestCode, resultCode, data)
-            MAIN_ACTIVITY_REQUEST_CODE -> when (resultCode) {
+            COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE -> when (resultCode) {
                 RESULT_TRY_AGAIN -> tryAgain()
 
                 Activity.RESULT_CANCELED, Activity.RESULT_OK -> finishWith(resultCode, data)
@@ -198,7 +198,7 @@ open class LaunchActivity : AppCompatActivity() {
         consentConfirmed = true
         waitingForConfirmation = false
         appState.scanner.unregisterButtonListener(scannerButton)
-        startActivityForResult(Intent(this@LaunchActivity, MainActivity::class.java), MAIN_ACTIVITY_REQUEST_CODE)
+        startActivityForResult(Intent(this@LaunchActivity, CollectFingerprintsActivity::class.java), COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE)
         launchLayout.visibility = View.INVISIBLE
     }
 }

@@ -45,10 +45,10 @@ fun launchActivityVerify(calloutCredentials: CalloutCredentials,
 fun fullHappyWorkflow() {
     log("fullHappyWorkflow")
     setupActivityAndContinue()
-    mainActivityPressScan()
-    mainActivityPressScan()
-    mainActivityCheckGoodScan()
-    mainActivityPressContinue()
+    collectFingerprintsPressScan()
+    collectFingerprintsPressScan()
+    collectFingerprintsCheckGoodScan()
+    collectFingerprintsPressContinue()
 }
 
 private fun setupActivityAndContinue() {
@@ -77,8 +77,8 @@ private fun setupActivityContinue() {
     })
 }
 
-private fun mainActivityPressScan() {
-    log("mainActivityPressScan")
+private fun collectFingerprintsPressScan() {
+    log("collectFingerprintsPressScan")
     WaitingUtils.tryOnUiUntilTimeout(10000, 200, {
         onView(withId(R.id.scan_button))
             .check(matches(isDisplayed()))
@@ -87,8 +87,8 @@ private fun mainActivityPressScan() {
     })
 }
 
-private fun mainActivityCheckGoodScan() {
-    log("mainActivityCheckGoodScan")
+private fun collectFingerprintsCheckGoodScan() {
+    log("collectFingerprintsCheckGoodScan")
     WaitingUtils.tryOnUiUntilTimeout(10000, 200, {
         onView(withId(R.id.scan_button))
             .check(matches(isDisplayed()))
@@ -96,8 +96,8 @@ private fun mainActivityCheckGoodScan() {
     })
 }
 
-private fun mainActivityPressContinue() {
-    log("mainActivityPressContinue")
+private fun collectFingerprintsPressContinue() {
+    log("collectFingerprintsPressContinue")
     WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
         onView(withId(R.id.action_forward))
             .check(matches(isDisplayed()))
@@ -105,8 +105,8 @@ private fun mainActivityPressContinue() {
     })
 }
 
-fun mainActivityEnrolmentCheckFinished(enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
-    log("mainActivityEnrolmentCheckFinished")
+fun collectFingerprintsEnrolmentCheckFinished(enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
+    log("collectFingerprintsEnrolmentCheckFinished")
     WaitingUtils.tryOnSystemUntilTimeout(5000, 500, {
         assertTrue(enrolTestRule.activity.isDestroyed)
     })
@@ -200,34 +200,34 @@ fun happySync(calloutCredentials: CalloutCredentials, identifyTestRule: Activity
     log("happySync")
     launchActivityIdentify(calloutCredentials, identifyTestRule)
     setupActivityAndContinue()
-    mainActivitySync()
-    exitFromMainActivity()
+    collectFingerprintsSync()
+    exitFromCollectFingerprints()
 }
 
-private fun mainActivitySync() {
-    log("mainActivitySync")
-    mainActivityOpenDrawer()
-    mainActivityPressSync()
+private fun collectFingerprintsSync() {
+    log("collectFingerprintsSync")
+    collectFingerprintsOpenDrawer()
+    collectFingerprintsPressSync()
     verifyUiForSyncStarted()
     verifyUiForSyncCompleted()
-    mainActivityCloseDrawer()
+    collectFingerprintsCloseDrawer()
 }
 
-private fun mainActivityOpenDrawer() {
-    log("mainActivityOpenDrawer")
+private fun collectFingerprintsOpenDrawer() {
+    log("collectFingerprintsOpenDrawer")
     WaitingUtils.tryOnUiUntilTimeout(4000, 50, {
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
     })
 }
 
-private fun mainActivityCloseDrawer() {
-    log("mainActivityCloseDrawer")
+private fun collectFingerprintsCloseDrawer() {
+    log("collectFingerprintsCloseDrawer")
     pressBackButton()
 }
 
-private fun mainActivityPressSync() {
-    log("mainActivityPressSync")
+private fun collectFingerprintsPressSync() {
+    log("collectFingerprintsPressSync")
     WaitingUtils.tryOnUiUntilTimeout(4000, 50, {
         onView(withId(R.id.nav_view))
             .perform(navigateTo(R.id.nav_sync))
@@ -250,8 +250,8 @@ private fun verifyUiForSyncCompleted() {
     })
 }
 
-private fun exitFromMainActivity() {
-    log("exitFromMainActivity")
+private fun exitFromCollectFingerprints() {
+    log("exitFromCollectFingerprints")
     pressBackButton()
 }
 

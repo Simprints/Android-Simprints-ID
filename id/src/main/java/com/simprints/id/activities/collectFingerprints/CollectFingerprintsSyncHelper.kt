@@ -17,9 +17,9 @@ import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 import javax.inject.Inject
 
-// Because who in their right mind would want to write in Java
-class MainActivitySyncHelper(private val activity: MainActivity,
-                             private val syncItem: MenuItem) {
+
+class CollectFingerprintsSyncHelper(private val activity: CollectFingerprintsActivity,
+                                    private val syncItem: MenuItem) {
 
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var preferencesManager: PreferencesManager
@@ -29,11 +29,11 @@ class MainActivitySyncHelper(private val activity: MainActivity,
     init {
         (activity.application as Application).component.inject(this)
 
-        syncManager.addObserver(mainActivitySyncObserver())
+        syncManager.addObserver(collectFingerprintsSyncObserver())
         setReadySyncItem()
     }
 
-    private fun mainActivitySyncObserver(): DisposableObserver<Progress> =
+    private fun collectFingerprintsSyncObserver(): DisposableObserver<Progress> =
         object : DisposableObserver<Progress>() {
 
             override fun onNext(progress: Progress) {

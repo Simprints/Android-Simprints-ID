@@ -111,7 +111,7 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
         pressSignIn()
         // Once signed in proceed to enrol workflow
         fullHappyWorkflow()
-        mainActivityEnrolmentCheckFinished(enrolTestRule)
+        collectFingerprintsEnrolmentCheckFinished(enrolTestRule)
         val guid = enrolmentReturnedResult(enrolTestRule)
 
         // Launch app and do an identification workflow
@@ -147,13 +147,13 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
         pressSignIn()
         // Once signed in proceed to enrol person1
         fullHappyWorkflow()
-        mainActivityEnrolmentCheckFinished(enrolTestRule)
+        collectFingerprintsEnrolmentCheckFinished(enrolTestRule)
         val person1 = enrolmentReturnedResult(enrolTestRule)
 
         // Launch app and enrol person2
         launchActivityEnrol(calloutCredentials, enrolTestRule)
         fullHappyWorkflow()
-        mainActivityEnrolmentCheckFinished(enrolTestRule)
+        collectFingerprintsEnrolmentCheckFinished(enrolTestRule)
         val person2 = enrolmentReturnedResult(enrolTestRule)
 
         // Launch app and do an identification with person 1
