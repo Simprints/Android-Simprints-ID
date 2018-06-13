@@ -6,6 +6,7 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.support.annotation.DrawableRes
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
@@ -40,7 +41,6 @@ import com.simprints.id.domain.FingerRes
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.exceptions.unsafe.UnexpectedScannerError
-import com.simprints.id.services.sync.SyncService
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
@@ -99,10 +99,9 @@ class CollectFingerprintsActivity :
     private var previousStatus: Status = Status.NOT_COLLECTED
 
     private var continueItem: MenuItem? = null
-    private lateinit var syncItem: MenuItem
+    lateinit var syncItem: MenuItem
 
     private lateinit var un20WakeupDialog: ProgressDialog
-    private lateinit var syncHelper: CollectFingerprintsSyncHelper
 
     private val defaultScanConfig = ScanConfig().apply {
         set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0, 0)
@@ -130,7 +129,6 @@ class CollectFingerprintsActivity :
         super.onCreate(savedInstanceState)
         val app = application as Application
         app.component.inject(this)
-        val syncClient = SyncService.getClient(this)
 
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -153,8 +151,10 @@ class CollectFingerprintsActivity :
         initIndicators()
         initScanButton()
         initViewPager()
-        syncHelper = CollectFingerprintsSyncHelper(this, syncItem)
         refreshDisplay()
+
+        viewPresenter = CollectFingerprintsPresenter(this, this)
+        viewPresenter.start()
     }
 
     override fun onStart() {
@@ -521,7 +521,7 @@ class CollectFingerprintsActivity :
             R.id.nav_help -> Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
             R.id.privacy -> startActivityForResult(Intent(this, PrivacyActivity::class.java), PRIVACY_ACTIVITY_REQUEST_CODE)
             R.id.nav_sync -> {
-                syncHelper.sync(dataManager)
+                viewPresenter.handleSyncPressed()
                 return true
             }
             R.id.nav_about -> startActivityForResult(Intent(this, AboutActivity::class.java),
@@ -647,7 +647,7 @@ class CollectFingerprintsActivity :
 
     override fun onPause() {
         super.onPause()
-        syncHelper.syncManager.stopListeners()
+        viewPresenter.handleOnPause()
     }
 
     override fun onStop() {
@@ -799,6 +799,14 @@ class CollectFingerprintsActivity :
         }
 
         setup.start(this, setupCallback)
+    }
+
+    override fun setSyncItem(enabled: Boolean, title: String, @DrawableRes icon: Int) {
+        runOnUiThreadIfStillRunning {
+            syncItem.isEnabled = enabled
+            syncItem.title = title
+            syncItem.setIcon(icon)
+        }
     }
 
     companion object {
