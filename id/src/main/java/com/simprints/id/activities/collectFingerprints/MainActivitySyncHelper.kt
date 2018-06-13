@@ -1,4 +1,4 @@
-package com.simprints.id.activities.main
+package com.simprints.id.activities.collectFingerprints
 
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes

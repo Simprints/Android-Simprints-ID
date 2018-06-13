@@ -1,4 +1,4 @@
-package com.simprints.id.tools;
+package com.simprints.id.activities.collectFingerprints;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

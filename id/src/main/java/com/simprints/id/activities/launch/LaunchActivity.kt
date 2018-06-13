@@ -11,7 +11,7 @@ import android.view.WindowManager
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.RefusalActivity
-import com.simprints.id.activities.main.MainActivity
+import com.simprints.id.activities.collectFingerprints.MainActivity
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
