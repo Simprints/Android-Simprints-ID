@@ -1,33 +1,36 @@
 package com.simprints.id.activities.collectFingerprints
 
+import android.app.Activity
+import android.content.Context
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
-import android.view.MenuItem
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 import javax.inject.Inject
 
 
-class CollectFingerprintsSyncHelper(private val activity: CollectFingerprintsActivity,
-                                    private val syncItem: MenuItem) {
+class CollectFingerprintsSyncHelper(private val context: Context,
+                                    private val view: CollectFingerprintsContract.View) {
 
-    @Inject lateinit var analyticsManager: AnalyticsManager
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var syncManager: SyncManager
+    @Inject
+    lateinit var analyticsManager: AnalyticsManager
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
+    @Inject
+    lateinit var loginInfoManager: LoginInfoManager
+    @Inject
+    lateinit var syncManager: SyncManager
 
     init {
-        (activity.application as Application).component.inject(this)
+        ((view as Activity).application as Application).component.inject(this)
 
         syncManager.addObserver(collectFingerprintsSyncObserver())
         setReadySyncItem()
@@ -53,7 +56,7 @@ class CollectFingerprintsSyncHelper(private val activity: CollectFingerprintsAct
             }
         }
 
-    fun sync(dataManager: DataManager) {
+    fun sync() {
         setZeroProgressSyncItem()
         syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager))
     }
@@ -61,9 +64,9 @@ class CollectFingerprintsSyncHelper(private val activity: CollectFingerprintsAct
     private fun setProgressSyncItem(progress: Progress) {
         if (isProgressZero(progress))
             setZeroProgressSyncItem()
-        else setSyncItem(false,
-                activity.getString(R.string.syncing_with_progress, progress.currentValue, progress.maxValue),
-                R.drawable.ic_syncing)
+        else view.setSyncItem(false,
+            context.getString(R.string.syncing_with_progress, progress.currentValue, progress.maxValue),
+            R.drawable.ic_syncing)
     }
 
     private fun setZeroProgressSyncItem() {
@@ -87,14 +90,7 @@ class CollectFingerprintsSyncHelper(private val activity: CollectFingerprintsAct
     }
 
     private fun setSyncItem(enabled: Boolean, @StringRes title: Int, @DrawableRes icon: Int) {
-        setSyncItem(enabled, activity.getString(title), icon)
+        view.setSyncItem(enabled, context.getString(title), icon)
     }
 
-    private fun setSyncItem(enabled: Boolean, title: String, @DrawableRes icon: Int) {
-        activity.runOnUiThreadIfStillRunning {
-            syncItem.isEnabled = enabled
-            syncItem.title = title
-            syncItem.setIcon(icon)
-        }
-    }
 }
