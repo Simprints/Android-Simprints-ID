@@ -73,7 +73,7 @@
         </activity>
 
         <activity
-            android:name=".activities.AlertActivity"
+            android:name=".activities.alert.AlertActivity"
             android:label="@string/alert_title"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />

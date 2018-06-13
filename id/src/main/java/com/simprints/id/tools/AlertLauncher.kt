@@ -2,7 +2,7 @@ package com.simprints.id.tools
 
 import android.app.Activity
 import android.content.Intent
-import com.simprints.id.activities.AlertActivity
+import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.domain.ALERT_TYPE
 
