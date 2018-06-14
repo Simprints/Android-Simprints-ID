@@ -69,7 +69,7 @@ class PublicKeyManagerTest : RxJavaTest() {
     }
 
     private fun makeTestRequestPublicKey(secureApiMock: SecureApiInterface): TestObserver<PublicKeyString> {
-        return PublicKeyManager(secureApiMock).requestPublicKey()
+        return PublicKeyManager(secureApiMock).requestPublicKey("some_project_id", "some_user_id")
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .test()

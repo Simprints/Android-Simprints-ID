@@ -8,10 +8,7 @@ import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsExce
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
-import com.simprints.id.secure.models.AttestToken
-import com.simprints.id.secure.models.AuthRequest
-import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.secure.models.Tokens
+import com.simprints.id.secure.models.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -44,13 +41,13 @@ open class ProjectAuthenticator(private val loginInfoManager: LoginInfoManager,
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
-        val encryptedProjectSecret = getEncryptedProjectSecret(projectSecret)
+        val encryptedProjectSecret = getEncryptedProjectSecret(projectSecret, nonceScope)
         val googleAttestation = getGoogleAttestation(safetyNetClient, nonceScope)
         return zipAuthRequestParameters(encryptedProjectSecret, googleAttestation, nonceScope)
     }
 
-    private fun getEncryptedProjectSecret(projectSecret: String): Single<String> =
-        publicKeyManager.requestPublicKey()
+    private fun getEncryptedProjectSecret(projectSecret: String, noneScope: NonceScope): Single<String> =
+        publicKeyManager.requestPublicKey(noneScope.projectId, noneScope.userId)
             .flatMap { publicKey ->
                 Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey))
             }
@@ -66,7 +63,7 @@ open class ProjectAuthenticator(private val loginInfoManager: LoginInfoManager,
                                          nonceScope: NonceScope): Single<AuthRequest> =
         Singles.zip(encryptedProjectSecretSingle, googleAttestationSingle) {
             encryptedProjectSecret: String, googleAttestation: AttestToken ->
-            AuthRequest(encryptedProjectSecret, nonceScope.projectId, nonceScope.userId, googleAttestation)
+            AuthRequest(nonceScope.projectId, nonceScope.userId, AuthRequestBody(encryptedProjectSecret, googleAttestation.value))
         }
 
     private fun Single<out AuthRequest>.makeAuthRequest(): Single<Tokens> =
