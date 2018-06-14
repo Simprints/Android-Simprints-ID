@@ -12,7 +12,7 @@ import retrofit2.HttpException
 class AuthManager(val client: SecureApiInterface) {
 
     fun requestAuthToken(authRequest: AuthRequest): Single<Tokens> {
-        return client.customTokens(
+        return client.requestCustomTokens(
             authRequest.projectId,
             authRequest.userId,
             authRequest.authRequestBody)

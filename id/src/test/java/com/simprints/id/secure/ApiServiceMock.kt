@@ -13,24 +13,24 @@ import retrofit2.mock.Calls
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class ApiServiceMock(private val delegate: BehaviorDelegate<SecureApiInterface>) : SecureApiInterface {
 
-    override fun legacyProject(legacyIdMD5: String, key: String): Single<Response<LegacyProject>> {
+    override fun requestLegacyProject(legacyIdMD5: String, key: String): Single<Response<LegacyProject>> {
         val legacyProjectResponse = LegacyProject("project_id", "legacy_project_id")
-        return delegate.returning(buildSuccessResponseWith(legacyProjectResponse)).legacyProject(legacyIdMD5, key)
+        return delegate.returning(buildSuccessResponseWith(legacyProjectResponse)).requestLegacyProject(legacyIdMD5, key)
     }
 
-    override fun publicKey(projectId: String, userId: String, key: String): Single<Response<PublicKeyString>> {
+    override fun requestPublicKey(projectId: String, userId: String, key: String): Single<Response<PublicKeyString>> {
         val publicKeyResponse = PublicKeyString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB")
-        return delegate.returning(buildSuccessResponseWith(publicKeyResponse)).publicKey(projectId, userId, key)
+        return delegate.returning(buildSuccessResponseWith(publicKeyResponse)).requestPublicKey(projectId, userId, key)
     }
 
-    override fun nonce(projectId: String, userId: String, key: String): Single<Response<Nonce>> {
+    override fun requestNonce(projectId: String, userId: String, key: String): Single<Response<Nonce>> {
         val nonceResponse = Nonce("nonce_from_server")
-        return delegate.returning(buildSuccessResponseWith(nonceResponse)).nonce(projectId, userId)
+        return delegate.returning(buildSuccessResponseWith(nonceResponse)).requestNonce(projectId, userId)
     }
 
-    override fun customTokens(projectId: String, userId: String, credentials: AuthRequestBody, key: String): Single<Response<Tokens>> {
+    override fun requestCustomTokens(projectId: String, userId: String, credentials: AuthRequestBody, key: String): Single<Response<Tokens>> {
         val tokens = Tokens("firestore_token", "legacy_token")
-        return delegate.returning(buildSuccessResponseWith(tokens)).customTokens(projectId, userId, credentials)
+        return delegate.returning(buildSuccessResponseWith(tokens)).requestCustomTokens(projectId, userId, credentials)
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {

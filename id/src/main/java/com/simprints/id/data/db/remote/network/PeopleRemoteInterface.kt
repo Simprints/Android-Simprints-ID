@@ -29,12 +29,12 @@ interface PeopleRemoteInterface {
                      @Body patientsJson: HashMap<String, ArrayList<fb_Person>>): Single<Result<Unit>>
 
     @GET("projects/{projectId}/patients/{patientId}")
-    fun person(
+    fun requestPerson(
         @Path("patientId") patientId: String,
         @Path("projectId") projectId: String): Single<Response<fb_Person>>
 
     @GET("projects/{projectId}/patients/count")
-    fun peopleCount(
+    fun requestPeopleCount(
         @Path("projectId") projectId: String,
         @Query("userId") userId: String?,
         @Query("moduleId") moduleId: String?): Single<Response<PeopleCount>>

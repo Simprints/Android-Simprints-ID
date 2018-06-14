@@ -11,7 +11,7 @@ import retrofit2.HttpException
 class LegacyProjectIdManager(val client: SecureApiInterface) {
 
     fun requestLegacyProject(hashedLegacyProjectId: String): Single<LegacyProject> {
-        return client.legacyProject(hashedLegacyProjectId)
+        return client.requestLegacyProject(hashedLegacyProjectId)
             .handleResponse(::handleResponseError)
             .subscribeOn(Schedulers.io())
     }

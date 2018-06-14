@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.simprints.id.exceptions.safe.secure.InvalidProjectIdForNonceRequestException
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
@@ -11,13 +12,14 @@ import retrofit2.HttpException
 class NonceManager(val client: SecureApiInterface) {
 
     fun requestNonce(nonceScope: NonceScope): Single<Nonce> {
-        return client.nonce(nonceScope.projectId, nonceScope.userId)
+        return client.requestNonce(nonceScope.projectId, nonceScope.userId)
             .handleResponse(::handleResponseError)
             .subscribeOn(Schedulers.io())
     }
 
     private fun handleResponseError(e: HttpException): Nothing =
         when (e.code()) {
+            404 -> throw InvalidProjectIdForNonceRequestException()
             in 500..599 -> throw SimprintsInternalServerException()
             else -> throw e
         }

@@ -23,12 +23,12 @@ class SimApiMock(private val delegate: BehaviorDelegate<PeopleRemoteInterface>) 
         return delegate.returning(buildSuccessResponseWith("")).downSync(projectId, userId, moduleId, lastKnownPatientId, lastKnownPatientUpdatedAt)
     }
 
-    override fun person(patientId: String, projectId: String): Single<Response<fb_Person>> {
-        return delegate.returning(buildSuccessResponseWith("")).person(patientId, projectId)
+    override fun requestPerson(patientId: String, projectId: String): Single<Response<fb_Person>> {
+        return delegate.returning(buildSuccessResponseWith("")).requestPerson(patientId, projectId)
     }
 
-    override fun peopleCount(projectId: String, userId: String?, moduleId: String?): Single<Response<PeopleCount>> {
-        return delegate.returning(buildSuccessResponseWith("{\"count\": 10}")).peopleCount(projectId, userId, moduleId)
+    override fun requestPeopleCount(projectId: String, userId: String?, moduleId: String?): Single<Response<PeopleCount>> {
+        return delegate.returning(buildSuccessResponseWith("{\"count\": 10}")).requestPeopleCount(projectId, userId, moduleId)
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {

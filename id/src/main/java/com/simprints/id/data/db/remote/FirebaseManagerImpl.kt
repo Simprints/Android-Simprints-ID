@@ -190,7 +190,7 @@ class FirebaseManagerImpl(private val appContext: Context,
     /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getPeopleApiClient().flatMap {
-            it.person(patientId, projectId)
+            it.requestPerson(patientId, projectId)
                 .retry(::retryCriteria)
                 .handleResponse {
                     when (it.code()) {
@@ -203,7 +203,7 @@ class FirebaseManagerImpl(private val appContext: Context,
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
         getPeopleApiClient().flatMap {
-            it.peopleCount(syncParams.projectId, syncParams.userId, syncParams.moduleId)
+            it.requestPeopleCount(syncParams.projectId, syncParams.userId, syncParams.moduleId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .map { it.count }
@@ -211,7 +211,7 @@ class FirebaseManagerImpl(private val appContext: Context,
 
     override fun loadProjectFromRemote(projectId: String): Single<Project> =
         getProjectApiClient().flatMap {
-            it.project(projectId)
+            it.requestProject(projectId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
         }
