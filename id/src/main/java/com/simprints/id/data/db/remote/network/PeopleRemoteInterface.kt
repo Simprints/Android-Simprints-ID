@@ -19,7 +19,10 @@ interface PeopleRemoteInterface {
     @Streaming
     fun downSync(
         @Path("projectId") projectId: String,
-        @QueryMap(encoded = true) syncParams: DownSyncParams): Single<ResponseBody>
+        @Query("userId") userId: String?,
+        @Query("moduleId") moduleId: String?,
+        @Query("lastKnownPatientId") lastKnownPatientId: String?,
+        @Query("lastKnownPatientUpdatedAt") lastKnownPatientUpdatedAt: Long?): Single<ResponseBody>
 
     @POST("projects/{projectId}/patients")
     fun uploadPeople(@Path("projectId") projectId: String,
@@ -33,5 +36,6 @@ interface PeopleRemoteInterface {
     @GET("projects/{projectId}/patients/count")
     fun peopleCount(
         @Path("projectId") projectId: String,
-        @QueryMap(encoded = true) syncParams: Map<String, String>): Single<Response<PeopleCount>>
+        @Query("userId") userId: String?,
+        @Query("moduleId") moduleId: String?): Single<Response<PeopleCount>>
 }

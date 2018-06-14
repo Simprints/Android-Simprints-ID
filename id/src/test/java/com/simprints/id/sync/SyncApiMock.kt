@@ -1,7 +1,6 @@
 package com.simprints.id.sync
 
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.network.DownSyncParams
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.sync.models.PeopleCount
 import io.reactivex.Single
@@ -20,16 +19,16 @@ class SimApiMock(private val delegate: BehaviorDelegate<PeopleRemoteInterface>) 
         return delegate.returning(buildSuccessResponseWith("")).uploadPeople(projectId, patientsJson)
     }
 
-    override fun downSync(projectId: String, syncParams: DownSyncParams): Single<ResponseBody> {
-        return delegate.returning(buildSuccessResponseWith("")).downSync("", syncParams)
+    override fun downSync(projectId: String, userId: String?, moduleId: String?, lastKnownPatientId: String?, lastKnownPatientUpdatedAt: Long?): Single<ResponseBody> {
+        return delegate.returning(buildSuccessResponseWith("")).downSync(projectId, userId, moduleId, lastKnownPatientId, lastKnownPatientUpdatedAt)
     }
 
     override fun person(patientId: String, projectId: String): Single<Response<fb_Person>> {
         return delegate.returning(buildSuccessResponseWith("")).person(patientId, projectId)
     }
 
-    override fun peopleCount(projectId: String, syncParams: Map<String, String>): Single<Response<PeopleCount>> {
-        return delegate.returning(buildSuccessResponseWith("{\"count\": 10}")).peopleCount(projectId, mapOf())
+    override fun peopleCount(projectId: String, userId: String?, moduleId: String?): Single<Response<PeopleCount>> {
+        return delegate.returning(buildSuccessResponseWith("{\"count\": 10}")).peopleCount(projectId, userId, moduleId)
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {

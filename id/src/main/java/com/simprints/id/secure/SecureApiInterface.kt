@@ -14,7 +14,7 @@ interface SecureApiInterface {
     }
 
     @GET("legacy-projects/{legacyIdMD5}")
-    fun legacyProject(@Path("legacyIdMD5") legacyIdMD5: String, //legacyIdMd5
+    fun legacyProject(@Path("legacyIdMD5") legacyIdMD5: String,
                       @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<LegacyProject>>
 
     @POST("projects/{projectId}/users/{userId}/nonces")
