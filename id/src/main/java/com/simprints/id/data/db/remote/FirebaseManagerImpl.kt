@@ -203,7 +203,7 @@ class FirebaseManagerImpl(private val appContext: Context,
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
         getPeopleApiClient().flatMap {
-            it.peopleCount(syncParams.projectId, syncParams.toMap())
+            it.peopleCount(syncParams.projectId, syncParams.userId, syncParams.moduleId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .map { it.count }

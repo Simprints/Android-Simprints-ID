@@ -10,8 +10,6 @@ import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.network.DownSyncParams.Companion.LAST_KNOWN_PATIENT_AT
-import com.simprints.id.data.db.remote.network.DownSyncParams.Companion.LAST_KNOWN_PATIENT_ID
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -176,8 +174,8 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
         assertPathUrlParam(peopleRequestUrl, projectIdTest)
         val lastDownloadedPatient = peopleToDownload.last()
-        assertQueryUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, lastDownloadedPatient.updatedAt!!.time, { it?.toLong() })
-        assertQueryUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, lastDownloadedPatient.patientId)
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", lastDownloadedPatient.updatedAt!!.time, { it?.toLong() })
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", lastDownloadedPatient.patientId)
     }
 
     @Test
@@ -216,8 +214,8 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
         assertPathUrlParam(peopleRequestUrl, projectIdTest)
         assertQueryUrlParam(peopleRequestUrl, "moduleId", moduleIdTest)
-        assertQueryUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
-        assertQueryUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, peopleToDownload.last().patientId)
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", peopleToDownload.last().patientId)
     }
 
     @Test
@@ -256,8 +254,8 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
         assertPathUrlParam(peopleRequestUrl, projectIdTest)
         assertQueryUrlParam(peopleRequestUrl, "userId", userIdTest)
-        assertQueryUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
-        assertQueryUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, peopleToDownload.last().patientId)
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", peopleToDownload.last().patientId)
     }
 
     private fun makeFakeDownloadRequest(

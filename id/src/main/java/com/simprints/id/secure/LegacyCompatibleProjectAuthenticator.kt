@@ -57,8 +57,8 @@ class LegacyCompatibleProjectAuthenticator(component: AppComponent,
         }
 
     private fun Single<out LegacyProject>.checkReceivedProjectIdIsAsExpected(expectedProjectId: String): Completable =
-        flatMapCompletable { projectId ->
-            val receivedProjectId = projectId.projectId
+        flatMapCompletable { legacyProject ->
+            val receivedProjectId = legacyProject.projectId
             Completable.create {
                 if (receivedProjectId == expectedProjectId)
                     it.onComplete()
