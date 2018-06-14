@@ -10,7 +10,7 @@ import retrofit2.HttpException
 class PublicKeyManager(val client: SecureApiInterface) {
 
     fun requestPublicKey(projectId: String, userId: String): Single<PublicKeyString> =
-        client.publicKey(projectId, userId)
+        client.requestPublicKey(projectId, userId)
             .handleResponse(::handleResponseError)
             .subscribeOn(Schedulers.io())
 

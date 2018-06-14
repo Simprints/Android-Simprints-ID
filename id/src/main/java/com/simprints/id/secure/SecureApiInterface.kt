@@ -14,22 +14,22 @@ interface SecureApiInterface {
     }
 
     @GET("legacy-projects/{legacyIdMD5}")
-    fun legacyProject(@Path("legacyIdMD5") legacyIdMD5: String,
-                      @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<LegacyProject>>
+    fun requestLegacyProject(@Path("legacyIdMD5") legacyIdMD5: String,
+                             @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<LegacyProject>>
 
     @POST("projects/{projectId}/users/{userId}/nonces")
-    fun nonce(@Path("projectId") projectId: String,
-              @Path("userId") userId: String,
-              @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<Nonce>>
+    fun requestNonce(@Path("projectId") projectId: String,
+                     @Path("userId") userId: String,
+                     @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<Nonce>>
 
     @GET("projects/{projectId}/users/{userId}/public-key")
-    fun publicKey(@Path("projectId") projectId: String,
-                  @Path("userId") userId: String,
-                  @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<PublicKeyString>>
+    fun requestPublicKey(@Path("projectId") projectId: String,
+                         @Path("userId") userId: String,
+                         @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<PublicKeyString>>
 
     @POST("projects/{projectId}/users/{userId}/custom-tokens")
-    fun customTokens(@Path("projectId") projectId: String,
-                     @Path("userId") userId: String,
-                     @Body credentials: AuthRequestBody,
-                     @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<Tokens>>
+    fun requestCustomTokens(@Path("projectId") projectId: String,
+                            @Path("userId") userId: String,
+                            @Body credentials: AuthRequestBody,
+                            @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<Tokens>>
 }
