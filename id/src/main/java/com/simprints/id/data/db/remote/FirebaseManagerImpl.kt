@@ -23,7 +23,10 @@ import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.id.tools.extensions.*
+import com.simprints.id.tools.extensions.handleResponse
+import com.simprints.id.tools.extensions.handleResult
+import com.simprints.id.tools.extensions.toMap
+import com.simprints.id.tools.extensions.trace
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -175,11 +178,11 @@ class FirebaseManagerImpl(private val appContext: Context,
     // API
 
     override fun uploadPerson(fbPerson: fb_Person): Completable =
-        uploadPeople(arrayListOf(fbPerson))
+        uploadPeople(fbPerson.projectId, arrayListOf(fbPerson))
 
-    override fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable =
+    override fun uploadPeople(projectId: String, patientsToUpload: ArrayList<fb_Person>): Completable =
         getPeopleApiClient().flatMapCompletable {
-            it.uploadPeople(hashMapOf("patients" to patientsToUpload))
+            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload))
                 .retry(::retryCriteria)
                 .handleResult(::defaultResponseErrorHandling)
         }
@@ -187,7 +190,7 @@ class FirebaseManagerImpl(private val appContext: Context,
     /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getPeopleApiClient().flatMap {
-            it.person(patientId, projectId)
+            it.requestPerson(patientId, projectId)
                 .retry(::retryCriteria)
                 .handleResponse {
                     when (it.code()) {
@@ -200,7 +203,7 @@ class FirebaseManagerImpl(private val appContext: Context,
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
         getPeopleApiClient().flatMap {
-            it.peopleCount(syncParams.toMap())
+            it.requestPeopleCount(syncParams.projectId, syncParams.userId, syncParams.moduleId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .map { it.count }
@@ -208,7 +211,7 @@ class FirebaseManagerImpl(private val appContext: Context,
 
     override fun loadProjectFromRemote(projectId: String): Single<Project> =
         getProjectApiClient().flatMap {
-            it.project(projectId)
+            it.requestProject(projectId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
         }
