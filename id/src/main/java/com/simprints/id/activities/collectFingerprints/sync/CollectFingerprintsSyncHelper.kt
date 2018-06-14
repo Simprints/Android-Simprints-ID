@@ -1,4 +1,4 @@
-package com.simprints.id.activities.collectFingerprints
+package com.simprints.id.activities.collectFingerprints.sync
 
 import android.app.Activity
 import android.content.Context
@@ -6,6 +6,7 @@ import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -32,8 +33,15 @@ class CollectFingerprintsSyncHelper(private val context: Context,
     init {
         ((view as Activity).application as Application).component.inject(this)
 
-        syncManager.addObserver(collectFingerprintsSyncObserver())
         setReadySyncItem()
+    }
+
+    fun startListeners() {
+        syncManager.addObserver(collectFingerprintsSyncObserver())
+    }
+
+    fun stopListeners() {
+        syncManager.removeObservers()
     }
 
     private fun collectFingerprintsSyncObserver(): DisposableObserver<Progress> =
@@ -92,5 +100,4 @@ class CollectFingerprintsSyncHelper(private val context: Context,
     private fun setSyncItem(enabled: Boolean, @StringRes title: Int, @DrawableRes icon: Int) {
         view.setSyncItem(enabled, context.getString(title), icon)
     }
-
 }

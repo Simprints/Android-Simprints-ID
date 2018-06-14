@@ -22,7 +22,9 @@ import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
-import com.simprints.id.activities.collectFingerprints.CollectFingerprintsSyncHelper
+import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprintsFingerDisplayHelper
+import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
+import com.simprints.id.activities.collectFingerprints.sync.CollectFingerprintsSyncHelper
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.activities.matching.MatchingPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -33,9 +35,6 @@ import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
 
-/**
- * Created by fabiotuzza on 16/01/2018.
- */
 @Singleton
 @Component(modules = arrayOf(AppModule::class, PreferencesModule::class, SerializerModule::class, AndroidInjectionModule::class))
 interface AppComponent {
@@ -64,6 +63,8 @@ interface AppComponent {
     fun inject(dashboardSyncCard: DashboardSyncCard)
     fun inject(loginPresenter: LoginPresenter)
     fun inject(collectFingerprintsSyncHelper: CollectFingerprintsSyncHelper)
+    fun inject(collectFingerprintsScanningHelper: CollectFingerprintsScanningHelper)
+    fun inject(collectFingerprintsFingerDisplayHelper: CollectFingerprintsFingerDisplayHelper)
     fun inject(requestLoginActivity: RequestLoginActivity)
     fun inject(projectAuthenticator: ProjectAuthenticator)
     fun inject(dashboardPresenter: DashboardPresenter)
