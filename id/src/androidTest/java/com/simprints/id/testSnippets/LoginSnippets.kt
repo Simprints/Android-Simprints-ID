@@ -72,7 +72,7 @@ fun ensureSignInFailure() {
 fun ensureConfigError() {
     log("ensureConfigError")
     WaitingUtils.tryOnUiUntilTimeout(25000, 1000) {
-        onView(withId(R.id.title))
+        onView(withId(R.id.alert_title))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.configuration_error_title)))
     }

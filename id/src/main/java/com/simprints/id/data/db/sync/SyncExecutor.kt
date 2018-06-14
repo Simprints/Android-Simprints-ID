@@ -35,26 +35,27 @@ open class SyncExecutor(private val dbManager: DbManager,
     fun sync(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
         Timber.d("Sync Started")
         return Observable.concat(
-            uploadNewPatients(isInterrupted),
+            uploadNewPatients(isInterrupted, syncParams),
             downloadNewPatients(isInterrupted, syncParams))
     }
 
     protected open fun uploadNewPatients(isInterrupted: () -> Boolean,
+                                         syncParams: SyncTaskParameters,
                                          batchSize: Int = UP_BATCH_SIZE): Observable<Progress> =
         getPeopleCountToSync().flatMapObservable {
             val counter = AtomicInteger(0)
 
             Timber.d("Uploading $it people")
             getPeopleInBatches(isInterrupted, batchSize)
-                .uploadEachBatch()
+                .uploadEachBatch(syncParams.projectId)
                 .updateUploadCounterAndConvertItToProgress(counter, it)
                 .toObservable()
         }
 
-    private fun Flowable<out MutableList<fb_Person>>.uploadEachBatch(): Flowable<Int> =
+    private fun Flowable<out MutableList<fb_Person>>.uploadEachBatch(projectId: String): Flowable<Int> =
         flatMap { batch ->
             dbManager
-                .uploadPeople(ArrayList(batch))
+                .uploadPeople(projectId, ArrayList(batch))
                 .andThen(Flowable.just(batch.size))
         }
 
@@ -79,9 +80,13 @@ open class SyncExecutor(private val dbManager: DbManager,
             dbManager.calculateNPatientsToDownSync(it, syncParams)
         }.flatMapObservable { nPeopleToDownload ->
             Timber.d("Downloading batch $nPeopleToDownload people")
+            val downSyncParam = DownSyncParams(syncParams, dbManager.localDbManager)
             syncApi.downSync(
-                syncParams.projectId,
-                DownSyncParams(syncParams, dbManager.localDbManager))
+                downSyncParam.projectId,
+                downSyncParam.userId,
+                downSyncParam.moduleId,
+                downSyncParam.lastKnownPatientId,
+                downSyncParam.lastKnownPatientUpdatedAt)
                 .flatMapObservable {
                     savePeopleFromStream(
                         isInterrupted,

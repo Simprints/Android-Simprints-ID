@@ -59,8 +59,7 @@ interface RemoteDbManager {
     fun downloadPerson(patientId: String, projectId: String): Single<fb_Person>
 
     fun uploadPerson(fbPerson: fb_Person): Completable
-
-    fun uploadPeople(patientsToUpload: ArrayList<fb_Person>): Completable
+    fun uploadPeople(projectId: String, patientsToUpload: ArrayList<fb_Person>): Completable
 
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
 

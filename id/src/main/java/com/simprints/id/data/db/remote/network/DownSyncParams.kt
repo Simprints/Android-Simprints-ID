@@ -3,7 +3,6 @@ package com.simprints.id.data.db.remote.network
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfoException
 import com.simprints.id.services.sync.SyncTaskParameters
-import java.util.*
 
 /**
  * An hashmap with (all optionals):
@@ -16,30 +15,25 @@ import java.util.*
  * Based on syncParams and last updated user
  */
 class DownSyncParams(syncParams: SyncTaskParameters,
-                     localDbManager: LocalDbManager) : HashMap<String, Any>() {
+                     localDbManager: LocalDbManager) {
 
-    companion object {
-        const val LAST_KNOWN_PATIENT_ID = "lastKnownPatientId"
-        const val LAST_KNOWN_PATIENT_AT = "lastKnownPatientUpdatedAt"
-        const val BATCH_SIZE = "batchSize"
-        const val BATCH_SIZE_VALUE = 5000
-    }
+    val projectId: String = syncParams.projectId
+    val userId: String? = syncParams.userId
+    val moduleId: String? = syncParams.moduleId
+
+    var lastKnownPatientId: String? = null
+    var lastKnownPatientUpdatedAt: Long? = null
 
     init {
-        syncParams.userId?.let { this[SyncTaskParameters.USER_ID_FIELD] = it }
-        syncParams.moduleId?.let { this[SyncTaskParameters.MODULE_ID_FIELD] = it }
-
         try {
             localDbManager
                 .getSyncInfoFor(syncParams.toGroup())
                 .blockingGet().let {
-                    this[LAST_KNOWN_PATIENT_AT] = it.lastKnownPatientUpdatedAt.time
+                    lastKnownPatientUpdatedAt = it.lastKnownPatientUpdatedAt.time
                     if (it.lastKnownPatientId.isNotEmpty())
-                        this[LAST_KNOWN_PATIENT_ID] = it.lastKnownPatientId
+                        lastKnownPatientId = it.lastKnownPatientId
                 }
         } catch (e: NoStoredLastSyncedInfoException) {
         }
-
-        this[BATCH_SIZE] = BATCH_SIZE_VALUE
     }
 }

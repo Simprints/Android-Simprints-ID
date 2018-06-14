@@ -10,8 +10,8 @@ import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFro
 import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
+import com.simprints.id.secure.models.LegacyProject
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.secure.models.ProjectId
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.io.IOException
@@ -56,13 +56,13 @@ class LegacyCompatibleProjectAuthenticator(loginInfoManager: LoginInfoManager,
 
     private fun checkLegacyProjectIdMatchesProjectId(expectedProjectId: String, legacyProjectId: String): Completable =
         Hasher().hash(legacyProjectId).let {
-            legacyProjectIdManager.requestProjectId(it)
+            legacyProjectIdManager.requestLegacyProject(it)
                 .checkReceivedProjectIdIsAsExpected(expectedProjectId)
         }
 
-    private fun Single<out ProjectId>.checkReceivedProjectIdIsAsExpected(expectedProjectId: String): Completable =
-        flatMapCompletable { projectId ->
-            val receivedProjectId = projectId.value
+    private fun Single<out LegacyProject>.checkReceivedProjectIdIsAsExpected(expectedProjectId: String): Completable =
+        flatMapCompletable { legacyProject ->
+            val receivedProjectId = legacyProject.projectId
             Completable.create {
                 if (receivedProjectId == expectedProjectId)
                     it.onComplete()
