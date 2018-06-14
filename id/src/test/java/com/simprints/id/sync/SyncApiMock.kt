@@ -1,15 +1,12 @@
 package com.simprints.id.sync
 
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.network.DownSyncParams
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.sync.models.PeopleCount
-import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.Calls
@@ -18,27 +15,23 @@ import retrofit2.mock.Calls
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class SimApiMock(private val delegate: BehaviorDelegate<PeopleRemoteInterface>) : PeopleRemoteInterface {
 
-    override fun uploadPeople(patientsJson: HashMap<String, ArrayList<fb_Person>>): Single<Result<Unit>> {
-        return delegate.returning(buildSuccessResponseWith("")).uploadPeople(patientsJson)
+    override fun uploadPeople(projectId: String, patientsJson: HashMap<String, ArrayList<fb_Person>>): Single<Result<Unit>> {
+        return delegate.returning(buildSuccessResponseWith("")).uploadPeople(projectId, patientsJson)
     }
 
-    override fun downSync(projectId: String, syncParams: DownSyncParams, batchSize: Int): Single<ResponseBody> {
-        return delegate.returning(buildSuccessResponseWith("")).downSync("", syncParams)
+    override fun downSync(projectId: String, userId: String?, moduleId: String?, lastKnownPatientId: String?, lastKnownPatientUpdatedAt: Long?): Single<ResponseBody> {
+        return delegate.returning(buildSuccessResponseWith("")).downSync(projectId, userId, moduleId, lastKnownPatientId, lastKnownPatientUpdatedAt)
     }
 
-    override fun person(patientId: String, projectId: String): Single<Response<fb_Person>> {
-        return delegate.returning(buildSuccessResponseWith("")).person(patientId, projectId)
+    override fun requestPerson(patientId: String, projectId: String): Single<Response<fb_Person>> {
+        return delegate.returning(buildSuccessResponseWith("")).requestPerson(patientId, projectId)
     }
 
-    override fun peopleCount(syncParams: Map<String, String>): Single<Response<PeopleCount>> {
-        return delegate.returning(buildSuccessResponseWith("{\"count\": 10}")).peopleCount(mapOf())
+    override fun requestPeopleCount(projectId: String, userId: String?, moduleId: String?): Single<Response<PeopleCount>> {
+        return delegate.returning(buildSuccessResponseWith("{\"count\": 10}")).requestPeopleCount(projectId, userId, moduleId)
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {
         return Calls.response(Response.success(body))
     }
-}
-
-fun createMockServiceToFailRequests(retrofit: Retrofit): PeopleRemoteInterface {
-    return SimApiMock(createMockBehaviorService(retrofit, 0, PeopleRemoteInterface::class.java))
 }
