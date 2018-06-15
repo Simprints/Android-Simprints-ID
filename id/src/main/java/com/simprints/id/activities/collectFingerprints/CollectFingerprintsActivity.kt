@@ -1,6 +1,5 @@
 package com.simprints.id.activities.collectFingerprints
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
@@ -29,7 +28,6 @@ import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.Finger
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.session.callout.CalloutAction
@@ -57,11 +55,7 @@ class CollectFingerprintsActivity :
 
     override var buttonContinue = false
 
-    private var rightToLeft = resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
-
-    //Array with only the active Fingers, used to populate the ViewPager
-    private val activeFingers = ArrayList<Finger>()
-    private var currentActiveFingerNo: Int = 0
+    private var rightToLeft: Boolean = false
 
     private val indicators = ArrayList<ImageView>()
 
@@ -73,7 +67,6 @@ class CollectFingerprintsActivity :
     private lateinit var syncItem: MenuItem
 
     // Singletons
-    @Inject lateinit var appState: AppState
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var dbManager: DbManager
 
@@ -85,27 +78,21 @@ class CollectFingerprintsActivity :
         setContentView(R.layout.activity_main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+        rightToLeft = resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
+
         nav_view.itemIconTintList = null
 
-
-
-        currentActiveFingerNo = 0
+        viewPresenter = CollectFingerprintsPresenter(this, this)
 
         initBarAndDrawer()
         initIndicators()
-        initViewPager()
 
-        viewPresenter = CollectFingerprintsPresenter(this, this)
         viewPresenter.start()
     }
 
     override fun onStart() {
         super.onStart()
         viewPresenter.handleOnStart()
-    }
-
-    public override fun onResume() {
-        super.onResume()
         LanguageHelper.setLanguage(this, preferencesManager.language)
     }
 
@@ -157,20 +144,15 @@ class CollectFingerprintsActivity :
         scan_button.setOnLongClickListener { onLongClick() }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private fun initViewPager() {
+    override fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean) {
         view_pager.adapter = pageAdapter
         view_pager.offscreenPageLimit = 1
         view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageScrollStateChanged(state: Int) {}
-            override fun onPageSelected(position: Int) {
-                currentActiveFingerNo = position
-                viewPresenter.refreshDisplay()
-                appState.scanner.resetUI(null)
-            }
+            override fun onPageSelected(position: Int) { onPageSelected(position) }
         })
-        view_pager.setOnTouchListener { _, _ -> viewPresenter.isScanning() }
+        view_pager.setOnTouchListener { _, _ -> onTouch() }
         view_pager.currentItem = viewPresenter.currentActiveFingerNo
 
         // If the layout is from right to left, we need to reverse the scrolling direction
@@ -182,9 +164,9 @@ class CollectFingerprintsActivity :
 
         var promptContinue = true
 
-        activeFingers.indices.forEach { fingerIndex ->
-            val selected = currentActiveFingerNo == fingerIndex
-            val finger = activeFingers[fingerIndex]
+        viewPresenter.activeFingers.indices.forEach { fingerIndex ->
+            val selected = viewPresenter.currentActiveFingerNo == fingerIndex
+            val finger = viewPresenter.activeFingers[fingerIndex]
             indicators[fingerIndex].setImageResource(finger.status.getDrawableId(selected))
 
             if (finger.template != null) {
@@ -207,7 +189,7 @@ class CollectFingerprintsActivity :
     }
 
     override fun refreshFingerFragment() {
-        pageAdapter.getFragment(currentActiveFingerNo)?.let {
+        pageAdapter.getFragment(viewPresenter.currentActiveFingerNo)?.let {
             if (rightToLeft) {
                 it.view?.rotationY = 180f
             }
@@ -219,7 +201,7 @@ class CollectFingerprintsActivity :
         buttonContinue = false
 
         continueItem?.let {
-            if (activeFingers[currentActiveFingerNo].isCollecting) {
+            if (viewPresenter.isScanning()) {
                 it.setIcon(R.drawable.ic_menu_forward_grey)
                 it.isEnabled = false
             } else {
@@ -242,9 +224,9 @@ class CollectFingerprintsActivity :
 
         if (nudge) {
             Handler().postDelayed({
-                if (currentActiveFingerNo < activeFingers.size) {
+                if (viewPresenter.currentActiveFingerNo < viewPresenter.activeFingers.size) {
                     view_pager.setScrollDuration(SLOW_SWIPE_SPEED)
-                    view_pager.currentItem = currentActiveFingerNo + 1
+                    view_pager.currentItem = viewPresenter.currentActiveFingerNo + 1
                     view_pager.setScrollDuration(FAST_SWIPE_SPEED)
                 }
             }, AUTO_SWIPE_DELAY)
@@ -255,13 +237,11 @@ class CollectFingerprintsActivity :
     // It gathers all valid fingerprints and either it saves them in case of enrol or returns them
     // for identifications/verifications
     override fun onActionForward() {
-        // Gathers the fingerprints in a list
-        activeFingers[currentActiveFingerNo]
 
         val fingerprints = ArrayList<Fingerprint>()
         var nbRequiredFingerprints = 0
 
-        for (finger in activeFingers) {
+        for (finger in viewPresenter.activeFingers) {
             if ((finger.isGoodScan || finger.isBadScan || finger.isRescanGoodScan) && finger.template != null) {
                 fingerprints.add(Fingerprint(finger.id, finger.template.templateBytes))
 
@@ -304,9 +284,8 @@ class CollectFingerprintsActivity :
     }
 
     override fun onBackPressed() {
-        val drawer = findViewById<DrawerLayout>(R.id.drawer_layout)
         when {
-            drawer.isDrawerOpen(GravityCompat.START) -> drawer.closeDrawer(GravityCompat.START)
+            drawer_layout.isDrawerOpen(GravityCompat.START) -> drawer_layout.closeDrawer(GravityCompat.START)
             viewPresenter.isScanning() -> viewPresenter.handleBackPressedWhileScanning()
             else -> {
                 viewPresenter.handleOnBackPressedToLeave()

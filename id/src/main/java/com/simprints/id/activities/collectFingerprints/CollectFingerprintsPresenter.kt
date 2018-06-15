@@ -78,6 +78,12 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun isScanning(): Boolean = currentFinger().isCollecting
 
+    override fun viewPagerOnPageSelected(position: Int) {
+        currentActiveFingerNo = position
+        refreshDisplay()
+        scanningHelper.resetScannerUi()
+    }
+
     override fun handleBackPressedWhileScanning() {
         scanningHelper.toggleContinuousCapture()
     }

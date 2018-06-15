@@ -37,6 +37,7 @@ interface CollectFingerprintsContract {
         fun refreshIndicators(): Pair<Int, Boolean>
         fun setScanButtonEnabled(enabled: Boolean)
         fun setCurrentViewPagerItem(idx: Int)
+        fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
     }
 
     interface Presenter: BasePresenter {
@@ -64,5 +65,6 @@ interface CollectFingerprintsContract {
         fun handleAddFingerPressed()
         fun currentFinger(): Finger
         fun handleUnexpectedError(error: SimprintsError)
+        fun viewPagerOnPageSelected(position: Int)
     }
 }
