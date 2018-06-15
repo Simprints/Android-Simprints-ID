@@ -17,7 +17,6 @@ import android.support.v7.widget.Toolbar
 import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.Toast
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -34,27 +33,17 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
-import com.simprints.id.domain.Finger.NB_OF_FINGERS
-import com.simprints.id.domain.Finger.Status
-import com.simprints.id.domain.FingerRes
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
-import com.simprints.id.tools.extensions.isFingerNotCollectable
-import com.simprints.id.tools.extensions.isFingerRequired
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
-import com.simprints.libcommon.FingerConfig
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libcommon.Person
-import com.simprints.libcommon.ScanConfig
-import com.simprints.libscanner.SCANNER_ERROR
-import com.simprints.libscanner.ScannerCallback
 import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.libsimprints.Registration
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -71,10 +60,7 @@ class CollectFingerprintsActivity :
 
     override var buttonContinue = false
 
-    private var rightToLeft = false
-
-    //Array with all fingers, built based on defaultScanConfig
-    private var fingers = ArrayList<Finger>(NB_OF_FINGERS)
+    private var rightToLeft = resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
 
     //Array with only the active Fingers, used to populate the ViewPager
     private val activeFingers = ArrayList<Finger>()
@@ -83,15 +69,11 @@ class CollectFingerprintsActivity :
     private val indicators = ArrayList<ImageView>()
 
     private lateinit var pageAdapter: FingerPageAdapter
-    private lateinit var timeoutBar: TimeoutBar
-
-    private var registrationResult: Registration? = null
-    private var previousStatus: Status = Status.NOT_COLLECTED
+    override lateinit var timeoutBar: TimeoutBar
+    override lateinit var un20WakeupDialog: ProgressDialog
 
     private var continueItem: MenuItem? = null
     private lateinit var syncItem: MenuItem
-
-    override lateinit var un20WakeupDialog: ProgressDialog
 
     // Singletons
     @Inject lateinit var appState: AppState
@@ -118,10 +100,6 @@ class CollectFingerprintsActivity :
 
         pageAdapter = FingerPageAdapter(supportFragmentManager, activeFingers)
 
-        timeoutBar = TimeoutBar(applicationContext,
-            findViewById<View>(R.id.pb_timeout) as ProgressBar,
-            preferencesManager.timeoutS * 1000)
-
         initBarAndDrawer()
         initIndicators()
         initViewPager()
@@ -143,7 +121,7 @@ class CollectFingerprintsActivity :
 
     // init the bars and drawers, in particular:
     // 1) add listeners for drawer open/close
-    // 2) set the title based on the ColloutAction
+    // 2) set the title based on the CalloutAction
     private fun initBarAndDrawer() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -171,7 +149,7 @@ class CollectFingerprintsActivity :
 
     // It adds an imageView for each bullet point (indicator) underneath the finger image.
     // "Indicator" indicates the scan state (good scan/bad scan/ etc...) for a specific finger.
-    private fun initIndicators() {
+    override fun initIndicators() {
         indicator_layout.removeAllViewsInLayout()
         indicators.clear()
         for (i in viewPresenter.activeFingers.indices) {
@@ -191,9 +169,6 @@ class CollectFingerprintsActivity :
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initViewPager() {
-        // If the layout is from right to left, we need to reverse the scrolling direction
-        rightToLeft = resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
-
         view_pager.adapter = pageAdapter
         view_pager.offscreenPageLimit = 1
         view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -208,9 +183,8 @@ class CollectFingerprintsActivity :
         view_pager.setOnTouchListener { _, _ -> viewPresenter.isScanning() }
         view_pager.currentItem = viewPresenter.currentActiveFingerNo
 
-        if (rightToLeft) {
-            view_pager.rotationY = 180f
-        }
+        // If the layout is from right to left, we need to reverse the scrolling direction
+        if (rightToLeft) view_pager.rotationY = 180f
     }
 
     // Resets the UI:
@@ -332,8 +306,7 @@ class CollectFingerprintsActivity :
 
     // If the enrol succeed, the activity returns the result and finishes.
     private fun handleRegistrationSuccess() {
-        registrationResult = Registration(preferencesManager.patientId)
-
+        val registrationResult = Registration(preferencesManager.patientId)
         val resultData = Intent(Constants.SIMPRINTS_REGISTER_INTENT)
         FormatResult.put(resultData, registrationResult, preferencesManager.resultFormat)
         setResult(Activity.RESULT_OK, resultData)
@@ -377,9 +350,7 @@ class CollectFingerprintsActivity :
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-        when (id) {
+        when (item.itemId) {
             R.id.nav_autoAdd -> {
                 viewPresenter.handleAutoAddFingerPressed()
                 return true
@@ -406,7 +377,6 @@ class CollectFingerprintsActivity :
             SETTINGS_ACTIVITY_REQUEST_CODE, PRIVACY_ACTIVITY_REQUEST_CODE, ABOUT_ACTIVITY_REQUEST_CODE -> {
                 super.onActivityResult(requestCode, resultCode, data)
             }
-
             REFUSAL_ACTIVITY_REQUEST, ALERT_ACTIVITY_REQUEST_CODE -> if (resultCode == RESULT_TRY_AGAIN) {
                 viewPresenter.handleTryAgain()
             } else {

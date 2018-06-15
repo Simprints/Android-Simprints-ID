@@ -55,7 +55,9 @@ class CollectFingerprintsPresenter(private val context: Context,
         return true
     }
 
-    override fun isScanning(): Boolean = activeFingers[currentActiveFingerNo].isCollecting
+    override fun currentFinger(): Finger = activeFingers[currentActiveFingerNo]
+
+    override fun isScanning(): Boolean = currentFinger().isCollecting
 
     override fun handleBackPressedWhileScanning() {
         scanningHelper.toggleContinuousCapture()

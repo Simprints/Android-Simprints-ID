@@ -6,6 +6,7 @@ import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
+import com.simprints.id.tools.TimeoutBar
 
 
 interface CollectFingerprintsContract {
@@ -22,9 +23,11 @@ interface CollectFingerprintsContract {
         fun setSyncItem(enabled: Boolean, title: String, @DrawableRes icon: Int)
 
         // Scanning
+        var timeoutBar: TimeoutBar
         var un20WakeupDialog: ProgressDialog
 
         fun setScanButtonListeners(onClick: () -> Unit, onLongClick: () -> Boolean)
+        fun initIndicators()
     }
 
     interface Presenter: BasePresenter {
@@ -48,5 +51,6 @@ interface CollectFingerprintsContract {
         // Finger
         fun handleAutoAddFingerPressed()
         fun handleAddFingerPressed()
+        fun currentFinger(): Finger
     }
 }

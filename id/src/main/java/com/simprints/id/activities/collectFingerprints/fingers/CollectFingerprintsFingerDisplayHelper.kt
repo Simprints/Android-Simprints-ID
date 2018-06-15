@@ -3,9 +3,7 @@ package com.simprints.id.activities.collectFingerprints.fingers
 import android.app.Activity
 import android.content.Context
 import com.simprints.id.Application
-import com.simprints.id.activities.collectFingerprints.AddFingerDialog
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
-import com.simprints.id.activities.collectFingerprints.FingerDialogOption
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.FingerRes

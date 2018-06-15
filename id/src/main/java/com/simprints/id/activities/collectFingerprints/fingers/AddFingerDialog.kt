@@ -1,4 +1,4 @@
-package com.simprints.id.activities.collectFingerprints
+package com.simprints.id.activities.collectFingerprints.fingers
 
 import android.content.Context
 import android.support.v7.app.AlertDialog
