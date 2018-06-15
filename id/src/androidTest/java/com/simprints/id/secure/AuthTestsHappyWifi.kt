@@ -6,6 +6,8 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
 import android.util.Base64.NO_WRAP
+import com.simprints.mockscanner.MockBluetoothAdapter
+import com.simprints.mockscanner.MockScannerManager
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.db.local.models.LocalDbKey
@@ -13,9 +15,9 @@ import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTemplates.HappyBluetooth
 import com.simprints.id.testTemplates.HappyWifi
 import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.tools.RandomGenerator
@@ -30,7 +32,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth, DaggerForAndroidTests() {
+class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, DaggerForAndroidTests() {
 
     private val calloutCredentials = CalloutCredentials(
         "bWOFHInKA2YaQwrxZ7uJ",
@@ -61,16 +63,21 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, HappyBluetooth, DaggerForAn
     @JvmField
     val loginTestRule = ActivityTestRule<CheckLoginFromIntentActivity>(CheckLoginFromIntentActivity::class.java, false, false)
 
-    @Inject lateinit var remoteDbManager: RemoteDbManager
-    @Inject lateinit var randomGeneratorMock: RandomGenerator
+    @Inject
+    lateinit var remoteDbManager: RemoteDbManager
+    @Inject
+    lateinit var randomGeneratorMock: RandomGenerator
 
     override var module by lazyVar {
-        AppModuleForAndroidTests(app, randomGeneratorSpy = false)
+        AppModuleForAndroidTests(app,
+            randomGeneratorRule = MockRule(),
+            bluetoothComponentAdapterRule = ReplaceRule { mockScannerManager })
     }
+
+    private var mockScannerManager = MockBluetoothAdapter(MockScannerManager())
 
     @Before
     override fun setUp() {
-        super<HappyBluetooth>.setUp()
         super<HappyWifi>.setUp()
         app = InstrumentationRegistry.getTargetContext().applicationContext as Application
         super<DaggerForAndroidTests>.setUp()

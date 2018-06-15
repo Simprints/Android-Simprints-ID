@@ -11,6 +11,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
+import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.tools.delegates.lazyVar
@@ -39,9 +40,9 @@ class CheckLoginFromMainLauncherActivityTest : DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            localDbManagerSpy = false,
-            remoteDbManagerSpy = false,
-            secureDataManagerSpy = false)
+            localDbManagerRule = MockRule(),
+            remoteDbManagerRule = MockRule(),
+            secureDataManagerRule = MockRule())
     }
 
     @Before

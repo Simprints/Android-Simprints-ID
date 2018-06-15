@@ -1,5 +1,6 @@
 package com.simprints.id
 
+
 import android.support.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore

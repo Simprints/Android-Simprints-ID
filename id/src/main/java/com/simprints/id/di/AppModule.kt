@@ -1,5 +1,6 @@
 package com.simprints.id.di
 
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
@@ -31,13 +32,12 @@ import com.simprints.id.tools.*
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import com.simprints.id.tools.utils.NetworkUtils
+import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
+import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-/**
- * Created by fabiotuzza on 16/01/2018.
- */
 @Module
 open class AppModule(val app: Application) {
 
@@ -118,12 +118,17 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
+    open fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter = AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
+
+    @Provides
+    @Singleton
     fun provideSetup(preferencesManager: PreferencesManager,
                      dbManager: DbManager,
                      loginInfoManager: LoginInfoManager,
                      analyticsManager: AnalyticsManager,
                      appState: AppState,
-                     networkUtils: NetworkUtils): Setup = Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, networkUtils)
+                     networkUtils: NetworkUtils,
+                     bluetoothComponentAdapter: BluetoothComponentAdapter): Setup = Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, networkUtils, bluetoothComponentAdapter)
 
     @Provides
     @Singleton

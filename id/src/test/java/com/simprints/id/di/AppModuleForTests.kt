@@ -3,17 +3,20 @@ package com.simprints.id.di
 import com.simprints.id.Application
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.shared.AppModuleForAnyTests
+import com.simprints.id.shared.DependencyRule
+import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.shared.setupFakeKeyStore
 
 open class AppModuleForTests(app: Application,
-                             override var localDbManagerSpy: Boolean? = null,
-                             override var remoteDbManagerSpy: Boolean? = null,
-                             override var dbManagerSpy: Boolean? = null,
-                             override val secureDataManagerSpy: Boolean? = null,
-                             override var dataManagerSpy: Boolean? = null,
-                             override var loginInfoManagerSpy: Boolean? = null,
-                             override var analyticsManagerSpy: Boolean? = null)
-    : AppModuleForAnyTests(app, localDbManagerSpy, remoteDbManagerSpy, dbManagerSpy, secureDataManagerSpy, dataManagerSpy, loginInfoManagerSpy, analyticsManagerSpy) {
+                             override var localDbManagerRule: DependencyRule = RealRule(),
+                             override var remoteDbManagerRule: DependencyRule = RealRule(),
+                             override var dbManagerRule: DependencyRule = RealRule(),
+                             override var secureDataManagerRule: DependencyRule = RealRule(),
+                             override var dataManagerRule: DependencyRule = RealRule(),
+                             override var loginInfoManagerRule: DependencyRule = RealRule(),
+                             override var analyticsManagerRule: DependencyRule = RealRule(),
+                             override var bluetoothComponentAdapterRule: DependencyRule = RealRule())
+    : AppModuleForAnyTests(app, localDbManagerRule, remoteDbManagerRule, dbManagerRule, secureDataManagerRule, dataManagerRule, loginInfoManagerRule, analyticsManagerRule, bluetoothComponentAdapterRule) {
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
 }

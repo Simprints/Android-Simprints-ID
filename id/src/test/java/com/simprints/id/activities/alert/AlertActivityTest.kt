@@ -11,6 +11,7 @@ import com.simprints.id.activities.IntentKeys
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.testUtils.extensions.showOnScreen
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.createRoboAlertActivity
@@ -31,10 +32,10 @@ class AlertActivityTest : DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            remoteDbManagerSpy = false,
-            localDbManagerSpy = false,
-            analyticsManagerSpy = false,
-            secureDataManagerSpy = false)
+            remoteDbManagerRule = MockRule(),
+            localDbManagerRule = MockRule(),
+            analyticsManagerRule = MockRule(),
+            secureDataManagerRule = MockRule())
     }
 
     @Before
