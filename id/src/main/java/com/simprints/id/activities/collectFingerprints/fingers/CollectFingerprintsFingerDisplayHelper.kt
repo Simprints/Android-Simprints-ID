@@ -2,8 +2,10 @@ package com.simprints.id.activities.collectFingerprints.fingers
 
 import android.app.Activity
 import android.content.Context
+import android.support.v7.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
+import com.simprints.id.activities.collectFingerprints.FingerPageAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.FingerRes
@@ -25,13 +27,6 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
     //Array with all fingers, built based on defaultScanConfig
     private var fingers = ArrayList<Finger>(Finger.NB_OF_FINGERS)
 
-    init {
-        ((view as Activity).application as Application).component.inject(this)
-
-        setFingerStatus()
-        initActiveFingers()
-    }
-
     private val defaultScanConfig = ScanConfig().apply {
         set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0, 0)
         set(FingerIdentifier.LEFT_INDEX_FINGER, FingerConfig.REQUIRED, 1, 1)
@@ -43,6 +38,18 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         set(FingerIdentifier.RIGHT_3RD_FINGER, FingerConfig.OPTIONAL, 7, 7)
         set(FingerIdentifier.RIGHT_4TH_FINGER, FingerConfig.OPTIONAL, 8, 8)
         set(FingerIdentifier.RIGHT_5TH_FINGER, FingerConfig.OPTIONAL, 9, 9)
+    }
+
+    init {
+        ((view as Activity).application as Application).component.inject(this)
+
+        setFingerStatus()
+        initPageAdapter()
+        initActiveFingers()
+    }
+
+    private fun initPageAdapter() {
+        view.pageAdapter = FingerPageAdapter((view as AppCompatActivity).supportFragmentManager, presenter.activeFingers)
     }
 
     // Reads the fingerStatus Map (from sharedPrefs) and "active" LEFT_THUMB and LEFT_INDEX_FINGER as
@@ -127,10 +134,7 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
 
             updateLastFinger()
 
-            initIndicators()
-            pageAdapter.notifyDataSetChanged()
-            view_pager.currentItem = presenter.currentActiveFingerNo
-            refreshDisplay()
+            handleFingersChanged()
         }.create()
 
         (view as Activity).runOnUiThreadIfStillRunning {
@@ -164,9 +168,13 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
 
         presenter.activeFingers[presenter.activeFingers.size - 1].isLastFinger = true
 
-        initIndicators()
-        pageAdapter.notifyDataSetChanged()
-        view_pager.currentItem = presenter.currentActiveFingerNo
-        refreshDisplay()
+        handleFingersChanged()
+    }
+
+    private fun handleFingersChanged() {
+        view.initIndicators()
+        view.pageAdapter.notifyDataSetChanged()
+        view.setCurrentViewPagerItem(presenter.currentActiveFingerNo)
+        presenter.refreshDisplay()
     }
 }

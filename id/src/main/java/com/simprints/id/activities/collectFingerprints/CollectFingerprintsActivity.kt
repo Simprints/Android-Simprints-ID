@@ -26,9 +26,6 @@ import com.simprints.id.activities.RefusalActivity
 import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.about.AboutActivity
 import com.simprints.id.activities.matching.MatchingActivity
-import com.simprints.id.controllers.Setup
-import com.simprints.id.data.DataManager
-import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
@@ -68,7 +65,7 @@ class CollectFingerprintsActivity :
 
     private val indicators = ArrayList<ImageView>()
 
-    private lateinit var pageAdapter: FingerPageAdapter
+    override lateinit var pageAdapter: FingerPageAdapter
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
 
@@ -77,11 +74,7 @@ class CollectFingerprintsActivity :
 
     // Singletons
     @Inject lateinit var appState: AppState
-    @Inject lateinit var setup: Setup
-    @Inject lateinit var dataManager: DataManager
-    @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var dbManager: DbManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,16 +87,13 @@ class CollectFingerprintsActivity :
 
         nav_view.itemIconTintList = null
 
-        preferencesManager.msSinceBootOnMainStart = timeHelper.msSinceBoot()
+
 
         currentActiveFingerNo = 0
-
-        pageAdapter = FingerPageAdapter(supportFragmentManager, activeFingers)
 
         initBarAndDrawer()
         initIndicators()
         initViewPager()
-        refreshDisplay()
 
         viewPresenter = CollectFingerprintsPresenter(this, this)
         viewPresenter.start()
@@ -142,7 +132,7 @@ class CollectFingerprintsActivity :
                 CalloutAction.IDENTIFY -> it.setTitle(R.string.identify_title)
                 CalloutAction.UPDATE -> it.setTitle(R.string.update_title)
                 CalloutAction.VERIFY -> it.setTitle(R.string.verify_title)
-                else -> handleUnexpectedError(InvalidCalloutParameterError.forParameter("CalloutParameters"))
+                else -> viewPresenter.handleUnexpectedError(InvalidCalloutParameterError.forParameter("CalloutParameters"))
             }
         }
     }
@@ -176,7 +166,7 @@ class CollectFingerprintsActivity :
             override fun onPageScrollStateChanged(state: Int) {}
             override fun onPageSelected(position: Int) {
                 currentActiveFingerNo = position
-                refreshDisplay()
+                viewPresenter.refreshDisplay()
                 appState.scanner.resetUI(null)
             }
         })
@@ -187,15 +177,7 @@ class CollectFingerprintsActivity :
         if (rightToLeft) view_pager.rotationY = 180f
     }
 
-    // Resets the UI:
-    // 1) set the right image for the current finger indicator (gray/green bullet point)
-    // 2) set the right UI for scan button based on current finger state.
-    // 3) set the direction for the ViewPager swipe.
-    // 4) set the UI for the top-right button (continueItem) based on the scan state.
-    //      interesting: promptContinue - it drives the arrow's UI, but it depends on
-    //                                    the last scan only.
-    private fun refreshDisplay() {
-        // Update indicators display
+    override fun refreshIndicators(): Pair<Int, Boolean> {
         var nbCollected = 0
 
         var promptContinue = true
@@ -212,22 +194,28 @@ class CollectFingerprintsActivity :
                 promptContinue = false
             }
         }
+        return Pair(nbCollected, promptContinue)
+    }
 
-        // Update scan button display
-        val activeStatus = activeFingers[currentActiveFingerNo].status
+    override fun refreshScanButtonAndTimeoutBar() {
+        val activeStatus = viewPresenter.currentFinger().status
         scan_button.setText(activeStatus.buttonTextId)
         scan_button.setTextColor(activeStatus.buttonTextColor)
         scan_button.setBackgroundColor(activeStatus.buttonBgColor)
 
         timeoutBar.setProgressBar(activeStatus)
+    }
 
+    override fun refreshFingerFragment() {
         pageAdapter.getFragment(currentActiveFingerNo)?.let {
             if (rightToLeft) {
                 it.view?.rotationY = 180f
             }
             it.updateTextAccordingToStatus()
         }
+    }
 
+    override fun refreshContinueButton(nbCollected: Int, promptContinue: Boolean) {
         buttonContinue = false
 
         continueItem?.let {
@@ -248,13 +236,8 @@ class CollectFingerprintsActivity :
         }
     }
 
-    private fun handleUnexpectedError(error: SimprintsError) {
-        analyticsManager.logError(error)
-        doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
-    }
-
     // Swipes ViewPager automatically when the scanner's button is pressed.
-    private fun nudgeMode() {
+    override fun nudgeMode() {
         val nudge = preferencesManager.nudgeMode
 
         if (nudge) {
@@ -315,8 +298,7 @@ class CollectFingerprintsActivity :
 
     // If the enrol fails, the activity shows an alert activity the finishes.
     private fun handleRegistrationFailure(throwable: Throwable) {
-        analyticsManager.logError(SimprintsError(throwable))
-        doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
+        viewPresenter.handleUnexpectedError(SimprintsError(throwable))
         setResult(Activity.RESULT_CANCELED)
         finish()
     }
@@ -336,7 +318,7 @@ class CollectFingerprintsActivity :
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
         continueItem = menu.findItem(R.id.action_forward)
-        refreshDisplay()
+        viewPresenter.refreshDisplay()
         return true
     }
 
@@ -401,6 +383,14 @@ class CollectFingerprintsActivity :
             syncItem.title = title
             syncItem.setIcon(icon)
         }
+    }
+
+    override fun setScanButtonEnabled(enabled: Boolean) {
+        scan_button.isEnabled = enabled
+    }
+
+    override fun setCurrentViewPagerItem(idx: Int) {
+        view_pager.currentItem = idx
     }
 
     override fun cancelAndFinish() {
