@@ -6,8 +6,8 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
 import android.util.Base64.NO_WRAP
-import com.example.mockscanner.MockBluetoothAdapter
-import com.example.mockscanner.MockScannerManager
+import com.simprints.mockscanner.MockBluetoothAdapter
+import com.simprints.mockscanner.MockScannerManager
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.db.local.models.LocalDbKey
@@ -71,10 +71,10 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, DaggerForAndroidTests() {
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
             randomGeneratorRule = MockRule(),
-            bluetoothComponentAdapterRule = ReplaceRule({ mockScannerManager }))
+            bluetoothComponentAdapterRule = ReplaceRule { mockScannerManager })
     }
 
-    var mockScannerManager = MockBluetoothAdapter(MockScannerManager())
+    private var mockScannerManager = MockBluetoothAdapter(MockScannerManager())
 
     @Before
     override fun setUp() {
