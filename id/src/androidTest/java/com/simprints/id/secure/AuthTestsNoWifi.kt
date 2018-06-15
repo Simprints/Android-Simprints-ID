@@ -1,7 +1,9 @@
 package com.simprints.id.secure
 
 import android.support.test.InstrumentationRegistry
+import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
+import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
@@ -9,6 +11,7 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.NoWifi
@@ -20,8 +23,11 @@ import io.realm.RealmConfiguration
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import javax.inject.Inject
 
+@RunWith(AndroidJUnit4::class)
+@LargeTest
 class AuthTestsNoWifi : FirstUseLocal, NoWifi, DaggerForAndroidTests() {
 
     private val calloutCredentials = CalloutCredentials(
@@ -47,7 +53,7 @@ class AuthTestsNoWifi : FirstUseLocal, NoWifi, DaggerForAndroidTests() {
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
     override var module by lazyVar {
-        AppModuleForAndroidTests(app, randomGeneratorSpy = false)
+        AppModuleForAndroidTests(app, randomGeneratorRule = MockRule())
     }
 
     @Before

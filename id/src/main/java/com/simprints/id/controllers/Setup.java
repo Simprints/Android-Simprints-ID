@@ -26,6 +26,7 @@ import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
 import com.simprints.libscanner.ScannerCallback;
 import com.simprints.libscanner.ScannerUtils;
+import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,23 +36,27 @@ import timber.log.Timber;
 import static com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE;
 import static com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE;
 import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
+import static com.simprints.libscanner.ScannerUtils.convertAddressToSerial;
 
 public class Setup {
 
     private final NetworkUtils networkUtils;
+    private BluetoothComponentAdapter bluetoothAdapter;
 
     public Setup(PreferencesManager preferencesManager,
                   DbManager dbManager,
                   LoginInfoManager loginInfoManager,
                   AnalyticsManager analyticsManager,
                   AppState appState,
-                  NetworkUtils networkUtils) {
+                  NetworkUtils networkUtils,
+                  BluetoothComponentAdapter bluetoothAdapter) {
         this.analyticsManager = analyticsManager;
         this.loginInfoManager = loginInfoManager;
         this.dbManager = dbManager;
         this.preferencesManager = preferencesManager;
         this.appState = appState;
         this.networkUtils = networkUtils;
+        this.bluetoothAdapter = bluetoothAdapter;
     }
 
 
@@ -133,7 +138,7 @@ public class Setup {
     // STEP 2
     private void initScanner(@NonNull final Activity activity) {
         onProgress(45, R.string.launch_bt_connect);
-        List<String> pairedScanners = ScannerUtils.getPairedScanners();
+        List<String> pairedScanners = ScannerUtils.getPairedScanners(bluetoothAdapter);
         if (pairedScanners.size() == 0) {
             onAlert(ALERT_TYPE.NOT_PAIRED);
             return;
@@ -144,10 +149,12 @@ public class Setup {
         }
         String macAddress = pairedScanners.get(0);
         preferencesManager.setMacAddress(macAddress);
-        appState.setScanner(new Scanner(macAddress));
 
-        //TODO: move convertAddressToSerial in libscanner
-        preferencesManager.setLastScannerUsed(com.simprints.id.tools.utils.ScannerUtils.convertAddressToSerial(macAddress));
+        Scanner scanner;
+        scanner = new Scanner(macAddress, bluetoothAdapter);
+        appState.setScanner(scanner);
+
+        preferencesManager.setLastScannerUsed(convertAddressToSerial(macAddress));
 
         Timber.d("Setup: Scanner initialized.");
         goOn(activity);

@@ -22,6 +22,7 @@ import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.UploadProgress
 import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -67,8 +68,8 @@ class SyncTest : RxJavaTest, DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            remoteDbManagerSpy = true,
-            localDbManagerSpy = false)
+            remoteDbManagerRule = SpyRule(),
+            localDbManagerRule = MockRule())
     }
 
     @Before

@@ -16,6 +16,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.shared.anyNotNull
+import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
@@ -60,9 +61,9 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            analyticsManagerSpy = true,
-            localDbManagerSpy = false,
-            remoteDbManagerSpy = false)
+            analyticsManagerRule = SpyRule(),
+            localDbManagerRule = MockRule(),
+            remoteDbManagerRule = MockRule())
     }
 
     @Before
