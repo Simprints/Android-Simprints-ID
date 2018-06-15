@@ -263,6 +263,10 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         presenter.refreshDisplay()
     }
 
+    fun resetScannerUi() {
+        appState.scanner.resetUI(null)
+    }
+
     fun stopReconnecting() {
         setup.stop()
     }

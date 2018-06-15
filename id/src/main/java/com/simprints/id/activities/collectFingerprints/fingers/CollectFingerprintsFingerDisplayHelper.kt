@@ -45,6 +45,7 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
 
         setFingerStatus()
         initPageAdapter()
+        initViewPager()
         initActiveFingers()
     }
 
@@ -84,6 +85,12 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         fingers.sort()
 
         updateLastFinger()
+    }
+
+    private fun initViewPager() {
+        view.initViewPager(
+            onPageSelected = { presenter.viewPagerOnPageSelected(it) },
+            onTouch = { presenter.isScanning() })
     }
 
     fun addFinger() {
