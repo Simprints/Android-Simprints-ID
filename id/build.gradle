@@ -262,7 +262,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin_version"
 
     // Simprints
-    implementation "com.simprints:libscanner:2018.2.0"
+    implementation "com.simprints:libscanner:2018.2.1"
     implementation 'com.simprints:libmatcher:1.3.2'
 
     // Test
@@ -292,7 +292,7 @@ dependencies {
     }
     androidTestImplementation 'com.simprints:cerberus-library:2018.1.1-dev-1'
     androidTestImplementation 'com.simprints:remote-admin-client:2017.4.0-dev-5'
-    androidTestImplementation "com.simprints:mockscanner:2018.2.1"
+    androidTestImplementation "com.simprints:mockscanner:2018.2.2"
     androidTestImplementation 'joda-time:joda-time:2.9.9'
 
     //UI
