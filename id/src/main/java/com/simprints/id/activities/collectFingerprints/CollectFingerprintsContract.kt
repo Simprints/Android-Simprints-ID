@@ -6,6 +6,7 @@ import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
+import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.tools.TimeoutBar
 
 
@@ -23,17 +24,27 @@ interface CollectFingerprintsContract {
         fun setSyncItem(enabled: Boolean, title: String, @DrawableRes icon: Int)
 
         // Scanning
+        var pageAdapter: FingerPageAdapter
         var timeoutBar: TimeoutBar
         var un20WakeupDialog: ProgressDialog
 
         fun setScanButtonListeners(onClick: () -> Unit, onLongClick: () -> Boolean)
         fun initIndicators()
+        fun refreshContinueButton(nbCollected: Int, promptContinue: Boolean)
+        fun refreshFingerFragment()
+        fun refreshScanButtonAndTimeoutBar()
+        fun nudgeMode()
+        fun refreshIndicators(): Pair<Int, Boolean>
+        fun setScanButtonEnabled(enabled: Boolean)
+        fun setCurrentViewPagerItem(idx: Int)
     }
 
     interface Presenter: BasePresenter {
 
         val activeFingers: ArrayList<Finger>
         var currentActiveFingerNo: Int
+
+        fun refreshDisplay()
 
         // Lifecycle
         fun handleOnStart()
@@ -52,5 +63,6 @@ interface CollectFingerprintsContract {
         fun handleAutoAddFingerPressed()
         fun handleAddFingerPressed()
         fun currentFinger(): Finger
+        fun handleUnexpectedError(error: SimprintsError)
     }
 }

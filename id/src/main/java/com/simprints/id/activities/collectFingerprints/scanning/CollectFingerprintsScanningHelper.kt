@@ -26,7 +26,6 @@ import com.simprints.libcommon.Fingerprint
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
-import kotlinx.android.synthetic.main.content_main.*
 import javax.inject.Inject
 
 
@@ -137,7 +136,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
             else -> {
                 cancelCaptureUI()
-                handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "CollectFingerprintsActivity"))
+                presenter.handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "CollectFingerprintsActivity"))
             }
         }
     }
@@ -148,8 +147,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
         appState.scanner.resetUI(object : ScannerCallback {
             override fun onSuccess() {
-                refreshDisplay()
-                scan_button.isEnabled = true
+                presenter.refreshDisplay()
+                view.setScanButtonEnabled(true)
                 view.un20WakeupDialog.dismiss()
             }
 
@@ -157,7 +156,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 when (scanner_error) {
                     SCANNER_ERROR.BUSY -> resetUIFromError()
                     SCANNER_ERROR.INVALID_STATE -> reconnect()
-                    else -> handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "CollectFingerprintsActivity"))
+                    else -> presenter.handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "CollectFingerprintsActivity"))
                 }
             }
         })
@@ -170,14 +169,14 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         when (finger.status) {
             Finger.Status.GOOD_SCAN -> {
                 presenter.activeFingers[presenter.currentActiveFingerNo].isRescanGoodScan
-                refreshDisplay()
+                presenter.refreshDisplay()
             }
             Finger.Status.RESCAN_GOOD_SCAN, Finger.Status.BAD_SCAN, Finger.Status.NOT_COLLECTED -> {
                 previousStatus = finger.status
                 finger.status = Finger.Status.COLLECTING
-                refreshDisplay()
-                scan_button.isEnabled = true
-                refreshDisplay()
+                presenter.refreshDisplay()
+                view.setScanButtonEnabled(true)
+                presenter.refreshDisplay()
                 startContinuousCapture()
             }
             Finger.Status.COLLECTING -> stopContinuousCapture()
@@ -224,13 +223,13 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private fun forceCaptureNotPossible() {
         presenter.currentFinger().status = Finger.Status.BAD_SCAN
         Vibrate.vibrate(context, preferencesManager.vibrateMode)
-        refreshDisplay()
+        presenter.refreshDisplay()
     }
 
     private fun cancelCaptureUI() {
         presenter.currentFinger().status = previousStatus
         view.timeoutBar.cancelTimeoutBar()
-        refreshDisplay()
+        presenter.refreshDisplay()
     }
 
     private fun captureSuccess() {
@@ -255,13 +254,13 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
         if (quality >= qualityScore1) {
             presenter.currentFinger().status = Finger.Status.GOOD_SCAN
-            nudgeMode()
+            view.nudgeMode()
         } else {
             presenter.currentFinger().status = Finger.Status.BAD_SCAN
         }
 
         Vibrate.vibrate(context, preferencesManager.vibrateMode)
-        refreshDisplay()
+        presenter.refreshDisplay()
     }
 
     fun stopReconnecting() {

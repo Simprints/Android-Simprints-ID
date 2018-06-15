@@ -22,6 +22,7 @@ import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
 import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
 import com.simprints.id.activities.collectFingerprints.sync.CollectFingerprintsSyncHelper
@@ -62,6 +63,7 @@ interface AppComponent {
     fun inject(dashboardCardsFactory: DashboardCardsFactory)
     fun inject(dashboardSyncCard: DashboardSyncCard)
     fun inject(loginPresenter: LoginPresenter)
+    fun inject(collectFingerprintsPresenter: CollectFingerprintsPresenter)
     fun inject(collectFingerprintsSyncHelper: CollectFingerprintsSyncHelper)
     fun inject(collectFingerprintsScanningHelper: CollectFingerprintsScanningHelper)
     fun inject(collectFingerprintsFingerDisplayHelper: CollectFingerprintsFingerDisplayHelper)
