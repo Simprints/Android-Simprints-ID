@@ -43,7 +43,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private val scannerButtonListener = ButtonListener {
         if (view.buttonContinue)
             view.onActionForward()
-        else if (!presenter.activeFingers[presenter.currentActiveFingerNo].isGoodScan)
+        else if (!presenter.currentFinger().isGoodScan)
             toggleContinuousCapture()
     }
 
@@ -142,8 +142,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun resetUIFromError() {
-        presenter.activeFingers[presenter.currentActiveFingerNo].status = Finger.Status.NOT_COLLECTED
-        presenter.activeFingers[presenter.currentActiveFingerNo].template = null
+        presenter.currentFinger().status = Finger.Status.NOT_COLLECTED
+        presenter.currentFinger().template = null
 
         appState.scanner.resetUI(object : ScannerCallback {
             override fun onSuccess() {
@@ -164,16 +164,14 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     // it start/stop the scan based on the activeFingers[currentActiveFingerNo] state
     fun toggleContinuousCapture() {
-        val finger = presenter.activeFingers[presenter.currentActiveFingerNo]
-
-        when (finger.status) {
+        when (presenter.currentFinger().status!!) {
             Finger.Status.GOOD_SCAN -> {
-                presenter.activeFingers[presenter.currentActiveFingerNo].isRescanGoodScan
+                presenter.currentFinger().isRescanGoodScan
                 presenter.refreshDisplay()
             }
             Finger.Status.RESCAN_GOOD_SCAN, Finger.Status.BAD_SCAN, Finger.Status.NOT_COLLECTED -> {
-                previousStatus = finger.status
-                finger.status = Finger.Status.COLLECTING
+                previousStatus = presenter.currentFinger().status
+                presenter.currentFinger().status = Finger.Status.COLLECTING
                 presenter.refreshDisplay()
                 view.setScanButtonEnabled(true)
                 presenter.refreshDisplay()

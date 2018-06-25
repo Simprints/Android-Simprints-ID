@@ -45,9 +45,9 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
 
         setFingerStatus()
         initActiveFingers()
-        initIndicators()
         initPageAdapter()
         initViewPager()
+        initIndicators()
     }
 
     // Builds the array of "fingers" and "activeFingers" based on the info from:
@@ -109,7 +109,7 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         }
 
         val dialog = AddFingerDialog(context, fingerOptions, preferencesManager.fingerStatusPersist) { persistFingerState, fingersDialogOptions ->
-            val currentActiveFinger = presenter.activeFingers[presenter.currentActiveFingerNo]
+            val currentActiveFinger = presenter.currentFinger()
 
             val persistentFingerStatus = preferencesManager.fingerStatus as MutableMap
 
