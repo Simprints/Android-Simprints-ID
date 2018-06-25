@@ -14,7 +14,6 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.*
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import com.simprints.id.Application
@@ -57,8 +56,8 @@ class CollectFingerprintsActivity :
 
     private var rightToLeft: Boolean = false
 
-    private val indicators = ArrayList<ImageView>()
-
+    override lateinit var viewPager: ViewPagerCustom
+    override lateinit var indicatorLayout: LinearLayout
     override lateinit var pageAdapter: FingerPageAdapter
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
@@ -85,6 +84,7 @@ class CollectFingerprintsActivity :
         viewPresenter = CollectFingerprintsPresenter(this, this)
 
         initBarAndDrawer()
+        indicatorLayout = indicator_layout
 
         viewPresenter.start()
     }
@@ -123,27 +123,13 @@ class CollectFingerprintsActivity :
         }
     }
 
-    // It adds an imageView for each bullet point (indicator) underneath the finger image.
-    // "Indicator" indicates the scan state (good scan/bad scan/ etc...) for a specific finger.
-    override fun initIndicators() {
-        indicator_layout.removeAllViewsInLayout()
-        indicators.clear()
-        for (i in viewPresenter.activeFingers.indices) {
-            val indicator = ImageView(this)
-            indicator.adjustViewBounds = true
-            indicator.setOnClickListener { view_pager.currentItem = i }
-            indicators.add(indicator)
-            indicator_layout.addView(indicator, LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT))
-        }
-    }
-
     override fun setScanButtonListeners(onClick: () -> Unit, onLongClick: () -> Boolean) {
         scan_button.setOnClickListener { onClick() }
         scan_button.setOnLongClickListener { onLongClick() }
     }
 
     override fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean) {
+        viewPager = view_pager
         view_pager.adapter = pageAdapter
         view_pager.offscreenPageLimit = 1
         view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -156,26 +142,6 @@ class CollectFingerprintsActivity :
 
         // If the layout is from right to left, we need to reverse the scrolling direction
         if (rightToLeft) view_pager.rotationY = 180f
-    }
-
-    override fun refreshIndicators(): Pair<Int, Boolean> {
-        var nbCollected = 0
-
-        var promptContinue = true
-
-        viewPresenter.activeFingers.indices.forEach { fingerIndex ->
-            val selected = viewPresenter.currentActiveFingerNo == fingerIndex
-            val finger = viewPresenter.activeFingers[fingerIndex]
-            indicators[fingerIndex].setImageResource(finger.status.getDrawableId(selected))
-
-            if (finger.template != null) {
-                nbCollected++
-            }
-            if (!finger.isGoodScan && !finger.isRescanGoodScan) {
-                promptContinue = false
-            }
-        }
-        return Pair(nbCollected, promptContinue)
     }
 
     override fun refreshScanButtonAndTimeoutBar() {
