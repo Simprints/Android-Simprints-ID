@@ -13,37 +13,32 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.Toast
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.PrivacyActivity
 import com.simprints.id.activities.RefusalActivity
 import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.about.AboutActivity
-import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
-import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.tools.*
 import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
+import com.simprints.id.tools.LanguageHelper
+import com.simprints.id.tools.TimeoutBar
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
-import com.simprints.libcommon.Fingerprint
-import com.simprints.libcommon.Person
-import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Registration
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 class CollectFingerprintsActivity :
     AppCompatActivity(),
@@ -135,7 +130,9 @@ class CollectFingerprintsActivity :
         view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
             override fun onPageScrollStateChanged(state: Int) {}
-            override fun onPageSelected(position: Int) { onPageSelected(position) }
+            override fun onPageSelected(position: Int) {
+                onPageSelected(position)
+            }
         })
         view_pager.setOnTouchListener { _, _ -> onTouch() }
         view_pager.currentItem = viewPresenter.currentActiveFingerNo
@@ -198,55 +195,14 @@ class CollectFingerprintsActivity :
         }
     }
 
-    // Executed either user presses the scanner button at the end of the scans or the top-right arrow
-    // It gathers all valid fingerprints and either it saves them in case of enrol or returns them
-    // for identifications/verifications
-    override fun onActionForward() {
+    override fun finishSuccessEnrol(result: Intent) =
+        setResultAndFinish(Activity.RESULT_OK, result)
 
-        val fingerprints = ArrayList<Fingerprint>()
-        var nbRequiredFingerprints = 0
+    override fun finishSuccessAndStartMatching(intent: Intent) =
+        startActivityForResult(intent, CollectFingerprintsActivity.MATCHING_ACTIVITY_REQUEST_CODE)
 
-        for (finger in viewPresenter.activeFingers) {
-            if ((finger.isGoodScan || finger.isBadScan || finger.isRescanGoodScan) && finger.template != null) {
-                fingerprints.add(Fingerprint(finger.id, finger.template.templateBytes))
-
-                nbRequiredFingerprints++
-            }
-        }
-
-        if (nbRequiredFingerprints < 1) {
-            Toast.makeText(this, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show()
-        } else {
-            val person = Person(preferencesManager.patientId, fingerprints)
-            if (preferencesManager.calloutAction === CalloutAction.REGISTER || preferencesManager.calloutAction === CalloutAction.UPDATE) {
-                dbManager.savePerson(person)
-                        .subscribe({
-                            preferencesManager.lastEnrolDate = Date()
-                            handleRegistrationSuccess()
-                        }) { throwable -> handleRegistrationFailure(throwable) }
-            } else {
-                val intent = Intent(this, MatchingActivity::class.java)
-                intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person)
-                startActivityForResult(intent, MATCHING_ACTIVITY_REQUEST_CODE)
-            }
-        }
-    }
-
-    // If the enrol succeed, the activity returns the result and finishes.
-    private fun handleRegistrationSuccess() {
-        val registrationResult = Registration(preferencesManager.patientId)
-        val resultData = Intent(Constants.SIMPRINTS_REGISTER_INTENT)
-        FormatResult.put(resultData, registrationResult, preferencesManager.resultFormat)
-        setResult(Activity.RESULT_OK, resultData)
-        finish()
-    }
-
-    // If the enrol fails, the activity shows an alert activity the finishes.
-    private fun handleRegistrationFailure(throwable: Throwable) {
-        viewPresenter.handleUnexpectedError(SimprintsError(throwable))
-        setResult(Activity.RESULT_CANCELED)
-        finish()
-    }
+    override fun finishFailure() =
+        setResultAndFinish(Activity.RESULT_CANCELED)
 
     override fun onBackPressed() {
         when {
@@ -269,7 +225,7 @@ class CollectFingerprintsActivity :
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.action_forward) {
-            onActionForward()
+            viewPresenter.onActionForward()
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -292,22 +248,23 @@ class CollectFingerprintsActivity :
         return true
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) =
         when (requestCode) {
-            SETTINGS_ACTIVITY_REQUEST_CODE, PRIVACY_ACTIVITY_REQUEST_CODE, ABOUT_ACTIVITY_REQUEST_CODE -> {
+            SETTINGS_ACTIVITY_REQUEST_CODE,
+            PRIVACY_ACTIVITY_REQUEST_CODE,
+            ABOUT_ACTIVITY_REQUEST_CODE ->
                 super.onActivityResult(requestCode, resultCode, data)
-            }
-            REFUSAL_ACTIVITY_REQUEST, ALERT_ACTIVITY_REQUEST_CODE -> if (resultCode == RESULT_TRY_AGAIN) {
-                viewPresenter.handleTryAgain()
-            } else {
-                setResult(resultCode, data)
-                finish()
-            }
-            else -> {
-                setResult(resultCode, data)
-                finish()
-            }
+            REFUSAL_ACTIVITY_REQUEST, ALERT_ACTIVITY_REQUEST_CODE ->
+                if (resultCode == RESULT_TRY_AGAIN)
+                    viewPresenter.handleTryAgain()
+                else
+                    setResultAndFinish(resultCode, data)
+            else -> setResultAndFinish(resultCode, data)
         }
+
+    private fun setResultAndFinish(resultCode: Int, data: Intent? = null) {
+        setResult(resultCode, data)
+        finish()
     }
 
     override fun onStop() {

@@ -42,7 +42,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     private val scannerButtonListener = ButtonListener {
         if (view.buttonContinue)
-            view.onActionForward()
+            presenter.onActionForward()
         else if (!presenter.currentFinger().isGoodScan)
             toggleContinuousCapture()
     }
