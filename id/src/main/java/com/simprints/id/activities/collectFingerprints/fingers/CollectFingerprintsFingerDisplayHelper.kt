@@ -44,23 +44,10 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         ((view as Activity).application as Application).component.inject(this)
 
         setFingerStatus()
+        initActiveFingers()
+        initIndicators()
         initPageAdapter()
         initViewPager()
-        initActiveFingers()
-    }
-
-    private fun initPageAdapter() {
-        view.pageAdapter = FingerPageAdapter((view as AppCompatActivity).supportFragmentManager, presenter.activeFingers)
-    }
-
-    // Reads the fingerStatus Map (from sharedPrefs) and "active" LEFT_THUMB and LEFT_INDEX_FINGER as
-    // default finger.
-    private fun setFingerStatus() {
-        // We set the two defaults in the config for the first reset.
-        val fingerStatus = preferencesManager.fingerStatus as MutableMap
-        fingerStatus[FingerIdentifier.LEFT_THUMB] = true
-        fingerStatus[FingerIdentifier.LEFT_INDEX_FINGER] = true
-        preferencesManager.fingerStatus = fingerStatus
     }
 
     // Builds the array of "fingers" and "activeFingers" based on the info from:
@@ -85,6 +72,24 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         fingers.sort()
 
         updateLastFinger()
+    }
+
+    private fun initIndicators() {
+        view.initIndicators()
+    }
+
+    private fun initPageAdapter() {
+        view.pageAdapter = FingerPageAdapter((view as AppCompatActivity).supportFragmentManager, presenter.activeFingers)
+    }
+
+    // Reads the fingerStatus Map (from sharedPrefs) and "active" LEFT_THUMB and LEFT_INDEX_FINGER as
+    // default finger.
+    private fun setFingerStatus() {
+        // We set the two defaults in the config for the first reset.
+        val fingerStatus = preferencesManager.fingerStatus as MutableMap
+        fingerStatus[FingerIdentifier.LEFT_THUMB] = true
+        fingerStatus[FingerIdentifier.LEFT_INDEX_FINGER] = true
+        preferencesManager.fingerStatus = fingerStatus
     }
 
     private fun initViewPager() {
