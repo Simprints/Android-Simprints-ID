@@ -85,7 +85,6 @@ class CollectFingerprintsActivity :
         viewPresenter = CollectFingerprintsPresenter(this, this)
 
         initBarAndDrawer()
-        initIndicators()
 
         viewPresenter.start()
     }
