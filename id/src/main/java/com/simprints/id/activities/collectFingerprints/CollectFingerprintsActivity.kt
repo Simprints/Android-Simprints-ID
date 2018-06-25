@@ -311,14 +311,8 @@ class CollectFingerprintsActivity :
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.nav_autoAdd -> {
-                viewPresenter.handleAutoAddFingerPressed()
-                return true
-            }
-            R.id.nav_add -> {
-                viewPresenter.handleAddFingerPressed()
-                return true
-            }
+            R.id.nav_autoAdd -> viewPresenter.handleAutoAddFingerPressed()
+            R.id.nav_add -> viewPresenter.handleAddFingerPressed()
             R.id.nav_help -> Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
             R.id.privacy -> startActivityForResult(Intent(this, PrivacyActivity::class.java), PRIVACY_ACTIVITY_REQUEST_CODE)
             R.id.nav_sync -> {
