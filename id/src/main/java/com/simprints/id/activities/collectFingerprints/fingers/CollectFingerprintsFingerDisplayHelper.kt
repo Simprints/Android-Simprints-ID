@@ -43,11 +43,11 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
     init {
         ((view as Activity).application as Application).component.inject(this)
 
+
         setFingerStatus()
         initActiveFingers()
         initPageAdapter()
         initViewPager()
-        initIndicators()
     }
 
     // Builds the array of "fingers" and "activeFingers" based on the info from:
@@ -72,10 +72,6 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         fingers.sort()
 
         updateLastFinger()
-    }
-
-    private fun initIndicators() {
-        view.initIndicators()
     }
 
     private fun initPageAdapter() {
@@ -184,7 +180,7 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
     }
 
     private fun handleFingersChanged() {
-        view.initIndicators()
+        presenter.initIndicators()
         view.pageAdapter.notifyDataSetChanged()
         view.setCurrentViewPagerItem(presenter.currentActiveFingerNo)
         presenter.refreshDisplay()

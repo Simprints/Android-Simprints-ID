@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import com.simprints.id.Application
 import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprintsFingerDisplayHelper
+import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
 import com.simprints.id.activities.collectFingerprints.sync.CollectFingerprintsSyncHelper
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -27,6 +28,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private lateinit var syncHelper: CollectFingerprintsSyncHelper
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
     private lateinit var fingerDisplayHelper: CollectFingerprintsFingerDisplayHelper
+    private lateinit var indicatorsHelper: CollectFingerprintsIndicatorsHelper
 
     // Array with only the active Fingers, used to populate the ViewPager
     override val activeFingers = ArrayList<Finger>()
@@ -41,6 +43,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
         initSyncHelper(context, view)
         initFingerDisplayHelper(context, view)
+        initIndicatorsHelper(context, view)
         initScanningHelper(context, view)
         initScanButtonListeners()
         refreshDisplay()
@@ -53,6 +56,10 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun initFingerDisplayHelper(context: Context, view: CollectFingerprintsContract.View) {
         fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(context, view, this)
+    }
+
+    private fun initIndicatorsHelper(context: Context, view: CollectFingerprintsContract.View) {
+        indicatorsHelper = CollectFingerprintsIndicatorsHelper(context, view, this)
     }
 
     private fun initScanningHelper(context: Context, view: CollectFingerprintsContract.View) {
@@ -102,11 +109,28 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper.addFinger()
     }
 
+    private fun getNumberOfCollectedFingerprints(): Int =
+        activeFingers.filter { it.template != null }.size
+
+    private fun isContinueConditionSatisfied(): Boolean {
+        var promptContinue = true
+        activeFingers.forEach {
+            if (!it.isGoodScan && !it.isRescanGoodScan) promptContinue = false
+        }
+        return promptContinue
+    }
+
     override fun refreshDisplay() {
-        val (nbCollected, promptContinue) = view.refreshIndicators()
+        val nbCollected = getNumberOfCollectedFingerprints()
+        val promptContinue = isContinueConditionSatisfied()
+        indicatorsHelper.refreshIndicators()
         view.refreshScanButtonAndTimeoutBar()
         view.refreshFingerFragment()
         view.refreshContinueButton(nbCollected, promptContinue)
+    }
+
+    override fun initIndicators() {
+        indicatorsHelper.initIndicators()
     }
 
     override fun handleSyncPressed() {

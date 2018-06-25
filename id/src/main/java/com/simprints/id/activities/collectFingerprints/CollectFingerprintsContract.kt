@@ -2,6 +2,7 @@ package com.simprints.id.activities.collectFingerprints
 
 import android.app.ProgressDialog
 import android.support.annotation.DrawableRes
+import android.widget.LinearLayout
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.ALERT_TYPE
@@ -28,13 +29,15 @@ interface CollectFingerprintsContract {
         var timeoutBar: TimeoutBar
         var un20WakeupDialog: ProgressDialog
 
+        // Indicators
+        var viewPager: ViewPagerCustom
+        var indicatorLayout: LinearLayout
+
         fun setScanButtonListeners(onClick: () -> Unit, onLongClick: () -> Boolean)
-        fun initIndicators()
         fun refreshContinueButton(nbCollected: Int, promptContinue: Boolean)
         fun refreshFingerFragment()
         fun refreshScanButtonAndTimeoutBar()
         fun nudgeMode()
-        fun refreshIndicators(): Pair<Int, Boolean>
         fun setScanButtonEnabled(enabled: Boolean)
         fun setCurrentViewPagerItem(idx: Int)
         fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
@@ -59,6 +62,9 @@ interface CollectFingerprintsContract {
         // Scanning
         fun isScanning(): Boolean
         fun handleTryAgain()
+
+        // Indicators
+        fun initIndicators()
 
         // Finger
         fun handleAutoAddFingerPressed()
