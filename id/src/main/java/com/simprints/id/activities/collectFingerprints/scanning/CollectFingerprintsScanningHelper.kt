@@ -166,7 +166,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     fun toggleContinuousCapture() {
         when (presenter.currentFinger().status!!) {
             Finger.Status.GOOD_SCAN -> {
-                presenter.currentFinger().isRescanGoodScan
+                presenter.currentFinger().status = Finger.Status.RESCAN_GOOD_SCAN
                 presenter.refreshDisplay()
             }
             Finger.Status.RESCAN_GOOD_SCAN, Finger.Status.BAD_SCAN, Finger.Status.NOT_COLLECTED -> {
