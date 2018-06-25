@@ -1,6 +1,7 @@
 package com.simprints.id.activities.collectFingerprints
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.support.annotation.DrawableRes
 import android.widget.LinearLayout
 import com.simprints.id.activities.BasePresenter
@@ -18,8 +19,10 @@ interface CollectFingerprintsContract {
         // Lifecycle
         var buttonContinue: Boolean
         fun cancelAndFinish()
-        fun onActionForward()
         fun doLaunchAlert(alertType: ALERT_TYPE)
+        fun finishSuccessEnrol(result: Intent)
+        fun finishSuccessAndStartMatching(intent: Intent)
+        fun finishFailure()
 
         // Sync
         fun setSyncItem(enabled: Boolean, title: String, @DrawableRes icon: Int)
@@ -55,6 +58,7 @@ interface CollectFingerprintsContract {
         fun handleOnStop()
         fun handleOnBackPressedToLeave()
         fun handleBackPressedWhileScanning()
+        fun onActionForward()
 
         // Sync
         fun handleSyncPressed()
