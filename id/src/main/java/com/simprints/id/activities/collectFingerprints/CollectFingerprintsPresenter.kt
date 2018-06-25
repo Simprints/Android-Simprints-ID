@@ -28,7 +28,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
     private lateinit var fingerDisplayHelper: CollectFingerprintsFingerDisplayHelper
 
-    //Array with only the active Fingers, used to populate the ViewPager
+    // Array with only the active Fingers, used to populate the ViewPager
     override val activeFingers = ArrayList<Finger>()
     override var currentActiveFingerNo: Int = 0
 
@@ -67,8 +67,8 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun resetFingerState(): Boolean {
         if (!isScanning()) {
-            activeFingers[currentActiveFingerNo].isNotCollected
-            activeFingers[currentActiveFingerNo].template = null
+            currentFinger().isNotCollected
+            currentFinger().template = null
             refreshDisplay()
         }
         return true
