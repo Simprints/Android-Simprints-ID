@@ -10,8 +10,8 @@ import io.reactivex.Observable
 class SyncExecutorMock(dbManager: DbManager,
                        gson: Gson) : SyncExecutor(dbManager, gson) {
 
-    public override fun uploadNewPatients(isInterrupted: () -> Boolean, batchSize: Int): Observable<Progress> {
-        return super.uploadNewPatients(isInterrupted, batchSize)
+    public override fun uploadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters, batchSize: Int): Observable<Progress> {
+        return super.uploadNewPatients(isInterrupted, syncParams, batchSize)
     }
 
     public override fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {

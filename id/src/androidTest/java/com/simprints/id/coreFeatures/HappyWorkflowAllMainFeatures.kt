@@ -5,9 +5,9 @@ import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
-import com.example.mockscanner.MockBluetoothAdapter
-import com.example.mockscanner.MockFinger
-import com.example.mockscanner.MockScannerManager
+import com.simprints.mockscanner.MockBluetoothAdapter
+import com.simprints.mockscanner.MockFinger
+import com.simprints.mockscanner.MockScannerManager
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.db.local.models.LocalDbKey
@@ -72,10 +72,10 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
             randomGeneratorRule = MockRule(),
-            bluetoothComponentAdapterRule = ReplaceRule({ mockBluetoothAdapter }))
+            bluetoothComponentAdapterRule = ReplaceRule { mockBluetoothAdapter })
     }
 
-    lateinit var mockBluetoothAdapter: MockBluetoothAdapter
+    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
 
     @Before
     override fun setUp() {

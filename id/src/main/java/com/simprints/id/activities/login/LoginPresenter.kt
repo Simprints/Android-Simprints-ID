@@ -3,10 +3,7 @@ package com.simprints.id.activities.login
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.secure.*
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.extensions.trace
@@ -74,6 +71,7 @@ class LoginPresenter(val view: LoginContract.View,
             is IOException -> view.handleSignInFailedNoConnection()
             is DifferentProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch()
             is InvalidLegacyProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch()
+            is InvalidProjectIdForNonceRequestException -> view.handleSignInFailedInvalidCredentials()
             is AuthRequestInvalidCredentialsException -> view.handleSignInFailedInvalidCredentials()
             is SimprintsInternalServerException -> view.handleSignInFailedServerError()
             else -> view.handleSignInFailedUnknownReason()
