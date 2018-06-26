@@ -2,7 +2,6 @@ package com.simprints.id.sync
 
 import com.google.firebase.FirebaseApp
 import com.google.gson.stream.JsonReader
-import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
@@ -11,8 +10,6 @@ import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.network.DownSyncParams.Companion.LAST_KNOWN_PATIENT_AT
-import com.simprints.id.data.db.remote.network.DownSyncParams.Companion.LAST_KNOWN_PATIENT_ID
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -29,7 +26,8 @@ import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.mockServer.assertUrlParam
+import com.simprints.id.testUtils.mockServer.assertPathUrlParam
+import com.simprints.id.testUtils.mockServer.assertQueryUrlParam
 import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
@@ -91,9 +89,9 @@ class SyncTest : RxJavaTest, DaggerForTests() {
     @Test
     fun uploadPeopleInBatches_shouldWorkWithPoorConnection() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
-        val app = RuntimeEnvironment.application as Application
-
         val patientsToUpload = getRandomPeople(35)
+        val projectIdTest = "projectIDTest"
+        val syncParams = SyncTaskParameters.GlobalSyncTaskParameters(projectIdTest)
 
         whenever(localDbManager.loadPeopleFromLocalRx(toSync = true)).thenReturn(Flowable.fromIterable(patientsToUpload))
         whenever(localDbManager.getPeopleCountFromLocal(toSync = true)).thenReturn(Single.just(patientsToUpload.count()))
@@ -103,7 +101,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
 
         val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager), JsonHelper.gson)
 
-        val testObserver = sync.uploadNewPatients({ false }, 10).test()
+        val testObserver = sync.uploadNewPatients({ false }, syncParams, 10).test()
         testObserver.awaitTerminalEvent()
 
         testObserver
@@ -119,7 +117,10 @@ class SyncTest : RxJavaTest, DaggerForTests() {
     @Test
     fun uploadPeopleGetInterrupted_shouldStopUploading() {
         val localDbManager = Mockito.mock(LocalDbManager::class.java)
-        val peopleToUpload = getRandomPeople(35)
+        val projectIdTest = "projectIDTest"
+        val syncParams = SyncTaskParameters.GlobalSyncTaskParameters(projectIdTest)
+
+        val peopleToUpload = getRandomPeople(35, projectId = projectIdTest)
 
         whenever(localDbManager.loadPeopleFromLocalRx(toSync = true)).thenReturn(Flowable.fromIterable(peopleToUpload))
         whenever(localDbManager.getPeopleCountFromLocal(toSync = true)).thenReturn(Single.just(peopleToUpload.count()))
@@ -130,7 +131,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager), JsonHelper.gson)
 
         val count = AtomicInteger(0)
-        val testObserver = sync.uploadNewPatients({ count.addAndGet(1) > 2 }, 10).test()
+        val testObserver = sync.uploadNewPatients({ count.addAndGet(1) > 2 }, syncParams, 10).test()
 
         testObserver.awaitTerminalEvent()
 
@@ -169,13 +170,13 @@ class SyncTest : RxJavaTest, DaggerForTests() {
             DownloadProgress(nPeopleToDownload, nPeopleToDownload))))
 
         val peopleCountRequestUrl = mockServer.takeRequest().requestUrl
-        assertUrlParam(peopleCountRequestUrl, "projectId", projectIdTest)
+        assertPathUrlParam(peopleCountRequestUrl, projectIdTest)
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
-        assertUrlParam(peopleRequestUrl, "projectId", projectIdTest)
+        assertPathUrlParam(peopleRequestUrl, projectIdTest)
         val lastDownloadedPatient = peopleToDownload.last()
-        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, lastDownloadedPatient.updatedAt!!.time, { it?.toLong() })
-        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, lastDownloadedPatient.patientId)
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", lastDownloadedPatient.updatedAt!!.time, { it?.toLong() })
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", lastDownloadedPatient.patientId)
     }
 
     @Test
@@ -208,14 +209,14 @@ class SyncTest : RxJavaTest, DaggerForTests() {
             DownloadProgress(nPeopleToDownload, nPeopleToDownload))))
 
         val peopleCountRequestUrl = mockServer.takeRequest().requestUrl
-        assertUrlParam(peopleCountRequestUrl, "projectId", projectIdTest)
-        assertUrlParam(peopleCountRequestUrl, "moduleId", moduleIdTest)
+        assertPathUrlParam(peopleCountRequestUrl, projectIdTest)
+        assertQueryUrlParam(peopleCountRequestUrl, "moduleId", moduleIdTest)
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
-        assertUrlParam(peopleRequestUrl, "projectId", projectIdTest)
-        assertUrlParam(peopleRequestUrl, "moduleId", moduleIdTest)
-        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
-        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, peopleToDownload.last().patientId)
+        assertPathUrlParam(peopleRequestUrl, projectIdTest)
+        assertQueryUrlParam(peopleRequestUrl, "moduleId", moduleIdTest)
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", peopleToDownload.last().patientId)
     }
 
     @Test
@@ -248,14 +249,14 @@ class SyncTest : RxJavaTest, DaggerForTests() {
             DownloadProgress(nPeopleToDownload, nPeopleToDownload))))
 
         val peopleCountRequestUrl = mockServer.takeRequest().requestUrl
-        assertUrlParam(peopleCountRequestUrl, "projectId", projectIdTest)
-        assertUrlParam(peopleCountRequestUrl, "userId", userIdTest)
+        assertPathUrlParam(peopleCountRequestUrl, projectIdTest)
+        assertQueryUrlParam(peopleCountRequestUrl, "userId", userIdTest)
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
-        assertUrlParam(peopleRequestUrl, "projectId", projectIdTest)
-        assertUrlParam(peopleRequestUrl, "userId", userIdTest)
-        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_AT, peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
-        assertUrlParam(peopleRequestUrl, LAST_KNOWN_PATIENT_ID, peopleToDownload.last().patientId)
+        assertPathUrlParam(peopleRequestUrl, projectIdTest)
+        assertQueryUrlParam(peopleRequestUrl, "userId", userIdTest)
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", peopleToDownload.last().patientId)
     }
 
     private fun makeFakeDownloadRequest(

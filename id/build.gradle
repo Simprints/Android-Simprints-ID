@@ -76,9 +76,11 @@ android {
         if (variant.buildType.name == "release") {
             buildConfigField("String", "GCP_PROJECT", "\"simprints-152315\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
+            buildConfigField("String", "END_POINT", "\"prod\"")
         } else if (variant.buildType.name == "debug") {
             buildConfigField("String", "GCP_PROJECT", "\"${getDevProjectId()}\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
+            buildConfigField("String", "END_POINT", "\"dev\"")
         }
     }
 
@@ -262,7 +264,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin_version"
 
     // Simprints
-    implementation "com.simprints:libscanner:2018.2.0"
+    implementation "com.simprints:libscanner:2018.2.1"
     implementation 'com.simprints:libmatcher:1.3.2'
 
     // Test
@@ -292,7 +294,7 @@ dependencies {
     }
     androidTestImplementation 'com.simprints:cerberus-library:2018.1.1-dev-1'
     androidTestImplementation 'com.simprints:remote-admin-client:2017.4.0-dev-5'
-    androidTestImplementation "com.simprints:mockscanner:2018.2.0"
+    androidTestImplementation "com.simprints:mockscanner:2018.2.2"
     androidTestImplementation 'joda-time:joda-time:2.9.9'
 
     //UI
