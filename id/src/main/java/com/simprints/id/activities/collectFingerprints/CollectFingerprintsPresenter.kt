@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import com.simprints.id.Application
+import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerprintsIndicatorsHelper
@@ -16,10 +17,12 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
+import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.FormatResult
+import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libcommon.Person
@@ -28,7 +31,6 @@ import com.simprints.libsimprints.Registration
 import io.reactivex.rxkotlin.subscribeBy
 import java.util.*
 import javax.inject.Inject
-
 
 class CollectFingerprintsPresenter(private val context: Context,
                                    private val view: CollectFingerprintsContract.View)
@@ -54,6 +56,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun start() {
         preferencesManager.msSinceBootOnMainStart = timeHelper.msSinceBoot()
+        LanguageHelper.setLanguage(context, preferencesManager.language)
 
         initSyncHelper(context, view)
         initFingerDisplayHelper(context, view)
@@ -81,9 +84,8 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun initScanButtonListeners() {
-        view.setScanButtonListeners(
-            onClick = { scanningHelper.toggleContinuousCapture() },
-            onLongClick = { resetFingerState() })
+        view.scanButton.setOnClickListener { scanningHelper.toggleContinuousCapture() }
+        view.scanButton.setOnLongClickListener { resetFingerState() }
     }
 
     private fun resetFingerState(): Boolean {
@@ -133,6 +135,18 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
         return promptContinue
     }
+
+    override fun getTitle(): String =
+        when (preferencesManager.calloutAction) {
+            CalloutAction.REGISTER -> context.getString(R.string.register_title)
+            CalloutAction.IDENTIFY -> context.getString(R.string.identify_title)
+            CalloutAction.UPDATE -> context.getString(R.string.update_title)
+            CalloutAction.VERIFY -> context.getString(R.string.verify_title)
+            else -> {
+                handleUnexpectedError(InvalidCalloutParameterError.forParameter("CalloutParameters"))
+                ""
+            }
+        }
 
     override fun refreshDisplay() {
         val nbCollected = getNumberOfCollectedFingerprints()
@@ -213,7 +227,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun handleSavePersonFailure(throwable: Throwable) {
         handleUnexpectedError(SimprintsError(throwable))
-        view.finishFailure()
+        view.cancelAndFinish()
     }
 
     private fun goToMatching(person: Person) {

@@ -13,6 +13,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 import javax.inject.Inject
@@ -21,14 +22,10 @@ import javax.inject.Inject
 class CollectFingerprintsSyncHelper(private val context: Context,
                                     private val view: CollectFingerprintsContract.View) {
 
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
-    @Inject
-    lateinit var preferencesManager: PreferencesManager
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-    @Inject
-    lateinit var syncManager: SyncManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var syncManager: SyncManager
 
     init {
         ((view as Activity).application as Application).component.inject(this)
@@ -72,7 +69,7 @@ class CollectFingerprintsSyncHelper(private val context: Context,
     private fun setProgressSyncItem(progress: Progress) {
         if (isProgressZero(progress))
             setZeroProgressSyncItem()
-        else view.setSyncItem(false,
+        else setSyncItem(false,
             context.getString(R.string.syncing_with_progress, progress.currentValue, progress.maxValue),
             R.drawable.ic_syncing)
     }
@@ -98,6 +95,14 @@ class CollectFingerprintsSyncHelper(private val context: Context,
     }
 
     private fun setSyncItem(enabled: Boolean, @StringRes title: Int, @DrawableRes icon: Int) {
-        view.setSyncItem(enabled, context.getString(title), icon)
+        setSyncItem(enabled, context.getString(title), icon)
+    }
+
+    private fun setSyncItem(enabled: Boolean, title: String, @DrawableRes icon: Int) {
+        (view as Activity).runOnUiThreadIfStillRunning {
+            view.syncItem.isEnabled = enabled
+            view.syncItem.title = title
+            view.syncItem.setIcon(icon)
+        }
     }
 }

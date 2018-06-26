@@ -3,6 +3,7 @@ package com.simprints.id.activities.collectFingerprints.scanning
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
+import android.os.Handler
 import android.view.View
 import android.widget.ProgressBar
 import com.simprints.id.Application
@@ -148,7 +149,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         appState.scanner.resetUI(object : ScannerCallback {
             override fun onSuccess() {
                 presenter.refreshDisplay()
-                view.setScanButtonEnabled(true)
+                view.scanButton.isEnabled = true
                 view.un20WakeupDialog.dismiss()
             }
 
@@ -173,7 +174,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 previousStatus = presenter.currentFinger().status
                 presenter.currentFinger().status = Finger.Status.COLLECTING
                 presenter.refreshDisplay()
-                view.setScanButtonEnabled(true)
+                view.scanButton.isEnabled = true
                 presenter.refreshDisplay()
                 startContinuousCapture()
             }
@@ -252,7 +253,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
         if (quality >= qualityScore1) {
             presenter.currentFinger().status = Finger.Status.GOOD_SCAN
-            view.nudgeMode()
+            doNudgeIfNecessary()
         } else {
             presenter.currentFinger().status = Finger.Status.BAD_SCAN
         }
@@ -261,11 +262,32 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         presenter.refreshDisplay()
     }
 
+    // Swipes ViewPager automatically when the scanner's button is pressed.
+    private fun doNudgeIfNecessary() {
+        val nudge = preferencesManager.nudgeMode
+
+        if (nudge) {
+            Handler().postDelayed({
+                if (presenter.currentActiveFingerNo < presenter.activeFingers.size) {
+                    view.viewPager.setScrollDuration(SLOW_SWIPE_SPEED)
+                    view.viewPager.currentItem = presenter.currentActiveFingerNo + 1
+                    view.viewPager.setScrollDuration(FAST_SWIPE_SPEED)
+                }
+            }, AUTO_SWIPE_DELAY)
+        }
+    }
+
     fun resetScannerUi() {
         appState.scanner.resetUI(null)
     }
 
     fun stopReconnecting() {
         setup.stop()
+    }
+
+    companion object {
+        private const val AUTO_SWIPE_DELAY: Long = 500
+        private const val FAST_SWIPE_SPEED = 100
+        private const val SLOW_SWIPE_SPEED = 1000
     }
 }
