@@ -38,9 +38,6 @@ class CollectFingerprintsActivity :
     override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
 
     override var buttonContinue = false
-
-    private var rightToLeft: Boolean = false
-
     override lateinit var viewPager: ViewPagerCustom
     override lateinit var indicatorLayout: LinearLayout
     override lateinit var pageAdapter: FingerPageAdapter
@@ -49,6 +46,7 @@ class CollectFingerprintsActivity :
     override lateinit var un20WakeupDialog: ProgressDialog
     override lateinit var syncItem: MenuItem
 
+    private var rightToLeft: Boolean = false
     private var continueItem: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,6 +106,10 @@ class CollectFingerprintsActivity :
         view_pager.setOnTouchListener { _, _ -> onTouch() }
         view_pager.currentItem = viewPresenter.currentActiveFingerNo
 
+        reverseViewPagerIfNeeded()
+    }
+
+    private fun reverseViewPagerIfNeeded() {
         // If the layout is from right to left, we need to reverse the scrolling direction
         if (rightToLeft) view_pager.rotationY = 180f
     }
@@ -123,10 +125,16 @@ class CollectFingerprintsActivity :
 
     override fun refreshFingerFragment() {
         pageAdapter.getFragment(viewPresenter.currentActiveFingerNo)?.let {
-            if (rightToLeft) {
-                it.view?.rotationY = 180f
-            }
+            reverseFingerFragmentIfNeeded(it)
             it.updateTextAccordingToStatus()
+        }
+    }
+
+    private fun reverseFingerFragmentIfNeeded(it: FingerFragment) {
+        // If the layout direction is RTL, then the view pager will have been rotated,
+        // but the image and text need to be rotated back
+        if (rightToLeft) {
+            it.view?.rotationY = 180f
         }
     }
 

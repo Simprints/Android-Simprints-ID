@@ -68,14 +68,13 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         preferencesManager.timeoutS * 1000)
 
     // Creates a progress dialog when the scan gets disconnected
-    private fun initUn20Dialog(): ProgressDialog {
-        val dialog = ProgressDialog(context)
-        dialog.isIndeterminate = true
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.setMessage(context.getString(R.string.reconnecting_message))
-        dialog.setOnCancelListener { view.cancelAndFinish() }
-        return dialog
-    }
+    private fun initUn20Dialog(): ProgressDialog = 
+        ProgressDialog(context).also {
+            it.isIndeterminate = true
+            it.setCanceledOnTouchOutside(false)
+            it.setMessage(context.getString(R.string.reconnecting_message))
+            it.setOnCancelListener { view.cancelAndFinish() }
+        }
 
     fun reconnect() {
         appState.scanner.unregisterButtonListener(scannerButtonListener)
