@@ -42,7 +42,6 @@ interface AppComponent {
     fun inject(app: Application)
     fun inject(launchActivity: LaunchActivity)
     fun inject(guidSelectionService: GuidSelectionService)
-    fun inject(collectFingerprintsActivity: CollectFingerprintsActivity)
     fun inject(alertActivity: AlertActivity)
     fun inject(aboutActivity: AboutActivity)
     fun inject(refusalActivity: RefusalActivity)

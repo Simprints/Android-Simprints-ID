@@ -3,6 +3,9 @@ package com.simprints.id.activities.collectFingerprints
 import android.app.ProgressDialog
 import android.content.Intent
 import android.support.annotation.DrawableRes
+import android.support.annotation.StringRes
+import android.view.MenuItem
+import android.widget.Button
 import android.widget.LinearLayout
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
@@ -18,16 +21,16 @@ interface CollectFingerprintsContract {
 
         // Lifecycle
         var buttonContinue: Boolean
-        fun cancelAndFinish()
         fun doLaunchAlert(alertType: ALERT_TYPE)
         fun finishSuccessEnrol(result: Intent)
         fun finishSuccessAndStartMatching(intent: Intent)
-        fun finishFailure()
+        fun cancelAndFinish()
 
         // Sync
-        fun setSyncItem(enabled: Boolean, title: String, @DrawableRes icon: Int)
+        var syncItem: MenuItem
 
         // Scanning
+        var scanButton: Button
         var pageAdapter: FingerPageAdapter
         var timeoutBar: TimeoutBar
         var un20WakeupDialog: ProgressDialog
@@ -36,13 +39,9 @@ interface CollectFingerprintsContract {
         var viewPager: ViewPagerCustom
         var indicatorLayout: LinearLayout
 
-        fun setScanButtonListeners(onClick: () -> Unit, onLongClick: () -> Boolean)
         fun refreshContinueButton(nbCollected: Int, promptContinue: Boolean)
         fun refreshFingerFragment()
         fun refreshScanButtonAndTimeoutBar()
-        fun nudgeMode()
-        fun setScanButtonEnabled(enabled: Boolean)
-        fun setCurrentViewPagerItem(idx: Int)
         fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
     }
 
@@ -51,6 +50,7 @@ interface CollectFingerprintsContract {
         val activeFingers: ArrayList<Finger>
         var currentActiveFingerNo: Int
 
+        fun getTitle(): String
         fun refreshDisplay()
 
         // Lifecycle
