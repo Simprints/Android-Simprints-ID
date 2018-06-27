@@ -220,7 +220,7 @@ class CollectFingerprintsActivity :
                 super.onActivityResult(requestCode, resultCode, data)
             REFUSAL_ACTIVITY_REQUEST, ALERT_ACTIVITY_REQUEST_CODE ->
                 if (resultCode == RESULT_TRY_AGAIN)
-                    viewPresenter.handleTryAgain()
+                    viewPresenter.handleTryAgainFromDifferentActivity()
                 else
                     setResultAndFinish(resultCode, data)
             else -> setResultAndFinish(resultCode, data)
@@ -235,7 +235,6 @@ class CollectFingerprintsActivity :
         super.onStop()
         viewPresenter.handleOnStop()
     }
-
 
     override fun doLaunchAlert(alertType: ALERT_TYPE) {
         launchAlert(alertType)
