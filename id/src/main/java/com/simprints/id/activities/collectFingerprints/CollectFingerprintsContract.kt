@@ -21,6 +21,7 @@ interface CollectFingerprintsContract {
 
         // Lifecycle
         var buttonContinue: Boolean
+        fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
         fun doLaunchAlert(alertType: ALERT_TYPE)
         fun finishSuccessEnrol(result: Intent)
         fun finishSuccessAndStartMatching(intent: Intent)
@@ -39,10 +40,10 @@ interface CollectFingerprintsContract {
         var viewPager: ViewPagerCustom
         var indicatorLayout: LinearLayout
 
+        // Refresh Display
         fun refreshContinueButton(nbCollected: Int, promptContinue: Boolean)
         fun refreshFingerFragment()
         fun refreshScanButtonAndTimeoutBar()
-        fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
     }
 
     interface Presenter: BasePresenter {
@@ -56,16 +57,17 @@ interface CollectFingerprintsContract {
         // Lifecycle
         fun handleOnStart()
         fun handleOnStop()
-        fun handleOnBackPressedToLeave()
-        fun handleBackPressedWhileScanning()
         fun onActionForward()
+        fun handleBackPressedWhileScanning()
+        fun handleOnBackPressedToLeave()
+        fun handleUnexpectedError(error: SimprintsError)
 
         // Sync
         fun handleSyncPressed()
 
         // Scanning
         fun isScanning(): Boolean
-        fun handleTryAgain()
+        fun handleTryAgainFromDifferentActivity()
 
         // Indicators
         fun initIndicators()
@@ -74,7 +76,6 @@ interface CollectFingerprintsContract {
         fun handleAutoAddFingerPressed()
         fun handleAddFingerPressed()
         fun currentFinger(): Finger
-        fun handleUnexpectedError(error: SimprintsError)
         fun viewPagerOnPageSelected(position: Int)
     }
 }
