@@ -115,14 +115,14 @@ class CollectFingerprintsPresenter(private val context: Context,
         if (isScanning()) {
             scanningHelper.toggleContinuousCapture()
         }
-        fingerDisplayHelper.autoAdd()
+        fingerDisplayHelper.handleAutoAddFinger()
     }
 
     override fun handleAddFingerPressed() {
         if (isScanning()) {
             scanningHelper.toggleContinuousCapture()
         }
-        fingerDisplayHelper.addFinger()
+        fingerDisplayHelper.launchAddFingerDialog()
     }
 
     private fun getNumberOfCollectedFingerprints(): Int =

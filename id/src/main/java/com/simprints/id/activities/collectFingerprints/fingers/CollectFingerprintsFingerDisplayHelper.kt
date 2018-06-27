@@ -24,8 +24,7 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
 
     @Inject lateinit var preferencesManager: PreferencesManager
 
-    //Array with all fingers, built based on defaultScanConfig
-    private var fingers = ArrayList<Finger>(Finger.NB_OF_FINGERS)
+    private val allFingers = ArrayList<Finger>(Finger.NB_OF_FINGERS)
 
     private val defaultScanConfig = ScanConfig().apply {
         set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0, 0)
@@ -42,50 +41,49 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
 
     init {
         ((view as Activity).application as Application).component.inject(this)
-
-
-        setFingerStatus()
-        initActiveFingers()
+        loadFingerStatusAndRefreshWithDefaultFingers()
+        initFingerArrays()
         initPageAdapter()
         initViewPager()
     }
 
-    // Builds the array of "fingers" and "activeFingers" based on the info from:
-    // FingerIdentifier values - all possible fingers
-    // defaultScanConfig - to find out if a finger is required or not, collectable or not, etc..
-    // fingerStatusPersist - to find out if a finger is active or not (added by user with "Add finger dialog" or defaults ones)
-    private fun initActiveFingers() {
-        FingerIdentifier.values().take(Finger.NB_OF_FINGERS).forEachIndexed { _, identifier ->
-
-            val wasFingerAddedByUser = { preferencesManager.fingerStatusPersist && preferencesManager.fingerStatus[identifier] == true }
-            val isFingerRequired = { defaultScanConfig.isFingerRequired(identifier) }
-            val isFingerActive = isFingerRequired() || wasFingerAddedByUser()
-
-            val finger = Finger(identifier, isFingerActive, defaultScanConfig.getPriority(identifier), defaultScanConfig.getOrder(identifier))
-            fingers.add(finger)
-            if (isFingerActive) {
-                presenter.activeFingers.add(finger)
-            }
-        }
-
-        presenter.activeFingers.sort()
-        fingers.sort()
-
-        updateLastFinger()
-    }
-
-    private fun initPageAdapter() {
-        view.pageAdapter = FingerPageAdapter((view as AppCompatActivity).supportFragmentManager, presenter.activeFingers)
-    }
-
-    // Reads the fingerStatus Map (from sharedPrefs) and "active" LEFT_THUMB and LEFT_INDEX_FINGER as
-    // default finger.
-    private fun setFingerStatus() {
-        // We set the two defaults in the config for the first reset.
+    private fun loadFingerStatusAndRefreshWithDefaultFingers() {
         val fingerStatus = preferencesManager.fingerStatus as MutableMap
         fingerStatus[FingerIdentifier.LEFT_THUMB] = true
         fingerStatus[FingerIdentifier.LEFT_INDEX_FINGER] = true
         preferencesManager.fingerStatus = fingerStatus
+    }
+
+    private fun initFingerArrays() {
+        FingerIdentifier.values().take(Finger.NB_OF_FINGERS).forEach { id ->
+            val finger = createFinger(id)
+            allFingers.add(finger)
+            if (finger.isActive) presenter.activeFingers.add(finger)
+        }
+        allFingers.sort()
+        presenter.activeFingers.sort()
+        refreshWhichFingerIsLast()
+    }
+
+    private fun createFinger(id: FingerIdentifier): Finger {
+        val isFingerActive = isFingerRequired(id) || wasFingerAddedByUser(id)
+        val fingerPriority = defaultScanConfig.getPriority(id)
+        val fingerOrder = defaultScanConfig.getOrder(id)
+        return Finger(id, isFingerActive, fingerPriority, fingerOrder)
+    }
+
+    private fun isFingerRequired(identifier: FingerIdentifier) = defaultScanConfig.isFingerRequired(identifier)
+
+    private fun wasFingerAddedByUser(identifier: FingerIdentifier) =
+        preferencesManager.fingerStatusPersist && preferencesManager.fingerStatus[identifier] == true
+
+    private fun refreshWhichFingerIsLast() {
+        allFingers.forEach { it.isLastFinger = false }
+        allFingers.last().isLastFinger = true
+    }
+
+    private fun initPageAdapter() {
+        view.pageAdapter = FingerPageAdapter((view as AppCompatActivity).supportFragmentManager, presenter.activeFingers)
     }
 
     private fun initViewPager() {
@@ -94,89 +92,107 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
             onTouch = { presenter.isScanning() })
     }
 
-    fun addFinger() {
-        val fingerOptions = arrayListOf<FingerDialogOption>().apply {
-            fingers.forEach {
+    fun launchAddFingerDialog() {
+        val fingerOptions = createAddFingerOptionsList()
+
+        val dialog = AddFingerDialog(context, fingerOptions,
+            preferencesManager.fingerStatusPersist,
+            onAddFingerPositiveButton()
+        ).create()
+
+        (view as Activity).runOnUiThreadIfStillRunning { dialog.show() }
+    }
+
+    private fun onAddFingerPositiveButton() = { shouldPersistFingerState: Boolean, fingersDialogOptions: ArrayList<FingerDialogOption> ->
+        val currentFinger = presenter.currentFinger()
+        val fingerStates = updateActiveFingersAndGetFingerStates(fingersDialogOptions)
+        saveFingerStates(shouldPersistFingerState, fingerStates)
+        refreshIndexOfCurrentFinger(currentFinger)
+        refreshWhichFingerIsLast()
+        handleFingersChanged()
+    }
+
+    private fun updateActiveFingersAndGetFingerStates(fingersDialogOptions: ArrayList<FingerDialogOption>): MutableMap<FingerIdentifier, Boolean> {
+        val fingerStates = preferencesManager.fingerStatus as MutableMap
+        updateAllFingersActiveState(fingersDialogOptions)
+        updateFingerStatesAndAddNewActiveFingers(fingerStates)
+        updateFingerStatesAndRemoveOldActiveFingers(fingerStates)
+        presenter.activeFingers.sort()
+        return fingerStates
+    }
+
+    private fun createAddFingerOptionsList(): ArrayList<FingerDialogOption> =
+        arrayListOf<FingerDialogOption>().apply {
+            allFingers.forEach {
                 val fingerName = context.getString(FingerRes.get(it).nameId)
-                FingerDialogOption(fingerName, it.id, defaultScanConfig.isFingerRequired(it.id), it.isActive).also {
-                    this.add(it)
-                }
+                FingerDialogOption(fingerName, it.id, defaultScanConfig.isFingerRequired(it.id), it.isActive)
+                    .also {
+                        add(it)
+                    }
             }
         }
 
-        val dialog = AddFingerDialog(context, fingerOptions, preferencesManager.fingerStatusPersist) { persistFingerState, fingersDialogOptions ->
-            val currentActiveFinger = presenter.currentFinger()
-
-            val persistentFingerStatus = preferencesManager.fingerStatus as MutableMap
-
-            //updateFingersActiveState
-            fingersDialogOptions.forEach { option ->
-                fingers.find { it.id == option.fingerId }?.isActive = option.active
-            }
-            preferencesManager.fingerStatusPersist = persistFingerState
-
-            //remove old active fingers from MainView
-            fingers
-                .filter { it.isActive && !presenter.activeFingers.contains(it) }
-                .forEach {
-                    presenter.activeFingers.add(it)
-                    persistentFingerStatus[it.id] = true
-                }
-
-            //add new active fingers from MainView
-            fingers
-                .filter { !it.isActive && presenter.activeFingers.contains(it) }
-                .forEach {
-                    presenter.activeFingers.remove(it)
-                    persistentFingerStatus[it.id] = false
-                }
-
-            preferencesManager.fingerStatus = persistentFingerStatus
-            presenter.activeFingers.sort()
-
-            presenter.currentActiveFingerNo = if (currentActiveFinger.isActive) {
-                presenter.activeFingers.indexOf(currentActiveFinger)
-            } else {
-                0
-            }
-
-            updateLastFinger()
-
-            handleFingersChanged()
-        }.create()
-
-        (view as Activity).runOnUiThreadIfStillRunning {
-            dialog.show()
+    private fun updateAllFingersActiveState(fingersDialogOptions: ArrayList<FingerDialogOption>) {
+        fingersDialogOptions.forEach { option ->
+            allFingers.find { it.id == option.fingerId }?.isActive = option.active
         }
     }
 
-    private fun updateLastFinger() {
-        fingers.forEach { it.isLastFinger = false }
-        fingers.last().isLastFinger = true
+    private fun updateFingerStatesAndAddNewActiveFingers(fingerStates: MutableMap<FingerIdentifier, Boolean>) {
+        allFingers
+            .filter { it.isActive && !presenter.activeFingers.contains(it) }
+            .forEach {
+                presenter.activeFingers.add(it)
+                fingerStates[it.id] = true
+            }
     }
 
-    fun autoAdd() {
-        presenter.activeFingers[presenter.activeFingers.size - 1].isLastFinger = false
+    private fun updateFingerStatesAndRemoveOldActiveFingers(fingerStates: MutableMap<FingerIdentifier, Boolean>) {
+        allFingers
+            .filter { !it.isActive && presenter.activeFingers.contains(it) }
+            .forEach {
+                presenter.activeFingers.remove(it)
+                fingerStates[it.id] = false
+            }
+    }
 
-        // Construct a list of fingers sorted by priority
+    private fun refreshIndexOfCurrentFinger(currentFinger: Finger) {
+        presenter.currentActiveFingerNo = if (presenter.activeFingers.contains(currentFinger)) {
+            presenter.activeFingers.indexOf(currentFinger)
+        } else {
+            0
+        }
+    }
+
+    private fun saveFingerStates(persistFingerState: Boolean, persistentFingerStatus: MutableMap<FingerIdentifier, Boolean>) {
+        preferencesManager.fingerStatusPersist = persistFingerState
+        preferencesManager.fingerStatus = persistentFingerStatus
+    }
+
+    fun handleAutoAddFinger() {
+        val fingersSortedByPriority = getFingersSortedByPriority()
+        addNextFingerInPriorityList(fingersSortedByPriority)
+        presenter.activeFingers.sort()
+        refreshWhichFingerIsLast()
+        handleFingersChanged()
+    }
+
+    private fun getFingersSortedByPriority(): List<Finger> {
         val fingersSortedByPriority = arrayOfNulls<Finger>(Finger.NB_OF_FINGERS)
-        for (finger in fingers) {
+        allFingers.forEach { finger ->
             fingersSortedByPriority[finger.priority] = finger
         }
+        return fingersSortedByPriority.filterNotNull()
+    }
 
-        // Auto-add the next finger sorted by the "priority" field
-        for (finger in fingersSortedByPriority.filterNotNull()) {
+    private fun addNextFingerInPriorityList(fingersSortedByPriority: List<Finger>) {
+        for (finger in fingersSortedByPriority) {
             if (!defaultScanConfig.isFingerNotCollectable(finger.id) && !presenter.activeFingers.contains(finger)) {
                 presenter.activeFingers.add(finger)
                 finger.isActive = true
                 break
             }
         }
-        presenter.activeFingers.sort()
-
-        presenter.activeFingers[presenter.activeFingers.size - 1].isLastFinger = true
-
-        handleFingersChanged()
     }
 
     private fun handleFingersChanged() {
