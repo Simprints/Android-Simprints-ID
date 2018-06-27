@@ -60,8 +60,6 @@ class AboutPresenter(private val view: AboutContract.View,
                 onError = { throwable -> handleRecoveryError(throwable) })
     }
 
-    override fun getMap() = mapOf("LEFT THUMB" to true, "LEFT INDEX FINGER" to false)
-
     private fun handleRecoverySuccess() {
         recoveryRunning = false
         view.setSuccessRecovering()

@@ -7,6 +7,7 @@ import android.widget.Toast
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
+import com.simprints.id.activities.collectFingerprints.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
@@ -17,6 +18,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
+import com.simprints.id.domain.FingerRes
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.services.sync.SyncService
@@ -188,11 +190,22 @@ class CollectFingerprintsPresenter(private val context: Context,
             .filter { isFingerScannedAndHasTemplate(it) }
             .map { Fingerprint(it.id, it.template.templateBytes) }
 
-        if (fingerprints.isEmpty()) {
-            Toast.makeText(context, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show()
-        } else {
-            proceedToFinish(fingerprints)
+        val fingersScanned = mutableMapOf<String, Boolean>()
+        activeFingers.forEach {
+            fingersScanned[context.getString(FingerRes.get(it).nameId)] = it.isGoodScan
         }
+
+        ConfirmFingerprintsDialog(context, fingersScanned,
+            callbackConfirm = { proceedToFinish(fingerprints) },
+            callbackRestart = {})
+            .create()
+            .show()
+
+//        if (fingerprints.isEmpty()) {
+//            Toast.makeText(context, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show()
+//        } else {
+//            proceedToFinish(fingerprints)
+//        }
     }
 
     private fun isFingerScannedAndHasTemplate(it: Finger) =

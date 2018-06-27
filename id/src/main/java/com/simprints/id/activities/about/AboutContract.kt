@@ -27,7 +27,5 @@ interface AboutContract {
     interface Presenter : BasePresenter {
 
         fun recoverDb()
-
-        fun getMap(): Map<String, Boolean>
     }
 }
