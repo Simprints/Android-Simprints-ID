@@ -244,7 +244,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun checkNumberOfFingersScannedAndShowDialog() {
-        if(getNumberOfCollectedFingerprints() == 4) {
+        if (getNumberOfCollectedFingerprints() == 4) {
             showConfirmationDialog()
         } else if (getNumberOfCollectedFingerprints() == 2) {
             val fingersScanQualities = activeFingers.map { it.isGoodScan }
@@ -262,8 +262,21 @@ class CollectFingerprintsPresenter(private val context: Context,
 
         ConfirmFingerprintsDialog(context, fingersScanned,
             callbackConfirm = {},
-            callbackRestart = {})
+            callbackRestart = { handleRestart() })
             .create()
             .show()
+    }
+
+    private fun handleRestart() {
+        clearEachFingerAndResetState()
+        currentActiveFingerNo = 0
+        fingerDisplayHelper.handleFingersChanged()
+    }
+
+    private fun clearEachFingerAndResetState() {
+        activeFingers.forEach {
+            it.template = null
+            it.status = Finger.Status.NOT_COLLECTED
+        }
     }
 }
