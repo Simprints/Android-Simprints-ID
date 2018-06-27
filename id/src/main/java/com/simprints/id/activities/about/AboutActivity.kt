@@ -45,6 +45,11 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
         initUi()
 
         viewPresenter = AboutPresenter(this, component)
+
+        showConfirmDialog.setOnClickListener {
+            val dialog = ConfirmFingerprintsDialog(this, viewPresenter.getMap(), callbackConfirm, callbackRestart)
+            dialog.create().show()
+        }
     }
 
     private fun initUi() {
@@ -69,6 +74,14 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
         AlertDialog.Builder(this)
             .setMessage(getString(R.string.success_recovery_message))
             .setPositiveButton(getString(R.string.ok)) { dialog, _ -> dialog.dismiss() }.create()
+
+    private val callbackConfirm = {
+        //move ahead with the workflow
+    }
+
+    private val callbackRestart = {
+        //restart scanning fingerprints with all data cleared from the activity
+    }
 
     override fun onResume() {
         super.onResume()
