@@ -1,11 +1,11 @@
-package com.simprints.id.activities.about
+package com.simprints.id.activities.collectFingerprints.confirmFingerprints
 
 import android.app.AlertDialog
 import android.content.Context
 import com.simprints.id.R
 
 class ConfirmFingerprintsDialog(private val context: Context,
-                                private val scannedFingers: Map<String, Boolean>,
+                                private val scannedFingers: MutableMap<String, Boolean>,
                                 private val callbackConfirm: () -> Unit,
                                 private val callbackRestart: () -> Unit) {
 
