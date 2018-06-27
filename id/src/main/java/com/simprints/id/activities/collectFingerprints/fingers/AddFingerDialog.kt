@@ -18,22 +18,16 @@ class AddFingerDialog(private val ctx: Context,
     }
 
     fun create(): AlertDialog {
-
         val optionChecks = options.map { it.active }.toBooleanArray()
         val optionNames = options.map { it.name }.toTypedArray()
 
         val builder = AlertDialog.Builder(ctx)
             .setTitle(R.string.add_finger_dialog_title)
-            .setMultiChoiceItems(
-                optionNames,
-                optionChecks,
-                { dialogInterface, i, isChecked ->
-
-                    val fingerOption = options[i]
-                    fingerOption.active = fingerOption.required || isChecked
-
-                    setCheckStateForDialogRow((dialogInterface as AlertDialog), i, fingerOption.active)
-                })
+            .setMultiChoiceItems(optionNames, optionChecks) { dialogInterface, i, isChecked ->
+                val fingerOption = options[i]
+                fingerOption.active = fingerOption.required || isChecked
+                setCheckStateForDialogRow((dialogInterface as AlertDialog), i, fingerOption.active)
+            }
             .setPositiveButton(R.string.ok) { _, _ ->
                 val persistentOption = options.last()
                 options.remove(persistentOption)
