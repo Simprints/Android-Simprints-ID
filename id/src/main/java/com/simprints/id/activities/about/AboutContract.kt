@@ -28,5 +28,6 @@ interface AboutContract {
 
         fun recoverDb()
 
+        fun getMap(): Map<String, Boolean>
     }
 }

@@ -64,6 +64,8 @@
     <string name="cancel_button" tools:ignore="ButtonCase">CANCEL</string>
     <string name="ok">OK</string>
     <string name="scan">SCAN</string>
+    <string name="confirm">CONFIRM</string>
+    <string name="restart">RESTART</string>
     <!-- Content Descriptions -->
     <string name="finger_image_description" translatable="false">Hands with arrow pointing to a finger</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
