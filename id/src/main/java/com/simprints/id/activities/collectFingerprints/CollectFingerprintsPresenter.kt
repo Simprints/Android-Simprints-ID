@@ -165,7 +165,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         syncHelper.sync()
     }
 
-    override fun handleTryAgain() {
+    override fun handleTryAgainFromDifferentActivity() {
         scanningHelper.reconnect()
     }
 
