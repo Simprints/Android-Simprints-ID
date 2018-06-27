@@ -190,22 +190,11 @@ class CollectFingerprintsPresenter(private val context: Context,
             .filter { isFingerScannedAndHasTemplate(it) }
             .map { Fingerprint(it.id, it.template.templateBytes) }
 
-        val fingersScanned = mutableMapOf<String, Boolean>()
-        activeFingers.forEach {
-            fingersScanned[context.getString(FingerRes.get(it).nameId)] = it.isGoodScan
+        if (fingerprints.isEmpty()) {
+            Toast.makeText(context, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show()
+        } else {
+            proceedToFinish(fingerprints)
         }
-
-        ConfirmFingerprintsDialog(context, fingersScanned,
-            callbackConfirm = { proceedToFinish(fingerprints) },
-            callbackRestart = {})
-            .create()
-            .show()
-
-//        if (fingerprints.isEmpty()) {
-//            Toast.makeText(context, "Please scan at least 1 required finger", Toast.LENGTH_LONG).show()
-//        } else {
-//            proceedToFinish(fingerprints)
-//        }
     }
 
     private fun isFingerScannedAndHasTemplate(it: Finger) =
@@ -252,5 +241,29 @@ class CollectFingerprintsPresenter(private val context: Context,
     override fun handleUnexpectedError(error: SimprintsError) {
         analyticsManager.logError(error)
         view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
+    }
+
+    override fun checkNumberOfFingersScannedAndShowDialog() {
+        if(getNumberOfCollectedFingerprints() == 4) {
+            showConfirmationDialog()
+        } else if (getNumberOfCollectedFingerprints() == 2) {
+            val fingersScanQualities = activeFingers.map { it.isGoodScan }
+            if(!fingersScanQualities.contains(false)) {
+                showConfirmationDialog()
+            }
+        }
+    }
+
+    private fun showConfirmationDialog() {
+        val fingersScanned = mutableMapOf<String, Boolean>()
+        activeFingers.forEach {
+            fingersScanned[context.getString(FingerRes.get(it).nameId)] = it.isGoodScan
+        }
+
+        ConfirmFingerprintsDialog(context, fingersScanned,
+            callbackConfirm = {},
+            callbackRestart = {})
+            .create()
+            .show()
     }
 }
