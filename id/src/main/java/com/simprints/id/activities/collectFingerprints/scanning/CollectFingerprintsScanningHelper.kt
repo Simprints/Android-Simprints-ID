@@ -239,6 +239,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         setGoodOrBadScanAndNudgeIfNecessary(quality)
         Vibrate.vibrate(context, preferencesManager.vibrateMode)
         presenter.refreshDisplay()
+        presenter.checkNumberOfFingersScannedAndShowDialog()
     }
 
     private fun parseTemplateAndAddToCurrentFinger(finger: Finger) =
