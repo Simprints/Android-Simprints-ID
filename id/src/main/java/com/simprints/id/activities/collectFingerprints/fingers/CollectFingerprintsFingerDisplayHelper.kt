@@ -195,7 +195,7 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         }
     }
 
-    private fun handleFingersChanged() {
+    fun handleFingersChanged() {
         presenter.initIndicators()
         view.pageAdapter.notifyDataSetChanged()
         view.viewPager.currentItem = presenter.currentActiveFingerNo
