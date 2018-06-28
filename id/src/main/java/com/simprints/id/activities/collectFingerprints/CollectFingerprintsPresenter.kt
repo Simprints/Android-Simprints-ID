@@ -48,9 +48,6 @@ class CollectFingerprintsPresenter(private val context: Context,
     private lateinit var fingerDisplayHelper: CollectFingerprintsFingerDisplayHelper
     private lateinit var indicatorsHelper: CollectFingerprintsIndicatorsHelper
 
-    private val numberOfGoodScansRequired = 2
-    private val maxNumberOfScans = numberOfGoodScansRequired + 2
-
     // Array with only the active Fingers, used to populate the ViewPager
     override val activeFingers = ArrayList<Finger>()
     override var currentActiveFingerNo: Int = 0
@@ -131,8 +128,11 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper.launchAddFingerDialog()
     }
 
+    private fun getCollectedFingerprints(): List<Finger> =
+        activeFingers.filter { it.template != null }
+
     private fun getNumberOfCollectedFingerprints(): Int =
-        activeFingers.filter { it.template != null }.size
+        getCollectedFingerprints().size
 
     override fun getTitle(): String =
         when (preferencesManager.calloutAction) {
@@ -237,15 +237,23 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun checkScannedFingersAndCreateMapToShowDialog() {
-        if(getNumberOfCollectedFingerprints() == maxNumberOfScans) {
-            createMapAndShowDialog()
-        } else if (getNumberOfCollectedFingerprints() == numberOfGoodScansRequired) {
-            val fingersScanQualities = activeFingers.map { it.isGoodScan }
-            if (!fingersScanQualities.contains(false)) {
+        if (everyActiveFingerHasBeenScanned()) {
+            if (weHaveTheMinimumNumberOfAnyQualityScans()) {
+                createMapAndShowDialog()
+            } else if (weHaveTheMinimumNumberOfGoodScans()) {
                 createMapAndShowDialog()
             }
         }
     }
+
+    private fun weHaveTheMinimumNumberOfGoodScans(): Boolean =
+        getCollectedFingerprints().filter { it.isGoodScan }.size >= minimumNumberOfGoodScans
+
+    private fun weHaveTheMinimumNumberOfAnyQualityScans() =
+        getNumberOfCollectedFingerprints() >= minimumNumberOfAnyQualityScans
+
+    private fun everyActiveFingerHasBeenScanned() =
+        getNumberOfCollectedFingerprints() == activeFingers.size
 
     private fun createMapAndShowDialog() {
         isConfirmDialogShown = true
@@ -268,5 +276,10 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper.handleFingersChanged()
         fingerDisplayHelper.resetFingerIndexToBeginning()
         isConfirmDialogShown = false
+    }
+
+    companion object {
+        private const val minimumNumberOfGoodScans = 2
+        private const val minimumNumberOfAnyQualityScans = minimumNumberOfGoodScans + 2
     }
 }
