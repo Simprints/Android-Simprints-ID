@@ -48,6 +48,9 @@ class CollectFingerprintsPresenter(private val context: Context,
     private lateinit var fingerDisplayHelper: CollectFingerprintsFingerDisplayHelper
     private lateinit var indicatorsHelper: CollectFingerprintsIndicatorsHelper
 
+    private val numberOfGoodScansRequired = 2
+    private val maxNumberOfScans = numberOfGoodScansRequired + 2
+
     // Array with only the active Fingers, used to populate the ViewPager
     override val activeFingers = ArrayList<Finger>()
     override var currentActiveFingerNo: Int = 0
@@ -244,9 +247,9 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun checkNumberOfFingersScannedAndShowDialog() {
-        if (getNumberOfCollectedFingerprints() == 4) {
+        if(getNumberOfCollectedFingerprints() == maxNumberOfScans) {
             showConfirmationDialog()
-        } else if (getNumberOfCollectedFingerprints() == 2) {
+        } else if (getNumberOfCollectedFingerprints() == numberOfGoodScansRequired) {
             val fingersScanQualities = activeFingers.map { it.isGoodScan }
             if(!fingersScanQualities.contains(false)) {
                 showConfirmationDialog()
