@@ -238,9 +238,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun checkScannedFingersAndCreateMapToShowDialog() {
         if (everyActiveFingerHasBeenScanned()) {
-            if (weHaveTheMinimumNumberOfAnyQualityScans()) {
-                createMapAndShowDialog()
-            } else if (weHaveTheMinimumNumberOfGoodScans()) {
+            if (weHaveTheMinimumNumberOfAnyQualityScans() || weHaveTheMinimumNumberOfGoodScans()) {
                 createMapAndShowDialog()
             }
         }
@@ -276,6 +274,13 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper.handleFingersChanged()
         fingerDisplayHelper.resetFingerIndexToBeginning()
         isConfirmDialogShown = false
+    }
+
+    override fun addNewFingerIfNecessary() {
+        if (currentFinger().numberOfBadScans >= 3) {
+            fingerDisplayHelper.handleAutoAddFinger()
+            scanningHelper.doNudgeIfNecessary()
+        }
     }
 
     companion object {

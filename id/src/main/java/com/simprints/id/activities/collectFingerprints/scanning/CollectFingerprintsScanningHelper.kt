@@ -254,14 +254,24 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     private fun setGoodOrBadScanAndNudgeIfNecessary(quality: Int) =
         if (quality >= preferencesManager.qualityThreshold) {
-            presenter.currentFinger().status = Finger.Status.GOOD_SCAN
-            doNudgeIfNecessary()
+            handleGoodScan()
         } else {
-            presenter.currentFinger().status = Finger.Status.BAD_SCAN
+            handleBadScan()
         }
 
+    private fun handleGoodScan() {
+        presenter.currentFinger().status = Finger.Status.GOOD_SCAN
+        doNudgeIfNecessary()
+    }
+
+    private fun handleBadScan() {
+        presenter.currentFinger().status = Finger.Status.BAD_SCAN
+        presenter.currentFinger().numberOfBadScans += 1
+        presenter.addNewFingerIfNecessary()
+    }
+
     // Swipes ViewPager automatically when the current finger is complete
-    private fun doNudgeIfNecessary() {
+    fun doNudgeIfNecessary() {
         if (preferencesManager.nudgeMode) {
             Handler().postDelayed({
                 if (presenter.currentActiveFingerNo < presenter.activeFingers.size) {
