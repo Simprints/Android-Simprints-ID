@@ -100,6 +100,10 @@ class CollectFingerprintsPresenter(private val context: Context,
         return true
     }
 
+    override fun initIndicators() {
+        indicatorsHelper.initIndicators()
+    }
+
     override fun currentFinger(): Finger = activeFingers[currentActiveFingerNo]
 
     override fun isScanning(): Boolean = currentFinger().isCollecting
@@ -128,11 +132,16 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper.launchAddFingerDialog()
     }
 
-    private fun getCollectedFingerprints(): List<Finger> =
-        activeFingers.filter { it.template != null }
+    override fun addNewFingerIfNecessary() {
+        if (currentFinger().numberOfBadScans >= numberOfBadScansRequiredToAutoAddNewFinger) {
+            fingerDisplayHelper.handleAutoAddFinger()
+            doNudgeIfNecessary()
+        }
+    }
 
-    private fun getNumberOfCollectedFingerprints(): Int =
-        getCollectedFingerprints().size
+    override fun doNudgeIfNecessary() {
+        fingerDisplayHelper.doNudgeIfNecessary()
+    }
 
     override fun getTitle(): String =
         when (preferencesManager.calloutAction) {
@@ -150,10 +159,6 @@ class CollectFingerprintsPresenter(private val context: Context,
         indicatorsHelper.refreshIndicators()
         view.refreshScanButtonAndTimeoutBar()
         view.refreshFingerFragment()
-    }
-
-    override fun initIndicators() {
-        indicatorsHelper.initIndicators()
     }
 
     override fun handleSyncPressed() {
@@ -178,9 +183,14 @@ class CollectFingerprintsPresenter(private val context: Context,
         scanningHelper.stopReconnecting()
     }
 
+    private fun getCollectedFingerprints(): List<Finger> =
+        activeFingers.filter { isFingerScannedAndHasTemplate(it) }
+
+    private fun getNumberOfCollectedFingerprints(): Int =
+        getCollectedFingerprints().size
+
     override fun handleConfirmFingerprintsAndContinue() {
-        val fingerprints = activeFingers
-            .filter { isFingerScannedAndHasTemplate(it) }
+        val fingerprints = getCollectedFingerprints()
             .map { Fingerprint(it.id, it.template.templateBytes) }
 
         if (fingerprints.isEmpty()) {
@@ -276,19 +286,9 @@ class CollectFingerprintsPresenter(private val context: Context,
         isConfirmDialogShown = false
     }
 
-    override fun addNewFingerIfNecessary() {
-        if (currentFinger().numberOfBadScans >= 3) {
-            fingerDisplayHelper.handleAutoAddFinger()
-            doNudgeIfNecessary()
-        }
-    }
-
-    override fun doNudgeIfNecessary() {
-        fingerDisplayHelper.doNudgeIfNecessary()
-    }
-
     companion object {
         private const val minimumNumberOfGoodScans = 2
         private const val minimumNumberOfAnyQualityScans = minimumNumberOfGoodScans + 2
+        private const val numberOfBadScansRequiredToAutoAddNewFinger = 3
     }
 }
