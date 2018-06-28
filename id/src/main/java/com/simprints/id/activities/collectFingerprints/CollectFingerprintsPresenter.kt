@@ -279,8 +279,12 @@ class CollectFingerprintsPresenter(private val context: Context,
     override fun addNewFingerIfNecessary() {
         if (currentFinger().numberOfBadScans >= 3) {
             fingerDisplayHelper.handleAutoAddFinger()
-            scanningHelper.doNudgeIfNecessary()
+            doNudgeIfNecessary()
         }
+    }
+
+    override fun doNudgeIfNecessary() {
+        fingerDisplayHelper.doNudgeIfNecessary()
     }
 
     companion object {

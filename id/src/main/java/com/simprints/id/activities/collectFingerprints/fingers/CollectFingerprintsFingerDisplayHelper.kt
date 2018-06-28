@@ -2,9 +2,11 @@ package com.simprints.id.activities.collectFingerprints.fingers
 
 import android.app.Activity
 import android.content.Context
+import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
 import com.simprints.id.activities.collectFingerprints.FingerPageAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
@@ -214,5 +216,24 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         view.pageAdapter.notifyDataSetChanged()
         view.viewPager.currentItem = presenter.currentActiveFingerNo
         presenter.refreshDisplay()
+    }
+
+    // Swipes ViewPager automatically when the current finger is complete
+    fun doNudgeIfNecessary() {
+        if (preferencesManager.nudgeMode) {
+            Handler().postDelayed({
+                if (presenter.currentActiveFingerNo < presenter.activeFingers.size) {
+                    view.viewPager.setScrollDuration(SLOW_SWIPE_SPEED)
+                    view.viewPager.currentItem = presenter.currentActiveFingerNo + 1
+                    view.viewPager.setScrollDuration(FAST_SWIPE_SPEED)
+                }
+            }, AUTO_SWIPE_DELAY)
+        }
+    }
+
+    companion object {
+        private const val AUTO_SWIPE_DELAY: Long = 500
+        private const val FAST_SWIPE_SPEED = 100
+        private const val SLOW_SWIPE_SPEED = 1000
     }
 }

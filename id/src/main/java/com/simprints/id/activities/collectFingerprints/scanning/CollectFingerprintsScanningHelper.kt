@@ -3,7 +3,6 @@ package com.simprints.id.activities.collectFingerprints.scanning
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
-import android.os.Handler
 import android.view.View
 import android.widget.ProgressBar
 import com.simprints.id.Application
@@ -261,7 +260,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     private fun handleGoodScan() {
         presenter.currentFinger().status = Finger.Status.GOOD_SCAN
-        doNudgeIfNecessary()
+        presenter.doNudgeIfNecessary()
     }
 
     private fun handleBadScan() {
@@ -270,30 +269,11 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         presenter.addNewFingerIfNecessary()
     }
 
-    // Swipes ViewPager automatically when the current finger is complete
-    fun doNudgeIfNecessary() {
-        if (preferencesManager.nudgeMode) {
-            Handler().postDelayed({
-                if (presenter.currentActiveFingerNo < presenter.activeFingers.size) {
-                    view.viewPager.setScrollDuration(SLOW_SWIPE_SPEED)
-                    view.viewPager.currentItem = presenter.currentActiveFingerNo + 1
-                    view.viewPager.setScrollDuration(FAST_SWIPE_SPEED)
-                }
-            }, AUTO_SWIPE_DELAY)
-        }
-    }
-
     fun resetScannerUi() {
         appState.scanner.resetUI(null)
     }
 
     fun stopReconnecting() {
         setup.stop()
-    }
-
-    companion object {
-        private const val AUTO_SWIPE_DELAY: Long = 500
-        private const val FAST_SWIPE_SPEED = 100
-        private const val SLOW_SWIPE_SPEED = 1000
     }
 }
