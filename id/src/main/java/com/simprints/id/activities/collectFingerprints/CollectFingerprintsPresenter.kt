@@ -264,7 +264,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
 
         ConfirmFingerprintsDialog(context, fingersScanned,
-            callbackConfirm = {},
+            callbackConfirm = { onActionForward() },
             callbackRestart = { handleRestart() })
             .create()
             .show()
