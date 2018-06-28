@@ -30,12 +30,12 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0, 0)
         set(FingerIdentifier.LEFT_INDEX_FINGER, FingerConfig.REQUIRED, 1, 1)
         set(FingerIdentifier.LEFT_3RD_FINGER, FingerConfig.OPTIONAL, 4, 2)
-        set(FingerIdentifier.LEFT_4TH_FINGER, FingerConfig.OPTIONAL, 5, 3)
-        set(FingerIdentifier.LEFT_5TH_FINGER, FingerConfig.OPTIONAL, 6, 4)
+        set(FingerIdentifier.LEFT_4TH_FINGER, FingerConfig.OPTIONAL, 6, 3)
+        set(FingerIdentifier.LEFT_5TH_FINGER, FingerConfig.OPTIONAL, 8, 4)
         set(FingerIdentifier.RIGHT_THUMB, FingerConfig.OPTIONAL, 2, 5)
         set(FingerIdentifier.RIGHT_INDEX_FINGER, FingerConfig.OPTIONAL, 3, 6)
-        set(FingerIdentifier.RIGHT_3RD_FINGER, FingerConfig.OPTIONAL, 7, 7)
-        set(FingerIdentifier.RIGHT_4TH_FINGER, FingerConfig.OPTIONAL, 8, 8)
+        set(FingerIdentifier.RIGHT_3RD_FINGER, FingerConfig.OPTIONAL, 5, 7)
+        set(FingerIdentifier.RIGHT_4TH_FINGER, FingerConfig.OPTIONAL, 7, 8)
         set(FingerIdentifier.RIGHT_5TH_FINGER, FingerConfig.OPTIONAL, 9, 9)
     }
 
