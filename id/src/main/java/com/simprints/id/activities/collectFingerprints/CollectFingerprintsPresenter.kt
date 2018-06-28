@@ -50,11 +50,11 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private val numberOfGoodScansRequired = 2
     private val maxNumberOfScans = numberOfGoodScansRequired + 2
-    private val mapOfScannedFingers = mutableMapOf<String, Boolean>()
 
     // Array with only the active Fingers, used to populate the ViewPager
     override val activeFingers = ArrayList<Finger>()
     override var currentActiveFingerNo: Int = 0
+    override var isConfirmDialogShown = false
 
     init {
         ((view as Activity).application as Application).component.inject(this)
@@ -178,7 +178,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         scanningHelper.stopReconnecting()
     }
 
-    override fun onActionForward() {
+    override fun handleConfirmFingerprintsAndContinue() {
         val fingerprints = activeFingers
             .filter { isFingerScannedAndHasTemplate(it) }
             .map { Fingerprint(it.id, it.template.templateBytes) }
@@ -248,23 +248,25 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun createMapAndShowDialog() {
-        createMapForScannedFingers()
-        ConfirmFingerprintsDialog(context, mapOfScannedFingers,
-            callbackConfirm = {},
+        isConfirmDialogShown = true
+        ConfirmFingerprintsDialog(context, createMapForScannedFingers(),
+            callbackConfirm = { handleConfirmFingerprintsAndContinue() },
             callbackRestart = { handleRestart() })
             .create()
             .show()
     }
 
-    private fun createMapForScannedFingers() {
-        activeFingers.forEach {
-            mapOfScannedFingers[context.getString(FingerRes.get(it).nameId)] = it.isGoodScan
+    private fun createMapForScannedFingers(): MutableMap<String, Boolean> =
+        mutableMapOf<String, Boolean>().also { mapOfScannedFingers ->
+            activeFingers.forEach {
+                mapOfScannedFingers[context.getString(FingerRes.get(it).nameId)] = it.isGoodScan
+            }
         }
-    }
 
     private fun handleRestart() {
         fingerDisplayHelper.clearAndPopulateFingerArraysWithDefaultFingers()
         fingerDisplayHelper.handleFingersChanged()
         fingerDisplayHelper.resetFingerIndexToBeginning()
+        isConfirmDialogShown = false
     }
 }

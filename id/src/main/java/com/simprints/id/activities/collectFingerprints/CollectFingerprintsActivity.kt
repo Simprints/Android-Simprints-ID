@@ -36,7 +36,6 @@ class CollectFingerprintsActivity :
 
     override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
 
-    override var buttonContinue = false
     override lateinit var viewPager: ViewPagerCustom
     override lateinit var indicatorLayout: LinearLayout
     override lateinit var pageAdapter: FingerPageAdapter
