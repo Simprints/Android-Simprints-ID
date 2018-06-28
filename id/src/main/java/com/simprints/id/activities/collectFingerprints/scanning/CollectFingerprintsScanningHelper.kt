@@ -42,7 +42,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private var previousStatus: Finger.Status = Finger.Status.NOT_COLLECTED
 
     private val scannerButtonListener = ButtonListener {
-        if (view.buttonContinue)
+        if (presenter.isConfirmDialogShown)
             presenter.handleConfirmFingerprintsAndContinue()
         else if (!presenter.currentFinger().isGoodScan)
             toggleContinuousCapture()
