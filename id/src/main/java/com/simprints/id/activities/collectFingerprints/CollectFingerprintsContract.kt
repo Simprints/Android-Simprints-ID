@@ -2,8 +2,6 @@ package com.simprints.id.activities.collectFingerprints
 
 import android.app.ProgressDialog
 import android.content.Intent
-import android.support.annotation.DrawableRes
-import android.support.annotation.StringRes
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.LinearLayout
@@ -78,5 +76,6 @@ interface CollectFingerprintsContract {
         fun viewPagerOnPageSelected(position: Int)
         fun checkScannedFingersAndCreateMapToShowDialog()
         fun addNewFingerIfNecessary()
+        fun doNudgeIfNecessary()
     }
 }
