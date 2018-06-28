@@ -50,6 +50,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private val numberOfGoodScansRequired = 2
     private val maxNumberOfScans = numberOfGoodScansRequired + 2
+    private val mapOfScannedFingers = mutableMapOf<String, Boolean>()
 
     // Array with only the active Fingers, used to populate the ViewPager
     override val activeFingers = ArrayList<Finger>()
@@ -246,28 +247,30 @@ class CollectFingerprintsPresenter(private val context: Context,
         view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }
 
-    override fun checkNumberOfFingersScannedAndShowDialog() {
+    override fun checkScannedFingersAndCreateMapToShowDialog() {
         if(getNumberOfCollectedFingerprints() == maxNumberOfScans) {
-            showConfirmationDialog()
+            createMapAndShowDialog()
         } else if (getNumberOfCollectedFingerprints() == numberOfGoodScansRequired) {
             val fingersScanQualities = activeFingers.map { it.isGoodScan }
-            if(!fingersScanQualities.contains(false)) {
-                showConfirmationDialog()
+            if (!fingersScanQualities.contains(false)) {
+                createMapAndShowDialog()
             }
         }
     }
 
-    private fun showConfirmationDialog() {
-        val fingersScanned = mutableMapOf<String, Boolean>()
-        activeFingers.forEach {
-            fingersScanned[context.getString(FingerRes.get(it).nameId)] = it.isGoodScan
-        }
-
-        ConfirmFingerprintsDialog(context, fingersScanned,
+    private fun createMapAndShowDialog() {
+        createMapForScannedFingers()
+        ConfirmFingerprintsDialog(context, mapOfScannedFingers,
             callbackConfirm = {},
             callbackRestart = { handleRestart() })
             .create()
             .show()
+    }
+
+    private fun createMapForScannedFingers() {
+        activeFingers.forEach {
+            mapOfScannedFingers[context.getString(FingerRes.get(it).nameId)] = it.isGoodScan
+        }
     }
 
     private fun handleRestart() {

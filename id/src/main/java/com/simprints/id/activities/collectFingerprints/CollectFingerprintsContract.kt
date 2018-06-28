@@ -78,6 +78,6 @@ interface CollectFingerprintsContract {
         fun currentFinger(): Finger
         fun viewPagerOnPageSelected(position: Int)
 
-        fun checkNumberOfFingersScannedAndShowDialog()
+        fun checkScannedFingersAndCreateMapToShowDialog()
     }
 }
