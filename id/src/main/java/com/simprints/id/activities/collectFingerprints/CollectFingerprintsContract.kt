@@ -57,7 +57,7 @@ interface CollectFingerprintsContract {
         // Lifecycle
         fun handleOnStart()
         fun handleOnStop()
-        fun onActionForward()
+        fun handleConfirmFingerprintsAndContinue()
         fun handleBackPressedWhileScanning()
         fun handleOnBackPressedToLeave()
         fun handleUnexpectedError(error: SimprintsError)

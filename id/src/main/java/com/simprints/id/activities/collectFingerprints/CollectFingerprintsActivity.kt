@@ -21,7 +21,6 @@ import com.simprints.id.activities.PrivacyActivity
 import com.simprints.id.activities.RefusalActivity
 import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.about.AboutActivity
-import com.simprints.id.activities.collectFingerprints.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
@@ -190,7 +189,7 @@ class CollectFingerprintsActivity :
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.action_forward) {
-            viewPresenter.onActionForward()
+            viewPresenter.handleConfirmFingerprintsAndContinue()
             return true
         }
         return super.onOptionsItemSelected(item)

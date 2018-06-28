@@ -189,7 +189,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         scanningHelper.stopReconnecting()
     }
 
-    override fun onActionForward() {
+    override fun handleConfirmFingerprintsAndContinue() {
         val fingerprints = activeFingers
             .filter { isFingerScannedAndHasTemplate(it) }
             .map { Fingerprint(it.id, it.template.templateBytes) }
@@ -261,7 +261,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun createMapAndShowDialog() {
         createMapForScannedFingers()
         ConfirmFingerprintsDialog(context, mapOfScannedFingers,
-            callbackConfirm = {},
+            callbackConfirm = { handleConfirmFingerprintsAndContinue() },
             callbackRestart = { handleRestart() })
             .create()
             .show()
