@@ -265,8 +265,14 @@ class CollectFingerprintsPresenter(private val context: Context,
 
         ConfirmFingerprintsDialog(context, fingersScanned,
             callbackConfirm = {},
-            callbackRestart = {})
+            callbackRestart = { handleRestart() })
             .create()
             .show()
+    }
+
+    private fun handleRestart() {
+        fingerDisplayHelper.clearAndPopulateFingerArraysWithDefaultFingers()
+        fingerDisplayHelper.handleFingersChanged()
+        fingerDisplayHelper.resetFingerIndexToBeginning()
     }
 }
