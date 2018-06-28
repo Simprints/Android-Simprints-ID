@@ -41,10 +41,15 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
 
     init {
         ((view as Activity).application as Application).component.inject(this)
-        loadFingerStatusAndRefreshWithDefaultFingers()
-        initFingerArrays()
+        clearAndPopulateFingerArraysWithDefaultFingers()
         initPageAdapter()
         initViewPager()
+    }
+
+    fun clearAndPopulateFingerArraysWithDefaultFingers() {
+        loadFingerStatusAndRefreshWithDefaultFingers()
+        clearFingerArrays()
+        populateFingerArrays()
     }
 
     private fun loadFingerStatusAndRefreshWithDefaultFingers() {
@@ -54,7 +59,12 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         preferencesManager.fingerStatus = fingerStatus
     }
 
-    private fun initFingerArrays() {
+    private fun clearFingerArrays() {
+        allFingers.clear()
+        presenter.activeFingers.clear()
+    }
+
+    private fun populateFingerArrays() {
         FingerIdentifier.values().take(Finger.NB_OF_FINGERS).forEach { id ->
             val finger = createFinger(id)
             allFingers.add(finger)
@@ -156,12 +166,16 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
             }
     }
 
-    private fun refreshIndexOfCurrentFinger(currentFinger: Finger) {
-        presenter.currentActiveFingerNo = if (presenter.activeFingers.contains(currentFinger)) {
-            presenter.activeFingers.indexOf(currentFinger)
+    private fun refreshIndexOfCurrentFinger(currentFinger: Finger) =
+        if (presenter.activeFingers.contains(currentFinger)) {
+            presenter.currentActiveFingerNo = presenter.activeFingers.indexOf(currentFinger)
         } else {
-            0
+            resetFingerIndexToBeginning()
         }
+
+    fun resetFingerIndexToBeginning() {
+        view.viewPager.currentItem = 0
+        presenter.currentActiveFingerNo = 0
     }
 
     private fun saveFingerStates(persistFingerState: Boolean, persistentFingerStatus: MutableMap<FingerIdentifier, Boolean>) {

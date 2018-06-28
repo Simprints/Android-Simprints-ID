@@ -271,15 +271,8 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun handleRestart() {
-        clearEachFingerAndResetState()
-        currentActiveFingerNo = 0
+        fingerDisplayHelper.clearAndPopulateFingerArraysWithDefaultFingers()
         fingerDisplayHelper.handleFingersChanged()
-    }
-
-    private fun clearEachFingerAndResetState() {
-        activeFingers.forEach {
-            it.template = null
-            it.status = Finger.Status.NOT_COLLECTED
-        }
+        fingerDisplayHelper.resetFingerIndexToBeginning()
     }
 }
