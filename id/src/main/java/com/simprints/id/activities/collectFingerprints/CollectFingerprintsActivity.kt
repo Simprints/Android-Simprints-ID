@@ -9,7 +9,6 @@ import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
@@ -47,7 +46,6 @@ class CollectFingerprintsActivity :
     override lateinit var syncItem: MenuItem
 
     private var rightToLeft: Boolean = false
-    private var continueItem: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,27 +136,6 @@ class CollectFingerprintsActivity :
         }
     }
 
-    override fun refreshContinueButton(nbCollected: Int, promptContinue: Boolean) {
-        buttonContinue = false
-
-        continueItem?.let {
-            if (viewPresenter.isScanning()) {
-                it.setIcon(R.drawable.ic_menu_forward_grey)
-                it.isEnabled = false
-            } else {
-                if (nbCollected == 0) {
-                    it.setIcon(R.drawable.ic_menu_forward_grey)
-                } else if (nbCollected > 0 && promptContinue) {
-                    it.setIcon(R.drawable.ic_menu_forward_green)
-                    buttonContinue = true
-                } else if (nbCollected > 0) {
-                    it.setIcon(R.drawable.ic_menu_forward_white)
-                }
-                it.isEnabled = nbCollected > 0
-            }
-        }
-    }
-
     override fun finishSuccessEnrol(result: Intent) =
         setResultAndFinish(Activity.RESULT_OK, result)
 
@@ -177,22 +154,6 @@ class CollectFingerprintsActivity :
                 startActivityForResult(Intent(this, RefusalActivity::class.java), REFUSAL_ACTIVITY_REQUEST)
             }
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
-        continueItem = menu.findItem(R.id.action_forward)
-        viewPresenter.refreshDisplay()
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.action_forward) {
-            viewPresenter.handleConfirmFingerprintsAndContinue()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

@@ -11,7 +11,7 @@ class ConfirmFingerprintsDialog(private val context: Context,
 
     fun create(): AlertDialog {
         val builder = AlertDialog.Builder(context)
-            .setTitle("Fingers Scanned")
+            .setTitle(context.getString(R.string.confirm_fingers_dialog_title))
             .setMessage(getMapOfFingersAndQualityAsText())
             .setPositiveButton(context.resources.getString(R.string.confirm)) { _, _ -> callbackConfirm() }
             .setNegativeButton(context.resources.getString(R.string.restart)) { _, _ -> callbackRestart() }
