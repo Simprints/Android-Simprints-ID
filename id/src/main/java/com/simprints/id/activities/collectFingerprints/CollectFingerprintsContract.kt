@@ -20,7 +20,6 @@ interface CollectFingerprintsContract {
     interface View : BaseView<Presenter> {
 
         // Lifecycle
-        var buttonContinue: Boolean
         fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
         fun doLaunchAlert(alertType: ALERT_TYPE)
         fun finishSuccessEnrol(result: Intent)
@@ -49,6 +48,7 @@ interface CollectFingerprintsContract {
 
         val activeFingers: ArrayList<Finger>
         var currentActiveFingerNo: Int
+        var isConfirmDialogShown: Boolean
 
         fun getTitle(): String
         fun refreshDisplay()
@@ -56,7 +56,7 @@ interface CollectFingerprintsContract {
         // Lifecycle
         fun handleOnStart()
         fun handleOnStop()
-        fun onActionForward()
+        fun handleConfirmFingerprintsAndContinue()
         fun handleBackPressedWhileScanning()
         fun handleOnBackPressedToLeave()
         fun handleUnexpectedError(error: SimprintsError)
