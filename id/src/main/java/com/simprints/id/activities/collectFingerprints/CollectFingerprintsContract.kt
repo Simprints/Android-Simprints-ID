@@ -41,7 +41,6 @@ interface CollectFingerprintsContract {
         var indicatorLayout: LinearLayout
 
         // Refresh Display
-        fun refreshContinueButton(nbCollected: Int, promptContinue: Boolean)
         fun refreshFingerFragment()
         fun refreshScanButtonAndTimeoutBar()
     }
