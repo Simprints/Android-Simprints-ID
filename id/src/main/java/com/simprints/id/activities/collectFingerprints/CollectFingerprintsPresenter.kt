@@ -134,14 +134,6 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun getNumberOfCollectedFingerprints(): Int =
         activeFingers.filter { it.template != null }.size
 
-    private fun isContinueConditionSatisfied(): Boolean {
-        var promptContinue = true
-        activeFingers.forEach {
-            if (!it.isGoodScan && !it.isRescanGoodScan) promptContinue = false
-        }
-        return promptContinue
-    }
-
     override fun getTitle(): String =
         when (preferencesManager.calloutAction) {
             CalloutAction.REGISTER -> context.getString(R.string.register_title)
@@ -155,12 +147,9 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
 
     override fun refreshDisplay() {
-        val nbCollected = getNumberOfCollectedFingerprints()
-        val promptContinue = isContinueConditionSatisfied()
         indicatorsHelper.refreshIndicators()
         view.refreshScanButtonAndTimeoutBar()
         view.refreshFingerFragment()
-        view.refreshContinueButton(nbCollected, promptContinue)
     }
 
     override fun initIndicators() {

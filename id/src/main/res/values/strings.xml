@@ -361,5 +361,6 @@
     <string name="dashboard_card_identification_title">Last Identification</string>
     <string name="dashboard_card_lastuser_title">Last user</string>
     <string name="add_finger_dialog_title">Add Finger(s)</string>
+    <string name="confirm_fingers_dialog_title">Fingers Scanned</string>
 
 </resources>
