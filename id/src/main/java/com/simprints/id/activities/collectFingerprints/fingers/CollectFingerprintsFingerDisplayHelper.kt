@@ -4,9 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import com.simprints.id.Application
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
-import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
 import com.simprints.id.activities.collectFingerprints.FingerPageAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
@@ -231,9 +231,29 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         }
     }
 
+    fun showSplashAndAddNewFinger() {
+        showTryDifferentFingerSplash()
+        Handler().postDelayed({
+            hideTryDifferentFingerSplash()
+            handleAutoAddFinger()
+            doNudgeIfNecessary()
+        }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
+    }
+
+
+    private fun showTryDifferentFingerSplash() {
+        view.tryDifferentFingerSplash.visibility = View.VISIBLE
+    }
+
+    private fun hideTryDifferentFingerSplash() {
+        view.tryDifferentFingerSplash.visibility = View.GONE
+    }
+
     companion object {
         private const val AUTO_SWIPE_DELAY: Long = 500
         private const val FAST_SWIPE_SPEED = 100
         private const val SLOW_SWIPE_SPEED = 1000
+
+        private const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 1500
     }
 }

@@ -3,6 +3,7 @@ package com.simprints.id.activities.collectFingerprints
 import android.app.ProgressDialog
 import android.content.Intent
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import com.simprints.id.activities.BasePresenter
@@ -23,6 +24,9 @@ interface CollectFingerprintsContract {
         fun finishSuccessEnrol(result: Intent)
         fun finishSuccessAndStartMatching(intent: Intent)
         fun cancelAndFinish()
+
+        // Fingers
+        var tryDifferentFingerSplash: android.view.View
 
         // Sync
         var syncItem: MenuItem
@@ -75,7 +79,7 @@ interface CollectFingerprintsContract {
         fun currentFinger(): Finger
         fun viewPagerOnPageSelected(position: Int)
         fun checkScannedFingersAndCreateMapToShowDialog()
-        fun addNewFingerIfNecessary()
+        fun showSplashAndAddNewFingerIfNecessary()
         fun doNudgeIfNecessary()
     }
 }

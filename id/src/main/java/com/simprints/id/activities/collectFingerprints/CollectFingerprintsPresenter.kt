@@ -132,10 +132,9 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper.launchAddFingerDialog()
     }
 
-    override fun addNewFingerIfNecessary() {
+    override fun showSplashAndAddNewFingerIfNecessary() {
         if (currentFinger().numberOfBadScans >= numberOfBadScansRequiredToAutoAddNewFinger) {
-            fingerDisplayHelper.handleAutoAddFinger()
-            doNudgeIfNecessary()
+            fingerDisplayHelper.showSplashAndAddNewFinger()
         }
     }
 
