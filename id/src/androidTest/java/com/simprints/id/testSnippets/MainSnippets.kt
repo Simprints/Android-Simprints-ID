@@ -48,7 +48,7 @@ fun fullHappyWorkflow() {
     collectFingerprintsPressScan()
     collectFingerprintsPressScan()
     collectFingerprintsCheckGoodScan()
-    collectFingerprintsPressContinue()
+    checkIfDialogIsDisplayedAndClickConfirm()
 }
 
 private fun setupActivityAndContinue() {
@@ -93,15 +93,6 @@ private fun collectFingerprintsCheckGoodScan() {
         onView(withId(R.id.scan_button))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.good_scan_message)))
-    })
-}
-
-private fun collectFingerprintsPressContinue() {
-    log("collectFingerprintsPressContinue")
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
-        onView(withId(R.id.action_forward))
-            .check(matches(isDisplayed()))
-            .perform(click())
     })
 }
 
@@ -248,6 +239,13 @@ private fun verifyUiForSyncCompleted() {
         onView(withText(containsString(getResourceString(R.string.nav_sync_complete))))
             .check(matches(isDisplayed()))
     })
+}
+
+private fun checkIfDialogIsDisplayedAndClickConfirm() {
+    WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
+        onView(withText("Fingers Scanned")).check(matches(isDisplayed()))
+        onView(withId(android.R.id.button1)).perform(click())
+    }
 }
 
 private fun exitFromCollectFingerprints() {
