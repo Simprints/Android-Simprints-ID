@@ -263,12 +263,12 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         }
 
     private fun handleGoodScan() {
-        presenter.currentFinger().status = Finger.Status.GOOD_SCAN
+        currentFingerStatus = Finger.Status.GOOD_SCAN
         presenter.doNudgeIfNecessary()
     }
 
     private fun handleBadScan() {
-        presenter.currentFinger().status = Finger.Status.BAD_SCAN
+        currentFingerStatus = Finger.Status.BAD_SCAN
         presenter.currentFinger().numberOfBadScans += 1
         presenter.addNewFingerIfNecessary()
     }
