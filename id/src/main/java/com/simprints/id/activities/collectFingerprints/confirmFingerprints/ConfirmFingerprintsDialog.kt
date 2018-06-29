@@ -23,9 +23,9 @@ class ConfirmFingerprintsDialog(private val context: Context,
         var message = ""
         scannedFingers.forEach { fingerName, scanThresholdPassed ->
             message += if (scanThresholdPassed) {
-                "✓"
+                "✓ "
             } else {
-                "×"
+                "× "
             }
             message += fingerName + "\n"
         }
