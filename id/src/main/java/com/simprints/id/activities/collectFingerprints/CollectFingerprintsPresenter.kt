@@ -52,6 +52,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     override val activeFingers = ArrayList<Finger>()
     override var currentActiveFingerNo: Int = 0
     override var isConfirmDialogShown = false
+    private var numberOfFingersAdded = 0
 
     init {
         ((view as Activity).application as Application).component.inject(this)
@@ -133,10 +134,17 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun showSplashAndAddNewFingerIfNecessary() {
-        if (currentFinger().numberOfBadScans >= numberOfBadScansRequiredToAutoAddNewFinger) {
+        if (tooManyBadScans(currentFinger()) && haveNotExceedMaximumNumberOfFingersToAdd()) {
             fingerDisplayHelper.showSplashAndAddNewFinger()
+            numberOfFingersAdded++
         }
     }
+
+    private fun tooManyBadScans(finger: Finger) =
+        finger.numberOfBadScans >= numberOfBadScansRequiredToAutoAddNewFinger
+
+    private fun haveNotExceedMaximumNumberOfFingersToAdd() =
+        numberOfFingersAdded < maximumNumberOfFingersAdded
 
     override fun doNudgeIfNecessary() {
         fingerDisplayHelper.doNudgeIfNecessary()
@@ -282,12 +290,14 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper.clearAndPopulateFingerArraysWithDefaultFingers()
         fingerDisplayHelper.handleFingersChanged()
         fingerDisplayHelper.resetFingerIndexToBeginning()
+        numberOfFingersAdded = 0
         isConfirmDialogShown = false
     }
 
     companion object {
+        private const val maximumNumberOfFingersAdded = 2
         private const val minimumNumberOfGoodScans = 2
-        private const val minimumNumberOfAnyQualityScans = minimumNumberOfGoodScans + 2
+        private const val minimumNumberOfAnyQualityScans = minimumNumberOfGoodScans + maximumNumberOfFingersAdded
         private const val numberOfBadScansRequiredToAutoAddNewFinger = 3
     }
 }
