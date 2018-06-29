@@ -15,11 +15,7 @@ public class LanguageHelper {
 
         Locale.setDefault(locale);
         Configuration config = new Configuration();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            config.setLocale(locale);
-        } else {
-            config.locale = locale;
-        }
+        config.setLocale(locale);
 
         return config;
     }

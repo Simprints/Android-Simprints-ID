@@ -27,11 +27,17 @@ Thumbs.db
 
 # Android Studio
 *.iml
-.idea
-#.idea/workspace.xml - remove # and delete .idea if it better suit your needs.
+.idea/workspace.xml
+.idea/misc.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/dictionaries
+.idea/libraries
+.idea/jenkinsSettings.xml
 .gradle
 build/
 **/output.json
+projectFilesBackup/
 
 # PyCharm
 testing/__pycache__/
@@ -42,3 +48,6 @@ obj/
 
 # Test Log Files
 testing/logs/
+
+.idea/codeStyles/
+.idea/caches/

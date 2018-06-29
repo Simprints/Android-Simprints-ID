@@ -1,9 +1,11 @@
 package com.simprints.id.data.secure
 
-interface SecureDataManager {
+import com.simprints.id.data.db.local.LocalDbKeyProvider
+import com.simprints.id.data.db.local.models.LocalDbKey
 
-    var apiKey: String
+interface SecureDataManager : LocalDbKeyProvider {
 
-    fun getApiKeyOr(default: String): String
+    fun setLocalDatabaseKey(projectId: String, legacyApiKey: String?)
 
+    override fun getLocalDbKeyOrThrow(projectId: String): LocalDbKey
 }

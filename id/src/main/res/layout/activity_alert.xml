@@ -7,10 +7,10 @@
     android:background="@color/simprints_blue"
     android:orientation="vertical"
     android:weightSum="1"
-    tools:context=".activities.AlertActivity">
+    tools:context=".activities.alert.AlertActivity">
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/alert_title"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
@@ -23,7 +23,7 @@
         android:textStyle="bold" />
 
     <ImageView
-        android:id="@+id/graphic"
+        android:id="@+id/alert_image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginLeft="50dp"
@@ -45,7 +45,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_margin="10dp"
-            android:layout_weight="1" />
+            tools:ignore="NestedWeights"
+            android:layout_weight="1"
+            android:contentDescription="@string/hint_graphic"/>
 
         <TextView
             android:id="@+id/message"
@@ -75,6 +77,7 @@
             android:layout_marginEnd="1dp"
             android:layout_marginRight="1dp"
             android:layout_marginTop="2dp"
+            tools:ignore="NestedWeights"
             android:layout_weight="1"
             android:gravity="center"
             android:textColor="@color/simprints_white"

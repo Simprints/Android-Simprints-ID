@@ -12,14 +12,12 @@ import com.simprints.id.tools.LanguageHelper;
 
 public class TutorialActivity extends AppCompatActivity {
 
-    private DataManager dataManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Application app = ((Application) getApplication());
-        dataManager = app.getDataManager();
+        DataManager dataManager = app.getDataManager();
 
         LanguageHelper.setLanguage(this, dataManager.getLanguage());
         setContentView(R.layout.activity_tutorial);

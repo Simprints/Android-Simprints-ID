@@ -3,15 +3,14 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 import android.content.SharedPreferences
 import com.simprints.id.exceptions.unsafe.MismatchedTypeError
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
-import com.simprints.id.testUtils.assertThrows
-import com.simprints.id.testUtils.mock
-import com.simprints.id.testUtils.verifyOnlyInteraction
-import com.simprints.id.testUtils.whenever
+import com.simprints.id.shared.assertThrows
+import com.simprints.id.shared.mock
+import com.simprints.id.shared.verifyOnlyInteraction
+import com.simprints.id.shared.whenever
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 import org.mockito.ArgumentMatchers.*
 import kotlin.reflect.KClass
-
 
 class ImprovedSharedPreferencesImplTest {
 
@@ -55,7 +54,7 @@ class ImprovedSharedPreferencesImplTest {
     @Test
     fun testGetPrimitiveGetsIntWhenDefaultIsByte() {
         improvedPrefs.getPrimitive(aKey, aByte)
-        verifyOnlyInteraction(basePrefs) { getInt(aKey, aByte.toInt())}
+        verifyOnlyInteraction(basePrefs) { getInt(aKey, aByte.toInt()) }
     }
 
     @Test
@@ -154,5 +153,4 @@ class ImprovedSharedPreferencesImplTest {
             improvedPrefs.getPrimitive(aKey, aClass)
         }
     }
-
 }

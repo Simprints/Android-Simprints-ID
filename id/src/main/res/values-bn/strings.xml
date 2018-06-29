@@ -17,7 +17,7 @@
     <string name="privacy_label">গোপনীয়তা</string>
 
 
-    <!-- FrontActivity : screen when launched from the standalone Simprints ID app -->
+    <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
 
 
     <!-- SetupActivity : the loading screen -->
@@ -109,7 +109,6 @@
     <string name="low_battery_title">ব্যাটারীর চার্জ কম</string>
     <string name="alert_api_key_verify_failed">API কী যাচাই করতে ব্যর্থ</string>
     <!-- Error Message Text -->
-    <string name="missing_apikey_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ API Key), আপনার সিস্টেম অ্যাডমিনস্ট্রেটরের সঙ্গে যোগাযোগ করুন</string>
     <string name="invalid_apikey_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ API Key), আপনার সিস্টেম অ্যাডমিনস্ট্রেটরের সঙ্গে যোগাযোগ করুন</string>
     <string name="invalid_intentAction_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid intent action)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
     <string name="invalid_metadata_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid metadata)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>

@@ -1,14 +1,13 @@
 package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.content.SharedPreferences
+import com.simprints.id.shared.assertThrows
+import com.simprints.id.shared.mock
+import com.simprints.id.shared.verifyOnlyInteraction
+import com.simprints.id.shared.whenever
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
-import com.simprints.id.testUtils.assertThrows
-import com.simprints.id.testUtils.mock
-import com.simprints.id.testUtils.verifyOnlyInteraction
-import com.simprints.id.testUtils.whenever
 import org.junit.Test
 import org.mockito.ArgumentMatchers.*
-
 
 class ImprovedSharedPreferencesEditorImplTest {
 
@@ -16,7 +15,7 @@ class ImprovedSharedPreferencesEditorImplTest {
         val aKey = "aKey"
         val aByte: Byte = 0
         val aShort: Short = 1
-        val anInt: Int  = 2
+        val anInt: Int = 2
         val aLong: Long = 3
         val aFloat: Float = 4.0f
         val aDouble: Double = 5.0
@@ -29,7 +28,6 @@ class ImprovedSharedPreferencesEditorImplTest {
 
     private val improvedEditor: ImprovedSharedPreferences.Editor =
             ImprovedSharedPreferencesEditorImpl(baseEditor)
-
 
     private fun mockBaseEditor(): SharedPreferences.Editor {
         val editor = mock<SharedPreferences.Editor>()
@@ -102,5 +100,4 @@ class ImprovedSharedPreferencesEditorImplTest {
             improvedEditor.putPrimitive(aKey, aClass)
         }
     }
-
 }
