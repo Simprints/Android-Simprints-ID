@@ -2,10 +2,9 @@ package com.simprints.id.tools
 
 import android.app.Activity
 import android.content.Intent
-import com.simprints.id.activities.AlertActivity
+import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.IntentKeys
-import com.simprints.id.model.ALERT_TYPE
-
+import com.simprints.id.domain.ALERT_TYPE
 
 class AlertLauncher(private val activity: Activity) {
 
@@ -14,5 +13,4 @@ class AlertLauncher(private val activity: Activity) {
         intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alertType)
         activity.startActivityForResult(intent, requestCode)
     }
-
 }

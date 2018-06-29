@@ -1,7 +1,7 @@
 package com.simprints.id.services.progress.notifications
 
 import android.app.Notification
-import com.simprints.libcommon.Progress
+import com.simprints.id.services.progress.Progress
 import io.reactivex.observers.DisposableObserver
 import java.util.concurrent.atomic.AtomicInteger
 

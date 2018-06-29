@@ -2,18 +2,18 @@ package com.simprints.id.services.sync
 
 import android.content.Context
 import com.simprints.id.exceptions.safe.TaskInProgressException
+import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.client.ProgressClientImpl
 import com.simprints.id.services.progress.client.ProgressConnection
-import com.simprints.libcommon.Progress
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableObserver
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import org.jetbrains.anko.coroutines.experimental.bg
 import timber.log.Timber
-
 
 class SyncClient(context: Context)
     : ProgressClientImpl<SyncTaskParameters>(context, SyncService::class.java) {
@@ -23,13 +23,13 @@ class SyncClient(context: Context)
 
     fun sync(syncParameters: SyncTaskParameters,
              onStarted: () -> Unit,
-             onBusy: () -> Unit) {
+             onBusy: (e: Exception) -> Unit) {
         async(UI) {
             try {
                 bg { startSyncAndObserve(syncParameters) }.await()
                 onStarted()
             } catch (exception: TaskInProgressException) {
-                onBusy()
+                onBusy(exception)
             }
         }
     }
@@ -51,20 +51,17 @@ class SyncClient(context: Context)
     }
 
     private fun setProgressReplayObservable(observable: Observable<Progress>) {
-        synchronized(this) {
-            currentProgressReplayObservable = observable
-        }
+        currentProgressReplayObservable = observable
     }
 
     fun startListening(observer: DisposableObserver<Progress>) {
         Timber.d("startListening()")
-        synchronized(this) {
-            val observable = currentProgressReplayObservable
-            if (observable != null) {
-                disposables.add(observable
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(observer))
-            }
+        val observable = currentProgressReplayObservable
+        if (observable != null) {
+            disposables.add(observable
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribeWith(observer))
         }
     }
 
@@ -77,5 +74,4 @@ class SyncClient(context: Context)
             disposables.clear()
         }
     }
-
 }

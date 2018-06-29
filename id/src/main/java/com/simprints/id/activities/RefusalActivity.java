@@ -18,10 +18,10 @@ import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.data.DataManager;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
-import com.simprints.id.model.ALERT_TYPE;
+import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.tools.AlertLauncher;
 import com.simprints.id.tools.InternalConstants;
-import com.simprints.libdata.models.enums.REFUSAL_FORM_REASON;
+import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON;
 import com.simprints.libsimprints.Constants;
 import com.simprints.libsimprints.RefusalForm;
 

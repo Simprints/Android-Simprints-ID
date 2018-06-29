@@ -24,6 +24,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.simprints.id.data.DataManager;
 
 import java.util.Locale;
 
@@ -34,41 +35,39 @@ public class PositionTracker implements
         LocationListener
 {
 
-    private AppState appState;
+    // TODO: make sure that the concurrent reads and writes on this client are safe
+    private GoogleApiClient googleApiClient;
     private Activity activity;
+    private DataManager dataManager;
     private LocationRequest locationRequest;
 
-    public PositionTracker(Activity activity, AppState appState) {
-        this.appState = appState;
+    public PositionTracker(Activity activity, DataManager dataManager) {
         this.activity = activity;
+        this.dataManager = dataManager;
         locationRequest = new LocationRequest();
         locationRequest.setInterval(5000);
         locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
-
-        appState.setGoogleApiClient(
-                new GoogleApiClient.Builder(activity)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(LocationServices.API)
-                        .build());
+        googleApiClient = new GoogleApiClient.Builder(activity)
+            .addConnectionCallbacks(this)
+            .addOnConnectionFailedListener(this)
+            .addApi(LocationServices.API)
+            .build();
     }
 
     public void start() {
-        if (appState.getGoogleApiClient() != null) {
-            appState.getGoogleApiClient().connect();
+        if (googleApiClient != null) {
+            googleApiClient.connect();
         }
     }
 
     public void finish() {
-        GoogleApiClient client = appState.getGoogleApiClient();
-        if (client != null) {
-            if (client.isConnected()) {
-                LocationServices.FusedLocationApi.removeLocationUpdates(
-                        appState.getGoogleApiClient(), this);
-                appState.getGoogleApiClient().disconnect();
+        if (googleApiClient != null) {
+            if (googleApiClient.isConnected()) {
+                LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+                googleApiClient.disconnect();
             }
-            appState.setGoogleApiClient(null);
+            googleApiClient = null;
         }
     }
 
@@ -94,10 +93,8 @@ public class PositionTracker implements
                 break;
 
             case InternalConstants.GOOGLE_SERVICE_UPDATE_REQUEST:
-                if (resultCode == Activity.RESULT_OK &&
-                        appState.getGoogleApiClient() != null)
-                {
-                    appState.getGoogleApiClient().connect();
+                if (resultCode == Activity.RESULT_OK && googleApiClient != null) {
+                    googleApiClient.connect();
                 }
                 break;
         }
@@ -160,14 +157,11 @@ public class PositionTracker implements
                 activity, Manifest.permission.ACCESS_FINE_LOCATION
         );
 
-        if (locationPermission == PackageManager.PERMISSION_GRANTED &&
-                appState.getGoogleApiClient() != null)
+        if (locationPermission == PackageManager.PERMISSION_GRANTED && googleApiClient != null)
         {
-            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    appState.getGoogleApiClient());
+            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (lastLocation != null) {
-                appState.setPosition(String.valueOf(lastLocation.getLatitude()),
-                        String.valueOf(lastLocation.getLongitude()));
+                dataManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(lastLocation));
             }
             Log.INSTANCE.d(activity, String.format(Locale.UK, "Last location: %s", lastLocation));
         }
@@ -178,12 +172,9 @@ public class PositionTracker implements
                 .addLocationRequest(locationRequest)
                 .build();
 
-        if (appState.getGoogleApiClient() != null) {
+        if (googleApiClient != null) {
             PendingResult<LocationSettingsResult> result =
-                    LocationServices.SettingsApi.checkLocationSettings(
-                            appState.getGoogleApiClient(),
-                            settingsRequest
-                    );
+                    LocationServices.SettingsApi.checkLocationSettings(googleApiClient,settingsRequest);
 
             result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
                 @Override
@@ -221,12 +212,9 @@ public class PositionTracker implements
                 Manifest.permission.ACCESS_FINE_LOCATION
         );
 
-        if (locationPermission == PackageManager.PERMISSION_GRANTED &&
-                appState.getGoogleApiClient() != null) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    appState.getGoogleApiClient(),
-                    locationRequest,
-                    this
+        if (locationPermission == PackageManager.PERMISSION_GRANTED && googleApiClient != null) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient,
+                    locationRequest,this
             );
         }
     }
@@ -234,8 +222,7 @@ public class PositionTracker implements
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            appState.setPosition(String.valueOf(location.getLatitude()),
-                    String.valueOf(location.getLongitude()));
+            dataManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(location));
             Log.INSTANCE.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
                     location.getLatitude(), location.getLongitude()));
         }

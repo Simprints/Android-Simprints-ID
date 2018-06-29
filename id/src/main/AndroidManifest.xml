@@ -26,10 +26,28 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
         <activity
-            android:name=".activities.LaunchActivity"
+            android:name=".activities.launch.LaunchActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
+            android:label="@string/title_activity_front"
+            android:launchMode="standard"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
+            android:label="@string/title_activity_front"
+            android:launchMode="standard"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.simprints.id.REGISTER" />
@@ -51,24 +69,16 @@
 
                 <data android:mimeType="*/*" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".activities.front.FrontActivity"
-            android:label="@string/title_activity_front"
-            android:launchMode="standard">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
+
         <activity
-            android:name=".activities.AlertActivity"
+            android:name=".activities.alert.AlertActivity"
             android:label="@string/alert_title"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.main.MainActivity"
             android:label="Main"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
@@ -90,6 +100,17 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
         <activity
+            android:name=".activities.login.LoginActivity"
+            android:label="@string/login_title"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.requestLogin.RequestLoginActivity"
+            android:label="@string/requestLogin_title"
+            android:launchMode="singleTop"
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".activities.TutorialActivity"
             android:label="@string/tutorial_title"
             android:launchMode="singleTop"
@@ -109,28 +130,43 @@
             android:label="@string/refusal_label"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.dashboard.DashboardActivity"
+            android:label="@string/dashboard_label"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
 
-        <service android:name="com.simprints.id.services.GuidSelectionService"
+        <service
+            android:name="com.simprints.id.services.GuidSelectionService"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
-                <action android:name="com.simprints.id.CONFIRM_IDENTITY"/>
+                <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
             </intent-filter>
         </service>
 
-        <service android:name=".services.sync.SyncService"
-            android:exported="false"/>
-
+        <service
+            android:name=".services.sync.SyncService"
+            android:exported="false" />
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value=".activities.MainActivity" />
+            android:value=".activities.main.MainActivity" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="897ed2ef7a2d43e09bcd42998f2533acbb9657e7" />
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
+
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="${firebase_analytics_collection_enabled}" />
+
+        <meta-data
+            android:name="firebase_performance_logcat_enabled"
+            android:value="${firebase_performance_logcat_enabled}" />
+
     </application>
 
 </manifest>

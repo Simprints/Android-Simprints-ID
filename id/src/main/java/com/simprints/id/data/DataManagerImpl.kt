@@ -2,44 +2,37 @@ package com.simprints.id.data
 
 import android.content.Context
 import android.os.Build
-import com.simprints.id.BuildConfig
-import com.simprints.id.data.db.analytics.AnalyticsManager
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.network.ApiManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.DataCallback
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.unsafe.ApiKeyNotFoundError
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
-import com.simprints.id.model.ALERT_TYPE
+import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
+import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.Constants
+import com.simprints.id.session.Session
+import com.simprints.id.session.sessionParameters.SessionParameters
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.libcommon.Person
-import com.simprints.libcommon.Progress
-import com.simprints.libdata.*
-import com.simprints.libdata.models.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.libdata.tools.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
-import io.reactivex.Emitter
-import timber.log.Timber
-
+import io.reactivex.Completable
+import io.reactivex.Single
+import java.util.*
 
 class DataManagerImpl(private val context: Context,
                       private val preferencesManager: PreferencesManager,
-                      private val localDbManager: LocalDbManager,
-                      private val remoteDbManager: RemoteDbManager,
-                      private val apiManager: ApiManager,
+                      private val dbManager: DbManager,
                       private val analyticsManager: AnalyticsManager,
-                      private val secureDataManager: SecureDataManager)
+                      private val loginInfoManager: LoginInfoManager)
     : DataManager,
-        PreferencesManager by preferencesManager,
-        AnalyticsManager by analyticsManager,
-        LocalDbManager by localDbManager,
-        RemoteDbManager by remoteDbManager,
-        ApiManager by apiManager,
-        SecureDataManager by secureDataManager {
+    PreferencesManager by preferencesManager,
+    AnalyticsManager by analyticsManager,
+    DbManager by dbManager,
+    LoginInfoManager by loginInfoManager {
 
     override val androidSdkVersion: Int
         get() = Build.VERSION.SDK_INT
@@ -56,171 +49,84 @@ class DataManagerImpl(private val context: Context,
     override val libVersionName: String
         get() = com.simprints.libsimprints.BuildConfig.VERSION_NAME
 
+    override var sessionParameters: SessionParameters
+        get() = preferencesManager.sessionParameters
+        set(value) {
+            preferencesManager.sessionParameters = value
+        }
+
     override fun logAlert(alertType: ALERT_TYPE) =
-            analyticsManager.logAlert(alertType.name, getApiKeyOrEmpty(), moduleId, userId, deviceId)
+        analyticsManager.logAlert(alertType.name, getSignedInProjectIdOrEmpty(), moduleId, getSignedInUserIdOrEmpty(), deviceId)
 
     override fun logUserProperties() =
-            analyticsManager.logUserProperties(userId, getApiKeyOrEmpty(), moduleId, deviceId)
+        analyticsManager.logUserProperties(getSignedInUserIdOrEmpty(), getSignedInProjectIdOrEmpty(), moduleId, deviceId)
 
-    override fun logLogin() =
-            analyticsManager.logLogin(callout)
+    override fun logScannerProperties() =
+        analyticsManager.logScannerProperties(macAddress, scannerId)
 
     override fun logGuidSelectionService(apiKey: String, sessionId: String, selectedGuid: String,
                                          callbackSent: Boolean) =
-            analyticsManager.logGuidSelectionService(apiKey, sessionId, selectedGuid, callbackSent,
-                    deviceId)
+        analyticsManager.logGuidSelectionService(apiKey, sessionId, selectedGuid, callbackSent,
+            deviceId)
 
     override fun logConnectionStateChange(connected: Boolean) =
-            analyticsManager.logConnectionStateChange(connected, getApiKeyOrEmpty(), deviceId, sessionId)
+        analyticsManager.logConnectionStateChange(connected, getSignedInProjectIdOrEmpty(), deviceId, sessionId)
 
     override fun logAuthStateChange(authenticated: Boolean) =
-            analyticsManager.logAuthStateChange(authenticated, getApiKeyOrEmpty(), deviceId, sessionId)
+        analyticsManager.logAuthStateChange(authenticated, getSignedInProjectIdOrEmpty(), deviceId, sessionId)
 
-    private val connectionStateLogger = object : ConnectionListener {
-        override fun onConnection() = logConnectionStateChange(true)
-        override fun onDisconnection() = logConnectionStateChange(false)
+    // DbManager call interception for populating arguments
+    // Lifecycle
+    override fun initialiseDb() {
+        dbManager.initialiseDb()
     }
 
-    private val authStateLogger = object : AuthListener {
-        override fun onSignIn() = logAuthStateChange(true)
-        override fun onSignOut() = logAuthStateChange(false)
+    override fun signOut() {
+        dbManager.signOut()
     }
 
-    // Remote only
+    // Data transfer
+    override fun savePerson(person: Person): Completable =
+        dbManager.savePerson(fb_Person(person, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), moduleId))
 
-    @Throws(UninitializedDataManagerError::class)
-    override fun isConnected(): Boolean =
-            remoteDbManager.isConnected(getDbContextOrErr())
+    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) =
+        dbManager.loadPeople(destinationList, group, getSignedInUserIdOrEmpty(), moduleId, callback)
 
-    @Throws(UninitializedDataManagerError::class)
-    override fun registerAuthListener(authListener: AuthListener) =
-            remoteDbManager.registerAuthListener(getDbContextOrErr(), authListener)
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun registerConnectionListener(connectionListener: ConnectionListener) =
-            remoteDbManager.registerConnectionListener(getDbContextOrErr(), connectionListener)
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun unregisterAuthListener(authListener: AuthListener) =
-            remoteDbManager.unregisterAuthListener(getDbContextOrErr(), authListener)
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun unregisterConnectionListener(connectionListener: ConnectionListener) =
-            remoteDbManager.unregisterConnectionListener(getDbContextOrErr(), connectionListener)
-
-    @Throws(ApiKeyNotFoundError::class)
-    override fun updateIdentification(apiKey: String, selectedGuid: String) =
-            remoteDbManager.updateIdentification(apiKey, selectedGuid, deviceId, sessionId)
-
-    // Local only
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun getPeopleCount(group: Constants.GROUP): Long =
-            localDbManager.getPeopleCount(getDbContextOrErr(), group)
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP,
-                            callback: DataCallback?) =
-            localDbManager.loadPeople(getDbContextOrErr(), destinationList, group, callback)
-
-    // Local + remote which need to be split into smaller bits
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun recoverRealmDb(group: Constants.GROUP, callback: DataCallback) {
-        val filename = "${deviceId}_${System.currentTimeMillis()}.json"
-        getDbContextOrErr().recoverRealmDb(filename, deviceId, group, callback)
-    }
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
-            : Boolean =
-            getDbContextOrErr().saveIdentification(probe, matchSize, matches, sessionId)
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun savePerson(person: Person): Boolean =
-            getDbContextOrErr().savePerson(person)
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun saveRefusalForm(refusalForm: RefusalForm): Boolean =
-            getDbContextOrErr().saveRefusalForm(refusalForm, sessionId)
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun saveVerification(probe: Person, match: Verification?,
-                                  guidExistsResult: VERIFY_GUID_EXISTS_RESULT): Boolean =
-            getDbContextOrErr().saveVerification(probe, patientId, match, sessionId, guidExistsResult)
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun loadPerson(destinationList: MutableList<Person>, guid: String, callback: DataCallback) =
-            getDbContextOrErr().loadPerson(destinationList, guid, callback)
-
-    // Local + remote + api which need to be split into smaller bits
-
-    private var dbContext: DatabaseContext? = null
-        set(value) = synchronized(this) {
-            Timber.d("DataManagerImpl: set dbContext = $value")
-            if (field != null) {
-                unregisterConnectionListener(connectionStateLogger)
-                unregisterAuthListener(authStateLogger)
-            }
-            field = value
-            if (value != null) {
-                registerConnectionListener(connectionStateLogger)
-                registerAuthListener(authStateLogger)
-            }
+    override fun getPeopleCount(group: Constants.GROUP): Single<Int> =
+        when (group) {
+            Constants.GROUP.GLOBAL -> dbManager.getPeopleCount()
+            Constants.GROUP.USER -> dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty())
+            Constants.GROUP.MODULE -> dbManager.getPeopleCount(userId = getSignedInUserIdOrEmpty(), moduleId = moduleId)
         }
 
-    private fun getDbContextOrErr(): DatabaseContext =
-            dbContext ?: throw UninitializedDataManagerError()
-
-    override fun isInitialized(): Boolean =
-            dbContext != null
-
-    override fun initialize(callback: DataCallback) {
-
-        val apiKey: String
-        try {
-            apiKey = this.apiKey
-        } catch (e: ApiKeyNotFoundError) {
-            logError(e)
-            callback.onFailure(DATA_ERROR.NOT_FOUND)
-            return
-        }
-
-        val tentativeDbContext = DatabaseContext(apiKey, userId, moduleId, deviceId, context, BuildConfig.FIREBASE_PROJECT)
-
-        tentativeDbContext.initDatabase(object : DataCallback {
-            override fun onSuccess() {
-                dbContext = tentativeDbContext
-                callback.onSuccess()
-            }
-
-            override fun onFailure(error: DATA_ERROR) {
-                tentativeDbContext.destroy()
-                callback.onFailure(error)
-            }
-        })
+    override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
+        preferencesManager.lastIdentificationDate = Date()
+        dbManager.saveIdentification(probe, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, matchSize, matches, sessionId)
     }
 
-    @Throws(UninitializedDataManagerError::class)
-    override fun signIn(callback: DataCallback?) =
-            getDbContextOrErr().signIn(callback)
+    override fun updateIdentification(projectId: String, selectedGuid: String) =
+        dbManager.updateIdentificationInRemote(projectId, selectedGuid, deviceId, sessionId)
 
-    @Throws(UninitializedDataManagerError::class)
-    override fun syncGlobal(isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
-            getDbContextOrErr().naiveSyncManager.syncGlobal(isInterrupted, emitter)
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun syncUser(userId: String, isInterrupted: () -> Boolean, emitter: Emitter<Progress>) =
-            getDbContextOrErr().naiveSyncManager.syncUser(userId, isInterrupted, emitter)
-
-    @Throws(UninitializedDataManagerError::class)
-    override fun finish() {
-        getDbContextOrErr().destroy()
-        dbContext = null
+    override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
+        preferencesManager.lastVerificationDate = Date()
+        dbManager.saveVerification(probe, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, patientId, match, sessionId, guidExistsResult)
     }
 
-    //Secure Data
+    override fun saveRefusalForm(refusalForm: RefusalForm) =
+        dbManager.saveRefusalForm(refusalForm, getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), sessionId)
 
-    override fun getApiKeyOrEmpty(): String =
-            getApiKeyOr("")
+    override fun saveSession() {
+        val session = Session(sessionId, androidSdkVersion, deviceModel, deviceId, appVersionName,
+            libVersionName, calloutAction.toString(), getSignedInProjectIdOrEmpty(), moduleId, getSignedInUserIdOrEmpty(),
+            patientId, callingPackage, metadata, resultFormat, macAddress, scannerId,
+            hardwareVersion.toInt(), location.latitude, location.longitude,
+            msSinceBootOnSessionStart, msSinceBootOnLoadEnd, msSinceBootOnMainStart,
+            msSinceBootOnMatchStart, msSinceBootOnSessionEnd)
+        dbManager.saveSessionInRemote(session)
+        analyticsManager.logSession(session)
+    }
+
+    override fun recoverRealmDb(group: Constants.GROUP): Completable {
+        return dbManager.recoverLocalDb(getSignedInProjectIdOrEmpty(), getSignedInUserIdOrEmpty(), deviceId, moduleId, group)
+    }
 }
