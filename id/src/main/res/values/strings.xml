@@ -57,6 +57,9 @@
     <string name="good_scan_message">Good Scan</string>
     <string name="poor_scan_message">Poor Scan</string>
     <string name="reconnecting_message">Reconnecting…</string>
+    <string name="add_finger_dialog_title">Add Finger(s)</string>
+    <string name="confirm_fingers_dialog_title">Fingers Scanned</string>
+    <string name="try_different_finger_splash_text">Let\'s try another finger!</string>
     <!-- Button Labels -->
     <string name="rescan_label">Re-scan</string>
     <string name="rescan_label_question">Re-scan?</string>
@@ -360,7 +363,5 @@
     <string name="dashboard_card_verification_title">Last Verification</string>
     <string name="dashboard_card_identification_title">Last Identification</string>
     <string name="dashboard_card_lastuser_title">Last user</string>
-    <string name="add_finger_dialog_title">Add Finger(s)</string>
-    <string name="confirm_fingers_dialog_title">Fingers Scanned</string>
 
 </resources>

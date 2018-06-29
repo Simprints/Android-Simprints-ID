@@ -270,7 +270,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private fun handleBadScan() {
         currentFingerStatus = Finger.Status.BAD_SCAN
         presenter.currentFinger().numberOfBadScans += 1
-        presenter.addNewFingerIfNecessary()
+        presenter.showSplashAndAddNewFingerIfNecessary()
     }
 
     fun resetScannerUi() {

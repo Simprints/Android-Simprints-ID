@@ -43,6 +43,7 @@ class CollectFingerprintsActivity :
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
     override lateinit var syncItem: MenuItem
+    override lateinit var tryDifferentFingerSplash: View
 
     private var rightToLeft: Boolean = false
 
@@ -83,6 +84,7 @@ class CollectFingerprintsActivity :
         syncItem = nav_view.menu.findItem(R.id.nav_sync)
         indicatorLayout = indicator_layout
         scanButton = scan_button
+        tryDifferentFingerSplash = try_different_finger_splash
     }
 
     override fun onStart() {
