@@ -6,6 +6,7 @@ import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
+import android.support.test.espresso.matcher.RootMatchers.isDialog
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import com.simprints.id.R
@@ -14,8 +15,7 @@ import com.simprints.id.testTools.*
 import com.simprints.id.testTools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
-import org.hamcrest.Matchers.anyOf
-import org.hamcrest.Matchers.containsString
+import org.hamcrest.Matchers.*
 import org.junit.Assert.*
 
 
@@ -45,10 +45,9 @@ fun launchActivityVerify(calloutCredentials: CalloutCredentials,
 fun fullHappyWorkflow() {
     log("fullHappyWorkflow")
     setupActivityAndContinue()
-    mainActivityPressScan()
-    mainActivityPressScan()
-    mainActivityCheckGoodScan()
-    mainActivityPressContinue()
+    collectFingerprintsPressScan()
+    collectFingerprintsPressScan()
+    checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm()
 }
 
 private fun setupActivityAndContinue() {
@@ -59,57 +58,52 @@ private fun setupActivityAndContinue() {
 
 private fun setupActivity() {
     log("setupActivity")
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
+    WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
         ActivityUtils.grantPermissions()
         onView(withId(R.id.consentTextView))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.short_consent)))
-    })
+    }
 }
 
 private fun setupActivityContinue() {
     log("setupActivityContinue")
-    WaitingUtils.tryOnUiUntilTimeout(12000, 500, {
+    WaitingUtils.tryOnUiUntilTimeout(12000, 500) {
         onView(withId(R.id.confirmConsentTextView))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.confirm_consent)))
             .perform(click())
-    })
+    }
 }
 
-private fun mainActivityPressScan() {
-    log("mainActivityPressScan")
-    WaitingUtils.tryOnUiUntilTimeout(10000, 200, {
+private fun collectFingerprintsPressScan() {
+    log("collectFingerprintsPressScan")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
         onView(withId(R.id.scan_button))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.scan)))
             .perform(click())
-    })
+    }
 }
 
-private fun mainActivityCheckGoodScan() {
-    log("mainActivityCheckGoodScan")
-    WaitingUtils.tryOnUiUntilTimeout(10000, 200, {
-        onView(withId(R.id.scan_button))
+private fun checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm() {
+    WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
+        onView(withText(getResourceString(R.string.confirm_fingers_dialog_title)))
+            .inRoot(isDialog())
             .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.good_scan_message)))
-    })
-}
-
-private fun mainActivityPressContinue() {
-    log("mainActivityPressContinue")
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
-        onView(withId(R.id.action_forward))
+        onView(withId(android.R.id.message))
+            .inRoot(isDialog())
+            .check(matches(withText("✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n")))
             .check(matches(isDisplayed()))
-            .perform(click())
-    })
+        onView(withId(android.R.id.button1)).perform(click())
+    }
 }
 
-fun mainActivityEnrolmentCheckFinished(enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
-    log("mainActivityEnrolmentCheckFinished")
-    WaitingUtils.tryOnSystemUntilTimeout(5000, 500, {
+fun collectFingerprintsEnrolmentCheckFinished(enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
+    log("collectFingerprintsEnrolmentCheckFinished")
+    WaitingUtils.tryOnSystemUntilTimeout(5000, 500) {
         assertTrue(enrolTestRule.activity.isDestroyed)
-    })
+    }
 }
 
 fun enrolmentReturnedResult(enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>): String {
@@ -123,7 +117,7 @@ fun enrolmentReturnedResult(enrolTestRule: ActivityTestRule<CheckLoginFromIntent
 
 fun enrolmentReceivedOnline(apiKey: String, guid: String) {
     log("enrolmentReceivedOnline")
-    WaitingUtils.tryOnSystemUntilTimeout(12000, 3000, {
+    WaitingUtils.tryOnSystemUntilTimeout(12000, 3000) {
         val apiInstance = RemoteAdminUtils.configuredApiInstance
         try {
             // Check to see if the patient made it to the database
@@ -134,14 +128,14 @@ fun enrolmentReceivedOnline(apiKey: String, guid: String) {
         } catch (e: ApiException) {
             assertNull("ApiException", e)
         }
-    })
+    }
 }
 
 fun matchingActivityIdentificationCheckFinished(identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("matchingActivityIdentificationCheckFinished")
-    WaitingUtils.tryOnSystemUntilTimeout(20000, 500, {
+    WaitingUtils.tryOnSystemUntilTimeout(20000, 500) {
         assertTrue(identifyTestRule.activity.isDestroyed)
-    })
+    }
 }
 
 fun guidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>, guid: String) {
@@ -173,9 +167,9 @@ fun twoReturnedIdentificationsOneMatchOneNotMatch(identifyTestRule: ActivityTest
 
 fun matchingActivityVerificationCheckFinished(verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("matchingActivityVerificationCheckFinished")
-    WaitingUtils.tryOnSystemUntilTimeout(5000, 500, {
+    WaitingUtils.tryOnSystemUntilTimeout(5000, 500) {
         assertTrue(verifyTestRule.activity.isDestroyed)
-    })
+    }
 }
 
 fun verificationSuccessful(verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>, guid: String) {
@@ -200,58 +194,58 @@ fun happySync(calloutCredentials: CalloutCredentials, identifyTestRule: Activity
     log("happySync")
     launchActivityIdentify(calloutCredentials, identifyTestRule)
     setupActivityAndContinue()
-    mainActivitySync()
-    exitFromMainActivity()
+    collectFingerprintsSync()
+    exitFromCollectFingerprints()
 }
 
-private fun mainActivitySync() {
-    log("mainActivitySync")
-    mainActivityOpenDrawer()
-    mainActivityPressSync()
+private fun collectFingerprintsSync() {
+    log("collectFingerprintsSync")
+    collectFingerprintsOpenDrawer()
+    collectFingerprintsPressSync()
     verifyUiForSyncStarted()
     verifyUiForSyncCompleted()
-    mainActivityCloseDrawer()
+    collectFingerprintsCloseDrawer()
 }
 
-private fun mainActivityOpenDrawer() {
-    log("mainActivityOpenDrawer")
-    WaitingUtils.tryOnUiUntilTimeout(4000, 50, {
+private fun collectFingerprintsOpenDrawer() {
+    log("collectFingerprintsOpenDrawer")
+    WaitingUtils.tryOnUiUntilTimeout(4000, 50) {
         onView(withId(R.id.drawer_layout))
             .perform(DrawerActions.open())
-    })
+    }
 }
 
-private fun mainActivityCloseDrawer() {
-    log("mainActivityCloseDrawer")
+private fun collectFingerprintsCloseDrawer() {
+    log("collectFingerprintsCloseDrawer")
     pressBackButton()
 }
 
-private fun mainActivityPressSync() {
-    log("mainActivityPressSync")
-    WaitingUtils.tryOnUiUntilTimeout(4000, 50, {
+private fun collectFingerprintsPressSync() {
+    log("collectFingerprintsPressSync")
+    WaitingUtils.tryOnUiUntilTimeout(4000, 50) {
         onView(withId(R.id.nav_view))
             .perform(navigateTo(R.id.nav_sync))
-    })
+    }
 }
 
 private fun verifyUiForSyncStarted() {
     log("verifyUiForSyncStarted")
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
+    WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
         onView(anyOf(withText(containsString(getResourceString(R.string.syncing))), withText(containsString(getResourceString(R.string.nav_sync_complete)))))
             .check(matches(isDisplayed()))
-    })
+    }
 }
 
 private fun verifyUiForSyncCompleted() {
     log("verifyUiForSyncCompleted")
-    WaitingUtils.tryOnUiUntilTimeout(SyncParameters.MEDIUM_DATABASE_SYNC_TIMEOUT_MILLIS, 1000, {
+    WaitingUtils.tryOnUiUntilTimeout(SyncParameters.MEDIUM_DATABASE_SYNC_TIMEOUT_MILLIS, 1000) {
         onView(withText(containsString(getResourceString(R.string.nav_sync_complete))))
             .check(matches(isDisplayed()))
-    })
+    }
 }
 
-private fun exitFromMainActivity() {
-    log("exitFromMainActivity")
+private fun exitFromCollectFingerprints() {
+    log("exitFromCollectFingerprints")
     pressBackButton()
 }
 

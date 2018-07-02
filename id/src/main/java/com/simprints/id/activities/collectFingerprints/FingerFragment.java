@@ -1,7 +1,8 @@
-package com.simprints.id.fragments;
+package com.simprints.id.activities.collectFingerprints;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,18 +22,18 @@ public class FingerFragment extends Fragment {
     private TextView directionText;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_finger, container, false);
-        resultText = (TextView) view.findViewById(R.id.finger_result_text);
-        fingerNumber = (TextView) view.findViewById(R.id.finger_number_text);
-        directionText = (TextView) view.findViewById(R.id.finger_direction_text);
+        resultText = view.findViewById(R.id.finger_result_text);
+        fingerNumber = view.findViewById(R.id.finger_number_text);
+        directionText = view.findViewById(R.id.finger_direction_text);
 
         Finger finger = (Finger) getArguments().get(FINGER_ARG);
         assert finger != null;
 
         FingerRes.setFingerRes();
 
-        ImageView fingerImageView = (ImageView) view.findViewById(R.id.finger_image);
+        ImageView fingerImageView = view.findViewById(R.id.finger_image);
         fingerImageView.setImageResource(FingerRes.get(finger).getDrawableId());
         fingerImageView.setVisibility(View.VISIBLE);
 

@@ -35,7 +35,7 @@
     <string name="launch_checking_person_in_db">डेटाबेसमा व्यक्तिको खोजी गर्दै …</string>
 
 
-    <!-- MainActivity : screen where the scanning happens -->
+    <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
     <string name="good_scan_direction">अर्को औंलाको लागि देब्रे तर्फ सार्नुहोस </string>
     <string name="last_scan_message">अगाढी बढ्नको लागि तीरमा थिच्नुहोस </string>
@@ -54,7 +54,7 @@
     <string name="scan">स्क्यान</string>
 
 
-    <!-- activity_main_drawer.xml : menu that comes out from the top left of the MainActivity -->
+    <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Menu Titles -->
     <string name="action_settings">सेटिंगहरु</string>
     <string name="menu_header">सिम्प्रिन्ट्स ID</string>

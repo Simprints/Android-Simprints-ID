@@ -1,4 +1,4 @@
-package com.simprints.id.activities.main;
+package com.simprints.id.activities.collectFingerprints;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
-import com.simprints.id.fragments.FingerFragment;
 import com.simprints.id.domain.Finger;
 
 import java.util.List;
