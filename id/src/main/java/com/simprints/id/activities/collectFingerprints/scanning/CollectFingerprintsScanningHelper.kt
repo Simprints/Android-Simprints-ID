@@ -3,8 +3,6 @@ package com.simprints.id.activities.collectFingerprints.scanning
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
-import android.view.View
-import android.widget.ProgressBar
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
@@ -68,8 +66,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun initTimeoutBar(): TimeoutBar =
-        TimeoutBar(context.applicationContext, (view as Activity).findViewById<View>(R.id.pb_timeout) as ProgressBar,
-        preferencesManager.timeoutS * 1000)
+        TimeoutBar(context.applicationContext, view.progressBar, preferencesManager.timeoutS * 1000)
 
     // Creates a progress dialog when the scan gets disconnected
     private fun initUn20Dialog(): ProgressDialog = 
