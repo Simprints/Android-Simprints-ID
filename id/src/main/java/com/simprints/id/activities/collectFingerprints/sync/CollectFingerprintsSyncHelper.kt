@@ -1,11 +1,12 @@
-package com.simprints.id.activities.main
+package com.simprints.id.activities.collectFingerprints.sync
 
+import android.app.Activity
+import android.content.Context
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
-import android.view.MenuItem
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.DataManager
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -17,9 +18,9 @@ import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
 import javax.inject.Inject
 
-// Because who in their right mind would want to write in Java
-class MainActivitySyncHelper(private val activity: MainActivity,
-                             private val syncItem: MenuItem) {
+
+class CollectFingerprintsSyncHelper(private val context: Context,
+                                    private val view: CollectFingerprintsContract.View) {
 
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var preferencesManager: PreferencesManager
@@ -27,13 +28,20 @@ class MainActivitySyncHelper(private val activity: MainActivity,
     @Inject lateinit var syncManager: SyncManager
 
     init {
-        (activity.application as Application).component.inject(this)
+        ((view as Activity).application as Application).component.inject(this)
 
-        syncManager.addObserver(mainActivitySyncObserver())
         setReadySyncItem()
     }
 
-    private fun mainActivitySyncObserver(): DisposableObserver<Progress> =
+    fun startListeners() {
+        syncManager.addObserver(collectFingerprintsSyncObserver())
+    }
+
+    fun stopListeners() {
+        syncManager.removeObservers()
+    }
+
+    private fun collectFingerprintsSyncObserver(): DisposableObserver<Progress> =
         object : DisposableObserver<Progress>() {
 
             override fun onNext(progress: Progress) {
@@ -53,7 +61,7 @@ class MainActivitySyncHelper(private val activity: MainActivity,
             }
         }
 
-    fun sync(dataManager: DataManager) {
+    fun sync() {
         setZeroProgressSyncItem()
         syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager))
     }
@@ -62,8 +70,8 @@ class MainActivitySyncHelper(private val activity: MainActivity,
         if (isProgressZero(progress))
             setZeroProgressSyncItem()
         else setSyncItem(false,
-                activity.getString(R.string.syncing_with_progress, progress.currentValue, progress.maxValue),
-                R.drawable.ic_syncing)
+            context.getString(R.string.syncing_with_progress, progress.currentValue, progress.maxValue),
+            R.drawable.ic_syncing)
     }
 
     private fun setZeroProgressSyncItem() {
@@ -87,14 +95,14 @@ class MainActivitySyncHelper(private val activity: MainActivity,
     }
 
     private fun setSyncItem(enabled: Boolean, @StringRes title: Int, @DrawableRes icon: Int) {
-        setSyncItem(enabled, activity.getString(title), icon)
+        setSyncItem(enabled, context.getString(title), icon)
     }
 
     private fun setSyncItem(enabled: Boolean, title: String, @DrawableRes icon: Int) {
-        activity.runOnUiThreadIfStillRunning {
-            syncItem.isEnabled = enabled
-            syncItem.title = title
-            syncItem.setIcon(icon)
+        (view as Activity).runOnUiThreadIfStillRunning {
+            view.syncItem.isEnabled = enabled
+            view.syncItem.title = title
+            view.syncItem.setIcon(icon)
         }
     }
 }

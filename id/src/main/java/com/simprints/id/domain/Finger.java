@@ -30,6 +30,7 @@ public class Finger implements Parcelable, Comparable<Finger>{
     private boolean lastFinger;
     private int priority;
     private int order;
+    private int numberOfFailedScans;
 
     /**
      * Constructor for the Finger class
@@ -46,6 +47,7 @@ public class Finger implements Parcelable, Comparable<Finger>{
         this.lastFinger = false;
         this.priority = priority;
         this.order = order;
+        this.numberOfFailedScans = 0;
     }
 
 
@@ -157,6 +159,10 @@ public class Finger implements Parcelable, Comparable<Finger>{
     public boolean isNotCollected(){
         return status == Status.NOT_COLLECTED;
     }
+
+    public int getNumberOfBadScans() { return numberOfFailedScans; }
+
+    public void setNumberOfBadScans(int numberOfFailedScans) { this.numberOfFailedScans = numberOfFailedScans; }
 
     public enum Status {
         NOT_COLLECTED(R.drawable.ic_blank_selected, R.drawable.ic_blank_deselected,

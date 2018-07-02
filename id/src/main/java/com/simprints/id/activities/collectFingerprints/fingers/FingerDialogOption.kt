@@ -1,4 +1,4 @@
-package com.simprints.id.activities.main
+package com.simprints.id.activities.collectFingerprints.fingers
 
 import com.simprints.libsimprints.FingerIdentifier
 

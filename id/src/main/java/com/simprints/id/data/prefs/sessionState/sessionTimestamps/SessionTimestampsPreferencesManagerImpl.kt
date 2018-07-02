@@ -33,7 +33,7 @@ class SessionTimestampsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
     override var msSinceBootOnLoadEnd: Long
         by PrimitivePreference(prefs, MS_SINCE_BOOT_ON_LOAD_END_KEY, MS_SINCE_BOOT_ON_LOAD_END_DEFAULT)
 
-    // Milliseconds elapsed between current session started and main activity started.
+    // Milliseconds elapsed between current session started and collectFingerprintsActivity started.
     override var msSinceBootOnMainStart: Long
         by PrimitivePreference(prefs, MS_SINCE_BOOT_ON_MAIN_START_KEY, MS_SINCE_BOOT_ON_MAIN_START_DEFAULT)
 

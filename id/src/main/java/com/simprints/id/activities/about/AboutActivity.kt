@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.WindowManager
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.collectFingerprints.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.LanguageHelper

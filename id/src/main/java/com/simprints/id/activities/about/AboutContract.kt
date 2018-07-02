@@ -27,6 +27,5 @@ interface AboutContract {
     interface Presenter : BasePresenter {
 
         fun recoverDb()
-
     }
 }

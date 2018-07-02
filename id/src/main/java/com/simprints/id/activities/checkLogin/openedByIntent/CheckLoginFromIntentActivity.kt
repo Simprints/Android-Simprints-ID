@@ -87,7 +87,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
-        // We need to call setResult and finish when the either MainActivity returns a result
+        // We need to call setResult and finish when the either CollectFingerprintsActivity returns a result
         // that needs to be forward back to the calling app or the user tapped on "close" button (RESULT_CANCELED)
         // in a error screen.
         // If the activity doesn't finish, then we check again the SignedInState in onResume.
