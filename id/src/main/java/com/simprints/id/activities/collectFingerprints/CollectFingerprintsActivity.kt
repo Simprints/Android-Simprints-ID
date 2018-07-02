@@ -14,6 +14,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.Toast
 import com.simprints.id.R
 import com.simprints.id.activities.PrivacyActivity
@@ -40,6 +41,7 @@ class CollectFingerprintsActivity :
     override lateinit var indicatorLayout: LinearLayout
     override lateinit var pageAdapter: FingerPageAdapter
     override lateinit var scanButton: Button
+    override lateinit var progressBar: ProgressBar
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
     override lateinit var syncItem: MenuItem
@@ -84,6 +86,7 @@ class CollectFingerprintsActivity :
         syncItem = nav_view.menu.findItem(R.id.nav_sync)
         indicatorLayout = indicator_layout
         scanButton = scan_button
+        progressBar = pb_timeout
         tryDifferentFingerSplash = try_different_finger_splash
     }
 

@@ -9,26 +9,19 @@ class ConfirmFingerprintsDialog(private val context: Context,
                                 private val callbackConfirm: () -> Unit,
                                 private val callbackRestart: () -> Unit) {
 
-    fun create(): AlertDialog {
-        val builder = AlertDialog.Builder(context)
+    fun create(): AlertDialog =
+        AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.confirm_fingers_dialog_title))
             .setMessage(getMapOfFingersAndQualityAsText())
             .setPositiveButton(context.resources.getString(R.string.confirm)) { _, _ -> callbackConfirm() }
             .setNegativeButton(context.resources.getString(R.string.restart)) { _, _ -> callbackRestart() }
-            .setCancelable(false)
-        return builder.create()
-    }
+            .setCancelable(false).create()
 
-    private fun getMapOfFingersAndQualityAsText(): String {
-        var message = ""
-        scannedFingers.forEach { fingerName, scanThresholdPassed ->
-            message += if (scanThresholdPassed) {
-                "✓ "
-            } else {
-                "× "
+    private fun getMapOfFingersAndQualityAsText(): String =
+        StringBuilder().also {
+            scannedFingers.forEach { fingerName, scanThresholdPassed ->
+                it.append(if (scanThresholdPassed) "✓ " else "× ")
+                it.append(fingerName + "\n")
             }
-            message += fingerName + "\n"
-        }
-        return message
-    }
+        }.toString()
 }

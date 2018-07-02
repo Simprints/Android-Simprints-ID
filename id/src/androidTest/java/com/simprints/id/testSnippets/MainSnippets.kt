@@ -47,7 +47,7 @@ fun fullHappyWorkflow() {
     setupActivityAndContinue()
     collectFingerprintsPressScan()
     collectFingerprintsPressScan()
-    checkIfDialogIsDisplayedAndClickConfirm()
+    checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm()
 }
 
 private fun setupActivityAndContinue() {
@@ -86,14 +86,14 @@ private fun collectFingerprintsPressScan() {
     }
 }
 
-private fun checkIfDialogIsDisplayedAndClickConfirm() {
+private fun checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm() {
     WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
         onView(withText(getResourceString(R.string.confirm_fingers_dialog_title)))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
         onView(withId(android.R.id.message))
             .inRoot(isDialog())
-            .check(matches(withText("✓LEFT THUMB\n✓LEFT INDEX FINGER\n")))
+            .check(matches(withText("✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n")))
             .check(matches(isDisplayed()))
         onView(withId(android.R.id.button1)).perform(click())
     }

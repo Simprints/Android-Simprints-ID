@@ -22,7 +22,7 @@ class CollectFingerprintsIndicatorsHelper(private val context: Context,
     fun initIndicators() {
         view.indicatorLayout.removeAllViewsInLayout()
         indicators.clear()
-        for (i in presenter.activeFingers.indices) {
+        presenter.activeFingers.indices.forEach { i ->
             val indicator = ImageView(context)
             indicator.adjustViewBounds = true
             indicator.setOnClickListener { view.viewPager.currentItem = i }
@@ -33,10 +33,10 @@ class CollectFingerprintsIndicatorsHelper(private val context: Context,
     }
 
     fun refreshIndicators() {
-        presenter.activeFingers.indices.forEach { fingerIndex ->
-            val selected = presenter.currentActiveFingerNo == fingerIndex
-            val finger = presenter.activeFingers[fingerIndex]
-            indicators[fingerIndex].setImageResource(finger.status.getDrawableId(selected))
+        presenter.activeFingers.indices.forEach { i ->
+            val selected = presenter.currentActiveFingerNo == i
+            val finger = presenter.activeFingers[i]
+            indicators[i].setImageResource(finger.status.getDrawableId(selected))
         }
     }
 }
