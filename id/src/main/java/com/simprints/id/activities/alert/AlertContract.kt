@@ -22,6 +22,7 @@ interface AlertContract {
         fun openWifiSettings()
         fun closeActivity()
         fun closeAllActivities()
+        fun hideLeftButton()
     }
 
     interface Presenter : BasePresenter {

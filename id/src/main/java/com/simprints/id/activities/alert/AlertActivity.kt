@@ -44,6 +44,10 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         }
     }
 
+    override fun hideLeftButton() {
+        left_button.visibility = View.GONE
+    }
+
     override fun setAlertMessageWithStringRes(stringRes: Int) = message.setText(stringRes)
 
     override fun initLeftButton(alertType: ALERT_TYPE) {
