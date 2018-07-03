@@ -66,23 +66,23 @@ class LaunchPresenter(private val context: Context,
     }
 
     private val setupCallback = object : SetupCallback {
-            override fun onSuccess() {
-                handleSetupFinished()
-            }
-
-            override fun onProgress(progress: Int, detailsId: Int) {
-                Log.d(this@LaunchPresenter, "onProgress")
-                view.handleSetupProgress(progress, detailsId)
-            }
-
-            override fun onError(resultCode: Int) {
-                view.setResultAndFinish(resultCode, null)
-            }
-
-            override fun onAlert(alertType: ALERT_TYPE) {
-                stopSetupAndLaunchAlert(alertType)
-            }
+        override fun onSuccess() {
+            handleSetupFinished()
         }
+
+        override fun onProgress(progress: Int, detailsId: Int) {
+            Log.d(this@LaunchPresenter, "onProgress")
+            view.handleSetupProgress(progress, detailsId)
+        }
+
+        override fun onError(resultCode: Int) {
+            view.setResultAndFinish(resultCode, null)
+        }
+
+        override fun onAlert(alertType: ALERT_TYPE) {
+            stopSetupAndLaunchAlert(alertType)
+        }
+    }
 
     private fun handleSetupFinished() {
         preferencesManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
