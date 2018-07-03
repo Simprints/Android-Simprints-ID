@@ -64,10 +64,8 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
     @JvmField
     val verifyTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
-    @Inject
-    lateinit var remoteDbManager: RemoteDbManager
-    @Inject
-    lateinit var randomGeneratorMock: RandomGenerator
+    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var randomGeneratorMock: RandomGenerator
 
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
