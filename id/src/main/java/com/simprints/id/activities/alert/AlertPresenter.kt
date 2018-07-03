@@ -19,6 +19,7 @@ class AlertPresenter(val view: AlertContract.View,
 
     override fun start() {
         analyticsManager.logAlert(alertType)
+        checkAlertTypeAndHandleIfUnexpected()
         val color = view.getColorForColorRes(alertType.backgroundColor)
         view.setLayoutBackgroundColor(color)
         view.setLeftButtonBackgroundColor(color)
@@ -27,8 +28,6 @@ class AlertPresenter(val view: AlertContract.View,
         view.setAlertImageWithDrawableId(alertType.alertMainDrawableId)
         view.setAlertHintImageWithDrawableId(alertType.alertHintDrawableId)
         view.setAlertMessageWithStringRes(alertType.alertMessageId)
-        view.initLeftButton(alertType)
-        view.initRightButton(alertType)
     }
 
     override fun handleLeftButtonClick() {
@@ -65,5 +64,15 @@ class AlertPresenter(val view: AlertContract.View,
 
     override fun handleBackButton() {
         view.setResult(RESULT_CANCELED)
+    }
+
+    private fun checkAlertTypeAndHandleIfUnexpected() {
+        if (alertType == ALERT_TYPE.UNEXPECTED_ERROR) {
+            view.hideLeftButton()
+        }
+        else {
+            view.initLeftButton(alertType)
+        }
+        view.initRightButton(alertType)
     }
 }
