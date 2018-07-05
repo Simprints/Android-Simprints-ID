@@ -103,7 +103,7 @@ class LaunchPresenter(private val context: Context,
         setup.onRequestPermissionsResult(activity, requestCode, permissions, grantResults)
     }
 
-    override fun handleOnBackPressed() {
+    override fun handleOnBackOrDeclinePressed() {
         launchOutOfFocus = true
         setup.stop()
         view.goToRefusalActivity()

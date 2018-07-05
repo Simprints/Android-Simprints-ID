@@ -24,7 +24,7 @@ interface LaunchContract {
         fun updatePositionTracker(requestCode: Int, resultCode: Int, data: Intent?)
 
         fun handleOnRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray)
-        fun handleOnBackPressed()
+        fun handleOnBackOrDeclinePressed()
         fun handleOnDestroy()
 
         fun tearDownAppWithResult(resultCode: Int, resultData: Intent?)
