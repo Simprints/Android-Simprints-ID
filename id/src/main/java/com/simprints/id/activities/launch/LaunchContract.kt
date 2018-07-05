@@ -3,6 +3,7 @@ package com.simprints.id.activities.launch
 import android.content.Intent
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
+import com.simprints.id.domain.ALERT_TYPE
 
 
 interface LaunchContract {
@@ -12,9 +13,12 @@ interface LaunchContract {
         fun handleSetupProgress(progress: Int, detailsId: Int)
         fun handleSetupFinished()
 
+        fun setLanguage(language: String)
         fun setResultAndFinish(resultCode: Int, resultData: Intent?)
         fun continueToNextActivity()
         fun goToRefusalActivity()
+        fun doLaunchAlert(alertType: ALERT_TYPE)
+        fun doVibrateIfNecessary(doVibrate: Boolean)
     }
 
     interface Presenter : BasePresenter {
