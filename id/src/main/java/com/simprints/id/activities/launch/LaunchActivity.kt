@@ -21,6 +21,10 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        consentDeclineButton.setOnClickListener { viewPresenter.handleOnBackOrDeclinePressed() }
+        consentAcceptButton.setOnClickListener { viewPresenter.confirmConsentAndContinueToNextActivity() }
+
         viewPresenter = LaunchPresenter(this, this)
         viewPresenter.start()
     }
@@ -32,7 +36,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override fun handleSetupFinished() {
         launchProgressBar.progress = 100
-        confirmConsentTextView.visibility = View.VISIBLE
+        consentDeclineButton.visibility = View.VISIBLE
+        consentAcceptButton.visibility = View.VISIBLE
         loadingInfoTextView.visibility = View.INVISIBLE
     }
 
@@ -60,16 +65,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         viewPresenter.handleOnRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean =
-        if (viewPresenter.isReadyToProceedToNextActivity()) {
-            viewPresenter.confirmConsentAndContinueToNextActivity()
-            true
-        } else {
-            super.onTouchEvent(event)
-        }
-
     override fun onBackPressed() {
-        viewPresenter.handleOnBackPressed()
+        viewPresenter.handleOnBackOrDeclinePressed()
     }
 
     override fun onDestroy() {

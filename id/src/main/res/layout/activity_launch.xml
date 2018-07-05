@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/launchLayout"
     android:layout_width="match_parent"
@@ -9,56 +10,89 @@
     tools:context=".activities.launch.LaunchActivity">
 
     <ImageView
+        android:id="@+id/imageView2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
         android:layout_marginTop="35dp"
+        android:layout_weight="3"
         android:contentDescription="@string/launch_background_description"
-        android:src="@drawable/launch_background" />
+        android:src="@drawable/launch_background"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4" />
 
     <TextView
         android:id="@+id/consentTextView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
         android:paddingTop="25dp"
         android:text="@string/short_consent"
         android:textColor="@color/simprints_white"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/confirmConsentTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="2"
-        android:gravity="center"
-        android:text="@string/confirm_consent"
-        android:textColor="@color/simprints_white"
         android:textSize="20sp"
-        android:visibility="invisible" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+
+    <Button
+        android:id="@+id/consentDeclineButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@color/simprints_grey"
+        android:text="@string/launch_consent_decline_button"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/loadingInfoTextView"
+        app:layout_constraintDimensionRatio="w,4:2"
+        app:layout_constraintEnd_toStartOf="@+id/consentAcceptButton"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/consentTextView"
+        app:layout_constraintVertical_bias="0.65" />
+
+    <Button
+        android:id="@+id/consentAcceptButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@color/simprints_white"
+        android:text="@string/launch_consent_accept_button"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/loadingInfoTextView"
+        app:layout_constraintDimensionRatio="w,4:2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/consentDeclineButton"
+        app:layout_constraintTop_toBottomOf="@+id/consentTextView"
+        app:layout_constraintVertical_bias="0.65" />
 
     <TextView
         android:id="@+id/loadingInfoTextView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
         android:gravity="center"
         android:text="@string/loading"
         android:textColor="@color/simprints_white"
-        android:visibility="visible" />
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/launchProgressBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ProgressBar
         android:id="@+id/launchProgressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginStart="5dp"
-        android:progressDrawable="@drawable/launch_progress_bar" />
+        android:progressDrawable="@drawable/launch_progress_bar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>
