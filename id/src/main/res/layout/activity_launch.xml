@@ -10,18 +10,18 @@
     tools:context=".activities.launch.LaunchActivity">
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/simprintsLogoWithTagLine"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="35dp"
         android:layout_weight="3"
         android:contentDescription="@string/launch_background_description"
         android:src="@drawable/launch_background"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintBottom_toTopOf="@+id/simprintsLogoGuideline"
         app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.constraint.Guideline
-        android:id="@+id/guideline"
+        android:id="@+id/simprintsLogoGuideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -40,7 +40,7 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+        app:layout_constraintTop_toBottomOf="@+id/simprintsLogoWithTagLine" />
 
     <Button
         android:id="@+id/consentDeclineButton"

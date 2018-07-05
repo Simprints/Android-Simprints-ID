@@ -90,15 +90,18 @@ class AlertActivityTest : DaggerForTests() {
 
     private fun checkAlertIsShownCorrectly(alertActivity: AlertActivity, alertType: ALERT_TYPE) {
         Assert.assertEquals(getBackgroundColor(alertActivity.alertLayout), getColorWithColorRes(alertType.backgroundColor))
-        Assert.assertEquals(getBackgroundColor(alertActivity.left_button), getColorWithColorRes(alertType.backgroundColor))
+
+        if (alertType.isTwoButton) Assert.assertEquals(getBackgroundColor(alertActivity.left_button), getColorWithColorRes(alertType.backgroundColor))
         Assert.assertEquals(getBackgroundColor(alertActivity.right_button), getColorWithColorRes(alertType.backgroundColor))
+
         Assert.assertEquals(alertActivity.alert_title.text, alertActivity.resources.getString(alertType.alertTitleId))
 
         val alertImageDrawableShown = Shadows.shadowOf(alertActivity.alert_image.drawable).createdFromResId
         Assert.assertEquals(alertImageDrawableShown, alertType.alertMainDrawableId)
 
         Assert.assertEquals(alertActivity.message.text, alertActivity.resources.getString(alertType.alertMessageId))
-        Assert.assertEquals(alertActivity.left_button.text, alertActivity.resources.getString(alertType.alertLeftButtonTextId))
+
+        if (alertType.isTwoButton) Assert.assertEquals(alertActivity.left_button.text, alertActivity.resources.getString(alertType.alertLeftButtonTextId))
         Assert.assertEquals(alertActivity.right_button.text, alertActivity.resources.getString(alertType.alertRightButtonTextId))
     }
 
