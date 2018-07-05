@@ -7,8 +7,13 @@ import com.simprints.id.Application
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.sync.SyncManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.services.sync.SyncService
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.*
 import com.simprints.id.tools.Vibrate.vibrate
 import com.simprints.id.tools.extensions.launchAlert
@@ -23,6 +28,9 @@ class LaunchPresenter(private val context: Context,
 
     @Inject lateinit var dataManager: DataManager
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var appState: AppState
     @Inject lateinit var setup: Setup
     @Inject lateinit var timeHelper: TimeHelper
@@ -54,6 +62,7 @@ class LaunchPresenter(private val context: Context,
         LanguageHelper.setLanguage(context, preferencesManager.language)
         initPositionTracker()
         initSetup()
+        initBackgroundSync()
     }
 
     private fun initPositionTracker() {
@@ -63,6 +72,11 @@ class LaunchPresenter(private val context: Context,
 
     private fun initSetup() {
         setup.start(activity, setupCallback)
+    }
+
+    private fun initBackgroundSync() {
+        SyncService.getClient(context)
+        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager))
     }
 
     private val setupCallback = object : SetupCallback {
