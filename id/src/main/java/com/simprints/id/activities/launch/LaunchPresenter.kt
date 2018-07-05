@@ -71,7 +71,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun initBackgroundSync() {
-        SyncService.getClient(context)
         syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager))
     }
 
