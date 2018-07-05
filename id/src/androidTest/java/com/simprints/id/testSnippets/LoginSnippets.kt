@@ -57,7 +57,6 @@ fun ensureSignInSuccess() {
         ActivityUtils.grantPermissions()
         onView(withId(R.id.consentAcceptButton))
             .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.confirm_consent)))
     }
 }
 

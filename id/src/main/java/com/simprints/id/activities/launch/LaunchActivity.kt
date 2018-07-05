@@ -3,13 +3,16 @@ package com.simprints.id.activities.launch
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import com.simprints.id.R
 import com.simprints.id.activities.RefusalActivity
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
+import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants.*
+import com.simprints.id.tools.LanguageHelper
+import com.simprints.id.tools.Vibrate.vibrate
+import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_launch.*
 
 
@@ -22,12 +25,18 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        consentDeclineButton.setOnClickListener { viewPresenter.handleOnBackOrDeclinePressed() }
-        consentAcceptButton.setOnClickListener { viewPresenter.confirmConsentAndContinueToNextActivity() }
+        setButtonClickListeners()
 
-        viewPresenter = LaunchPresenter(this, this)
+        viewPresenter = LaunchPresenter(this)
         viewPresenter.start()
     }
+
+    private fun setButtonClickListeners() {
+        consentDeclineButton.setOnClickListener { viewPresenter.handleOnBackOrDeclinePressed() }
+        consentAcceptButton.setOnClickListener { viewPresenter.confirmConsentAndContinueToNextActivity() }
+    }
+
+    override fun setLanguage(language: String) = LanguageHelper.setLanguage(this, language)
 
     override fun handleSetupProgress(progress: Int, detailsId: Int) {
         launchProgressBar.progress = progress
@@ -89,6 +98,12 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         setResult(resultCode, resultData)
         finish()
     }
+
+    override fun doLaunchAlert(alertType: ALERT_TYPE) {
+        launchAlert(alertType)
+    }
+
+    override fun doVibrateIfNecessary(doVibrate: Boolean) = vibrate(this, doVibrate)
 
     companion object {
         const val COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1

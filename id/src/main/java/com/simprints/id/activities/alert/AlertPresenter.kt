@@ -19,6 +19,7 @@ class AlertPresenter(val view: AlertContract.View,
 
     override fun start() {
         analyticsManager.logAlert(alertType)
+        checkAlertTypeAndHandleButtons()
         val color = view.getColorForColorRes(alertType.backgroundColor)
         view.setLayoutBackgroundColor(color)
         view.setLeftButtonBackgroundColor(color)
@@ -27,8 +28,6 @@ class AlertPresenter(val view: AlertContract.View,
         view.setAlertImageWithDrawableId(alertType.alertMainDrawableId)
         view.setAlertHintImageWithDrawableId(alertType.alertHintDrawableId)
         view.setAlertMessageWithStringRes(alertType.alertMessageId)
-        view.initLeftButton(alertType)
-        view.initRightButton(alertType)
     }
 
     override fun handleLeftButtonClick() {
@@ -52,18 +51,22 @@ class AlertPresenter(val view: AlertContract.View,
 
             else -> {
                 view.setResult(RESULT_CANCELED)
-                if (isACriticalError()) {
-                    view.closeAllActivities()
-                } else {
-                    view.closeActivity()
-                }
+                view.closeAllActivities()
             }
         }
     }
 
-    private fun isACriticalError(): Boolean = alertType == ALERT_TYPE.UNEXPECTED_ERROR
-
     override fun handleBackButton() {
         view.setResult(RESULT_CANCELED)
+    }
+
+    private fun checkAlertTypeAndHandleButtons() {
+        if (alertType.isTwoButton) {
+            view.initLeftButton(alertType)
+        }
+        else {
+            view.hideLeftButton()
+        }
+        view.initRightButton(alertType)
     }
 }
