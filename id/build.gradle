@@ -218,6 +218,7 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$support_version"
     implementation "com.android.support:design:$support_version"
     implementation "com.android.support:support-v4:$support_version"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
     // Google
     implementation "com.google.android.gms:play-services-location:$google_version"

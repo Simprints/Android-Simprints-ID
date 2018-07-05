@@ -58,7 +58,7 @@ private fun setupActivityAndContinue() {
 
 private fun setupActivity() {
     log("setupActivity")
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
+    WaitingUtils.tryOnUiUntilTimeout(10000, 50) {
         ActivityUtils.grantPermissions()
         onView(withId(R.id.consentTextView))
             .check(matches(isDisplayed()))
@@ -69,9 +69,8 @@ private fun setupActivity() {
 private fun setupActivityContinue() {
     log("setupActivityContinue")
     WaitingUtils.tryOnUiUntilTimeout(12000, 500) {
-        onView(withId(R.id.confirmConsentTextView))
+        onView(withId(R.id.consentAcceptButton))
             .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.confirm_consent)))
             .perform(click())
     }
 }
