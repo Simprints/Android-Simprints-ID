@@ -55,7 +55,7 @@ fun ensureSignInSuccess() {
     log("ensureSignInSuccess")
     WaitingUtils.tryOnUiUntilTimeout(25000, 1000) {
         ActivityUtils.grantPermissions()
-        onView(withId(R.id.confirmConsentTextView))
+        onView(withId(R.id.consentAcceptButton))
             .check(matches(isDisplayed()))
             .check(matches(withText(R.string.confirm_consent)))
     }
