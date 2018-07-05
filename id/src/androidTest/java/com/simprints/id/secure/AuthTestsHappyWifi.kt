@@ -63,18 +63,16 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, DaggerForAndroidTests() {
     @JvmField
     val loginTestRule = ActivityTestRule<CheckLoginFromIntentActivity>(CheckLoginFromIntentActivity::class.java, false, false)
 
-    @Inject
-    lateinit var remoteDbManager: RemoteDbManager
-    @Inject
-    lateinit var randomGeneratorMock: RandomGenerator
+    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var randomGeneratorMock: RandomGenerator
 
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
             randomGeneratorRule = MockRule(),
-            bluetoothComponentAdapterRule = ReplaceRule { mockScannerManager })
+            bluetoothComponentAdapterRule = ReplaceRule { mockBluetoothAdapter })
     }
 
-    private var mockScannerManager = MockBluetoothAdapter(MockScannerManager())
+    private val mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
 
     @Before
     override fun setUp() {
