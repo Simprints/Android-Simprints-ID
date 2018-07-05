@@ -61,20 +61,11 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     private fun checkAlertTypeAndHandleButtons() {
-        when(alertType) {
-            ALERT_TYPE.UNVERIFIED_API_KEY,
-            ALERT_TYPE.GUID_NOT_FOUND_ONLINE,
-            ALERT_TYPE.GUID_NOT_FOUND_OFFLINE,
-            ALERT_TYPE.BLUETOOTH_NOT_ENABLED,
-            ALERT_TYPE.NOT_PAIRED,
-            ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS,
-            ALERT_TYPE.DISCONNECTED,
-            ALERT_TYPE.LOW_BATTERY -> {
-                view.initLeftButton(alertType)
-            }
-            else -> {
-                view.hideLeftButton()
-            }
+        if (alertType.isTwoButton) {
+            view.initLeftButton(alertType)
+        }
+        else {
+            view.hideLeftButton()
         }
         view.initRightButton(alertType)
     }
