@@ -1,7 +1,6 @@
 package com.simprints.id.activities.launch
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import com.simprints.id.Application
 import com.simprints.id.controllers.Setup
@@ -10,16 +9,13 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.*
-import com.simprints.id.tools.Vibrate.vibrate
-import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
 import javax.inject.Inject
 
 
-class LaunchPresenter(private val context: Context,
-                      private val view: LaunchContract.View) : LaunchContract.Presenter {
+class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
 
     @Inject lateinit var dataManager: DataManager
     @Inject lateinit var preferencesManager: PreferencesManager
@@ -51,7 +47,7 @@ class LaunchPresenter(private val context: Context,
     }
 
     override fun start() {
-        LanguageHelper.setLanguage(context, preferencesManager.language)
+        view.setLanguage(preferencesManager.language)
         initPositionTracker()
         initSetup()
     }
@@ -92,7 +88,7 @@ class LaunchPresenter(private val context: Context,
             view.handleSetupFinished()
             waitingForConfirmation = true
             appState.scanner.registerButtonListener(scannerButton)
-            vibrate(context, preferencesManager.vibrateMode)
+            view.doVibrateIfNecessary(preferencesManager.vibrateMode)
         } else {
             confirmConsentAndContinueToNextActivity()
         }
@@ -118,7 +114,7 @@ class LaunchPresenter(private val context: Context,
             return
         launchOutOfFocus = true
         setup.stop()
-        activity.launchAlert(alertType)
+        view.doLaunchAlert(alertType)
     }
 
     override fun handleOnDestroy() {
