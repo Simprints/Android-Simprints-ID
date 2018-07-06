@@ -16,6 +16,7 @@ class ProgressNotificationBuilder(notificationManager: NotificationManager,
 
     init {
         updateBuilder {
+            cancelAllNotifications()
             setOngoing(true)
             setProgress(0, 0, true)
             setContentText(progressTextBuilder(Progress(0, 0)))
