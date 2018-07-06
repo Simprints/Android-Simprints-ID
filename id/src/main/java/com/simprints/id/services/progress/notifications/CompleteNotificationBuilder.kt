@@ -20,6 +20,7 @@ class CompleteNotificationBuilder(notificationManager: NotificationManager,
                     updateBuilder {
                         setContentText(completeTextBuilder())
                     }
+                    cancelAllNotifications()
                     notifyIfVisible()
                     dispose()
                 }
