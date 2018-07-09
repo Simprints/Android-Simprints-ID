@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.secure.models.LegacyProject
 import com.simprints.id.tools.extensions.handleResponse
 import io.reactivex.Single
