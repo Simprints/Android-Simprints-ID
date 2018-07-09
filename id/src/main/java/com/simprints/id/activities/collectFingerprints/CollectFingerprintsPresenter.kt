@@ -21,7 +21,6 @@ import com.simprints.id.domain.Finger
 import com.simprints.id.domain.FingerRes
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.exceptions.unsafe.SimprintsError
-import com.simprints.id.services.sync.SyncService
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.FormatResult
 import com.simprints.id.tools.LanguageHelper
@@ -71,7 +70,6 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun initSyncHelper(context: Context, view: CollectFingerprintsContract.View) {
-        SyncService.getClient(context)
         syncHelper = CollectFingerprintsSyncHelper(context, view)
     }
 
