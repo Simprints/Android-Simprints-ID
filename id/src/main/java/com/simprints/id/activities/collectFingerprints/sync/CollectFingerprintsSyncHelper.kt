@@ -13,6 +13,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.service.ProgressService
+import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
@@ -33,7 +34,7 @@ class CollectFingerprintsSyncHelper(private val context: Context,
         ((view as Activity).application as Application).component.inject(this)
 
         setReadySyncItem()
-        catchUpWithSyncStateIfServiceRunning()
+        SyncService.catchUpWithSyncServiceIfStillRunning(syncManager, preferencesManager, loginInfoManager)
     }
 
     fun startListeners() {
@@ -64,16 +65,9 @@ class CollectFingerprintsSyncHelper(private val context: Context,
             }
         }
 
-    private fun catchUpWithSyncStateIfServiceRunning() {
-        if (ProgressService.isRunning.get()) {
-            // The "sync" happens only once at time on Service, no matters how many times we call "sync".
-            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager))
-        }
-    }
-
     fun sync() {
         setZeroProgressSyncItem()
-        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager))
+        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.USER_INITIATED)
     }
 
     private fun setProgressSyncItem(progress: Progress) {

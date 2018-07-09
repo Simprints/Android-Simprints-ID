@@ -11,7 +11,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.progress.Progress
-import com.simprints.id.services.progress.service.ProgressService
+import com.simprints.id.services.sync.SyncCategory
+import com.simprints.id.services.sync.SyncService
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
@@ -55,7 +56,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         if (!started.getAndSet(true) || hasSyncGroupChangedSinceLastRun()) {
             initCards()
         } else {
-            catchUpWithSyncStateIfServiceRunning()
+            SyncService.catchUpWithSyncServiceIfStillRunning(syncManager, preferencesManager, loginInfoManager)
         }
     }
 
@@ -93,7 +94,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun handleCardsCreated() {
-        catchUpWithSyncStateIfServiceRunning()
+        SyncService.catchUpWithSyncServiceIfStillRunning(syncManager, preferencesManager, loginInfoManager)
         view.stopRequestIfRequired()
     }
 
@@ -132,15 +133,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
         view.updateCardViews()
     }
 
-    private fun catchUpWithSyncStateIfServiceRunning() {
-        if (ProgressService.isRunning.get()) {
-            // The "sync" happens only once at time on Service, no matters how many times we call "sync".
-            // When "sync" is called, syncManager connect to the Service and syncManager either starts
-            // the sync or catch with the Sync state.
-            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager))
-        }
-    }
-
     override fun userDidWantToRefreshCardsIfPossible() {
         if (isUserAllowedToRefresh()) {
             initCards()
@@ -153,7 +145,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override fun userDidWantToSync() {
         setSyncingStartedInLocalDbCardView()
-        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager))
+        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.USER_INITIATED)
     }
 
     private fun setSyncingStartedInLocalDbCardView() {
