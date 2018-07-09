@@ -68,3 +68,6 @@
 -keep public class * extends java.lang.Throwable
 -keep class com.crashlytics.** { *; }
 -dontwarn com.crashlytics.**
+
+# Dagger
+-dontwarn com.google.errorprone.annotations.**
