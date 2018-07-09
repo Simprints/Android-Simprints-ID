@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.secure.models.AuthRequest
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.tools.extensions.handleResponse
