@@ -6,8 +6,13 @@ import com.simprints.id.Application
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.sync.SyncManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.services.sync.SyncCategory
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.*
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
@@ -19,6 +24,9 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     @Inject lateinit var dataManager: DataManager
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var appState: AppState
     @Inject lateinit var setup: Setup
     @Inject lateinit var timeHelper: TimeHelper
@@ -50,6 +58,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         view.setLanguage(preferencesManager.language)
         initPositionTracker()
         initSetup()
+        initBackgroundSyncIfNecessary()
     }
 
     private fun initPositionTracker() {
@@ -59,6 +68,12 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     private fun initSetup() {
         setup.start(activity, setupCallback)
+    }
+
+    private fun initBackgroundSyncIfNecessary() {
+        if (preferencesManager.autoSyncOnCallout) {
+            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.AT_LAUNCH)
+        }
     }
 
     private val setupCallback = object : SetupCallback {

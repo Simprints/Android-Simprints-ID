@@ -15,46 +15,49 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     companion object {
 
-        private val NUDGE_MODE_KEY = "NudgeModeBool"
-        private val NUDGE_MODE_DEFAULT = true
+        private const val NUDGE_MODE_KEY = "NudgeModeBool"
+        private const val NUDGE_MODE_DEFAULT = true
 
-        private val CONSENT_KEY = "ConsentBool"
-        private val CONSENT_DEFAULT = true
+        private const val CONSENT_KEY = "ConsentBool"
+        private const val CONSENT_DEFAULT = true
 
-        private val QUALITY_THRESHOLD_KEY = "QualityThresholdInt"
-        private val QUALITY_THRESHOLD_DEFAULT = 60
+        private const val QUALITY_THRESHOLD_KEY = "QualityThresholdInt"
+        private const val QUALITY_THRESHOLD_DEFAULT = 60
 
-        private val NB_IDS_KEY = "NbOfIdsInt"
-        private val NB_IDS_DEFAULT = 10
+        private const val NB_IDS_KEY = "NbOfIdsInt"
+        private const val NB_IDS_DEFAULT = 10
 
-        private val LANGUAGE_KEY = "SelectedLanguage"
-        private val LANGUAGE_DEFAULT = ""
+        private const val LANGUAGE_KEY = "SelectedLanguage"
+        private const val LANGUAGE_DEFAULT = ""
 
-        private val LANGUAGE_POSITION_KEY = "SelectedLanguagePosition"
-        private val LANGUAGE_POSITION_DEFAULT = 0
+        private const val LANGUAGE_POSITION_KEY = "SelectedLanguagePosition"
+        private const val LANGUAGE_POSITION_DEFAULT = 0
 
-        private val MATCHER_TYPE_KEY = "MatcherType"
-        private val MATCHER_TYPE_DEFAULT = 0
+        private const val MATCHER_TYPE_KEY = "MatcherType"
+        private const val MATCHER_TYPE_DEFAULT = 0
 
-        private val TIMEOUT_KEY = "TimeoutInt"
-        private val TIMEOUT_DEFAULT = 3
+        private const val TIMEOUT_KEY = "TimeoutInt"
+        private const val TIMEOUT_DEFAULT = 3
 
-        private val SYNC_GROUP_KEY = "SyncGroup"
+        private const val AUTO_SYNC_ON_CALLOUT_KEY = "AutoSyncOnCallout"
+        private const val AUTO_SYNC_ON_CALLOUT_DEFAULT = false
+
+        private const val SYNC_GROUP_KEY = "SyncGroup"
         private val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
 
-        private val MATCH_GROUP_KEY = "MatchGroup"
+        private const val MATCH_GROUP_KEY = "MatchGroup"
         private val MATCH_GROUP_DEFAULT = Constants.GROUP.USER
 
-        private val VIBRATE_KEY = "VibrateOn"
-        private val VIBRATE_DEFAULT = true
+        private const val VIBRATE_KEY = "VibrateOn"
+        private const val VIBRATE_DEFAULT = true
 
-        private val MATCHING_END_WAIT_TIME_KEY = "MatchingEndWaitTime"
-        private val MATCHING_END_WAIT_TIME_DEFAULT = 1
+        private const val MATCHING_END_WAIT_TIME_KEY = "MatchingEndWaitTime"
+        private const val MATCHING_END_WAIT_TIME_DEFAULT = 1
 
-        private val PERSIST_FINGER_KEY = "PersistFingerStatus"
-        private val PERSIST_FINGER_DEFAULT = false
+        private const val PERSIST_FINGER_KEY = "PersistFingerStatus"
+        private const val PERSIST_FINGER_DEFAULT = false
 
-        private val FINGER_STATUS_KEY = "FingerStatus"
+        private const val FINGER_STATUS_KEY = "FingerStatus"
         private val FINGER_STATUS_DEFAULT =  FingerIdentifier.values()
             .map { Pair(it, false) }
             .toMap()
@@ -93,6 +96,10 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var timeoutS: Int
         by PrimitivePreference(prefs, TIMEOUT_KEY, TIMEOUT_DEFAULT)
 
+    // Whether to sync as soon as the LaunchActivity opens
+    override var autoSyncOnCallout: Boolean
+        by PrimitivePreference(prefs, AUTO_SYNC_ON_CALLOUT_KEY, AUTO_SYNC_ON_CALLOUT_DEFAULT)
+
     // Sync group. Default is user
     override var syncGroup: Constants.GROUP
         by ComplexPreference(prefs, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
@@ -105,7 +112,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var vibrateMode: Boolean
         by PrimitivePreference(prefs, VIBRATE_KEY, VIBRATE_DEFAULT)
 
-    // TODO: document that
+    // The number of seconds the screens pauses for when a match is complete
     override var matchingEndWaitTimeSeconds: Int
         by PrimitivePreference(prefs, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
 

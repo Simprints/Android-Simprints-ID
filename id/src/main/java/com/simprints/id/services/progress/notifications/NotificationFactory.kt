@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.id.services.progress.notifications
 
 import android.annotation.TargetApi
 import android.app.NotificationChannel
@@ -9,10 +9,7 @@ import android.support.v4.app.NotificationCompat
 import com.simprints.id.R
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.UploadProgress
-import com.simprints.id.services.progress.notifications.CompleteNotificationBuilder
-import com.simprints.id.services.progress.notifications.ErrorNotificationBuilder
-import com.simprints.id.services.progress.notifications.NotificationBuilder
-import com.simprints.id.services.progress.notifications.ProgressNotificationBuilder
+import com.simprints.id.services.sync.SyncCategory
 import org.jetbrains.anko.notificationManager
 
 class NotificationFactory(private val context: Context) {
@@ -59,14 +56,16 @@ class NotificationFactory(private val context: Context) {
         notificationManager.createNotificationChannel(channel)
     }
 
-    fun syncProgressNotification() =
-            ProgressNotificationBuilder(notificationManager,
-                    NotificationCompat.Builder(context, channelId),
-                    syncTag,
-                    syncTitle,
-                    syncProgressIcon,
-                    { progress ->
-                        formatProgressContent(progress) })
+    fun syncProgressNotification(syncCategory: SyncCategory?) =
+        ProgressNotificationBuilder(notificationManager,
+            NotificationCompat.Builder(context, channelId),
+            syncTag,
+            syncTitle,
+            syncProgressIcon,
+            syncCategory
+        ) { progress ->
+            formatProgressContent(progress)
+        }
 
     private fun formatProgressContent(progress: Progress): String =
         when {
@@ -84,21 +83,23 @@ class NotificationFactory(private val context: Context) {
         }
 
     private fun isProgressZero(progress: Progress): Boolean =
-            progress.currentValue == 0 && progress.maxValue == 0
+        progress.currentValue == 0 && progress.maxValue == 0
 
-    fun syncCompleteNotification(): NotificationBuilder =
-            CompleteNotificationBuilder(notificationManager,
-                    NotificationCompat.Builder(context, channelId),
-                    syncTag,
-                    syncTitle,
-                    syncCompleteIcon,
-                    { syncCompleteContent })
+    fun syncCompleteNotification(syncCategory: SyncCategory?): NotificationBuilder =
+        CompleteNotificationBuilder(notificationManager,
+            NotificationCompat.Builder(context, channelId),
+            syncTag,
+            syncTitle,
+            syncCompleteIcon,
+            syncCategory
+        ) { syncCompleteContent }
 
-    fun syncErrorNotification(): NotificationBuilder =
-            ErrorNotificationBuilder(notificationManager,
-                    NotificationCompat.Builder(context, channelId),
-                    syncTag,
-                    syncTitle,
-                    syncErrorIcon,
-                    { syncErrorContent })
+    fun syncErrorNotification(syncCategory: SyncCategory?): NotificationBuilder =
+        ErrorNotificationBuilder(notificationManager,
+            NotificationCompat.Builder(context, channelId),
+            syncTag,
+            syncTitle,
+            syncErrorIcon,
+            syncCategory
+        ) { syncErrorContent }
 }
