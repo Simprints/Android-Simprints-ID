@@ -19,7 +19,7 @@ abstract class BaseNotificationBuilder(private val notificationManager: Notifica
 
     private val builder: NotificationCompat.Builder =
             notificationBuilder
-                    .setVibrate(longArrayOf(50, 75))
+                    .setVibrate(notificationVibrationPattern)
                     .setOnlyAlertOnce(true)
                     .setContentTitle(title)
                     .setSmallIcon(icon)
@@ -53,5 +53,9 @@ abstract class BaseNotificationBuilder(private val notificationManager: Notifica
 
     protected fun cancelAllNotifications() {
         notificationManager.cancelAll()
+    }
+
+    companion object {
+        private val notificationVibrationPattern = longArrayOf(50, 75)
     }
 }
