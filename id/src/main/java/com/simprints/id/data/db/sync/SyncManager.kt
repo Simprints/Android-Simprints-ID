@@ -5,7 +5,9 @@ import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.exceptions.safe.TaskInProgressException
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncClient
+import com.simprints.id.services.sync.SyncService
 import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.observers.DisposableObserver
 import timber.log.Timber
@@ -18,8 +20,8 @@ class SyncManager(private val analyticsManager: AnalyticsManager,
     // hashset to avoid duplicates
     private var observers = hashSetOf<DisposableObserver<Progress>>()
 
-    fun sync(syncParams: SyncTaskParameters) {
-        SyncManagerState.STARTED
+    fun sync(syncParams: SyncTaskParameters, syncCategory: SyncCategory) {
+        SyncService.syncCategory = syncCategory
         syncClient.sync(syncParams, {
             startListeners()
         }, { e ->
