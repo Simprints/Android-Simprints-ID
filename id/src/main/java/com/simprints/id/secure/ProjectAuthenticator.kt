@@ -3,6 +3,7 @@ package com.simprints.id.secure
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Project
@@ -24,6 +25,7 @@ open class ProjectAuthenticator(component: AppComponent,
                                 secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
                                 private val attestationManager: AttestationManager = AttestationManager()) {
 
+    @Inject lateinit var prefercesManager: PreferencesManager
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
@@ -101,7 +103,7 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun Completable.scheduleSync(): Completable =
         andThen {
-            ScheduledSyncManager().scheduleSync()
+            ScheduledSyncManager(prefercesManager).scheduleSyncIfNecessary()
             it.onComplete()
         }
 }

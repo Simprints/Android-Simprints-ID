@@ -12,7 +12,7 @@ class ScheduledSyncManager(private val preferencesManager: PreferencesManager) {
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
-    fun scheduleSync() {
+    fun scheduleSyncIfNecessary() {
         val scheduledSyncRequest = createRequestAndSaveId()
         WorkManager.getInstance()?.enqueue(scheduledSyncRequest)
     }
@@ -27,6 +27,6 @@ class ScheduledSyncManager(private val preferencesManager: PreferencesManager) {
     }
 
     private fun saveWorkRequestId(id: UUID) {
-
+        preferencesManager.scheduledSyncWorkRequestId = id.toString()
     }
 }
