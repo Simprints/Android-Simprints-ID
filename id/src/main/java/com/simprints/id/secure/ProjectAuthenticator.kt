@@ -11,6 +11,7 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromInt
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.*
+import com.simprints.id.services.scheduledSync.ScheduledSyncManager
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -48,6 +49,7 @@ open class ProjectAuthenticator(component: AppComponent,
             .signIn(nonceScope.projectId)
             .fetchProjectInfo(nonceScope.projectId)
             .storeCredentials(nonceScope.userId)
+            .scheduleSync()
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
@@ -95,5 +97,11 @@ open class ProjectAuthenticator(component: AppComponent,
         flatMapCompletable {
             loginInfoManager.storeCredentials(it.id, it.legacyId, userId)
             Completable.complete()
+        }
+
+    private fun Completable.scheduleSync(): Completable =
+        andThen {
+            ScheduledSyncManager().scheduleSync()
+            it.onComplete()
         }
 }

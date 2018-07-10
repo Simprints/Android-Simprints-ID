@@ -30,6 +30,7 @@ import com.simprints.id.activities.matching.MatchingPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
+import com.simprints.id.services.scheduledSync.ScheduledSync
 import com.simprints.id.services.sync.SyncService
 import dagger.Component
 import dagger.android.AndroidInjectionModule
@@ -69,4 +70,5 @@ interface AppComponent {
     fun inject(dashboardPresenter: DashboardPresenter)
     fun inject(alertPresenter: AlertPresenter)
     fun inject(launchPresenter: LaunchPresenter)
+    fun inject(scheduledSync: ScheduledSync)
 }
