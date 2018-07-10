@@ -19,7 +19,7 @@ class ConfirmFingerprintsDialog(private val context: Context,
 
     private fun getMapOfFingersAndQualityAsText(): String =
         StringBuilder().also {
-            scannedFingers.forEach { fingerName, scanThresholdPassed ->
+            scannedFingers.forEach { (fingerName, scanThresholdPassed) ->
                 it.append(if (scanThresholdPassed) "✓ " else "× ")
                 it.append(fingerName + "\n")
             }
