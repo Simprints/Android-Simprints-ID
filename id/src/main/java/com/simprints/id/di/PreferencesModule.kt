@@ -18,6 +18,8 @@ import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimesta
 import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimestampsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.data.prefs.sync.SyncPreferencesManager
+import com.simprints.id.data.prefs.sync.SyncPreferencesManagerImpl
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
 import com.simprints.id.session.callout.CalloutAction
@@ -28,9 +30,7 @@ import dagger.Provides
 import javax.inject.Named
 import javax.inject.Singleton
 
-/**
- * Created by fabiotuzza on 17/01/2018.
- */
+
 @Module
 @JvmSuppressWildcards(false)
 open class PreferencesModule {
@@ -65,9 +65,12 @@ open class PreferencesModule {
                                                                @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                                                @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, fingerIdToBooleanSerializer, groupSerializer)
 
+    @Provides @Singleton fun provideSyncPreferencesManager(prefs: ImprovedSharedPreferences): SyncPreferencesManager = SyncPreferencesManagerImpl(prefs)
+
     @Provides @Singleton fun providePreferencesManager(sessionStatePreferencesManager: SessionStatePreferencesManager,
                                                        settingsPreferencesManager: SettingsPreferencesManager,
                                                        lastEventsPreferencesManager: RecentEventsPreferencesManager,
+                                                       syncPreferencesManager: SyncPreferencesManager,
                                                        app: Application): PreferencesManager =
-        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, lastEventsPreferencesManager, app)
+        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, lastEventsPreferencesManager, syncPreferencesManager, app)
 }

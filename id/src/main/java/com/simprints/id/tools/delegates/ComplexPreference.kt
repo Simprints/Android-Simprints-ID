@@ -12,8 +12,6 @@ import kotlin.reflect.KProperty
  *
  * Backed by a PrimitivePreference<String>, after serialization with the specified serializer.
  * Thus, has the same guarantees as PrimitivePreference.
- *
- * @author etienne@simprints.com
  */
 class ComplexPreference<T : Any> (val prefs: ImprovedSharedPreferences,
                                 private val key: String,

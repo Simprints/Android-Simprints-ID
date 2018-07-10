@@ -10,8 +10,6 @@ import kotlin.reflect.KProperty
  * Represents a variable with lazy initialization.
  *
  * To create an instance of [LazyVar] use the [lazyVar] function.
- *
- * @author: Etienne Thiery (etienne@simprints.com), largely inspired by code from the Jetbrains guys
  */
 interface LazyVar<T> {
     /**
@@ -43,16 +41,11 @@ interface LazyVar<T> {
  *
  * Note that the returned instance uses itself to synchronize on. Do not synchronize from external code on
  * the returned instance as it may cause accidental deadlock. Also this behavior can be changed in the future.
- *
- * @author: Etienne Thiery (etienne@simprints.com), largely inspired by code from the Jetbrains guys
  */
 fun <T> lazyVar(initializer: () -> T): LazyVar<T> = SynchronizedLazyVarImpl(initializer)
 
 private object UNINITIALIZED_VALUE
 
-/**
- * @author: Etienne Thiery (etienne@simprints.com), largely inspired by code from the Jetbrains guys
- */
 private class SynchronizedLazyVarImpl<T>(initializer: () -> T, lock: Any? = null) : LazyVar<T> {
 
     private var initializer: (() -> T)? = initializer

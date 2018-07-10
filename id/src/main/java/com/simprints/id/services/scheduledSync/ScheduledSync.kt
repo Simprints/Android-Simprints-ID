@@ -20,7 +20,7 @@ class ScheduledSync : Worker() {
         if (applicationContext is Application) {
             (applicationContext as Application).component.inject(this)
 
-            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.USER_INITIATED)
+            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.SCHEDULED_BACKGROUND)
 
             return Result.SUCCESS
         }
