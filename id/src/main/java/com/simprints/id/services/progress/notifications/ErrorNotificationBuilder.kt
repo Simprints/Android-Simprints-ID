@@ -1,10 +1,15 @@
 package com.simprints.id.services.progress.notifications
 
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.support.v4.app.NotificationCompat
+import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncCategory
+import com.simprints.id.tools.InternalConstants
 import io.reactivex.observers.DisposableObserver
+
 
 class ErrorNotificationBuilder(notificationManager: NotificationManager,
                                notificationBuilder: NotificationCompat.Builder,
@@ -21,15 +26,9 @@ class ErrorNotificationBuilder(notificationManager: NotificationManager,
                 dispose()
             }
 
-            override fun onError(throwable: Throwable) =
-                when (syncCategory) {
-                    SyncCategory.SCHEDULED_BACKGROUND,
-                    SyncCategory.AT_LAUNCH -> doNotShowNotification()
-                    else -> showErrorNotification(throwable)
-                }
-
-            private fun doNotShowNotification() {
-                dispose()
+            override fun onError(throwable: Throwable) {
+                setToLaunchDashboardActivity()
+                showErrorNotification(throwable)
             }
 
             private fun showErrorNotification(throwable: Throwable) {
@@ -44,4 +43,16 @@ class ErrorNotificationBuilder(notificationManager: NotificationManager,
                 cancelIfVisible()
             }
         }
+
+    private fun setToLaunchDashboardActivity() {
+        notificationBuilder.setContentIntent(getIntentForDashboardActivity())
+        notificationBuilder.setAutoCancel(true)
+    }
+
+    private fun getIntentForDashboardActivity()=
+        PendingIntent.getActivity(notificationBuilder.mContext,
+            InternalConstants.LAST_GLOBAL_REQUEST_CODE,
+            Intent(notificationBuilder.mContext, DashboardActivity::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT)
+
 }
