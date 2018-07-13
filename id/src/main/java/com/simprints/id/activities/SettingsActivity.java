@@ -37,7 +37,6 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     private final static int MAX_ID_WAIT_TIME = 10;
     ToggleButton nudgeToggleButton;
     ToggleButton vibrateToggleButton;
-    ToggleButton autoSyncOnCalloutToggleButton;
     SeekBar qualitySeekBar;
     SeekBar nbOfIdsSeekBar;
     SeekBar timeoutSeekBar;
@@ -92,16 +91,6 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 preferencesManager.setVibrateMode(vibrateToggleButton.isChecked());
-            }
-        });
-
-        boolean autoSyncOnCallout = preferencesManager.getAutoSyncOnCallout();
-        autoSyncOnCalloutToggleButton = findViewById(R.id.autoSyncOnCalloutToggleButton);
-        autoSyncOnCalloutToggleButton.setChecked(autoSyncOnCallout);
-        autoSyncOnCalloutToggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                preferencesManager.setAutoSyncOnCallout(autoSyncOnCalloutToggleButton.isChecked());
             }
         });
 

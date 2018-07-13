@@ -58,7 +58,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         view.setLanguage(preferencesManager.language)
         initPositionTracker()
         initSetup()
-        initBackgroundSyncIfNecessary()
+        initBackgroundSync()
     }
 
     private fun initPositionTracker() {
@@ -70,10 +70,8 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         setup.start(activity, setupCallback)
     }
 
-    private fun initBackgroundSyncIfNecessary() {
-        if (preferencesManager.autoSyncOnCallout) {
-            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.AT_LAUNCH)
-        }
+    private fun initBackgroundSync() {
+        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.AT_LAUNCH)
     }
 
     private val setupCallback = object : SetupCallback {
