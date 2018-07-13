@@ -8,8 +8,6 @@ import com.google.gson.reflect.TypeToken
  *
  * If you manage to write a generic Map serializer that implements the Serializer interface,
  * shoot me an email because I am very much interested!
- *
- * @author: Etienne Thiery (etienne@simprints.com)
  */
 class MapSerializer<K: Any, V: Any>(private val kSerializer: Serializer<K>,
                                     private val vSerializer: Serializer<V>,

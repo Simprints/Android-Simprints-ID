@@ -228,6 +228,9 @@ dependencies {
     implementation "com.android.support:support-v4:$support_version"
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
+    // WorkManager
+    implementation "android.arch.work:work-runtime-ktx:$work_version"
+
     // Google
     implementation "com.google.android.gms:play-services-location:$google_version"
     implementation "com.google.android.gms:play-services-safetynet:$google_version"
