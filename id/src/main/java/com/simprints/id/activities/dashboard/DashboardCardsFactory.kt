@@ -41,7 +41,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
         createLastEnrolInfoCard(),
         createLastVerificationInfoCard(),
         createLastIdentificationInfoCard()
-        ).filterNotNull()
+    ).filterNotNull()
 
     private fun createProjectInfoCard(position: Int = 0): Single<DashboardCard> =
         dbManager
@@ -57,20 +57,29 @@ class DashboardCardsFactory(private val component: AppComponent) {
 
     fun createLocalDbInfoCard(position: Int = 1): Single<DashboardCard> =
         dbManager.getPeopleCount(preferencesManager.syncGroup).map {
-                val titleRes =
-                    if (preferencesManager.syncGroup == Constants.GROUP.USER) {
-                        R.string.dashboard_card_localdb_sync_user_title
-                    } else {
-                        R.string.dashboard_card_localdb_sync_project_title
-                    }
+            DashboardCard(
+                DashboardCardType.LOCAL_DB,
+                position,
+                R.drawable.local_db,
+                getLocalDbInfoTitle(),
+                getLocalDbInfoDescription(it))
+        }.doOnError { it.printStackTrace() }
 
-                DashboardCard(
-                    DashboardCardType.LOCAL_DB,
-                    position,
-                    R.drawable.local_db,
-                    androidResourcesHelper.getString(titleRes),
-                    "$it")
-            }.doOnError { it.printStackTrace() }
+    private fun getLocalDbInfoTitle(): String =
+        androidResourcesHelper.getString(
+            if (preferencesManager.syncGroup == Constants.GROUP.USER)
+                R.string.dashboard_card_localdb_sync_user_title
+            else
+                R.string.dashboard_card_localdb_sync_project_title)
+
+    private fun getLocalDbInfoDescription(numberOfPeople: Int): String =
+        if (preferencesManager.syncGroup == Constants.GROUP.USER)
+            String.format(
+                androidResourcesHelper.getString(R.string.dashboard_card_localdb_sync_user_text),
+                loginInfoManager.signedInUserId,
+                numberOfPeople)
+        else
+            "$numberOfPeople"
 
     private fun createSyncInfoCard(position: Int = 2): Single<DashboardSyncCard>? =
         Single.just(

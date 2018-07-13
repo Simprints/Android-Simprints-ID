@@ -71,6 +71,14 @@ android {
 //            testCoverageEnabled false
 //        }
     }
+    splits {
+        density {
+            enable true
+        }
+        abi {
+            enable true
+        }
+    }
     
     applicationVariants.all { variant ->
         if (variant.buildType.name == "release") {
