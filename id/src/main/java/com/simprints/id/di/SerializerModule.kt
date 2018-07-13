@@ -26,9 +26,7 @@ import java.util.*
 import javax.inject.Named
 import javax.inject.Singleton
 
-/**
- * Created by fabiotuzza on 16/01/2018.
- */
+
 @Module
 @JvmSuppressWildcards(false)
 class SerializerModule {

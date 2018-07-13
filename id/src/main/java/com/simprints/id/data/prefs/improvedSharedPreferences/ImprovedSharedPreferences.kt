@@ -5,8 +5,6 @@ import android.content.SharedPreferences
 /**
  * Extension of the SharedPreferences interface of the Android framework.
  * Adds generic read and write capabilities, and provides a more test friendly boundary.
- *
- * @author: Etienne Thiery (etienne@simprints.com)
  */
 interface ImprovedSharedPreferences : SharedPreferences {
 

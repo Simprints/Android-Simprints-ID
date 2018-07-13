@@ -18,8 +18,6 @@ import kotlin.reflect.KProperty
  *
  * Caching: the value of the property is cached to reduce the number of reads and writes to the
  * Shared Preferences: at most one read on first access, and one write per set.
- *
- * @author etienne@simprints.com
  */
 class PrimitivePreference<T : Any>(private val preferences: ImprovedSharedPreferences,
                                   private val key: String,
