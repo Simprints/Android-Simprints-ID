@@ -8,10 +8,6 @@ import java.util.concurrent.TimeUnit
 
 class ScheduledSyncManager(private val preferencesManager: PreferencesManager) {
 
-    private val constraints: Constraints = Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.CONNECTED)
-        .build()
-
     fun scheduleSyncIfNecessary() {
         val scheduledSyncRequest = createRequestAndSaveId()
         WorkManager.getInstance()?.enqueue(scheduledSyncRequest)
@@ -19,14 +15,23 @@ class ScheduledSyncManager(private val preferencesManager: PreferencesManager) {
 
     private fun createRequestAndSaveId(): PeriodicWorkRequest {
         val scheduledSyncRequest =
-                PeriodicWorkRequestBuilder<ScheduledSync>(20, TimeUnit.SECONDS)
-                    .setConstraints(constraints)
-                    .build()
+            PeriodicWorkRequestBuilder<ScheduledSync>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
+                .setConstraints(getConstraints())
+                .build()
         saveWorkRequestId(scheduledSyncRequest.id)
         return scheduledSyncRequest
     }
 
+    private fun getConstraints() = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED)
+        .build()
+
     private fun saveWorkRequestId(id: UUID) {
         preferencesManager.scheduledSyncWorkRequestId = id.toString()
+    }
+
+    companion object {
+        private const val SYNC_REPEAT_INTERVAL = 6L
+        private val SYNC_REPEAT_UNIT = TimeUnit.HOURS
     }
 }
