@@ -11,6 +11,7 @@ import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.services.scheduledSync.ScheduledSyncManager
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.*
@@ -59,6 +60,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         initPositionTracker()
         initSetup()
         initBackgroundSyncIfNecessary()
+        scheduleSyncIfNecessary()
     }
 
     private fun initPositionTracker() {
@@ -73,6 +75,12 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     private fun initBackgroundSyncIfNecessary() {
         if (preferencesManager.autoSyncOnCallout) {
             syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.AT_LAUNCH)
+        }
+    }
+
+    private fun scheduleSyncIfNecessary() {
+        if (preferencesManager.scheduledSyncWorkRequestId.isEmpty()) {
+            ScheduledSyncManager(preferencesManager).scheduleSyncIfNecessary()
         }
     }
 
