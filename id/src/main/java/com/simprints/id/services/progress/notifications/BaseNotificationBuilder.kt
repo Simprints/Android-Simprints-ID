@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 
 abstract class BaseNotificationBuilder(private val notificationManager: NotificationManager,
-                                       notificationBuilder: NotificationCompat.Builder,
+                                       val notificationBuilder: NotificationCompat.Builder,
                                        override val tag: String,
                                        title: String,
                                        icon: Int)
