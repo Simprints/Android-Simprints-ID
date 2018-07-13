@@ -39,9 +39,6 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private const val TIMEOUT_KEY = "TimeoutInt"
         private const val TIMEOUT_DEFAULT = 3
 
-        private const val AUTO_SYNC_ON_CALLOUT_KEY = "AutoSyncOnCallout"
-        private const val AUTO_SYNC_ON_CALLOUT_DEFAULT = false
-
         private const val SYNC_GROUP_KEY = "SyncGroup"
         private val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
 
@@ -95,10 +92,6 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Timeout seconds
     override var timeoutS: Int
         by PrimitivePreference(prefs, TIMEOUT_KEY, TIMEOUT_DEFAULT)
-
-    // Whether to sync as soon as the LaunchActivity opens
-    override var autoSyncOnCallout: Boolean
-        by PrimitivePreference(prefs, AUTO_SYNC_ON_CALLOUT_KEY, AUTO_SYNC_ON_CALLOUT_DEFAULT)
 
     // Sync group. Default is user
     override var syncGroup: Constants.GROUP

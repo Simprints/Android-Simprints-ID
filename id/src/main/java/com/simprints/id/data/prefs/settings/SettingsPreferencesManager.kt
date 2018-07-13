@@ -14,7 +14,6 @@ interface SettingsPreferencesManager {
     var languagePosition: Int
     var matcherType: Int
     var timeoutS: Int
-    var autoSyncOnCallout: Boolean
     var syncGroup: Constants.GROUP
     var matchGroup: Constants.GROUP
     var vibrateMode: Boolean
