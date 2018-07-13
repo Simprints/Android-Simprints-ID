@@ -24,6 +24,7 @@ class ScheduledSyncManager(private val preferencesManager: PreferencesManager) {
 
     private fun getConstraints() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
+        .setRequiresBatteryNotLow(true)
         .build()
 
     private fun saveWorkRequestId(id: UUID) {
