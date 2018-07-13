@@ -49,7 +49,7 @@ class ErrorNotificationBuilder(notificationManager: NotificationManager,
         notificationBuilder.setAutoCancel(true)
     }
 
-    private fun getIntentForDashboardActivity()=
+    private fun getIntentForDashboardActivity() =
         PendingIntent.getActivity(notificationBuilder.mContext,
             InternalConstants.LAST_GLOBAL_REQUEST_CODE,
             Intent(notificationBuilder.mContext, DashboardActivity::class.java),
