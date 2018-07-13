@@ -27,8 +27,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         multiDexEnabled true
-        versionCode 92
-        versionName "2018.3.0-dev2"
+        versionCode 93
+        versionName "2018.3.0-dev3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -71,14 +71,14 @@ android {
 //            testCoverageEnabled false
 //        }
     }
-    splits {
-        density {
-            enable true
-        }
-        abi {
-            enable true
-        }
-    }
+//    splits { // FIXME
+//        density {
+//            enable true
+//        }
+//        abi {
+//            enable true
+//        }
+//    }
     
     applicationVariants.all { variant ->
         if (variant.buildType.name == "release") {
