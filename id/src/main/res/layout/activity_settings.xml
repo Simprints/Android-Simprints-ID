@@ -86,7 +86,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/auto_sync_on_callout"
+                    android:text="@string/auto_sync"
                     android:textSize="20sp" />
 
             </TableRow>
