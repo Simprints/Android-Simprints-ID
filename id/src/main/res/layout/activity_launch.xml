@@ -47,7 +47,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:background="@color/simprints_grey"
+        android:background="@color/simprints_white"
         android:text="@string/launch_consent_decline_button"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/loadingInfoTextView"

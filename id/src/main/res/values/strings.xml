@@ -218,7 +218,7 @@
     <string name="settings_select_language">Select Language</string>
     <string name="nudge_mode_checkbox_name">Nudge Mode</string>
     <string name="vibrate">Vibrate</string>
-    <string name="auto_sync_on_callout">Sync On Callout</string>
+    <string name="auto_sync">Auto Sync</string>
     <string name="quality_threshold_empty">Quality Threshold:</string>
     <string name="quality_threshold_value">Quality Threshold: %1$d</string>
     <string name="nb_of_ids_empty">Returned Identifications:</string>
