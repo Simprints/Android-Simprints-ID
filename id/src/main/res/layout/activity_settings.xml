@@ -75,28 +75,6 @@
                 android:layout_margin="15dp"
                 android:background="#3F000000" />
 
-            <TableRow>
-
-                <ToggleButton
-                    android:id="@+id/autoSyncOnCalloutToggleButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/auto_sync"
-                    android:textSize="20sp" />
-
-            </TableRow>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_margin="15dp"
-                android:background="#3F000000" />
-
             <TextView
                 android:id="@+id/qualityTextView"
                 android:layout_width="wrap_content"
