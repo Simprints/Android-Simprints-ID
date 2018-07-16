@@ -27,8 +27,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         multiDexEnabled true
-        versionCode 93
-        versionName "2018.3.0-dev3"
+        versionCode 95
+        versionName "2018.3.0-dev5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -39,6 +39,12 @@ android {
             storePassword SIMPRINTSID_RELEASE_STORE_PASSWORD
             keyAlias SIMPRINTSID_RELEASE_KEY_ALIAS
             keyPassword SIMPRINTSID_RELEASE_KEY_PASSWORD
+        }
+    }
+
+    bundle {
+        language {
+            enableSplit = false
         }
     }
     
@@ -71,14 +77,6 @@ android {
 //            testCoverageEnabled false
 //        }
     }
-//    splits { // FIXME
-//        density {
-//            enable true
-//        }
-//        abi {
-//            enable true
-//        }
-//    }
     
     applicationVariants.all { variant ->
         if (variant.buildType.name == "release") {
@@ -256,7 +254,6 @@ dependencies {
     }
 
     // Network
-    implementation "com.android.volley:volley:$volley_version"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
