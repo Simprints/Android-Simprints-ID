@@ -51,6 +51,8 @@ class CollectFingerprintsPresenter(private val context: Context,
     override val activeFingers = ArrayList<Finger>()
     override var currentActiveFingerNo: Int = 0
     override var isConfirmDialogShown = false
+    override var isTryDifferentFingerSplashShown = false
+    override var isNudging = false
     private var numberOfFingersAdded = 0
 
     init {
