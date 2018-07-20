@@ -46,9 +46,12 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private val scannerButtonListener = ButtonListener {
         if (presenter.isConfirmDialogShown)
             presenter.handleConfirmFingerprintsAndContinue()
-        else if (!presenter.currentFinger().isGoodScan)
+        else if (!shouldNotEnableScanButton())
             toggleContinuousCapture()
     }
+
+    private fun shouldNotEnableScanButton() = presenter.currentFinger().isGoodScan ||
+        presenter.isTryDifferentFingerSplashShown || presenter.isNudging
 
     init {
         ((view as Activity).application as Application).component.inject(this)
@@ -239,6 +242,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         setGoodOrBadScanAndNudgeIfNecessary(quality)
         Vibrate.vibrate(context, preferencesManager.vibrateMode)
         presenter.refreshDisplay()
+        if (currentFingerStatus == BAD_SCAN) presenter.showSplashAndAddNewFingerIfNecessary()
         presenter.checkScannedFingersAndCreateMapToShowDialog()
     }
 
@@ -267,7 +271,6 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private fun handleBadScan() {
         currentFingerStatus = Finger.Status.BAD_SCAN
         presenter.currentFinger().numberOfBadScans += 1
-        presenter.showSplashAndAddNewFingerIfNecessary()
     }
 
     fun resetScannerUi() {
