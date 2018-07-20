@@ -77,8 +77,8 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         preferencesManager.fingerStatusPersist && preferencesManager.fingerStatus[identifier] == true
 
     private fun refreshWhichFingerIsLast() {
-        allFingers.forEach { it.isLastFinger = false }
-        allFingers.last().isLastFinger = true
+        presenter.activeFingers.forEach { it.isLastFinger = false }
+        presenter.activeFingers.last().isLastFinger = true
     }
 
     private fun initPageAdapter() {
@@ -223,6 +223,14 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         Handler().postDelayed({
             hideTryDifferentFingerSplash()
             handleAutoAddFinger()
+            doNudgeIfNecessary()
+        }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
+    }
+
+    fun showSplashAndNudgeIfNecessary() {
+        showTryDifferentFingerSplash()
+        Handler().postDelayed({
+            hideTryDifferentFingerSplash()
             doNudgeIfNecessary()
         }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
     }
