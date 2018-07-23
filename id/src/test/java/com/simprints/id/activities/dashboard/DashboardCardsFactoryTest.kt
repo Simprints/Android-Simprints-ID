@@ -18,7 +18,7 @@ import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -112,14 +112,14 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     }
 
     @Test
-    fun shouldCreateTheLastUserCard_onlyWhenAnLastUserEventHappened() {
+    fun shouldCreateTheCurrentUserCard_onlyWhenAnLastUserEventHappened() {
         val factory = DashboardCardsFactory(testAppComponent)
         val lastUser = "someone"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
             { lastUser.also { preferencesManager.lastUserUsed = lastUser } },
             { preferencesManager.lastUserUsed = "" },
-            app.getString(R.string.dashboard_card_lastuser_title))
+            app.getString(R.string.dashboard_card_currentuser_title))
     }
 
     @Test
