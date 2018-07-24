@@ -18,7 +18,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import com.simprints.id.R
 import com.simprints.id.activities.PrivacyActivity
-import com.simprints.id.activities.RefusalActivity
+import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.about.AboutActivity
 import com.simprints.id.domain.ALERT_TYPE
