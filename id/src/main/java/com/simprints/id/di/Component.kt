@@ -2,7 +2,7 @@ package com.simprints.id.di
 
 import com.simprints.id.Application
 import com.simprints.id.activities.PrivacyActivity
-import com.simprints.id.activities.RefusalActivity
+import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.TutorialActivity
 import com.simprints.id.activities.about.AboutActivity
@@ -27,6 +27,7 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.activities.matching.MatchingPresenter
+import com.simprints.id.activities.refusal.RefusalPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
@@ -43,7 +44,7 @@ interface AppComponent {
     fun inject(guidSelectionService: GuidSelectionService)
     fun inject(alertActivity: AlertActivity)
     fun inject(aboutActivity: AboutActivity)
-    fun inject(refusalActivity: RefusalActivity)
+    fun inject(refusalPresenter: RefusalPresenter)
     fun inject(privacyActivity: PrivacyActivity)
     fun inject(tutorialActivity: TutorialActivity)
     fun inject(settingsActivity: SettingsActivity)
