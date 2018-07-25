@@ -246,7 +246,7 @@
     <string name="scanner_not_working">Scanner not working</string>
     <string name="other">Other</string>
     <!-- Text Prompt -->
-    <string name="hint_other_reason">More info…</string>
+    <string name="hint_other_reason">Additional Information</string>
 
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
