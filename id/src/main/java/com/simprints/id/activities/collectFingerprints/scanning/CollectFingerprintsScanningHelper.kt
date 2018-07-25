@@ -122,8 +122,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 cancelCaptureUI()
                 reconnect()
             }
-            UN20_SDK_ERROR ->
-                forceCaptureNotPossible()
+            UN20_SDK_ERROR -> // The UN20 throws an SDK error if it doesn't detect a finger
+                noFingerTemplateDetected()
             else -> {
                 cancelCaptureUI()
                 presenter.handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "CollectFingerprintsScanningHelper"))
@@ -171,7 +171,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         when (currentFingerStatus) {
             GOOD_SCAN ->
                 askIfWantRescan()
-            RESCAN_GOOD_SCAN, BAD_SCAN, NOT_COLLECTED ->
+            RESCAN_GOOD_SCAN, BAD_SCAN, NOT_COLLECTED, NO_FINGER_DETECTED ->
                 startContinuousCapture()
             COLLECTING ->
                 stopContinuousCapture()
@@ -223,8 +223,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     // For hardware version <=4, set bad scan if force capture isn't possible
-    private fun forceCaptureNotPossible() {
-        currentFingerStatus = BAD_SCAN
+    private fun noFingerTemplateDetected() {
+        currentFingerStatus = NO_FINGER_DETECTED
         Vibrate.vibrate(context, preferencesManager.vibrateMode)
         presenter.refreshDisplay()
     }
