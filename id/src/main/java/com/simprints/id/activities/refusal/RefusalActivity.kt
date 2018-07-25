@@ -15,6 +15,7 @@ import com.simprints.libsimprints.Constants
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 
+
 class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
 
@@ -37,7 +38,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
     private fun setButtonClickListeners() {
         btSubmitRefusalForm.setOnClickListener { viewPresenter.handleSubmitButtonClick(reason, getRefusalText()) }
-        btBackToSimprints.setOnClickListener { viewPresenter.handleBackToSimprintsClick() }
+        btScanFingerprints.setOnClickListener { viewPresenter.handleScanFingerprintsClick() }
     }
 
     private fun setTextChangeListenerToRefusalText() {
@@ -46,7 +47,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                viewPresenter.handleChangesInRefusalText(refusalText.text.toString())
+                viewPresenter.handleChangesInRefusalText(getRefusalText())
             }
 
             override fun afterTextChanged(s: Editable) {
@@ -54,6 +55,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         })
     }
 
+    //Changes in the layout occur when the keyboard shows up
     private fun setLayoutChangeListeners() {
         refusalScrollView.onLayoutChange { _, _, _, _,
                                            _, _, _, _, _ ->
@@ -71,7 +73,6 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         refusalScrollView.post {
             refusalScrollView.fullScroll(View.FOCUS_DOWN)
         }
-        //refusalScrollView.setOnTouchListener { _, _ -> true }
     }
 
     override fun disableSubmitButton() {
@@ -86,11 +87,6 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         refusalText.isEnabled = true
     }
 
-    private fun getIntentForResultData(reason: REFUSAL_FORM_REASON?) =
-        Intent().putExtra(Constants.SIMPRINTS_REFUSAL_FORM, reason)
-
-    private fun getRefusalText() = refusalText.text.toString()
-
     override fun doLaunchAlert(alertType: ALERT_TYPE) {
         launchAlert(alertType)
     }
@@ -99,4 +95,9 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         setResult(activityResult, getIntentForResultData(reason))
         finish()
     }
+
+    private fun getIntentForResultData(reason: REFUSAL_FORM_REASON?) =
+        Intent().putExtra(Constants.SIMPRINTS_REFUSAL_FORM, reason)
+
+    private fun getRefusalText() = refusalText.text.toString()
 }

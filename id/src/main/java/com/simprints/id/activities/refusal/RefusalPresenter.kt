@@ -12,15 +12,12 @@ import com.simprints.id.tools.InternalConstants
 import com.simprints.libsimprints.RefusalForm
 import javax.inject.Inject
 
+
 class RefusalPresenter(private val view: RefusalContract.View) : RefusalContract.Presenter {
-
-
 
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     private var reason: REFUSAL_FORM_REASON? = null
-    var checked = false
-
     private val activity = view as Activity
 
     init {
@@ -30,44 +27,12 @@ class RefusalPresenter(private val view: RefusalContract.View) : RefusalContract
     override fun start() {
     }
 
-    override fun handleSubmitButtonClick(reason: REFUSAL_FORM_REASON?, refusalText: String) {
-        reason.let {
-            saveRefusalFormInDb(getRefusalForm(refusalText))
-        }
-        view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
-    }
-
-    override fun handleBackToSimprintsClick() {
-        view.setResultAndFinish(InternalConstants.RESULT_TRY_AGAIN, null)
-    }
-
-    override fun handleLayoutChange() {
-        if(checked)
-            view.scrollToBottom()
-    }
-
-    override fun handleChangesInRefusalText(refusalText: String) {
-        if (refusalText.isEmpty()) {
-            view.disableSubmitButton()
-        } else {
-            view.enableSubmitButton()
-        }
-    }
-
     override fun handleRadioOptionClicked(optionIdentifier: Int) {
-
-        checked = true
         view.enableSubmitButton()
         view.enableRefusalText()
         when (optionIdentifier) {
-            R.id.rbScannerNotHere ->
-                reason = REFUSAL_FORM_REASON.SCANNER_NOT_HERE
             R.id.rbScannerNotWorking ->
                 reason = REFUSAL_FORM_REASON.SCANNER_NOT_WORKING
-            R.id.rbUnableToCapture ->
-                reason = REFUSAL_FORM_REASON.UNABLE_TO_CAPTURE_GOOD_SCAN
-            R.id.rbUnableToGive ->
-                reason = REFUSAL_FORM_REASON.UNABLE_TO_GIVE_PRINTS
             R.id.rbRefused ->
                 reason = REFUSAL_FORM_REASON.REFUSED
             R.id.rb_other -> {
@@ -77,6 +42,28 @@ class RefusalPresenter(private val view: RefusalContract.View) : RefusalContract
         }
     }
 
+    override fun handleSubmitButtonClick(reason: REFUSAL_FORM_REASON?, refusalText: String) {
+        reason.let {
+            saveRefusalFormInDb(getRefusalForm(refusalText))
+        }
+        view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
+    }
+
+    override fun handleScanFingerprintsClick() {
+        view.setResultAndFinish(InternalConstants.RESULT_TRY_AGAIN, null)
+    }
+
+    override fun handleLayoutChange() {
+        view.scrollToBottom()
+    }
+
+    override fun handleChangesInRefusalText(refusalText: String) {
+        if (refusalText.isEmpty()) {
+            view.disableSubmitButton()
+        } else {
+            view.enableSubmitButton()
+        }
+    }
 
     private fun getRefusalForm(refusalText: String) = RefusalForm(reason.toString(), refusalText)
 
