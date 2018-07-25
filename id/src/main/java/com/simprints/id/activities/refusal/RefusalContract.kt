@@ -5,6 +5,7 @@ import com.simprints.id.activities.BaseView
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
 import com.simprints.id.domain.ALERT_TYPE
 
+
 interface RefusalContract {
 
     interface View: BaseView<Presenter> {
@@ -26,7 +27,7 @@ interface RefusalContract {
 
         fun handleSubmitButtonClick(reason: REFUSAL_FORM_REASON?, refusalText: String)
 
-        fun handleBackToSimprintsClick()
+        fun handleScanFingerprintsClick()
 
         fun handleLayoutChange()
 
