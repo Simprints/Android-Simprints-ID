@@ -35,10 +35,8 @@ class RefusalPresenter(private val view: RefusalContract.View) : RefusalContract
                 reason = REFUSAL_FORM_REASON.SCANNER_NOT_WORKING
             R.id.rbRefused ->
                 reason = REFUSAL_FORM_REASON.REFUSED
-            R.id.rb_other -> {
+            R.id.rb_other ->
                 reason = REFUSAL_FORM_REASON.OTHER
-                view.disableSubmitButton()
-            }
         }
     }
 

@@ -64,14 +64,18 @@
             android:id="@+id/refusalText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
             android:background="@color/simprints_white"
             android:enabled="false"
             android:gravity="top|start"
             android:hint="@string/hint_other_reason"
             android:imeOptions="actionDone"
             android:inputType="textMultiLine"
-            android:maxLength="180"
-            android:minHeight="100dp" />
+            android:maxLength="100"
+            android:minHeight="100dp"
+            android:maxLines="4"
+            android:padding="4dp" />
 
         <LinearLayout
             android:id="@+id/refusalButtonsLayout"
