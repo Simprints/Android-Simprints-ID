@@ -1,11 +1,11 @@
 package com.simprints.id.activities.refusal
 
 import android.app.Activity
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
+import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.tools.InternalConstants
@@ -13,15 +13,15 @@ import com.simprints.libsimprints.RefusalForm
 import javax.inject.Inject
 
 
-class RefusalPresenter(private val view: RefusalContract.View) : RefusalContract.Presenter {
+class RefusalPresenter(private val view: RefusalContract.View,
+                       component: AppComponent) : RefusalContract.Presenter {
 
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     private var reason: REFUSAL_FORM_REASON? = null
-    private val activity = view as Activity
 
     init {
-        (activity.application as Application).component.inject(this)
+        component.inject(this)
     }
 
     override fun start() {
