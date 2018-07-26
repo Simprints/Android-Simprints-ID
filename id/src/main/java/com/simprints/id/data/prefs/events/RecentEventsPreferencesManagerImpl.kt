@@ -1,8 +1,8 @@
 package com.simprints.id.data.prefs.events
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.tools.delegates.DatePreference
-import com.simprints.id.tools.delegates.PrimitivePreference
+import com.simprints.id.data.prefs.preferenceType.DatePreference
+import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import java.util.*
 
 class RecentEventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)

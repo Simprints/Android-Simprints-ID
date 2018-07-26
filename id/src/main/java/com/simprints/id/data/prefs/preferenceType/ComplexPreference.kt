@@ -1,4 +1,4 @@
-package com.simprints.id.tools.delegates
+package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unsafe.MismatchedTypeError
@@ -21,14 +21,10 @@ class ComplexPreference<T : Any> (val prefs: ImprovedSharedPreferences,
     private val serializedDefValue = serializer.serialize(defValue)
     private var serializedValue by PrimitivePreference(prefs, key, serializedDefValue)
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        Timber.d("ComplexPreference.getValue $key")
-
-        return try {
-            serializer.deserialize(serializedValue)
-        } catch (e: MismatchedTypeError) {
-            ifEnumDeserializationFailedThenTryIndex() ?: throw e
-        }
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = try {
+        serializer.deserialize(serializedValue)
+    } catch (e: MismatchedTypeError) {
+        ifEnumDeserializationFailedThenTryIndex() ?: throw e
     }
 
     /**
