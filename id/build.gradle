@@ -234,16 +234,15 @@ dependencies {
     implementation "com.google.android.gms:play-services-safetynet:$google_version"
 
     // Databases
-    implementation "com.michaelpardo:activeandroid:$active_android_version"
-    implementation "com.google.firebase:firebase-database:$google_version"
-    implementation "com.google.firebase:firebase-firestore:$google_version"
+    implementation "com.google.firebase:firebase-database:16.0.1"
+    implementation "com.google.firebase:firebase-firestore:17.0.3"
 
     // Firebase
-    implementation "com.google.firebase:firebase-core:$google_version"
-    implementation "com.google.firebase:firebase-auth:$google_version"
-    implementation "com.google.firebase:firebase-config:$google_version"
-    implementation "com.google.firebase:firebase-perf:$google_version"
-    implementation "com.google.firebase:firebase-storage:$google_version"
+    implementation "com.google.firebase:firebase-core:16.0.1"
+    implementation "com.google.firebase:firebase-auth:16.0.2"
+    implementation "com.google.firebase:firebase-config:16.0.0"
+    implementation "com.google.firebase:firebase-perf:16.0.0"
+    implementation "com.google.firebase:firebase-storage:16.0.1"
 
     // Analytics
     implementation("com.crashlytics.sdk.android:crashlytics:$crashlytics_version@aar") {
