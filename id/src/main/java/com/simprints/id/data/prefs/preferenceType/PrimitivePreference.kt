@@ -1,7 +1,8 @@
-package com.simprints.id.tools.delegates
+package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
+import com.simprints.id.tools.delegates.lazyVar
 import isPrimitive
 import timber.log.Timber
 import kotlin.reflect.KProperty
@@ -30,21 +31,15 @@ class PrimitivePreference<T : Any>(private val preferences: ImprovedSharedPrefer
     }
 
     private var value: T by lazyVar {
-        Timber.d("PrimitivePreference read $key from Shared Preferences")
         preferences.getPrimitive(key, defValue)
     }
 
     @Synchronized
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        Timber.d("PrimitivePreference.getValue $key")
-        return value
-    }
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
 
     @Synchronized
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        Timber.d("PrimitivePreference.setValue $key")
         this.value = value
-        Timber.d("PrimitivePreference write $key to Shared Preferences")
         preferences.edit()
                 .putPrimitive(key, value)
                 .apply()
