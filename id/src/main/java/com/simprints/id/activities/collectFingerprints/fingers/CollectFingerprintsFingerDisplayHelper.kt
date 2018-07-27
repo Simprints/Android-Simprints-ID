@@ -77,8 +77,8 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         preferencesManager.fingerStatusPersist && preferencesManager.fingerStatus[identifier] == true
 
     private fun refreshWhichFingerIsLast() {
-        allFingers.forEach { it.isLastFinger = false }
-        allFingers.last().isLastFinger = true
+        presenter.activeFingers.forEach { it.isLastFinger = false }
+        presenter.activeFingers.last().isLastFinger = true
     }
 
     private fun initPageAdapter() {
@@ -208,13 +208,15 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
     // Swipes ViewPager automatically when the current finger is complete
     fun doNudgeIfNecessary() {
         if (preferencesManager.nudgeMode) {
-            Handler().postDelayed({
-                if (presenter.currentActiveFingerNo < presenter.activeFingers.size) {
+            if (presenter.currentActiveFingerNo < presenter.activeFingers.size) {
+                presenter.isNudging = true
+                Handler().postDelayed({
                     view.viewPager.setScrollDuration(SLOW_SWIPE_SPEED)
                     view.viewPager.currentItem = presenter.currentActiveFingerNo + 1
                     view.viewPager.setScrollDuration(FAST_SWIPE_SPEED)
-                }
-            }, AUTO_SWIPE_DELAY)
+                    presenter.isNudging = false
+                }, AUTO_SWIPE_DELAY)
+            }
         }
     }
 
@@ -227,13 +229,23 @@ class CollectFingerprintsFingerDisplayHelper(private val context: Context,
         }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
     }
 
+    fun showSplashAndNudgeIfNecessary() {
+        showTryDifferentFingerSplash()
+        Handler().postDelayed({
+            hideTryDifferentFingerSplash()
+            doNudgeIfNecessary()
+        }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
+    }
+
 
     private fun showTryDifferentFingerSplash() {
         view.tryDifferentFingerSplash.visibility = View.VISIBLE
+        presenter.isTryDifferentFingerSplashShown = true
     }
 
     private fun hideTryDifferentFingerSplash() {
         view.tryDifferentFingerSplash.visibility = View.GONE
+        presenter.isTryDifferentFingerSplashShown = false
     }
 
     companion object {

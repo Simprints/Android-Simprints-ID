@@ -71,6 +71,7 @@ public class TimeoutBar {
                 break;
 
             case BAD_SCAN:
+            case NO_FINGER_DETECTED:
                 drawable = ContextCompat.getDrawable(context,
                         R.drawable.timer_progress_bad);
                 break;

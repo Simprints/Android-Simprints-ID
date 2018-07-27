@@ -160,6 +160,10 @@ public class Finger implements Parcelable, Comparable<Finger>{
         return status == Status.NOT_COLLECTED;
     }
 
+    public boolean isNoFingerDetected() {
+        return status == Status.NO_FINGER_DETECTED;
+    }
+
     public int getNumberOfBadScans() { return numberOfFailedScans; }
 
     public void setNumberOfBadScans(int numberOfFailedScans) { this.numberOfFailedScans = numberOfFailedScans; }
@@ -179,7 +183,10 @@ public class Finger implements Parcelable, Comparable<Finger>{
                 R.string.good_scan_message, Color.GREEN, R.string.good_scan_direction),
         BAD_SCAN(R.drawable.ic_alert_selected, R.drawable.ic_alert_deselected,
                 R.string.rescan_label, Color.argb(255, 204, 0, 0),
-                R.string.poor_scan_message, Color.RED, R.string.poor_scan_direction);
+                R.string.poor_scan_message, Color.RED, R.string.poor_scan_direction),
+        NO_FINGER_DETECTED(R.drawable.ic_alert_selected, R.drawable.ic_alert_deselected,
+            R.string.rescan_label, Color.argb(255, 204, 0, 0),
+            R.string.no_finger_detected_message, Color.RED, R.string.poor_scan_direction);
 
         private int dotSelectedDrawableId;
         private int dotDeselectedDrawableId;
