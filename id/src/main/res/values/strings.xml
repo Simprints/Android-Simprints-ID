@@ -75,27 +75,6 @@
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
-
-    <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
-    <!-- Menu Titles -->
-    <string name="action_settings">Settings</string>
-    <string name="menu_header">Simprints ID</string>
-    <string name="menu_subheader">Every person counts!</string>
-    <!-- Menu Labels -->
-    <string name="fingerprints_menu">Fingerprints</string>
-    <string name="help_menu">Help</string>
-    <string name="about_menu">About</string>
-    <string name="help_and_support_menu">Help and Support</string>
-    <string name="configuration_menu">Configuration</string>
-    <string name="nav_add_finger">Add Finger</string>
-    <string name="nav_select_finger">Select Finger</string>
-    <string name="nav_settings">Settings</string>
-    <string name="nav_sync">Sync</string>
-    <string name="nav_offline">Offline</string>
-    <string name="nav_sync_complete">Sync Complete</string>
-    <string name="nav_sync_failed">Sync Failed</string>
-    <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
-    <string name="persistence_label">Remember these settings next time</string>
     <!--SyncerSync Button Text -->
     <string name="sync_data">Sync Data</string>
     <string name="syncing">Syncing…</string>
@@ -358,6 +337,7 @@
     <string name="dashboard_card_sync_needed">you may need to sync</string>
     <string name="dashboard_card_sync_last_sync">Last sync: %1$s</string>
     <string name="dashboard_card_sync_action">SYNC</string>
+    <string name="dashboard_card_sync_failed">Sync Failed</string>
 
     <string name="dashboard_card_remotedb_title">People saved on server</string>
     <string name="dashboard_card_lastscanner_title">Last scanner used</string>
@@ -365,5 +345,8 @@
     <string name="dashboard_card_verification_title">Last Verification</string>
     <string name="dashboard_card_identification_title">Last Identification</string>
     <string name="dashboard_card_lastuser_title">Last user</string>
+    <string name="menu_privacy_notice">Privacy Notice</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_log_out">Log Out</string>
 
 </resources>

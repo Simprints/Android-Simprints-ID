@@ -4,36 +4,27 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.NavigationView
-import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
-import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.Toast
 import com.simprints.id.R
-import com.simprints.id.activities.PrivacyActivity
 import com.simprints.id.activities.RefusalActivity
-import com.simprints.id.activities.SettingsActivity
-import com.simprints.id.activities.about.AboutActivity
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
 import com.simprints.id.tools.TimeoutBar
 import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.app_bar_main.*
+
 import kotlinx.android.synthetic.main.content_main.*
 
 class CollectFingerprintsActivity :
     AppCompatActivity(),
-    CollectFingerprintsContract.View,
-    NavigationView.OnNavigationItemSelectedListener {
+    CollectFingerprintsContract.View {
 
     override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
 
@@ -44,7 +35,6 @@ class CollectFingerprintsActivity :
     override lateinit var progressBar: ProgressBar
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
-    override lateinit var syncItem: MenuItem
     override lateinit var tryDifferentFingerSplash: View
 
     private var rightToLeft: Boolean = false
@@ -57,7 +47,6 @@ class CollectFingerprintsActivity :
 
         viewPresenter = CollectFingerprintsPresenter(this, this)
         initBar()
-        initDrawer()
         initViewFields()
         viewPresenter.start()
     }
@@ -72,18 +61,8 @@ class CollectFingerprintsActivity :
         supportActionBar?.title = viewPresenter.getTitle()
     }
 
-    private fun initDrawer() {
-        nav_view.itemIconTintList = null
-        val toggle = ActionBarDrawerToggle(
-            this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawer_layout.addDrawerListener(toggle)
-        toggle.syncState()
-        nav_view.setNavigationItemSelectedListener(this)
-    }
-
     private fun initViewFields() {
         viewPager = view_pager
-        syncItem = nav_view.menu.findItem(R.id.nav_sync)
         indicatorLayout = indicator_layout
         scanButton = scan_button
         progressBar = pb_timeout
@@ -151,30 +130,12 @@ class CollectFingerprintsActivity :
 
     override fun onBackPressed() {
         when {
-            drawer_layout.isDrawerOpen(GravityCompat.START) -> drawer_layout.closeDrawer(GravityCompat.START)
             viewPresenter.isScanning() -> viewPresenter.handleBackPressedWhileScanning()
             else -> {
                 viewPresenter.handleOnBackPressedToLeave()
                 startActivityForResult(Intent(this, RefusalActivity::class.java), REFUSAL_ACTIVITY_REQUEST)
             }
         }
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_autoAdd -> viewPresenter.handleAutoAddFingerPressed()
-            R.id.nav_add -> viewPresenter.handleAddFingerPressed()
-            R.id.nav_help -> Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
-            R.id.privacy -> startActivityForResult(Intent(this, PrivacyActivity::class.java), PRIVACY_ACTIVITY_REQUEST_CODE)
-            R.id.nav_sync -> {
-                viewPresenter.handleSyncPressed()
-                return true
-            }
-            R.id.nav_about -> startActivityForResult(Intent(this, AboutActivity::class.java), ABOUT_ACTIVITY_REQUEST_CODE)
-            R.id.nav_settings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
-        }
-        drawer_layout.closeDrawer(GravityCompat.START)
-        return true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) =
