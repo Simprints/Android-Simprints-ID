@@ -46,12 +46,12 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private val scannerButtonListener = ButtonListener {
         if (presenter.isConfirmDialogShown)
             presenter.handleConfirmFingerprintsAndContinue()
-        else if (!shouldNotEnableScanButton())
+        else if (shouldEnableScanButton())
             toggleContinuousCapture()
     }
 
-    private fun shouldNotEnableScanButton() = presenter.currentFinger().isGoodScan ||
-        presenter.isTryDifferentFingerSplashShown || presenter.isNudging
+    private fun shouldEnableScanButton() = !presenter.currentFinger().isGoodScan &&
+        !presenter.isTryDifferentFingerSplashShown && !presenter.isNudging
 
     init {
         ((view as Activity).application as Application).component.inject(this)
@@ -123,7 +123,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 reconnect()
             }
             UN20_SDK_ERROR -> // The UN20 throws an SDK error if it doesn't detect a finger
-                noFingerTemplateDetected()
+                handleNoFingerTemplateDetected()
             else -> {
                 cancelCaptureUI()
                 presenter.handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "CollectFingerprintsScanningHelper"))
@@ -223,7 +223,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     // For hardware version <=4, set bad scan if force capture isn't possible
-    private fun noFingerTemplateDetected() {
+    private fun handleNoFingerTemplateDetected() {
         currentFingerStatus = NO_FINGER_DETECTED
         Vibrate.vibrate(context, preferencesManager.vibrateMode)
         presenter.refreshDisplay()
@@ -242,7 +242,9 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         setGoodOrBadScanAndNudgeIfNecessary(quality)
         Vibrate.vibrate(context, preferencesManager.vibrateMode)
         presenter.refreshDisplay()
-        if (currentFingerStatus == BAD_SCAN) presenter.showSplashAndAddNewFingerIfNecessary()
+        if (currentFingerStatus == BAD_SCAN) {
+            presenter.showSplashAndAddNewFingerIfNecessary()
+        }
         presenter.checkScannedFingersAndCreateMapToShowDialog()
     }
 
