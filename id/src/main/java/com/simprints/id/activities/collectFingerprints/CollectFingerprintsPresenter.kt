@@ -51,6 +51,8 @@ class CollectFingerprintsPresenter(private val context: Context,
     override val activeFingers = ArrayList<Finger>()
     override var currentActiveFingerNo: Int = 0
     override var isConfirmDialogShown = false
+    override var isTryDifferentFingerSplashShown = false
+    override var isNudging = false
     private var numberOfFingersAdded = 0
 
     init {
@@ -132,9 +134,13 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun showSplashAndAddNewFingerIfNecessary() {
-        if (tooManyBadScans(currentFinger()) && haveNotExceedMaximumNumberOfFingersToAdd()) {
-            fingerDisplayHelper.showSplashAndAddNewFinger()
-            numberOfFingersAdded++
+        if (tooManyBadScans(currentFinger())) {
+            if (haveNotExceedMaximumNumberOfFingersToAdd()) {
+                fingerDisplayHelper.showSplashAndAddNewFinger()
+                numberOfFingersAdded++
+            } else if (!currentFinger().isLastFinger) {
+                fingerDisplayHelper.showSplashAndNudgeIfNecessary()
+            }
         }
     }
 
@@ -252,12 +258,20 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun checkScannedFingersAndCreateMapToShowDialog() {
-        if (everyActiveFingerHasBeenScanned()) {
+        if (everyActiveFingerHasBeenScanned() && isGoodScanOrShouldNotAddAnyMoreFingers()) {
             if (weHaveTheMinimumNumberOfAnyQualityScans() || weHaveTheMinimumNumberOfGoodScans()) {
                 createMapAndShowDialog()
             }
         }
     }
+
+    private fun isGoodScanOrShouldNotAddAnyMoreFingers() = currentFinger().isGoodScan ||
+        onLastFingerAndTooManyBadScansAndNoMoreFingersToAutoAdd()
+
+    private fun onLastFingerAndTooManyBadScansAndNoMoreFingersToAutoAdd(): Boolean =
+        currentFinger().isLastFinger &&
+            currentFinger().numberOfBadScans >= numberOfBadScansRequiredToAutoAddNewFinger &&
+            !haveNotExceedMaximumNumberOfFingersToAdd()
 
     private fun weHaveTheMinimumNumberOfGoodScans(): Boolean =
         getCollectedFingerprints().filter { it.isGoodScan }.size >= minimumNumberOfGoodScans
