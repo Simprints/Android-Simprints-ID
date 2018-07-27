@@ -284,6 +284,9 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         //Mock app RealmSyncInfo for syncParams
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup(), rl_Person(peopleToDownload.last()))) })
 
+        // Mock when trying to save the syncInfo
+        whenever(localDbMock.updateSyncInfo(anyNotNull())).thenReturn(Completable.complete())
+
         val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager), JsonHelper.gson)
 
         return sync.downloadNewPatients({ false }, syncParams).test()
