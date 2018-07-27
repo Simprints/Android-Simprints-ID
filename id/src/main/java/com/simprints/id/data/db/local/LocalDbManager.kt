@@ -57,6 +57,7 @@ interface LocalDbManager {
     fun loadProjectFromLocal(projectId: String): Single<Project>
 
     //Sync
+    fun updateSyncInfo(syncParams: SyncTaskParameters): Completable
     /** @throws NoStoredLastSyncedInfoException */
     fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo>
 
