@@ -188,13 +188,3 @@ fun verificationNotAMatch(verifyTestRule: ActivityTestRule<CheckLoginFromIntentA
     assertTrue(verification.confidence > 0)
     assertEquals(Tier.TIER_5, verification.tier)
 }
-
-private fun exitFromCollectFingerprints() {
-    log("exitFromCollectFingerprints")
-    pressBackButton()
-}
-
-private fun pressBackButton() {
-    log("pressBackButton")
-    pressBack()
-}
