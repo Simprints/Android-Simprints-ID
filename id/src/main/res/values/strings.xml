@@ -242,14 +242,11 @@
     <string name="button_submit">Submit</string>
     <string name="button_scan_prints">Scan Fingerprints</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_here">Scanner not here</string>
-    <string name="scanner_not_working">Scanner not working</string>
-    <string name="unable_to_capture_a_good_scan">Unable to capture a \'good scan\'</string>
-    <string name="beneficiary_was_physically_unable">Beneficiary was physically unable to give fingerprints (e.g. too painful, missing fingers)</string>
     <string name="beneficiary_refused">Beneficiary refused</string>
+    <string name="scanner_not_working">Scanner not working</string>
     <string name="other">Other</string>
     <!-- Text Prompt -->
-    <string name="hint_other_reason">More info…</string>
+    <string name="hint_other_reason">Additional Information</string>
 
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
