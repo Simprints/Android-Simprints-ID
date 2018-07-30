@@ -108,19 +108,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View{
         }
     }
 
-//    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-//        val id = item.itemId
-//
-//        when (id) {
-//            R.id.nav_help -> Toast.makeText(this, R.string.coming_soon, Toast.LENGTH_SHORT).show()
-//            R.id.privacy -> startActivityForResult(Intent(this, PrivacyActivity::class.java), PRIVACY_ACTIVITY_REQUEST_CODE)
-//            R.id.nav_about -> startActivityForResult(Intent(this, AboutActivity::class.java), ABOUT_ACTIVITY_REQUEST_CODE)
-//            R.id.nav_settings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
-//            R.id.logout -> logout()
-//        }
-//        return true
-//    }
-
     private fun logout() {
         viewPresenter.logout()
         startActivity(Intent(this, RequestLoginActivity::class.java))
