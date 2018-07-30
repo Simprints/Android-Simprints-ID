@@ -2,6 +2,7 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.Application
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
@@ -35,6 +36,8 @@ import javax.inject.Singleton
 @JvmSuppressWildcards(false)
 open class PreferencesModule {
 
+    @Provides @Singleton fun provideRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+
     @Provides @Singleton fun provideSharedPreferences(app: Application): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
 
     @Provides @Singleton fun provideImprovedSharedPreferences(basePrefs: SharedPreferences): ImprovedSharedPreferences = ImprovedSharedPreferencesImpl(basePrefs)
@@ -62,8 +65,9 @@ open class PreferencesModule {
                                                                             locationSerializer)
 
     @Provides @Singleton fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences,
+                                                               remoteConfig: FirebaseRemoteConfig,
                                                                @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                                                               @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, fingerIdToBooleanSerializer, groupSerializer)
+                                                               @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, remoteConfig, fingerIdToBooleanSerializer, groupSerializer)
 
     @Provides @Singleton fun provideSyncPreferencesManager(prefs: ImprovedSharedPreferences): SyncPreferencesManager = SyncPreferencesManagerImpl(prefs)
 

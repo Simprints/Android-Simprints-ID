@@ -1,5 +1,6 @@
 package com.simprints.id.data.prefs.settings
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
@@ -9,6 +10,7 @@ import com.simprints.libsimprints.FingerIdentifier
 
 
 class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
+                                     remoteConfig: FirebaseRemoteConfig,
                                      fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                      groupSerializer: Serializer<Constants.GROUP>)
     : SettingsPreferencesManager {
@@ -59,6 +61,22 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
             .map { Pair(it, false) }
             .toMap()
 
+    }
+
+    init {
+        remoteConfig.setDefaults(mapOf(
+            NUDGE_MODE_KEY to NUDGE_MODE_DEFAULT,
+            QUALITY_THRESHOLD_KEY to QUALITY_THRESHOLD_DEFAULT,
+            NB_IDS_KEY to NB_IDS_DEFAULT,
+            LANGUAGE_KEY to LANGUAGE_DEFAULT,
+            MATCHER_TYPE_KEY to MATCHER_TYPE_DEFAULT,
+            TIMEOUT_KEY to TIMEOUT_DEFAULT,
+            SYNC_GROUP_KEY to SYNC_GROUP_DEFAULT,
+            MATCH_GROUP_KEY to MATCH_GROUP_DEFAULT,
+            VIBRATE_KEY to VIBRATE_DEFAULT,
+            MATCHING_END_WAIT_TIME_KEY to MATCHING_END_WAIT_TIME_DEFAULT,
+            FINGER_STATUS_KEY to fingerIdToBooleanSerializer.serialize(FINGER_STATUS_DEFAULT)
+        ))
     }
 
     // Should the UI automatically slide forward?
