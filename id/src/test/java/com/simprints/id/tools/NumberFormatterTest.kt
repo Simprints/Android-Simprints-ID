@@ -20,7 +20,7 @@ class NumberFormatterTest {
         val targetEnglishNumber = "1,234,567,890"
 
         Assert.assertEquals(targetEnglishNumber,
-            NumberFormatter().getFormattedIntegerString(rawNumber, Locale.ENGLISH))
+            NumberFormatter(Locale.ENGLISH).getFormattedIntegerString(rawNumber))
     }
 
     @Test
@@ -29,7 +29,7 @@ class NumberFormatterTest {
         val targetGermanNumber = "1.234.567.890"
 
         Assert.assertEquals(targetGermanNumber,
-            NumberFormatter().getFormattedIntegerString(rawNumber, Locale.GERMAN))
+            NumberFormatter(Locale.GERMAN).getFormattedIntegerString(rawNumber))
     }
 
     @Test
@@ -38,7 +38,7 @@ class NumberFormatterTest {
         val targetHindiNumber = "1,23,45,67,890"
 
         Assert.assertEquals(targetHindiNumber,
-            NumberFormatter().getFormattedIntegerString(rawNumber, hindiLocale))
+            NumberFormatter(hindiLocale).getFormattedIntegerString(rawNumber))
     }
 
     @Config(sdk = [19])
@@ -48,7 +48,7 @@ class NumberFormatterTest {
         val targetEnglishNumber = "1,234,567,890"
 
         Assert.assertEquals(targetEnglishNumber,
-            NumberFormatter().getFormattedIntegerString(rawNumber, Locale.ENGLISH))
+            NumberFormatter(Locale.ENGLISH).getFormattedIntegerString(rawNumber))
     }
 
     @Config(sdk = [19])
@@ -58,6 +58,6 @@ class NumberFormatterTest {
         val targetEnglishNumber = "1,234,567,890"
 
         Assert.assertEquals(targetEnglishNumber,
-            NumberFormatter().getFormattedIntegerString(rawNumber, hindiLocale))
+            NumberFormatter(hindiLocale).getFormattedIntegerString(rawNumber))
     }
 }
