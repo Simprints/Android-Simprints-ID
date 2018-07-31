@@ -77,7 +77,8 @@ class DashboardCardsFactory(private val component: AppComponent) {
                 position,
                 R.drawable.local_db,
                 getLocalDbInfoTitle(),
-                NumberFormatter().getFormattedIntegerString(numberOfPeople, LanguageHelper.localeFor(preferencesManager.language)))
+                NumberFormatter(LanguageHelper.localeFor(preferencesManager.language))
+                    .getFormattedIntegerString(numberOfPeople))
         }.doOnError { it.printStackTrace() }
 
     private fun getLocalDbInfoTitle(): String =
