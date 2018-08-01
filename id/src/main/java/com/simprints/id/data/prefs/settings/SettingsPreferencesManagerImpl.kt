@@ -8,6 +8,7 @@ import com.simprints.id.data.prefs.preferenceType.RemoteConfigPrimitivePreferenc
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.id.domain.Constants
 import com.simprints.libsimprints.FingerIdentifier
+import timber.log.Timber
 
 
 class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
@@ -120,9 +121,4 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     override var fingerStatus: Map<FingerIdentifier, Boolean>
         by ComplexPreference(prefs, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
-
-    init {
-        remoteConfig.setDefaults(remoteConfigDefaults)
-        remoteConfig.activateFetched()
-    }
 }

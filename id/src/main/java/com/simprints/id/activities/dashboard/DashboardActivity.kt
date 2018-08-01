@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
 import android.view.Menu
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.PrivacyActivity
@@ -19,12 +21,14 @@ import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
 import org.jetbrains.anko.support.v4.onRefresh
+import timber.log.Timber
 import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View{
 
     @Inject lateinit var dataManager: DataManager
     @Inject lateinit var preferences: PreferencesManager
+    @Inject lateinit var remoteConfig: FirebaseRemoteConfig
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -46,6 +50,15 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View{
         setMenuItemClickListener()
 
         initCards()
+
+        // STOPSHIP
+        remoteConfig.setConfigSettings(FirebaseRemoteConfigSettings.Builder().setDeveloperModeEnabled(true).build())
+        val task = remoteConfig.fetch(0)
+        task.addOnCompleteListener {
+            remoteConfig.activateFetched()
+            Timber.d("HERE WE GO : activateFetched")
+        }
+        Timber.d("HERE WE GO : fetch")
     }
 
     private fun initCards() {
