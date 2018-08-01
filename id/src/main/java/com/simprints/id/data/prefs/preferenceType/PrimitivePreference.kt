@@ -20,7 +20,7 @@ import kotlin.reflect.KProperty
  * Caching: the value of the property is cached to reduce the number of reads and writes to the
  * Shared Preferences: at most one read on first access, and one write per set.
  */
-class PrimitivePreference<T : Any>(private val preferences: ImprovedSharedPreferences,
+open class PrimitivePreference<T : Any>(private val preferences: ImprovedSharedPreferences,
                                   private val key: String,
                                   private val defValue: T) {
 
@@ -30,15 +30,15 @@ class PrimitivePreference<T : Any>(private val preferences: ImprovedSharedPrefer
         }
     }
 
-    private var value: T by lazyVar {
+    protected var value: T by lazyVar {
         preferences.getPrimitive(key, defValue)
     }
 
     @Synchronized
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
+    open operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
 
     @Synchronized
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
         this.value = value
         preferences.edit()
                 .putPrimitive(key, value)
