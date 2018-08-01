@@ -1,12 +1,14 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
+import com.simprints.id.data.analytics.SessionEventsManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     component: AppComponent) : CheckLoginPresenter(view, component), CheckLoginFromIntentContract.Presenter {
@@ -14,6 +16,8 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var possibleLegacyApiKey: String = ""
     private var setupFailed: Boolean = false
+
+    @Inject lateinit var sessionEventManager: SessionEventsManager
 
     init {
         component.inject(this)
@@ -25,6 +29,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         try {
             extractSessionParameters()
             preferencesManager.lastUserUsed = preferencesManager.userId
+            sessionEventManager.createSessionEvent()
         } catch (exception: InvalidCalloutError) {
             view.openAlertActivityForError(exception.alertType)
             setupFailed = true
