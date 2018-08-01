@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/menu_privacy_notice"
+        android:id="@+id/menuPrivacyNotice" />
+    <item android:title="@string/menu_settings"
+        android:id="@+id/menuSettings" />
+    <item android:title="@string/menu_log_out"
+        android:id="@+id/menuLogout" />
+</menu>

@@ -107,6 +107,7 @@ open class SyncExecutor(private val dbManager: DbManager,
             try {
                 reader.beginArray()
                 var totalDownloaded = 0
+                dbManager.local.updateSyncInfo(syncParams).subscribe()
                 while (reader.hasNext() && !isInterrupted()) {
                     dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
                         totalDownloaded++

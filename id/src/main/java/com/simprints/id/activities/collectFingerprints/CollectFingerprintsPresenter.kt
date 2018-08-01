@@ -11,7 +11,6 @@ import com.simprints.id.activities.collectFingerprints.confirmFingerprints.Confi
 import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
-import com.simprints.id.activities.collectFingerprints.sync.CollectFingerprintsSyncHelper
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
@@ -42,7 +41,6 @@ class CollectFingerprintsPresenter(private val context: Context,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var timeHelper: TimeHelper
 
-    private lateinit var syncHelper: CollectFingerprintsSyncHelper
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
     private lateinit var fingerDisplayHelper: CollectFingerprintsFingerDisplayHelper
     private lateinit var indicatorsHelper: CollectFingerprintsIndicatorsHelper
@@ -51,6 +49,8 @@ class CollectFingerprintsPresenter(private val context: Context,
     override val activeFingers = ArrayList<Finger>()
     override var currentActiveFingerNo: Int = 0
     override var isConfirmDialogShown = false
+    override var isTryDifferentFingerSplashShown = false
+    override var isNudging = false
     private var numberOfFingersAdded = 0
 
     init {
@@ -61,20 +61,15 @@ class CollectFingerprintsPresenter(private val context: Context,
         preferencesManager.msSinceBootOnMainStart = timeHelper.msSinceBoot()
         LanguageHelper.setLanguage(context, preferencesManager.language)
 
-        initSyncHelper(context, view)
-        initFingerDisplayHelper(context, view)
+        initFingerDisplayHelper(view)
         initIndicatorsHelper(context, view)
         initScanningHelper(context, view)
         initScanButtonListeners()
         refreshDisplay()
     }
 
-    private fun initSyncHelper(context: Context, view: CollectFingerprintsContract.View) {
-        syncHelper = CollectFingerprintsSyncHelper(context, view)
-    }
-
-    private fun initFingerDisplayHelper(context: Context, view: CollectFingerprintsContract.View) {
-        fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(context, view, this)
+    private fun initFingerDisplayHelper(view: CollectFingerprintsContract.View) {
+        fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(view, this)
     }
 
     private fun initIndicatorsHelper(context: Context, view: CollectFingerprintsContract.View) {
@@ -117,24 +112,14 @@ class CollectFingerprintsPresenter(private val context: Context,
         scanningHelper.toggleContinuousCapture()
     }
 
-    override fun handleAutoAddFingerPressed() {
-        if (isScanning()) {
-            scanningHelper.toggleContinuousCapture()
-        }
-        fingerDisplayHelper.handleAutoAddFinger()
-    }
-
-    override fun handleAddFingerPressed() {
-        if (isScanning()) {
-            scanningHelper.toggleContinuousCapture()
-        }
-        fingerDisplayHelper.launchAddFingerDialog()
-    }
-
     override fun showSplashAndAddNewFingerIfNecessary() {
-        if (tooManyBadScans(currentFinger()) && haveNotExceedMaximumNumberOfFingersToAdd()) {
-            fingerDisplayHelper.showSplashAndAddNewFinger()
-            numberOfFingersAdded++
+        if (tooManyBadScans(currentFinger())) {
+            if (haveNotExceedMaximumNumberOfFingersToAdd()) {
+                fingerDisplayHelper.showSplashAndAddNewFinger()
+                numberOfFingersAdded++
+            } else if (!currentFinger().isLastFinger) {
+                fingerDisplayHelper.showSplashAndNudgeIfNecessary()
+            }
         }
     }
 
@@ -166,22 +151,16 @@ class CollectFingerprintsPresenter(private val context: Context,
         view.refreshFingerFragment()
     }
 
-    override fun handleSyncPressed() {
-        syncHelper.sync()
-    }
-
     override fun handleTryAgainFromDifferentActivity() {
         scanningHelper.reconnect()
     }
 
     override fun handleOnStart() {
         scanningHelper.startListeners()
-        syncHelper.startListeners()
     }
 
     override fun handleOnStop() {
         scanningHelper.stopListeners()
-        syncHelper.stopListeners()
     }
 
     override fun handleOnBackPressedToLeave() {
@@ -252,12 +231,20 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun checkScannedFingersAndCreateMapToShowDialog() {
-        if (everyActiveFingerHasBeenScanned()) {
+        if (everyActiveFingerHasBeenScanned() && isGoodScanOrShouldNotAddAnyMoreFingers()) {
             if (weHaveTheMinimumNumberOfAnyQualityScans() || weHaveTheMinimumNumberOfGoodScans()) {
                 createMapAndShowDialog()
             }
         }
     }
+
+    private fun isGoodScanOrShouldNotAddAnyMoreFingers() = currentFinger().isGoodScan ||
+        onLastFingerAndTooManyBadScansAndNoMoreFingersToAutoAdd()
+
+    private fun onLastFingerAndTooManyBadScansAndNoMoreFingersToAutoAdd(): Boolean =
+        currentFinger().isLastFinger &&
+            currentFinger().numberOfBadScans >= numberOfBadScansRequiredToAutoAddNewFinger &&
+            !haveNotExceedMaximumNumberOfFingersToAdd()
 
     private fun weHaveTheMinimumNumberOfGoodScans(): Boolean =
         getCollectedFingerprints().filter { it.isGoodScan }.size >= minimumNumberOfGoodScans

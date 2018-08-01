@@ -221,7 +221,7 @@ class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
         moduleId = syncParams.moduleId
     )
 
-    private fun updateSyncInfo(syncParams: SyncTaskParameters): Completable =
+    override fun updateSyncInfo(syncParams: SyncTaskParameters): Completable =
         getRealmInstance().map { realm ->
             buildQueryForPerson(realm, syncParams)
                 .equalTo(TO_SYNC_FIELD, false)
