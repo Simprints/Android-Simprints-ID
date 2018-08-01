@@ -9,6 +9,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
@@ -18,7 +19,7 @@ import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +38,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
 
     override var module by lazyVar {
@@ -112,18 +114,18 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     }
 
     @Test
-    fun shouldCreateTheLastUserCard_onlyWhenAnLastUserEventHappened() {
+    fun shouldCreateTheCurrentUserCard_onlyIfValidUserSignedIn() {
         val factory = DashboardCardsFactory(testAppComponent)
-        val lastUser = "someone"
+        val signedInUser = "someone"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-            { lastUser.also { preferencesManager.lastUserUsed = lastUser } },
-            { preferencesManager.lastUserUsed = "" },
-            app.getString(R.string.dashboard_card_lastuser_title))
+            { signedInUser.also { loginInfoManager.signedInUserId = signedInUser } },
+            { loginInfoManager.signedInUserId = "" },
+            app.getString(R.string.dashboard_card_currentuser_title))
     }
 
     @Test
-    fun shouldCreateTheLasScannerCard_onlyWhenAnLasScannerEventHappened() {
+    fun shouldCreateTheLastScannerCard_onlyWhenALastScannerEventHappened() {
         val factory = DashboardCardsFactory(testAppComponent)
         val lastScanner = "SPXXXX"
         assertThatCardEventsAreCreatedOnlyWhenRequired(

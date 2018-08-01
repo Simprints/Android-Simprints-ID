@@ -10,6 +10,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Constants
+import com.simprints.id.tools.LanguageHelper
+import com.simprints.id.tools.NumberFormatter
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import io.reactivex.Single
 import java.text.DateFormat
@@ -34,10 +36,10 @@ class DashboardCardsFactory(private val component: AppComponent) {
 
     fun createCards() = arrayListOf(
         createProjectInfoCard(),
+        createCurrentUserInfoCard(),
         createLocalDbInfoCard(),
         createSyncInfoCard(),
         createLastScannerInfoCard(),
-        createLastUserInfoCard(),
         createLastEnrolInfoCard(),
         createLastVerificationInfoCard(),
         createLastIdentificationInfoCard()
@@ -55,14 +57,28 @@ class DashboardCardsFactory(private val component: AppComponent) {
                     it.description)
             }.doOnError { it.printStackTrace() }
 
-    fun createLocalDbInfoCard(position: Int = 1): Single<DashboardCard> =
-        dbManager.getPeopleCount(preferencesManager.syncGroup).map {
+    private fun createCurrentUserInfoCard(position: Int = 1): Single<DashboardCard>? =
+        if (loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()) {
+            Single.just(DashboardCard(
+                DashboardCardType.CURRENT_USER,
+                position,
+                R.drawable.current_user,
+                androidResourcesHelper.getString(R.string.dashboard_card_currentuser_title),
+                loginInfoManager.getSignedInUserIdOrEmpty())
+            ).doOnError { it.printStackTrace() }
+        } else {
+            null
+        }
+
+    fun createLocalDbInfoCard(position: Int = 2): Single<DashboardCard> =
+        dbManager.getPeopleCount(preferencesManager.syncGroup).map { numberOfPeople ->
             DashboardCard(
                 DashboardCardType.LOCAL_DB,
                 position,
                 R.drawable.local_db,
                 getLocalDbInfoTitle(),
-                getLocalDbInfoDescription(it))
+                NumberFormatter(LanguageHelper.localeFor(preferencesManager.language))
+                    .getFormattedIntegerString(numberOfPeople))
         }.doOnError { it.printStackTrace() }
 
     private fun getLocalDbInfoTitle(): String =
@@ -72,16 +88,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
             else
                 R.string.dashboard_card_localdb_sync_project_title)
 
-    private fun getLocalDbInfoDescription(numberOfPeople: Int): String =
-        if (preferencesManager.syncGroup == Constants.GROUP.USER)
-            String.format(
-                androidResourcesHelper.getString(R.string.dashboard_card_localdb_sync_user_text),
-                loginInfoManager.signedInUserId,
-                numberOfPeople)
-        else
-            "$numberOfPeople"
-
-    private fun createSyncInfoCard(position: Int = 2): Single<DashboardSyncCard>? =
+    private fun createSyncInfoCard(position: Int = 3): Single<DashboardSyncCard>? =
         Single.just(
             DashboardSyncCard(
                 component,
@@ -91,7 +98,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
                 androidResourcesHelper.getString(R.string.dashboard_card_sync_title),
                 dateFormat))
 
-    private fun createLastScannerInfoCard(position: Int = 3): Single<DashboardCard>? {
+    private fun createLastScannerInfoCard(position: Int = 4): Single<DashboardCard>? {
         return if (preferencesManager.lastScannerUsed.isNotEmpty()) {
             Single.just(DashboardCard(
                 DashboardCardType.LAST_SCANNER,
@@ -99,21 +106,6 @@ class DashboardCardsFactory(private val component: AppComponent) {
                 R.drawable.scanner,
                 androidResourcesHelper.getString(R.string.dashboard_card_lastscanner_title),
                 preferencesManager.lastScannerUsed)
-            ).doOnError { it.printStackTrace() }
-        } else {
-            null
-        }
-    }
-
-    //TODO: think about the option to use Maybe
-    private fun createLastUserInfoCard(position: Int = 4): Single<DashboardCard>? {
-        return if (preferencesManager.lastUserUsed.isNotEmpty()) {
-            Single.just(DashboardCard(
-                DashboardCardType.LAST_USER,
-                position,
-                R.drawable.last_user,
-                androidResourcesHelper.getString(R.string.dashboard_card_lastuser_title),
-                preferencesManager.lastUserUsed)
             ).doOnError { it.printStackTrace() }
         } else {
             null

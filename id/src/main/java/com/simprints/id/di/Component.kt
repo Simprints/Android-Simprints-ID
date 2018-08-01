@@ -2,7 +2,7 @@ package com.simprints.id.di
 
 import com.simprints.id.Application
 import com.simprints.id.activities.PrivacyActivity
-import com.simprints.id.activities.RefusalActivity
+import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.TutorialActivity
 import com.simprints.id.activities.about.AboutActivity
@@ -17,7 +17,6 @@ import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFro
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
 import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
-import com.simprints.id.activities.collectFingerprints.sync.CollectFingerprintsSyncHelper
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
 import com.simprints.id.activities.dashboard.DashboardPresenter
@@ -27,6 +26,7 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.activities.matching.MatchingPresenter
+import com.simprints.id.activities.refusal.RefusalPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
@@ -43,7 +43,7 @@ interface AppComponent {
     fun inject(guidSelectionService: GuidSelectionService)
     fun inject(alertActivity: AlertActivity)
     fun inject(aboutActivity: AboutActivity)
-    fun inject(refusalActivity: RefusalActivity)
+    fun inject(refusalPresenter: RefusalPresenter)
     fun inject(privacyActivity: PrivacyActivity)
     fun inject(tutorialActivity: TutorialActivity)
     fun inject(settingsActivity: SettingsActivity)
@@ -62,7 +62,6 @@ interface AppComponent {
     fun inject(dashboardSyncCard: DashboardSyncCard)
     fun inject(loginPresenter: LoginPresenter)
     fun inject(collectFingerprintsPresenter: CollectFingerprintsPresenter)
-    fun inject(collectFingerprintsSyncHelper: CollectFingerprintsSyncHelper)
     fun inject(collectFingerprintsScanningHelper: CollectFingerprintsScanningHelper)
     fun inject(collectFingerprintsFingerDisplayHelper: CollectFingerprintsFingerDisplayHelper)
     fun inject(requestLoginActivity: RequestLoginActivity)
