@@ -337,7 +337,7 @@
     <string name="dashboard_card_sync_failed">Sync Failed</string>
 
     <string name="dashboard_card_remotedb_title">People saved on server</string>
-    <string name="dashboard_card_lastscanner_title">Last scanner used</string>
+    <string name="dashboard_card_lastscanner_title">Scanner used</string>
     <string name="dashboard_card_enrol_title">Last Enrol</string>
     <string name="dashboard_card_verification_title">Last Verification</string>
     <string name="dashboard_card_identification_title">Last Identification</string>
