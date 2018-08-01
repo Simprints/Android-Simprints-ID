@@ -17,7 +17,6 @@ import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFro
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
 import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
-import com.simprints.id.activities.collectFingerprints.sync.CollectFingerprintsSyncHelper
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
 import com.simprints.id.activities.dashboard.DashboardPresenter
@@ -63,7 +62,6 @@ interface AppComponent {
     fun inject(dashboardSyncCard: DashboardSyncCard)
     fun inject(loginPresenter: LoginPresenter)
     fun inject(collectFingerprintsPresenter: CollectFingerprintsPresenter)
-    fun inject(collectFingerprintsSyncHelper: CollectFingerprintsSyncHelper)
     fun inject(collectFingerprintsScanningHelper: CollectFingerprintsScanningHelper)
     fun inject(collectFingerprintsFingerDisplayHelper: CollectFingerprintsFingerDisplayHelper)
     fun inject(requestLoginActivity: RequestLoginActivity)

@@ -2,7 +2,6 @@ package com.simprints.id.activities.collectFingerprints
 
 import android.app.ProgressDialog
 import android.content.Intent
-import android.view.MenuItem
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -36,9 +35,6 @@ interface CollectFingerprintsContract {
         var tryDifferentFingerSplash: android.view.View
         var pageAdapter: FingerPageAdapter
 
-        // Sync
-        var syncItem: MenuItem
-
         // Scanning
         var scanButton: Button
         var progressBar: ProgressBar
@@ -66,9 +62,6 @@ interface CollectFingerprintsContract {
         fun handleTryAgainFromDifferentActivity()
         fun handleUnexpectedError(error: SimprintsError)
 
-        // Sync
-        fun handleSyncPressed()
-
         // Scanning
         var isConfirmDialogShown: Boolean
         fun isScanning(): Boolean
@@ -79,8 +72,7 @@ interface CollectFingerprintsContract {
         // Finger
         var isTryDifferentFingerSplashShown: Boolean
         var isNudging: Boolean
-        fun handleAutoAddFingerPressed()
-        fun handleAddFingerPressed()
+
         fun currentFinger(): Finger
         fun viewPagerOnPageSelected(position: Int)
         fun checkScannedFingersAndCreateMapToShowDialog()
