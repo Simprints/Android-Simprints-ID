@@ -20,7 +20,7 @@ public class LanguageHelper {
         return config;
     }
 
-    private static Locale localeFor(String languageString) {
+    public static Locale localeFor(String languageString) {
         Locale locale;
 
         /*

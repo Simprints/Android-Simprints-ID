@@ -10,6 +10,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Constants
+import com.simprints.id.tools.LanguageHelper
+import com.simprints.id.tools.NumberFormatter
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import io.reactivex.Single
 import java.text.DateFormat
@@ -75,7 +77,8 @@ class DashboardCardsFactory(private val component: AppComponent) {
                 position,
                 R.drawable.local_db,
                 getLocalDbInfoTitle(),
-                "$numberOfPeople")
+                NumberFormatter(LanguageHelper.localeFor(preferencesManager.language))
+                    .getFormattedIntegerString(numberOfPeople))
         }.doOnError { it.printStackTrace() }
 
     private fun getLocalDbInfoTitle(): String =
