@@ -9,10 +9,14 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
+import com.simprints.id.data.analytics.SessionEventsManager
+import com.simprints.id.data.analytics.SessionEventsManagerImpl
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.LocalEventDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
+import com.simprints.id.data.db.local.realm.RealmEventDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.sync.SyncManager
@@ -154,4 +158,18 @@ open class AppModule(val app: Application) {
     @Provides
     fun provideSyncManager(analyticsManager: AnalyticsManager, syncClient: SyncClient): SyncManager =
         SyncManager(analyticsManager, syncClient)
+
+    @Provides
+    fun provideLocalEventDbManager(ctx: Context,
+                                   secureDataManager: SecureDataManager): LocalEventDbManager =
+        RealmEventDbManagerImpl(ctx).also {
+            secureDataManager.setLocalDatabaseKey("event_data", null)
+            it.initDb(secureDataManager.getLocalDbKeyOrThrow("event_data"))
+        }
+
+    @Provides
+    fun provideSessionEventsManager(ctx: Context,
+                                    eventsManager: LocalEventDbManager,
+                                    preferencesManager: PreferencesManager,
+                                    timeHelper: TimeHelper): SessionEventsManager = SessionEventsManagerImpl(ctx, eventsManager, preferencesManager, timeHelper)
 }
