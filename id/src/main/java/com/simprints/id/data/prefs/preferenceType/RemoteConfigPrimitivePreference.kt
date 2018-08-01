@@ -10,21 +10,19 @@ class RemoteConfigPrimitivePreference<T : Any>(preferences: ImprovedSharedPrefer
                                                private val remoteConfig: FirebaseRemoteConfig,
                                                remoteDefaultsMap: MutableMap<String, Any>,
                                                private val key: String,
-                                               private val defValue: T) {
-
-    private val storedDefaultValue = defValue
-    private var storedValue by PrimitivePreference(preferences, key, defValue)
+                                               private val defValue: T) : PrimitivePreference<T>(preferences, key, defValue) {
 
     init {
-        remoteDefaultsMap[key] = storedDefaultValue
+        remoteDefaultsMap[key] = defValue
     }
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+    override operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         try {
             @Suppress("UNCHECKED_CAST")
-            val value = when (defValue) {
+            value = when (defValue) {
                 is Boolean -> remoteConfig.getBoolean(key)
                 is Long -> remoteConfig.getLong(key)
+                is Short -> remoteConfig.getLong(key).toShort()
                 is Int -> remoteConfig.getLong(key).toInt()
                 is Double -> remoteConfig.getDouble(key)
                 is Float -> remoteConfig.getDouble(key).toFloat()
@@ -32,7 +30,6 @@ class RemoteConfigPrimitivePreference<T : Any>(preferences: ImprovedSharedPrefer
                 is ByteArray -> remoteConfig.getByteArray(key)
                 else -> throw NonPrimitiveTypeError.forTypeOf(defValue)
             } as T
-            storedValue = value
             return value
         } catch (e: ClassCastException) {
             throw PreferenceClassCastException.withKey(key)

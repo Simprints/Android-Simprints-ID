@@ -4,6 +4,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
+import com.simprints.id.data.prefs.preferenceType.RemoteConfigPrimitivePreference
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.id.domain.Constants
 import com.simprints.libsimprints.FingerIdentifier
@@ -63,21 +64,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     }
 
-    init {
-        remoteConfig.setDefaults(mapOf(
-            NUDGE_MODE_KEY to NUDGE_MODE_DEFAULT,
-            QUALITY_THRESHOLD_KEY to QUALITY_THRESHOLD_DEFAULT,
-            NB_IDS_KEY to NB_IDS_DEFAULT,
-            LANGUAGE_KEY to LANGUAGE_DEFAULT,
-            MATCHER_TYPE_KEY to MATCHER_TYPE_DEFAULT,
-            TIMEOUT_KEY to TIMEOUT_DEFAULT,
-            SYNC_GROUP_KEY to SYNC_GROUP_DEFAULT,
-            MATCH_GROUP_KEY to MATCH_GROUP_DEFAULT,
-            VIBRATE_KEY to VIBRATE_DEFAULT,
-            MATCHING_END_WAIT_TIME_KEY to MATCHING_END_WAIT_TIME_DEFAULT,
-            FINGER_STATUS_KEY to fingerIdToBooleanSerializer.serialize(FINGER_STATUS_DEFAULT)
-        ))
-    }
+    private val remoteConfigDefaults = mutableMapOf<String, Any>()
 
     // Should the UI automatically slide forward?
     override var nudgeMode: Boolean
@@ -125,7 +112,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // The number of seconds the screens pauses for when a match is complete
     override var matchingEndWaitTimeSeconds: Int
-        by PrimitivePreference(prefs, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
 
     // True if the fingers status should be persisted, false else
     override var fingerStatusPersist: Boolean
@@ -134,4 +121,8 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var fingerStatus: Map<FingerIdentifier, Boolean>
         by ComplexPreference(prefs, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
 
+    init {
+        remoteConfig.setDefaults(remoteConfigDefaults)
+        remoteConfig.activateFetched()
+    }
 }
