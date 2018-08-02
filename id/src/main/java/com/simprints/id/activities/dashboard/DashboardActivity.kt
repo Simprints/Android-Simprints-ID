@@ -28,7 +28,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View{
 
     @Inject lateinit var dataManager: DataManager
     @Inject lateinit var preferences: PreferencesManager
-    @Inject lateinit var remoteConfig: FirebaseRemoteConfig
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -50,15 +49,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View{
         setMenuItemClickListener()
 
         initCards()
-
-        // STOPSHIP
-        remoteConfig.setConfigSettings(FirebaseRemoteConfigSettings.Builder().setDeveloperModeEnabled(true).build())
-        val task = remoteConfig.fetch(0)
-        task.addOnCompleteListener {
-            remoteConfig.activateFetched()
-            Timber.d("HERE WE GO : activateFetched")
-        }
-        Timber.d("HERE WE GO : fetch")
     }
 
     private fun initCards() {
