@@ -3,18 +3,17 @@ package com.simprints.id.data.prefs.preferenceType
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
-import com.simprints.id.exceptions.unsafe.PreferenceClassCastException
 import timber.log.Timber
 import kotlin.reflect.KProperty
 
 class RemoteConfigPrimitivePreference<T : Any>(preferences: ImprovedSharedPreferences,
                                                private val remoteConfig: FirebaseRemoteConfig,
-                                               remoteDefaultsMap: MutableMap<String, Any>,
+                                               remoteConfigDefaults: MutableMap<String, Any>,
                                                private val key: String,
                                                private val defValue: T) : PrimitivePreference<T>(preferences, key, defValue) {
 
     init {
-        remoteConfig.setDefaults(mapOf(key to defValue))
+        remoteConfigDefaults[key] = defValue
     }
 
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
@@ -34,7 +33,7 @@ class RemoteConfigPrimitivePreference<T : Any>(preferences: ImprovedSharedPrefer
             Timber.d("HERE WE GO : $value")
             return value
         } catch (e: ClassCastException) {
-            throw PreferenceClassCastException.withKey(key)
+            return value
         }
     }
 }
