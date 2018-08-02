@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="GENERAL"
+        android:key="preferences_general"
+        >
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/language_array"
+            android:entryValues="@array/language_values"
+            android:key="language_list"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="Language" />
+        <MultiSelectListPreference
+            android:title="Select Fingers"
+            android:entries="@array/language_array"
+            android:summary="Pick the fingers you would like to scan"
+            android:entryValues="@array/language_values"/>
+        <SwitchPreference
+            android:title="Sync upon launch"
+            android:summary="Attempt sync each time app is launched"
+            android:defaultValue="false"/>
+        <SwitchPreference
+            android:title="Background Sync"
+            android:summary="Automatically sync on a set schedule"
+            android:defaultValue="true"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:layout="@layout/divider_preference" />
+    <PreferenceCategory
+        android:title="ABOUT">
+        <Preference
+            android:title="App Version"
+            android:summary="2018.3.1"
+            />
+        <Preference
+            android:title="Scanner Version"
+            android:summary="Some scanner version" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
