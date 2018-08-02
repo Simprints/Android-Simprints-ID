@@ -5,10 +5,9 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.RemoteConfigPrimitivePreference
-import com.simprints.id.tools.serializers.Serializer
 import com.simprints.id.domain.Constants
+import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
-import timber.log.Timber
 
 
 class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
@@ -97,7 +96,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Timeout seconds
     override var timeoutS: Int
-        by PrimitivePreference(prefs, TIMEOUT_KEY, TIMEOUT_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, TIMEOUT_KEY, TIMEOUT_DEFAULT)
 
     // Sync group. Default is user
     override var syncGroup: Constants.GROUP
@@ -121,4 +120,8 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     override var fingerStatus: Map<FingerIdentifier, Boolean>
         by ComplexPreference(prefs, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
+
+    init {
+         remoteConfig.setDefaults(remoteConfigDefaults)
+    }
 }
