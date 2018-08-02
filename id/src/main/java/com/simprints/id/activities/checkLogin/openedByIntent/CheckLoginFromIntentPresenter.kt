@@ -1,12 +1,16 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
+import com.simprints.id.data.analytics.DatabaseInfo
 import com.simprints.id.data.analytics.SessionEventsManager
+import com.simprints.id.data.analytics.events.CalloutEvent
+import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
+import io.reactivex.rxkotlin.subscribeBy
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -18,6 +22,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private var setupFailed: Boolean = false
 
     @Inject lateinit var sessionEventManager: SessionEventsManager
+    @Inject lateinit var dbManager: LocalDbManager
 
     init {
         component.inject(this)
@@ -30,6 +35,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             extractSessionParameters()
             preferencesManager.lastUserUsed = preferencesManager.userId
             sessionEventManager.createSessionEvent()
+            sessionEventManager.addEvent(CalloutEvent(view.parseCallout()))
         } catch (exception: InvalidCalloutError) {
             view.openAlertActivityForError(exception.alertType)
             setupFailed = true
@@ -85,6 +91,15 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         else loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()
 
     override fun handleSignedInUser() {
+        updateEventSessionWithDbInfo()
         view.openLaunchActivity()
+    }
+
+    private fun updateEventSessionWithDbInfo() {
+        dbManager.getPeopleCountFromLocal().subscribeBy(onError = {
+            it.printStackTrace()
+        }, onSuccess = {
+            sessionEventManager.updateDatabaseInfo(DatabaseInfo(it))
+        })
     }
 }

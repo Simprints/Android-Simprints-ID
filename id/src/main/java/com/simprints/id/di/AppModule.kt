@@ -168,6 +168,7 @@ open class AppModule(val app: Application) {
         }
 
     @Provides
+    @Singleton
     fun provideSessionEventsManager(ctx: Context,
                                     eventsManager: LocalEventDbManager,
                                     preferencesManager: PreferencesManager,
