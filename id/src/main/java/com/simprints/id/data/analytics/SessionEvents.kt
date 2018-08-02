@@ -1,9 +1,12 @@
 package com.simprints.id.data.analytics
 
+import com.simprints.id.data.analytics.events.Event
+import com.simprints.id.data.analytics.events.RlEvent
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import java.util.*
+import kotlin.collections.ArrayList
 
 open class SessionEvents : RealmObject {
 
@@ -22,7 +25,7 @@ open class SessionEvents : RealmObject {
     var databaseInfo: DatabaseInfo? = null
     var location: Location? = null
 
-    lateinit var events: RealmList<Event>
+    private lateinit var realmEvents: RealmList<RlEvent>
 
     fun isSessionCompleted(): Boolean = relativeEndTime > 0
 
@@ -42,5 +45,13 @@ open class SessionEvents : RealmObject {
         this.language = language
         this.device = device
         this.startTime = startTime
+        this.realmEvents = RealmList()
+    }
+
+    fun getEvents(): ArrayList<Event> = ArrayList(realmEvents.mapNotNull { it.getEvent() })
+
+    fun setEvents(events: ArrayList<Event>) {
+        realmEvents.clear()
+        realmEvents.addAll(events.map { RlEvent(it) })
     }
 }

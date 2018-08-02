@@ -24,9 +24,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.simprints.id.Application;
+import com.simprints.id.data.analytics.SessionEventsManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 @SuppressWarnings("UnusedParameters")
 public class PositionTracker implements
@@ -41,8 +45,12 @@ public class PositionTracker implements
     private PreferencesManager preferencesManager;
     private LocationRequest locationRequest;
 
+    @Inject SessionEventsManager sessionEventsManager;
+
     public PositionTracker(Activity activity, PreferencesManager preferencesManager) {
         this.activity = activity;
+        ((Application) activity.getApplicationContext()).getComponent().inject(this);
+
         this.preferencesManager = preferencesManager;
         locationRequest = new LocationRequest();
         locationRequest.setInterval(5000);
@@ -223,6 +231,7 @@ public class PositionTracker implements
     public void onLocationChanged(Location location) {
         if (location != null) {
             preferencesManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(location));
+            sessionEventsManager.updateLocation(location.getLatitude(), location.getLongitude());
             Log.INSTANCE.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
                     location.getLatitude(), location.getLongitude()));
         }

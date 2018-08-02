@@ -2,7 +2,6 @@ package com.simprints.id.di
 
 import com.simprints.id.Application
 import com.simprints.id.activities.PrivacyActivity
-import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.TutorialActivity
 import com.simprints.id.activities.about.AboutActivity
@@ -33,6 +32,7 @@ import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
 import com.simprints.id.services.scheduledSync.ScheduledSync
 import com.simprints.id.services.sync.SyncService
+import com.simprints.id.tools.PositionTracker
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
@@ -72,4 +72,5 @@ interface AppComponent {
     fun inject(alertPresenter: AlertPresenter)
     fun inject(launchPresenter: LaunchPresenter)
     fun inject(scheduledSync: ScheduledSync)
+    fun inject(positionTracker: PositionTracker)
 }
