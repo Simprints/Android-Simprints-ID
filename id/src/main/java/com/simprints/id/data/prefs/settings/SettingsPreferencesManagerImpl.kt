@@ -2,9 +2,10 @@ package com.simprints.id.data.prefs.settings
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
-import com.simprints.id.data.prefs.preferenceType.RemoteConfigPrimitivePreference
+import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
+import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
+import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
 import com.simprints.id.domain.Constants
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
@@ -46,7 +47,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
 
         private const val MATCH_GROUP_KEY = "MatchGroup"
-        private val MATCH_GROUP_DEFAULT = Constants.GROUP.USER
+        private val MATCH_GROUP_DEFAULT = Constants.GROUP.MODULE
 
         private const val VIBRATE_KEY = "VibrateOn"
         private const val VIBRATE_DEFAULT = true
@@ -68,7 +69,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Should the UI automatically slide forward?
     override var nudgeMode: Boolean
-        by PrimitivePreference(prefs, NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)
 
     // Has the CHW given consent to use Simprints ID?
     override var consent: Boolean
@@ -76,15 +77,15 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Threshold that determines the UI feedback for a given fingerprint quality
     override var qualityThreshold: Int
-        by PrimitivePreference(prefs, QUALITY_THRESHOLD_KEY, QUALITY_THRESHOLD_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, QUALITY_THRESHOLD_KEY, QUALITY_THRESHOLD_DEFAULT)
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
     override var returnIdCount: Int
-        by PrimitivePreference(prefs, NB_IDS_KEY, NB_IDS_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, NB_IDS_KEY, NB_IDS_DEFAULT)
 
     // Selected language
     override var language: String
-        by PrimitivePreference(prefs, LANGUAGE_KEY, LANGUAGE_DEFAULT)
+        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, LANGUAGE_KEY, LANGUAGE_DEFAULT)
 
     // Active language position to be displayed in the list
     override var languagePosition: Int
@@ -92,7 +93,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Matcher type
     override var matcherType: Int
-        by PrimitivePreference(prefs, MATCHER_TYPE_KEY, MATCHER_TYPE_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, MATCHER_TYPE_KEY, MATCHER_TYPE_DEFAULT)
 
     // Timeout seconds
     override var timeoutS: Int
@@ -100,15 +101,15 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Sync group. Default is user
     override var syncGroup: Constants.GROUP
-        by ComplexPreference(prefs, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
+        by RemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
 
     // Match group. Default is user
     override var matchGroup: Constants.GROUP
-        by ComplexPreference(prefs, MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT, groupSerializer)
+        by RemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT, groupSerializer)
 
     // Is the vibrate on
     override var vibrateMode: Boolean
-        by PrimitivePreference(prefs, VIBRATE_KEY, VIBRATE_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, VIBRATE_KEY, VIBRATE_DEFAULT)
 
     // The number of seconds the screens pauses for when a match is complete
     override var matchingEndWaitTimeSeconds: Int
@@ -119,7 +120,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         by PrimitivePreference(prefs, PERSIST_FINGER_KEY, PERSIST_FINGER_DEFAULT)
 
     override var fingerStatus: Map<FingerIdentifier, Boolean>
-        by ComplexPreference(prefs, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
+        by RemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
 
     init {
          remoteConfig.setDefaults(remoteConfigDefaults)
