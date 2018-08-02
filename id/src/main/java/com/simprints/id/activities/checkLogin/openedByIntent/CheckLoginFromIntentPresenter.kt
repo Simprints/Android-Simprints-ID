@@ -79,11 +79,17 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     /** @throws DifferentUserIdSignedInException */
     override fun isUserIdStoredAndMatches() =
-        if (dataManager.userId != dataManager.getSignedInUserIdOrEmpty())
-            throw DifferentUserIdSignedInException()
-        else dataManager.getSignedInUserIdOrEmpty().isNotEmpty()
+        //if (dataManager.userId != dataManager.getSignedInUserIdOrEmpty())
+        //    throw DifferentUserIdSignedInException()
+        //else
+        /** Hack to support multiple users: we do not check if the signed UserId
+        matches the userId from the Intent */
+        dataManager.getSignedInUserIdOrEmpty().isNotEmpty()
 
     override fun handleSignedInUser() {
+        /** Hack to support multiple users: If all login checks success, then we consider
+         *  the userId in the Intent as new signed User */
+        dataManager.signedInUserId = dataManager.userId
         view.openLaunchActivity()
     }
 }

@@ -113,7 +113,11 @@ class FirebaseManagerImpl(private val appContext: Context,
 
     private fun isFirestoreSignedInUserAsExpected(projectId: String, userId: String): Boolean {
         val firestoreUser = getFirebaseAuth(firestoreFirebaseApp).currentUser ?: return false
-        return firestoreUser.uid == "$projectId.$userId"
+
+        //return firestoreUser.uid == "$projectId.$userId"
+        /** Hack to support multiple users:
+        Loosey condition to make the check not user specific */
+        return firestoreUser.uid.contains(projectId)
     }
 
     private fun isLegacySignedInUserAsExpected(projectId: String): Boolean {
