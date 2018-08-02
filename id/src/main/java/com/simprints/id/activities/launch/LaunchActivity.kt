@@ -8,6 +8,7 @@ import android.view.WindowManager
 import com.simprints.id.R
 import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
+import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper
