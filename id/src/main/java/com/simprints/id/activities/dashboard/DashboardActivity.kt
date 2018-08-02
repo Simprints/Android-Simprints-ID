@@ -101,7 +101,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View{
             val id = menuItem.itemId
             when(id) {
                 R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, PrivacyActivity::class.java), PRIVACY_ACTIVITY_REQUEST_CODE)
-                R.id.menuSettings -> startActivityForResult(Intent(this, com.simprints.id.activities.settings.SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
+                R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
                 R.id.menuLogout -> logout()
             }
             true
