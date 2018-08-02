@@ -4,7 +4,6 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
 import com.simprints.id.tools.delegates.lazyVar
 import isPrimitive
-import timber.log.Timber
 import kotlin.reflect.KProperty
 
 /**
@@ -20,9 +19,9 @@ import kotlin.reflect.KProperty
  * Caching: the value of the property is cached to reduce the number of reads and writes to the
  * Shared Preferences: at most one read on first access, and one write per set.
  */
-open class PrimitivePreference<T : Any>(private val preferences: ImprovedSharedPreferences,
-                                  private val key: String,
-                                  private val defValue: T) {
+open class PrimitivePreference<T : Any>(private val prefs: ImprovedSharedPreferences,
+                                        private val key: String,
+                                        private val defValue: T) {
 
     init {
         if (!defValue.isPrimitive()) {
@@ -31,7 +30,7 @@ open class PrimitivePreference<T : Any>(private val preferences: ImprovedSharedP
     }
 
     protected var value: T by lazyVar {
-        preferences.getPrimitive(key, defValue)
+        prefs.getPrimitive(key, defValue)
     }
 
     @Synchronized
@@ -40,8 +39,8 @@ open class PrimitivePreference<T : Any>(private val preferences: ImprovedSharedP
     @Synchronized
     open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
         this.value = value
-        preferences.edit()
-                .putPrimitive(key, value)
-                .apply()
+        prefs.edit()
+            .putPrimitive(key, value)
+            .apply()
     }
 }

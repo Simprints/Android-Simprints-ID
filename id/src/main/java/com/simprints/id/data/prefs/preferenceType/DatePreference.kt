@@ -6,7 +6,7 @@ import timber.log.Timber
 import java.util.*
 import kotlin.reflect.KProperty
 
-class DatePreference(private val preferences: ImprovedSharedPreferences,
+class DatePreference(private val prefs: ImprovedSharedPreferences,
                      private val key: String,
                      private val defValue: Date?) {
 
@@ -16,7 +16,7 @@ class DatePreference(private val preferences: ImprovedSharedPreferences,
 
     private var value: Date? by lazyVar {
         Timber.d("DatePreference read $key from Shared Preferences")
-        val longTime: Long = preferences.getPrimitive(key, defValue?.time
+        val longTime: Long = prefs.getPrimitive(key, defValue?.time
             ?: NULL_DATE)
         if (longTime > NULL_DATE) {
             Date(longTime)
@@ -36,7 +36,7 @@ class DatePreference(private val preferences: ImprovedSharedPreferences,
         Timber.d("PrimitivePreference.setValue $key")
         this.value = value
         Timber.d("PrimitivePreference write $key to Shared Preferences")
-        preferences.edit()
+        prefs.edit()
             .putPrimitive(key, value?.time ?: -1)
             .apply()
     }
