@@ -55,14 +55,19 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private const val MATCHING_END_WAIT_TIME_KEY = "MatchingEndWaitTime"
         private const val MATCHING_END_WAIT_TIME_DEFAULT = 1
 
-        private const val PERSIST_FINGER_KEY = "PersistFingerStatus"
-        private const val PERSIST_FINGER_DEFAULT = false
-
         private const val FINGER_STATUS_KEY = "FingerStatus"
-        private val FINGER_STATUS_DEFAULT =  FingerIdentifier.values()
-            .map { Pair(it, false) }
-            .toMap()
-
+        private val FINGER_STATUS_DEFAULT = mapOf(
+            FingerIdentifier.RIGHT_THUMB to false,
+            FingerIdentifier.RIGHT_INDEX_FINGER to false,
+            FingerIdentifier.RIGHT_3RD_FINGER to false,
+            FingerIdentifier.RIGHT_4TH_FINGER to false,
+            FingerIdentifier.RIGHT_5TH_FINGER to false,
+            FingerIdentifier.LEFT_THUMB to true,
+            FingerIdentifier.LEFT_INDEX_FINGER to true,
+            FingerIdentifier.LEFT_3RD_FINGER to false,
+            FingerIdentifier.LEFT_4TH_FINGER to false,
+            FingerIdentifier.LEFT_5TH_FINGER to false
+        )
     }
 
     private val remoteConfigDefaults = mutableMapOf<String, Any>()
@@ -115,14 +120,11 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var matchingEndWaitTimeSeconds: Int
         by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
 
-    // True if the fingers status should be persisted, false else
-    override var fingerStatusPersist: Boolean
-        by PrimitivePreference(prefs, PERSIST_FINGER_KEY, PERSIST_FINGER_DEFAULT)
-
+    // The map of default fingers
     override var fingerStatus: Map<FingerIdentifier, Boolean>
         by RemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
 
     init {
-         remoteConfig.setDefaults(remoteConfigDefaults)
+        remoteConfig.setDefaults(remoteConfigDefaults)
     }
 }

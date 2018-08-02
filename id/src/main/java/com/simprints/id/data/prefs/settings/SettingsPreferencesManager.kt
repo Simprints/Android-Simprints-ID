@@ -18,7 +18,6 @@ interface SettingsPreferencesManager {
     var matchGroup: Constants.GROUP
     var vibrateMode: Boolean
     var matchingEndWaitTimeSeconds: Int
-    var fingerStatusPersist: Boolean
     var fingerStatus: Map<FingerIdentifier, Boolean>
 
 }
