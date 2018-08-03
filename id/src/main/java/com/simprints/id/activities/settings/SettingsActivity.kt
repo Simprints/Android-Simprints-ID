@@ -9,9 +9,11 @@ import android.os.Bundle
 import android.preference.*
 import android.support.v7.preference.PreferenceManager
 import android.view.MenuItem
+import android.widget.Toast
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.libsimprints.FingerIdentifier
 import kotlinx.android.synthetic.main.settings_toolbar.*
 import javax.inject.Inject
 
@@ -82,19 +84,33 @@ class SettingsActivity : AppCompatPreferenceActivity() {
             val stringValue = value.toString()
             when (preference) {
                 is ListPreference -> {
-                    val listPreference = preference
-                    val index = listPreference.findIndexOfValue(stringValue)
+                    val index = preference.findIndexOfValue(stringValue)
                     preferencesManager.language = preference.value
                     preferencesManager.fingerStatus
                     // Set the summary to reflect the new value.
                     preference.setSummary(
                         if (index >= 0)
-                            listPreference.entries[index]
+                            preference.entries[index]
                         else
                             null)
 
                 }
                 is MultiSelectListPreference -> {
+                    val fingersHash: HashSet<String> = value as HashSet<String>
+                    val map = mutableMapOf<FingerIdentifier, Boolean>()
+                    if(fingersHash.contains("LEFT_THUMB") && fingersHash.contains("LEFT_INDEX_FINGER")){
+                        fingersHash.forEach {
+                            val fingerIdentifier = FingerIdentifier.valueOf(it)
+                            map[fingerIdentifier] = true
+                        }
+                        preferencesManager.fingerStatus = map
+                        preferencesManager.fingerStatusPersist = true
+                    }
+                    else{
+                        Toast.makeText(activity, "Invalid Selection", Toast.LENGTH_LONG).show()
+                        value.clear()
+                        value.addAll(preference.values)
+                    }
 
                 }
                 is SwitchPreference -> {
@@ -110,23 +126,19 @@ class SettingsActivity : AppCompatPreferenceActivity() {
 
             // Trigger the listener immediately with the preference's
             // current value.
-            if(preference is ListPreference) {
-                sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                    PreferenceManager
-                        .getDefaultSharedPreferences(preference.context)
-                        .getString(preference.key, ""))
-            }
-            else if(preference is MultiSelectListPreference) {
-                sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                    PreferenceManager
-                        .getDefaultSharedPreferences(preference.context)
-                        .getStringSet(preference.key, null))
-            }
-            else if(preference is SwitchPreference) {
-                sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                    PreferenceManager
-                        .getDefaultSharedPreferences(preference.context)
-                        .getBoolean(preference.key, true))
+            when (preference) {
+                is ListPreference -> sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                        PreferenceManager
+                            .getDefaultSharedPreferences(preference.context)
+                            .getString(preference.key, ""))
+                is MultiSelectListPreference -> sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                        PreferenceManager
+                            .getDefaultSharedPreferences(preference.context)
+                            .getStringSet(preference.key, null))
+                is SwitchPreference -> sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                        PreferenceManager
+                            .getDefaultSharedPreferences(preference.context)
+                            .getBoolean(preference.key, true))
             }
         }
     }
