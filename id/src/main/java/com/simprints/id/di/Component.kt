@@ -70,4 +70,5 @@ interface AppComponent {
     fun inject(alertPresenter: AlertPresenter)
     fun inject(launchPresenter: LaunchPresenter)
     fun inject(scheduledSync: ScheduledSync)
+    fun inject(settingsActivity: com.simprints.id.activities.settings.SettingsActivity.GeneralPreferenceFragment)
 }
