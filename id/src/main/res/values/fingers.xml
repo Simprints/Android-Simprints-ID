@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="finger_array">
+        <item>@string/l_1_finger_name</item>
+        <item>@string/l_2_finger_name</item>
+        <item>@string/r_1_finger_name</item>
+        <item>@string/r_2_finger_name</item>
+        <item>@string/l_3_finger_name</item>
+        <item>@string/r_3_finger_name</item>
+        <item>@string/l_4_finger_name</item>
+        <item>@string/r_4_finger_name</item>
+        <item>@string/l_5_finger_name</item>
+        <item>@string/r_5_finger_name</item>
+    </string-array>
+
+    <string-array name="finger_values">
+        <item>LEFT_THUMB</item>
+        <item>LEFT_INDEX_FINGER</item>
+        <item>RIGHT_THUMB</item>
+        <item>RIGHT_INDEX_FINGER</item>
+        <item>LEFT_3RD_FINGER</item>
+        <item>RIGHT_3RD_FINGER</item>
+        <item>LEFT_4TH_FINGER</item>
+        <item>RIGHT_4TH_FINGER</item>
+        <item>LEFT_5TH_FINGER</item>
+        <item>RIGHT_5TH_FINGER</item>
+    </string-array>
+
+    <string-array name="default_fingers">
+        <item>LEFT_THUMB</item>
+        <item>LEFT_INDEX_FINGER</item>
+    </string-array>
+
+
+</resources>

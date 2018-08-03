@@ -137,17 +137,19 @@ def assembleTaskForEndToEndTest() {
 }
 
 project.afterEvaluate {
-    if (gradle.startParameter.taskNames.findAll {it.contains(connectedTaskForEndToEndTest())}.size() > 0) {
+    if (gradle.startParameter.taskNames.findAll {
+        it.contains(connectedTaskForEndToEndTest())
+    }.size() > 0) {
         project.(connectedTaskForEndToEndTest()).doFirst {
             def originalProvider = deviceProvider
             deviceProvider = [
-                getName       : { originalProvider.getName() },
-                init          : { originalProvider.init() },
-                terminate     : { originalProvider.terminate() },
-                getDevices    : { filterDevices(originalProvider.getDevices()) },
-                getTimeoutInMs: { originalProvider.getTimeoutInMs() },
-                isConfigured  : { originalProvider.isConfigured() },
-                getMaxThreads : { originalProvider.getMaxThreads() }
+                    getName       : { originalProvider.getName() },
+                    init          : { originalProvider.init() },
+                    terminate     : { originalProvider.terminate() },
+                    getDevices    : { filterDevices(originalProvider.getDevices()) },
+                    getTimeoutInMs: { originalProvider.getTimeoutInMs() },
+                    isConfigured  : { originalProvider.isConfigured() },
+                    getMaxThreads : { originalProvider.getMaxThreads() }
             ] as DeviceProvider
         }
     }
@@ -309,7 +311,8 @@ dependencies {
     //UI
     implementation 'com.github.michael-rapp:android-material-dialog:4.3.3'
     implementation "com.android.support:cardview-v7:$support_version"
-
+    implementation "com.android.support:preference-v7:$support_version"
+    implementation "com.android.support:support-fragment:$support_version"
 
     //Inject in tests
     testImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.4'
