@@ -151,20 +151,17 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
 
     fun showSplashAndNudgeIfNecessary() {
         showTryDifferentFingerSplash()
-        Handler().postDelayed({
-            hideTryDifferentFingerSplash()
-            doNudgeIfNecessary()
-        }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
+        hideTryDifferentFingerSplash()
+        doNudgeIfNecessary()
     }
 
 
     private fun showTryDifferentFingerSplash() {
-        view.tryDifferentFingerSplash.visibility = View.VISIBLE
+        view.showSplashScreen()
         presenter.isTryDifferentFingerSplashShown = true
     }
 
     private fun hideTryDifferentFingerSplash() {
-        view.tryDifferentFingerSplash.visibility = View.GONE
         presenter.isTryDifferentFingerSplashShown = false
     }
 
@@ -173,7 +170,7 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
         private const val FAST_SWIPE_SPEED = 100
         private const val SLOW_SWIPE_SPEED = 1000
 
-        private const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 1500
+        const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 1500
 
         private val defaultScanConfig = ScanConfig().apply {
             set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0, 0)
