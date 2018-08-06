@@ -8,7 +8,6 @@ import android.view.Menu
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.PrivacyActivity
-import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager

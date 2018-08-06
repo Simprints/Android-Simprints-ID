@@ -1,44 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="GENERAL"
         android:key="preferences_general"
-        >
+        android:title="@string/settings_general">
         <ListPreference
             android:defaultValue="en"
             android:entries="@array/language_array"
             android:entryValues="@array/language_values"
-            android:key="select_language"
+            android:key="@string/select_language_preference"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
-            android:title="Language" />
+            android:title="@string/settings_language" />
+
         <MultiSelectListPreference
-            android:title="Select Fingers"
+            android:defaultValue="@array/default_fingers"
             android:entries="@array/finger_array"
-            android:key="select_fingers"
-            android:summary="Pick the fingers you would like to scan"
             android:entryValues="@array/finger_values"
-            android:defaultValue="@array/default_fingers"/>
+            android:key="@string/select_fingers_preference"
+            android:summary="@string/settings_fingers_subtext"
+            android:title="@string/settings_fingers" />
+
         <SwitchPreference
-            android:title="Sync upon launch"
-            android:summary="Attempt sync each time app is launched"
             android:defaultValue="false"
-            android:key="sync_upon_launch"/>
+            android:key="@string/sync_upon_launch_preference"
+            android:summary="@string/settings_sync_launch_subtext"
+            android:title="@string/settings_sync_launch" />
+
         <SwitchPreference
-            android:title="Background Sync"
-            android:summary="Automatically sync on a set schedule"
             android:defaultValue="true"
-            android:key="background_sync"/>
+            android:key="@string/background_sync_preference"
+            android:summary="@string/settings_background_sync_subtext"
+            android:title="@string/settings_background_sync" />
     </PreferenceCategory>
-    <PreferenceCategory
-        android:title="ABOUT">
+
+    <PreferenceCategory android:layout="@layout/line_separator" />
+
+    <PreferenceCategory android:title="@string/settings_about">
         <Preference
-            android:title="App Version"
-            android:summary="2018.3.1"
-            />
+            android:key="@string/app_version_preference"
+            android:title="@string/about_app_version" />
+
         <Preference
-            android:title="Scanner Version"
-            android:summary="Some scanner version" />
+            android:key="@string/scanner_version_preference"
+            android:title="@string/about_scanner_version" />
     </PreferenceCategory>
 
 </PreferenceScreen>
