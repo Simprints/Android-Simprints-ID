@@ -31,6 +31,8 @@ interface CollectFingerprintsContract {
         fun finishSuccessAndStartMatching(intent: Intent)
         fun cancelAndFinish()
 
+        fun showSplashScreen()
+
         // Fingers
         var tryDifferentFingerSplash: android.view.View
         var pageAdapter: FingerPageAdapter

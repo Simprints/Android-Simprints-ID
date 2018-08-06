@@ -345,5 +345,7 @@
     <string name="menu_privacy_notice">Privacy Notice</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_log_out">Log Out</string>
+    <string name="splash_get_ready">Get Ready</string>
+    <string name="splash_lets_try_another_finger">Let\'s Try Another Finger!</string>
 
 </resources>

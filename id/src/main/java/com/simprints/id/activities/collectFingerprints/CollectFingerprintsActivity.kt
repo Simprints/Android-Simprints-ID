@@ -166,6 +166,10 @@ class CollectFingerprintsActivity :
         launchAlert(alertType)
     }
 
+    override fun showSplashScreen() {
+        startActivity(Intent(this, SplashScreen::class.java))
+    }
+
     companion object {
         private const val ALERT_ACTIVITY_REQUEST_CODE = 0
         private const val MATCHING_ACTIVITY_REQUEST_CODE = 1
