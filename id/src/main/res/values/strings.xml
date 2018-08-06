@@ -178,9 +178,9 @@
     <string name="user_count">User Count:</string>
     <string name="module_count">Module Count:</string>
     <string name="project_count">Project Count:</string>
-    <string name="about_app_version">App Version:</string>
+    <string name="about_app_version">App Version</string>
     <string name="about_libsimprints_version">LibSimprints Version:</string>
-    <string name="about_scanner_version">Scanner Version:</string>
+    <string name="about_scanner_version">Scanner Version</string>
     <!-- Button Labels -->
     <string name="recover_db" translatable="false">Recover DB</string>
     <!-- Recovery dialogs -->
@@ -195,7 +195,6 @@
 
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-    <string name="settings_select_language">Select Language</string>
     <string name="nudge_mode_checkbox_name">Nudge Mode</string>
     <string name="vibrate">Vibrate</string>
     <string name="quality_threshold_empty">Quality Threshold:</string>
@@ -345,7 +344,27 @@
     <string name="menu_privacy_notice">Privacy Notice</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_log_out">Log Out</string>
+
+    <!--Settings Activity-->
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_sett">Settings</string>
+    <string name="select_language_preference">select_language</string>
+    <string name="select_fingers_preference">select_fingers</string>
+    <string name="sync_upon_launch_preference">sync_upon_launch</string>
+    <string name="background_sync_preference">background_sync</string>
+    <string name="app_version_preference">app_version</string>
+    <string name="scanner_version_preference">scanner_version</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_fingers">Select default fingers</string>
+    <string name="settings_sync_launch">Sync upon launch</string>
+    <string name="settings_background_sync">Background Sync</string>
+    <string name="settings_general">GENERAL</string>
+    <string name="settings_about">ABOUT</string>
+    <string name="settings_app_version">App Version</string>
+    <string name="settings_scanner_version">Scanner Version</string>
+    <string name="settings_fingers_subtext">Choose the fingers you would like to scan</string>
+    <string name="settings_sync_launch_subtext">Attempt sync each time app is opened</string>
+    <string name="settings_background_sync_subtext">Automatically sync on a set schedule</string>
+    <string name="settings_invalid_selection">Invalid Selection</string>
 
 </resources>

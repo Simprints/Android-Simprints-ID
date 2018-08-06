@@ -2,8 +2,6 @@ package com.simprints.id.di
 
 import com.simprints.id.Application
 import com.simprints.id.activities.PrivacyActivity
-import com.simprints.id.activities.refusal.RefusalActivity
-import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.TutorialActivity
 import com.simprints.id.activities.about.AboutActivity
 import com.simprints.id.activities.about.AboutPresenter
@@ -28,6 +26,8 @@ import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.activities.matching.MatchingPresenter
 import com.simprints.id.activities.refusal.RefusalPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
+import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
 import com.simprints.id.services.scheduledSync.ScheduledSync
@@ -46,7 +46,6 @@ interface AppComponent {
     fun inject(refusalPresenter: RefusalPresenter)
     fun inject(privacyActivity: PrivacyActivity)
     fun inject(tutorialActivity: TutorialActivity)
-    fun inject(settingsActivity: SettingsActivity)
     fun inject(matchingActivity: MatchingActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
@@ -70,5 +69,5 @@ interface AppComponent {
     fun inject(alertPresenter: AlertPresenter)
     fun inject(launchPresenter: LaunchPresenter)
     fun inject(scheduledSync: ScheduledSync)
-    fun inject(settingsActivity: com.simprints.id.activities.settings.SettingsActivity.GeneralPreferenceFragment)
+    fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
 }

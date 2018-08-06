@@ -1,6 +1,5 @@
 package com.simprints.id.activities.settings
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.preference.PreferenceActivity
 import android.support.v7.app.ActionBar
