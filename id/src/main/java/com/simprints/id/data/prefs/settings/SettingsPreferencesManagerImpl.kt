@@ -68,6 +68,24 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
             FingerIdentifier.LEFT_4TH_FINGER to false,
             FingerIdentifier.LEFT_5TH_FINGER to false
         )
+
+        private const val SYNC_ON_CALLOUT_KEY = "SyncOnCallout"
+        private const val SYNC_ON_CALLOUT_DEFAULT = false
+        private const val SYNC_ON_CALLOUT_ONLY_ON_WIFI_KEY = "SyncOnCalloutOnlyOnWifi"
+        private const val SYNC_ON_CALLOUT_ONLY_ON_WIFI_DEFAULT = false
+        private const val SYNC_ON_CALLOUT_ONLY_WHEN_CHARGING_KEY = "SyncOnCalloutOnlyWhenCharging"
+        private const val SYNC_ON_CALLOUT_ONLY_WHEN_CHARGING_DEFAULT = false
+        private const val SYNC_ON_CALLOUT_ONLY_WHEN_NOT_LOW_BATTERY_KEY = "SyncOnCalloutOnlyWhenNotLowBattery"
+        private const val SYNC_ON_CALLOUT_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT = true
+
+        private const val SCHEDULED_BACKGROUND_SYNC_KEY = "ScheduledBackgroundSync"
+        private const val SCHEDULED_BACKGROUND_SYNC_DEFAULT = true
+        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY = "ScheduledBackgroundSyncOnlyOnWifi"
+        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT = false
+        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY = "ScheduledBackgroundSyncOnlyWhenCharging"
+        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT = false
+        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY = "ScheduledBackgroundSyncOnlyWhenNotLowBattery"
+        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT = true
     }
 
     private val remoteConfigDefaults = mutableMapOf<String, Any>()
@@ -123,6 +141,24 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // The map of default fingers
     override var fingerStatus: Map<FingerIdentifier, Boolean>
         by RemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
+
+    override var syncOnCallout: Boolean
+        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_ON_CALLOUT_KEY, SYNC_ON_CALLOUT_DEFAULT)
+    override var syncOnCalloutOnlyOnWifi: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_ON_CALLOUT_ONLY_ON_WIFI_KEY, SYNC_ON_CALLOUT_ONLY_ON_WIFI_DEFAULT)
+    override var syncOnCalloutOnlyWhenCharging: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_ON_CALLOUT_ONLY_WHEN_CHARGING_KEY, SYNC_ON_CALLOUT_ONLY_WHEN_CHARGING_DEFAULT)
+    override var syncOnCalloutOnlyWhenNotLowBattery: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_ON_CALLOUT_ONLY_WHEN_NOT_LOW_BATTERY_KEY, SYNC_ON_CALLOUT_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT)
+
+    override var scheduledBackgroundSync: Boolean
+        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_KEY, SCHEDULED_BACKGROUND_SYNC_DEFAULT)
+    override var scheduledBackgroundSyncOnlyOnWifi: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT)
+    override var scheduledBackgroundSyncOnlyWhenCharging: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT)
+    override var scheduledBackgroundSyncOnlyWhenNotLowBattery: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT)
 
     init {
         remoteConfig.setDefaults(remoteConfigDefaults)
