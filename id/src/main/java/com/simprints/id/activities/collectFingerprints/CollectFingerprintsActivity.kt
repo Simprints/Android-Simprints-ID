@@ -35,7 +35,6 @@ class CollectFingerprintsActivity :
     override lateinit var progressBar: ProgressBar
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
-    override lateinit var tryDifferentFingerSplash: View
 
     private var rightToLeft: Boolean = false
 
@@ -66,7 +65,6 @@ class CollectFingerprintsActivity :
         indicatorLayout = indicator_layout
         scanButton = scan_button
         progressBar = pb_timeout
-        tryDifferentFingerSplash = try_different_finger_splash
     }
 
     override fun onStart() {
@@ -168,6 +166,7 @@ class CollectFingerprintsActivity :
 
     override fun showSplashScreen() {
         startActivity(Intent(this, SplashScreen::class.java))
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
     }
 
     companion object {

@@ -34,7 +34,6 @@ interface CollectFingerprintsContract {
         fun showSplashScreen()
 
         // Fingers
-        var tryDifferentFingerSplash: android.view.View
         var pageAdapter: FingerPageAdapter
 
         // Scanning

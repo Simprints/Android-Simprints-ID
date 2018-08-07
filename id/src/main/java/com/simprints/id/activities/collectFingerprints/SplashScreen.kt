@@ -9,11 +9,11 @@ import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprin
 class SplashScreen : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
         Handler().postDelayed({
             finish()
+            overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
         }, CollectFingerprintsFingerDisplayHelper.TRY_DIFFERENT_FINGER_SPLASH_DELAY)
     }
 }
