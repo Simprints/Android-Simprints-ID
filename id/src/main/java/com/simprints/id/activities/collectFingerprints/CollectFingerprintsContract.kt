@@ -5,6 +5,7 @@ import android.content.Intent
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.TextView
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.ALERT_TYPE
@@ -79,5 +80,6 @@ interface CollectFingerprintsContract {
         fun checkScannedFingersAndCreateMapToShowDialog()
         fun showSplashAndAddNewFingerIfNecessary()
         fun doNudgeIfNecessary()
+        fun handleMissingFingerClick()
     }
 }

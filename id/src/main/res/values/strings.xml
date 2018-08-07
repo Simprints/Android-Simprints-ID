@@ -346,5 +346,6 @@
     <string name="menu_log_out">Log Out</string>
     <string name="get_ready">Get Ready</string>
     <string name="try_another_finger">Let\'s Try Another Finger!</string>
+    <string name="missing_finger"><u>Missing Finger?</u></string>
 
 </resources>
