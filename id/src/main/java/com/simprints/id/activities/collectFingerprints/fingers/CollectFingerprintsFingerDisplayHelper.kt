@@ -143,7 +143,6 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
     fun showSplashAndAddNewFinger() {
         showTryDifferentFingerSplash()
         Handler().postDelayed({
-            hideTryDifferentFingerSplash()
             handleAutoAddFinger()
             doNudgeIfNecessary()
         }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
@@ -151,18 +150,12 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
 
     fun showSplashAndNudgeIfNecessary() {
         showTryDifferentFingerSplash()
-        hideTryDifferentFingerSplash()
         doNudgeIfNecessary()
     }
 
 
     private fun showTryDifferentFingerSplash() {
         view.showSplashScreen()
-        presenter.isTryDifferentFingerSplashShown = true
-    }
-
-    private fun hideTryDifferentFingerSplash() {
-        presenter.isTryDifferentFingerSplashShown = false
     }
 
     companion object {
