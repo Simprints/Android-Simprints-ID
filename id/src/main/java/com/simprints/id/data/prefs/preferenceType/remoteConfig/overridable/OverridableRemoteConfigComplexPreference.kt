@@ -23,7 +23,7 @@ class OverridableRemoteConfigComplexPreference<T : Any>(prefs: ImprovedSharedPre
 
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T =
         if (isOverriddenFlag) {
-            super.getPrefsValue(thisRef, property)
+            super.getBackingPreferenceValue(thisRef, property)
         } else {
             super.getValue(thisRef, property)
         }

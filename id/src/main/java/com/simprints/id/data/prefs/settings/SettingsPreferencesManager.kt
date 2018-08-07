@@ -20,4 +20,14 @@ interface SettingsPreferencesManager {
     var matchingEndWaitTimeSeconds: Int
     var fingerStatus: Map<FingerIdentifier, Boolean>
 
+    var syncOnCallout: Boolean
+    var syncOnCalloutOnlyOnWifi: Boolean
+    var syncOnCalloutOnlyWhenCharging: Boolean
+    var syncOnCalloutOnlyWhenNotLowBattery: Boolean
+
+    var scheduledBackgroundSync: Boolean
+    var scheduledBackgroundSyncOnlyOnWifi: Boolean
+    var scheduledBackgroundSyncOnlyWhenCharging: Boolean
+    var scheduledBackgroundSyncOnlyWhenNotLowBattery: Boolean
+
 }

@@ -69,10 +69,10 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             }
             is SwitchPreference -> {
                 if (preference.key == view.getKeyForSyncUponLaunchPreference()) {
-
+                    handleSyncUponLaunchChanged(value as Boolean)
                 }
                 else if(preference.key == view.getKeyForBackgroundSyncPreference()) {
-
+                    handleBackgroundSyncChanged(value as Boolean)
                 }
             }
             is Preference -> {
@@ -85,6 +85,14 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             }
         }
         true
+    }
+
+    private fun handleSyncUponLaunchChanged(value: Boolean) {
+        preferencesManager.syncOnCallout = value
+    }
+
+    private fun handleBackgroundSyncChanged(value: Boolean) {
+        preferencesManager.scheduledBackgroundSync = value
     }
 
     private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String) {
@@ -103,7 +111,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
                                             fingersHash: HashSet<String>) {
         if(selectionContainsDefaultFingers(fingersHash)){
             preferencesManager.fingerStatus = getMapFromFingersHash(fingersHash)
-            preferencesManager.fingerStatusPersist = true
         }
         else{
             view.showToastForInvalidSelectionOfFingers()

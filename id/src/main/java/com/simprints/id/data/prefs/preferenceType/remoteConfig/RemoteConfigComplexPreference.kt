@@ -21,13 +21,14 @@ open class RemoteConfigComplexPreference<T : Any>(prefs: ImprovedSharedPreferenc
 
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         serializedValue = remoteConfig.getString(key)
-        return getPrefsValue(thisRef, property)
+        return getBackingPreferenceValue(thisRef, property)
     }
 
-    protected fun getPrefsValue(thisRef: Any?, property: KProperty<*>): T =
+    protected fun getBackingPreferenceValue(thisRef: Any?, property: KProperty<*>): T =
         try {
             super.getValue(thisRef, property)
         } catch (e: InvalidParameterException) {
+            // InvalidParameterException can be thrown if the deserialization fails
             defValue
         }
 }
