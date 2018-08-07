@@ -87,6 +87,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
+
         // We need to call setResult and finish when the either CollectFingerprintsActivity returns a result
         // that needs to be forward back to the calling app or the user tapped on "close" button (RESULT_CANCELED)
         // in a error screen.
@@ -94,6 +95,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         if (requestCode == LAUNCH_ACTIVITY_REQUEST_CODE ||
             requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED) {
 
+            viewPresenter.handleActivityResult(requestCode, resultCode, data.toCallout())
             setResult(resultCode, data)
             finish()
         }

@@ -1,9 +1,11 @@
-package com.simprints.id.data.db.local.realm
+package com.simprints.id.data.analytics.events.realm
 
 import android.content.Context
-import com.simprints.id.data.analytics.SessionEvents
-import com.simprints.id.data.db.local.LocalEventDbManager
+import com.simprints.id.data.analytics.events.LocalEventDbManager
+import com.simprints.id.data.analytics.events.models.SessionEvents
 import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.db.local.realm.EncryptionMigration
+import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import io.reactivex.Completable
 import io.reactivex.Single

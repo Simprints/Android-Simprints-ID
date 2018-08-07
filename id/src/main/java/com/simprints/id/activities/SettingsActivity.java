@@ -254,7 +254,7 @@ public class SettingsActivity extends AppCompatActivity implements AdapterView.O
     public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long i) {
         switch (pos) {
             case 0:
-                preferencesManager.setLanguage("");
+                preferencesManager.setLanguage("en");
                 preferencesManager.setLanguagePosition(0);
                 break;
             case 1:
