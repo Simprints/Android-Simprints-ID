@@ -9,14 +9,14 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
-import com.simprints.id.data.analytics.SessionEventsManager
-import com.simprints.id.data.analytics.SessionEventsManagerImpl
+import com.simprints.id.data.analytics.events.LocalEventDbManager
+import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.events.SessionEventsManagerImpl
+import com.simprints.id.data.analytics.events.realm.RealmEventDbManagerImpl
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.LocalEventDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
-import com.simprints.id.data.db.local.realm.RealmEventDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.sync.SyncManager
@@ -167,10 +167,12 @@ open class AppModule(val app: Application) {
             it.initDb(secureDataManager.getLocalDbKeyOrThrow("event_data"))
         }
 
+
     @Provides
     @Singleton
     fun provideSessionEventsManager(ctx: Context,
+                                    analyticsManager: AnalyticsManager,
                                     eventsManager: LocalEventDbManager,
                                     preferencesManager: PreferencesManager,
-                                    timeHelper: TimeHelper): SessionEventsManager = SessionEventsManagerImpl(ctx, eventsManager, preferencesManager, timeHelper)
+                                    timeHelper: TimeHelper): SessionEventsManager = SessionEventsManagerImpl(ctx, analyticsManager, eventsManager, preferencesManager, timeHelper)
 }

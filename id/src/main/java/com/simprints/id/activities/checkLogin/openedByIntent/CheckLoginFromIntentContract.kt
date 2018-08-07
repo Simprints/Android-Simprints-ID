@@ -18,5 +18,6 @@ interface CheckLoginFromIntentContract {
 
     interface Presenter : BasePresenter {
         fun setup()
+        fun handleActivityResult(requestCode: Int, resultCode: Int, returnCallout: Callout){}
     }
 }

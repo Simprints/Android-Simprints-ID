@@ -1,15 +1,17 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.analytics.DatabaseInfo
-import com.simprints.id.data.analytics.SessionEventsManager
-import com.simprints.id.data.analytics.events.CalloutEvent
+import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.events.models.CallbackEvent
+import com.simprints.id.data.analytics.events.models.CalloutEvent
+import com.simprints.id.data.analytics.events.models.DatabaseInfo
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
+import com.simprints.id.session.callout.Callout
 import io.reactivex.rxkotlin.subscribeBy
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -34,8 +36,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         try {
             extractSessionParameters()
             preferencesManager.lastUserUsed = preferencesManager.userId
-            sessionEventManager.createSessionEvent()
-            sessionEventManager.addEvent(CalloutEvent(view.parseCallout()))
+            sessionEventManager.createSession().subscribeBy(onComplete = {
+                sessionEventManager.addEvent(CalloutEvent(view.parseCallout()))
+            }, onError = { it.printStackTrace() })
+
         } catch (exception: InvalidCalloutError) {
             view.openAlertActivityForError(exception.alertType)
             setupFailed = true
@@ -101,5 +105,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }, onSuccess = {
             sessionEventManager.updateDatabaseInfo(DatabaseInfo(it))
         })
+    }
+
+    override fun handleActivityResult(requestCode: Int, resultCode: Int, returnCallout: Callout) {
+        sessionEventManager.addEvent(CallbackEvent(callout = returnCallout))
+        sessionEventManager.closeSession()
     }
 }

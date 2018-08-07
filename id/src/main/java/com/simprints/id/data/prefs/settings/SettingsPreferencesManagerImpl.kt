@@ -1,10 +1,10 @@
 package com.simprints.id.data.prefs.settings
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.domain.Constants
 import com.simprints.id.tools.delegates.ComplexPreference
 import com.simprints.id.tools.delegates.PrimitivePreference
 import com.simprints.id.tools.serializers.Serializer
-import com.simprints.id.domain.Constants
 import com.simprints.libsimprints.FingerIdentifier
 
 
@@ -28,7 +28,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private const val NB_IDS_DEFAULT = 10
 
         private const val LANGUAGE_KEY = "SelectedLanguage"
-        private const val LANGUAGE_DEFAULT = ""
+        private const val LANGUAGE_DEFAULT = "en"
 
         private const val LANGUAGE_POSITION_KEY = "SelectedLanguagePosition"
         private const val LANGUAGE_POSITION_DEFAULT = 0

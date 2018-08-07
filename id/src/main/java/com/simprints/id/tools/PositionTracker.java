@@ -25,7 +25,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.simprints.id.Application;
-import com.simprints.id.data.analytics.SessionEventsManager;
+import com.simprints.id.data.analytics.events.SessionEventsManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 
 import java.util.Locale;

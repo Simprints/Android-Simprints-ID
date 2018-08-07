@@ -1,4 +1,4 @@
-package com.simprints.id.data.analytics
+package com.simprints.id.data.analytics.events.models
 
 import android.os.Build
 import io.realm.RealmObject
