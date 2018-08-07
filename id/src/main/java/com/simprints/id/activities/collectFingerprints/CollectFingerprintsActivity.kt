@@ -11,6 +11,7 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.TextView
 import com.simprints.id.R
 import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE
@@ -65,6 +66,7 @@ class CollectFingerprintsActivity :
         indicatorLayout = indicator_layout
         scanButton = scan_button
         progressBar = pb_timeout
+        setListenerToMissingFinger()
     }
 
     override fun onStart() {
@@ -91,6 +93,10 @@ class CollectFingerprintsActivity :
     private fun reverseViewPagerIfNeeded() {
         // If the layout is from right to left, we need to reverse the scrolling direction
         if (rightToLeft) view_pager.rotationY = 180f
+    }
+
+    private fun setListenerToMissingFinger() {
+        missingFingerText.setOnClickListener { viewPresenter.handleMissingFingerClick() }
     }
 
     override fun refreshScanButtonAndTimeoutBar() {

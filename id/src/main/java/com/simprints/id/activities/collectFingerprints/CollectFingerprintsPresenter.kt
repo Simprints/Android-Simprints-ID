@@ -279,6 +279,10 @@ class CollectFingerprintsPresenter(private val context: Context,
         isConfirmDialogShown = false
     }
 
+    override fun handleMissingFingerClick() {
+        fingerDisplayHelper.showSplashAndAddNewFinger()
+    }
+
     companion object {
         private const val maximumNumberOfFingersAdded = 2
         private const val minimumNumberOfGoodScans = 2
