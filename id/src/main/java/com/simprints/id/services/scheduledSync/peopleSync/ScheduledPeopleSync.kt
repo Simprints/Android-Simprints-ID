@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync
+package com.simprints.id.services.scheduledSync.peopleSync
 
 import androidx.work.Worker
 import com.simprints.id.Application
@@ -10,7 +10,7 @@ import com.simprints.id.services.sync.SyncTaskParameters
 import javax.inject.Inject
 
 
-class ScheduledSync : Worker() {
+class ScheduledPeopleSync : Worker() {
 
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var preferencesManager: PreferencesManager

@@ -1,5 +1,7 @@
 package com.simprints.id.data.db
 
+import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.events.models.EnrollmentEvent
 import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
@@ -18,6 +20,7 @@ import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
@@ -36,7 +39,9 @@ class DbManagerImpl(override val local: LocalDbManager,
                     override val remote: RemoteDbManager,
                     private val secureDataManager: SecureDataManager,
                     private val loginInfoManager: LoginInfoManager,
-                    private val preferencesManager: PreferencesManager) : DbManager {
+                    private val preferencesManager: PreferencesManager,
+                    private val sessionEventsManager: SessionEventsManager,
+                    private val timeHelper: TimeHelper) : DbManager {
 
     override fun initialiseDb() {
         remote.initialiseRemoteDb()
@@ -80,10 +85,17 @@ class DbManagerImpl(override val local: LocalDbManager,
     override fun savePerson(fbPerson: fb_Person): Completable =
         local.insertOrUpdatePersonInLocal(rl_Person(fbPerson))
             .doOnComplete {
-                uploadPersonAndDownloadAgain(fbPerson)
-                    .updatePersonInLocal()
-                    .subscribeOn(Schedulers.io())
-                    .subscribeBy(onComplete = {}, onError = { it.printStackTrace() })
+                sessionEventsManager.updateSession({
+                    it.events.add(EnrollmentEvent(
+                        timeHelper.msSinceBoot() - it.startTime,
+                        fbPerson.patientId
+                    ))
+                }).andThen (uploadPersonAndDownloadAgain(fbPerson))
+                .updatePersonInLocal()
+                .subscribeOn(Schedulers.io())
+                .subscribeBy(onComplete = {}, onError = {
+                    it.printStackTrace()
+                })
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

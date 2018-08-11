@@ -14,6 +14,8 @@ import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerpri
 import com.simprints.id.activities.collectFingerprints.sync.CollectFingerprintsSyncHelper
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.events.models.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
@@ -27,6 +29,7 @@ import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libcommon.Person
+import com.simprints.libcommon.Utils
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Registration
 import io.reactivex.rxkotlin.subscribeBy
@@ -41,6 +44,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
 
     private lateinit var syncHelper: CollectFingerprintsSyncHelper
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
@@ -54,6 +58,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     override var isTryDifferentFingerSplashShown = false
     override var isNudging = false
     private var numberOfFingersAdded = 0
+    private var lastCaptureStartedAt: Long = 0
 
     init {
         ((view as Activity).application as Application).component.inject(this)
@@ -87,8 +92,12 @@ class CollectFingerprintsPresenter(private val context: Context,
         scanningHelper = CollectFingerprintsScanningHelper(context, view, this)
     }
 
+
     private fun initScanButtonListeners() {
-        view.scanButton.setOnClickListener { scanningHelper.toggleContinuousCapture() }
+        view.scanButton.setOnClickListener {
+            lastCaptureStartedAt = timeHelper.msSinceBoot()
+            scanningHelper.toggleContinuousCapture()
+        }
         view.scanButton.setOnLongClickListener { resetFingerState() }
     }
 
@@ -263,6 +272,24 @@ class CollectFingerprintsPresenter(private val context: Context,
                 createMapAndShowDialog()
             }
         }
+    }
+
+    override fun addCaptureEventInSession(finger: Finger) {
+        sessionEventsManager.updateSessionInBackground({
+            it.events.add(FingerprintCaptureEvent(
+                it.timeRelativeToStartTime(lastCaptureStartedAt),
+                it.nowRelativeToStartTime(timeHelper),
+                UUID.randomUUID().toString(),
+                finger.id,
+                preferencesManager.qualityThreshold,
+                finger.status,
+                if (finger.isGoodScan || finger.isRescanGoodScan) {
+                    FingerprintCaptureEvent.Fingerprint(finger.template.qualityScore, Utils.byteArrayToBase64(finger.template.templateBytes))
+                } else {
+                    null
+                }
+            ))
+        })
     }
 
     private fun isGoodScanOrShouldNotAddAnyMoreFingers() = currentFinger().isGoodScan ||

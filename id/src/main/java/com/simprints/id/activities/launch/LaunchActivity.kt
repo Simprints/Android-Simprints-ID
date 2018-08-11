@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.WindowManager
 import com.simprints.id.R
-import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
+import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper
@@ -32,7 +32,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     }
 
     private fun setButtonClickListeners() {
-        consentDeclineButton.setOnClickListener { viewPresenter.handleOnBackOrDeclinePressed() }
+        consentDeclineButton.setOnClickListener { viewPresenter.handleDeclinePressed() }
         consentAcceptButton.setOnClickListener { viewPresenter.confirmConsentAndContinueToNextActivity() }
     }
 
@@ -75,7 +75,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     }
 
     override fun onBackPressed() {
-        viewPresenter.handleOnBackOrDeclinePressed()
+        viewPresenter.handleOnBackPressed()
     }
 
     override fun onDestroy() {

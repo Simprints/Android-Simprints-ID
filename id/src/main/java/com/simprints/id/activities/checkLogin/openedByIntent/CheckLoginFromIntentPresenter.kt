@@ -2,9 +2,9 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.analytics.events.SessionEventsManager
-import com.simprints.id.data.analytics.events.models.CallbackEvent
-import com.simprints.id.data.analytics.events.models.CalloutEvent
-import com.simprints.id.data.analytics.events.models.DatabaseInfo
+import com.simprints.id.data.analytics.events.models.*
+import com.simprints.id.data.analytics.events.models.AuthenticationEvent.Info
+import com.simprints.id.data.analytics.events.models.AuthenticationEvent.Result.SUCCESS
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
@@ -12,6 +12,8 @@ import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.session.callout.Callout
+import com.simprints.id.session.sessionParameters.SessionParameters
+import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.subscribeBy
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -23,7 +25,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private var possibleLegacyApiKey: String = ""
     private var setupFailed: Boolean = false
 
-    @Inject lateinit var sessionEventManager: SessionEventsManager
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var dbManager: LocalDbManager
 
     init {
@@ -34,16 +36,17 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         view.checkCallingAppIsFromKnownSource()
 
         try {
-            extractSessionParameters()
-            preferencesManager.lastUserUsed = preferencesManager.userId
-            sessionEventManager.createSession().subscribeBy(onComplete = {
-                sessionEventManager.addEvent(CalloutEvent(view.parseCallout()))
-            }, onError = { it.printStackTrace() })
-
+            val callout = view.parseCallout()
+            extractSessionParametersOrThrow(callout)
+            setLastUser()
         } catch (exception: InvalidCalloutError) {
             view.openAlertActivityForError(exception.alertType)
             setupFailed = true
         }
+    }
+
+    private fun setLastUser() {
+        preferencesManager.lastUserUsed = preferencesManager.userId
     }
 
     override fun start() {
@@ -52,13 +55,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    private fun extractSessionParameters() {
-        val callout = view.parseCallout()
+    private fun extractSessionParametersOrThrow(callout: Callout): SessionParameters {
         analyticsManager.logCallout(callout)
         val sessionParameters = sessionParametersExtractor.extractFrom(callout)
         possibleLegacyApiKey = sessionParameters.apiKey
         preferencesManager.sessionParameters = sessionParameters
         analyticsManager.logUserProperties()
+        return sessionParameters
     }
 
     override fun handleNotSignedInUser() {
@@ -95,20 +98,36 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         else loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()
 
     override fun handleSignedInUser() {
-        updateEventSessionWithDbInfo()
+        initSessionEvents(loginInfoManager.getSignedInProjectIdOrEmpty())
         view.openLaunchActivity()
     }
 
-    private fun updateEventSessionWithDbInfo() {
-        dbManager.getPeopleCountFromLocal().subscribeBy(onError = {
-            it.printStackTrace()
-        }, onSuccess = {
-            sessionEventManager.updateDatabaseInfo(DatabaseInfo(it))
-        })
+    private fun initSessionEvents(projectId: String) {
+
+        Singles.zip(
+            sessionEventsManager.createSession(projectId),
+            analyticsManager.analyticsId.onErrorReturn { "" },
+            dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }) { session: SessionEvents, gaId: String, count: Int ->
+                session.analyticsId = gaId
+                session.databaseInfo = DatabaseInfo(count)
+                session.events.add(CalloutEvent(session.nowRelativeToStartTime(timeHelper), view.parseCallout()))
+                session.events.add(AuthenticationEvent(
+                    session.nowRelativeToStartTime(timeHelper),
+                    SUCCESS, Info(loginInfoManager.getSignedInProjectIdOrEmpty(),
+                    loginInfoManager.getSignedInUserIdOrEmpty())))
+
+            return@zip session
+            }.flatMapCompletable {
+                sessionEventsManager.insertOrUpdateSession(it)
+            }.subscribeBy(onComplete = { }, onError = { it.printStackTrace() })
     }
 
     override fun handleActivityResult(requestCode: Int, resultCode: Int, returnCallout: Callout) {
-        sessionEventManager.addEvent(CallbackEvent(callout = returnCallout))
-        sessionEventManager.closeSession()
+        sessionEventsManager.updateSession({
+            it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), returnCallout))
+            it.closeIfRequired(timeHelper)
+        }).andThen {
+
+        }.subscribeBy(onComplete = { }, onError = { it.printStackTrace() })
     }
 }

@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync
+package com.simprints.id.services.scheduledSync.peopleSync
 
 import androidx.work.*
 import com.simprints.id.data.prefs.PreferencesManager
@@ -6,7 +6,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 
-class ScheduledSyncManager(private val preferencesManager: PreferencesManager) {
+class ScheduledPeopleSyncManager(private val preferencesManager: PreferencesManager) {
 
     fun scheduleSyncIfNecessary() {
         val scheduledSyncRequest = createRequestAndSaveId()
@@ -15,7 +15,7 @@ class ScheduledSyncManager(private val preferencesManager: PreferencesManager) {
 
     private fun createRequestAndSaveId(): PeriodicWorkRequest {
         val scheduledSyncRequest =
-            PeriodicWorkRequestBuilder<ScheduledSync>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
+            PeriodicWorkRequestBuilder<ScheduledPeopleSync>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
                 .setConstraints(getConstraints())
                 .build()
         saveWorkRequestId(scheduledSyncRequest.id)
@@ -28,7 +28,7 @@ class ScheduledSyncManager(private val preferencesManager: PreferencesManager) {
         .build()
 
     private fun saveWorkRequestId(id: UUID) {
-        preferencesManager.scheduledSyncWorkRequestId = id.toString()
+        preferencesManager.scheduledPeopleSyncWorkRequestId = id.toString()
     }
 
     companion object {

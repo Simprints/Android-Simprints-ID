@@ -231,9 +231,14 @@ public class PositionTracker implements
     public void onLocationChanged(Location location) {
         if (location != null) {
             preferencesManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(location));
-            sessionEventsManager.updateLocation(location.getLatitude(), location.getLongitude());
+            sessionEventsManager.updateLocation(location.getLatitude(), location.getLongitude()).subscribe();
+
             Log.INSTANCE.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
                     location.getLatitude(), location.getLongitude()));
+
+            if(location.hasAccuracy() && location.getAccuracy() < 100) {
+                finish();
+            }
         }
     }
 
