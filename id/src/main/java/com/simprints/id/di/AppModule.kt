@@ -9,10 +9,10 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
-import com.simprints.id.data.analytics.events.LocalEventDbManager
+import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.events.SessionEventsManager
 import com.simprints.id.data.analytics.events.SessionEventsManagerImpl
-import com.simprints.id.data.analytics.events.realm.RealmEventDbManagerImpl
+import com.simprints.id.data.analytics.events.realm.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
@@ -72,8 +72,10 @@ open class AppModule(val app: Application) {
                               remoteDbManager: RemoteDbManager,
                               secureDataManager: SecureDataManager,
                               loginInfoManager: LoginInfoManager,
-                              preferencesManager: PreferencesManager): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager)
+                              preferencesManager: PreferencesManager,
+                              sessionEventsManager: SessionEventsManager,
+                              timeHelper: TimeHelper): DbManager =
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper)
 
     @Provides
     @Singleton
@@ -161,18 +163,18 @@ open class AppModule(val app: Application) {
 
     @Provides
     fun provideLocalEventDbManager(ctx: Context,
-                                   secureDataManager: SecureDataManager): LocalEventDbManager =
-        RealmEventDbManagerImpl(ctx).also {
+                                   secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+        RealmSessionEventsDbManagerImpl(ctx).also {
             secureDataManager.setLocalDatabaseKey("event_data", null)
             it.initDb(secureDataManager.getLocalDbKeyOrThrow("event_data"))
         }
 
-
     @Provides
     @Singleton
     fun provideSessionEventsManager(ctx: Context,
-                                    analyticsManager: AnalyticsManager,
-                                    eventsManager: LocalEventDbManager,
+                                    loginInfoManager: LoginInfoManager,
+                                    sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                     preferencesManager: PreferencesManager,
-                                    timeHelper: TimeHelper): SessionEventsManager = SessionEventsManagerImpl(ctx, analyticsManager, eventsManager, preferencesManager, timeHelper)
+                                    timeHelper: TimeHelper): SessionEventsManager = SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper)
+
 }

@@ -2,86 +2,81 @@ package com.simprints.id.data.analytics.events
 
 import android.content.Context
 import android.os.Build
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.events.models.*
+import com.simprints.id.data.analytics.events.models.ArtificialTerminationEvent
+import com.simprints.id.data.analytics.events.models.Device
+import com.simprints.id.data.analytics.events.models.Location
+import com.simprints.id.data.analytics.events.models.SessionEvents
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.deviceId
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 
+// Class to manage the current session
 class SessionEventsManagerImpl(private val ctx: Context,
-                               private val analyticsManager: AnalyticsManager,
-                               private val eventDbManager: LocalEventDbManager,
+                               private val dbManagerSessionEvents: SessionEventsLocalDbManager,
+                               override val loginInfoManager: LoginInfoManager,
                                private val preferencesManager: PreferencesManager,
                                private val timeHelper: TimeHelper) : SessionEventsManager {
 
-    lateinit var session: SessionEvents
+    var session: SessionEvents? = null
 
-    override fun createSession(): Completable {
-        session = SessionEvents(
-            appVersionName = preferencesManager.appVersionName,
-            libVersionName = preferencesManager.libVersionName,
-            startTime = timeHelper.msSinceBoot(),
-            language = preferencesManager.language,
-            device =
-            Device(
-                androidSdkVersion = Build.VERSION.SDK_INT.toString(),
-                deviceModel = Build.MANUFACTURER + "_" + Build.MODEL,
-                deviceId = ctx.deviceId)
-        )
-
-        return insertOrUpdateSession()
-                .andThen(updateAnalyticsId())
+    //as default, the manager tries to load the last open session for a specific project
+    override fun getCurrentSession(projectId: String): Single<SessionEvents> = session?.let {
+        Single.just(it)
+    } ?: dbManagerSessionEvents.loadLastOpenSession(projectId).doOnSuccess {
+        session = it
     }
 
-    override fun closeSession() {
-        updateEndTime()
+    override fun createSession(projectId: String): Single<SessionEvents> =
+        if (projectId.isNotEmpty()) {
+            session = SessionEvents(
+                projectId = projectId,
+                appVersionName = preferencesManager.appVersionName,
+                libVersionName = preferencesManager.libVersionName,
+                startTime = timeHelper.msSinceBoot(),
+                language = preferencesManager.language,
+                device = Device(
+                    androidSdkVersion = Build.VERSION.SDK_INT.toString(),
+                    deviceModel = Build.MANUFACTURER + "_" + Build.MODEL,
+                    deviceId = ctx.deviceId)
+            )
+
+            closeLastSessionsIfPending(projectId)
+                .andThen(insertOrUpdateSession(session!!))
+                .toSingle { session }
+
+        } else {
+            Single.error<SessionEvents>(Throwable("project ID empty"))
+        }
+
+    override fun updateSession(block: (sessionEvents: SessionEvents) -> Unit, projectId: String): Completable =
+        getCurrentSession(projectId).flatMapCompletable {
+            block(it)
+            insertOrUpdateSession(it)
+        }
+
+    override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit, projectId: String) {
+        updateSession(block, projectId).subscribeBy(onComplete = {}, onError = { it.printStackTrace() })
     }
 
-    override fun saveSession() {
-        insertOrUpdateSession().subscribeBy(onError = {
-            it.printStackTrace()
+    override fun updateLocation(lat: Double, lon: Double): Completable =
+        updateSession({
+            it.location = Location(lat, lon)
         })
-    }
 
-    private fun updateAnalyticsId():Completable = analyticsManager.analyticsId.flatMapCompletable {
-        session.analyticsId = it
-        insertOrUpdateSession()
-    }
-
-    private fun insertOrUpdateSession():Completable = eventDbManager.insertOrUpdateSessionEvents(session)
-
-    override fun updateEndTime() {
-        session.relativeEndTime = msSinceStartTime()
-        saveSession()
-    }
-
-    override fun updateUploadTime() {
-        session.relativeUploadTime = msSinceStartTime()
-        saveSession()
-    }
-
-    override fun addEvent(event: Event) {
-        if (event is CallbackEvent) {
-            event.relativeStartTime = msSinceStartTime()
+    private fun closeLastSessionsIfPending(projectId: String): Completable =
+        dbManagerSessionEvents.loadSessions(projectId).flatMapCompletable {
+            it.forEach {
+                it.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.NEW_SESSION)
+                it.closeIfRequired(timeHelper)
+                insertOrUpdateSession(it).blockingAwait()
+            }
+            Completable.complete()
         }
 
-        session.setEvents(session.getEvents().also { it.add(event) })
-        saveSession()
-    }
 
-    override fun updateLocation(lat: Double, long: Double) {
-        if (session.location == null || (session.location?.latitude == 0.0 && session.location?.longitude == 0.0)) {
-            session.location = Location(lat, long)
-            saveSession()
-        }
-    }
-
-    override fun updateDatabaseInfo(databaseInfo: DatabaseInfo) {
-        session.databaseInfo = databaseInfo
-        saveSession()
-    }
-
-    private fun msSinceStartTime(): Long = timeHelper.msSinceBoot() - session.startTime
+    override fun insertOrUpdateSession(session: SessionEvents): Completable = dbManagerSessionEvents.insertOrUpdateSessionEvents(session)
 }

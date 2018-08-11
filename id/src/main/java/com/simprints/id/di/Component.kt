@@ -30,7 +30,8 @@ import com.simprints.id.activities.refusal.RefusalPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
-import com.simprints.id.services.scheduledSync.ScheduledSync
+import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSync
+import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSync
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.PositionTracker
 import dagger.Component
@@ -71,6 +72,7 @@ interface AppComponent {
     fun inject(dashboardPresenter: DashboardPresenter)
     fun inject(alertPresenter: AlertPresenter)
     fun inject(launchPresenter: LaunchPresenter)
-    fun inject(scheduledSync: ScheduledSync)
     fun inject(positionTracker: PositionTracker)
+    fun inject(scheduledSync: ScheduledPeopleSync)
+    fun inject(scheduledSessionsSync: ScheduledSessionsSync)
 }

@@ -70,7 +70,8 @@ abstract class CheckLoginPresenter(
             isEncryptedProjectSecretPresent() &&
             isProjectIdStoredAndMatches() &&
             isLocalKeyValid(loginInfoManager.getSignedInProjectIdOrEmpty()) &&
-            isUserIdStoredAndMatches() &&
+            /* Loosy rule to have login no user specific. */
+            //isUserIdStoredAndMatches() &&
             isFirebaseTokenValid()
 
         if (!isUserSignedIn)

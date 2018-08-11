@@ -7,14 +7,22 @@ import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.events.models.ConsentEvent
+import com.simprints.id.data.analytics.events.models.ConsentEvent.Result.*
+import com.simprints.id.data.analytics.events.models.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.services.scheduledSync.ScheduledSyncManager
+import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
+import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionSyncManager
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.id.tools.*
+import com.simprints.id.tools.AppState
+import com.simprints.id.tools.Log
+import com.simprints.id.tools.PositionTracker
+import com.simprints.id.tools.TimeHelper
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
@@ -31,6 +39,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     @Inject lateinit var appState: AppState
     @Inject lateinit var setup: Setup
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
 
     private val activity = view as Activity
     private lateinit var positionTracker: PositionTracker
@@ -51,8 +60,11 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         }
     }
 
+    private var consentEvent: ConsentEvent
+
     init {
         (activity.application as Application).component.inject(this)
+        consentEvent = ConsentEvent(timeHelper.msSinceBoot(), 0, INDIVIDUAL, NO_RESPONSE)
     }
 
     override fun start() {
@@ -60,7 +72,8 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         initPositionTracker()
         initSetup()
         initBackgroundSync()
-        scheduleSyncIfNecessary()
+        schedulePeopleSyncIfNecessary()
+        scheduleSessionsSyncIfNecessary()
     }
 
     private fun initPositionTracker() {
@@ -76,9 +89,15 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.AT_LAUNCH)
     }
 
-    private fun scheduleSyncIfNecessary() {
-        if (preferencesManager.scheduledSyncWorkRequestId.isEmpty()) {
-            ScheduledSyncManager(preferencesManager).scheduleSyncIfNecessary()
+    private fun schedulePeopleSyncIfNecessary() {
+        if (preferencesManager.scheduledPeopleSyncWorkRequestId.isEmpty()) {
+            ScheduledPeopleSyncManager(preferencesManager).scheduleSyncIfNecessary()
+        }
+    }
+
+    private fun scheduleSessionsSyncIfNecessary(){
+        if (preferencesManager.scheduledSessionsSyncWorkRequestId.isEmpty()) {
+            ScheduledSessionSyncManager(preferencesManager).scheduleSyncIfNecessary()
         }
     }
 
@@ -120,7 +139,25 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         setup.onRequestPermissionsResult(activity, requestCode, permissions, grantResults)
     }
 
-    override fun handleOnBackOrDeclinePressed() {
+    override fun handleOnBackPressed(){
+        addConsentEvent(NO_RESPONSE)
+        handleOnBackOrDeclinePressed()
+    }
+
+    override fun handleDeclinePressed(){
+        addConsentEvent(DECLINED)
+        handleOnBackOrDeclinePressed()
+    }
+
+    private fun addConsentEvent(result: ConsentEvent.Result) {
+        sessionEventsManager.updateSession({
+            consentEvent.relativeEndTime = timeHelper.msSinceBoot() - it.startTime
+            consentEvent.consent = result
+            it.events.add(consentEvent)
+        }).subscribe()
+    }
+
+    private fun handleOnBackOrDeclinePressed() {
         launchOutOfFocus = true
         setup.stop()
         view.goToRefusalActivity()
@@ -167,6 +204,8 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     override fun confirmConsentAndContinueToNextActivity() {
+        addConsentEvent(ACCEPTED)
+
         consentConfirmed = true
         waitingForConfirmation = false
         appState.scanner.unregisterButtonListener(scannerButton)

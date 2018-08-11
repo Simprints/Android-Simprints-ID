@@ -1,19 +1,19 @@
 package com.simprints.id.data.analytics.events.models
 
-import com.simprints.id.data.analytics.events.realm.RlEvent
-import io.realm.RealmList
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
+import com.simprints.id.data.analytics.events.realm.RlSessionEvents
+import com.simprints.id.tools.TimeHelper
+import java.util.*
 
-open class SessionEvents : RealmObject {
+open class SessionEvents {
 
-    @PrimaryKey var id: Long = 0
-
-    lateinit var appVersionName: String
-    lateinit var libVersionName: String
-    lateinit var language: String
-    var device: Device? = null
-    var startTime: Long = 0
+    val id: String
+    var projectId: String
+    var appVersionName: String
+    var libVersionName: String
+    var language: String
+    var device: Device
+    var startTime: Long = 0L
+    var events: ArrayList<Event>
 
     var relativeEndTime: Long = 0
     var relativeUploadTime: Long = 0
@@ -21,29 +21,53 @@ open class SessionEvents : RealmObject {
     var location: Location? = null
     var analyticsId: String? = null
 
-    private lateinit var realmEvents: RealmList<RlEvent>
+    constructor(rlSessionEvents: RlSessionEvents) : this(
+        id = rlSessionEvents.id,
+        projectId = rlSessionEvents.projectId,
+        appVersionName = rlSessionEvents.appVersionName,
+        libVersionName = rlSessionEvents.libVersionName,
+        language = rlSessionEvents.language,
+        device = rlSessionEvents.device ?: Device(),
+        startTime = rlSessionEvents.startTime) {
+        this.events = ArrayList(rlSessionEvents.realmEvents.mapNotNull { it.getEvent() })
+        this.relativeEndTime = rlSessionEvents.relativeEndTime
+        this.relativeUploadTime = rlSessionEvents.relativeUploadTime
+        this.databaseInfo = rlSessionEvents.databaseInfo
+        this.location = rlSessionEvents.location
+        this.analyticsId = rlSessionEvents.analyticsId
+    }
 
-    fun isSessionCompleted(): Boolean = relativeEndTime > 0
-
-    constructor()
-
-    constructor(appVersionName: String,
+    constructor(id: String = UUID.randomUUID().toString(),
+                projectId: String,
+                appVersionName: String,
                 libVersionName: String,
                 language: String,
                 device: Device,
                 startTime: Long = 0) {
-
+        this.id = id
+        this.projectId = projectId
         this.appVersionName = appVersionName
         this.libVersionName = libVersionName
         this.language = language
         this.device = device
         this.startTime = startTime
-        this.realmEvents = RealmList()
+        this.events = ArrayList()
     }
 
-    fun getEvents(): ArrayList<Event> = ArrayList(realmEvents.mapNotNull { it.getEvent() })
-    fun setEvents(events: ArrayList<Event>) = realmEvents.apply {
-        clear()
-        addAll(events.map { RlEvent(it) })
+    private fun isSessionCompleted(): Boolean = relativeEndTime > 0
+
+    fun addArtificialTerminationIfRequired(timeHelper: TimeHelper, reason: ArtificialTerminationEvent.Reason) {
+        if (relativeEndTime == 0L) {
+            events.add(ArtificialTerminationEvent(nowRelativeToStartTime(timeHelper), reason))
+        }
     }
+
+    fun closeIfRequired(timeHelper: TimeHelper) {
+        if (!isSessionCompleted()) {
+            relativeEndTime = nowRelativeToStartTime(timeHelper)
+        }
+    }
+
+    fun timeRelativeToStartTime(time: Long): Long = time - startTime
+    fun nowRelativeToStartTime(timeHelper: TimeHelper): Long = timeRelativeToStartTime(timeHelper.msSinceBoot())
 }

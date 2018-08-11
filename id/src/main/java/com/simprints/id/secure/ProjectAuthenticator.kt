@@ -7,12 +7,12 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Project
+import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.*
-import com.simprints.id.services.scheduledSync.ScheduledSyncManager
+import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -103,7 +103,7 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun Completable.scheduleSync(): Completable =
         andThen {
-            ScheduledSyncManager(prefercesManager).scheduleSyncIfNecessary()
+            ScheduledPeopleSyncManager(prefercesManager).scheduleSyncIfNecessary()
             it.onComplete()
         }
 }
