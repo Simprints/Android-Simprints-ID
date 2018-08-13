@@ -3,7 +3,9 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.content.SharedPreferences
 import android.preference.*
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.di.AppComponent
+import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
 import javax.inject.Inject
 
@@ -13,6 +15,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     SettingsPreferenceContract.Presenter {
 
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>
 
     init {
         component.inject(this)
@@ -173,7 +176,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     }
 
     private fun selectionContainsDefaultFingers(fingersHash: HashSet<String>): Boolean =
-        fingersHash.containsAll(getHashSetFromFingersMap(preferencesManager.fingerStatus))
+        fingersHash.containsAll(getHashSetFromFingersMap(preferencesManager.getRemoteConfigFingerStatus()))
 
     private fun getHashSetFromFingersMap(fingersMap: Map<FingerIdentifier, Boolean>) =
         fingersMap.filter { it.value }.keys.map { it.toString() }.toHashSet()

@@ -8,13 +8,14 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimi
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
 import com.simprints.id.domain.Constants
+import com.simprints.id.exceptions.unsafe.preferences.NoSuchPreferenceError
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
 
 
 class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
-                                     remoteConfig: FirebaseRemoteConfig,
-                                     fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
+                                     private val remoteConfig: FirebaseRemoteConfig,
+                                     private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                      groupSerializer: Serializer<Constants.GROUP>)
     : SettingsPreferencesManager {
 
@@ -164,4 +165,10 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     init {
         remoteConfig.setDefaults(remoteConfigDefaults)
     }
+
+    override fun getRemoteConfigStringPreference(key: String) = remoteConfig.getString(key)?: throw NoSuchPreferenceError.forKey(key)
+
+    override fun <T : Any> getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T = serializer.deserialize(getRemoteConfigStringPreference(key))
+
+    override fun getRemoteConfigFingerStatus() = getRemoteConfigComplexPreference(FINGER_STATUS_KEY, fingerIdToBooleanSerializer)
 }
