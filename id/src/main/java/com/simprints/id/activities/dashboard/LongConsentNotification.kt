@@ -44,6 +44,7 @@ class LongConsentNotification(val context: Context) {
     }
 
     fun updateNotification(language: String, progress: Int) {
+        builder.setContentTitle(String.format(channelContentTitle, language))
         builder.setProgress(100, progress, false)
         builder.setContentText(String.format(downloadProgress, progress))
         notificationManager.notify(languageToId(language), builder.build())
