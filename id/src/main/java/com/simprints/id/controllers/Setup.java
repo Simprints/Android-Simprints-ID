@@ -33,8 +33,6 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE;
-import static com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE;
 import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
 import static com.simprints.libscanner.ScannerUtils.convertAddressToSerial;
 
@@ -259,11 +257,11 @@ public class Setup {
     private void saveNotFoundVerification(Person probe) {
         if (networkUtils.isConnected()) {
             // We've synced with the online dbManager and they're not in the dbManager
-            dbManager.saveVerification(probe, null, GUID_NOT_FOUND_ONLINE);
+            //dbManager.saveVerification(probe, null, GUID_NOT_FOUND_ONLINE); //StopShip
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
         } else {
             // We're offline but might find the person if we sync
-            dbManager.saveVerification(probe, null, GUID_NOT_FOUND_OFFLINE);
+            //dbManager.saveVerification(probe, null, GUID_NOT_FOUND_OFFLINE); //StopShip
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
         }
     }

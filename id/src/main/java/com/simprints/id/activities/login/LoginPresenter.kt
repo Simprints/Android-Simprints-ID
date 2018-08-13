@@ -1,12 +1,20 @@
 package com.simprints.id.activities.login
 
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.events.models.LoginEvent
+import com.simprints.id.data.analytics.events.models.LoginEvent.LoginInfo
+import com.simprints.id.data.analytics.events.models.LoginEvent.Result.FAILURE
+import com.simprints.id.data.analytics.events.models.LoginEvent.Result.SUCCESS
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
-import com.simprints.id.exceptions.safe.secure.*
+import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
+import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
+import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -23,6 +31,8 @@ class LoginPresenter(val view: LoginContract.View,
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var timeHelper: TimeHelper
 
     init {
         component.inject(this)
@@ -49,6 +59,7 @@ class LoginPresenter(val view: LoginContract.View,
 
     private fun doAuthenticate(suppliedProjectId: String, suppliedUserId: String, suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
         loginInfoManager.cleanCredentials()
+        val startTime = timeHelper.msSinceBoot()
         projectAuthenticator.authenticate(
             NonceScope(suppliedProjectId, suppliedUserId),
             suppliedProjectSecret,
@@ -58,8 +69,27 @@ class LoginPresenter(val view: LoginContract.View,
             .observeOn(AndroidSchedulers.mainThread())
             .trace("doAuthenticate")
             .subscribeBy(
-                onComplete = { handleSignInSuccess() },
-                onError = { e -> handleSignInError(e) })
+                onComplete = {
+                    sessionEventsManager.updateSessionInBackground({
+                        it.events.add(LoginEvent(
+                            it.timeRelativeToStartTime(startTime),
+                            it.nowRelativeToStartTime(timeHelper),
+                            LoginInfo(suppliedProjectId, suppliedUserId),
+                            SUCCESS))
+                    })
+                    handleSignInSuccess()
+                },
+                onError = {
+                    e ->
+                    sessionEventsManager.updateSessionInBackground({
+                        it.events.add(LoginEvent(
+                            it.timeRelativeToStartTime(startTime),
+                            it.nowRelativeToStartTime(timeHelper),
+                            LoginInfo(suppliedProjectId, suppliedUserId),
+                            FAILURE))
+                    })
+                    handleSignInError(e)
+                })
     }
 
     private fun handleSignInSuccess() {
