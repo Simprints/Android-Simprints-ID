@@ -73,12 +73,6 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         private const val SYNC_ON_CALLOUT_KEY = "SyncOnCallout"
         private const val SYNC_ON_CALLOUT_DEFAULT = false
-        private const val SYNC_ON_CALLOUT_ONLY_ON_WIFI_KEY = "SyncOnCalloutOnlyOnWifi"
-        private const val SYNC_ON_CALLOUT_ONLY_ON_WIFI_DEFAULT = false
-        private const val SYNC_ON_CALLOUT_ONLY_WHEN_CHARGING_KEY = "SyncOnCalloutOnlyWhenCharging"
-        private const val SYNC_ON_CALLOUT_ONLY_WHEN_CHARGING_DEFAULT = false
-        private const val SYNC_ON_CALLOUT_ONLY_WHEN_NOT_LOW_BATTERY_KEY = "SyncOnCalloutOnlyWhenNotLowBattery"
-        private const val SYNC_ON_CALLOUT_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT = true
 
         private const val SCHEDULED_BACKGROUND_SYNC_KEY = "ScheduledBackgroundSync"
         private const val SCHEDULED_BACKGROUND_SYNC_DEFAULT = true
@@ -146,12 +140,6 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     override var syncOnCallout: Boolean
         by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_ON_CALLOUT_KEY, SYNC_ON_CALLOUT_DEFAULT)
-    override var syncOnCalloutOnlyOnWifi: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_ON_CALLOUT_ONLY_ON_WIFI_KEY, SYNC_ON_CALLOUT_ONLY_ON_WIFI_DEFAULT)
-    override var syncOnCalloutOnlyWhenCharging: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_ON_CALLOUT_ONLY_WHEN_CHARGING_KEY, SYNC_ON_CALLOUT_ONLY_WHEN_CHARGING_DEFAULT)
-    override var syncOnCalloutOnlyWhenNotLowBattery: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_ON_CALLOUT_ONLY_WHEN_NOT_LOW_BATTERY_KEY, SYNC_ON_CALLOUT_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT)
 
     override var scheduledBackgroundSync: Boolean
         by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_KEY, SCHEDULED_BACKGROUND_SYNC_DEFAULT)

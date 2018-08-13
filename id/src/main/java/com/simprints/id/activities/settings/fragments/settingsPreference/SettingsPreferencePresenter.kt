@@ -1,7 +1,9 @@
 package com.simprints.id.activities.settings.fragments.settingsPreference
 
-import android.content.SharedPreferences
-import android.preference.*
+import android.preference.ListPreference
+import android.preference.MultiSelectListPreference
+import android.preference.Preference
+import android.preference.SwitchPreference
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.libsimprints.FingerIdentifier
@@ -19,41 +21,44 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     }
 
     override fun start() {
-        findPreferencesAndBindThemToValues()
+        loadPreferencesAndBindThemToValues()
     }
 
-    private fun findPreferencesAndBindThemToValues() {
-        loadAndBindPreferenceSummaryToValue(view.getPreferenceForLanguage())
-        loadAndBindPreferenceSummaryToValue(view.getPreferenceForDefaultFingers())
-        loadAndBindPreferenceSummaryToValue(view.getPreferenceForSyncUponLaunchToggle())
-        loadAndBindPreferenceSummaryToValue(view.getPreferenceForBackgroundSyncToggle())
-        loadAndBindPreferenceSummaryToValue(view.getAppVersionPreference())
-        loadAndBindPreferenceSummaryToValue(view.getScannerVersionPreference())
+    private fun loadPreferencesAndBindThemToValues() {
+        loadValueAndBindChangeListener(view.getPreferenceForLanguage())
+        loadValueAndBindChangeListener(view.getPreferenceForDefaultFingers())
+        loadValueAndBindChangeListener(view.getPreferenceForSyncUponLaunchToggle())
+        loadValueAndBindChangeListener(view.getPreferenceForBackgroundSyncToggle())
+        loadValueAndBindChangeListener(view.getAppVersionPreference())
+        loadValueAndBindChangeListener(view.getScannerVersionPreference())
     }
 
-
-    private fun loadAndBindPreferenceSummaryToValue(preference: Preference) {
-        loadPreferenceValue(preference)
-        bindPreferenceToSummaryValue(preference)
-    }
-
-    private fun loadPreferenceValue(preference: Preference) {
+    private fun loadValueAndBindChangeListener(preference: Preference) {
         when (preference) {
             is ListPreference -> {
                 if (preference.key == view.getKeyForLanguagePreference()) {
                     loadLanguagePreference(preference)
+                    preference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+                        handleLanguagePreferenceChanged(preference, value.toString())
+                    }
                 }
             }
             is MultiSelectListPreference -> {
                 if (preference.key == view.getKeyForDefaultFingersPreference()) {
                     loadDefaultFingersPreference(preference)
+                    preference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+                        @Suppress("UNCHECKED_CAST")
+                        handleDefaultFingersChanged(preference, value as HashSet<String>)
+                    }
                 }
             }
             is SwitchPreference -> {
                 if (preference.key == view.getKeyForSyncUponLaunchPreference()) {
                     loadSyncUponLaunchPreference(preference)
+                    preference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value -> handleSyncUponLaunchChanged(value as Boolean) }
                 } else if (preference.key == view.getKeyForBackgroundSyncPreference()) {
                     loadBackgroundSyncPreference(preference)
+                    preference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value -> handleBackgroundSyncChanged(value as Boolean) }
                 }
             }
             else -> {
@@ -64,6 +69,13 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
                 }
             }
         }
+    }
+
+    inline fun <reified T : Preference, V : Any>Preference.setChangeListener(crossinline listener: (T, V) -> Unit) {
+        onPreferenceChangeListener = Preference.OnPreferenceChangeListener{ preference, value ->
+            @Suppress("UNCHECKED_CAST")
+            listener(preference as T, value as V)
+            true}
     }
 
     private fun loadLanguagePreference(preference: ListPreference) {
@@ -96,61 +108,17 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         preference.summary = preferencesManager.scannerId
     }
 
-    private fun bindPreferenceToSummaryValue(preference: Preference) {
-        preference.onPreferenceChangeListener = bindPreferenceSummaryToValueListener
-
-        when (preference) {
-            is ListPreference ->
-                bindPreferenceSummaryToValueListener.onPreferenceChangedGetPreference(preference) { getString(preference.key, "") }
-            is MultiSelectListPreference ->
-                bindPreferenceSummaryToValueListener.onPreferenceChangedGetPreference(preference) { getStringSet(preference.key, null) }
-            is SwitchPreference ->
-                bindPreferenceSummaryToValueListener.onPreferenceChangedGetPreference(preference) { getBoolean(preference.key, true) }
-            else ->
-                bindPreferenceSummaryToValueListener.onPreferenceChangedGetPreference(preference) { getString(preference.key, "") }
-        }
-    }
-
-    private fun Preference.OnPreferenceChangeListener.onPreferenceChangedGetPreference(preference: Preference, getPreference: SharedPreferences.() -> Any) =
-        onPreferenceChange(preference,
-            PreferenceManager
-                .getDefaultSharedPreferences(preference.context)
-                .getPreference())
-
-    private val bindPreferenceSummaryToValueListener =
-        Preference.OnPreferenceChangeListener { preference, value ->
-            when (preference) {
-                is ListPreference -> {
-                    if (preference.key == view.getKeyForLanguagePreference()) {
-                        handleLanguagePreferenceChanged(preference, value.toString())
-                    }
-                }
-                is MultiSelectListPreference -> {
-                    if (preference.key == view.getKeyForDefaultFingersPreference()) {
-                        @Suppress("UNCHECKED_CAST")
-                        handleDefaultFingersChanged(preference, value as HashSet<String>)
-                    }
-                }
-                is SwitchPreference -> {
-                    if (preference.key == view.getKeyForSyncUponLaunchPreference()) {
-                        handleSyncUponLaunchChanged(value as Boolean)
-                    } else if (preference.key == view.getKeyForBackgroundSyncPreference()) {
-                        handleBackgroundSyncChanged(value as Boolean)
-                    }
-                }
-            }
-            true
-        }
-
-    private fun handleSyncUponLaunchChanged(value: Boolean) {
+    private fun handleSyncUponLaunchChanged(value: Boolean): Boolean {
         preferencesManager.syncOnCallout = value
+        return true
     }
 
-    private fun handleBackgroundSyncChanged(value: Boolean) {
+    private fun handleBackgroundSyncChanged(value: Boolean): Boolean {
         preferencesManager.scheduledBackgroundSync = value
+        return true
     }
 
-    private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String) {
+    private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String): Boolean {
         val index = listPreference.findIndexOfValue(stringValue)
         preferencesManager.language = stringValue
 
@@ -159,10 +127,11 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         } else {
             null
         }
+        return true
     }
 
     private fun handleDefaultFingersChanged(preference: MultiSelectListPreference,
-                                            fingersHash: HashSet<String>) {
+                                            fingersHash: HashSet<String>): Boolean {
         if (selectionContainsDefaultFingers(fingersHash)) {
             preferencesManager.fingerStatus = getMapFromFingersHash(fingersHash)
         } else {
@@ -170,6 +139,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             fingersHash.clear()
             fingersHash.addAll(preference.values)
         }
+        return true
     }
 
     private fun selectionContainsDefaultFingers(fingersHash: HashSet<String>): Boolean =

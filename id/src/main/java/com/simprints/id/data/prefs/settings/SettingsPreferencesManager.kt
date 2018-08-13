@@ -22,9 +22,6 @@ interface SettingsPreferencesManager {
     var fingerStatus: Map<FingerIdentifier, Boolean>
 
     var syncOnCallout: Boolean
-    var syncOnCalloutOnlyOnWifi: Boolean
-    var syncOnCalloutOnlyWhenCharging: Boolean
-    var syncOnCalloutOnlyWhenNotLowBattery: Boolean
 
     var scheduledBackgroundSync: Boolean
     var scheduledBackgroundSyncOnlyOnWifi: Boolean
