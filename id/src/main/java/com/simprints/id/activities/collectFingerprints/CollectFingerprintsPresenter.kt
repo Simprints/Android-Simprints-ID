@@ -112,10 +112,16 @@ class CollectFingerprintsPresenter(private val context: Context,
         scanningHelper.toggleContinuousCapture()
     }
 
+    //TODO: Make the logic for adding finger better
     override fun showSplashAndAddNewFingerIfNecessary() {
         if (tooManyBadScans(currentFinger())) {
-            if (haveNotExceedMaximumNumberOfFingersToAdd()) {
-                fingerDisplayHelper.showSplashAndAddNewFinger()
+            if (haveNotExceedMaximumNumberOfFingersToAdd() ) {
+                if(!areDefaultFingersMoreThanMaximum()) {
+                    fingerDisplayHelper.showSplashAndAddNewFinger()
+                }
+                else {
+                    fingerDisplayHelper.showSplashAndNudgeIfNecessary()
+                }
                 numberOfFingersAdded++
             } else if (!currentFinger().isLastFinger) {
                 fingerDisplayHelper.showSplashAndNudgeIfNecessary()
@@ -128,6 +134,9 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun haveNotExceedMaximumNumberOfFingersToAdd() =
         numberOfFingersAdded < maximumNumberOfFingersAdded
+
+    private fun areDefaultFingersMoreThanMaximum() =
+        preferencesManager.fingerStatus.count() >= maximumNumberOfDefaultFingers
 
     override fun doNudgeIfNecessary() {
         fingerDisplayHelper.doNudgeIfNecessary()
@@ -287,6 +296,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     companion object {
         private const val maximumNumberOfFingersAdded = 2
         private const val minimumNumberOfGoodScans = 2
+        private const val maximumNumberOfDefaultFingers = 4
         private const val minimumNumberOfAnyQualityScans = minimumNumberOfGoodScans + maximumNumberOfFingersAdded
         private const val numberOfBadScansRequiredToAutoAddNewFinger = 3
     }
