@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E600B3D1"
-    tools:context=".activities.collectFingerprints.SplashScreen">
+    tools:context=".activities.collectFingerprints.SplashScreenActivity">
 
     <TextView
         android:id="@+id/splashGetReady"
