@@ -280,6 +280,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleMissingFingerClick() {
+        scanningHelper.setBadScanForCurrentFinger()
         fingerDisplayHelper.showSplashAndAddNewFinger()
     }
 
