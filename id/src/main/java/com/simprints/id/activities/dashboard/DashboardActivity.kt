@@ -40,7 +40,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override lateinit var viewPresenter: DashboardContract.Presenter
     private lateinit var cardsViewAdapter: DashboardCardAdapter
 
-    private val notification = LongConsentNotification(this)
+    private lateinit var notification: LongConsentNotification
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,12 +49,12 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         component.inject(this)
         setSupportActionBar(dashboardToolbar)
         LanguageHelper.setLanguage(this, preferences.language)
+        notification = LongConsentNotification(this)
 
         viewPresenter = DashboardPresenter(this, component)
         setMenuItemClickListener()
 
         initCards()
-
     }
 
     private fun initCards() {
