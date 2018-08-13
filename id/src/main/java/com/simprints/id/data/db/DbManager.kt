@@ -45,11 +45,11 @@ interface DbManager {
 
     fun getPeopleCount(group: Constants.GROUP): Single<Int>
 
-    fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
+    fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>, startTimeIdentification: Long)
 
     fun updateIdentification(projectId: String, selectedGuid: String, sessionId: String)
 
-    fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
+    fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT, startTimeVerification: Long)
 
     fun saveRefusalForm(refusalForm: RefusalForm)
 

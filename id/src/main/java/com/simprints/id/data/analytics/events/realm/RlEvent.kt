@@ -33,6 +33,9 @@ open class RlEvent : RealmObject {
             CONSENT -> JsonHelper.gson.fromJson(jsonEvent, ConsentEvent::class.java)
             ENROLLMENT -> JsonHelper.gson.fromJson(jsonEvent, EnrollmentEvent::class.java)
             FINGERPRINT_CAPTURE -> JsonHelper.gson.fromJson(jsonEvent, FingerprintCaptureEvent::class.java)
+            LOGIN -> JsonHelper.gson.fromJson(jsonEvent, LoginEvent::class.java)
+            ONE_TO_MANY_MATCH -> JsonHelper.gson.fromJson(jsonEvent, OneToManyMatchEvent::class.java)
+            ONE_TO_ONE_MATCH -> JsonHelper.gson.fromJson(jsonEvent, OneToOneMatchEvent::class.java)
             null -> null
         }
     }
