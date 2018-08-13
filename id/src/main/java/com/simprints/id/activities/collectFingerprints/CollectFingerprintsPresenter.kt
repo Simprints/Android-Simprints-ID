@@ -119,7 +119,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                 if(!areDefaultFingersMoreThanMaximum()) {
                     fingerDisplayHelper.showSplashAndAddNewFinger()
                 }
-                else {
+                else if(!currentFinger().isLastFinger){
                     fingerDisplayHelper.showSplashAndNudgeIfNecessary()
                 }
                 numberOfFingersAdded++
