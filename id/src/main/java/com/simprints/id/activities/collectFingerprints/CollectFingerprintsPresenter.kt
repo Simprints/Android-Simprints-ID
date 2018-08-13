@@ -112,6 +112,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         scanningHelper.toggleContinuousCapture()
     }
 
+    //TODO: Make the logic for adding finger better
     override fun showSplashAndAddNewFingerIfNecessary() {
         if (tooManyBadScans(currentFinger())) {
             if (haveNotExceedMaximumNumberOfFingersToAdd() ) {
