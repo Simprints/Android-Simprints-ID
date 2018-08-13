@@ -10,7 +10,7 @@ class ScheduledSyncManager(private val preferencesManager: PreferencesManager) {
 
     fun scheduleSyncIfNecessary() {
         val scheduledSyncRequest = createRequestAndSaveId()
-        WorkManager.getInstance()?.enqueue(scheduledSyncRequest)
+        WorkManager.getInstance().enqueue(scheduledSyncRequest)
     }
 
     private fun createRequestAndSaveId(): PeriodicWorkRequest {
@@ -23,8 +23,9 @@ class ScheduledSyncManager(private val preferencesManager: PreferencesManager) {
     }
 
     private fun getConstraints() = Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.CONNECTED)
-        .setRequiresBatteryNotLow(true)
+        .setRequiredNetworkType(if (preferencesManager.scheduledBackgroundSyncOnlyOnWifi) NetworkType.UNMETERED else NetworkType.CONNECTED)
+        .setRequiresBatteryNotLow(preferencesManager.scheduledBackgroundSyncOnlyWhenNotLowBattery)
+        .setRequiresCharging(preferencesManager.scheduledBackgroundSyncOnlyWhenCharging)
         .build()
 
     private fun saveWorkRequestId(id: UUID) {
