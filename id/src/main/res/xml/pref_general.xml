@@ -4,7 +4,6 @@
         android:key="preferences_general"
         android:title="@string/settings_general">
         <ListPreference
-            android:defaultValue="en"
             android:entries="@array/language_array"
             android:entryValues="@array/language_values"
             android:key="@string/select_language_preference"
@@ -13,7 +12,6 @@
             android:title="@string/settings_language" />
 
         <MultiSelectListPreference
-            android:defaultValue="@array/default_fingers"
             android:entries="@array/finger_array"
             android:entryValues="@array/finger_values"
             android:key="@string/select_fingers_preference"
@@ -21,13 +19,11 @@
             android:title="@string/settings_fingers" />
 
         <SwitchPreference
-            android:defaultValue="false"
             android:key="@string/sync_upon_launch_preference"
             android:summary="@string/settings_sync_launch_subtext"
             android:title="@string/settings_sync_launch" />
 
         <SwitchPreference
-            android:defaultValue="true"
             android:key="@string/background_sync_preference"
             android:summary="@string/settings_background_sync_subtext"
             android:title="@string/settings_background_sync" />
