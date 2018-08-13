@@ -122,7 +122,12 @@ class CollectFingerprintsPresenter(private val context: Context,
                 else if(!currentFinger().isLastFinger){
                     fingerDisplayHelper.showSplashAndNudgeIfNecessary()
                 }
-                numberOfFingersAdded++
+                if(areDefaultFingersMoreThanMaximum()) {
+                    numberOfFingersAdded = maximumNumberOfFingersAdded
+                }
+                else{
+                    numberOfFingersAdded++
+                }
             } else if (!currentFinger().isLastFinger) {
                 fingerDisplayHelper.showSplashAndNudgeIfNecessary()
             }
@@ -194,7 +199,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun isFingerScannedAndHasTemplate(it: Finger) =
-        (it.isGoodScan || it.isBadScan || it.isRescanGoodScan) && it.template != null
+        ((it.isGoodScan || it.isBadScan || it.isRescanGoodScan) && it.template != null) || it.isFingerSkipped
 
     private fun proceedToFinish(fingerprints: List<Fingerprint>) {
         val person = Person(preferencesManager.patientId, fingerprints)
@@ -289,7 +294,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleMissingFingerClick() {
-        scanningHelper.setBadScanForCurrentFinger()
+        scanningHelper.setCurrentFingerAsSkipped()
         currentFinger().numberOfBadScans = numberOfBadScansRequiredToAutoAddNewFinger
         checkScannedFingersAndCreateMapToShowDialog()
         showSplashAndAddNewFingerIfNecessary()
