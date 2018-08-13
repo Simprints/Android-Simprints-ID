@@ -171,7 +171,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         when (currentFingerStatus) {
             GOOD_SCAN ->
                 askIfWantRescan()
-            RESCAN_GOOD_SCAN, BAD_SCAN, NOT_COLLECTED, NO_FINGER_DETECTED ->
+            RESCAN_GOOD_SCAN, BAD_SCAN, NOT_COLLECTED, NO_FINGER_DETECTED, FINGER_SKIPPED ->
                 startContinuousCapture()
             COLLECTING ->
                 stopContinuousCapture()
@@ -283,7 +283,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         setup.stop()
     }
 
-    fun setBadScanForCurrentFinger() {
-        currentFingerStatus = Finger.Status.BAD_SCAN
+    fun setCurrentFingerAsSkipped() {
+        currentFingerStatus = Finger.Status.FINGER_SKIPPED
     }
 }
