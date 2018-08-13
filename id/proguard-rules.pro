@@ -71,3 +71,7 @@
 
 # Dagger
 -dontwarn com.google.errorprone.annotations.**
+
+# PDF Viewer
+-keep class com.shockwave.**
+

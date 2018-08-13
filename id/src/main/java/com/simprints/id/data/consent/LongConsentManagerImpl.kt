@@ -42,6 +42,8 @@ class LongConsentManagerImpl(context: Context,
 
         val file = File(filePath, "$language.$FILE_TYPE")
 
+        firebaseStorage.maxDownloadRetryTimeMillis = 1
+
         firebaseStorage.getReference(FILE_PATH)
             .child(loginInfoManager.signedInProjectId)
             .child("$language.$FILE_TYPE")
@@ -61,5 +63,7 @@ class LongConsentManagerImpl(context: Context,
     override fun getLongConsentUri(language: String): Uri {
         return Uri.fromFile(File(filePath, "$language.$FILE_TYPE"))
     }
+
+    override val languages = arrayOf("en", "ne", "bn", "ps", "fa-rAF", "so", "ha", "ny")
 
 }
