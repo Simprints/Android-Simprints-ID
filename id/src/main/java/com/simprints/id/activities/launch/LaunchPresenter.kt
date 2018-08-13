@@ -28,7 +28,6 @@ import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
 import javax.inject.Inject
 
-
 class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
 
     @Inject lateinit var dataManager: DataManager
@@ -95,7 +94,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         }
     }
 
-    private fun scheduleSessionsSyncIfNecessary(){
+    private fun scheduleSessionsSyncIfNecessary() {
         if (preferencesManager.scheduledSessionsSyncWorkRequestId.isEmpty()) {
             ScheduledSessionSyncManager(preferencesManager).scheduleSyncIfNecessary()
         }
@@ -139,12 +138,12 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         setup.onRequestPermissionsResult(activity, requestCode, permissions, grantResults)
     }
 
-    override fun handleOnBackPressed(){
+    override fun handleOnBackPressed() {
         addConsentEvent(NO_RESPONSE)
         handleOnBackOrDeclinePressed()
     }
 
-    override fun handleDeclinePressed(){
+    override fun handleDeclinePressed() {
         addConsentEvent(DECLINED)
         handleOnBackOrDeclinePressed()
     }
@@ -154,6 +153,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             consentEvent.relativeEndTime = timeHelper.msSinceBoot() - it.startTime
             consentEvent.consent = result
             it.events.add(consentEvent)
+            it.location = null
         }).subscribe()
     }
 

@@ -3,6 +3,7 @@ package com.simprints.id.data.db
 import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -11,7 +12,8 @@ import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
-import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.shared.DependencyRule
+import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.whenever
 import com.simprints.id.sync.SimApiMock
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -49,10 +51,12 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
 
     @Inject lateinit var localDbManagerSpy: LocalDbManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
+    @Inject lateinit var sessionEventsLocalDbManagerSpy: SessionEventsLocalDbManager
+
     @Inject lateinit var dbManager: DbManager
 
     override var module: AppModuleForTests by lazyVar {
-        object : AppModuleForTests(app, localDbManagerRule = SpyRule(), remoteDbManagerRule = SpyRule()) {
+        object : AppModuleForTests(app, localDbManagerRule = SpyRule(), remoteDbManagerRule = SpyRule(), sessionEventsLocalDbManagerRule = DependencyRule.MockRule()) {
             override fun provideLocalDbManager(ctx: Context): LocalDbManager {
                 return spy(LocalDbManager::class.java)
             }
@@ -69,7 +73,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
         mockServer.start()
         apiClient = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl)
 
-        setupLocalAndRemoteManagersForApiTesting(mockServer, localDbManagerSpy, remoteDbManagerSpy)
+        setupLocalAndRemoteManagersForApiTesting(mockServer, localDbManagerSpy, remoteDbManagerSpy, sessionEventsLocalDbManagerSpy)
     }
 
     @Test

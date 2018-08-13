@@ -162,19 +162,16 @@ open class AppModule(val app: Application) {
         SyncManager(analyticsManager, syncClient)
 
     @Provides
-    fun provideLocalEventDbManager(ctx: Context,
-                                   secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
-        RealmSessionEventsDbManagerImpl(ctx).also {
-            secureDataManager.setLocalDatabaseKey("event_data", null)
-            it.initDb(secureDataManager.getLocalDbKeyOrThrow("event_data"))
-        }
+    @Singleton
+    open fun provideLocalEventDbManager(ctx: Context,
+                                        secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+        RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
 
     @Provides
     @Singleton
-    fun provideSessionEventsManager(ctx: Context,
-                                    loginInfoManager: LoginInfoManager,
-                                    sessionEventsLocalDbManager: SessionEventsLocalDbManager,
-                                    preferencesManager: PreferencesManager,
-                                    timeHelper: TimeHelper): SessionEventsManager = SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper)
-
+    open fun provideSessionEventsManager(ctx: Context,
+                                         loginInfoManager: LoginInfoManager,
+                                         sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+                                         preferencesManager: PreferencesManager,
+                                         timeHelper: TimeHelper): SessionEventsManager = SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper)
 }

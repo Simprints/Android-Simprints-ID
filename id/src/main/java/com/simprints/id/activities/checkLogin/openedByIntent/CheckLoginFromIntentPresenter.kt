@@ -104,10 +104,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun initSessionEvents(projectId: String) {
 
-        Singles.zip(
-            sessionEventsManager.createSession(projectId),
-            analyticsManager.analyticsId.onErrorReturn { "" },
-            dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }) { session: SessionEvents, gaId: String, count: Int ->
+        try {
+            Singles.zip(
+                sessionEventsManager.createSession(projectId),
+                analyticsManager.analyticsId.onErrorReturn { "" },
+                dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }) { session: SessionEvents, gaId: String, count: Int ->
                 session.analyticsId = gaId
                 session.databaseInfo = DatabaseInfo(count)
                 session.events.add(CalloutEvent(session.nowRelativeToStartTime(timeHelper), view.parseCallout()))
@@ -116,10 +117,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                     SUCCESS, Info(loginInfoManager.getSignedInProjectIdOrEmpty(),
                     loginInfoManager.getSignedInUserIdOrEmpty())))
 
-            return@zip session
+                return@zip session
             }.flatMapCompletable {
                 sessionEventsManager.insertOrUpdateSession(it)
             }.subscribeBy(onComplete = { }, onError = { it.printStackTrace() })
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun handleActivityResult(requestCode: Int, resultCode: Int, returnCallout: Callout) {
@@ -127,7 +131,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), returnCallout))
             it.closeIfRequired(timeHelper)
         }).andThen {
-
         }.subscribeBy(onComplete = { }, onError = { it.printStackTrace() })
     }
 }

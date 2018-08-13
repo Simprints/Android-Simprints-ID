@@ -5,6 +5,7 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.shared.AppModuleForAnyTests
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.DependencyRule.RealRule
+
 import com.simprints.id.shared.setupFakeKeyStore
 
 open class AppModuleForTests(app: Application,
@@ -15,8 +16,21 @@ open class AppModuleForTests(app: Application,
                              override var dataManagerRule: DependencyRule = RealRule(),
                              override var loginInfoManagerRule: DependencyRule = RealRule(),
                              override var analyticsManagerRule: DependencyRule = RealRule(),
-                             override var bluetoothComponentAdapterRule: DependencyRule = RealRule())
-    : AppModuleForAnyTests(app, localDbManagerRule, remoteDbManagerRule, dbManagerRule, secureDataManagerRule, dataManagerRule, loginInfoManagerRule, analyticsManagerRule, bluetoothComponentAdapterRule) {
+                             override var bluetoothComponentAdapterRule: DependencyRule = RealRule(),
+                             override var sessionEventsManagerRule: DependencyRule = RealRule(),
+                             override var sessionEventsLocalDbManagerRule: DependencyRule = DependencyRule.MockRule()) //Roboletric doesn't support Realm
+    : AppModuleForAnyTests(
+    app,
+    localDbManagerRule,
+    remoteDbManagerRule,
+    dbManagerRule,
+    secureDataManagerRule,
+    dataManagerRule,
+    loginInfoManagerRule,
+    analyticsManagerRule,
+    bluetoothComponentAdapterRule,
+    sessionEventsManagerRule,
+    sessionEventsLocalDbManagerRule) {
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
 }

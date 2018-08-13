@@ -10,13 +10,16 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
+import com.simprints.id.shared.DependencyRule.MockRule
+import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
@@ -54,7 +57,9 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
     private lateinit var sharedPrefs: SharedPreferences
 
+    @Inject lateinit var sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var analyticsManagerSpy: AnalyticsManager
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var dbManager: DbManager
@@ -63,7 +68,8 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
         AppModuleForTests(app,
             analyticsManagerRule = SpyRule(),
             localDbManagerRule = MockRule(),
-            remoteDbManagerRule = MockRule())
+            remoteDbManagerRule = MockRule(),
+            sessionEventsLocalDbManagerRule = MockRule())
     }
 
     @Before
@@ -75,6 +81,11 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
         sharedPrefs = getRoboSharedPreferences()
         initLogInStateMock(sharedPrefs, remoteDbManagerMock)
+
+        setupLocalAndRemoteManagersForApiTesting(
+            localDbManagerSpy = localDbManagerMock,
+            remoteDbManagerSpy = remoteDbManagerMock,
+            sessionEventsLocalDbManagerMock = sessionEventsLocalDbManagerMock)
     }
 
     @Test

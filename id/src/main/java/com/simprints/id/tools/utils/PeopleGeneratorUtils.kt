@@ -16,12 +16,18 @@ object PeopleGeneratorUtils {
 
         return arrayListOf<rl_Person>().also { list ->
             (0 until numberOfPeople).forEach {
-                list.add(getRandomPerson(projectId, userId, moduleId, toSync))
+                list.add(getRandomPerson(
+                    UUID.randomUUID().toString(),
+                    projectId,
+                    userId,
+                    moduleId,
+                    toSync))
             }
         }.also { it.sortBy { it.updatedAt } }
     }
 
-    fun getRandomPerson(projectId: String = UUID.randomUUID().toString(),
+    fun getRandomPerson(patientId: String = UUID.randomUUID().toString(),
+                        projectId: String = UUID.randomUUID().toString(),
                         userId: String = UUID.randomUUID().toString(),
                         moduleId: String = UUID.randomUUID().toString(),
                         toSync: Boolean = false): rl_Person {
@@ -31,7 +37,7 @@ object PeopleGeneratorUtils {
         prints.add(getRandomFingerprint())
 
         return rl_Person().apply {
-            patientId = UUID.randomUUID().toString()
+            this.patientId = patientId
             this.projectId = projectId
             this.userId = userId
             this.moduleId = moduleId

@@ -30,6 +30,8 @@ android {
         versionCode 96
         versionName "2018.3.0-dev6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //testInstrumentationRunner "com.simprints.id.UiTestsRunner" //To use custom TestApplication
+
     }
 
     //Add those properties in ~/.gradle/gradle.properties
@@ -287,6 +289,9 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.0-alpha-3-SNAPSHOT'
     testImplementation 'org.robolectric:shadows-multidex:3.7.1'
     testImplementation 'com.android.support.test:monitor:1.0.2'
+
+    testImplementation "com.google.truth:truth:0.42"
+    androidTestImplementation "com.google.truth:truth:0.42"
 
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"
