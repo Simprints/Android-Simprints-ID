@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.WindowManager
+import android.widget.TabHost
 import com.simprints.id.R
 import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
@@ -29,6 +30,13 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
         viewPresenter = LaunchPresenter(this)
         viewPresenter.start()
+
+        tabHost.setup()
+        val tab1 = tabHost.newTabSpec("General").setIndicator("General Consent").setContent(R.id.generalConsentText)
+        val tab2 = tabHost.newTabSpec("Parental").setIndicator("Parental Consent").setContent(R.id.parentalConsentText)
+
+        tabHost.addTab(tab1)
+        tabHost.addTab(tab2)
     }
 
     private fun setButtonClickListeners() {
