@@ -5,6 +5,7 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
+import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
 import com.simprints.id.domain.Constants
 import com.simprints.id.tools.serializers.Serializer
@@ -140,7 +141,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // The map of default fingers
     override var fingerStatus: Map<FingerIdentifier, Boolean>
-        by RemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
+        by OverridableRemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
 
     override var syncOnCallout: Boolean
         by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_ON_CALLOUT_KEY, SYNC_ON_CALLOUT_DEFAULT)
