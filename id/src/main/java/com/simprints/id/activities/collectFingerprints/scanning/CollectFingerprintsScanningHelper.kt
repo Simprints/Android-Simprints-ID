@@ -282,4 +282,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     fun stopReconnecting() {
         setup.stop()
     }
+
+    fun setBadScanForCurrentFinger() {
+        currentFingerStatus = Finger.Status.BAD_SCAN
+    }
 }
