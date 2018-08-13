@@ -21,10 +21,10 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     }
 
     override fun start() {
-        loadPreferencesAndBindThemToValues()
+        loadPreferenceValuesAndBindThemToChangeListeners()
     }
 
-    private fun loadPreferencesAndBindThemToValues() {
+    private fun loadPreferenceValuesAndBindThemToChangeListeners() {
         loadValueAndBindChangeListener(view.getPreferenceForLanguage())
         loadValueAndBindChangeListener(view.getPreferenceForDefaultFingers())
         loadValueAndBindChangeListener(view.getPreferenceForSyncUponLaunchToggle())
@@ -38,27 +38,22 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             is ListPreference -> {
                 if (preference.key == view.getKeyForLanguagePreference()) {
                     loadLanguagePreference(preference)
-                    preference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
-                        handleLanguagePreferenceChanged(preference, value.toString())
-                    }
+                    preference.setChangeListener { value: String -> handleLanguagePreferenceChanged(preference, value) }
                 }
             }
             is MultiSelectListPreference -> {
                 if (preference.key == view.getKeyForDefaultFingersPreference()) {
                     loadDefaultFingersPreference(preference)
-                    preference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
-                        @Suppress("UNCHECKED_CAST")
-                        handleDefaultFingersChanged(preference, value as HashSet<String>)
-                    }
+                    preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
                 }
             }
             is SwitchPreference -> {
                 if (preference.key == view.getKeyForSyncUponLaunchPreference()) {
                     loadSyncUponLaunchPreference(preference)
-                    preference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value -> handleSyncUponLaunchChanged(value as Boolean) }
+                    preference.setChangeListener { value: Boolean -> handleSyncUponLaunchChanged(value) }
                 } else if (preference.key == view.getKeyForBackgroundSyncPreference()) {
                     loadBackgroundSyncPreference(preference)
-                    preference.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value -> handleBackgroundSyncChanged(value as Boolean) }
+                    preference.setChangeListener { value: Boolean -> handleBackgroundSyncChanged(value) }
                 }
             }
             else -> {
@@ -71,11 +66,11 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         }
     }
 
-    inline fun <reified T : Preference, V : Any>Preference.setChangeListener(crossinline listener: (T, V) -> Unit) {
-        onPreferenceChangeListener = Preference.OnPreferenceChangeListener{ preference, value ->
-            @Suppress("UNCHECKED_CAST")
-            listener(preference as T, value as V)
-            true}
+    private inline fun <reified V : Any> Preference.setChangeListener(crossinline listener: (V) -> Unit) {
+        onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, value ->
+            listener(value as V)
+            true
+        }
     }
 
     private fun loadLanguagePreference(preference: ListPreference) {
