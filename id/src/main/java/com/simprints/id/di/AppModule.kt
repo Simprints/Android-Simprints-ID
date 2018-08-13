@@ -9,6 +9,8 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
+import com.simprints.id.data.consent.LongConsentManager
+import com.simprints.id.data.consent.LongConsentManagerImpl
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
@@ -108,6 +110,11 @@ open class AppModule(val app: Application) {
                                 analyticsManager: AnalyticsManager,
                                 remoteDbManager: RemoteDbManager): DataManager =
         DataManagerImpl(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager)
+
+    @Provides
+    @Singleton
+    open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager):
+        LongConsentManager = LongConsentManagerImpl(ctx, loginInfoManager)
 
     @Provides
     @Singleton

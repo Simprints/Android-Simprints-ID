@@ -9,9 +9,8 @@ import io.reactivex.Flowable
 import java.io.File
 
 
-class LongConsentManagerImpl(private val loginInfoManager: LoginInfoManager,
-                             context: Context,
-                             private val firebaseStorage: FirebaseStorage) : LongConsentManager {
+class LongConsentManagerImpl(context: Context,
+                             private val loginInfoManager: LoginInfoManager) : LongConsentManager {
 
     companion object {
         private const val FILE_PATH = "long-consents"
@@ -19,6 +18,8 @@ class LongConsentManagerImpl(private val loginInfoManager: LoginInfoManager,
     }
 
     private val filePath: File
+
+    private val firebaseStorage = FirebaseStorage.getInstance()
 
     init {
         filePath = File(context.filesDir.absolutePath +
