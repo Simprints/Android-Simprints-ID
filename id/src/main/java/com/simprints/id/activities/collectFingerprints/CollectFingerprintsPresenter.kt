@@ -290,7 +290,9 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun handleMissingFingerClick() {
         scanningHelper.setBadScanForCurrentFinger()
-        fingerDisplayHelper.showSplashAndAddNewFinger()
+        currentFinger().numberOfBadScans = numberOfBadScansRequiredToAutoAddNewFinger
+        checkScannedFingersAndCreateMapToShowDialog()
+        showSplashAndAddNewFingerIfNecessary()
     }
 
     companion object {
