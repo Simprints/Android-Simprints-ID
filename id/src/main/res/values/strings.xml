@@ -289,6 +289,13 @@
     <string name="sync_error_notification_content">Sync failed.</string>
     <string name="sync_complete_notification_content">Sync completed.</string>
 
+    <!--Long Consent Download Notifications -->
+    <string name="notification_long_consent_channel_id" translatable="false">notificationLongConsentChannelId</string>
+    <string name="notification_long_consent_channel_title">Long Consent Download Progress</string>
+    <string name="notification_long_consent_channel_content_title">Downloading Language: %1$s</string>
+    <string name="notification_long_consent_progress_download">Downloading… %1$d</string>
+    <string name="notification_long_consent_complete">Complete</string>
+    <string name="notification_long_consent_failed">Failed</string>
 
     <!-- LoginActivity -->
     <!-- TODO: what about translation? -->
