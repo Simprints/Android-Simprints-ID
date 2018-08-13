@@ -39,6 +39,7 @@ class LongConsentNotification(val context: Context) {
 
     fun setNotification(language: String) {
         builder.setContentTitle(String.format(channelContentTitle, language))
+        builder.setProgress(100, 0, false)
         notificationManager.notify(languageToId(language), builder.build())
     }
 
@@ -48,11 +49,7 @@ class LongConsentNotification(val context: Context) {
         notificationManager.notify(languageToId(language), builder.build())
     }
 
-    fun failedNotification(language: String) {
-        builder.setProgress(0, 0, false)
-        builder.setContentText(context.getString(R.string.notification_long_consent_failed))
-        notificationManager.notify(languageToId(language), builder.build())
-    }
+    fun failedNotification(language: String) = notificationManager.cancel(languageToId(language))
 
     fun completeNotification(language: String) {
         builder.setProgress(0, 0, false)
