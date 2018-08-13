@@ -34,8 +34,10 @@ class LongConsentManagerImpl(private val loginInfoManager: LoginInfoManager,
     override fun downloadLongConsent(language: String):
         Flowable<Int> = Flowable.create<Int>({ emitter ->
 
-        if (language.isBlank())
-            emitter.onError(IllegalStateException("Invalid language choice: $language"))
+        if (language.isBlank()) emitter.apply {
+            onError(IllegalStateException("Invalid language choice: $language"))
+            onComplete()
+        }
 
         val file = File(filePath, "$language.$FILE_TYPE")
 
