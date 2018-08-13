@@ -1,6 +1,7 @@
 package com.simprints.id.data.prefs.settings
 
 import com.simprints.id.domain.Constants
+import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
 
 
@@ -30,4 +31,8 @@ interface SettingsPreferencesManager {
     var scheduledBackgroundSyncOnlyWhenCharging: Boolean
     var scheduledBackgroundSyncOnlyWhenNotLowBattery: Boolean
 
+    fun getRemoteConfigStringPreference(key: String): String
+    fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
+
+    fun getRemoteConfigFingerStatus(): Map<FingerIdentifier, Boolean>
 }
