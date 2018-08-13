@@ -46,7 +46,7 @@ class ScheduledSessionsSync : Worker() {
 
                 apiClient?.api?.uploadSessions(signedInProjectId, sessions)
             }.flatMapCompletable {
-                if(!it.isError) { //StopShip
+                if (!it.isError && false) { //StopShip
                     sessionEventsLocalDbManager.deleteSessions(signedInProjectId)
                 } else {
                     Completable.complete()

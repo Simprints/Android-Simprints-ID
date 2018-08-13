@@ -16,7 +16,7 @@ import io.reactivex.rxkotlin.subscribeBy
 
 // Class to manage the current session
 class SessionEventsManagerImpl(private val ctx: Context,
-                               private val dbManagerSessionEvents: SessionEventsLocalDbManager,
+                               private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                override val loginInfoManager: LoginInfoManager,
                                private val preferencesManager: PreferencesManager,
                                private val timeHelper: TimeHelper) : SessionEventsManager {
@@ -26,13 +26,13 @@ class SessionEventsManagerImpl(private val ctx: Context,
     //as default, the manager tries to load the last open session for a specific project
     override fun getCurrentSession(projectId: String): Single<SessionEvents> = session?.let {
         Single.just(it)
-    } ?: dbManagerSessionEvents.loadLastOpenSession(projectId).doOnSuccess {
+    } ?: sessionEventsLocalDbManager.loadSessions(projectId, true).map { it[0] }.doOnSuccess {
         session = it
     }
 
     override fun createSession(projectId: String): Single<SessionEvents> =
         if (projectId.isNotEmpty()) {
-            session = SessionEvents(
+            val sessionToSave = SessionEvents(
                 projectId = projectId,
                 appVersionName = preferencesManager.appVersionName,
                 libVersionName = preferencesManager.libVersionName,
@@ -42,12 +42,11 @@ class SessionEventsManagerImpl(private val ctx: Context,
                     androidSdkVersion = Build.VERSION.SDK_INT.toString(),
                     deviceModel = Build.MANUFACTURER + "_" + Build.MODEL,
                     deviceId = ctx.deviceId)
-            )
+            ).also { session = it }
 
             closeLastSessionsIfPending(projectId)
-                .andThen(insertOrUpdateSession(session!!))
-                .toSingle { session }
-
+                .andThen(insertOrUpdateSession(sessionToSave))
+                .toSingle { sessionToSave }
         } else {
             Single.error<SessionEvents>(Throwable("project ID empty"))
         }
@@ -56,7 +55,7 @@ class SessionEventsManagerImpl(private val ctx: Context,
         getCurrentSession(projectId).flatMapCompletable {
             block(it)
             insertOrUpdateSession(it)
-        }
+        }.onErrorComplete() // StopShip: if it fails, because events are low priority, it swallows the exception
 
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit, projectId: String) {
         updateSession(block, projectId).subscribeBy(onComplete = {}, onError = { it.printStackTrace() })
@@ -68,7 +67,7 @@ class SessionEventsManagerImpl(private val ctx: Context,
         })
 
     private fun closeLastSessionsIfPending(projectId: String): Completable =
-        dbManagerSessionEvents.loadSessions(projectId).flatMapCompletable {
+        sessionEventsLocalDbManager.loadSessions(projectId).flatMapCompletable {
             it.forEach {
                 it.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.NEW_SESSION)
                 it.closeIfRequired(timeHelper)
@@ -77,6 +76,5 @@ class SessionEventsManagerImpl(private val ctx: Context,
             Completable.complete()
         }
 
-
-    override fun insertOrUpdateSession(session: SessionEvents): Completable = dbManagerSessionEvents.insertOrUpdateSessionEvents(session)
+    override fun insertOrUpdateSession(session: SessionEvents): Completable = sessionEventsLocalDbManager.insertOrUpdateSessionEvents(session)
 }

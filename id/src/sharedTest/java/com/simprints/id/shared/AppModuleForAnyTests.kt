@@ -5,6 +5,8 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.events.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -14,8 +16,9 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
-import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.tools.RandomGenerator
+import com.simprints.id.tools.TimeHelper
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import org.mockito.Mockito.spy
 
@@ -27,8 +30,11 @@ open class AppModuleForAnyTests(app: Application,
                                 open var dataManagerRule: DependencyRule = RealRule(),
                                 open var loginInfoManagerRule: DependencyRule = RealRule(),
                                 open var randomGeneratorRule: DependencyRule = RealRule(),
+                                open var keystoreManagerRule: DependencyRule = RealRule(),
                                 open var analyticsManagerRule: DependencyRule = RealRule(),
-                                open var bluetoothComponentAdapterRule: DependencyRule = RealRule()) : AppModule(app) {
+                                open var bluetoothComponentAdapterRule: DependencyRule = RealRule(),
+                                open var sessionEventsManagerRule: DependencyRule = RealRule(),
+                                open var sessionEventsLocalDbManagerRule: DependencyRule = RealRule()) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         resolveDependencyRule(localDbManagerRule) { super.provideLocalDbManager(ctx) }
@@ -51,8 +57,10 @@ open class AppModuleForAnyTests(app: Application,
                                   remoteDbManager: RemoteDbManager,
                                   secureDataManager: SecureDataManager,
                                   loginInfoManager: LoginInfoManager,
-                                  preferencesManager: PreferencesManager): DbManager =
-        resolveDependencyRule(dbManagerRule) { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager) }
+                                  preferencesManager: PreferencesManager,
+                                  sessionEventsManager: SessionEventsManager,
+                                  timeHelper: TimeHelper): DbManager =
+        resolveDependencyRule(dbManagerRule) { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,
@@ -65,10 +73,22 @@ open class AppModuleForAnyTests(app: Application,
                                     remoteDbManager: RemoteDbManager): DataManager =
         resolveDependencyRule(dataManagerRule) { super.provideDataManager(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager) }
 
-    override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
+    override fun provideKeystoreManager(): KeystoreManager =
+        resolveDependencyRule(keystoreManagerRule) { super.provideKeystoreManager() }
 
     override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
         resolveDependencyRule(bluetoothComponentAdapterRule) { super.provideBluetoothComponentAdapter() }
+
+    override fun provideSessionEventsManager(ctx: Context,
+                                             loginInfoManager: LoginInfoManager,
+                                             sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+                                             preferencesManager: PreferencesManager,
+                                             timeHelper: TimeHelper): SessionEventsManager =
+        resolveDependencyRule(sessionEventsManagerRule) { super.provideSessionEventsManager(ctx, loginInfoManager, sessionEventsLocalDbManager, preferencesManager, timeHelper) }
+
+    override fun provideLocalEventDbManager(ctx: Context,
+                                            secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+        resolveDependencyRule(sessionEventsLocalDbManagerRule) { super.provideLocalEventDbManager(ctx, secureDataManager) }
 
     private inline fun <reified T> resolveDependencyRule(dependencyRule: DependencyRule, provider: () -> T): T =
         when (dependencyRule) {
