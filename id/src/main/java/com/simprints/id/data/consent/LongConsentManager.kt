@@ -1,7 +1,7 @@
 package com.simprints.id.data.consent
 
-import android.net.Uri
 import io.reactivex.Flowable
+import java.io.File
 
 interface LongConsentManager {
 
@@ -11,6 +11,6 @@ interface LongConsentManager {
 
     fun checkIfLongConsentExists(language: String): Boolean
 
-    fun getLongConsentUri(language: String): Uri
+    fun getLongConsentUri(language: String): File
 
 }

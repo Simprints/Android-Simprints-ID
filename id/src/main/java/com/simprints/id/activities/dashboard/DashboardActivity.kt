@@ -139,6 +139,4 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun completeNotification(language: String) = notification.completeNotification(language)
 
-    override fun getLanguageList(): Array<String> = resources.getStringArray(R.array.language_array)
-
 }

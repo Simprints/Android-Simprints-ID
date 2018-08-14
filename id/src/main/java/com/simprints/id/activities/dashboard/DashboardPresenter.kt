@@ -177,18 +177,19 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun downloadAllLongConsents() =
-        view.getLanguageList().forEach { language ->
-            longConsentManager.downloadLongConsent(language)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe { view.setNotification(language) }
-                .subscribe({
-                    view.updateNotification(language, it)
-                }, {
-                    view.cancelNotification(language)
-                }, {
-                    view.completeNotification(language)
-                })
+        longConsentManager.languages.forEach { language ->
+            if (!longConsentManager.checkIfLongConsentExists(language))
+                longConsentManager.downloadLongConsent(language)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        if (it > 1)
+                            view.updateNotification(language, it)
+                    }, {
+                        view.cancelNotification(language)
+                    }, {
+                        view.completeNotification(language)
+                    })
         }
 
 }
