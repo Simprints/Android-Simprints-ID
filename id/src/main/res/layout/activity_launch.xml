@@ -20,7 +20,7 @@
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@+id/tabHost"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_max="180dp"
+        app:layout_constraintHeight_max="160dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -32,7 +32,7 @@
         android:background="@color/simprints_white"
         android:text="@string/launch_consent_decline_button"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/loadingInfoTextView"
+        app:layout_constraintBottom_toTopOf="@+id/privacyNoticeText"
         app:layout_constraintDimensionRatio="w,4:2"
         app:layout_constraintEnd_toStartOf="@+id/consentAcceptButton"
         app:layout_constraintHorizontal_chainStyle="packed"
@@ -110,7 +110,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/generalConsentText"
+                        android:id="@+id/generalConsentTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -129,7 +129,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/parentalConsentText"
+                        android:id="@+id/parentalConsentTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
@@ -144,5 +144,19 @@
             </FrameLayout>
         </LinearLayout>
     </TabHost>
+
+    <TextView
+        android:id="@+id/privacyNoticeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="15dp"
+        android:text="@string/privacy_notice_text"
+        android:textColor="@color/simprints_white"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/loadingInfoTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/consentDeclineButton" />
 
 </android.support.constraint.ConstraintLayout>
