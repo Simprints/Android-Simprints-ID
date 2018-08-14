@@ -30,7 +30,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View{
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
-        private const val PRIVACY_ACTIVITY_REQUEST_CODE = 2
+        const val PRIVACY_ACTIVITY_REQUEST_CODE = 2
     }
 
     override lateinit var viewPresenter: DashboardContract.Presenter

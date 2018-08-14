@@ -19,6 +19,9 @@ interface LaunchContract {
         fun goToRefusalActivity()
         fun doLaunchAlert(alertType: ALERT_TYPE)
         fun doVibrateIfNecessary(doVibrate: Boolean)
+
+        fun setTextToGeneralConsent(generalConsentText: String)
+        fun addParentalConsentTabWithText(parentalConsentText: String)
     }
 
     interface Presenter : BasePresenter {

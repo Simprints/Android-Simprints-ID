@@ -61,6 +61,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         initSetup()
         initBackgroundSyncIfNecessary()
         scheduleSyncIfNecessary()
+        setupConsentTabs()
     }
 
     private fun initPositionTracker() {
@@ -115,6 +116,11 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         } else {
             confirmConsentAndContinueToNextActivity()
         }
+    }
+
+    private fun setupConsentTabs() {
+        view.setTextToGeneralConsent("General Consent")
+        view.addParentalConsentTabWithText("Parental Consent")
     }
 
     override fun handleOnRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

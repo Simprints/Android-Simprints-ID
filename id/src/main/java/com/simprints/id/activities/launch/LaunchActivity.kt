@@ -2,12 +2,16 @@ package com.simprints.id.activities.launch
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.WindowManager
+import android.widget.TabHost
 import com.simprints.id.R
+import com.simprints.id.activities.PrivacyActivity
 import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
+import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper
@@ -19,6 +23,8 @@ import kotlinx.android.synthetic.main.activity_launch.*
 class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override lateinit var viewPresenter: LaunchContract.Presenter
+    private lateinit var generalConsentTab: TabHost.TabSpec
+    private lateinit var parentalConsentTab: TabHost.TabSpec
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +32,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setButtonClickListeners()
+        setupConsentTabs()
+        setClickListenerToPrivacyNotice()
 
         viewPresenter = LaunchPresenter(this)
         viewPresenter.start()
@@ -34,6 +42,12 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     private fun setButtonClickListeners() {
         consentDeclineButton.setOnClickListener { viewPresenter.handleOnBackOrDeclinePressed() }
         consentAcceptButton.setOnClickListener { viewPresenter.confirmConsentAndContinueToNextActivity() }
+    }
+
+    private fun setClickListenerToPrivacyNotice() {
+        privacyNoticeText.setOnClickListener {
+            startActivityForResult(Intent(this, PrivacyActivity::class.java), DashboardActivity.PRIVACY_ACTIVITY_REQUEST_CODE)
+        }
     }
 
     override fun setLanguage(language: String) = LanguageHelper.setLanguage(this, language)
@@ -61,6 +75,23 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
                 whenReturningFromAnotherActivity(resultCode, data)
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun setupConsentTabs() {
+        tabHost.setup()
+        generalConsentTab = tabHost.newTabSpec("General").setIndicator(getString(R.string.consent_general_title)).setContent(R.id.generalConsentTextView)
+        parentalConsentTab = tabHost.newTabSpec("Parental").setIndicator(getString(R.string.consent_parental_title)).setContent(R.id.parentalConsentTextView)
+
+        tabHost.addTab(generalConsentTab)
+    }
+
+    override fun setTextToGeneralConsent(generalConsentText: String) {
+        generalConsentTextView.text = generalConsentText
+    }
+
+    override fun addParentalConsentTabWithText(parentalConsentText: String) {
+        tabHost.addTab(parentalConsentTab)
+        parentalConsentTextView.text = parentalConsentText
     }
 
     private fun whenReturningFromAnotherActivity(resultCode: Int, data: Intent?) {
