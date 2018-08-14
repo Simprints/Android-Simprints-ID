@@ -137,15 +137,17 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
+        <activity android:name=".activities.collectFingerprints.SplashScreenActivity"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
+
         <service
-            android:name="com.simprints.id.services.GuidSelectionService"
+            android:name=".services.GuidSelectionService"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
             </intent-filter>
         </service>
-
         <service
             android:name=".services.sync.SyncService"
             android:exported="false" />
