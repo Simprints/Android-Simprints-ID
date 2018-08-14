@@ -1,15 +1,19 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
+import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     component: AppComponent) : CheckLoginPresenter(view, component), CheckLoginFromIntentContract.Presenter {
+
+    @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var possibleLegacyApiKey: String = ""
@@ -80,6 +84,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         else loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()
 
     override fun handleSignedInUser() {
+        remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
         view.openLaunchActivity()
     }
 }

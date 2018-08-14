@@ -2,8 +2,8 @@ package com.simprints.id.data.prefs.sessionState.sessionParameters
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.tools.delegates.ComplexPreference
-import com.simprints.id.tools.delegates.PrimitivePreference
+import com.simprints.id.data.prefs.preferenceType.ComplexPreference
+import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.tools.serializers.Serializer
 
 class SessionParametersPreferencesManagerImpl(prefs: ImprovedSharedPreferences,

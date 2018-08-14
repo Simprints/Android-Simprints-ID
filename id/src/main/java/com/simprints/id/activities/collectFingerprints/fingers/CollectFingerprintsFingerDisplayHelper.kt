@@ -10,7 +10,6 @@ import com.simprints.id.activities.collectFingerprints.FingerPageAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
 import com.simprints.id.tools.extensions.isFingerNotCollectable
-import com.simprints.id.tools.extensions.isFingerRequired
 import com.simprints.libcommon.FingerConfig
 import com.simprints.libcommon.ScanConfig
 import com.simprints.libsimprints.FingerIdentifier
@@ -26,22 +25,14 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
 
     init {
         ((view as Activity).application as Application).component.inject(this)
-        clearAndPopulateFingerArraysWithDefaultFingers()
+        clearAndPopulateFingerArrays()
         initPageAdapter()
         initViewPager()
     }
 
-    fun clearAndPopulateFingerArraysWithDefaultFingers() {
-        loadFingerStatusAndRefreshWithDefaultFingers()
+    fun clearAndPopulateFingerArrays() {
         clearFingerArrays()
         populateFingerArrays()
-    }
-
-    private fun loadFingerStatusAndRefreshWithDefaultFingers() {
-        val fingerStatus = preferencesManager.fingerStatus as MutableMap
-        fingerStatus[FingerIdentifier.LEFT_THUMB] = true
-        fingerStatus[FingerIdentifier.LEFT_INDEX_FINGER] = true
-        preferencesManager.fingerStatus = fingerStatus
     }
 
     private fun clearFingerArrays() {
@@ -61,16 +52,13 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
     }
 
     private fun createFinger(id: FingerIdentifier): Finger {
-        val isFingerActive = isFingerRequired(id) || wasFingerAddedByUser(id)
+        val isFingerActive = isFingerRequired(id)
         val fingerPriority = defaultScanConfig.getPriority(id)
         val fingerOrder = defaultScanConfig.getOrder(id)
         return Finger(id, isFingerActive, fingerPriority, fingerOrder)
     }
 
-    private fun isFingerRequired(identifier: FingerIdentifier) = defaultScanConfig.isFingerRequired(identifier)
-
-    private fun wasFingerAddedByUser(identifier: FingerIdentifier) =
-        preferencesManager.fingerStatusPersist && preferencesManager.fingerStatus[identifier] == true
+    private fun isFingerRequired(identifier: FingerIdentifier) = preferencesManager.fingerStatus[identifier] == true
 
     private fun refreshWhichFingerIsLast() {
         presenter.activeFingers.forEach { it.isLastFinger = false }

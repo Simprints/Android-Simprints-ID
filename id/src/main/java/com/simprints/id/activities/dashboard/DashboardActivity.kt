@@ -5,10 +5,11 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
 import android.view.Menu
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.PrivacyActivity
-import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
@@ -19,6 +20,7 @@ import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
 import org.jetbrains.anko.support.v4.onRefresh
+import timber.log.Timber
 import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View{
@@ -101,7 +103,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View{
             val id = menuItem.itemId
             when(id) {
                 R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, PrivacyActivity::class.java), PRIVACY_ACTIVITY_REQUEST_CODE)
-                R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
+                R.id.menuSettings -> startActivityForResult(Intent(this, com.simprints.id.activities.settings.SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
                 R.id.menuLogout -> logout()
             }
             true

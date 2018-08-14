@@ -7,8 +7,8 @@ import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttribu
 import com.simprints.id.data.prefs.sessionState.sessionParameters.SessionParametersPreferencesManager
 import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimestampsPreferencesManager
 import com.simprints.id.domain.Location
-import com.simprints.id.tools.delegates.ComplexPreference
-import com.simprints.id.tools.delegates.PrimitivePreference
+import com.simprints.id.data.prefs.preferenceType.ComplexPreference
+import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.serializers.Serializer
