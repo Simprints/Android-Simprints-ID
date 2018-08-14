@@ -295,9 +295,14 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun handleMissingFingerClick() {
         scanningHelper.setCurrentFingerAsSkipped()
-        currentFinger().numberOfBadScans = numberOfBadScansRequiredToAutoAddNewFinger
-        checkScannedFingersAndCreateMapToShowDialog()
-        showSplashAndAddNewFingerIfNecessary()
+        if(currentFinger().isLastFinger && areDefaultFingersMoreThanMaximum()) {
+            numberOfFingersAdded = maximumNumberOfFingersAdded
+            refreshDisplay()
+            checkScannedFingersAndCreateMapToShowDialog()
+        }
+        else {
+            showSplashAndAddNewFingerIfNecessary()
+        }
     }
 
     companion object {
@@ -305,6 +310,6 @@ class CollectFingerprintsPresenter(private val context: Context,
         private const val minimumNumberOfGoodScans = 2
         private const val maximumNumberOfDefaultFingers = 4
         private const val minimumNumberOfAnyQualityScans = minimumNumberOfGoodScans + maximumNumberOfFingersAdded
-        private const val numberOfBadScansRequiredToAutoAddNewFinger = 3
+        const val numberOfBadScansRequiredToAutoAddNewFinger = 3
     }
 }

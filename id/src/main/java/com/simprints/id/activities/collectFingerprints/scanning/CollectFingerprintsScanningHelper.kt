@@ -7,6 +7,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -285,5 +286,6 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     fun setCurrentFingerAsSkipped() {
         currentFingerStatus = Finger.Status.FINGER_SKIPPED
+        presenter.currentFinger().numberOfBadScans = CollectFingerprintsPresenter.numberOfBadScansRequiredToAutoAddNewFinger
     }
 }
