@@ -8,7 +8,10 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimi
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
 import com.simprints.id.domain.Constants
+import com.simprints.id.domain.consent.IndividualConsent
+import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.preferences.NoSuchPreferenceError
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
 
@@ -82,6 +85,21 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT = false
         private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY = "ScheduledBackgroundSyncOnlyWhenNotLowBattery"
         private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT = true
+
+        private const val PROGRAM_NAME_KEY = "ProgramName"
+        private const val PROGRAM_NAME_DEFAULT = "This program"
+
+        private const val ORGANIZATION_NAME_KEY = "OrganizationName"
+        private const val ORGANIZATION_NAME_DEFAULT = "This organization"
+
+        private const val PARENTAL_CONSENT_KEY = "ConsentParent"
+        private const val PARENTAL_CONSENT_DEFAULT = false
+
+        private const val INDIVIDUAL_CONSENT_OPTIONS_JSON_KEY = "ConsentIndividualOptions"
+        private val INDIVIDUAL_CONSENT_OPTIONS_JSON_DEFAULT = JsonHelper.gson.toJson(IndividualConsent())
+
+        private const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
+        private val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT = JsonHelper.gson.toJson(ParentalConsent())
     }
 
     private val remoteConfigDefaults = mutableMapOf<String, Any>()
@@ -149,6 +167,23 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT)
     override var scheduledBackgroundSyncOnlyWhenNotLowBattery: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT)
+
+    // Name of the partner's program
+    override var programName: String
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PROGRAM_NAME_KEY, PROGRAM_NAME_DEFAULT)
+    // Name of the partner's organization
+    override var organizationName: String
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, ORGANIZATION_NAME_KEY, ORGANIZATION_NAME_DEFAULT)
+
+    // Whether the parental consent should be shown
+    override var parentalConsent: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PARENTAL_CONSENT_KEY, PARENTAL_CONSENT_DEFAULT)
+    // The options of the individual consent as a JSON string of booleans
+    override var individualConsentOptionsJson: String
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, INDIVIDUAL_CONSENT_OPTIONS_JSON_KEY, INDIVIDUAL_CONSENT_OPTIONS_JSON_DEFAULT)
+    // The options of the parental consent as a JSON string of booleans
+    override var parentalConsentOptionsJson: String
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT)
 
     init {
         remoteConfig.setDefaults(remoteConfigDefaults)
