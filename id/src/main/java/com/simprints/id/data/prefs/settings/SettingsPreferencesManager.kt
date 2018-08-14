@@ -32,7 +32,7 @@ interface SettingsPreferencesManager {
     var organizationName: String
 
     var parentalConsent: Boolean
-    var individualConsentOptionsJson: String
+    var generalConsentOptionsJson: String
     var parentalConsentOptionsJson: String
 
     fun getRemoteConfigStringPreference(key: String): String
