@@ -88,9 +88,10 @@ class FirebaseAnalyticsManager(private val firebaseAnalytics: FirebaseAnalytics)
     }
 
     override fun logUserProperties(userId: String, apiKey: String, moduleId: String, deviceId: String) {
-        Timber.d("FirebaseAnalyticsManager.logUserProperties(userId=$userId, apiKey=$apiKey,moduleId=$moduleId, deviceIde=$deviceId)")
+        Timber.d("FirebaseAnalyticsManager.logUserProperties(userId=$userId, apiKey=$apiKey, projectId=$apiKey, moduleId=$moduleId, deviceIde=$deviceId)")
         firebaseAnalytics.setUserId(userId)
         firebaseAnalytics.setUserProperty("api_key", apiKey)
+        firebaseAnalytics.setUserProperty("project_id", apiKey)
         firebaseAnalytics.setUserProperty("module_id", moduleId)
         firebaseAnalytics.setUserProperty("device_id", deviceId)
     }
