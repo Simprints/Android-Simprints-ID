@@ -1,11 +1,11 @@
 package com.simprints.id.data.consent
 
 import android.content.Context
-import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import java.io.BufferedReader
 import java.io.File
 
 
@@ -14,7 +14,7 @@ class LongConsentManagerImpl(context: Context,
 
     companion object {
         private const val FILE_PATH = "long-consents"
-        private const val FILE_TYPE = "pdf"
+        private const val FILE_TYPE = "txt"
     }
 
     private val filePath: File
@@ -60,8 +60,16 @@ class LongConsentManagerImpl(context: Context,
 
     override fun checkIfLongConsentExists(language: String): Boolean = File(filePath, "$language.$FILE_TYPE").exists()
 
-    override fun getLongConsentUri(language: String): File {
-        return File(filePath, "$language.$FILE_TYPE")
+    override fun getLongConsentText(language: String): String {
+
+        val br: BufferedReader = File(filePath, "$language.$FILE_TYPE").bufferedReader()
+        val fileContent = StringBuffer("")
+
+        br.forEachLine {
+            fileContent.append(it)
+        }
+
+        return fileContent.toString()
     }
 
     override val languages = arrayOf("en", "ne", "bn", "ps", "fa-rAF", "so", "ha", "ny")
