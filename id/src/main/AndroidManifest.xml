@@ -137,7 +137,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".activities.collectFingerprints.SplashScreen"
+        <activity android:name=".activities.collectFingerprints.SplashScreenActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
 
         <service

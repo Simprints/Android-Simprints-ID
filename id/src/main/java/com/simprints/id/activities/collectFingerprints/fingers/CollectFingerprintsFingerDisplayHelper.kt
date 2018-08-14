@@ -151,7 +151,7 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
         private const val FAST_SWIPE_SPEED = 100
         private const val SLOW_SWIPE_SPEED = 1000
 
-        const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 1500
+        const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 2000
 
         private val defaultScanConfig = ScanConfig().apply {
             set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0, 0)

@@ -171,7 +171,7 @@ class CollectFingerprintsActivity :
     }
 
     override fun showSplashScreen() {
-        startActivity(Intent(this, SplashScreen::class.java))
+        startActivity(Intent(this, SplashScreenActivity::class.java))
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
     }
 
