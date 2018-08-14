@@ -60,8 +60,8 @@ class LongConsentManagerImpl(context: Context,
 
     override fun checkIfLongConsentExists(language: String): Boolean = File(filePath, "$language.$FILE_TYPE").exists()
 
-    override fun getLongConsentUri(language: String): Uri {
-        return Uri.fromFile(File(filePath, "$language.$FILE_TYPE"))
+    override fun getLongConsentUri(language: String): File {
+        return File(filePath, "$language.$FILE_TYPE")
     }
 
     override val languages = arrayOf("en", "ne", "bn", "ps", "fa-rAF", "so", "ha", "ny")

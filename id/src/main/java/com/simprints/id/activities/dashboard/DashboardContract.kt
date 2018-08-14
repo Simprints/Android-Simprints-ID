@@ -17,7 +17,6 @@ interface DashboardContract {
         fun updateNotification(language: String, progress: Int)
         fun cancelNotification(language: String)
         fun completeNotification(language: String)
-        fun getLanguageList(): Array<String>
     }
 
     interface Presenter : BasePresenter {
