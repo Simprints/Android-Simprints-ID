@@ -28,6 +28,13 @@ interface SettingsPreferencesManager {
     var scheduledBackgroundSyncOnlyWhenCharging: Boolean
     var scheduledBackgroundSyncOnlyWhenNotLowBattery: Boolean
 
+    var programName: String
+    var organizationName: String
+
+    var parentalConsent: Boolean
+    var individualConsentOptionsJson: String
+    var parentalConsentOptionsJson: String
+
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
 
