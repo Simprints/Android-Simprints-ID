@@ -31,7 +31,7 @@ interface SettingsPreferencesManager {
     var programName: String
     var organizationName: String
 
-    var parentalConsent: Boolean
+    var parentalConsentExists: Boolean
     var generalConsentOptionsJson: String
     var parentalConsentOptionsJson: String
 
