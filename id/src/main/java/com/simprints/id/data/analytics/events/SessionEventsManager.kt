@@ -17,8 +17,5 @@ interface SessionEventsManager {
     fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit,
                                   projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty())
 
-    //Required because it's called from java where updateSession can't be used
-    fun updateLocation(lat: Double, lon: Double): Completable
-
     fun insertOrUpdateSession(session: SessionEvents): Completable
 }

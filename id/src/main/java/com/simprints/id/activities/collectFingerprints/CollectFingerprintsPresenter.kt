@@ -16,6 +16,7 @@ import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.events.SessionEventsManager
 import com.simprints.id.data.analytics.events.models.FingerprintCaptureEvent
+import com.simprints.id.data.analytics.events.models.PersonCreationEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
@@ -91,7 +92,6 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun initScanningHelper(context: Context, view: CollectFingerprintsContract.View) {
         scanningHelper = CollectFingerprintsScanningHelper(context, view, this)
     }
-
 
     private fun initScanButtonListeners() {
         view.scanButton.setOnClickListener {
@@ -225,6 +225,15 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun proceedToFinish(fingerprints: List<Fingerprint>) {
         val person = Person(preferencesManager.patientId, fingerprints)
+        sessionEventsManager.updateSessionInBackground({
+            it.events.add(PersonCreationEvent(
+                it.nowRelativeToStartTime(timeHelper),
+                it.events
+                    .filterIsInstance(FingerprintCaptureEvent::class.java)
+                    .filter { it.result == Finger.Status.GOOD_SCAN || it.result == Finger.Status.RESCAN_GOOD_SCAN }.map { it.id }
+            ))
+        })
+
         if (isRegisteringElseIsMatching()) {
             savePerson(person)
         } else {
@@ -283,10 +292,8 @@ class CollectFingerprintsPresenter(private val context: Context,
                 finger.id,
                 preferencesManager.qualityThreshold,
                 finger.status,
-                if (finger.isGoodScan || finger.isRescanGoodScan) {
-                    FingerprintCaptureEvent.Fingerprint(finger.template.qualityScore, Utils.byteArrayToBase64(finger.template.templateBytes))
-                } else {
-                    null
+                finger.template?.let {
+                    FingerprintCaptureEvent.Fingerprint(it.qualityScore, Utils.byteArrayToBase64(it.templateBytes))
                 }
             ))
         })
