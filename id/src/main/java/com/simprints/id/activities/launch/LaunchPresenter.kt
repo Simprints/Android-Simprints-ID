@@ -1,6 +1,7 @@
 package com.simprints.id.activities.launch
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import com.simprints.id.Application
 import com.simprints.id.controllers.Setup
@@ -11,10 +12,13 @@ import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.consent.GeneralConsent
+import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.services.scheduledSync.ScheduledSyncManager
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.*
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
@@ -119,8 +123,20 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun setupConsentTabs() {
-        view.setTextToGeneralConsent("General Consent")
-        view.addParentalConsentTabWithText("Parental Consent")
+        view.setTextToGeneralConsent(getGeneralConsentText())
+        if (preferencesManager.parentalConsent) {
+            view.addParentalConsentTabWithText(getParentalConsentText())
+        }
+    }
+
+    private fun getGeneralConsentText(): String {
+        val generalConsent = JsonHelper.gson.fromJson(preferencesManager.generalConsentOptionsJson, GeneralConsent::class.java)
+        return generalConsent.assembleText(view as Context, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
+    }
+
+    private fun getParentalConsentText(): String {
+        val parentalConsent = JsonHelper.gson.fromJson(preferencesManager.parentalConsentOptionsJson, ParentalConsent::class.java)
+        return parentalConsent.assembleText(view as Context, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
     }
 
     override fun handleOnRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

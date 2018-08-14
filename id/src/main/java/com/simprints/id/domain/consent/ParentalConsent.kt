@@ -3,6 +3,9 @@ package com.simprints.id.domain.consent
 import android.content.Context
 import com.google.gson.annotations.SerializedName
 import com.simprints.id.R
+import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.session.callout.CalloutAction.IDENTIFY
+import com.simprints.id.session.callout.CalloutAction.VERIFY
 
 
 data class ParentalConsent(
@@ -16,10 +19,16 @@ data class ParentalConsent(
     @SerializedName("consent_parent_confirmation") var consentParentConfirmation: Boolean = true
 ) {
 
-    fun assmebleText(context: Context, programName: String, organisationName: String) = StringBuilder().apply {
-        if (consentParentEnrolOnly) append(context.getString(R.string.consent_parental_enrol_only).format(programName))
-        if (consentParentEnrol) append(context.getString(R.string.consent_parental_enrol).format(programName))
-        if (consentParentIdVerify) append(context.getString(R.string.consent_parental_id_verify).format(programName))
+    fun assembleText(context: Context, calloutAction: CalloutAction, programName: String, organisationName: String) = StringBuilder().apply {
+        when (calloutAction) {
+            IDENTIFY, VERIFY -> {
+                if (consentParentIdVerify) append(context.getString(R.string.consent_parental_id_verify).format(programName))
+            }
+            else -> {
+                if (consentParentEnrolOnly) append(context.getString(R.string.consent_parental_enrol_only).format(programName))
+                if (consentParentEnrol) append(context.getString(R.string.consent_parental_enrol).format(programName))
+            }
+        }
         if (consentParentShareDataNo) append(context.getString(R.string.consent_parental_share_data_no))
         if (consentParentShareDataYes) append(context.getString(R.string.consent_parental_share_data_yes).format(organisationName))
         if (consentParentCollectYes) append(context.getString(R.string.consent_parental_collect_yes))

@@ -79,8 +79,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     private fun setupConsentTabs() {
         tabHost.setup()
-        generalConsentTab = tabHost.newTabSpec("General").setIndicator(getString(R.string.consent_general_title)).setContent(R.id.generalConsentTextView)
-        parentalConsentTab = tabHost.newTabSpec("Parental").setIndicator(getString(R.string.consent_parental_title)).setContent(R.id.parentalConsentTextView)
+        generalConsentTab = tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_general_title)).setContent(R.id.generalConsentTextView)
+        parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_parental_title)).setContent(R.id.parentalConsentTextView)
 
         tabHost.addTab(generalConsentTab)
     }
@@ -138,5 +138,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     companion object {
         const val COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1
+
+        const val GENERAL_CONSENT_TAB_TAG = "General"
+        const val PARENTAL_CONSENT_TAB_TAG = "Parental"
     }
 }

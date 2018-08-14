@@ -3,9 +3,12 @@ package com.simprints.id.domain.consent
 import android.content.Context
 import com.google.gson.annotations.SerializedName
 import com.simprints.id.R
+import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.session.callout.CalloutAction.IDENTIFY
+import com.simprints.id.session.callout.CalloutAction.VERIFY
 
 
-data class IndividualConsent(
+data class GeneralConsent(
     @SerializedName("consent_enrol_only") var consentEnrolOnly: Boolean = false,
     @SerializedName("consent_enrol") var consentEnrol: Boolean = true,
     @SerializedName("consent_id_verify") var consentIdVerify: Boolean = true,
@@ -16,10 +19,16 @@ data class IndividualConsent(
     @SerializedName("consent_confirmation") var consentConfirmation: Boolean = true
 ) {
 
-    fun assmebleText(context: Context, programName: String, organisationName: String) = StringBuilder().apply {
-        if (consentEnrolOnly) append(context.getString(R.string.consent_enrol_only).format(programName))
-        if (consentEnrol) append(context.getString(R.string.consent_enrol).format(programName))
-        if (consentIdVerify) append(context.getString(R.string.consent_id_verify).format(programName))
+    fun assembleText(context: Context, calloutAction: CalloutAction, programName: String, organisationName: String) = StringBuilder().apply {
+        when (calloutAction) {
+            IDENTIFY, VERIFY -> {
+                if (consentIdVerify) append(context.getString(R.string.consent_id_verify).format(programName))
+            }
+            else -> {
+                if (consentEnrolOnly) append(context.getString(R.string.consent_enrol_only).format(programName))
+                if (consentEnrol) append(context.getString(R.string.consent_enrol).format(programName))
+            }
+        }
         if (consentShareDataNo) append(context.getString(R.string.consent_share_data_no))
         if (consentShareDataYes) append(context.getString(R.string.consent_share_data_yes).format(organisationName))
         if (consentCollectYes) append(context.getString(R.string.consent_collect_yes))

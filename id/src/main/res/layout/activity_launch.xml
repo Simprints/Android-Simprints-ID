@@ -119,7 +119,7 @@
                         android:paddingTop="10dp"
                         android:text="@string/short_consent"
                         android:textColor="@color/simprints_white"
-                        android:textSize="20sp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -136,9 +136,9 @@
                         android:paddingLeft="30dp"
                         android:paddingRight="30dp"
                         android:paddingTop="10dp"
-                        android:text="Parental Consent Text"
+                        android:text=""
                         android:textColor="@color/simprints_white"
-                        android:textSize="20sp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
             </FrameLayout>
