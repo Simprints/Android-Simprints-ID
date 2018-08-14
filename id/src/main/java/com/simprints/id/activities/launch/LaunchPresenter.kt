@@ -124,7 +124,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     private fun setupConsentTabs() {
         view.setTextToGeneralConsent(getGeneralConsentText())
-        if (preferencesManager.parentalConsent) {
+        if (preferencesManager.parentalConsentExists) {
             view.addParentalConsentTabWithText(getParentalConsentText())
         }
     }

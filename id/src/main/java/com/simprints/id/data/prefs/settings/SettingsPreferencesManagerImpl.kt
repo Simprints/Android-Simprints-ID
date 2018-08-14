@@ -176,7 +176,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, ORGANIZATION_NAME_KEY, ORGANIZATION_NAME_DEFAULT)
 
     // Whether the parental consent should be shown
-    override var parentalConsent: Boolean
+    override var parentalConsentExists: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PARENTAL_CONSENT_KEY, PARENTAL_CONSENT_DEFAULT)
     // The options of the general consent as a JSON string of booleans
     override var generalConsentOptionsJson: String
