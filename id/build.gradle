@@ -69,7 +69,7 @@ android {
             ext.enableCrashlytics = false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
-            manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: false]
+            manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
         }
 //        endToEndTesting {
 //            initWith debug
@@ -137,17 +137,19 @@ def assembleTaskForEndToEndTest() {
 }
 
 project.afterEvaluate {
-    if (gradle.startParameter.taskNames.findAll {it.contains(connectedTaskForEndToEndTest())}.size() > 0) {
+    if (gradle.startParameter.taskNames.findAll {
+        it.contains(connectedTaskForEndToEndTest())
+    }.size() > 0) {
         project.(connectedTaskForEndToEndTest()).doFirst {
             def originalProvider = deviceProvider
             deviceProvider = [
-                getName       : { originalProvider.getName() },
-                init          : { originalProvider.init() },
-                terminate     : { originalProvider.terminate() },
-                getDevices    : { filterDevices(originalProvider.getDevices()) },
-                getTimeoutInMs: { originalProvider.getTimeoutInMs() },
-                isConfigured  : { originalProvider.isConfigured() },
-                getMaxThreads : { originalProvider.getMaxThreads() }
+                    getName       : { originalProvider.getName() },
+                    init          : { originalProvider.init() },
+                    terminate     : { originalProvider.terminate() },
+                    getDevices    : { filterDevices(originalProvider.getDevices()) },
+                    getTimeoutInMs: { originalProvider.getTimeoutInMs() },
+                    isConfigured  : { originalProvider.isConfigured() },
+                    getMaxThreads : { originalProvider.getMaxThreads() }
             ] as DeviceProvider
         }
     }
@@ -234,16 +236,15 @@ dependencies {
     implementation "com.google.android.gms:play-services-safetynet:$google_version"
 
     // Databases
-    implementation "com.michaelpardo:activeandroid:$active_android_version"
-    implementation "com.google.firebase:firebase-database:$google_version"
-    implementation "com.google.firebase:firebase-firestore:$google_version"
+    implementation "com.google.firebase:firebase-database:16.0.1"
+    implementation "com.google.firebase:firebase-firestore:17.0.3"
 
     // Firebase
-    implementation "com.google.firebase:firebase-core:$google_version"
-    implementation "com.google.firebase:firebase-auth:$google_version"
-    implementation "com.google.firebase:firebase-config:$google_version"
-    implementation "com.google.firebase:firebase-perf:$google_version"
-    implementation "com.google.firebase:firebase-storage:$google_version"
+    implementation "com.google.firebase:firebase-core:16.0.1"
+    implementation "com.google.firebase:firebase-auth:16.0.2"
+    implementation "com.google.firebase:firebase-config:16.0.0"
+    implementation "com.google.firebase:firebase-perf:16.0.0"
+    implementation "com.google.firebase:firebase-storage:16.0.1"
 
     // Analytics
     implementation("com.crashlytics.sdk.android:crashlytics:$crashlytics_version@aar") {
@@ -309,7 +310,8 @@ dependencies {
     //UI
     implementation 'com.github.michael-rapp:android-material-dialog:4.3.3'
     implementation "com.android.support:cardview-v7:$support_version"
-
+    implementation "com.android.support:preference-v7:$support_version"
+    implementation "com.android.support:support-fragment:$support_version"
 
     //Inject in tests
     testImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.4'

@@ -1,4 +1,4 @@
-package com.simprints.id.tools.delegates
+package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unsafe.MismatchedTypeError
@@ -13,22 +13,18 @@ import kotlin.reflect.KProperty
  * Backed by a PrimitivePreference<String>, after serialization with the specified serializer.
  * Thus, has the same guarantees as PrimitivePreference.
  */
-class ComplexPreference<T : Any> (val prefs: ImprovedSharedPreferences,
-                                private val key: String,
-                                defValue: T,
-                                private val serializer: Serializer<T>) {
+open class ComplexPreference<T : Any>(val prefs: ImprovedSharedPreferences,
+                                      private val key: String,
+                                      defValue: T,
+                                      private val serializer: Serializer<T>) {
 
-    private val serializedDefValue = serializer.serialize(defValue)
-    private var serializedValue by PrimitivePreference(prefs, key, serializedDefValue)
+    protected val serializedDefValue = serializer.serialize(defValue)
+    protected var serializedValue by PrimitivePreference(prefs, key, serializedDefValue)
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        Timber.d("ComplexPreference.getValue $key")
-
-        return try {
-            serializer.deserialize(serializedValue)
-        } catch (e: MismatchedTypeError) {
-            ifEnumDeserializationFailedThenTryIndex() ?: throw e
-        }
+    open operator fun getValue(thisRef: Any?, property: KProperty<*>): T = try {
+        serializer.deserialize(serializedValue)
+    } catch (e: MismatchedTypeError) {
+        ifEnumDeserializationFailedThenTryIndex() ?: throw e
     }
 
     /**
@@ -47,13 +43,15 @@ class ComplexPreference<T : Any> (val prefs: ImprovedSharedPreferences,
                     return serializer.deserialize(serializedValue)
                 }
             }
-        } catch (t: Throwable) { t.printStackTrace() }
+        } catch (t: Throwable) {
+            t.printStackTrace()
+        }
 
         return null
     }
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        Timber.d("ComplexPreference.setValue $key")
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+        Timber.d("ComplexPreference.setValue key=$key , value=$serializedValue")
         serializedValue = serializer.serialize(value)
     }
 }

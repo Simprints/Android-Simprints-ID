@@ -9,6 +9,7 @@ import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncCategory
@@ -31,6 +32,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncManager: SyncManager
+    @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
 
     private var started: AtomicBoolean = AtomicBoolean(false)
 
@@ -52,7 +54,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun start() {
-
+        remoteConfigFetcher.forceDoFetchInBackgroundAndActivate() // STOPSHIP flick back to scheduled mode
         if (!started.getAndSet(true) || hasSyncGroupChangedSinceLastRun()) {
             initCards()
         } else {
