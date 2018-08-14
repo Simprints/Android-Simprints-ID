@@ -12,20 +12,17 @@
     <ImageView
         android:id="@+id/simprintsLogoWithTagLine"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="35dp"
         android:layout_weight="3"
         android:contentDescription="@string/launch_background_description"
         android:src="@drawable/launch_background"
-        app:layout_constraintBottom_toTopOf="@+id/simprintsLogoGuideline"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@+id/tabHost"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="180dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/simprintsLogoGuideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.4" />
 
     <Button
         android:id="@+id/consentDeclineButton"
@@ -51,12 +48,11 @@
         android:background="@color/simprints_white"
         android:text="@string/launch_consent_accept_button"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/loadingInfoTextView"
+        app:layout_constraintBottom_toBottomOf="@+id/consentDeclineButton"
         app:layout_constraintDimensionRatio="w,4:2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/consentDeclineButton"
-        app:layout_constraintTop_toBottomOf="@+id/tabHost"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintTop_toTopOf="@+id/consentDeclineButton" />
 
     <TextView
         android:id="@+id/loadingInfoTextView"
@@ -83,8 +79,10 @@
     <TabHost
         android:id="@+id/tabHost"
         android:layout_width="0dp"
-        android:layout_marginTop="20dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/consentDeclineButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/simprintsLogoWithTagLine">
@@ -98,7 +96,7 @@
                 android:id="@android:id/tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/simprints_white"/>
+                android:background="@color/simprints_white" />
 
             <FrameLayout
                 android:id="@android:id/tabcontent"
@@ -110,18 +108,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/short_consent"
-                    android:id="@+id/generalConsentText"
-                    android:textColor="@color/simprints_white"
-                    android:paddingLeft="30dp"
-                    android:gravity="center"
-                    android:maxLines="5"
-                    android:paddingRight="30dp"
-                    android:paddingTop="10dp"
-                    android:textSize="20sp"/>
+
+                    <TextView
+                        android:id="@+id/generalConsentText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingLeft="30dp"
+                        android:paddingRight="30dp"
+                        android:paddingTop="10dp"
+                        android:text="@string/short_consent"
+                        android:textColor="@color/simprints_white"
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -129,18 +127,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
+
                     <TextView
+                        android:id="@+id/parentalConsentText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Parental Consent Text"
-                        android:textColor="@color/simprints_white"
+                        android:gravity="center"
                         android:paddingLeft="30dp"
                         android:paddingRight="30dp"
-                        android:maxLines="5"
-                        android:gravity="center"
-                        android:id="@+id/parentalConsentText"
                         android:paddingTop="10dp"
-                        android:textSize="20sp"/>
+                        android:text="Parental Consent Text"
+                        android:textColor="@color/simprints_white"
+                        android:textSize="20sp" />
                 </LinearLayout>
 
             </FrameLayout>
