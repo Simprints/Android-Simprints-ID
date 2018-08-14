@@ -116,13 +116,13 @@ class CollectFingerprintsPresenter(private val context: Context,
     override fun showSplashAndAddNewFingerIfNecessary() {
         if (tooManyBadScans(currentFinger())) {
             if (haveNotExceedMaximumNumberOfFingersToAdd() ) {
-                if(!areDefaultFingersMoreThanMaximum()) {
+                if(!areDefaultFingersOrNumberOfScannedFingersMoreThanMaximum()) {
                     fingerDisplayHelper.showSplashAndAddNewFinger()
                 }
                 else if(!currentFinger().isLastFinger){
                     fingerDisplayHelper.showSplashAndNudgeIfNecessary()
                 }
-                if(areDefaultFingersMoreThanMaximum()) {
+                if(areDefaultFingersOrNumberOfScannedFingersMoreThanMaximum()) {
                     numberOfFingersAdded = maximumNumberOfFingersAdded
                 }
                 else{
@@ -140,8 +140,9 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun haveNotExceedMaximumNumberOfFingersToAdd() =
         numberOfFingersAdded < maximumNumberOfFingersAdded
 
-    private fun areDefaultFingersMoreThanMaximum() =
-        preferencesManager.fingerStatus.count() >= maximumNumberOfDefaultFingers
+    private fun areDefaultFingersOrNumberOfScannedFingersMoreThanMaximum() =
+        preferencesManager.fingerStatus.count() >= maximumNumberOfDefaultFingers ||
+            getCollectedFingerprints().size >= maximumNumberOfDefaultFingers
 
     override fun doNudgeIfNecessary() {
         fingerDisplayHelper.doNudgeIfNecessary()
@@ -189,6 +190,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun handleConfirmFingerprintsAndContinue() {
         val fingerprints = getCollectedFingerprints()
+            .filter { it.template != null }
             .map { Fingerprint(it.id, it.template.templateBytes) }
 
         if (fingerprints.isEmpty()) {
@@ -295,7 +297,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun handleMissingFingerClick() {
         scanningHelper.setCurrentFingerAsSkipped()
-        if(currentFinger().isLastFinger && areDefaultFingersMoreThanMaximum()) {
+        if(currentFinger().isLastFinger && areDefaultFingersOrNumberOfScannedFingersMoreThanMaximum()) {
             numberOfFingersAdded = maximumNumberOfFingersAdded
             refreshDisplay()
             checkScannedFingersAndCreateMapToShowDialog()
