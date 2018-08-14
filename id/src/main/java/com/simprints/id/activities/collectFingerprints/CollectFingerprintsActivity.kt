@@ -11,6 +11,7 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.TextView
 import com.simprints.id.R
 import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE
@@ -35,7 +36,6 @@ class CollectFingerprintsActivity :
     override lateinit var progressBar: ProgressBar
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
-    override lateinit var tryDifferentFingerSplash: View
 
     private var rightToLeft: Boolean = false
 
@@ -66,7 +66,7 @@ class CollectFingerprintsActivity :
         indicatorLayout = indicator_layout
         scanButton = scan_button
         progressBar = pb_timeout
-        tryDifferentFingerSplash = try_different_finger_splash
+        setListenerToMissingFinger()
     }
 
     override fun onStart() {
@@ -93,6 +93,10 @@ class CollectFingerprintsActivity :
     private fun reverseViewPagerIfNeeded() {
         // If the layout is from right to left, we need to reverse the scrolling direction
         if (rightToLeft) view_pager.rotationY = 180f
+    }
+
+    private fun setListenerToMissingFinger() {
+        missingFingerText.setOnClickListener { viewPresenter.handleMissingFingerClick() }
     }
 
     override fun refreshScanButtonAndTimeoutBar() {
@@ -164,6 +168,11 @@ class CollectFingerprintsActivity :
 
     override fun doLaunchAlert(alertType: ALERT_TYPE) {
         launchAlert(alertType)
+    }
+
+    override fun showSplashScreen() {
+        startActivity(Intent(this, SplashScreen::class.java))
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
     }
 
     companion object {
