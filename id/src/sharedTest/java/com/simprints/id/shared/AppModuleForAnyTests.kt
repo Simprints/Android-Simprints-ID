@@ -14,6 +14,7 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
+import com.simprints.id.services.scheduledSync.ScheduledSyncManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.shared.DependencyRule.*
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
@@ -28,7 +29,8 @@ open class AppModuleForAnyTests(app: Application,
                                 open var loginInfoManagerRule: DependencyRule = RealRule(),
                                 open var randomGeneratorRule: DependencyRule = RealRule(),
                                 open var analyticsManagerRule: DependencyRule = RealRule(),
-                                open var bluetoothComponentAdapterRule: DependencyRule = RealRule()) : AppModule(app) {
+                                open var bluetoothComponentAdapterRule: DependencyRule = RealRule(),
+                                open var scheduledSyncManagerRule: DependencyRule = RealRule()) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         resolveDependencyRule(localDbManagerRule) { super.provideLocalDbManager(ctx) }
@@ -69,6 +71,9 @@ open class AppModuleForAnyTests(app: Application,
 
     override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
         resolveDependencyRule(bluetoothComponentAdapterRule) { super.provideBluetoothComponentAdapter() }
+
+    override fun provideScheduledSyncManager(preferencesManager: PreferencesManager): ScheduledSyncManager =
+        resolveDependencyRule(scheduledSyncManagerRule) { super.provideScheduledSyncManager(preferencesManager) }
 
     private inline fun <reified T> resolveDependencyRule(dependencyRule: DependencyRule, provider: () -> T): T =
         when (dependencyRule) {

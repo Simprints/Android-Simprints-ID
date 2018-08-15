@@ -2,7 +2,6 @@ package com.simprints.id.activities.launch
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.TabLayout
 import android.support.v7.app.AppCompatActivity
 import android.text.method.ScrollingMovementMethod
 import android.view.View
@@ -10,9 +9,9 @@ import android.view.WindowManager
 import android.widget.TabHost
 import com.simprints.id.R
 import com.simprints.id.activities.PrivacyActivity
-import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.activities.dashboard.DashboardActivity
+import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper

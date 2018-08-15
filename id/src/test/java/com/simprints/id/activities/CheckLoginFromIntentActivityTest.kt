@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
+import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
@@ -68,6 +69,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
     @Before
     override fun setUp() {
+        FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as TestApplication)
         super.setUp()
         testAppComponent.inject(this)
