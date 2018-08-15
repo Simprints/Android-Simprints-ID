@@ -21,4 +21,5 @@ interface SessionEventsManager {
     fun insertOrUpdateSession(session: SessionEvents): Completable
 
     fun addGuidSelectionEventToLastIdentificationIfExists(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid: String): Completable
+    fun syncSessions(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty()): Completable
 }

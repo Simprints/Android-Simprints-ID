@@ -6,6 +6,12 @@ import java.util.*
 
 open class SessionEvents {
 
+    companion object {
+        // When the sync starts, any open activeSession started GRACE_PERIOD ms
+        // before it will be considered closed
+        const val GRACE_PERIOD = 1000 * 60 * 5 // 5 minutes
+     }
+
     val id: String
     var projectId: String
     var appVersionName: String
@@ -20,6 +26,10 @@ open class SessionEvents {
     var databaseInfo: DatabaseInfo? = null
     var location: Location? = null
     var analyticsId: String? = null
+
+    // Function and not kotlin properties to avoid them to get serialised/deserialised
+    private fun isClose(): Boolean = relativeEndTime > 0
+    fun isOpen(): Boolean = !isClose()
 
     constructor(rlSessionEvents: RlSessionEvents) : this(
         id = rlSessionEvents.id,
@@ -54,8 +64,6 @@ open class SessionEvents {
         this.events = ArrayList()
     }
 
-    private fun isSessionCompleted(): Boolean = relativeEndTime > 0
-
     fun addArtificialTerminationIfRequired(timeHelper: TimeHelper, reason: ArtificialTerminationEvent.Reason) {
         if (relativeEndTime == 0L) {
             events.add(ArtificialTerminationEvent(nowRelativeToStartTime(timeHelper), reason))
@@ -63,11 +71,14 @@ open class SessionEvents {
     }
 
     fun closeIfRequired(timeHelper: TimeHelper) {
-        if (!isSessionCompleted()) {
+        if (!isClose()) {
             relativeEndTime = nowRelativeToStartTime(timeHelper)
         }
     }
 
     fun timeRelativeToStartTime(time: Long): Long = time - startTime
     fun nowRelativeToStartTime(timeHelper: TimeHelper): Long = timeRelativeToStartTime(timeHelper.msSinceBoot())
+
+    fun isPossiblyInProgress(timeHelper: TimeHelper): Boolean =
+        timeHelper.msBetweenNowAndTime(startTime) < GRACE_PERIOD
 }

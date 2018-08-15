@@ -123,7 +123,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
 
         val futureResultIsNotEmpty = CompletableFuture<Boolean>()
         val callback = object : DataCallback {
-            override fun onSuccess() {
+            override fun onSuccess(isDataFromRemote: Boolean) {
                 futureResultIsNotEmpty.complete(result.isEmpty())
             }
 
@@ -192,7 +192,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
         val futurePersonExists = CompletableFuture<Boolean>()
         val futureDataErrorExistsAndIsPersonNotFound = CompletableFuture<Boolean>()
         val callback = object : DataCallback {
-            override fun onSuccess() {
+            override fun onSuccess(isDataFromRemote: Boolean) {
                 futurePersonExists.complete(true)
             }
 
@@ -221,7 +221,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
         val futurePersonExists = CompletableFuture<Boolean>()
         val futureDataErrorExistsAndIsPersonNotFound = CompletableFuture<Boolean>()
         val callback = object : DataCallback {
-            override fun onSuccess() {
+            override fun onSuccess(isDataFromRemote: Boolean) {
                 futurePersonExists.complete(true)
             }
 

@@ -198,12 +198,12 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
     }
 
     override fun logSession(session: Session) {
-        Timber.d("AnalyticsManagerImpl.logSession(session=$session)")
+        Timber.d("AnalyticsManagerImpl.logSession(activeSession=$session)")
         val fbSession = session.toFirebaseSession()
         val bundle = Bundle()
         for (property in fb_Session::class.memberProperties) {
             bundle.putString(property.name.fromLowerCamelToLowerUnderscore(), property.get(fbSession).toString())
         }
-        firebaseAnalytics.logEvent("session", bundle)
+        firebaseAnalytics.logEvent("activeSession", bundle)
     }
 }

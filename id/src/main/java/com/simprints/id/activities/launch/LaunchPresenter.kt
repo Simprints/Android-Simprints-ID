@@ -16,6 +16,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
+import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionSyncManager
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.AppState
@@ -58,11 +59,11 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         }
     }
 
-    private var consentEvent: ConsentEvent
+    private var startConsentEventTime: Long = 0
 
     init {
         (activity.application as Application).component.inject(this)
-        consentEvent = ConsentEvent(timeHelper.msSinceBoot(), 0, INDIVIDUAL, NO_RESPONSE)
+        startConsentEventTime = timeHelper.msSinceBoot()
     }
 
     override fun start() {
@@ -95,8 +96,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     private fun scheduleSessionsSyncIfNecessary() {
         if (preferencesManager.scheduledSessionsSyncWorkRequestId.isEmpty()) {
-           //ScheduledSessionSyncManager(preferencesManager).scheduleSyncIfNecessary()
-            //StopShip: uncommentsetHandle
+            ScheduledSessionSyncManager(preferencesManager).scheduleSyncIfNecessary()
         }
     }
 
@@ -149,12 +149,19 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun addConsentEvent(result: ConsentEvent.Result) {
-        sessionEventsManager.updateSession({
-            consentEvent.relativeEndTime = timeHelper.msSinceBoot() - it.startTime
-            consentEvent.result = result
-            it.events.add(consentEvent)
-            it.location = null
-        }).subscribe()
+
+        sessionEventsManager.updateSessionInBackground({
+            it.events.add(
+                ConsentEvent(
+                    it.timeRelativeToStartTime(startConsentEventTime),
+                    it.nowRelativeToStartTime(timeHelper),
+                    INDIVIDUAL, //StopShip: Merge with short consent
+                    result))
+
+            if (result == DECLINED || result == NO_RESPONSE) {
+                it.location = null
+            }
+        })
     }
 
     private fun handleOnBackOrDeclinePressed() {

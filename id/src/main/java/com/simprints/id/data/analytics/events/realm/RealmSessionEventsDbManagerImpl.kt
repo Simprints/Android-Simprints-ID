@@ -12,6 +12,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.RealmQuery
 
 class RealmSessionEventsDbManagerImpl(private val appContext: Context,
                                       private val secureDataManager: SecureDataManager) : SessionEventsLocalDbManager {
@@ -40,6 +41,37 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         return Completable.complete()
     }
 
+    override fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents): Completable =
+        getRealmInstance().flatMapCompletable { realm ->
+            realm.executeTransaction {
+                it.insertOrUpdate(RlSessionEvents(sessionEvents))
+            }
+            Completable.complete()
+        }
+
+    override fun loadSessions(projectId: String?, openSession: Boolean?): Single<ArrayList<SessionEvents>> =
+        getRealmInstance().map {
+            val query = it.where(RlSessionEvents::class.java).apply {
+                addQueryParamForProjectId(projectId, this)
+                addQueryParamForOpenSession(openSession, this)
+
+                this.sort(RealmSessionEventsDbManagerImpl.START_TIME, io.realm.Sort.DESCENDING)
+            }
+            ArrayList(it.copyFromRealm(query.findAll(), 4).map { SessionEvents(it) })
+        }
+
+    override fun deleteSessions(projectId: String?, openSession: Boolean?): Completable =
+        getRealmInstance().flatMapCompletable { realm ->
+            realm.executeTransaction {
+                val query = it.where(RlSessionEvents::class.java).apply {
+                    addQueryParamForProjectId(projectId, this)
+                    addQueryParamForOpenSession(openSession, this)
+                }
+                query.findAll().deleteAllFromRealm()
+            }
+            Completable.complete()
+        }
+
     private fun generateDbKeyIfRequired(): LocalDbKey {
         try {
             secureDataManager.getLocalDbKeyOrThrow("event_data")
@@ -62,44 +94,19 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
             Single.just(Realm.getInstance(it))
         })
 
-    override fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents): Completable =
-        getRealmInstance().flatMapCompletable { realm ->
-            realm.executeTransaction {
-                it.insertOrUpdate(RlSessionEvents(sessionEvents))
-            }
-            Completable.complete()
+    private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<RlSessionEvents>) {
+        projectId?.let {
+            query.equalTo(RealmSessionEventsDbManagerImpl.PROJECT_ID, projectId)
         }
+    }
 
-    override fun loadSessions(projectId: String?, openSession: Boolean?): Single<ArrayList<SessionEvents>> =
-        getRealmInstance().map {
-            val query = it.where(RlSessionEvents::class.java).apply {
-                projectId?.let {
-                    this.equalTo(RealmSessionEventsDbManagerImpl.PROJECT_ID, projectId)
-                }
-
-                openSession?.let { openSession ->
-                    if (openSession) {
-                        this.equalTo(RealmSessionEventsDbManagerImpl.END_TIME, 0L)
-                    } else {
-                        this.greaterThan(RealmSessionEventsDbManagerImpl.END_TIME, 0L)
-                    }
-                }
-
-                this.sort(RealmSessionEventsDbManagerImpl.START_TIME, io.realm.Sort.DESCENDING)
+    private fun addQueryParamForOpenSession(openSession: Boolean?, query: RealmQuery<RlSessionEvents>) {
+        openSession?.let {
+            if (it) {
+                query.equalTo(RealmSessionEventsDbManagerImpl.END_TIME, 0L)
+            } else {
+                query.greaterThan(RealmSessionEventsDbManagerImpl.END_TIME, 0L)
             }
-            ArrayList(it.copyFromRealm(query.findAll(), 4).map { SessionEvents(it) })
         }
-
-    override fun deleteSessions(projectId: String?): Completable =
-        getRealmInstance().flatMapCompletable { realm ->
-            realm.executeTransaction {
-                val query = it.where(RlSessionEvents::class.java).apply {
-                    projectId?.let {
-                        this.equalTo(RealmSessionEventsDbManagerImpl.PROJECT_ID, projectId)
-                    }
-                }
-                query.findAll().deleteAllFromRealm()
-            }
-            Completable.complete()
-        }
+    }
 }
