@@ -1,5 +1,6 @@
 package com.simprints.id.activities
 
+import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.di.AppModuleForTests
@@ -39,6 +40,7 @@ class AboutActivityTest : RxJavaTest, DaggerForTests() {
 
     @Before
     override fun setUp() {
+        FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as TestApplication)
         super.setUp()
         testAppComponent.inject(this)

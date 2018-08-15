@@ -2,6 +2,7 @@ package com.simprints.id.di
 
 import com.simprints.id.Application
 import com.simprints.id.data.secure.keystore.KeystoreManager
+import com.simprints.id.services.scheduledSync.ScheduledSyncManager
 import com.simprints.id.shared.AppModuleForAnyTests
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.DependencyRule.RealRule
@@ -15,7 +16,8 @@ open class AppModuleForTests(app: Application,
                              override var dataManagerRule: DependencyRule = RealRule(),
                              override var loginInfoManagerRule: DependencyRule = RealRule(),
                              override var analyticsManagerRule: DependencyRule = RealRule(),
-                             override var bluetoothComponentAdapterRule: DependencyRule = RealRule())
+                             override var bluetoothComponentAdapterRule: DependencyRule = RealRule(),
+                             override var scheduledSyncManagerRule: DependencyRule = RealRule())
     : AppModuleForAnyTests(app, localDbManagerRule, remoteDbManagerRule, dbManagerRule, secureDataManagerRule, dataManagerRule, loginInfoManagerRule, analyticsManagerRule, bluetoothComponentAdapterRule) {
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
