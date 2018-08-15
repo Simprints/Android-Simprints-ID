@@ -7,7 +7,8 @@
     android:layout_height="match_parent"
     android:background="@color/simprints_blue"
     android:orientation="vertical"
-    tools:context=".activities.launch.LaunchActivity">
+    tools:context=".activities.launch.LaunchActivity"
+    tools:layout_editor_absoluteY="25dp">
 
     <ImageView
         android:id="@+id/simprintsLogoWithTagLine"
@@ -26,19 +27,17 @@
 
     <Button
         android:id="@+id/consentDeclineButton"
-        android:layout_width="0dp"
+        android:layout_width="96dp"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
         android:background="@color/simprints_white"
         android:text="@string/launch_consent_decline_button"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/privacyNoticeText"
-        app:layout_constraintDimensionRatio="w,4:2"
         app:layout_constraintEnd_toStartOf="@+id/consentAcceptButton"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tabHost"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintTop_toBottomOf="@+id/guideline" />
 
     <Button
         android:id="@+id/consentAcceptButton"
@@ -74,16 +73,17 @@
         android:progressDrawable="@drawable/launch_progress_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TabHost
         android:id="@+id/tabHost"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         android:layout_marginTop="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/consentDeclineButton"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/simprintsLogoWithTagLine">
 
@@ -114,14 +114,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
+                        android:maxLines="12"
                         android:paddingLeft="20dp"
-                        android:paddingRight="20dp"
                         android:paddingTop="10dp"
+                        android:paddingRight="20dp"
+                        android:scrollbars="vertical"
                         android:text="@string/short_consent"
                         android:textColor="@color/simprints_white"
-                        android:textSize="16sp"
-                        android:maxLines="12"
-                        android:scrollbars="vertical"/>
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -135,14 +135,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
+                        android:maxLines="12"
                         android:paddingLeft="20dp"
-                        android:paddingRight="20dp"
                         android:paddingTop="10dp"
+                        android:paddingRight="20dp"
+                        android:scrollbars="vertical"
                         android:text=""
                         android:textColor="@color/simprints_white"
-                        android:textSize="16sp"
-                        android:maxLines="12"
-                        android:scrollbars="vertical"/>
+                        android:textSize="16sp" />
                 </LinearLayout>
 
             </FrameLayout>
@@ -161,5 +161,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/consentDeclineButton" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.75" />
 
 </android.support.constraint.ConstraintLayout>

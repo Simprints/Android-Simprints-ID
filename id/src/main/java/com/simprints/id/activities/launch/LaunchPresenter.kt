@@ -1,7 +1,6 @@
 package com.simprints.id.activities.launch
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import com.simprints.id.Application
 import com.simprints.id.controllers.Setup
@@ -17,7 +16,10 @@ import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.services.scheduledSync.ScheduledSyncManager
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.id.tools.*
+import com.simprints.id.tools.AppState
+import com.simprints.id.tools.Log
+import com.simprints.id.tools.PositionTracker
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
