@@ -25,17 +25,24 @@ open class RlEvent : RealmObject {
 
     fun getEvent(): Event? {
         return when (getType()) {
-            CALLOUT -> JsonHelper.gson.fromJson(jsonEvent, CalloutEvent::class.java)
-            LOGIN -> JsonHelper.gson.fromJson(jsonEvent, LoginEvent::class.java)
-            CALLBACK -> JsonHelper.gson.fromJson(jsonEvent, CallbackEvent::class.java)
-            ARTIFICIAL_TERMINATION -> JsonHelper.gson.fromJson(jsonEvent, ArtificialTerminationEvent::class.java)
-            AUTHENTICATION -> JsonHelper.gson.fromJson(jsonEvent, AuthenticationEvent::class.java)
+            REFUSAL -> JsonHelper.gson.fromJson(jsonEvent, RefusalEvent::class.java)
             CONSENT -> JsonHelper.gson.fromJson(jsonEvent, ConsentEvent::class.java)
+            CALLOUT -> JsonHelper.gson.fromJson(jsonEvent, CalloutEvent::class.java)
+            CALLBACK -> JsonHelper.gson.fromJson(jsonEvent, CallbackEvent::class.java)
             ENROLLMENT -> JsonHelper.gson.fromJson(jsonEvent, EnrollmentEvent::class.java)
-            FINGERPRINT_CAPTURE -> JsonHelper.gson.fromJson(jsonEvent, FingerprintCaptureEvent::class.java)
-            LOGIN -> JsonHelper.gson.fromJson(jsonEvent, LoginEvent::class.java)
-            ONE_TO_MANY_MATCH -> JsonHelper.gson.fromJson(jsonEvent, OneToManyMatchEvent::class.java)
+            ALERT_SCREEN -> JsonHelper.gson.fromJson(jsonEvent, AlertScreenEvent::class.java)
+            CANDIDATE_READ -> JsonHelper.gson.fromJson(jsonEvent, CandidateReadEvent::class.java)
+            AUTHORIZATION -> JsonHelper.gson.fromJson(jsonEvent, AuthorizationEvent::class.java)
+            GUID_SELECTION -> JsonHelper.gson.fromJson(jsonEvent, GuidSelectionEvent::class.java)
+            AUTHENTICATION -> JsonHelper.gson.fromJson(jsonEvent, AuthenticationEvent::class.java)
             ONE_TO_ONE_MATCH -> JsonHelper.gson.fromJson(jsonEvent, OneToOneMatchEvent::class.java)
+            PERSON_CREATION -> JsonHelper.gson.fromJson(jsonEvent, PersonCreationEvent::class.java)
+            ONE_TO_MANY_MATCH -> JsonHelper.gson.fromJson(jsonEvent, OneToManyMatchEvent::class.java)
+            SCANNER_CONNECTION -> JsonHelper.gson.fromJson(jsonEvent, ScannerConnectionEvent::class.java)
+            FINGERPRINT_CAPTURE -> JsonHelper.gson.fromJson(jsonEvent, FingerprintCaptureEvent::class.java)
+            CONNECTIVITY_SNAPSHOT -> JsonHelper.gson.fromJson(jsonEvent, ConnectivitySnapshotEvent::class.java)
+            ARTIFICIAL_TERMINATION -> JsonHelper.gson.fromJson(jsonEvent, ArtificialTerminationEvent::class.java)
+
             null -> null
         }
     }

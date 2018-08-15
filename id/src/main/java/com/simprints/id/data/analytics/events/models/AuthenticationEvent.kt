@@ -1,13 +1,16 @@
 package com.simprints.id.data.analytics.events.models
 
 class AuthenticationEvent(val relativeStartTime: Long,
-                          val result: AuthenticationEvent.Result,
-                          val signedInUserInfo: AuthenticationEvent.Info): Event(EventType.AUTHENTICATION) {
+                          val relativeEndTime: Long,
+                          val userInfo: LoginInfo,
+                          val result: Result) : Event(EventType.AUTHENTICATION) {
+
+    class LoginInfo(val projectId: String, val userId: String)
 
     enum class Result {
-        SUCCESS, FAILURE
+        AUTHENTICATED,
+        BAD_CREDENTIALS,
+        OFFLINE,
+        TECHNICAL_FAILURE
     }
-
-    class Info(val projectId: String, val userId: String)
 }
-

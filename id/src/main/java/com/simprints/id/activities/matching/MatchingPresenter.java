@@ -137,7 +137,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     private DataCallback newOnLoadPeopleCallback() {
         return new DataCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(boolean isDataFromRemote) {
                 Log.INSTANCE.d(MatchingPresenter.this, String.format(Locale.UK,
                     "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
@@ -192,7 +192,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     private DataCallback newOnLoadPersonCallback() {
         return new DataCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(boolean isDataFromRemote) {
                 Log.INSTANCE.d(MatchingPresenter.this, "Successfully loaded candidate");
 
                 int matcherType = preferencesManager.getMatcherType();

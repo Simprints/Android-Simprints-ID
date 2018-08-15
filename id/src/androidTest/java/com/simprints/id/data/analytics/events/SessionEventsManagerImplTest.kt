@@ -192,10 +192,11 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             val session = it.values().first()
             assertThat(session.events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
                 CalloutEvent::class.java,
-                AuthenticationEvent::class.java,
+                AuthorizationEvent::class.java,
                 ConsentEvent::class.java,
                 FingerprintCaptureEvent::class.java,
                 FingerprintCaptureEvent::class.java,
+                PersonCreationEvent::class.java,
                 EnrollmentEvent::class.java,
                 CallbackEvent::class.java
             )).inOrder()
@@ -227,7 +228,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             val session = it.values().first()
             assertThat(session.events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
                 CalloutEvent::class.java,
-                AuthenticationEvent::class.java,
+                AuthorizationEvent::class.java,
                 ConsentEvent::class.java,
                 FingerprintCaptureEvent::class.java,
                 FingerprintCaptureEvent::class.java,
@@ -260,7 +261,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             val session = it.values().first()
             assertThat(session.events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
                 CalloutEvent::class.java,
-                AuthenticationEvent::class.java,
+                AuthorizationEvent::class.java,
                 ConsentEvent::class.java,
                 FingerprintCaptureEvent::class.java,
                 FingerprintCaptureEvent::class.java,

@@ -16,7 +16,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
-import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionSyncManager
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.AppState
@@ -96,7 +95,8 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     private fun scheduleSessionsSyncIfNecessary() {
         if (preferencesManager.scheduledSessionsSyncWorkRequestId.isEmpty()) {
-            ScheduledSessionSyncManager(preferencesManager).scheduleSyncIfNecessary()
+           //ScheduledSessionSyncManager(preferencesManager).scheduleSyncIfNecessary()
+            //StopShip: uncommentsetHandle
         }
     }
 
@@ -151,7 +151,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     private fun addConsentEvent(result: ConsentEvent.Result) {
         sessionEventsManager.updateSession({
             consentEvent.relativeEndTime = timeHelper.msSinceBoot() - it.startTime
-            consentEvent.consent = result
+            consentEvent.result = result
             it.events.add(consentEvent)
             it.location = null
         }).subscribe()

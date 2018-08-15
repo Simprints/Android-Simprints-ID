@@ -4,6 +4,7 @@ import com.simprints.id.data.analytics.events.SessionEventsManager
 import com.simprints.id.data.analytics.events.models.EnrollmentEvent
 import com.simprints.id.data.analytics.events.models.MatchCandidate
 import com.simprints.id.data.analytics.events.models.OneToManyMatchEvent
+import com.simprints.id.data.analytics.events.models.OneToManyMatchEvent.MatchPoolType.Companion.fromConstantGroup
 import com.simprints.id.data.analytics.events.models.OneToOneMatchEvent
 import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbManager
@@ -121,10 +122,10 @@ class DbManagerImpl(override val local: LocalDbManager,
 
         local.loadPersonFromLocal(guid).subscribe({
             destinationList.add(it)
-            callback.onSuccess()
+            callback.onSuccess(false)
         }, {
             remote.downloadPerson(guid, projectId).subscribeBy(
-                onSuccess = { destinationList.add(rl_Person(it).libPerson); callback.onSuccess() },
+                onSuccess = { destinationList.add(rl_Person(it).libPerson); callback.onSuccess(true) },
                 onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
         })
     }
@@ -136,7 +137,7 @@ class DbManagerImpl(override val local: LocalDbManager,
             Constants.GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = preferencesManager.moduleId).blockingGet().map { it.libPerson }
         }
         destinationList.addAll(result)
-        callback?.onSuccess()
+        callback?.onSuccess(false)
     }
 
     override fun loadProject(projectId: String): Single<Project> =
@@ -188,8 +189,7 @@ class DbManagerImpl(override val local: LocalDbManager,
             it.events.add(OneToManyMatchEvent(
                 it.timeRelativeToStartTime(startTimeIdentification),
                 it.nowRelativeToStartTime(timeHelper),
-                OneToManyMatchEvent.MatchPool(preferencesManager.matchGroup, matchSize),
-                OneToManyMatchEvent.MatchResult.SUCCESS,
+                OneToManyMatchEvent.MatchPool(fromConstantGroup(preferencesManager.matchGroup), matchSize),
                 matches.map { MatchCandidate(it.guid, it.confidence) }.toList().toTypedArray()))
         })
     }
@@ -220,7 +220,6 @@ class DbManagerImpl(override val local: LocalDbManager,
                 it.timeRelativeToStartTime(startTimeVerification),
                 it.nowRelativeToStartTime(timeHelper),
                 preferencesManager.patientId,
-                guidExistsResult,
                 match?.let { MatchCandidate(it.guid, match.confidence) }))
         })
     }

@@ -11,6 +11,7 @@ interface SessionEventsManager {
 
     fun createSession(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty()): Single<SessionEvents>
     fun getCurrentSession(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty() ): Single<SessionEvents>
+
     fun updateSession(block: (sessionEvents: SessionEvents) -> Unit,
                       projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty()): Completable
 
@@ -18,4 +19,6 @@ interface SessionEventsManager {
                                   projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty())
 
     fun insertOrUpdateSession(session: SessionEvents): Completable
+
+    fun addGuidSelectionEventToLastIdentificationIfExists(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid: String): Completable
 }

@@ -2,11 +2,11 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.events.SessionEventsManager
-import com.simprints.id.data.analytics.events.models.LoginEvent
-import com.simprints.id.data.analytics.events.models.LoginEvent.LoginInfo
-import com.simprints.id.data.analytics.events.models.LoginEvent.Result.FAILURE
-import com.simprints.id.data.analytics.events.models.LoginEvent.Result.SUCCESS
+import com.simprints.id.data.analytics.events.models.AuthenticationEvent
+import com.simprints.id.data.analytics.events.models.AuthenticationEvent.LoginInfo
+import com.simprints.id.data.analytics.events.models.AuthenticationEvent.Result.*
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
@@ -32,7 +32,10 @@ class LoginPresenter(val view: LoginContract.View,
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
+
+    private var startTimeLogin: Long = 0
 
     init {
         component.inject(this)
@@ -59,7 +62,7 @@ class LoginPresenter(val view: LoginContract.View,
 
     private fun doAuthenticate(suppliedProjectId: String, suppliedUserId: String, suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
         loginInfoManager.cleanCredentials()
-        val startTime = timeHelper.msSinceBoot()
+        startTimeLogin = timeHelper.msSinceBoot()
         projectAuthenticator.authenticate(
             NonceScope(suppliedProjectId, suppliedUserId),
             suppliedProjectSecret,
@@ -70,42 +73,42 @@ class LoginPresenter(val view: LoginContract.View,
             .trace("doAuthenticate")
             .subscribeBy(
                 onComplete = {
-                    sessionEventsManager.updateSessionInBackground({
-                        it.events.add(LoginEvent(
-                            it.timeRelativeToStartTime(startTime),
-                            it.nowRelativeToStartTime(timeHelper),
-                            LoginInfo(suppliedProjectId, suppliedUserId),
-                            SUCCESS))
-                    })
                     handleSignInSuccess()
                 },
                 onError = {
                     e ->
-                    sessionEventsManager.updateSessionInBackground({
-                        it.events.add(LoginEvent(
-                            it.timeRelativeToStartTime(startTime),
-                            it.nowRelativeToStartTime(timeHelper),
-                            LoginInfo(suppliedProjectId, suppliedUserId),
-                            FAILURE))
-                    })
                     handleSignInError(e)
                 })
     }
 
     private fun handleSignInSuccess() {
+        addAuthenticatedEvent(AUTHENTICATED)
         view.handleSignInSuccess()
+    }
+
+    private fun addAuthenticatedEvent(result: AuthenticationEvent.Result) {
+        sessionEventsManager.updateSessionInBackground({
+            it.events.add(AuthenticationEvent(
+                it.timeRelativeToStartTime(startTimeLogin),
+                it.nowRelativeToStartTime(timeHelper),
+                LoginInfo(preferencesManager.projectId, preferencesManager.userId),
+                result))
+        })
     }
 
     private fun handleSignInError(e: Throwable) {
         logSignInError(e)
+        var reason = TECHNICAL_FAILURE
         when (e) {
-            is IOException -> view.handleSignInFailedNoConnection()
-            is DifferentProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch()
-            is InvalidLegacyProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch()
-            is AuthRequestInvalidCredentialsException -> view.handleSignInFailedInvalidCredentials()
-            is SimprintsInternalServerException -> view.handleSignInFailedServerError()
-            else -> view.handleSignInFailedUnknownReason()
+            is IOException -> view.handleSignInFailedNoConnection().also { reason = OFFLINE }
+            is DifferentProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch().also { reason = BAD_CREDENTIALS }
+            is InvalidLegacyProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch().also { reason = BAD_CREDENTIALS }
+            is AuthRequestInvalidCredentialsException -> view.handleSignInFailedInvalidCredentials().also { reason = BAD_CREDENTIALS }
+            is SimprintsInternalServerException -> view.handleSignInFailedServerError().also { reason = TECHNICAL_FAILURE }
+            else -> view.handleSignInFailedUnknownReason().also { reason = TECHNICAL_FAILURE }
         }
+
+        addAuthenticatedEvent(reason)
     }
 
     private fun logSignInError(e: Throwable) {
