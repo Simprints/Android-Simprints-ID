@@ -87,7 +87,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT = true
 
         private const val PROGRAM_NAME_KEY = "ProgramName"
-        private const val PROGRAM_NAME_DEFAULT = "This program"
+        private const val PROGRAM_NAME_DEFAULT = "this program"
 
         private const val ORGANIZATION_NAME_KEY = "OrganizationName"
         private const val ORGANIZATION_NAME_DEFAULT = "This organization"

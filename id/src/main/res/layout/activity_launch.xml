@@ -114,12 +114,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:paddingLeft="30dp"
-                        android:paddingRight="30dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
                         android:paddingTop="10dp"
                         android:text="@string/short_consent"
                         android:textColor="@color/simprints_white"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:maxLines="12"
+                        android:scrollbars="vertical"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -133,12 +135,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:paddingLeft="30dp"
-                        android:paddingRight="30dp"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
                         android:paddingTop="10dp"
                         android:text=""
                         android:textColor="@color/simprints_white"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:maxLines="12"
+                        android:scrollbars="vertical"/>
                 </LinearLayout>
 
             </FrameLayout>

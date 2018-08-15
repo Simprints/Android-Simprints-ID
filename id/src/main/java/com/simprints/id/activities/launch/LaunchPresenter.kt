@@ -131,12 +131,12 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     private fun getGeneralConsentText(): String {
         val generalConsent = JsonHelper.gson.fromJson(preferencesManager.generalConsentOptionsJson, GeneralConsent::class.java)
-        return generalConsent.assembleText(view as Context, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
+        return generalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
     }
 
     private fun getParentalConsentText(): String {
         val parentalConsent = JsonHelper.gson.fromJson(preferencesManager.parentalConsentOptionsJson, ParentalConsent::class.java)
-        return parentalConsent.assembleText(view as Context, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
+        return parentalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
     }
 
     override fun handleOnRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
