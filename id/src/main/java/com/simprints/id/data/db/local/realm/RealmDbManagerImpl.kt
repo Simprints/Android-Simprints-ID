@@ -249,6 +249,6 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
             Constants.GROUP.MODULE -> loadPeopleFromLocal(moduleId = moduleId).blockingGet().map { it.libPerson }
         }
         destinationList.addAll(result)
-        callback?.onSuccess()
+        callback?.onSuccess(false)
     }
 }

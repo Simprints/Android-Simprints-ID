@@ -135,7 +135,10 @@ open class AppModule(val app: Application) {
                      analyticsManager: AnalyticsManager,
                      appState: AppState,
                      networkUtils: NetworkUtils,
-                     bluetoothComponentAdapter: BluetoothComponentAdapter): Setup = Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, networkUtils, bluetoothComponentAdapter)
+                     bluetoothComponentAdapter: BluetoothComponentAdapter,
+                     sessionEventsManager: SessionEventsManager,
+                     timeHelper: TimeHelper): Setup =
+        Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, networkUtils, bluetoothComponentAdapter, sessionEventsManager, timeHelper)
 
     @Provides
     @Singleton

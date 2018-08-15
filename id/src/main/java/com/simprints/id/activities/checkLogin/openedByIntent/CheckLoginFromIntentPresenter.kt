@@ -3,8 +3,8 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.analytics.events.SessionEventsManager
 import com.simprints.id.data.analytics.events.models.*
-import com.simprints.id.data.analytics.events.models.AuthenticationEvent.Info
-import com.simprints.id.data.analytics.events.models.AuthenticationEvent.Result.SUCCESS
+import com.simprints.id.data.analytics.events.models.AuthorizationEvent.Info
+import com.simprints.id.data.analytics.events.models.AuthorizationEvent.Result.AUTHORIZED
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
@@ -13,8 +13,10 @@ import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.sessionParameters.SessionParameters
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -65,6 +67,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     override fun handleNotSignedInUser() {
+        sessionEventsManager.updateSessionInBackground({
+            addAuthorizationEvent(it, AuthorizationEvent.Result.NOT_AUTHORIZED)
+        })
+
         if (!loginAlreadyTried.get()) {
             loginAlreadyTried.set(true)
             view.openLoginActivity(possibleLegacyApiKey)
@@ -109,15 +115,17 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 sessionEventsManager.createSession(projectId),
                 analyticsManager.analyticsId.onErrorReturn { "" },
                 dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }) { session: SessionEvents, gaId: String, count: Int ->
-                session.analyticsId = gaId
-                session.databaseInfo = DatabaseInfo(count)
-                session.events.add(CalloutEvent(session.nowRelativeToStartTime(timeHelper), view.parseCallout()))
-                session.events.add(AuthenticationEvent(
-                    session.nowRelativeToStartTime(timeHelper),
-                    SUCCESS, Info(loginInfoManager.getSignedInProjectIdOrEmpty(),
-                    loginInfoManager.getSignedInUserIdOrEmpty())))
+                    session.apply {
+                        analyticsId = gaId
+                        databaseInfo = DatabaseInfo(count)
+                        events.apply {
+                            add(CalloutEvent(session.nowRelativeToStartTime(timeHelper), view.parseCallout()))
+                            add(view.buildConnectionEvent(session))
+                            addAuthorizationEvent(session, AUTHORIZED)
+                        }
+                    }
 
-                return@zip session
+                    return@zip session
             }.flatMapCompletable {
                 sessionEventsManager.insertOrUpdateSession(it)
             }.subscribeBy(onComplete = { }, onError = { it.printStackTrace() })
@@ -126,11 +134,23 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
+    private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
+        session.events.add(AuthorizationEvent(
+            session.nowRelativeToStartTime(timeHelper),
+            result,
+            Info(preferencesManager.projectId,
+                preferencesManager.userId)))
+    }
+
     override fun handleActivityResult(requestCode: Int, resultCode: Int, returnCallout: Callout) {
         sessionEventsManager.updateSession({
             it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), returnCallout))
             it.closeIfRequired(timeHelper)
-        }).andThen {
-        }.subscribeBy(onComplete = { }, onError = { it.printStackTrace() })
+        }).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onComplete = {
+            }, onError = {
+                it.printStackTrace()
+            })
     }
 }

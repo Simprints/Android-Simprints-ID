@@ -4,6 +4,7 @@ import android.app.IntentService
 import android.content.Intent
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.events.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -11,6 +12,7 @@ import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.libsimprints.Constants.*
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class GuidSelectionService : IntentService("GuidSelectionService") {
@@ -19,6 +21,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
 
     override fun onCreate() {
         super.onCreate()
@@ -41,6 +44,11 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         val callbackSent = try {
             checkCalloutParameters(projectId, apiKey, sessionId, selectedGuid)
             dbManager.updateIdentification(loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId ?: "")
+
+            //StopShip: write tests
+            sessionEventsManager
+                .addGuidSelectionEventToLastIdentificationIfExists(selectedGuid = selectedGuid)
+                .subscribeBy(onError = { it.printStackTrace() })
             true
         } catch (error: InvalidCalloutParameterError) {
             analyticsManager.logError(error)

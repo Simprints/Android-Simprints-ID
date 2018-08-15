@@ -230,7 +230,13 @@ class CollectFingerprintsPresenter(private val context: Context,
                 it.nowRelativeToStartTime(timeHelper),
                 it.events
                     .filterIsInstance(FingerprintCaptureEvent::class.java)
-                    .filter { it.result == Finger.Status.GOOD_SCAN || it.result == Finger.Status.RESCAN_GOOD_SCAN }.map { it.id }
+                    .reversed() //StopShip: write tests
+                    .distinctBy { it.finger }
+                    .reversed()
+                    .filter {
+                        it.result == FingerprintCaptureEvent.Result.GOOD_SCAN ||
+                        it.result == FingerprintCaptureEvent.Result.BAD_QUALITY
+                    }.map { it.id }
             ))
         })
 
@@ -291,7 +297,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                 UUID.randomUUID().toString(),
                 finger.id,
                 preferencesManager.qualityThreshold,
-                finger.status,
+                FingerprintCaptureEvent.Result.fromFingerStatus(finger.status),
                 finger.template?.let {
                     FingerprintCaptureEvent.Fingerprint(it.qualityScore, Utils.byteArrayToBase64(it.templateBytes))
                 }
