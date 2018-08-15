@@ -26,7 +26,6 @@ import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
-import timber.log.Timber
 import javax.inject.Inject
 
 
