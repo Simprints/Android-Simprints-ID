@@ -2,6 +2,7 @@ package com.simprints.id.activities.launch
 
 import android.app.Activity
 import android.content.Intent
+import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
@@ -13,6 +14,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
+import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
 import com.simprints.id.services.scheduledSync.ScheduledSyncManager
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncTaskParameters
@@ -24,6 +26,7 @@ import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -132,12 +135,22 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun getGeneralConsentText(): String {
-        val generalConsent = JsonHelper.gson.fromJson(preferencesManager.generalConsentOptionsJson, GeneralConsent::class.java)
+        val generalConsent = try {
+            JsonHelper.gson.fromJson(preferencesManager.generalConsentOptionsJson, GeneralConsent::class.java)
+        } catch (e: JsonSyntaxException) {
+            analyticsManager.logError(MalformedConsentTextError("Malformed General Consent Text Error", e))
+            GeneralConsent()
+        }
         return generalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
     }
 
     private fun getParentalConsentText(): String {
-        val parentalConsent = JsonHelper.gson.fromJson(preferencesManager.parentalConsentOptionsJson, ParentalConsent::class.java)
+        val parentalConsent = try {
+            JsonHelper.gson.fromJson(preferencesManager.parentalConsentOptionsJson, ParentalConsent::class.java)
+        } catch (e: JsonSyntaxException) {
+            analyticsManager.logError(MalformedConsentTextError("Malformed Parental Consent Text Error", e))
+            ParentalConsent()
+        }
         return parentalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
     }
 
