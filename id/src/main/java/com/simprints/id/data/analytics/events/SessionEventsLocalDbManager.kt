@@ -10,5 +10,5 @@ interface SessionEventsLocalDbManager {
 
     fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents): Completable
     fun loadSessions(projectId: String? = null, openSession: Boolean? = null): Single<ArrayList<SessionEvents>>
-    fun deleteSessions(projectId: String? = null): Completable
+    fun deleteSessions(projectId: String? = null, openSession: Boolean? = null): Completable
 }

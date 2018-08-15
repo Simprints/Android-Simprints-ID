@@ -9,10 +9,11 @@ import retrofit2.http.Path
 
 interface SessionApiInterface {
     companion object {
-        const val baseUrl = "https://eventapi-v0.simprints-dev.appspot.com/" //NetworkConstants.baseUrl
+        //StopShip: change the url to the facade one
+        var baseUrl = "http://eventapi-v0.simprints-dev.appspot.com/" //NetworkConstants.baseUrl
     }
 
     @POST("projects/{projectId}/sessions")
     fun uploadSessions(@Path("projectId") projectId: String,
-                       @Body sessionsJson: ArrayList<SessionEvents>): Single<Result<Unit>>
+                       @Body sessionsJson: Array<SessionEvents>): Single<Result<Unit>>
 }

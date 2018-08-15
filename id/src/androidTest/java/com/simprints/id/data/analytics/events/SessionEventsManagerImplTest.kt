@@ -8,7 +8,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.analytics.events.models.*
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -17,13 +16,17 @@ import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.anyNotNull
+import com.simprints.id.shared.mock
+import com.simprints.id.shared.whenever
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
+import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.realm.Realm
 import junit.framework.Assert.*
@@ -33,6 +36,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import retrofit2.Response
+import retrofit2.adapter.rxjava2.Result
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
@@ -53,8 +58,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
-    @Inject lateinit var dbManager: DbManager
     @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var timeHelper: TimeHelper
 
     override var module by lazyVar {
         AppModuleForAndroidTests(
@@ -97,6 +102,45 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
                 assertEquals(it.relativeEndTime, 0L)
             }
         }
+    }
+
+    @Test
+    fun sync_shouldClosePendingSessions() {
+        val projectId = "some_project"
+        createFakeSession(timeHelper, projectId = projectId, id = "closed_session").apply {
+            startTime = timeHelper.msSinceBoot() - 1000
+            relativeEndTime = nowRelativeToStartTime(timeHelper) - 10
+        }.also { saveSessionInDb(it) }
+
+        createFakeSession(timeHelper, projectId = projectId, id = "still_valid_open_session").apply {
+            startTime = timeHelper.msSinceBoot() - 1000
+            relativeEndTime = 0
+        }.also { saveSessionInDb(it) }
+
+        createFakeSession(timeHelper, projectId = projectId, id = "open_session_but_old").apply {
+            startTime = timeHelper.msSinceBoot() - SessionEvents.GRACE_PERIOD - 1000
+            relativeEndTime = 0
+        }.also { saveSessionInDb(it) }
+
+        realmSessionEventsManager.loadSessions(projectId).blockingGet().also {
+            assertEquals(it.size, 3)
+        }
+
+        val sessionManagerImpl = (sessionEventsManager as SessionEventsManagerImpl)
+        sessionManagerImpl.apiClient = mock()
+        whenever(sessionManagerImpl.apiClient.uploadSessions(anyNotNull(), anyNotNull())).thenReturn(Single.just(Result.response(Response.success(Unit))))
+
+        sessionEventsManager.syncSessions(projectId).test().also {
+            it.awaitTerminalEvent()
+            it.assertComplete()
+            val sessions = realmSessionEventsManager.loadSessions().blockingGet()
+            assertEquals(sessions.size, 1)
+            assertEquals(sessions[0].id, "still_valid_open_session")
+        }
+    }
+
+    private fun saveSessionInDb(session: SessionEvents) {
+        realmSessionEventsManager.insertOrUpdateSessionEvents(session).blockingAwait()
     }
 
     @Test
@@ -160,7 +204,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     fun anErrorWithEvents_shouldBeSwallowed() {
         realmSessionEventsManager.deleteSessions().blockingAwait()
 
-        // There is not session open or pending in the db. So it should fail, but it swallows the error
+        // There is not activeSession open or pending in the db. So it should fail, but it swallows the error
         val test = sessionEventsManager.updateSession({
             it.location = null
         }).test()
@@ -192,7 +236,9 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             val session = it.values().first()
             assertThat(session.events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
                 CalloutEvent::class.java,
+                ConnectivitySnapshotEvent::class.java,
                 AuthorizationEvent::class.java,
+                ScannerConnectionEvent::class.java,
                 ConsentEvent::class.java,
                 FingerprintCaptureEvent::class.java,
                 FingerprintCaptureEvent::class.java,
@@ -228,10 +274,15 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             val session = it.values().first()
             assertThat(session.events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
                 CalloutEvent::class.java,
+                ConnectivitySnapshotEvent::class.java,
                 AuthorizationEvent::class.java,
+                ScannerConnectionEvent::class.java,
+                CandidateReadEvent::class.java,
                 ConsentEvent::class.java,
                 FingerprintCaptureEvent::class.java,
                 FingerprintCaptureEvent::class.java,
+                PersonCreationEvent::class.java,
+                OneToOneMatchEvent::class.java,
                 CallbackEvent::class.java
             )).inOrder()
         }
@@ -247,12 +298,12 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             *MockFinger.person1TwoFingersAgainGoodScan,
             *MockFinger.person1TwoFingersGoodScan)))
 
-        launchActivityVerify(calloutCredentials, loginTestRule, guid)
+        launchActivityIdentify(calloutCredentials, loginTestRule)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
 
         fullHappyWorkflow()
-        matchingActivityVerificationCheckFinished(loginTestRule)
+        matchingActivityIdentificationCheckFinished(loginTestRule)
 
         sessionEventsManager.getCurrentSession(calloutCredentials.projectId).test().also {
             it.awaitTerminalEvent()
@@ -261,10 +312,14 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             val session = it.values().first()
             assertThat(session.events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
                 CalloutEvent::class.java,
+                ConnectivitySnapshotEvent::class.java,
                 AuthorizationEvent::class.java,
+                ScannerConnectionEvent::class.java,
                 ConsentEvent::class.java,
                 FingerprintCaptureEvent::class.java,
                 FingerprintCaptureEvent::class.java,
+                PersonCreationEvent::class.java,
+                OneToManyMatchEvent::class.java,
                 CallbackEvent::class.java
             )).inOrder()
         }
@@ -278,7 +333,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         }.`when`(localDbManager).signInToLocal(anyNotNull())
     }
 
-    private fun createFakeSession(projectId: String = "some_project", id: String = "some_id"): SessionEvents =
+    private fun createFakeSession(timeHelper: TimeHelper? = null, projectId: String = "some_project", id: String = "some_id"): SessionEvents =
         SessionEvents(
             id = id,
             projectId = projectId,
@@ -286,7 +341,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             libVersionName = "some_version",
             language = "en",
             device = Device(),
-            startTime = 0)
+            startTime = timeHelper?.msSinceBoot() ?: 0)
 
     private fun signOut() {
         remoteDbManager.signOutOfRemoteDb()

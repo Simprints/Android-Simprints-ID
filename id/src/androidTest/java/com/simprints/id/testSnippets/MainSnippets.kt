@@ -74,7 +74,7 @@ fun setupActivity() {
 
 private fun setupActivityContinue() {
     log("setupActivityContinue")
-    WaitingUtils.tryOnUiUntilTimeout(12000, 500) {
+    WaitingUtils.tryOnUiUntilTimeout(15000, 500) {
         onView(withId(R.id.consentAcceptButton))
             .check(matches(isDisplayed()))
             .perform(click())

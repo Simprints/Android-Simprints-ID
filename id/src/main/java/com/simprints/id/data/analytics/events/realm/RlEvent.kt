@@ -9,7 +9,7 @@ open class RlEvent : RealmObject {
 
     private var typeEventDescription: String? = null
 
-    var jsonEvent: String? = null
+    private var jsonEvent: String? = null
 
     private fun saveType(type: EventType) {
         this.typeEventDescription = type.toString()

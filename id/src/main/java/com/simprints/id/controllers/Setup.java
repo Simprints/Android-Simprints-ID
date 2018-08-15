@@ -37,7 +37,6 @@ import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.functions.Function;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import timber.log.Timber;
@@ -236,24 +235,16 @@ public class Setup {
         }
 
         onProgress(70, R.string.launch_checking_person_in_db);
-        sessionEventsManager.getCurrentSession(preferencesManager.getProjectId()).map(new Function<SessionEvents, Unit>() {
-            @Override
-            public Unit apply(SessionEvents sessionEvents) {
-                startCandidateSearchTime = sessionEvents.nowRelativeToStartTime(timeHelper);
+        startCandidateSearchTime = timeHelper.msSinceBoot();
 
-                List<Person> loadedPerson = new ArrayList<>();
-                final String guid = preferencesManager.getPatientId();
-                try {
-
-                    dbManager.loadPerson(loadedPerson, loginInfoManager.getSignedInProjectId(), guid, wrapCallback("loading people from dbManager", newLoadPersonCallback(activity, guid)));
-                } catch (UninitializedDataManagerError error) {
-                    analyticsManager.logError(error);
-                    onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
-                }
-                return null;
-            }
-        });
-
+        List<Person> loadedPerson = new ArrayList<>();
+        final String guid = preferencesManager.getPatientId();
+        try {
+            dbManager.loadPerson(loadedPerson, loginInfoManager.getSignedInProjectId(), guid, wrapCallback("loading people from dbManager", newLoadPersonCallback(activity, guid)));
+        } catch (UninitializedDataManagerError error) {
+            analyticsManager.logError(error);
+            onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
+        }
     }
 
     private DataCallback newLoadPersonCallback(@NonNull final Activity activity, final String guid) {
@@ -303,13 +294,13 @@ public class Setup {
 
     private void addEventForCandidateSearch(final String guid,
                                             final CandidateReadEvent.LocalResult localResult,
-                                            final CandidateReadEvent.RemoteResult remoteResult){
+                                            final CandidateReadEvent.RemoteResult remoteResult) {
         if (localResult != null) {
             sessionEventsManager.updateSessionInBackground(new Function1<SessionEvents, Unit>() {
                 @Override
                 public Unit invoke(SessionEvents sessionEvents) {
                     sessionEvents.getEvents().add(new CandidateReadEvent(
-                        startCandidateSearchTime,
+                        sessionEvents.timeRelativeToStartTime(startCandidateSearchTime),
                         sessionEvents.nowRelativeToStartTime(timeHelper),
                         guid,
                         localResult,
@@ -321,17 +312,17 @@ public class Setup {
         }
     }
 
-    private void addEventForScannerConnectivity(final ScannerConnectionEvent.ScannerInfo scannerInfo){
-            sessionEventsManager.updateSessionInBackground(new Function1<SessionEvents, Unit>() {
-                @Override
-                public Unit invoke(SessionEvents sessionEvents) {
-                    sessionEvents.getEvents().add(new ScannerConnectionEvent(
-                        sessionEvents.nowRelativeToStartTime(timeHelper),
-                        scannerInfo
-                    ));
-                    return null;
-                }
-            }, preferencesManager.getProjectId());
+    private void addEventForScannerConnectivity(final ScannerConnectionEvent.ScannerInfo scannerInfo) {
+        sessionEventsManager.updateSessionInBackground(new Function1<SessionEvents, Unit>() {
+            @Override
+            public Unit invoke(SessionEvents sessionEvents) {
+                sessionEvents.getEvents().add(new ScannerConnectionEvent(
+                    sessionEvents.nowRelativeToStartTime(timeHelper),
+                    scannerInfo
+                ));
+                return null;
+            }
+        }, preferencesManager.getProjectId());
 
     }
 
