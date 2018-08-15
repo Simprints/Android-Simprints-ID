@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v7.app.AppCompatActivity
+import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.view.WindowManager
 import android.widget.TabHost
@@ -34,6 +35,9 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         setButtonClickListeners()
         setupConsentTabs()
         setClickListenerToPrivacyNotice()
+
+        generalConsentTextView.movementMethod = ScrollingMovementMethod()
+        parentalConsentTextView.movementMethod = ScrollingMovementMethod()
 
         viewPresenter = LaunchPresenter(this)
         viewPresenter.start()
