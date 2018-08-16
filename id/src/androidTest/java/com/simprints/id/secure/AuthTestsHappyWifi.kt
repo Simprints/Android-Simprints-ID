@@ -68,7 +68,7 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, DaggerForAndroidTests() {
 
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
-            randomGeneratorRule = MockRule(),
+            randomGeneratorRule = MockRule,
             bluetoothComponentAdapterRule = ReplaceRule { mockBluetoothAdapter })
     }
 

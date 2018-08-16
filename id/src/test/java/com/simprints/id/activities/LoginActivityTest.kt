@@ -54,8 +54,8 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            localDbManagerRule = MockRule(),
-            dbManagerRule = MockRule())
+            localDbManagerRule = MockRule,
+            dbManagerRule = MockRule)
     }
 
     @Before

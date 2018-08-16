@@ -20,16 +20,16 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 
 open class AppModuleForAnyTests(app: Application,
-                                open var localDbManagerRule: DependencyRule = RealRule(),
-                                open var remoteDbManagerRule: DependencyRule = RealRule(),
-                                open var dbManagerRule: DependencyRule = RealRule(),
-                                open var secureDataManagerRule: DependencyRule = RealRule(),
-                                open var dataManagerRule: DependencyRule = RealRule(),
-                                open var loginInfoManagerRule: DependencyRule = RealRule(),
-                                open var randomGeneratorRule: DependencyRule = RealRule(),
-                                open var analyticsManagerRule: DependencyRule = RealRule(),
-                                open var bluetoothComponentAdapterRule: DependencyRule = RealRule(),
-                                open var scheduledSyncManagerRule: DependencyRule = RealRule()) : AppModule(app) {
+                                open var localDbManagerRule: DependencyRule = RealRule,
+                                open var remoteDbManagerRule: DependencyRule = RealRule,
+                                open var dbManagerRule: DependencyRule = RealRule,
+                                open var secureDataManagerRule: DependencyRule = RealRule,
+                                open var dataManagerRule: DependencyRule = RealRule,
+                                open var loginInfoManagerRule: DependencyRule = RealRule,
+                                open var randomGeneratorRule: DependencyRule = RealRule,
+                                open var analyticsManagerRule: DependencyRule = RealRule,
+                                open var bluetoothComponentAdapterRule: DependencyRule = RealRule,
+                                open var scheduledSyncManagerRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }

@@ -32,10 +32,10 @@ class AlertActivityTest : DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            remoteDbManagerRule = MockRule(),
-            localDbManagerRule = MockRule(),
-            analyticsManagerRule = MockRule(),
-            secureDataManagerRule = MockRule())
+            remoteDbManagerRule = MockRule,
+            localDbManagerRule = MockRule,
+            analyticsManagerRule = MockRule,
+            secureDataManagerRule = MockRule)
     }
 
     @Before
