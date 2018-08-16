@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.activities.PrivacyActivity
 import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.TutorialActivity
 import com.simprints.id.activities.about.AboutActivity
@@ -45,7 +44,6 @@ interface AppComponent {
     fun inject(aboutActivity: AboutActivity)
     fun inject(longConsentActivity: LongConsentActivity)
     fun inject(refusalPresenter: RefusalPresenter)
-    fun inject(privacyActivity: PrivacyActivity)
     fun inject(tutorialActivity: TutorialActivity)
     fun inject(settingsActivity: SettingsActivity)
     fun inject(matchingActivity: MatchingActivity)

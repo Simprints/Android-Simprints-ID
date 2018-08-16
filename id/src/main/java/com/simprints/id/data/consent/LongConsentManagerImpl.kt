@@ -18,7 +18,6 @@ class LongConsentManagerImpl(context: Context,
     }
 
     private val filePath: File
-
     private val firebaseStorage = FirebaseStorage.getInstance()
 
     init {
