@@ -37,7 +37,7 @@ import javax.inject.Singleton
 @JvmSuppressWildcards(false)
 open class PreferencesModule {
 
-    @Provides @Singleton fun provideRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+    @Provides @Singleton open fun provideRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
 
     @Provides @Singleton fun provideRemoteConfigFetcher(remoteConfig: FirebaseRemoteConfig): RemoteConfigFetcher = RemoteConfigFetcher(remoteConfig)
 
