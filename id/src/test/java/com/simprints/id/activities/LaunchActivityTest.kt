@@ -29,10 +29,10 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            localDbManagerRule = MockRule(),
-            remoteDbManagerRule = MockRule(),
-            dbManagerRule = MockRule(),
-            scheduledSyncManagerRule = MockRule())
+            localDbManagerRule = MockRule,
+            remoteDbManagerRule = MockRule,
+            dbManagerRule = MockRule,
+            scheduledSyncManagerRule = MockRule)
     }
 
     @Before

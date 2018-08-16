@@ -9,7 +9,7 @@ import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
 
-open class PreferencesModuleForAnyTests(open var settingsPreferencesManagerRule: DependencyRule = RealRule())
+open class PreferencesModuleForAnyTests(open var settingsPreferencesManagerRule: DependencyRule = RealRule)
     : PreferencesModule() {
 
     override fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences,

@@ -3,9 +3,9 @@ package com.simprints.id.shared
 import org.mockito.Mockito.spy
 
 sealed class DependencyRule {
-    class RealRule : DependencyRule()
-    class MockRule : DependencyRule()
-    class SpyRule : DependencyRule()
+    object RealRule : DependencyRule()
+    object MockRule : DependencyRule()
+    object SpyRule : DependencyRule()
     class ReplaceRule<T>(var replacementProvider: () -> T) : DependencyRule()
 
     inline fun <reified T> resolveDependency(provider: () -> T): T =

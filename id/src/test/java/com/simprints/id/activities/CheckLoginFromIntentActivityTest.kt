@@ -62,9 +62,9 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            analyticsManagerRule = SpyRule(),
-            localDbManagerRule = MockRule(),
-            remoteDbManagerRule = MockRule())
+            analyticsManagerRule = SpyRule,
+            localDbManagerRule = MockRule,
+            remoteDbManagerRule = MockRule)
     }
 
     @Before

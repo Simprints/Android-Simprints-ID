@@ -43,8 +43,8 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            remoteDbManagerRule = MockRule(),
-            localDbManagerRule = MockRule())
+            remoteDbManagerRule = MockRule,
+            localDbManagerRule = MockRule)
     }
 
     @Before
