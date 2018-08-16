@@ -4,6 +4,7 @@ import com.simprints.id.activities.*
 import com.simprints.id.activities.alert.AlertActivityTest
 import com.simprints.id.activities.dashboard.DashboardCardsFactoryTest
 import com.simprints.id.data.db.DbManagerTest
+import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.secure.ProjectAuthenticatorTest
 import com.simprints.id.secure.ProjectSecretManagerTest
 import com.simprints.id.sync.SyncTest
@@ -25,4 +26,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(projectAuthenticatorTest: ProjectAuthenticatorTest)
     fun inject(alertActivityTest: AlertActivityTest)
     fun inject(launchActivityTest: LaunchActivityTest)
+    fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
 }

@@ -1,6 +1,5 @@
-package com.simprints.id.tools.delegates
+package com.simprints.id.data.prefs.preferenceType
 
-import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.domain.Constants
 import com.simprints.id.exceptions.unsafe.MismatchedTypeError
