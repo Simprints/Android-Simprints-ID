@@ -24,44 +24,44 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     companion object {
 
-        private const val NUDGE_MODE_KEY = "NudgeModeBool"
-        private const val NUDGE_MODE_DEFAULT = true
+        const val NUDGE_MODE_KEY = "NudgeModeBool"
+        const val NUDGE_MODE_DEFAULT = true
 
-        private const val CONSENT_KEY = "ConsentBool"
-        private const val CONSENT_DEFAULT = true
+        const val CONSENT_KEY = "ConsentBool"
+        const val CONSENT_DEFAULT = true
 
-        private const val QUALITY_THRESHOLD_KEY = "QualityThresholdInt"
-        private const val QUALITY_THRESHOLD_DEFAULT = 60
+        const val QUALITY_THRESHOLD_KEY = "QualityThresholdInt"
+        const val QUALITY_THRESHOLD_DEFAULT = 60
 
-        private const val NB_IDS_KEY = "NbOfIdsInt"
-        private const val NB_IDS_DEFAULT = 10
+        const val NB_IDS_KEY = "NbOfIdsInt"
+        const val NB_IDS_DEFAULT = 10
 
-        private const val LANGUAGE_KEY = "SelectedLanguage"
-        private const val LANGUAGE_DEFAULT = ""
+        const val LANGUAGE_KEY = "SelectedLanguage"
+        const val LANGUAGE_DEFAULT = ""
 
-        private const val LANGUAGE_POSITION_KEY = "SelectedLanguagePosition"
-        private const val LANGUAGE_POSITION_DEFAULT = 0
+        const val LANGUAGE_POSITION_KEY = "SelectedLanguagePosition"
+        const val LANGUAGE_POSITION_DEFAULT = 0
 
-        private const val MATCHER_TYPE_KEY = "MatcherType"
-        private const val MATCHER_TYPE_DEFAULT = 0
+        const val MATCHER_TYPE_KEY = "MatcherType"
+        const val MATCHER_TYPE_DEFAULT = 0
 
-        private const val TIMEOUT_KEY = "TimeoutInt"
-        private const val TIMEOUT_DEFAULT = 3
+        const val TIMEOUT_KEY = "TimeoutInt"
+        const val TIMEOUT_DEFAULT = 3
 
-        private const val SYNC_GROUP_KEY = "SyncGroup"
-        private val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
+        const val SYNC_GROUP_KEY = "SyncGroup"
+        val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
 
-        private const val MATCH_GROUP_KEY = "MatchGroup"
-        private val MATCH_GROUP_DEFAULT = Constants.GROUP.MODULE
+        const val MATCH_GROUP_KEY = "MatchGroup"
+        val MATCH_GROUP_DEFAULT = Constants.GROUP.USER
 
-        private const val VIBRATE_KEY = "VibrateOn"
-        private const val VIBRATE_DEFAULT = true
+        const val VIBRATE_KEY = "VibrateOn"
+        const val VIBRATE_DEFAULT = true
 
-        private const val MATCHING_END_WAIT_TIME_KEY = "MatchingEndWaitTime"
-        private const val MATCHING_END_WAIT_TIME_DEFAULT = 1
+        const val MATCHING_END_WAIT_TIME_KEY = "MatchingEndWaitTime"
+        const val MATCHING_END_WAIT_TIME_DEFAULT = 1
 
-        private const val FINGER_STATUS_KEY = "FingerStatus"
-        private val FINGER_STATUS_DEFAULT = mapOf(
+        const val FINGER_STATUS_KEY = "FingerStatus"
+        val FINGER_STATUS_DEFAULT = mapOf(
             FingerIdentifier.RIGHT_THUMB to false,
             FingerIdentifier.RIGHT_INDEX_FINGER to false,
             FingerIdentifier.RIGHT_3RD_FINGER to false,
@@ -74,32 +74,32 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
             FingerIdentifier.LEFT_5TH_FINGER to false
         )
 
-        private const val SYNC_ON_CALLOUT_KEY = "SyncOnCallout"
-        private const val SYNC_ON_CALLOUT_DEFAULT = false
+        const val SYNC_ON_CALLOUT_KEY = "SyncOnCallout"
+        const val SYNC_ON_CALLOUT_DEFAULT = false
 
-        private const val SCHEDULED_BACKGROUND_SYNC_KEY = "ScheduledBackgroundSync"
-        private const val SCHEDULED_BACKGROUND_SYNC_DEFAULT = true
-        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY = "ScheduledBackgroundSyncOnlyOnWifi"
-        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT = false
-        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY = "ScheduledBackgroundSyncOnlyWhenCharging"
-        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT = false
-        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY = "ScheduledBackgroundSyncOnlyWhenNotLowBattery"
+        const val SCHEDULED_BACKGROUND_SYNC_KEY = "ScheduledBackgroundSync"
+        const val SCHEDULED_BACKGROUND_SYNC_DEFAULT = true
+        const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY = "ScheduledBackgroundSyncOnlyOnWifi"
+        const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT = false
+        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY = "ScheduledBackgroundSyncOnlyWhenCharging"
+        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT = false
+        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY = "ScheduledBackgroundSyncOnlyWhenNotLowBattery"
         private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT = true
 
-        private const val PROGRAM_NAME_KEY = "ProgramName"
-        private const val PROGRAM_NAME_DEFAULT = "this program"
+        const val PROGRAM_NAME_KEY = "ProgramName"
+        const val PROGRAM_NAME_DEFAULT = "this program"
 
-        private const val ORGANIZATION_NAME_KEY = "OrganizationName"
-        private const val ORGANIZATION_NAME_DEFAULT = "This organization"
+        const val ORGANIZATION_NAME_KEY = "OrganizationName"
+        const val ORGANIZATION_NAME_DEFAULT = "This organization"
 
-        private const val PARENTAL_CONSENT_KEY = "ConsentParentalExists"
-        private const val PARENTAL_CONSENT_DEFAULT = false
+        const val PARENTAL_CONSENT_EXISTS_KEY = "ConsentParentalExists"
+        const val PARENTAL_CONSENT_EXISTS_DEFAULT = false
 
-        private const val GENERAL_CONSENT_OPTIONS_JSON_KEY = "ConsentGeneralOptions"
-        private val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT = JsonHelper.gson.toJson(GeneralConsent())
+        const val GENERAL_CONSENT_OPTIONS_JSON_KEY = "ConsentGeneralOptions"
+        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(GeneralConsent())
 
-        private const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
-        private val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT = JsonHelper.gson.toJson(ParentalConsent())
+        const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
+        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(ParentalConsent())
     }
 
     private val remoteConfigDefaults = mutableMapOf<String, Any>()
@@ -177,7 +177,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Whether the parental consent should be shown
     override var parentalConsentExists: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PARENTAL_CONSENT_KEY, PARENTAL_CONSENT_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PARENTAL_CONSENT_EXISTS_KEY, PARENTAL_CONSENT_EXISTS_DEFAULT)
     // The options of the general consent as a JSON string of booleans
     override var generalConsentOptionsJson: String
         by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, GENERAL_CONSENT_OPTIONS_JSON_KEY, GENERAL_CONSENT_OPTIONS_JSON_DEFAULT)
