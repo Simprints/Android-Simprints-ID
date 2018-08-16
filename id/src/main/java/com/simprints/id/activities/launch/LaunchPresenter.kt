@@ -36,6 +36,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var syncManager: SyncManager
+    @Inject lateinit var scheduledSyncManager: ScheduledSyncManager
     @Inject lateinit var appState: AppState
     @Inject lateinit var setup: Setup
     @Inject lateinit var timeHelper: TimeHelper
@@ -89,7 +90,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     private fun scheduleSyncIfNecessary() {
         if (preferencesManager.scheduledSyncWorkRequestId.isEmpty()) {
-            ScheduledSyncManager(preferencesManager).scheduleSyncIfNecessary()
+            scheduledSyncManager.scheduleSyncIfNecessary()
         }
     }
 
