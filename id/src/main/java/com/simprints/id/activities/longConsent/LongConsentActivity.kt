@@ -19,11 +19,10 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        (application as Application).component.inject(this)
         LanguageHelper.setLanguage(this, preferences.language)
         setContentView(R.layout.activity_long_consent)
-
-        val component = (application as Application).component
-        component.inject(this)
 
         viewPresenter = LongConsentPresenter(this)
         viewPresenter.start()
