@@ -176,5 +176,7 @@ open class AppModule(val app: Application) {
                                          loginInfoManager: LoginInfoManager,
                                          sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                          preferencesManager: PreferencesManager,
-                                         timeHelper: TimeHelper): SessionEventsManager = SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper)
+                                         timeHelper: TimeHelper,
+                                         remoteDbManager: RemoteDbManager): SessionEventsManager =
+        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, remoteDbManager.getSessionsApiClient())
 }

@@ -5,24 +5,31 @@ import android.os.Build
 import com.simprints.id.data.analytics.events.models.*
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.network.SimApiClient
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.deviceId
+import com.simprints.libcommon.Person
+import com.simprints.libcommon.Utils
+import com.simprints.libsimprints.Identification
+import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 
 // Class to manage the current activeSession
-class SessionEventsManagerImpl(private val ctx: Context,
-                               private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
-                               override val loginInfoManager: LoginInfoManager,
-                               private val preferencesManager: PreferencesManager,
-                               private val timeHelper: TimeHelper,
-                               var apiClient: SessionApiInterface =
-                                    SimApiClient(SessionApiInterface::class.java, SessionApiInterface.baseUrl).api) : SessionEventsManager {
+open class SessionEventsManagerImpl(private val ctx: Context,
+                                    private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+                                    override val loginInfoManager: LoginInfoManager,
+                                    private val preferencesManager: PreferencesManager,
+                                    private val timeHelper: TimeHelper,
+                                    private val sessionsApiBuilder: Single<SessionsRemoteInterface>) : SessionEventsManager {
 
-    var activeSession: SessionEvents? = null
+    private var activeSession: SessionEvents? = null
+
+    var sessionsApi: SessionsRemoteInterface by lazyVar {
+        sessionsApiBuilder.blockingGet()
+    }
 
     //as default, the manager tries to load the last open activeSession for a specific project
     override fun getCurrentSession(projectId: String): Single<SessionEvents> = activeSession?.let {
@@ -56,7 +63,7 @@ class SessionEventsManagerImpl(private val ctx: Context,
         getCurrentSession(projectId).flatMapCompletable {
             block(it)
             insertOrUpdateSession(it)
-        }.onErrorComplete() // StopShip: if it fails, because events are low priority, it swallows the exception
+        }.onErrorComplete() // because events are low priority, it swallows the exception
 
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit, projectId: String) {
         updateSession(block, projectId).subscribeBy(onError = { it.printStackTrace() })
@@ -95,19 +102,19 @@ class SessionEventsManagerImpl(private val ctx: Context,
 
     override fun syncSessions(projectId: String): Completable {
         return sessionEventsLocalDbManager.loadSessions(projectId).flatMap { sessions ->
+            if(sessions.size > 0 ) {
+                sessions.forEach {
+                    forceSessionToCloseIfOpenAndNotInProgress(it, timeHelper)
+                    it.relativeUploadTime = it.nowRelativeToStartTime(timeHelper)
+                    sessionEventsLocalDbManager.insertOrUpdateSessionEvents(it).blockingAwait()
+                }
 
-            sessions.forEach {
-                forceSessionToCloseIfOpenAndNotInProgress(it, timeHelper)
-                it.relativeUploadTime = it.nowRelativeToStartTime(timeHelper)
-                sessionEventsLocalDbManager.insertOrUpdateSessionEvents(it).blockingAwait()
+                sessions.filter { it.isClose() }.toTypedArray().let {
+                    sessionsApi.uploadSessions(projectId, hashMapOf("sessions" to it))
+                }
+            } else {
+                throw Throwable("No sessions To upload")
             }
-
-            apiClient.uploadSessions(projectId, /* sessions */
-                //StopShip: Remove this filter
-                    sessions.map { session ->
-                        session.also { it.events.filter { it !is FingerprintCaptureEvent } }
-                    }.toTypedArray()
-            )
         }.flatMapCompletable {
             if (!it.isError && it.response()?.code() == 200) {
                 sessionEventsLocalDbManager.deleteSessions(projectId, false)
@@ -123,4 +130,74 @@ class SessionEventsManagerImpl(private val ctx: Context,
             it.closeIfRequired(timeHelper)
         }
     }
+
+    override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: Verification?) {
+        updateSessionInBackground({
+            it.events.add(OneToOneMatchEvent(
+                it.timeRelativeToStartTime(startTimeVerification),
+                it.nowRelativeToStartTime(timeHelper),
+                preferencesManager.patientId,
+                match?.let { MatchCandidate(it.guid, match.confidence) }))
+        })
+    }
+
+    override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<Identification>, matchSize: Int) {
+        updateSessionInBackground({
+            it.events.add(OneToManyMatchEvent(
+                it.timeRelativeToStartTime(startTimeIdentification),
+                it.nowRelativeToStartTime(timeHelper),
+                OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
+                matches.map { MatchCandidate(it.guid, it.confidence) }.toList().toTypedArray()))
+        })
+    }
+
+
+    override fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo) {
+        updateSessionInBackground({
+            it.events.add(ScannerConnectionEvent(
+                it.nowRelativeToStartTime(timeHelper),
+                scannerInfo
+            ))
+        })
+    }
+
+    override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
+        updateSessionInBackground({
+            val scannerConnectivityEvents = it.events.filterIsInstance(ScannerConnectionEvent::class.java)
+            scannerConnectivityEvents.forEach { it.scannerInfo.hardwareVersion = hardwareVersion }
+        })
+    }
+
+    override fun addPersonCreationEventInBackground(person: Person) {
+        updateSessionInBackground({
+            it.events.add(PersonCreationEvent(
+                it.nowRelativeToStartTime(timeHelper),
+                extractCaptureEventIdsBasedOnPersonTemplate(it, person.fingerprints.map { Utils.byteArrayToBase64(it.templateBytes) })
+            ))
+        })
+    }
+
+    override fun addEventForCandidateReadInBackground(guid: String,
+                                                      startCandidateSearchTime: Long,
+                                                      localResult: CandidateReadEvent.LocalResult,
+                                                      remoteResult: CandidateReadEvent.RemoteResult) {
+        updateSessionInBackground({
+            it.events.add(CandidateReadEvent(
+                it.timeRelativeToStartTime(startCandidateSearchTime),
+                it.nowRelativeToStartTime(timeHelper),
+                guid,
+                localResult,
+                remoteResult
+            ))
+        })
+    }
+
+    // It extracts CaptureEvents Ids with the templates used to create the "Person" object for
+    // identification, verification, enrolment.
+    private fun extractCaptureEventIdsBasedOnPersonTemplate(sessionEvents: SessionEvents, personTemplates: List<String>): List<String> =
+        sessionEvents.events
+            .filterIsInstance(FingerprintCaptureEvent::class.java)
+            .filter { it.fingerprint?.template in personTemplates }
+            .map { it.id }
+
 }

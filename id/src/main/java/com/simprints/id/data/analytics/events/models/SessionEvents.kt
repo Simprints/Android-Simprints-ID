@@ -2,6 +2,7 @@ package com.simprints.id.data.analytics.events.models
 
 import com.simprints.id.data.analytics.events.realm.RlSessionEvents
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.json.SkipSerialisationProperty
 import java.util.*
 
 open class SessionEvents {
@@ -13,7 +14,10 @@ open class SessionEvents {
      }
 
     val id: String
+
+    @SkipSerialisationProperty
     var projectId: String
+
     var appVersionName: String
     var libVersionName: String
     var language: String
@@ -28,7 +32,7 @@ open class SessionEvents {
     var analyticsId: String? = null
 
     // Function and not kotlin properties to avoid them to get serialised/deserialised
-    private fun isClose(): Boolean = relativeEndTime > 0
+    fun isClose(): Boolean = relativeEndTime > 0
     fun isOpen(): Boolean = !isClose()
 
     constructor(rlSessionEvents: RlSessionEvents) : this(

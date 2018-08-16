@@ -1,6 +1,7 @@
 package com.simprints.id.activities.matching;
 
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -8,6 +9,7 @@ import android.support.annotation.NonNull;
 
 import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.data.analytics.events.SessionEventsManager;
+import com.simprints.id.data.analytics.events.models.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.DbManager;
@@ -39,6 +41,8 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import io.reactivex.functions.BiConsumer;
+
 import static android.app.Activity.RESULT_OK;
 import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
 import static com.simprints.id.tools.TierHelper.computeTier;
@@ -62,13 +66,21 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     @NonNull @Inject SessionEventsManager sessionEventsManager;
     private Long startTimeVerification = 0L;
     private Long startTimeIdentification = 0L;
+    private String sessionId = "";
 
+    @SuppressLint("CheckResult")
     MatchingPresenter(@NonNull MatchingContract.View matchingView,
                       @NonNull AppComponent component,
                       Person probe) {
         component.inject(this);
         this.matchingView = matchingView;
         this.probe = probe;
+        sessionEventsManager.getCurrentSession(loginInfoManager.getSignedInProjectId()).subscribe(new BiConsumer<SessionEvents, Throwable>() {
+            @Override
+            public void accept(SessionEvents sessionEvents, Throwable throwable) throws Exception {
+                sessionId = sessionEvents.getId();
+            }
+        });
     }
 
     @Override
@@ -267,8 +279,8 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         }
 
                         try {
-                            dbManager.saveIdentification(probe, candidates.size(), topCandidates, startTimeIdentification);
-
+                            sessionEventsManager.addOneToManyEventInBackground(startTimeIdentification, topCandidates, candidates.size());
+                            dbManager.saveIdentification(probe, candidates.size(), topCandidates);
                         } catch (UninitializedDataManagerError error) {
                             analyticsManager.logError(error);
                             matchingView.launchAlert();
@@ -296,7 +308,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
                         Intent resultData;
                         resultData = new Intent(com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFY_INTENT);
-                        FormatResult.put(resultData, topCandidates, preferencesManager);
+                        FormatResult.put(resultData, topCandidates, preferencesManager, sessionId);
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                             tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.getMatchingEndWaitTimeSeconds() * 1000);
@@ -320,7 +332,8 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         }
 
                         try {
-                            dbManager.saveVerification(probe, verification, guidExistsResult, startTimeVerification);
+                            dbManager.saveVerification(probe, verification, guidExistsResult);
+                            sessionEventsManager.addOneToOneMatchEventInBackground(probe.getGuid(), startTimeVerification, verification);
                         } catch (UninitializedDataManagerError error) {
                             analyticsManager.logError(error);
                             matchingView.launchAlert();

@@ -1,7 +1,12 @@
 package com.simprints.id.data.analytics.events
 
+import com.simprints.id.data.analytics.events.models.CandidateReadEvent
+import com.simprints.id.data.analytics.events.models.ScannerConnectionEvent
 import com.simprints.id.data.analytics.events.models.SessionEvents
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.libcommon.Person
+import com.simprints.libsimprints.Identification
+import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -20,6 +25,14 @@ interface SessionEventsManager {
 
     fun insertOrUpdateSession(session: SessionEvents): Completable
 
-    fun addGuidSelectionEventToLastIdentificationIfExists(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid: String): Completable
     fun syncSessions(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty()): Completable
+
+    fun addGuidSelectionEventToLastIdentificationIfExists(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid: String): Completable
+    fun addPersonCreationEventInBackground(person: Person)
+    fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: Verification?)
+    fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<Identification>, matchSize: Int)
+    fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo)
+    fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
+
+    fun addEventForCandidateReadInBackground(guid: String, startCandidateSearchTime: Long, localResult: CandidateReadEvent.LocalResult, remoteResult: CandidateReadEvent.RemoteResult)
 }

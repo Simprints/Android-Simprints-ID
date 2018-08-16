@@ -11,7 +11,6 @@ import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.data.analytics.events.SessionEventsManager;
 import com.simprints.id.data.analytics.events.models.CandidateReadEvent;
 import com.simprints.id.data.analytics.events.models.ScannerConnectionEvent;
-import com.simprints.id.data.analytics.events.models.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.DbManager;
@@ -37,8 +36,6 @@ import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
 import timber.log.Timber;
 
 import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
@@ -185,10 +182,12 @@ public class Setup {
                     uiResetSinceConnection = false;
                     preferencesManager.setScannerId(appState.getScanner().getScannerId());
                     analyticsManager.logScannerProperties();
-                    addEventForScannerConnectivity(new ScannerConnectionEvent.ScannerInfo(
-                        preferencesManager.getScannerId(),
-                        preferencesManager.getMacAddress(),
-                        preferencesManager.getHardwareVersionString()));
+
+                    sessionEventsManager.addEventForScannerConnectivityInBackground(
+                        new ScannerConnectionEvent.ScannerInfo(
+                            preferencesManager.getScannerId(),
+                            preferencesManager.getMacAddress(),
+                            preferencesManager.getHardwareVersionString()));
 
                     goOn(activity);
                 } else {
@@ -255,7 +254,9 @@ public class Setup {
                 guidExists = true;
                 goOn(activity);
 
-                addEventForCandidateSearch(guid,
+                sessionEventsManager.addEventForCandidateReadInBackground(
+                    guid,
+                    startCandidateSearchTime,
                     isDataFromRemote ? CandidateReadEvent.LocalResult.NOT_FOUND : CandidateReadEvent.LocalResult.FOUND,
                     isDataFromRemote ? CandidateReadEvent.RemoteResult.FOUND : CandidateReadEvent.RemoteResult.NOT_FOUND);
             }
@@ -284,46 +285,20 @@ public class Setup {
         if (networkUtils.isConnected()) {
             // We've synced with the online dbManager and they're not in the dbManager
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
-            addEventForCandidateSearch(probe.getGuid(), CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND);
+            sessionEventsManager.addEventForCandidateReadInBackground(
+                probe.getGuid(),
+                startCandidateSearchTime,
+                CandidateReadEvent.LocalResult.NOT_FOUND,
+                CandidateReadEvent.RemoteResult.NOT_FOUND);
+
         } else {
             // We're offline but might find the person if we sync
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
-            addEventForCandidateSearch(probe.getGuid(), CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.OFFLINE);
+            sessionEventsManager.addEventForCandidateReadInBackground(
+                probe.getGuid(), startCandidateSearchTime,
+                CandidateReadEvent.LocalResult.NOT_FOUND,
+                CandidateReadEvent.RemoteResult.OFFLINE);
         }
-    }
-
-    private void addEventForCandidateSearch(final String guid,
-                                            final CandidateReadEvent.LocalResult localResult,
-                                            final CandidateReadEvent.RemoteResult remoteResult) {
-        if (localResult != null) {
-            sessionEventsManager.updateSessionInBackground(new Function1<SessionEvents, Unit>() {
-                @Override
-                public Unit invoke(SessionEvents sessionEvents) {
-                    sessionEvents.getEvents().add(new CandidateReadEvent(
-                        sessionEvents.timeRelativeToStartTime(startCandidateSearchTime),
-                        sessionEvents.nowRelativeToStartTime(timeHelper),
-                        guid,
-                        localResult,
-                        remoteResult
-                    ));
-                    return null;
-                }
-            }, preferencesManager.getProjectId());
-        }
-    }
-
-    private void addEventForScannerConnectivity(final ScannerConnectionEvent.ScannerInfo scannerInfo) {
-        sessionEventsManager.updateSessionInBackground(new Function1<SessionEvents, Unit>() {
-            @Override
-            public Unit invoke(SessionEvents sessionEvents) {
-                sessionEvents.getEvents().add(new ScannerConnectionEvent(
-                    sessionEvents.nowRelativeToStartTime(timeHelper),
-                    scannerInfo
-                ));
-                return null;
-            }
-        }, preferencesManager.getProjectId());
-
     }
 
     // STEP 5
@@ -362,6 +337,7 @@ public class Setup {
                 if (appState != null && appState.getScanner() != null) {
                     Timber.d("Setup: UN20 ready.");
                     preferencesManager.setHardwareVersion(appState.getScanner().getUcVersion());
+                    sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(preferencesManager.getHardwareVersionString());
                     Setup.this.onSuccess();
                 } else {
                     analyticsManager.logError(new NullScannerError("Null values in onSuccess Setup.wakeUpUn20()"));
