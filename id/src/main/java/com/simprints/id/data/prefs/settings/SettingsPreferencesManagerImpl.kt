@@ -1,6 +1,7 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.gson.JsonSyntaxException
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
@@ -153,6 +154,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
 
     // The map of default fingers
+    /** @throws JsonSyntaxException */
     override var fingerStatus: Map<FingerIdentifier, Boolean>
         by OverridableRemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
 
