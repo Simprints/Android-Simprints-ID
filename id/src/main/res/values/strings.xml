@@ -229,7 +229,7 @@
     <string name="hint_other_reason">Additional Information</string>
 
 
-    <!-- PrivacyActivity : the screen where the user can find the long consent form -->
+    <!-- Long Consent Activity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
     <string name="developmentworker_consent_checkbox">I agree to Simprints using this data in these ways.</string>
     <string name="long_consent">

@@ -118,11 +118,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.PrivacyActivity"
-            android:label="@string/privacy_label"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".activities.refusal.RefusalActivity"
             android:label="@string/refusal_label"
             android:launchMode="singleTop"

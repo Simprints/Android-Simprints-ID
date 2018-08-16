@@ -7,9 +7,9 @@ import android.support.v7.widget.DefaultItemAnimator
 import android.view.Menu
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.PrivacyActivity
 import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
+import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -34,7 +34,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
-        private const val PRIVACY_ACTIVITY_REQUEST_CODE = 2
+        private const val LONG_CONSENT_ACTIVITY_REQUEST_CODE = 2
     }
 
     override lateinit var viewPresenter: DashboardContract.Presenter
@@ -109,7 +109,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
             val id = menuItem.itemId
             when (id) {
-                R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, PrivacyActivity::class.java), PRIVACY_ACTIVITY_REQUEST_CODE)
+                R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, LongConsentActivity::class.java), LONG_CONSENT_ACTIVITY_REQUEST_CODE)
                 R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
                 R.id.menuLogout -> logout()
             }
