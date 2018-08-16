@@ -23,6 +23,7 @@ import com.simprints.id.activities.launch.LaunchPresenter
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentActivity
+import com.simprints.id.activities.longConsent.LongConsentPresenter
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.activities.matching.MatchingPresenter
 import com.simprints.id.activities.refusal.RefusalPresenter
@@ -69,4 +70,5 @@ interface AppComponent {
     fun inject(alertPresenter: AlertPresenter)
     fun inject(launchPresenter: LaunchPresenter)
     fun inject(scheduledSync: ScheduledSync)
+    fun inject(longConsentPresenter: LongConsentPresenter)
 }

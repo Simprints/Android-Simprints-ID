@@ -65,7 +65,7 @@ class LongConsentManagerImpl(context: Context,
         val fileContent = StringBuffer("")
 
         br.forEachLine {
-            fileContent.append(it)
+            fileContent.append(it + "\n")
         }
 
         return fileContent.toString()
