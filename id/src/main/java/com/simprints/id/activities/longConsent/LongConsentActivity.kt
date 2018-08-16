@@ -2,6 +2,7 @@ package com.simprints.id.activities.longConsent
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
@@ -17,14 +18,21 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
 
     override lateinit var viewPresenter: LongConsentContract.Presenter
 
+    override var showProgressBar: Boolean = true
+        set(value) {
+            field = value
+            if (value) longConsent_progressBar.visibility = View.VISIBLE
+            else longConsent_progressBar.visibility = View.INVISIBLE
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (application as Application).component.inject(this)
+        val component = (application as Application).component.also { it.inject(this) }
         LanguageHelper.setLanguage(this, preferences.language)
         setContentView(R.layout.activity_long_consent)
 
-        viewPresenter = LongConsentPresenter(this)
+        viewPresenter = LongConsentPresenter(this, component)
         viewPresenter.start()
     }
 
@@ -32,5 +40,7 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
         longConsent_TextView.text = text
         longConsent_ScrollView.requestLayout()
     }
+
+    override fun setDefaultLongConsent() = setLongConsentText(getString(R.string.long_consent))
 
 }

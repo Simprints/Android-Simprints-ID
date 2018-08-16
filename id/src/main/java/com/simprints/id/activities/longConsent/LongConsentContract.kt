@@ -9,6 +9,10 @@ interface LongConsentContract {
 
         fun setLongConsentText(text: String)
 
+        var showProgressBar: Boolean
+
+        fun setDefaultLongConsent()
+
     }
 
     interface Presenter : BasePresenter {
