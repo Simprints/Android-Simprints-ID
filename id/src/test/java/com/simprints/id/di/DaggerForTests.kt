@@ -3,9 +3,10 @@ package com.simprints.id.di
 import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Before
 
-open class DaggerForTests {
+abstract class DaggerForTests {
 
-    open lateinit var module: AppModuleForTests
+    abstract var module: AppModuleForTests
+    open var preferencesModule = PreferencesModule()
     lateinit var testAppComponent: AppComponentForTests
     lateinit var app: TestApplication
 
@@ -15,6 +16,7 @@ open class DaggerForTests {
         testAppComponent = DaggerAppComponentForTests
             .builder()
             .appModule(module)
+            .preferencesModule(preferencesModule)
             .build()
 
         app.component = testAppComponent

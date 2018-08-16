@@ -15,10 +15,9 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.services.scheduledSync.ScheduledSyncManager
+import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.shared.DependencyRule.*
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
-import org.mockito.Mockito.spy
 
 open class AppModuleForAnyTests(app: Application,
                                 open var localDbManagerRule: DependencyRule = RealRule(),
@@ -33,53 +32,45 @@ open class AppModuleForAnyTests(app: Application,
                                 open var scheduledSyncManagerRule: DependencyRule = RealRule()) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
-        resolveDependencyRule(localDbManagerRule) { super.provideLocalDbManager(ctx) }
+        localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
 
     override fun provideAnalyticsManager(loginInfoManager: LoginInfoManager,
                                          preferencesManager: PreferencesManager,
                                          firebaseAnalytics: FirebaseAnalytics): AnalyticsManager =
-        resolveDependencyRule(analyticsManagerRule) { super.provideAnalyticsManager(loginInfoManager, preferencesManager, firebaseAnalytics) }
+        analyticsManagerRule.resolveDependency { super.provideAnalyticsManager(loginInfoManager, preferencesManager, firebaseAnalytics) }
 
     override fun provideRemoteDbManager(ctx: Context): RemoteDbManager =
-        resolveDependencyRule(remoteDbManagerRule) { super.provideRemoteDbManager(ctx) }
+        remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(ctx) }
 
     override fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager =
-        resolveDependencyRule(loginInfoManagerRule) { super.provideLoginInfoManager(improvedSharedPreferences) }
+        loginInfoManagerRule.resolveDependency { super.provideLoginInfoManager(improvedSharedPreferences) }
 
     override fun provideRandomGenerator(): RandomGenerator =
-        resolveDependencyRule(randomGeneratorRule) { super.provideRandomGenerator() }
+        randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
 
     override fun provideDbManager(localDbManager: LocalDbManager,
                                   remoteDbManager: RemoteDbManager,
                                   secureDataManager: SecureDataManager,
                                   loginInfoManager: LoginInfoManager,
                                   preferencesManager: PreferencesManager): DbManager =
-        resolveDependencyRule(dbManagerRule) { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager) }
+        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,
                                           randomGenerator: RandomGenerator): SecureDataManager =
-        resolveDependencyRule(secureDataManagerRule) { super.provideSecureDataManager(preferencesManager, keystoreManager, randomGenerator) }
+        secureDataManagerRule.resolveDependency { super.provideSecureDataManager(preferencesManager, keystoreManager, randomGenerator) }
 
     override fun provideDataManager(preferencesManager: PreferencesManager,
                                     loginInfoManager: LoginInfoManager,
                                     analyticsManager: AnalyticsManager,
                                     remoteDbManager: RemoteDbManager): DataManager =
-        resolveDependencyRule(dataManagerRule) { super.provideDataManager(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager) }
+        dataManagerRule.resolveDependency { super.provideDataManager(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager) }
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
 
     override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
-        resolveDependencyRule(bluetoothComponentAdapterRule) { super.provideBluetoothComponentAdapter() }
+        bluetoothComponentAdapterRule.resolveDependency { super.provideBluetoothComponentAdapter() }
 
     override fun provideScheduledSyncManager(preferencesManager: PreferencesManager): ScheduledSyncManager =
-        resolveDependencyRule(scheduledSyncManagerRule) { super.provideScheduledSyncManager(preferencesManager) }
-
-    private inline fun <reified T> resolveDependencyRule(dependencyRule: DependencyRule, provider: () -> T): T =
-        when (dependencyRule) {
-            is RealRule -> provider()
-            is MockRule -> mock()
-            is SpyRule -> spy(provider())
-            is ReplaceRule<*> -> dependencyRule.replacementProvider() as T
-        }
+        scheduledSyncManagerRule.resolveDependency { super.provideScheduledSyncManager(preferencesManager) }
 }
