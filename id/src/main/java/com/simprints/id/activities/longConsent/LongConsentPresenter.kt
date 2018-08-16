@@ -13,12 +13,16 @@ class LongConsentPresenter(val view: LongConsentContract.View) : LongConsentCont
     @Inject
     lateinit var preferences: PreferencesManager
 
+    companion object {
+        private const val ENGLISH_LANGUAGE_CODE = "en"
+    }
+
     override fun start() {
 
         doAsync {
 
             val selectedLanguage: String = preferences.language.let {
-                if (it.isBlank()) "en" else it
+                if (it.isBlank()) ENGLISH_LANGUAGE_CODE else it
             }
 
             if (longConsentManager.checkIfLongConsentExists(selectedLanguage)) {
