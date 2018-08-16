@@ -1,12 +1,13 @@
 package com.simprints.id.di
 
+import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Before
 
 abstract class DaggerForTests {
 
     abstract var module: AppModuleForTests
-    open var preferencesModule = PreferencesModule()
+    open var preferencesModule = PreferencesModuleForAnyTests()
     lateinit var testAppComponent: AppComponentForTests
     lateinit var app: TestApplication
 
