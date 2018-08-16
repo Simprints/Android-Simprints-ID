@@ -7,6 +7,8 @@ interface LongConsentContract {
 
     interface View : BaseView<Presenter> {
 
+        fun setLongConsentText(text: String)
+
     }
 
     interface Presenter : BasePresenter {
