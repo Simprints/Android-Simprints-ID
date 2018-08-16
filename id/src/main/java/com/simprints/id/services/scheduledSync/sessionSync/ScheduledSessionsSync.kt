@@ -30,10 +30,10 @@ class ScheduledSessionsSync : Worker() {
         try {
             val signedInProjectId = loginInfoManager.signedInProjectId
 
-            sessionEventsManager.syncSessions(signedInProjectId)
-                .subscribeBy(onComplete = {
+            sessionEventsManager.syncSessions(signedInProjectId).subscribeBy(onComplete = {
                 result.put(Result.SUCCESS)
             }, onError = {
+                it.printStackTrace()
                 result.put(Result.FAILURE)
             })
         } catch (e: Exception) {

@@ -2,10 +2,6 @@ package com.simprints.id.data.db
 
 import com.simprints.id.data.analytics.events.SessionEventsManager
 import com.simprints.id.data.analytics.events.models.EnrollmentEvent
-import com.simprints.id.data.analytics.events.models.MatchCandidate
-import com.simprints.id.data.analytics.events.models.OneToManyMatchEvent
-import com.simprints.id.data.analytics.events.models.OneToManyMatchEvent.MatchPoolType.Companion.fromConstantGroup
-import com.simprints.id.data.analytics.events.models.OneToOneMatchEvent
 import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
@@ -173,7 +169,7 @@ class DbManagerImpl(override val local: LocalDbManager,
                 local.getPeopleCountFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty(), moduleId = preferencesManager.moduleId)
         }
 
-    override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>, startTimeIdentification: Long) {
+    override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
         preferencesManager.lastIdentificationDate = Date()
         remote.saveIdentificationInRemote(
             probe,
@@ -184,14 +180,6 @@ class DbManagerImpl(override val local: LocalDbManager,
             matchSize,
             matches,
             preferencesManager.sessionId)
-
-        sessionEventsManager.updateSessionInBackground({
-            it.events.add(OneToManyMatchEvent(
-                it.timeRelativeToStartTime(startTimeIdentification),
-                it.nowRelativeToStartTime(timeHelper),
-                OneToManyMatchEvent.MatchPool(fromConstantGroup(preferencesManager.matchGroup), matchSize),
-                matches.map { MatchCandidate(it.guid, it.confidence) }.toList().toTypedArray()))
-        })
     }
 
     override fun updateIdentification(projectId: String, selectedGuid: String, sessionId: String) {
@@ -202,7 +190,7 @@ class DbManagerImpl(override val local: LocalDbManager,
             sessionId)
     }
 
-    override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT, startTimeVerification: Long) {
+    override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
         preferencesManager.lastVerificationDate = Date()
         remote.saveVerificationInRemote(
             probe,
@@ -214,14 +202,6 @@ class DbManagerImpl(override val local: LocalDbManager,
             match,
             preferencesManager.sessionId,
             guidExistsResult)
-
-        sessionEventsManager.updateSessionInBackground({
-            it.events.add(OneToOneMatchEvent(
-                it.timeRelativeToStartTime(startTimeVerification),
-                it.nowRelativeToStartTime(timeHelper),
-                preferencesManager.patientId,
-                match?.let { MatchCandidate(it.guid, match.confidence) }))
-        })
     }
 
     override fun saveRefusalForm(refusalForm: RefusalForm) {

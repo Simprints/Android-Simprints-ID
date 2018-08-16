@@ -9,8 +9,6 @@ import java.util.concurrent.TimeUnit
 class ScheduledSessionSyncManager(private val preferencesManager: PreferencesManager) {
 
     fun scheduleSyncIfNecessary() {
-        WorkManager.getInstance()?.cancelAllWork() //StopShip
-
         val scheduledSyncRequest = createRequestAndSaveId()
         WorkManager.getInstance()?.enqueue(scheduledSyncRequest)
     }
@@ -24,6 +22,7 @@ class ScheduledSessionSyncManager(private val preferencesManager: PreferencesMan
         return scheduledSyncRequest
     }
 
+    //StopShip: check conditions
     private fun getConstraints() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .setRequiresBatteryNotLow(true)

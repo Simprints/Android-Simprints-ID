@@ -16,7 +16,6 @@ import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.events.SessionEventsManager
 import com.simprints.id.data.analytics.events.models.FingerprintCaptureEvent
-import com.simprints.id.data.analytics.events.models.PersonCreationEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
@@ -225,20 +224,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun proceedToFinish(fingerprints: List<Fingerprint>) {
         val person = Person(preferencesManager.patientId, fingerprints)
-        sessionEventsManager.updateSessionInBackground({
-            it.events.add(PersonCreationEvent(
-                it.nowRelativeToStartTime(timeHelper),
-                it.events
-                    .filterIsInstance(FingerprintCaptureEvent::class.java)
-                    .reversed() //StopShip: write tests
-                    .distinctBy { it.finger }
-                    .reversed()
-                    .filter {
-                        it.result == FingerprintCaptureEvent.Result.GOOD_SCAN ||
-                        it.result == FingerprintCaptureEvent.Result.BAD_QUALITY
-                    }.map { it.id }
-            ))
-        })
+        sessionEventsManager.addPersonCreationEventInBackground(person)
 
         if (isRegisteringElseIsMatching()) {
             savePerson(person)

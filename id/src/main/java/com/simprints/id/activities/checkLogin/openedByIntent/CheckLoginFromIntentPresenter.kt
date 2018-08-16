@@ -138,8 +138,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         session.events.add(AuthorizationEvent(
             session.nowRelativeToStartTime(timeHelper),
             result,
-            Info(preferencesManager.projectId,
-                preferencesManager.userId)))
+            if (result == AUTHORIZED) {
+                Info(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
+            } else { null }
+        ))
     }
 
     override fun handleActivityResult(requestCode: Int, resultCode: Int, returnCallout: Callout) {

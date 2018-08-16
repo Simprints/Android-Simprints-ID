@@ -30,13 +30,9 @@ object PeopleGeneratorUtils {
                         projectId: String = UUID.randomUUID().toString(),
                         userId: String = UUID.randomUUID().toString(),
                         moduleId: String = UUID.randomUUID().toString(),
-                        toSync: Boolean = false): rl_Person {
-
-        val prints: RealmList<rl_Fingerprint> = RealmList()
-        prints.add(getRandomFingerprint())
-        prints.add(getRandomFingerprint())
-
-        return rl_Person().apply {
+                        toSync: Boolean = false,
+                        fingerprints: Array<rl_Fingerprint> = arrayOf(getRandomFingerprint(), getRandomFingerprint())): rl_Person =
+        rl_Person().apply {
             this.patientId = patientId
             this.projectId = projectId
             this.userId = userId
@@ -44,9 +40,9 @@ object PeopleGeneratorUtils {
             createdAt = if (!toSync) getRandomTime() else null
             updatedAt = if (!toSync) getRandomTime() else null
             this.toSync = toSync
-            fingerprints = prints
+            this.fingerprints = RealmList<rl_Fingerprint>().apply { addAll(fingerprints) }
         }
-    }
+
 
     fun getRandomFingerprint(): rl_Fingerprint {
         val fingerprint: Fingerprint = Fingerprint.generateRandomFingerprint()
