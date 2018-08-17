@@ -43,7 +43,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             dbManagerRule = MockRule,
-            scheduledSyncManagerRule = MockRule)
+            scheduledPeopleSyncManagerRule = MockRule)
     }
 
     @Before

@@ -41,7 +41,7 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var dbManager: DbManager
 
     override var module by lazyVar {
-        AppModuleForTests(app, localDbManagerRule = MockRule, remoteDbManagerRule = MockRule, loginInfoManagerRule = MockRule, scheduledSyncManagerRule = MockRule)
+        AppModuleForTests(app, localDbManagerRule = MockRule, remoteDbManagerRule = MockRule, loginInfoManagerRule = MockRule, scheduledPeopleSyncManagerRule = MockRule)
     }
 
     @Before
