@@ -94,12 +94,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.SettingsActivity"
-            android:label="@string/settings_title"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.ActionBar" />
-        <activity
             android:name=".activities.login.LoginActivity"
             android:label="@string/login_title"
             android:launchMode="singleTop"
@@ -121,10 +115,11 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.PrivacyActivity"
-            android:label="@string/privacy_label"
+            android:name=".activities.settings.SettingsActivity"
+            android:label="@string/title_activity_settings"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.ActionBar" />
         <activity
             android:name=".activities.refusal.RefusalActivity"
             android:label="@string/refusal_label"
@@ -134,6 +129,10 @@
         <activity
             android:name=".activities.dashboard.DashboardActivity"
             android:label="@string/dashboard_label"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.longConsent.LongConsentActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
@@ -171,12 +170,15 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity
-            android:name=".activities.settings.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.ActionBar" />
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="@string/file_provider_authority"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_path" />
+        </provider>
     </application>
 
 </manifest>
