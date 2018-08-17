@@ -30,8 +30,10 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
-import com.simprints.id.services.scheduledSync.ScheduledSync
+import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSync
+import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSync
 import com.simprints.id.services.sync.SyncService
+import com.simprints.id.tools.PositionTracker
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
@@ -68,7 +70,9 @@ interface AppComponent {
     fun inject(dashboardPresenter: DashboardPresenter)
     fun inject(alertPresenter: AlertPresenter)
     fun inject(launchPresenter: LaunchPresenter)
-    fun inject(scheduledSync: ScheduledSync)
+    fun inject(positionTracker: PositionTracker)
+    fun inject(scheduledPeopleSync: ScheduledPeopleSync)
+    fun inject(scheduledSessionsSync: ScheduledSessionsSync)
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(longConsentPresenter: LongConsentPresenter)
 }

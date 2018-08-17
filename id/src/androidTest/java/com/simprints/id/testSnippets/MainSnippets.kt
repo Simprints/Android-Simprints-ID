@@ -15,9 +15,9 @@ import com.simprints.id.testTools.*
 import com.simprints.id.testTools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.anyOf
+import org.hamcrest.Matchers.containsString
 import org.junit.Assert.*
-
 
 fun launchActivityEnrol(calloutCredentials: CalloutCredentials,
                         enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
@@ -50,13 +50,19 @@ fun fullHappyWorkflow() {
     checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm()
 }
 
-private fun setupActivityAndContinue() {
+fun setupActivityAndContinue() {
     log("setupActivityAndContinue")
     setupActivity()
     setupActivityContinue()
 }
 
-private fun setupActivity() {
+fun setupActivityAndDecline() {
+    log("setupActivityAndDecline")
+    setupActivity()
+    setupActivityDecine()
+}
+
+fun setupActivity() {
     log("setupActivity")
     WaitingUtils.tryOnUiUntilTimeout(10000, 50) {
         ActivityUtils.grantPermissions()
@@ -68,8 +74,17 @@ private fun setupActivity() {
 
 private fun setupActivityContinue() {
     log("setupActivityContinue")
-    WaitingUtils.tryOnUiUntilTimeout(12000, 500) {
+    WaitingUtils.tryOnUiUntilTimeout(15000, 500) {
         onView(withId(R.id.consentAcceptButton))
+            .check(matches(isDisplayed()))
+            .perform(click())
+    }
+}
+
+fun setupActivityDecine() {
+    log("setupActivityContinue")
+    WaitingUtils.tryOnUiUntilTimeout(12000, 500) {
+        onView(withId(R.id.consentDeclineButton))
             .check(matches(isDisplayed()))
             .perform(click())
     }

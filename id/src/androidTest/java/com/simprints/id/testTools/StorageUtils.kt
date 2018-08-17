@@ -39,7 +39,16 @@ object StorageUtils {
         return deletedAll
     }
 
-    private fun clearSharedPrefs(context: Context) {
+    fun deletaAllFiles(ctx: Context) {
+        val files = ctx.filesDir.listFiles()
+        files?.let {
+            for (file in it) {
+                file.delete()
+            }
+        }
+    }
+
+    fun clearSharedPrefs(context: Context) {
         log("StorageUtils.clearApplicationData(): clearing shared prefs.")
         context.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE).edit().clear().commit()
     }

@@ -37,8 +37,8 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val NB_IDS_KEY = "NbOfIdsInt"
         const val NB_IDS_DEFAULT = 10
 
-        const val LANGUAGE_KEY = "SelectedLanguage"
-        const val LANGUAGE_DEFAULT = ""
+        private const val LANGUAGE_KEY = "SelectedLanguage"
+        private const val LANGUAGE_DEFAULT = "en"
 
         const val LANGUAGE_POSITION_KEY = "SelectedLanguagePosition"
         const val LANGUAGE_POSITION_DEFAULT = 0

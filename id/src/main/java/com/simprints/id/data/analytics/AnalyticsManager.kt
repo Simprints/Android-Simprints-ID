@@ -5,9 +5,12 @@ import com.simprints.id.exceptions.safe.SimprintsException
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
+import io.reactivex.Single
 
 
 interface AnalyticsManager {
+
+    val analyticsId: Single<String>
 
     fun logThrowable(throwable: Throwable)
     fun logError(error: SimprintsError)

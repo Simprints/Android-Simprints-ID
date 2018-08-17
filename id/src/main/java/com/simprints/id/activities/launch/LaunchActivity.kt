@@ -8,9 +8,8 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.TabHost
 import com.simprints.id.R
-import com.simprints.id.activities.PrivacyActivity
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
-import com.simprints.id.activities.dashboard.DashboardActivity
+import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants.*
@@ -43,13 +42,13 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     }
 
     private fun setButtonClickListeners() {
-        consentDeclineButton.setOnClickListener { viewPresenter.handleOnBackOrDeclinePressed() }
+        consentDeclineButton.setOnClickListener { viewPresenter.handleDeclinePressed() }
         consentAcceptButton.setOnClickListener { viewPresenter.confirmConsentAndContinueToNextActivity() }
     }
 
     private fun setClickListenerToPrivacyNotice() {
         privacyNoticeText.setOnClickListener {
-            startActivityForResult(Intent(this, PrivacyActivity::class.java), DashboardActivity.PRIVACY_ACTIVITY_REQUEST_CODE)
+            startActivityForResult(Intent(this, LongConsentActivity::class.java), LONG_CONSENT_ACTIVITY_REQUEST_CODE)
         }
     }
 
@@ -109,7 +108,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     }
 
     override fun onBackPressed() {
-        viewPresenter.handleOnBackOrDeclinePressed()
+        viewPresenter.handleOnBackPressed()
     }
 
     override fun onDestroy() {
@@ -141,6 +140,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     companion object {
         const val COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1
+        private const val LONG_CONSENT_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 2
 
         const val GENERAL_CONSENT_TAB_TAG = "General"
         const val PARENTAL_CONSENT_TAB_TAG = "Parental"

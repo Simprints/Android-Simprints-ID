@@ -81,5 +81,6 @@ interface CollectFingerprintsContract {
         fun showSplashAndAddNewFingerIfNecessary()
         fun doNudgeIfNecessary()
         fun handleMissingFingerClick()
+        fun addCaptureEventInSession(finger: Finger)
     }
 }
