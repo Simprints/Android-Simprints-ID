@@ -25,10 +25,10 @@ open class ProjectAuthenticator(component: AppComponent,
                                 secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
                                 private val attestationManager: AttestationManager = AttestationManager()) {
 
-    @Inject lateinit var prefercesManager: PreferencesManager
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var scheduledSyncManager: ScheduledSyncManager
 
     private val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
     private val publicKeyManager = PublicKeyManager(secureApiClient)
@@ -103,7 +103,7 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun Completable.scheduleSync(): Completable =
         andThen {
-            ScheduledSyncManager(prefercesManager).scheduleSyncIfNecessary()
+            scheduledSyncManager.scheduleSyncIfNecessary()
             it.onComplete()
         }
 }

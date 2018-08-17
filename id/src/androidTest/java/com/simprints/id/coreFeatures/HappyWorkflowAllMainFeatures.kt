@@ -69,7 +69,7 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
 
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
-            randomGeneratorRule = MockRule(),
+            randomGeneratorRule = MockRule,
             bluetoothComponentAdapterRule = ReplaceRule { mockBluetoothAdapter })
     }
 

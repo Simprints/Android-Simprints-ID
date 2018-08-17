@@ -1,6 +1,7 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.gson.JsonSyntaxException
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
@@ -8,7 +9,10 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimi
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
 import com.simprints.id.domain.Constants
+import com.simprints.id.domain.consent.GeneralConsent
+import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.preferences.NoSuchPreferenceError
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
 
@@ -21,44 +25,44 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     companion object {
 
-        private const val NUDGE_MODE_KEY = "NudgeModeBool"
-        private const val NUDGE_MODE_DEFAULT = true
+        const val NUDGE_MODE_KEY = "NudgeModeBool"
+        const val NUDGE_MODE_DEFAULT = true
 
-        private const val CONSENT_KEY = "ConsentBool"
-        private const val CONSENT_DEFAULT = true
+        const val CONSENT_KEY = "ConsentBool"
+        const val CONSENT_DEFAULT = true
 
-        private const val QUALITY_THRESHOLD_KEY = "QualityThresholdInt"
-        private const val QUALITY_THRESHOLD_DEFAULT = 60
+        const val QUALITY_THRESHOLD_KEY = "QualityThresholdInt"
+        const val QUALITY_THRESHOLD_DEFAULT = 60
 
-        private const val NB_IDS_KEY = "NbOfIdsInt"
-        private const val NB_IDS_DEFAULT = 10
+        const val NB_IDS_KEY = "NbOfIdsInt"
+        const val NB_IDS_DEFAULT = 10
 
-        private const val LANGUAGE_KEY = "SelectedLanguage"
-        private const val LANGUAGE_DEFAULT = ""
+        const val LANGUAGE_KEY = "SelectedLanguage"
+        const val LANGUAGE_DEFAULT = ""
 
-        private const val LANGUAGE_POSITION_KEY = "SelectedLanguagePosition"
-        private const val LANGUAGE_POSITION_DEFAULT = 0
+        const val LANGUAGE_POSITION_KEY = "SelectedLanguagePosition"
+        const val LANGUAGE_POSITION_DEFAULT = 0
 
-        private const val MATCHER_TYPE_KEY = "MatcherType"
-        private const val MATCHER_TYPE_DEFAULT = 0
+        const val MATCHER_TYPE_KEY = "MatcherType"
+        const val MATCHER_TYPE_DEFAULT = 0
 
-        private const val TIMEOUT_KEY = "TimeoutInt"
-        private const val TIMEOUT_DEFAULT = 3
+        const val TIMEOUT_KEY = "TimeoutInt"
+        const val TIMEOUT_DEFAULT = 3
 
-        private const val SYNC_GROUP_KEY = "SyncGroup"
-        private val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
+        const val SYNC_GROUP_KEY = "SyncGroup"
+        val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
 
-        private const val MATCH_GROUP_KEY = "MatchGroup"
-        private val MATCH_GROUP_DEFAULT = Constants.GROUP.MODULE
+        const val MATCH_GROUP_KEY = "MatchGroup"
+        val MATCH_GROUP_DEFAULT = Constants.GROUP.USER
 
-        private const val VIBRATE_KEY = "VibrateOn"
-        private const val VIBRATE_DEFAULT = true
+        const val VIBRATE_KEY = "VibrateOn"
+        const val VIBRATE_DEFAULT = true
 
-        private const val MATCHING_END_WAIT_TIME_KEY = "MatchingEndWaitTime"
-        private const val MATCHING_END_WAIT_TIME_DEFAULT = 1
+        const val MATCHING_END_WAIT_TIME_KEY = "MatchingEndWaitTime"
+        const val MATCHING_END_WAIT_TIME_DEFAULT = 1
 
-        private const val FINGER_STATUS_KEY = "FingerStatus"
-        private val FINGER_STATUS_DEFAULT = mapOf(
+        const val FINGER_STATUS_KEY = "FingerStatus"
+        val FINGER_STATUS_DEFAULT = mapOf(
             FingerIdentifier.RIGHT_THUMB to false,
             FingerIdentifier.RIGHT_INDEX_FINGER to false,
             FingerIdentifier.RIGHT_3RD_FINGER to false,
@@ -71,17 +75,32 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
             FingerIdentifier.LEFT_5TH_FINGER to false
         )
 
-        private const val SYNC_ON_CALLOUT_KEY = "SyncOnCallout"
-        private const val SYNC_ON_CALLOUT_DEFAULT = false
+        const val SYNC_ON_CALLOUT_KEY = "SyncOnCallout"
+        const val SYNC_ON_CALLOUT_DEFAULT = false
 
-        private const val SCHEDULED_BACKGROUND_SYNC_KEY = "ScheduledBackgroundSync"
-        private const val SCHEDULED_BACKGROUND_SYNC_DEFAULT = true
-        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY = "ScheduledBackgroundSyncOnlyOnWifi"
-        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT = false
-        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY = "ScheduledBackgroundSyncOnlyWhenCharging"
-        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT = false
-        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY = "ScheduledBackgroundSyncOnlyWhenNotLowBattery"
+        const val SCHEDULED_BACKGROUND_SYNC_KEY = "ScheduledBackgroundSync"
+        const val SCHEDULED_BACKGROUND_SYNC_DEFAULT = true
+        const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY = "ScheduledBackgroundSyncOnlyOnWifi"
+        const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT = false
+        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY = "ScheduledBackgroundSyncOnlyWhenCharging"
+        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT = false
+        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY = "ScheduledBackgroundSyncOnlyWhenNotLowBattery"
         private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT = true
+
+        const val PROGRAM_NAME_KEY = "ProgramName"
+        const val PROGRAM_NAME_DEFAULT = "this program"
+
+        const val ORGANIZATION_NAME_KEY = "OrganizationName"
+        const val ORGANIZATION_NAME_DEFAULT = "This organization"
+
+        const val PARENTAL_CONSENT_EXISTS_KEY = "ConsentParentalExists"
+        const val PARENTAL_CONSENT_EXISTS_DEFAULT = false
+
+        const val GENERAL_CONSENT_OPTIONS_JSON_KEY = "ConsentGeneralOptions"
+        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(GeneralConsent())
+
+        const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
+        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(ParentalConsent())
     }
 
     private val remoteConfigDefaults = mutableMapOf<String, Any>()
@@ -135,6 +154,7 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
 
     // The map of default fingers
+    /** @throws JsonSyntaxException */
     override var fingerStatus: Map<FingerIdentifier, Boolean>
         by OverridableRemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
 
@@ -149,6 +169,23 @@ class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT)
     override var scheduledBackgroundSyncOnlyWhenNotLowBattery: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT)
+
+    // Name of the partner's program
+    override var programName: String
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PROGRAM_NAME_KEY, PROGRAM_NAME_DEFAULT)
+    // Name of the partner's organization
+    override var organizationName: String
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, ORGANIZATION_NAME_KEY, ORGANIZATION_NAME_DEFAULT)
+
+    // Whether the parental consent should be shown
+    override var parentalConsentExists: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PARENTAL_CONSENT_EXISTS_KEY, PARENTAL_CONSENT_EXISTS_DEFAULT)
+    // The options of the general consent as a JSON string of booleans
+    override var generalConsentOptionsJson: String
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, GENERAL_CONSENT_OPTIONS_JSON_KEY, GENERAL_CONSENT_OPTIONS_JSON_DEFAULT)
+    // The options of the parental consent as a JSON string of booleans
+    override var parentalConsentOptionsJson: String
+        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT)
 
     init {
         remoteConfig.setDefaults(remoteConfigDefaults)

@@ -29,6 +29,7 @@ import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.services.progress.notifications.NotificationFactory
+import com.simprints.id.services.scheduledSync.ScheduledSyncManager
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.*
@@ -161,4 +162,8 @@ open class AppModule(val app: Application) {
     @Provides
     fun provideSyncManager(analyticsManager: AnalyticsManager, syncClient: SyncClient): SyncManager =
         SyncManager(analyticsManager, syncClient)
+
+    @Provides
+    open fun provideScheduledSyncManager(preferencesManager: PreferencesManager): ScheduledSyncManager =
+        ScheduledSyncManager(preferencesManager)
 }

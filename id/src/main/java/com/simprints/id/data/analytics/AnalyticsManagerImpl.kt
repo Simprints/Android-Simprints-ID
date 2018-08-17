@@ -87,7 +87,7 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
     }
 
     private fun logUnsafeThrowable(e: Throwable) {
-        Timber.d(e)
+        Timber.e(e)
         if (Fabric.isInitialized()) {
             Crashlytics.logException(e)
         }

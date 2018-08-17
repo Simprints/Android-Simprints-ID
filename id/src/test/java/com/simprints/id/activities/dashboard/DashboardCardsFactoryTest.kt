@@ -43,8 +43,8 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            remoteDbManagerRule = MockRule(),
-            localDbManagerRule = MockRule())
+            remoteDbManagerRule = MockRule,
+            localDbManagerRule = MockRule)
     }
 
     @Before
@@ -114,6 +114,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     }
 
     @Test
+    @Config(sdk = [25]) // Bug with Robolectric and SharedPreferences.commit() on API >= 26. apply() works fine
     fun shouldCreateTheCurrentUserCard_onlyIfValidUserSignedIn() {
         val factory = DashboardCardsFactory(testAppComponent)
         val signedInUser = "someone"

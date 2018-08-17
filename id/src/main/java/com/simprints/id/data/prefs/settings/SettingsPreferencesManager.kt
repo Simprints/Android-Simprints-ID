@@ -1,5 +1,6 @@
 package com.simprints.id.data.prefs.settings
 
+import com.google.gson.JsonSyntaxException
 import com.simprints.id.domain.Constants
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
@@ -19,6 +20,7 @@ interface SettingsPreferencesManager {
     var matchGroup: Constants.GROUP
     var vibrateMode: Boolean
     var matchingEndWaitTimeSeconds: Int
+    /** @throws JsonSyntaxException */
     var fingerStatus: Map<FingerIdentifier, Boolean>
 
     var syncOnCallout: Boolean
@@ -27,6 +29,13 @@ interface SettingsPreferencesManager {
     var scheduledBackgroundSyncOnlyOnWifi: Boolean
     var scheduledBackgroundSyncOnlyWhenCharging: Boolean
     var scheduledBackgroundSyncOnlyWhenNotLowBattery: Boolean
+
+    var programName: String
+    var organizationName: String
+
+    var parentalConsentExists: Boolean
+    var generalConsentOptionsJson: String
+    var parentalConsentOptionsJson: String
 
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
