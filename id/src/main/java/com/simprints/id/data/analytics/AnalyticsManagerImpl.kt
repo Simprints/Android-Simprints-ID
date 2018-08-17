@@ -14,6 +14,7 @@ import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.extensions.fromLowerCamelToLowerUnderscore
 import io.fabric.sdk.android.Fabric
+import io.reactivex.Single
 import timber.log.Timber
 import kotlin.reflect.full.memberProperties
 
@@ -27,6 +28,16 @@ import kotlin.reflect.full.memberProperties
 class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
                            private val preferencesManager: PreferencesManager,
                            private val firebaseAnalytics: FirebaseAnalytics) : AnalyticsManager {
+
+    override val analyticsId: Single<String> = Single.create<String> {
+        firebaseAnalytics.appInstanceId.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                it.onSuccess(task.result)
+            } else {
+                it.onError(task.exception as Throwable)
+            }
+        }
+    }
 
     override fun logAlert(alertType: ALERT_TYPE) {
         logAlert(
@@ -187,12 +198,12 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
     }
 
     override fun logSession(session: Session) {
-        Timber.d("AnalyticsManagerImpl.logSession(session=$session)")
+        Timber.d("AnalyticsManagerImpl.logSession(activeSession=$session)")
         val fbSession = session.toFirebaseSession()
         val bundle = Bundle()
         for (property in fb_Session::class.memberProperties) {
             bundle.putString(property.name.fromLowerCamelToLowerUnderscore(), property.get(fbSession).toString())
         }
-        firebaseAnalytics.logEvent("session", bundle)
+        firebaseAnalytics.logEvent("activeSession", bundle)
     }
 }

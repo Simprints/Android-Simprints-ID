@@ -24,9 +24,17 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.simprints.id.Application;
+import com.simprints.id.data.analytics.events.SessionEventsManager;
+import com.simprints.id.data.analytics.events.models.SessionEvents;
 import com.simprints.id.data.prefs.PreferencesManager;
 
 import java.util.Locale;
+
+import javax.inject.Inject;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 @SuppressWarnings("UnusedParameters")
 public class PositionTracker implements
@@ -41,8 +49,12 @@ public class PositionTracker implements
     private PreferencesManager preferencesManager;
     private LocationRequest locationRequest;
 
+    @Inject SessionEventsManager sessionEventsManager;
+
     public PositionTracker(Activity activity, PreferencesManager preferencesManager) {
         this.activity = activity;
+        ((Application) activity.getApplicationContext()).getComponent().inject(this);
+
         this.preferencesManager = preferencesManager;
         locationRequest = new LocationRequest();
         locationRequest.setInterval(5000);
@@ -220,11 +232,27 @@ public class PositionTracker implements
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(final Location location) {
         if (location != null) {
+
             preferencesManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(location));
+            sessionEventsManager.updateSessionInBackground(new Function1<SessionEvents, Unit>() {
+                                                               @Override
+                                                               public Unit invoke(SessionEvents sessionEvents) {
+                                                                   sessionEvents.setLocation(
+                                                                       new com.simprints.id.data.analytics.events.models.Location(
+                                                                           location.getLatitude(),
+                                                                           location.getLongitude())
+                                                                   );
+                                                                   return null;
+                                                               }},  preferencesManager.getProjectId());
+
             Log.INSTANCE.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
                     location.getLatitude(), location.getLongitude()));
+
+            if(location.hasAccuracy() && location.getAccuracy() < 100) {
+                finish();
+            }
         }
     }
 

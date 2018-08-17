@@ -5,6 +5,8 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.events.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -14,9 +16,10 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
-import com.simprints.id.services.scheduledSync.ScheduledSyncManager
+import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.tools.RandomGenerator
+import com.simprints.id.tools.TimeHelper
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 
 open class AppModuleForAnyTests(app: Application,
@@ -27,9 +30,12 @@ open class AppModuleForAnyTests(app: Application,
                                 open var dataManagerRule: DependencyRule = RealRule,
                                 open var loginInfoManagerRule: DependencyRule = RealRule,
                                 open var randomGeneratorRule: DependencyRule = RealRule,
+                                open var keystoreManagerRule: DependencyRule = RealRule,
                                 open var analyticsManagerRule: DependencyRule = RealRule,
                                 open var bluetoothComponentAdapterRule: DependencyRule = RealRule,
-                                open var scheduledSyncManagerRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var sessionEventsManagerRule: DependencyRule = RealRule,
+                                open var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
+                                open var scheduledPeopleSyncManagerRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -52,8 +58,10 @@ open class AppModuleForAnyTests(app: Application,
                                   remoteDbManager: RemoteDbManager,
                                   secureDataManager: SecureDataManager,
                                   loginInfoManager: LoginInfoManager,
-                                  preferencesManager: PreferencesManager): DbManager =
-        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager) }
+                                  preferencesManager: PreferencesManager,
+                                  sessionEventsManager: SessionEventsManager,
+                                  timeHelper: TimeHelper): DbManager =
+        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,
@@ -66,11 +74,25 @@ open class AppModuleForAnyTests(app: Application,
                                     remoteDbManager: RemoteDbManager): DataManager =
         dataManagerRule.resolveDependency { super.provideDataManager(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager) }
 
-    override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
+    override fun provideKeystoreManager(): KeystoreManager =
+        keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
 
     override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
         bluetoothComponentAdapterRule.resolveDependency { super.provideBluetoothComponentAdapter() }
 
-    override fun provideScheduledSyncManager(preferencesManager: PreferencesManager): ScheduledSyncManager =
-        scheduledSyncManagerRule.resolveDependency { super.provideScheduledSyncManager(preferencesManager) }
+    override fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
+        scheduledPeopleSyncManagerRule.resolveDependency { super.provideScheduledPeopleSyncManager(preferencesManager) }
+
+    override fun provideSessionEventsManager(ctx: Context,
+                                             loginInfoManager: LoginInfoManager,
+                                             sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+                                             preferencesManager: PreferencesManager,
+                                             timeHelper: TimeHelper,
+                                             remoteDbManager: RemoteDbManager): SessionEventsManager =
+
+        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, loginInfoManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, remoteDbManager) }
+
+    override fun provideLocalEventDbManager(ctx: Context,
+                                            secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+        sessionEventsLocalDbManagerRule.resolveDependency { super.provideLocalEventDbManager(ctx, secureDataManager) }
 }

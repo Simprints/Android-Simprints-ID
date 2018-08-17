@@ -29,7 +29,7 @@ import io.realm.RealmQuery
 import io.realm.Sort
 
 //TODO: investigate potential concurrency issues using .use
-class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
+open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
 
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"
@@ -249,6 +249,6 @@ class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
             Constants.GROUP.MODULE -> loadPeopleFromLocal(moduleId = moduleId).blockingGet().map { it.libPerson }
         }
         destinationList.addAll(result)
-        callback?.onSuccess()
+        callback?.onSuccess(false)
     }
 }

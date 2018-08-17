@@ -45,11 +45,7 @@ interface DbManager {
 
     fun getPeopleCount(group: Constants.GROUP): Single<Int>
 
-    fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
-
     fun updateIdentification(projectId: String, selectedGuid: String, sessionId: String)
-
-    fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
 
     fun saveRefusalForm(refusalForm: RefusalForm)
 
@@ -60,4 +56,8 @@ interface DbManager {
     fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress>
 
     fun recoverLocalDb(group: Constants.GROUP): Completable
+
+    fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
+
+    fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
 }

@@ -22,14 +22,13 @@ class SessionTimestampsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
 
         private val MS_SINCE_BOOT_ON_SESSION_END_KEY = "MsSinceBootOnSessionEnd"
         private val MS_SINCE_BOOT_ON_SESSION_END_DEFAULT = -1L
-
     }
 
     // Milliseconds since boot, on current session start
     override var msSinceBootOnSessionStart: Long
         by PrimitivePreference(prefs, MS_SINCE_BOOT_ON_SESSION_START_KEY, MS_SINCE_BOOT_ON_SESSION_START_DEFAULT)
 
-    // Milliseconds elapsed between current session started, and current session loading ended.
+    // Milliseconds elapsed between current activeSession started, and current activeSession loading ended.
     override var msSinceBootOnLoadEnd: Long
         by PrimitivePreference(prefs, MS_SINCE_BOOT_ON_LOAD_END_KEY, MS_SINCE_BOOT_ON_LOAD_END_DEFAULT)
 
@@ -52,5 +51,4 @@ class SessionTimestampsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
         msSinceBootOnMatchStart = msSinceBootOnSessionStart - 1
         msSinceBootOnSessionEnd = msSinceBootOnSessionStart - 1
     }
-
 }

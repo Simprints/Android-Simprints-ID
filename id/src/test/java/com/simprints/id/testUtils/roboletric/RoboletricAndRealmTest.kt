@@ -2,8 +2,8 @@ package com.simprints.id.testUtils.roboletric
 
 import android.content.SharedPreferences
 import com.nhaarman.mockito_kotlin.any
-import com.simprints.id.Application
 import com.simprints.id.activities.CheckLoginFromIntentActivityTest
+import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
@@ -18,7 +18,6 @@ import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
 import org.mockito.Mockito
 import org.mockito.stubbing.Answer
-import org.robolectric.RuntimeEnvironment
 
 const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
 const val SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY = "SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY"
@@ -66,13 +65,22 @@ fun setUserLogInState(logged: Boolean,
     editor.commit()
 }
 
-fun setupLocalAndRemoteManagersForApiTesting(mockServer: MockWebServer,
+fun setupLocalAndRemoteManagersForApiTesting(mockServer: MockWebServer? = null,
                                              localDbManagerSpy: LocalDbManager,
-                                             remoteDbManagerSpy: RemoteDbManager) {
-    PeopleRemoteInterface.baseUrl = mockServer.url("/").toString()
+                                             remoteDbManagerSpy: RemoteDbManager,
+                                             sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager) {
+
+    PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
     whenever(localDbManagerSpy.insertOrUpdatePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
     whenever(localDbManagerSpy.loadPersonFromLocal(any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
+    whenever(localDbManagerSpy.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
 
-    val app = RuntimeEnvironment.application as Application
+    setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)
+
     whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))
+}
+
+fun setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager) {
+    whenever(sessionEventsLocalDbManagerMock.loadSessions(any(), any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
+    whenever(sessionEventsLocalDbManagerMock.insertOrUpdateSessionEvents(any())).thenReturn(Completable.complete())
 }

@@ -50,6 +50,7 @@ abstract class CheckLoginPresenter(
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_USER_ID)
                 is NotSignedInException -> handleNotSignedInUser()
                 else -> {
+                    e.printStackTrace()
                     analyticsManager.logThrowable(e)
                     view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
                 }

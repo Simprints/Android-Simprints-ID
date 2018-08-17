@@ -3,7 +3,7 @@ package com.simprints.id.data.db;
 
 public interface DataCallback {
 
-    void onSuccess();
+    void onSuccess(boolean isDataFromRemote);
 
     void onFailure(DATA_ERROR error);
 

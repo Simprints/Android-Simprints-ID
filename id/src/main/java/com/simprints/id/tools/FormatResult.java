@@ -56,9 +56,9 @@ public class FormatResult {
         }
     }
 
-    static public void put(Intent intent, ArrayList<Identification> identifications, PreferencesManager preferencesManager) {
+    static public void put(Intent intent, ArrayList<Identification> identifications, PreferencesManager preferencesManager, String sessionId) {
 
-        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, preferencesManager.getSessionId());
+        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId);
 
         if (isODK(preferencesManager.getResultFormat())) {
             // a bit inefficient to run through the array x times but there will be <= 20 objects in there

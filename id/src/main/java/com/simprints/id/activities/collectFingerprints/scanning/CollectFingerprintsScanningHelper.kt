@@ -247,6 +247,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             presenter.showSplashAndAddNewFingerIfNecessary()
         }
         presenter.checkScannedFingersAndCreateMapToShowDialog()
+        presenter.addCaptureEventInSession(finger)
     }
 
     private fun parseTemplateAndAddToCurrentFinger(finger: Finger) =

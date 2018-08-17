@@ -3,6 +3,7 @@ package com.simprints.id.sync
 import com.google.firebase.FirebaseApp
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.DataManager
+import com.simprints.id.data.analytics.events.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
@@ -22,7 +23,8 @@ import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.UploadProgress
 import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.shared.DependencyRule.MockRule
+import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
@@ -30,6 +32,7 @@ import com.simprints.id.testUtils.mockServer.assertPathUrlParam
 import com.simprints.id.testUtils.mockServer.assertQueryUrlParam
 import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
@@ -65,6 +68,8 @@ class SyncTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var timeHelper: TimeHelper
 
     override var module by lazyVar {
         AppModuleForTests(app,
@@ -99,7 +104,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 25, PeopleRemoteInterface::class.java))
         whenever(remoteDbManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper), JsonHelper.gson)
 
         val testObserver = sync.uploadNewPatients({ false }, syncParams, 10).test()
         testObserver.awaitTerminalEvent()
@@ -128,7 +133,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 25, PeopleRemoteInterface::class.java))
         whenever(remoteDbManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper), JsonHelper.gson)
 
         val count = AtomicInteger(0)
         val testObserver = sync.uploadNewPatients({ count.addAndGet(1) > 2 }, syncParams, 10).test()
@@ -287,13 +292,13 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         // Mock when trying to save the syncInfo
         whenever(localDbMock.updateSyncInfo(anyNotNull())).thenReturn(Completable.complete())
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper), JsonHelper.gson)
 
         return sync.downloadNewPatients({ false }, syncParams).test()
     }
 
     private fun mockLocalDbToSavePatientsFromStream(localDbMock: LocalDbManager) {
-        whenever(localDbMock.savePeopleFromStreamAndUpdateSyncInfo(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenAnswer({ invocation ->
+        whenever(localDbMock.savePeopleFromStreamAndUpdateSyncInfo(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenAnswer { invocation ->
             Completable.create {
                 val args = invocation.arguments
                 (args[0] as JsonReader).skipValue()
@@ -302,7 +307,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
                     it.onComplete()
                 }
             }
-        })
+        }
     }
 
     private fun mockResponseForPatientsCount(count: Int): MockResponse? {

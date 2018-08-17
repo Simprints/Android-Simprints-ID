@@ -10,14 +10,18 @@ import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.events.models.ConnectivitySnapshotEvent
+import com.simprints.id.data.analytics.events.models.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.Callout.Companion.toCallout
 import com.simprints.id.tools.InternalConstants
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
+import org.jetbrains.anko.ctx
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -25,6 +29,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var timeHelper: TimeHelper
 
     companion object {
         const val LOGIN_REQUEST_CODE: Int = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 1
@@ -94,8 +99,12 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         if (requestCode == LAUNCH_ACTIVITY_REQUEST_CODE ||
             requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED) {
 
+            viewPresenter.handleActivityResult(requestCode, resultCode, data.toCallout())
             setResult(resultCode, data)
             finish()
         }
     }
+
+    override fun buildConnectionEvent(sessionEvents: SessionEvents): ConnectivitySnapshotEvent =
+        ConnectivitySnapshotEvent.buildEvent(ctx, sessionEvents, timeHelper)
 }

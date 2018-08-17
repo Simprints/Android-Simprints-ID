@@ -9,6 +9,10 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
+import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.events.SessionEventsManagerImpl
+import com.simprints.id.data.analytics.events.realm.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
 import com.simprints.id.data.db.DbManager
@@ -29,7 +33,7 @@ import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.services.progress.notifications.NotificationFactory
-import com.simprints.id.services.scheduledSync.ScheduledSyncManager
+import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.*
@@ -71,8 +75,10 @@ open class AppModule(val app: Application) {
                               remoteDbManager: RemoteDbManager,
                               secureDataManager: SecureDataManager,
                               loginInfoManager: LoginInfoManager,
-                              preferencesManager: PreferencesManager): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager)
+                              preferencesManager: PreferencesManager,
+                              sessionEventsManager: SessionEventsManager,
+                              timeHelper: TimeHelper): DbManager =
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper)
 
     @Provides
     @Singleton
@@ -137,7 +143,10 @@ open class AppModule(val app: Application) {
                      analyticsManager: AnalyticsManager,
                      appState: AppState,
                      networkUtils: NetworkUtils,
-                     bluetoothComponentAdapter: BluetoothComponentAdapter): Setup = Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, networkUtils, bluetoothComponentAdapter)
+                     bluetoothComponentAdapter: BluetoothComponentAdapter,
+                     sessionEventsManager: SessionEventsManager,
+                     timeHelper: TimeHelper): Setup =
+        Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, networkUtils, bluetoothComponentAdapter, sessionEventsManager, timeHelper)
 
     @Provides
     @Singleton
@@ -164,6 +173,22 @@ open class AppModule(val app: Application) {
         SyncManager(analyticsManager, syncClient)
 
     @Provides
-    open fun provideScheduledSyncManager(preferencesManager: PreferencesManager): ScheduledSyncManager =
-        ScheduledSyncManager(preferencesManager)
+    @Singleton
+    open fun provideLocalEventDbManager(ctx: Context,
+                                        secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+        RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
+
+    @Provides
+    @Singleton
+    open fun provideSessionEventsManager(ctx: Context,
+                                         loginInfoManager: LoginInfoManager,
+                                         sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+                                         preferencesManager: PreferencesManager,
+                                         timeHelper: TimeHelper,
+                                         remoteDbManager: RemoteDbManager): SessionEventsManager =
+        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, remoteDbManager.getSessionsApiClient())
+
+    @Provides
+    open fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
+        ScheduledPeopleSyncManager(preferencesManager)
 }

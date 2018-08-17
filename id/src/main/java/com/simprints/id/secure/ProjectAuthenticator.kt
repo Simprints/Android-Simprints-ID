@@ -3,16 +3,15 @@ package com.simprints.id.secure
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Project
+import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.*
-import com.simprints.id.services.scheduledSync.ScheduledSyncManager
+import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -28,7 +27,7 @@ open class ProjectAuthenticator(component: AppComponent,
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var scheduledSyncManager: ScheduledSyncManager
+    @Inject lateinit var scheduledPeopleSyncManager: ScheduledPeopleSyncManager
 
     private val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
     private val publicKeyManager = PublicKeyManager(secureApiClient)
@@ -103,7 +102,7 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun Completable.scheduleSync(): Completable =
         andThen {
-            scheduledSyncManager.scheduleSyncIfNecessary()
+            scheduledPeopleSyncManager.scheduleSyncIfNecessary()
             it.onComplete()
         }
 }

@@ -16,31 +16,33 @@ object PeopleGeneratorUtils {
 
         return arrayListOf<rl_Person>().also { list ->
             (0 until numberOfPeople).forEach {
-                list.add(getRandomPerson(projectId, userId, moduleId, toSync))
+                list.add(getRandomPerson(
+                    UUID.randomUUID().toString(),
+                    projectId,
+                    userId,
+                    moduleId,
+                    toSync))
             }
         }.also { it.sortBy { it.updatedAt } }
     }
 
-    fun getRandomPerson(projectId: String = UUID.randomUUID().toString(),
+    fun getRandomPerson(patientId: String = UUID.randomUUID().toString(),
+                        projectId: String = UUID.randomUUID().toString(),
                         userId: String = UUID.randomUUID().toString(),
                         moduleId: String = UUID.randomUUID().toString(),
-                        toSync: Boolean = false): rl_Person {
-
-        val prints: RealmList<rl_Fingerprint> = RealmList()
-        prints.add(getRandomFingerprint())
-        prints.add(getRandomFingerprint())
-
-        return rl_Person().apply {
-            patientId = UUID.randomUUID().toString()
+                        toSync: Boolean = false,
+                        fingerprints: Array<rl_Fingerprint> = arrayOf(getRandomFingerprint(), getRandomFingerprint())): rl_Person =
+        rl_Person().apply {
+            this.patientId = patientId
             this.projectId = projectId
             this.userId = userId
             this.moduleId = moduleId
             createdAt = if (!toSync) getRandomTime() else null
             updatedAt = if (!toSync) getRandomTime() else null
             this.toSync = toSync
-            fingerprints = prints
+            this.fingerprints = RealmList<rl_Fingerprint>().apply { addAll(fingerprints) }
         }
-    }
+
 
     fun getRandomFingerprint(): rl_Fingerprint {
         val fingerprint: Fingerprint = Fingerprint.generateRandomFingerprint()
