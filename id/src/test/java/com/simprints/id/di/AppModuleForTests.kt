@@ -18,8 +18,9 @@ open class AppModuleForTests(app: Application,
                              override var analyticsManagerRule: DependencyRule = RealRule,
                              override var bluetoothComponentAdapterRule: DependencyRule = RealRule,
                              override var sessionEventsManagerRule: DependencyRule = RealRule,
-                             override var sessionEventsLocalDbManagerRule: DependencyRule = MockRule,
-                             override var scheduledPeopleSyncManagerRule: DependencyRule = RealRule) //Roboletric doesn't support Realm
+                             override var sessionEventsLocalDbManagerRule: DependencyRule = MockRule, //Roboletric doesn't support Realm
+                             override var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
+                             override var scheduledSessionsSyncManagerRule: DependencyRule = RealRule)
     : AppModuleForAnyTests(
     app,
     localDbManagerRule,
@@ -32,7 +33,8 @@ open class AppModuleForTests(app: Application,
     bluetoothComponentAdapterRule,
     sessionEventsManagerRule,
     sessionEventsLocalDbManagerRule,
-    scheduledPeopleSyncManagerRule) {
+    scheduledPeopleSyncManagerRule,
+    scheduledSessionsSyncManagerRule) {
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
 }

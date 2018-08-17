@@ -34,6 +34,7 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.services.progress.notifications.NotificationFactory
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
+import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.*
@@ -186,9 +187,13 @@ open class AppModule(val app: Application) {
                                          preferencesManager: PreferencesManager,
                                          timeHelper: TimeHelper,
                                          remoteDbManager: RemoteDbManager): SessionEventsManager =
-        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, remoteDbManager.getSessionsApiClient())
+        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, remoteDbManager)
 
     @Provides
     open fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
         ScheduledPeopleSyncManager(preferencesManager)
+
+    @Provides
+    open fun provideScheduledSessionsSyncManager(preferencesManager: PreferencesManager): ScheduledSessionsSyncManager =
+        ScheduledSessionsSyncManager(preferencesManager)
 }

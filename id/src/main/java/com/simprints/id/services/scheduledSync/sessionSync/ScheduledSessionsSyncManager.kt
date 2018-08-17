@@ -6,7 +6,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 
-class ScheduledSessionSyncManager(private val preferencesManager: PreferencesManager) {
+class ScheduledSessionsSyncManager(private val preferencesManager: PreferencesManager) {
 
     fun scheduleSyncIfNecessary() {
         val scheduledSyncRequest = createRequestAndSaveId()
