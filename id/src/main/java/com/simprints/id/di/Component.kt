@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.activities.PrivacyActivity
 import com.simprints.id.activities.TutorialActivity
 import com.simprints.id.activities.about.AboutActivity
 import com.simprints.id.activities.about.AboutPresenter
@@ -22,11 +21,12 @@ import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.activities.launch.LaunchPresenter
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
+import com.simprints.id.activities.longConsent.LongConsentActivity
+import com.simprints.id.activities.longConsent.LongConsentPresenter
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.activities.matching.MatchingPresenter
 import com.simprints.id.activities.refusal.RefusalPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
@@ -43,8 +43,8 @@ interface AppComponent {
     fun inject(guidSelectionService: GuidSelectionService)
     fun inject(alertActivity: AlertActivity)
     fun inject(aboutActivity: AboutActivity)
+    fun inject(longConsentActivity: LongConsentActivity)
     fun inject(refusalPresenter: RefusalPresenter)
-    fun inject(privacyActivity: PrivacyActivity)
     fun inject(tutorialActivity: TutorialActivity)
     fun inject(matchingActivity: MatchingActivity)
     fun inject(loginActivity: LoginActivity)
@@ -70,4 +70,5 @@ interface AppComponent {
     fun inject(launchPresenter: LaunchPresenter)
     fun inject(scheduledSync: ScheduledSync)
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
+    fun inject(longConsentPresenter: LongConsentPresenter)
 }
