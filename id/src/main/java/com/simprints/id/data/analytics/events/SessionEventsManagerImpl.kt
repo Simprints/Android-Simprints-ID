@@ -3,6 +3,7 @@ package com.simprints.id.data.analytics.events
 import android.content.Context
 import android.os.Build
 import com.simprints.id.data.analytics.events.models.*
+import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.session.callout.CalloutAction
@@ -23,12 +24,12 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                                     override val loginInfoManager: LoginInfoManager,
                                     private val preferencesManager: PreferencesManager,
                                     private val timeHelper: TimeHelper,
-                                    private val sessionsApiBuilder: Single<SessionsRemoteInterface>) : SessionEventsManager {
+                                    private val remoteDbManager: RemoteDbManager) : SessionEventsManager {
 
     private var activeSession: SessionEvents? = null
 
     var sessionsApi: SessionsRemoteInterface by lazyVar {
-        sessionsApiBuilder.blockingGet()
+        remoteDbManager.getSessionsApiClient().blockingGet()
     }
 
     //as default, the manager tries to load the last open activeSession for a specific project

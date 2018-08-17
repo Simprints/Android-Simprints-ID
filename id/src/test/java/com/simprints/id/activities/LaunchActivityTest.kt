@@ -1,6 +1,7 @@
 package com.simprints.id.activities
 
 import com.google.firebase.FirebaseApp
+import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForTests
@@ -31,6 +32,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
+    @Inject lateinit var remoteDbManagerMock: RemoteDbManager
 
     override var preferencesModule by lazyVar {
         PreferencesModuleForAnyTests(
@@ -43,7 +45,8 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             dbManagerRule = MockRule,
-            scheduledPeopleSyncManagerRule = MockRule)
+            scheduledPeopleSyncManagerRule = MockRule,
+            scheduledSessionsSyncManagerRule = MockRule)
     }
 
     @Before

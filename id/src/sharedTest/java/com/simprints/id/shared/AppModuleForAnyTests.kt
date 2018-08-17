@@ -17,6 +17,7 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
+import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
 import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
@@ -37,6 +38,7 @@ open class AppModuleForAnyTests(app: Application,
                                 open var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
                                 open var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
                                 open var settingsPreferencesManagerRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var scheduledSessionsSyncManagerRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -83,6 +85,9 @@ open class AppModuleForAnyTests(app: Application,
 
     override fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
         scheduledPeopleSyncManagerRule.resolveDependency { super.provideScheduledPeopleSyncManager(preferencesManager) }
+
+    override fun provideScheduledSessionsSyncManager(preferencesManager: PreferencesManager): ScheduledSessionsSyncManager =
+        scheduledSessionsSyncManagerRule.resolveDependency { super.provideScheduledSessionsSyncManager(preferencesManager) }
 
     override fun provideSessionEventsManager(ctx: Context,
                                              loginInfoManager: LoginInfoManager,
