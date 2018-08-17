@@ -5,6 +5,7 @@ import com.simprints.id.activities.about.AboutActivity
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
+import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import org.robolectric.Robolectric
 import org.robolectric.android.controller.ActivityController
@@ -23,3 +24,6 @@ fun createRoboAlertActivity(startIntent: Intent = Intent()): ActivityController<
 
 fun createRoboAboutActivity(): ActivityController<AboutActivity> =
     Robolectric.buildActivity(AboutActivity::class.java).create()
+
+fun createRoboLaunchActivity(): ActivityController<LaunchActivity> =
+    Robolectric.buildActivity(LaunchActivity::class.java).create()

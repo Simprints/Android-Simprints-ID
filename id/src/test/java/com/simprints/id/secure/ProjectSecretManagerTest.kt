@@ -28,7 +28,7 @@ class ProjectSecretManagerTest : RxJavaTest, DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            remoteDbManagerRule = MockRule())
+            remoteDbManagerRule = MockRule)
     }
 
     @Before

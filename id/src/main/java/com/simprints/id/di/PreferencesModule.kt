@@ -37,7 +37,7 @@ import javax.inject.Singleton
 @JvmSuppressWildcards(false)
 open class PreferencesModule {
 
-    @Provides @Singleton fun provideRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+    @Provides @Singleton open fun provideRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
 
     @Provides @Singleton fun provideRemoteConfigFetcher(remoteConfig: FirebaseRemoteConfig): RemoteConfigFetcher = RemoteConfigFetcher(remoteConfig)
 
@@ -47,7 +47,7 @@ open class PreferencesModule {
 
     @Provides @Singleton fun provideScannerAttributesPreferencesManager(prefs: ImprovedSharedPreferences): ScannerAttributesPreferencesManager = ScannerAttributesPreferencesManagerImpl(prefs)
 
-    @Provides @Singleton open fun provideSessionParametersPreferencesManager(prefs: ImprovedSharedPreferences,
+    @Provides @Singleton fun provideSessionParametersPreferencesManager(prefs: ImprovedSharedPreferences,
                                                                              @Named("CalloutActionSerializer") calloutActionSerializer: Serializer<CalloutAction>): SessionParametersPreferencesManager = SessionParametersPreferencesManagerImpl(prefs, calloutActionSerializer)
 
     @Provides @Singleton fun provideSessionTimestampsPreferencesManager(prefs: ImprovedSharedPreferences): SessionTimestampsPreferencesManager = SessionTimestampsPreferencesManagerImpl(prefs)
@@ -67,7 +67,7 @@ open class PreferencesModule {
                                                                             sessionTimestampsPreferencesManager,
                                                                             locationSerializer)
 
-    @Provides @Singleton fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences,
+    @Provides @Singleton open fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences,
                                                                remoteConfig: FirebaseRemoteConfig,
                                                                @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                                                @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, remoteConfig, fingerIdToBooleanSerializer, groupSerializer)

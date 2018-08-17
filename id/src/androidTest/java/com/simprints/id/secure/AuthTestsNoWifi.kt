@@ -53,7 +53,7 @@ class AuthTestsNoWifi : FirstUseLocal, NoWifi, DaggerForAndroidTests() {
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
     override var module by lazyVar {
-        AppModuleForAndroidTests(app, randomGeneratorRule = MockRule())
+        AppModuleForAndroidTests(app, randomGeneratorRule = MockRule)
     }
 
     @Before

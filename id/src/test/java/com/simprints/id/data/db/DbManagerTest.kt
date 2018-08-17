@@ -52,7 +52,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var dbManager: DbManager
 
     override var module: AppModuleForTests by lazyVar {
-        object : AppModuleForTests(app, localDbManagerRule = SpyRule(), remoteDbManagerRule = SpyRule()) {
+        object : AppModuleForTests(app, localDbManagerRule = SpyRule, remoteDbManagerRule = SpyRule) {
             override fun provideLocalDbManager(ctx: Context): LocalDbManager {
                 return spy(LocalDbManager::class.java)
             }
