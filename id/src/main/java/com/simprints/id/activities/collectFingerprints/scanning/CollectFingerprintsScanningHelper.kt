@@ -285,8 +285,9 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         setup.stop()
     }
 
-    fun setCurrentFingerAsSkipped() {
+    fun setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger() {
         currentFingerStatus = Finger.Status.FINGER_SKIPPED
         presenter.currentFinger().numberOfBadScans = CollectFingerprintsPresenter.numberOfBadScansRequiredToAutoAddNewFinger
+        presenter.refreshDisplay()
     }
 }
