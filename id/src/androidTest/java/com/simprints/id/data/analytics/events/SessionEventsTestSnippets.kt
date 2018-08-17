@@ -18,7 +18,7 @@ fun verifyEventsAfterEnrolment(events: List<Event>) {
         PersonCreationEvent::class.java,
         EnrollmentEvent::class.java,
         CallbackEvent::class.java
-    )).inOrder()
+    ))
 }
 
 fun verifyEventsAfterVerification(events: List<Event>) {
@@ -34,7 +34,7 @@ fun verifyEventsAfterVerification(events: List<Event>) {
         PersonCreationEvent::class.java,
         OneToOneMatchEvent::class.java,
         CallbackEvent::class.java
-    )).inOrder()
+    ))
 }
 
 fun verifyEventsAfterIdentification(events: List<Event>) {
@@ -49,7 +49,7 @@ fun verifyEventsAfterIdentification(events: List<Event>) {
         PersonCreationEvent::class.java,
         OneToManyMatchEvent::class.java,
         CallbackEvent::class.java
-    )).inOrder()
+    ))
 }
 
 fun verifySessionIsOpen(sessionEvents: SessionEvents){

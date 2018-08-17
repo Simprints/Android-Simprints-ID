@@ -6,7 +6,7 @@ import android.os.Build
 import android.support.test.InstrumentationRegistry
 import android.support.test.rule.ActivityTestRule
 import android.view.WindowManager
-import com.schibsted.spain.barista.permission.PermissionGranter
+import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.libsimprints.Constants
 import java.util.*

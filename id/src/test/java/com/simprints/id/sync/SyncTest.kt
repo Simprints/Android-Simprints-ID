@@ -63,7 +63,6 @@ class SyncTest : RxJavaTest, DaggerForTests() {
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
 
     @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var dataManager: DataManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager

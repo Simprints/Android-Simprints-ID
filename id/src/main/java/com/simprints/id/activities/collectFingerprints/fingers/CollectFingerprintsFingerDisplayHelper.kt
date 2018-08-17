@@ -3,7 +3,6 @@ package com.simprints.id.activities.collectFingerprints.fingers
 import android.app.Activity
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
-import android.view.View
 import com.simprints.id.Application
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.FingerPageAdapter
@@ -128,7 +127,7 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
         }
     }
 
-    fun showSplashAndAddNewFinger() {
+    fun showSplashAndNudgeAndAddNewFinger() {
         showTryDifferentFingerSplash()
         Handler().postDelayed({
             handleAutoAddFinger()

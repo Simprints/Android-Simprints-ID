@@ -3,7 +3,7 @@ package com.simprints.id.testTools
 import android.os.SystemClock
 import android.support.test.espresso.IdlingPolicies.getMasterIdlingPolicy
 import android.support.test.espresso.IdlingPolicies.setMasterPolicyTimeout
-import com.schibsted.spain.barista.BaristaSleepActions.sleep
+import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
 import java.util.concurrent.TimeUnit
 
 
