@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.sync.sessions
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.tools.delegates.PrimitivePreference
+import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 
 
 class SyncSessionsPreferencesManagerImpl(prefs: ImprovedSharedPreferences) : SyncSessionsPreferencesManager {
