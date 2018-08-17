@@ -1,11 +1,8 @@
 package com.simprints.id.testSnippets
 
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.Espresso.pressBack
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.contrib.DrawerActions
-import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
 import android.support.test.espresso.matcher.RootMatchers.isDialog
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
@@ -15,8 +12,6 @@ import com.simprints.id.testTools.*
 import com.simprints.id.testTools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
-import org.hamcrest.Matchers.anyOf
-import org.hamcrest.Matchers.containsString
 import org.junit.Assert.*
 
 fun launchActivityEnrol(calloutCredentials: CalloutCredentials,
@@ -90,7 +85,7 @@ fun setupActivityDecine() {
     }
 }
 
-private fun collectFingerprintsPressScan() {
+fun collectFingerprintsPressScan() {
     log("collectFingerprintsPressScan")
     WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
         onView(withId(R.id.scan_button))

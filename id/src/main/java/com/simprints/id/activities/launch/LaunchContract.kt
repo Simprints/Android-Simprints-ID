@@ -5,7 +5,6 @@ import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.ALERT_TYPE
 
-
 interface LaunchContract {
 
     interface View : BaseView<Presenter> {
@@ -22,6 +21,7 @@ interface LaunchContract {
 
         fun setTextToGeneralConsent(generalConsentText: String)
         fun addParentalConsentTabWithText(parentalConsentText: String)
+        fun isCurrentTabParental(): Boolean
     }
 
     interface Presenter : BasePresenter {

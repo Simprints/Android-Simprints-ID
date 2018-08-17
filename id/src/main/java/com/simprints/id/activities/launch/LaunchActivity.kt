@@ -18,7 +18,6 @@ import com.simprints.id.tools.Vibrate.vibrate
 import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_launch.*
 
-
 class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override lateinit var viewPresenter: LaunchContract.Presenter
@@ -135,6 +134,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun doLaunchAlert(alertType: ALERT_TYPE) {
         launchAlert(alertType)
     }
+
+    override fun isCurrentTabParental(): Boolean = tabHost.currentTab == 1
 
     override fun doVibrateIfNecessary(doVibrate: Boolean) = vibrate(this, doVibrate)
 
