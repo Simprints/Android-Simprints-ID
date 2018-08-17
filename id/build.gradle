@@ -292,7 +292,10 @@ dependencies {
     testImplementation 'com.android.support.test:monitor:1.0.2'
 
     testImplementation "com.google.truth:truth:0.42"
-    androidTestImplementation "com.google.truth:truth:0.42"
+    androidTestImplementation("com.google.truth:truth:0.42"){
+        exclude group: "com.google.guava"
+        exclude group: "com.google.errorprone"
+    }
 
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"
@@ -306,9 +309,11 @@ dependencies {
     androidTestImplementation 'org.mockito:mockito-core:2.18.3'
     androidTestImplementation 'org.mockito:mockito-android:2.18.3'
 
-    androidTestImplementation('com.schibsted.spain:barista:1.7.0') {
+    androidTestImplementation('com.schibsted.spain:barista:2.5.0') {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"
+        exclude group: "org.jetbrains.kotlin"
+        exclude group: "com.google.guava"
     }
     androidTestImplementation 'com.simprints:cerberus-library:2018.1.1-dev-1'
     androidTestImplementation 'com.simprints:remote-admin-client:2017.4.0-dev-5'

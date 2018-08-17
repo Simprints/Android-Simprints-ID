@@ -66,9 +66,8 @@ fun setupActivity() {
     log("setupActivity")
     WaitingUtils.tryOnUiUntilTimeout(10000, 50) {
         ActivityUtils.grantPermissions()
-        onView(withId(R.id.consentTextView))
+        onView(withId(R.id.generalConsentTextView))
             .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.short_consent)))
     }
 }
 

@@ -68,8 +68,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     override var module by lazyVar {
         AppModuleForAndroidTests(
             app,
-            localDbManagerRule = DependencyRule.SpyRule(),
-            sessionEventsManagerRule = DependencyRule.SpyRule(),
+            localDbManagerRule = DependencyRule.SpyRule,
+            sessionEventsManagerRule = DependencyRule.SpyRule,
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter }
         )
     }
