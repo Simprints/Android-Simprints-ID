@@ -5,7 +5,9 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.SkipSerialisationProperty
 import java.util.*
 
-open class SessionEvents { // STOPSHIP : add models into progaurd
+open class SessionEvents {
+    // STOPSHIP : add models into progaurd
+    // STOPSHIP : investigate migration
 
     companion object {
         // When the sync starts, any open activeSession started GRACE_PERIOD ms
