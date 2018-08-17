@@ -17,7 +17,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
-import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionSyncManager
+import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
@@ -41,6 +41,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var scheduledPeopleSyncManager: ScheduledPeopleSyncManager
+    @Inject lateinit var scheduledSessionsSyncManager: ScheduledSessionsSyncManager
     @Inject lateinit var appState: AppState
     @Inject lateinit var setup: Setup
     @Inject lateinit var timeHelper: TimeHelper
@@ -105,7 +106,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     private fun scheduleSessionsSyncIfNecessary() {
         if (preferencesManager.scheduledSessionsSyncWorkRequestId.isEmpty()) {
-            ScheduledSessionSyncManager(preferencesManager).scheduleSyncIfNecessary() // STOPSHIP : inject preferencesManager instead
+            scheduledSessionsSyncManager.scheduleSyncIfNecessary() // STOPSHIP : inject preferencesManager instead
         }
     }
 
