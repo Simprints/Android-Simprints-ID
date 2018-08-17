@@ -12,6 +12,7 @@ import com.simprints.id.data.analytics.events.SessionEventsManager
 import com.simprints.id.data.analytics.events.models.ConsentEvent
 import com.simprints.id.data.analytics.events.models.ConsentEvent.Result.*
 import com.simprints.id.data.analytics.events.models.ConsentEvent.Type.INDIVIDUAL
+import com.simprints.id.data.analytics.events.models.ConsentEvent.Type.PARENTAL
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -191,7 +192,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
                 ConsentEvent(
                     it.timeRelativeToStartTime(startConsentEventTime),
                     it.nowRelativeToStartTime(timeHelper),
-                    INDIVIDUAL, //StopShip: Merge with short consent
+                    if (view.isCurrentTabParental()) { PARENTAL } else { INDIVIDUAL },
                     result))
 
             if (result == DECLINED || result == NO_RESPONSE) {

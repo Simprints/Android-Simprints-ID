@@ -15,8 +15,10 @@ import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.ReplaceRule
+import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.HappyWifi
@@ -66,6 +68,10 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
 
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var randomGeneratorMock: RandomGenerator
+
+    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
+        PreferencesModuleForAnyTests(remoteConfigRule = DependencyRule.SpyRule)
+    }
 
     override var module by lazyVar {
         AppModuleForAndroidTests(app,

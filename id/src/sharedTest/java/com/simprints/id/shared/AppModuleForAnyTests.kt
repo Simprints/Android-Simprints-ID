@@ -35,7 +35,8 @@ open class AppModuleForAnyTests(app: Application,
                                 open var bluetoothComponentAdapterRule: DependencyRule = RealRule,
                                 open var sessionEventsManagerRule: DependencyRule = RealRule,
                                 open var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
-                                open var scheduledPeopleSyncManagerRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
+                                open var settingsPreferencesManagerRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }

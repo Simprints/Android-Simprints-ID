@@ -9,6 +9,7 @@ abstract class DaggerForTests {
 
     lateinit var testAppComponent: AppComponentForTests
     lateinit var app: TestApplication
+
     open var module: AppModuleForTests by lazyVar {
         AppModuleForTests(app)
     }

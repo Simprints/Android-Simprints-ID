@@ -18,7 +18,8 @@ open class AppModuleForAndroidTests(app: Application,
                                     override var bluetoothComponentAdapterRule: DependencyRule = RealRule,
                                     override var sessionEventsManagerRule: DependencyRule = RealRule,
                                     override var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
-                                    override var scheduledPeopleSyncManagerRule: DependencyRule = RealRule)
+                                    override var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
+                                    override var settingsPreferencesManagerRule: DependencyRule = RealRule)
     : AppModuleForAnyTests(
     app,
     localDbManagerRule,
@@ -33,4 +34,5 @@ open class AppModuleForAndroidTests(app: Application,
     bluetoothComponentAdapterRule,
     sessionEventsManagerRule,
     sessionEventsLocalDbManagerRule,
-    scheduledPeopleSyncManagerRule)
+    scheduledPeopleSyncManagerRule,
+    settingsPreferencesManagerRule)

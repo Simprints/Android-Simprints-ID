@@ -1,13 +1,22 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
+import com.simprints.id.shared.PreferencesModuleForAnyTests
+import com.simprints.id.tools.delegates.lazyVar
 import org.junit.Before
 
-open class DaggerForAndroidTests {
+abstract class DaggerForAndroidTests {
 
-    open lateinit var module: AppModuleForAndroidTests
     lateinit var testAppComponent: AppComponentForAndroidTests
     lateinit var app: Application
+
+    open var module: AppModuleForAndroidTests by lazyVar {
+        AppModuleForAndroidTests(app)
+    }
+
+    open var preferencesModule by lazyVar {
+        PreferencesModuleForAnyTests()
+    }
 
     @Before
     open fun setUp() {
@@ -15,7 +24,7 @@ open class DaggerForAndroidTests {
         testAppComponent = DaggerAppComponentForAndroidTests
             .builder()
             .appModule(module)
-            .preferencesModule(PreferencesModule())
+            .preferencesModule(preferencesModule)
             .serializerModule(SerializerModule())
             .build()
 
