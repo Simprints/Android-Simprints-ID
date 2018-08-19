@@ -19,9 +19,8 @@ open class AppModuleForAndroidTests(app: Application,
                                     override var sessionEventsManagerRule: DependencyRule = RealRule,
                                     override var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
                                     override var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
-                                    override var settingsPreferencesManagerRule: DependencyRule = RealRule)
-                                    override var scheduledSessionsSyncManagerRule: DependencyRule = RealRule)
-    : AppModuleForAnyTests(
+                                    override var settingsPreferencesManagerRule: DependencyRule = RealRule,
+                                    override var scheduledSessionsSyncManagerRule: DependencyRule = RealRule) : AppModuleForAnyTests(
     app,
     localDbManagerRule,
     remoteDbManagerRule,

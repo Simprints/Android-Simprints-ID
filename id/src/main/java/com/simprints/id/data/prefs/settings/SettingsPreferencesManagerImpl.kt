@@ -17,7 +17,7 @@ import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
 
 
-class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
+open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                      private val remoteConfig: FirebaseRemoteConfig,
                                      private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                      groupSerializer: Serializer<Constants.GROUP>)

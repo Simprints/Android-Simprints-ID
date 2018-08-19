@@ -25,7 +25,7 @@ import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.TimeHelper;
-import com.simprints.id.tools.utils.NetworkUtils;
+import com.simprints.id.tools.utils.SimNetworkUtils;
 import com.simprints.libcommon.Person;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
@@ -43,7 +43,7 @@ import static com.simprints.libscanner.ScannerUtils.convertAddressToSerial;
 
 public class Setup {
 
-    private final NetworkUtils networkUtils;
+    private final SimNetworkUtils simNetworkUtils;
     private BluetoothComponentAdapter bluetoothAdapter;
     private long startCandidateSearchTime = 0;
 
@@ -52,7 +52,7 @@ public class Setup {
                  LoginInfoManager loginInfoManager,
                  AnalyticsManager analyticsManager,
                  AppState appState,
-                 NetworkUtils networkUtils,
+                 SimNetworkUtils simNetworkUtils,
                  BluetoothComponentAdapter bluetoothAdapter,
                  SessionEventsManager sessionEventsManager,
                  TimeHelper timeHelper) {
@@ -61,7 +61,7 @@ public class Setup {
         this.dbManager = dbManager;
         this.preferencesManager = preferencesManager;
         this.appState = appState;
-        this.networkUtils = networkUtils;
+        this.simNetworkUtils = simNetworkUtils;
         this.bluetoothAdapter = bluetoothAdapter;
         this.sessionEventsManager = sessionEventsManager;
         this.timeHelper = timeHelper;
@@ -282,7 +282,7 @@ public class Setup {
     }
 
     private void saveNotFoundVerification(final Person probe) {
-        if (networkUtils.isConnected()) {
+        if (simNetworkUtils.isConnected()) {
             // We've synced with the online dbManager and they're not in the dbManager
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
             sessionEventsManager.addEventForCandidateReadInBackground(

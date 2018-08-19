@@ -1,5 +1,6 @@
 package com.simprints.id.testUtils.roboletric
 
+import android.app.Activity
 import android.content.Intent
 import com.simprints.id.activities.about.AboutActivity
 import com.simprints.id.activities.alert.AlertActivity
@@ -27,3 +28,6 @@ fun createRoboAboutActivity(): ActivityController<AboutActivity> =
 
 fun createRoboLaunchActivity(): ActivityController<LaunchActivity> =
     Robolectric.buildActivity(LaunchActivity::class.java).create()
+
+inline fun <reified T : Activity?> createRoboActivity(): ActivityController<T> =
+    Robolectric.buildActivity(T::class.java).create()

@@ -2,6 +2,7 @@ package com.simprints.id.testSnippets
 
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.RootMatchers.isDialog
 import android.support.test.espresso.matcher.ViewMatchers.*
@@ -12,6 +13,7 @@ import com.simprints.id.testTools.*
 import com.simprints.id.testTools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
+import org.hamcrest.Matchers.*
 import org.junit.Assert.*
 
 fun launchActivityEnrol(calloutCredentials: CalloutCredentials,
@@ -89,8 +91,21 @@ fun collectFingerprintsPressScan() {
     WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
         onView(withId(R.id.scan_button))
             .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.scan)))
+            .check(matches(anyOf(withText(R.string.scan), withText(R.string.rescan_label))))
             .perform(click())
+    }
+}
+
+fun waitForSplashScreenAppearsAndDisappears() {
+    log("checkSplashScreen")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+        onView(withId(R.id.splashGetReady))
+            .check(matches(isDisplayed()))
+    }
+
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+        onView(withId(R.id.splashGetReady))
+            .check(doesNotExist())
     }
 }
 

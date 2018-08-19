@@ -20,7 +20,8 @@ open class AppModuleForTests(app: Application,
                              override var sessionEventsManagerRule: DependencyRule = RealRule,
                              override var sessionEventsLocalDbManagerRule: DependencyRule = MockRule, //Roboletric doesn't support Realm
                              override var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
-                             override var scheduledSessionsSyncManagerRule: DependencyRule = RealRule)
+                             override var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
+                             override var simNetworkUtilsRule: DependencyRule = RealRule)
     : AppModuleForAnyTests(
     app,
     localDbManagerRule,
@@ -34,7 +35,8 @@ open class AppModuleForTests(app: Application,
     sessionEventsManagerRule,
     sessionEventsLocalDbManagerRule,
     scheduledPeopleSyncManagerRule,
-    scheduledSessionsSyncManagerRule) {
+    scheduledSessionsSyncManagerRule,
+    simNetworkUtilsRule) {
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
 }
