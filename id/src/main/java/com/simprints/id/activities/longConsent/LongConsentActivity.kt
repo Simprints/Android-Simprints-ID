@@ -7,9 +7,9 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.LanguageHelper
+import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.activity_long_consent.*
 import javax.inject.Inject
-
 
 class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
 
@@ -32,8 +32,19 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
         LanguageHelper.setLanguage(this, preferences.language)
         setContentView(R.layout.activity_long_consent)
 
+        setSupportActionBar(longConsentToolbar)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setTitle(R.string.privacy_notice_title)
+
         viewPresenter = LongConsentPresenter(this, component)
         viewPresenter.start()
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     override fun setLongConsentText(text: String) {
@@ -42,5 +53,4 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
     }
 
     override fun setDefaultLongConsent() = setLongConsentText(getString(R.string.long_consent))
-
 }
