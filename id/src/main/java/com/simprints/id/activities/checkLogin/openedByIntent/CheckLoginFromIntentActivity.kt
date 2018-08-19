@@ -21,6 +21,7 @@ import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
+import com.simprints.id.tools.utils.SimNetworkUtils
 import org.jetbrains.anko.ctx
 import javax.inject.Inject
 
@@ -30,6 +31,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
 
     companion object {
         const val LOGIN_REQUEST_CODE: Int = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 1
@@ -106,5 +108,5 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     }
 
     override fun buildConnectionEvent(sessionEvents: SessionEvents): ConnectivitySnapshotEvent =
-        ConnectivitySnapshotEvent.buildEvent(ctx, sessionEvents, timeHelper)
+        ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, sessionEvents, timeHelper)
 }

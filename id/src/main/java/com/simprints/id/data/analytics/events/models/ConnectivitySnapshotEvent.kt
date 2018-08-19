@@ -1,20 +1,19 @@
 package com.simprints.id.data.analytics.events.models
 
-import android.content.Context
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.utils.NetworkUtils
+import com.simprints.id.tools.utils.SimNetworkUtils
 
 class ConnectivitySnapshotEvent(
     val relativeStartTime: Long,
     val networkType: String?,
-    val connections: List<NetworkUtils.Connection>) : Event(EventType.CONNECTIVITY_SNAPSHOT) {
+    val connections: List<SimNetworkUtils.Connection>) : Event(EventType.CONNECTIVITY_SNAPSHOT) {
 
     companion object {
-        fun buildEvent(ctx: Context,
+        fun buildEvent(simNetworkUtils: SimNetworkUtils,
                        sessionEvents: SessionEvents,
                        timeHelper: TimeHelper): ConnectivitySnapshotEvent {
 
-            return NetworkUtils(ctx).let {
+            return simNetworkUtils.let {
                 ConnectivitySnapshotEvent(
                     sessionEvents.nowRelativeToStartTime(timeHelper),
                     it.mobileNetworkType,

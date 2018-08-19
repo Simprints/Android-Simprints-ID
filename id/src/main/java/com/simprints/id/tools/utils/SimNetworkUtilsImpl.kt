@@ -5,25 +5,24 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Build
 import android.telephony.TelephonyManager
+import com.simprints.id.tools.utils.SimNetworkUtils.Connection
 
-class NetworkUtils(ctx: Context) {
-
-    class Connection(val type: String, val state: NetworkInfo.DetailedState)
+class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
 
     private val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val tm = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
-    fun isConnected(): Boolean {
+    override fun isConnected(): Boolean {
         return cm.activeNetworkInfo.detailedState == NetworkInfo.DetailedState.CONNECTED
     }
 
-    val connectionsStates: List<Connection> =
+    override var connectionsStates: List<Connection> =
         arrayListOf<Connection>().apply {
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     cm.allNetworks?.map {
                         cm.getNetworkInfo(it).let {
-                            add(Connection(it.typeName, it.detailedState))
+                            add(SimNetworkUtils.Connection(it.typeName, it.detailedState))
                         }
                     }
                 } else {
@@ -37,7 +36,7 @@ class NetworkUtils(ctx: Context) {
             }
         }
 
-    val mobileNetworkType: String? =
+    override var mobileNetworkType: String? =
         tm.networkType.let {
             return@let when (it) {
                 TelephonyManager.NETWORK_TYPE_1xRTT -> "1xRTT"

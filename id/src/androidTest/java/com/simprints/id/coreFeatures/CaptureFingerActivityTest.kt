@@ -9,6 +9,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.collectFingerprints.ViewPagerCustom
+import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -21,6 +22,7 @@ import com.simprints.id.shared.whenever
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.HappyWifi
+import com.simprints.id.testTools.ActivityUtils.getCurrentActivity
 import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
@@ -72,7 +74,6 @@ class CaptureFingerActivityTest : DaggerForAndroidTests(), FirstUseLocal, HappyW
     }
 
     private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
-
     @Inject lateinit var randomGeneratorMock: RandomGenerator
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
@@ -91,37 +92,97 @@ class CaptureFingerActivityTest : DaggerForAndroidTests(), FirstUseLocal, HappyW
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
         realmConfiguration = RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
         super<FirstUseLocal>.setUp()
-
-        signOut()
     }
 
     @Test
     fun threeBadScanAndNotMaxReached_thenAddAFinger() {
 
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
-            MockFinger.PERSON_1_VERSION_1_LEFT_INDEX_BAD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_INDEX_BAD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_INDEX_BAD_SCAN)))
+            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
+            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
+            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN)))
 
-        whenever(settingsPreferencesManagerSpy.getRemoteConfigFingerStatus()).thenReturn(hashMapOf(
-            FingerIdentifier.LEFT_THUMB to true,
-            FingerIdentifier.RIGHT_THUMB to true ))
-
-        // Launch and sign in
         launchActivityEnrol(calloutCredentials, scanTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
-        pressSignIn()
 
+        signInIfRequired()
         setupActivityAndContinue()
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
-        val viewPager = scanTestRule.activity.findViewById<ViewPagerCustom>(R.id.view_pager)
-        Assert.assertEquals(viewPager.currentItem, 3)
+        addBadFingerAndScan()
+        addBadFingerAndScan()
+        addBadFingerAndScan()
+
+        waitForSplashScreenAppearsAndDisappears().also { Thread.sleep(2000) }
+
+        Assert.assertEquals(3, viewPager?.adapter?.count)
+        Assert.assertEquals(1, viewPager?.currentItem)
     }
 
-    private fun signOut() {
-        remoteDbManager.signOutOfRemoteDb()
+    @Test
+    fun threeBadAndMaxReached_thenNotFingerAdded() {
+
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
+            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
+            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
+            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN)))
+
+        whenever(settingsPreferencesManagerSpy.fingerStatus).thenReturn(hashMapOf(
+            FingerIdentifier.LEFT_THUMB to true,
+            FingerIdentifier.LEFT_INDEX_FINGER to true,
+            FingerIdentifier.RIGHT_THUMB to true,
+            FingerIdentifier.RIGHT_INDEX_FINGER to true))
+
+        launchActivityEnrol(calloutCredentials, scanTestRule)
+
+        signInIfRequired()
+        setupActivityAndContinue()
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+
+        Assert.assertEquals(4, viewPager?.adapter?.count)
+
+        addBadFingerAndScan()
+        addBadFingerAndScan()
+        addBadFingerAndScan()
+
+        waitForSplashScreenAppearsAndDisappears().also { Thread.sleep(2000) }
+
+        Assert.assertEquals(4, viewPager?.adapter?.count)
+        Assert.assertEquals(1, viewPager?.currentItem)
+    }
+
+    @Test
+    fun threeMissingBadScans_thenNotFingerAdded() {
+
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
+            MockFinger.NO_FINGER,
+            MockFinger.NO_FINGER,
+            MockFinger.NO_FINGER,
+            MockFinger.NO_FINGER)))
+
+        launchActivityEnrol(calloutCredentials, scanTestRule)
+
+        signInIfRequired()
+        setupActivityAndContinue()
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+
+        collectFingerprintsPressScan()
+        collectFingerprintsPressScan()
+        collectFingerprintsPressScan()
+        collectFingerprintsPressScan()
+
+        Assert.assertEquals(2, viewPager?.adapter?.count)
+        Assert.assertEquals(0, viewPager?.currentItem)
+    }
+
+    private fun addBadFingerAndScan(){
+        whenever(settingsPreferencesManagerSpy.qualityThreshold).thenReturn(100)
+        collectFingerprintsPressScan()
+    }
+
+    private fun signInIfRequired() {
+        if (getCurrentActivity() is LoginActivity) {
+            enterCredentialsDirectly(calloutCredentials, projectSecret)
+            pressSignIn()
+        }
     }
 }

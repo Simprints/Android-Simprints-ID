@@ -40,7 +40,8 @@ import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.*
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
-import com.simprints.id.tools.utils.NetworkUtils
+import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Module
@@ -130,7 +131,7 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    fun provideNetworkUtils(): NetworkUtils = NetworkUtils(app)
+    open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
     @Singleton
@@ -143,11 +144,11 @@ open class AppModule(val app: Application) {
                      loginInfoManager: LoginInfoManager,
                      analyticsManager: AnalyticsManager,
                      appState: AppState,
-                     networkUtils: NetworkUtils,
+                     simNetworkUtils: SimNetworkUtils,
                      bluetoothComponentAdapter: BluetoothComponentAdapter,
                      sessionEventsManager: SessionEventsManager,
                      timeHelper: TimeHelper): Setup =
-        Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, networkUtils, bluetoothComponentAdapter, sessionEventsManager, timeHelper)
+        Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, simNetworkUtils, bluetoothComponentAdapter, sessionEventsManager, timeHelper)
 
     @Provides
     @Singleton

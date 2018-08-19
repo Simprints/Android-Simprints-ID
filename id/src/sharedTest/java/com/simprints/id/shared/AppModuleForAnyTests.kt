@@ -21,6 +21,7 @@ import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSync
 import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 
 open class AppModuleForAnyTests(app: Application,
@@ -37,8 +38,9 @@ open class AppModuleForAnyTests(app: Application,
                                 open var sessionEventsManagerRule: DependencyRule = RealRule,
                                 open var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
                                 open var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
-                                open var settingsPreferencesManagerRule: DependencyRule = RealRule) : AppModule(app) {
-                                open var scheduledSessionsSyncManagerRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var settingsPreferencesManagerRule: DependencyRule = RealRule,
+                                open var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
+                                open var simNetworkUtilsRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -101,4 +103,8 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideLocalEventDbManager(ctx: Context,
                                             secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
         sessionEventsLocalDbManagerRule.resolveDependency { super.provideLocalEventDbManager(ctx, secureDataManager) }
+
+    override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
+        simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
+
 }

@@ -117,6 +117,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         }
     }
 
+    //StopShip: Add popup
     private fun logout() {
         viewPresenter.logout()
         startActivity(Intent(this, RequestLoginActivity::class.java))
