@@ -2,6 +2,7 @@ package com.simprints.id.activities.dashboard
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
 import android.view.Menu
@@ -11,7 +12,6 @@ import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManage
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.data.DataManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
@@ -22,11 +22,8 @@ import kotlinx.android.synthetic.main.content_dashboard.*
 import org.jetbrains.anko.support.v4.onRefresh
 import javax.inject.Inject
 
-
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
-    @Inject
-    lateinit var dataManager: DataManager
     @Inject
     lateinit var preferences: PreferencesManager
     @Inject
@@ -39,7 +36,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override lateinit var viewPresenter: DashboardContract.Presenter
     private lateinit var cardsViewAdapter: DashboardCardAdapter
-
+    private var confirmationLogoutDialog: AlertDialog.Builder? = null
     private lateinit var notification: LongConsentNotification
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,13 +108,20 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
             when (id) {
                 R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, LongConsentActivity::class.java), LONG_CONSENT_ACTIVITY_REQUEST_CODE)
                 R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
-                R.id.menuLogout -> logout()
+                R.id.menuLogout -> viewPresenter.userDidWantToLogout()
             }
             true
         }
     }
 
-    //StopShip: Add popup
+    override fun showConfirmationDialogForLogout() {
+        confirmationLogoutDialog = AlertDialog.Builder(this)
+            .setTitle(R.string.confirmation_logout_title)
+            .setMessage(R.string.confirmation_logout_message)
+            .setPositiveButton(android.R.string.yes) { _, _ -> logout() }
+            .setNegativeButton(android.R.string.no, null).apply { show() }
+    }
+
     private fun logout() {
         viewPresenter.logout()
         startActivity(Intent(this, RequestLoginActivity::class.java))
@@ -139,5 +143,4 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override fun cancelNotification(language: String) = notification.failedNotification(language)
 
     override fun completeNotification(language: String) = notification.completeNotification(language)
-
 }
