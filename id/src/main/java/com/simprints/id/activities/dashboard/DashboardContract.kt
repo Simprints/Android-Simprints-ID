@@ -17,6 +17,7 @@ interface DashboardContract {
         fun updateNotification(language: String, progress: Int)
         fun cancelNotification(language: String)
         fun completeNotification(language: String)
+        fun showConfirmationDialogForLogout()
     }
 
     interface Presenter : BasePresenter {
@@ -25,6 +26,7 @@ interface DashboardContract {
         fun pause()
         fun userDidWantToRefreshCardsIfPossible()
         fun userDidWantToSync()
+        fun userDidWantToLogout()
         fun logout()
     }
 }

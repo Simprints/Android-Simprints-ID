@@ -189,4 +189,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
                     })
         }
 
+    override fun userDidWantToLogout() {
+        view.showConfirmationDialogForLogout()
+    }
 }

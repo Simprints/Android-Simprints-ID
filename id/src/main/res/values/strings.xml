@@ -346,6 +346,9 @@
     <!-- Dashboard Activity -->
     <string name="dashboard_label">Dashboard</string>
     <string name="logout">Logout</string>
+    <string name="confirmation_logout_title">Logout</string>
+    <string name="confirmation_logout_message">Do you really want to logout?</string>
+
     <string name="hint_graphic">Hint graphic</string>
     <string name="dashboard_sync_status_icon">Synchronisation status icon</string>
     <string name="dashboard_sync_icon">Synchronisation icon</string>
