@@ -26,8 +26,8 @@ class FingerprintCaptureEvent(val relativeStartTime: Long,
                     Finger.Status.GOOD_SCAN, Finger.Status.RESCAN_GOOD_SCAN -> GOOD_SCAN
                     Finger.Status.BAD_SCAN -> BAD_QUALITY
                     Finger.Status.NO_FINGER_DETECTED -> NO_FINGER_DETECTED
+                    Finger.Status.FINGER_SKIPPED -> SKIPPED
                     else -> FAILURE_TO_ACQUIRE
-                    //StopShip: implemented Missed Finger status
                 }
             }
         }
