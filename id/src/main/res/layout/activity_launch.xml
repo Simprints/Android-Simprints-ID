@@ -157,6 +157,8 @@
         android:text="@string/privacy_notice_text"
         android:textColor="@color/simprints_white"
         android:textSize="15sp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         app:layout_constraintBottom_toTopOf="@+id/loadingInfoTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -373,6 +373,8 @@
     <string name="dashboard_card_identification_title">Last Identification</string>
     <string name="dashboard_card_currentuser_title">Current user</string>
     <string name="menu_privacy_notice">Privacy Notice</string>
+    <string name="privacy_notice_title">Privacy Notice</string>
+
     <string name="menu_settings">Settings</string>
     <string name="menu_log_out">Log Out</string>
     <string name="get_ready">Get Ready</string>
