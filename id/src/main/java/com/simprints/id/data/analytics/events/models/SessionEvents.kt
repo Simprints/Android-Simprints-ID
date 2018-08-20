@@ -6,7 +6,6 @@ import com.simprints.id.tools.json.SkipSerialisationProperty
 import java.util.*
 
 open class SessionEvents {
-    // STOPSHIP : add models into progaurd
     // STOPSHIP : investigate migration
 
     companion object {

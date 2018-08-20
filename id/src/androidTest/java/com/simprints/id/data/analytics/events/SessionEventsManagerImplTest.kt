@@ -260,7 +260,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         }
     }
 
-    @Test //StopShip: Add test for missing finger
+    @Test
     fun multipleScans_shouldGenerateACreatePersonEventWithRightTemplates() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
@@ -287,12 +287,12 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             val personCreationEvent = session.events.filterIsInstance(PersonCreationEvent::class.java)[0]
             val usefulTemplatesFromEvents = session.events
                                                           .filterIsInstance(FingerprintCaptureEvent::class.java)
-                                                          .filter { it.id in personCreationEvent.fingerprintCaptureIds}
+                                                          .filter { it.id in personCreationEvent.fingerprintCaptureIds }
                                                           .map { it.fingerprint?.template }
 
             Truth.assertThat(usefulTemplatesFromEvents)
                 .containsExactlyElementsIn(personCreatedForMatchingActivity.fingerprints.map {
-                    Utils.byteArrayToBase64(it.templateBytes)})
+                    Utils.byteArrayToBase64(it.templateBytes) })
         }
     }
 

@@ -107,7 +107,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     private fun scheduleSessionsSyncIfNecessary() {
         if (preferencesManager.scheduledSessionsSyncWorkRequestId.isEmpty()) {
-            scheduledSessionsSyncManager.scheduleSyncIfNecessary() // STOPSHIP : inject preferencesManager instead
+            scheduledSessionsSyncManager.scheduleSyncIfNecessary()
         }
     }
 
