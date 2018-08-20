@@ -90,8 +90,16 @@ fun collectFingerprintsPressScan() {
     log("collectFingerprintsPressScan")
     WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
         onView(withId(R.id.scan_button))
+            .check(matches(not(withText(R.string.cancel_button))))
+            .perform(click())
+    }
+}
+
+fun skipFinger() {
+    log("skipFinger")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+        onView(withId(R.id.missingFingerText))
             .check(matches(isDisplayed()))
-            .check(matches(anyOf(withText(R.string.scan), withText(R.string.rescan_label))))
             .perform(click())
     }
 }
