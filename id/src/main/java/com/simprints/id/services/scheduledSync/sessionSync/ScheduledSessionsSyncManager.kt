@@ -5,7 +5,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-
 class ScheduledSessionsSyncManager(private val preferencesManager: PreferencesManager) {
 
     fun scheduleSyncIfNecessary() {
@@ -26,6 +25,7 @@ class ScheduledSessionsSyncManager(private val preferencesManager: PreferencesMa
     private fun getConstraints() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .setRequiresBatteryNotLow(true)
+        .setRequiredNetworkType(NetworkType.UNMETERED)
         .build()
 
     private fun saveWorkRequestId(id: UUID) {

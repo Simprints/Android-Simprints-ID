@@ -2,12 +2,12 @@ package com.simprints.id.data.consent
 
 import android.content.Context
 import com.google.firebase.storage.FirebaseStorage
+import com.simprints.id.R
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import java.io.BufferedReader
 import java.io.File
-
 
 class LongConsentManagerImpl(context: Context,
                              private val loginInfoManager: LoginInfoManager) : LongConsentManager {
@@ -54,7 +54,6 @@ class LongConsentManagerImpl(context: Context,
             }.addOnProgressListener {
                 emitter.onNext(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
             }
-
     }, BackpressureStrategy.BUFFER)
 
     override fun checkIfLongConsentExists(language: String): Boolean = File(filePath, "$language.$FILE_TYPE").exists()
@@ -71,6 +70,5 @@ class LongConsentManagerImpl(context: Context,
         return fileContent.toString()
     }
 
-    override val languages = arrayOf("en", "ne", "bn", "ps", "fa-rAF", "so", "ha", "ny")
-
+    override val languages: Array<String> = context.resources.getStringArray(R.array.language_values) ?: arrayOf("en")
 }

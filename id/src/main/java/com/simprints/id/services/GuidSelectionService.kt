@@ -45,7 +45,6 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
             checkCalloutParameters(projectId, apiKey, sessionId, selectedGuid)
             dbManager.updateIdentification(loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId ?: "")
 
-            //StopShip: write tests
             sessionEventsManager
                 .addGuidSelectionEventToLastIdentificationIfExists(selectedGuid = selectedGuid)
                 .subscribeBy(onError = { it.printStackTrace() })
