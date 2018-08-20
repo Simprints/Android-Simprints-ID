@@ -75,10 +75,12 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         component.inject(this);
         this.matchingView = matchingView;
         this.probe = probe;
-        sessionEventsManager.getCurrentSession(loginInfoManager.getSignedInProjectId()).subscribe(new BiConsumer<SessionEvents, Throwable>() {
+        sessionEventsManager.getCurrentSession(loginInfoManager.getSignedInProjectIdOrEmpty()).subscribe(new BiConsumer<SessionEvents, Throwable>() {
             @Override
             public void accept(SessionEvents sessionEvents, Throwable throwable) throws Exception {
-                sessionId = sessionEvents.getId();
+                if (sessionEvents != null && throwable == null) {
+                    sessionId = sessionEvents.getId();
+                }
             }
         });
     }
@@ -192,7 +194,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         try {
             dbManager.loadPerson(
                 candidates,
-                loginInfoManager.getSignedInProjectId(),
+                loginInfoManager.getSignedInProjectIdOrEmpty(),
                 guid,
                 wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {

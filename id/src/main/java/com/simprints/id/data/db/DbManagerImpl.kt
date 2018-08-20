@@ -82,12 +82,12 @@ class DbManagerImpl(override val local: LocalDbManager,
             loginInfoManager.getSignedInUserIdOrEmpty(),
             preferencesManager.moduleId))
 
-    override fun savePerson(fbPerson: fb_Person): Completable =
+    override fun savePerson(fbPerson: fb_Person): Completable = // TODO Investigate this interesting nested subscription
         local.insertOrUpdatePersonInLocal(rl_Person(fbPerson))
             .doOnComplete {
                 sessionEventsManager.updateSession({
                     it.events.add(EnrollmentEvent(
-                        timeHelper.now() - it.startTime,
+                        it.nowRelativeToStartTime(timeHelper),
                         fbPerson.patientId
                     ))
                 }).andThen(uploadPersonAndDownloadAgain(fbPerson))
@@ -116,10 +116,10 @@ class DbManagerImpl(override val local: LocalDbManager,
                             guid: String,
                             callback: DataCallback) {
 
-        local.loadPersonFromLocal(guid).subscribe({
+        local.loadPersonFromLocal(guid).subscribeBy(onSuccess = {
             destinationList.add(it)
             callback.onSuccess(false)
-        }, {
+        }, onError = { e ->
             remote.downloadPerson(guid, projectId).subscribeBy(
                 onSuccess = { destinationList.add(rl_Person(it).libPerson); callback.onSuccess(true) },
                 onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })

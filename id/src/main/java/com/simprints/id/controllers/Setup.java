@@ -239,7 +239,7 @@ public class Setup {
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = preferencesManager.getPatientId();
         try {
-            dbManager.loadPerson(loadedPerson, loginInfoManager.getSignedInProjectId(), guid, wrapCallback("loading people from dbManager", newLoadPersonCallback(activity, guid)));
+            dbManager.loadPerson(loadedPerson, loginInfoManager.getSignedInProjectIdOrEmpty(), guid, wrapCallback("loading people from dbManager", newLoadPersonCallback(activity, guid)));
         } catch (UninitializedDataManagerError error) {
             analyticsManager.logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
@@ -254,9 +254,8 @@ public class Setup {
                 guidExists = true;
                 goOn(activity);
 
-                sessionEventsManager.addEventForCandidateReadInBackground(
+                saveEventForCandidateReadInBackgroundNotFound(
                     guid,
-                    startCandidateSearchTime,
                     isDataFromRemote ? CandidateReadEvent.LocalResult.NOT_FOUND : CandidateReadEvent.LocalResult.FOUND,
                     isDataFromRemote ? CandidateReadEvent.RemoteResult.FOUND : CandidateReadEvent.RemoteResult.NOT_FOUND);
             }
@@ -285,20 +284,21 @@ public class Setup {
         if (simNetworkUtils.isConnected()) {
             // We've synced with the online dbManager and they're not in the dbManager
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
-            sessionEventsManager.addEventForCandidateReadInBackground(
-                probe.getGuid(),
-                startCandidateSearchTime,
-                CandidateReadEvent.LocalResult.NOT_FOUND,
-                CandidateReadEvent.RemoteResult.NOT_FOUND);
+            saveEventForCandidateReadInBackgroundNotFound(probe.getGuid(), CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND);
 
         } else {
             // We're offline but might find the person if we sync
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
-            sessionEventsManager.addEventForCandidateReadInBackground(
-                probe.getGuid(), startCandidateSearchTime,
-                CandidateReadEvent.LocalResult.NOT_FOUND,
-                CandidateReadEvent.RemoteResult.OFFLINE);
+            saveEventForCandidateReadInBackgroundNotFound(probe.getGuid(), CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.OFFLINE);
         }
+    }
+
+    private void saveEventForCandidateReadInBackgroundNotFound(String guid, CandidateReadEvent.LocalResult localResult, CandidateReadEvent.RemoteResult remoteResult) {
+        sessionEventsManager.addEventForCandidateReadInBackground(
+            guid,
+            startCandidateSearchTime,
+            localResult,
+            remoteResult);
     }
 
     // STEP 5

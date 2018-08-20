@@ -48,17 +48,15 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleSubmitButtonClick(reason: REFUSAL_FORM_REASON?, refusalText: String) {
-        reason.let {
-            saveRefusalFormInDb(getRefusalForm(refusalText))
-        }
+        saveRefusalFormInDb(getRefusalForm(refusalText))
         view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
 
-        reason?.let {
+        reason?.let { refusalReason ->
             sessionEventsManager.updateSessionInBackground({
                 it.events.add(RefusalEvent(
                     it.timeRelativeToStartTime(refusalStartTime),
                     it.nowRelativeToStartTime(timeHelper),
-                    RefusalEvent.Answer.fromRefusalReason(reason),
+                    RefusalEvent.Answer.fromRefusalReason(refusalReason),
                     refusalText))
             })
         }

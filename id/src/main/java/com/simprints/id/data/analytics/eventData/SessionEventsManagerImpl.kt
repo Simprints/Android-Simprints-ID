@@ -5,6 +5,7 @@ import android.os.Build
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.models.events.*
 import com.simprints.id.data.analytics.eventData.models.session.Device
+import com.simprints.id.data.analytics.eventData.models.session.Location
 import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -50,7 +51,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         if (projectId.isNotEmpty()) {
             createSessionWithAvailableInfo(projectId).let {
                 activeSession = it
-                closeLastSessionsIfPending(projectId)
+                closeLastSessionsIfPending()
                     .andThen(insertOrUpdateSession(it))
                     .toSingle { it }
             }
@@ -82,8 +83,8 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         updateSession(block, projectId).subscribeBy(onError = { it.printStackTrace() })
     }
 
-    private fun closeLastSessionsIfPending(projectId: String): Completable =
-        sessionEventsLocalDbManager.loadSessions(projectId, true).flatMapCompletable { openSessions ->
+    private fun closeLastSessionsIfPending(): Completable =
+        sessionEventsLocalDbManager.loadSessions(openSession = true).flatMapCompletable { openSessions ->
             openSessions.forEach {
                 it.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.NEW_SESSION)
                 it.closeIfRequired(timeHelper)
@@ -204,6 +205,12 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                 remoteResult
             ))
         })
+    }
+
+    override fun addLocationToSession(latitude: Double, longitude: Double) {
+        this.updateSessionInBackground({ sessionEvents ->
+            sessionEvents.location = Location(latitude, longitude)
+        }, loginInfoManager.getSignedInProjectIdOrEmpty())
     }
 
     // It extracts CaptureEvents Ids with the templates used to create the "Person" object for

@@ -236,16 +236,7 @@ public class PositionTracker implements
         if (location != null) {
 
             preferencesManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(location));
-            sessionEventsManager.updateSessionInBackground(new Function1<SessionEvents, Unit>() {
-                                                               @Override
-                                                               public Unit invoke(SessionEvents sessionEvents) {
-                                                                   sessionEvents.setLocation(
-                                                                       new com.simprints.id.data.analytics.eventData.models.session.Location(
-                                                                           location.getLatitude(),
-                                                                           location.getLongitude())
-                                                                   );
-                                                                   return null;
-                                                               }},  preferencesManager.getProjectId());
+            sessionEventsManager.addLocationToSession(location.getLatitude(), location.getLongitude());
 
             Log.INSTANCE.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
                     location.getLatitude(), location.getLongitude()));

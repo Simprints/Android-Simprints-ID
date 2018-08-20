@@ -31,6 +31,7 @@ interface SessionEventsManager {
     fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<Identification>, matchSize: Int)
     fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo)
     fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
+    fun addLocationToSession(latitude: Double, longitude: Double)
 
     fun addEventForCandidateReadInBackground(guid: String, startCandidateSearchTime: Long, localResult: CandidateReadEvent.LocalResult, remoteResult: CandidateReadEvent.RemoteResult)
 }
