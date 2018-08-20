@@ -25,7 +25,7 @@ class LongConsentManagerImpl(context: Context,
             File.separator +
             FILE_PATH +
             File.separator +
-            loginInfoManager.signedInProjectId)
+            loginInfoManager.getSignedInProjectIdOrEmpty())
 
         if (!filePath.exists())
             filePath.mkdirs()
@@ -44,7 +44,7 @@ class LongConsentManagerImpl(context: Context,
         firebaseStorage.maxDownloadRetryTimeMillis = 1
 
         firebaseStorage.getReference(FILE_PATH)
-            .child(loginInfoManager.signedInProjectId)
+            .child(loginInfoManager.getSignedInProjectIdOrEmpty())
             .child("$language.$FILE_TYPE")
             .getFile(file)
             .addOnSuccessListener {
