@@ -5,8 +5,8 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager

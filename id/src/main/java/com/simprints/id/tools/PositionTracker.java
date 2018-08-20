@@ -25,8 +25,8 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.simprints.id.Application;
-import com.simprints.id.data.analytics.events.SessionEventsManager;
-import com.simprints.id.data.analytics.events.models.SessionEvents;
+import com.simprints.id.data.analytics.eventData.SessionEventsManager;
+import com.simprints.id.data.analytics.eventData.models.session.SessionEvents;
 import com.simprints.id.data.prefs.PreferencesManager;
 
 import java.util.Locale;
@@ -240,7 +240,7 @@ public class PositionTracker implements
                                                                @Override
                                                                public Unit invoke(SessionEvents sessionEvents) {
                                                                    sessionEvents.setLocation(
-                                                                       new com.simprints.id.data.analytics.events.models.Location(
+                                                                       new com.simprints.id.data.analytics.eventData.models.session.Location(
                                                                            location.getLatitude(),
                                                                            location.getLongitude())
                                                                    );

@@ -8,7 +8,7 @@ import android.support.v4.content.res.ResourcesCompat
 import android.view.View
 import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.IntentKeys
-import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.domain.ALERT_TYPE

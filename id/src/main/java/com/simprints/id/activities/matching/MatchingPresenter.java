@@ -8,8 +8,8 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.data.analytics.AnalyticsManager;
-import com.simprints.id.data.analytics.events.SessionEventsManager;
-import com.simprints.id.data.analytics.events.models.SessionEvents;
+import com.simprints.id.data.analytics.eventData.SessionEventsManager;
+import com.simprints.id.data.analytics.eventData.models.session.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.DbManager;

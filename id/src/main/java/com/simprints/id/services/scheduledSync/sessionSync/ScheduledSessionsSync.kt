@@ -2,7 +2,7 @@ package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.work.Worker
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.rxkotlin.subscribeBy

@@ -10,8 +10,8 @@ import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.events.models.ConnectivitySnapshotEvent
-import com.simprints.id.data.analytics.events.models.SessionEvents
+import com.simprints.id.data.analytics.eventData.models.events.ConnectivitySnapshotEvent
+import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
@@ -22,7 +22,6 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.utils.SimNetworkUtils
-import org.jetbrains.anko.ctx
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
