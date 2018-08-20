@@ -27,10 +27,14 @@
 
     <Button
         android:id="@+id/consentDeclineButton"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="96dp"
         android:layout_height="wrap_content"
-        android:background="@color/simprints_white"
+        android:background="@drawable/button_rounded_corners"
+        android:fontFamily="@font/muli_extralight"
         android:text="@string/launch_consent_decline_button"
+        android:textColor="@color/simprints_white"
+        android:textStyle="bold"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/privacyNoticeText"
         app:layout_constraintEnd_toStartOf="@+id/consentAcceptButton"
@@ -41,11 +45,15 @@
 
     <Button
         android:id="@+id/consentAcceptButton"
+        style="?android:attr/borderlessButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:background="@color/simprints_white"
+        android:background="@drawable/button_rounded_corners"
+        android:fontFamily="@font/muli_extralight"
         android:text="@string/launch_consent_accept_button"
+        android:textColor="@color/simprints_white"
+        android:textStyle="bold"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/consentDeclineButton"
         app:layout_constraintDimensionRatio="w,4:2"
