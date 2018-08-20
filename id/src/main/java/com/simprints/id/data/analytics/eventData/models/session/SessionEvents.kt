@@ -35,8 +35,8 @@ open class SessionEvents {
     var analyticsId: String? = null
 
     // Function and not kotlin properties to avoid them to get serialised/deserialised
-    fun isClose(): Boolean = relativeEndTime > 0
-    fun isOpen(): Boolean = !isClose()
+    fun isClosed(): Boolean = relativeEndTime > 0
+    fun isOpen(): Boolean = !isClosed()
 
     constructor(rlSessionEvents: RlSessionEvents) : this(
         id = rlSessionEvents.id,
@@ -72,19 +72,19 @@ open class SessionEvents {
     }
 
     fun addArtificialTerminationIfRequired(timeHelper: TimeHelper, reason: ArtificialTerminationEvent.Reason) {
-        if (relativeEndTime == 0L) {
+        if (isOpen()) {
             events.add(ArtificialTerminationEvent(nowRelativeToStartTime(timeHelper), reason))
         }
     }
 
     fun closeIfRequired(timeHelper: TimeHelper) {
-        if (!isClose()) {
+        if (!isClosed()) {
             relativeEndTime = nowRelativeToStartTime(timeHelper)
         }
     }
 
     fun timeRelativeToStartTime(time: Long): Long = time - startTime
-    fun nowRelativeToStartTime(timeHelper: TimeHelper): Long = timeRelativeToStartTime(timeHelper.msSinceBoot())
+    fun nowRelativeToStartTime(timeHelper: TimeHelper): Long = timeRelativeToStartTime(timeHelper.now())
 
     fun isPossiblyInProgress(timeHelper: TimeHelper): Boolean =
         timeHelper.msBetweenNowAndTime(startTime) < GRACE_PERIOD

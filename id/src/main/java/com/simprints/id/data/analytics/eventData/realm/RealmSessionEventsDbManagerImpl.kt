@@ -7,12 +7,14 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.EncryptionMigration
 import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
+import io.realm.Sort
 
 class RealmSessionEventsDbManagerImpl(private val appContext: Context,
                                       private val secureDataManager: SecureDataManager) : SessionEventsLocalDbManager {
@@ -21,10 +23,16 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         const val PROJECT_ID = "projectId"
         const val END_TIME = "relativeEndTime"
         const val START_TIME = "startTime"
+        const val SESSION_ID = "id"
     }
 
     private var realmConfig: RealmConfiguration? = null
     private var localDbKey: LocalDbKey? = null
+
+    private fun getRealmInstance(): Single<Realm> = initDbIfRequired().andThen(getRealmConfig()
+        .flatMap {
+            Single.just(Realm.getInstance(it))
+        })
 
     private fun initDbIfRequired(): Completable {
         try {
@@ -50,14 +58,23 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         }
 
     override fun loadSessions(projectId: String?, openSession: Boolean?): Single<ArrayList<SessionEvents>> =
-        getRealmInstance().map {
-            val query = it.where(RlSessionEvents::class.java).apply {
+        getRealmInstance().map { realm ->
+            val query = realm.where(RlSessionEvents::class.java).apply {
                 addQueryParamForProjectId(projectId, this)
                 addQueryParamForOpenSession(openSession, this)
 
-                this.sort(RealmSessionEventsDbManagerImpl.START_TIME, io.realm.Sort.DESCENDING)
+                this.sort(RealmSessionEventsDbManagerImpl.START_TIME, Sort.DESCENDING)
             }
-            ArrayList(it.copyFromRealm(query.findAll(), 4).map { SessionEvents(it) })
+            ArrayList(realm.copyFromRealm(query.findAll()).map { SessionEvents(it) })
+        }
+
+    /** @throws SessionNotFoundException */
+    override fun loadSessionById(sessionId: String): Single<SessionEvents> =
+        getRealmInstance().map { realm ->
+            val query = realm.where(RlSessionEvents::class.java).apply {
+                equalTo(RealmSessionEventsDbManagerImpl.SESSION_ID, sessionId)
+            }
+            SessionEvents(query.findFirst()?: throw SessionNotFoundException())
         }
 
     override fun deleteSessions(projectId: String?, openSession: Boolean?): Completable =
@@ -88,11 +105,6 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     private fun getRealmConfig(): Single<RealmConfiguration> = realmConfig?.let {
         Single.just(it)
     } ?: throw RealmUninitialisedError("No valid realm Config")
-
-    private fun getRealmInstance(): Single<Realm> = initDbIfRequired().andThen(getRealmConfig()
-        .flatMap {
-            Single.just(Realm.getInstance(it))
-        })
 
     private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<RlSessionEvents>) {
         projectId?.let {

@@ -234,7 +234,7 @@ public class Setup {
         }
 
         onProgress(70, R.string.launch_checking_person_in_db);
-        startCandidateSearchTime = timeHelper.msSinceBoot();
+        startCandidateSearchTime = timeHelper.now();
 
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = preferencesManager.getPatientId();

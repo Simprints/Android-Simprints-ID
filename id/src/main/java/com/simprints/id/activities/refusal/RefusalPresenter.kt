@@ -28,7 +28,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     init {
         component.inject(this)
-        refusalStartTime = timeHelper.msSinceBoot()
+        refusalStartTime = timeHelper.now()
     }
 
     override fun start() {

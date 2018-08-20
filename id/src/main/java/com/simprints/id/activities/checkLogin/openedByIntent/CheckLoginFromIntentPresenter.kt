@@ -17,6 +17,7 @@ import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.session.callout.Callout
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
@@ -124,12 +125,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             Singles.zip(
                 createSessionEvents(projectId),
                 fetchAnalyticsId(),
-                fetchPeopleCountInLocalDatabase()) { session: SessionEvents, gaId: String, count: Int ->
+                fetchPeopleCountInLocalDatabase()) { _: SessionEvents, gaId: String, dbCount: Int ->
+                return@zip Pair(gaId, dbCount)
 
-                return@zip populateSessionWithAnalyticsIdAndDbInfo(session, gaId, count)
-            }.flatMapCompletable {
-                sessionEventsManager.insertOrUpdateSession(it)
-            }.subscribeBy(onComplete = { }, onError = { it.printStackTrace() })
+            }.flatMapCompletable { gaIdAndDbCount ->
+                populateSessionWithAnalyticsIdAndDbInfo(gaIdAndDbCount.first, gaIdAndDbCount.second)
+            }.subscribeBy(onError = { it.printStackTrace() })
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -138,16 +140,16 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private fun createSessionEvents(projectId: String): Single<SessionEvents> = sessionEventsManager.createSession(projectId)
     private fun fetchAnalyticsId(): Single<String> = analyticsManager.analyticsId.onErrorReturn { "" }
     private fun fetchPeopleCountInLocalDatabase(): Single<Int> = dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }
-    private fun populateSessionWithAnalyticsIdAndDbInfo(session: SessionEvents, gaId: String, dbCount: Int): SessionEvents =
-        session.apply {
-            analyticsId = gaId
-            databaseInfo = DatabaseInfo(dbCount)
-            events.apply {
-                add(CalloutEvent(session.nowRelativeToStartTime(timeHelper), view.parseCallout()))
-                add(view.buildConnectionEvent(session))
-                addAuthorizationEvent(session, AUTHORIZED)
+    private fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, dbCount: Int): Completable =
+        sessionEventsManager.updateSession({
+            it.analyticsId = gaId
+            it.databaseInfo = DatabaseInfo(dbCount)
+            it.events.apply {
+                add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), view.parseCallout()))
+                add(view.buildConnectionEvent(it))
+                addAuthorizationEvent(it, AUTHORIZED)
             }
-        }
+        })
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.events.add(AuthorizationEvent(

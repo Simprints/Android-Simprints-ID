@@ -23,11 +23,9 @@ interface SessionEventsManager {
     fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit,
                                   projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty())
 
-    fun insertOrUpdateSession(session: SessionEvents): Completable
-
     fun syncSessions(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty()): Completable
 
-    fun addGuidSelectionEventToLastIdentificationIfExists(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid: String): Completable
+    fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable
     fun addPersonCreationEventInBackground(person: Person)
     fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: Verification?)
     fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<Identification>, matchSize: Int)
