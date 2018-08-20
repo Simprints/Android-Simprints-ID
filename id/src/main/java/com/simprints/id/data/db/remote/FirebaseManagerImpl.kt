@@ -6,7 +6,7 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.events.SessionsRemoteInterface
+import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*

@@ -8,9 +8,9 @@ import android.support.annotation.Nullable;
 
 import com.simprints.id.R;
 import com.simprints.id.data.analytics.AnalyticsManager;
-import com.simprints.id.data.analytics.events.SessionEventsManager;
-import com.simprints.id.data.analytics.events.models.CandidateReadEvent;
-import com.simprints.id.data.analytics.events.models.ScannerConnectionEvent;
+import com.simprints.id.data.analytics.eventData.SessionEventsManager;
+import com.simprints.id.data.analytics.eventData.models.events.CandidateReadEvent;
+import com.simprints.id.data.analytics.eventData.models.events.ScannerConnectionEvent;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.DbManager;

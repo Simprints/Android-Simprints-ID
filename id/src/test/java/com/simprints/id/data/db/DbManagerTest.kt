@@ -3,7 +3,7 @@ package com.simprints.id.data.db
 import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
