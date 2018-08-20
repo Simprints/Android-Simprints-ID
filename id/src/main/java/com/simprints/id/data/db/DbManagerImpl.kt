@@ -87,7 +87,7 @@ class DbManagerImpl(override val local: LocalDbManager,
             .doOnComplete {
                 sessionEventsManager.updateSession({
                     it.events.add(EnrollmentEvent(
-                        timeHelper.msSinceBoot() - it.startTime,
+                        timeHelper.now() - it.startTime,
                         fbPerson.patientId
                     ))
                 }).andThen(uploadPersonAndDownloadAgain(fbPerson))

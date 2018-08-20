@@ -33,7 +33,7 @@ abstract class CheckLoginPresenter(
     }
 
     private fun initSession() {
-        preferencesManager.initializeSessionState(newSessionId(), timeHelper.msSinceBoot())
+        preferencesManager.initializeSessionState(newSessionId(), timeHelper.now())
     }
 
     private fun newSessionId(): String {

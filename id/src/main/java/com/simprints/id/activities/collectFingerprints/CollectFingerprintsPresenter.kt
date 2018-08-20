@@ -62,7 +62,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun start() {
-        preferencesManager.msSinceBootOnMainStart = timeHelper.msSinceBoot()
+        preferencesManager.msSinceBootOnMainStart = timeHelper.now()
         LanguageHelper.setLanguage(context, preferencesManager.language)
 
         initFingerDisplayHelper(view)
@@ -86,7 +86,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun initScanButtonListeners() {
         view.scanButton.setOnClickListener {
-            lastCaptureStartedAt = timeHelper.msSinceBoot()
+            lastCaptureStartedAt = timeHelper.now()
             scanningHelper.toggleContinuousCapture()
         }
         view.scanButton.setOnLongClickListener { resetFingerState() }

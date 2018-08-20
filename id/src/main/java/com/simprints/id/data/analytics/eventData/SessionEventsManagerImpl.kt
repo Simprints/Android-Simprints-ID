@@ -2,13 +2,16 @@ package com.simprints.id.data.analytics.eventData
 
 import android.content.Context
 import android.os.Build
+import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.models.events.*
 import com.simprints.id.data.analytics.eventData.models.session.Device
 import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
+import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.deviceId
@@ -19,6 +22,7 @@ import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
+import retrofit2.adapter.rxjava2.Result
 
 // Class to manage the current activeSession
 open class SessionEventsManagerImpl(private val ctx: Context,
@@ -26,7 +30,8 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                                     override val loginInfoManager: LoginInfoManager,
                                     private val preferencesManager: PreferencesManager,
                                     private val timeHelper: TimeHelper,
-                                    private val remoteDbManager: RemoteDbManager) : SessionEventsManager {
+                                    private val remoteDbManager: RemoteDbManager,
+                                    private val analyticsManager: AnalyticsManager) : SessionEventsManager {
 
     private var activeSession: SessionEvents? = null
 
@@ -43,29 +48,34 @@ open class SessionEventsManagerImpl(private val ctx: Context,
 
     override fun createSession(projectId: String): Single<SessionEvents> =
         if (projectId.isNotEmpty()) {
-            val sessionToSave = SessionEvents(
-                projectId = projectId,
-                appVersionName = preferencesManager.appVersionName,
-                libVersionName = preferencesManager.libVersionName,
-                startTime = timeHelper.msSinceBoot(),
-                language = preferencesManager.language,
-                device = Device(
-                    androidSdkVersion = Build.VERSION.SDK_INT.toString(),
-                    deviceModel = Build.MANUFACTURER + "_" + Build.MODEL,
-                    deviceId = ctx.deviceId)
-            ).also { activeSession = it }
-
-            closeLastSessionsIfPending(projectId)
-                .andThen(insertOrUpdateSession(sessionToSave))
-                .toSingle { sessionToSave }
+            createSessionWithAvailableInfo(projectId).let {
+                activeSession = it
+                closeLastSessionsIfPending(projectId)
+                    .andThen(insertOrUpdateSession(it))
+                    .toSingle { it }
+            }
         } else {
-            Single.error<SessionEvents>(Throwable("project ID empty"))
+            Single.error<SessionEvents>(SimprintsError("Project ID Empty when creating session"))
         }
+
+    private fun createSessionWithAvailableInfo(projectId: String): SessionEvents =
+        SessionEvents(
+            projectId = projectId,
+            appVersionName = preferencesManager.appVersionName,
+            libVersionName = preferencesManager.libVersionName,
+            startTime = timeHelper.now(),
+            language = preferencesManager.language,
+            device = Device(
+                androidSdkVersion = Build.VERSION.SDK_INT.toString(),
+                deviceModel = Build.MANUFACTURER + "_" + Build.MODEL,
+                deviceId = ctx.deviceId))
 
     override fun updateSession(block: (sessionEvents: SessionEvents) -> Unit, projectId: String): Completable =
         getCurrentSession(projectId).flatMapCompletable {
             block(it)
             insertOrUpdateSession(it)
+        }.doOnError {
+            analyticsManager.logThrowable(it)
         }.onErrorComplete() // because events are low priority, it swallows the exception
 
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit, projectId: String) {
@@ -73,8 +83,8 @@ open class SessionEventsManagerImpl(private val ctx: Context,
     }
 
     private fun closeLastSessionsIfPending(projectId: String): Completable =
-        sessionEventsLocalDbManager.loadSessions(projectId, true).flatMapCompletable {
-            it.forEach {
+        sessionEventsLocalDbManager.loadSessions(projectId, true).flatMapCompletable { openSessions ->
+            openSessions.forEach {
                 it.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.NEW_SESSION)
                 it.closeIfRequired(timeHelper)
                 insertOrUpdateSession(it).blockingAwait()
@@ -82,50 +92,51 @@ open class SessionEventsManagerImpl(private val ctx: Context,
             Completable.complete()
         }
 
-    override fun insertOrUpdateSession(session: SessionEvents): Completable = sessionEventsLocalDbManager.insertOrUpdateSessionEvents(session)
+    private fun insertOrUpdateSession(session: SessionEvents): Completable = sessionEventsLocalDbManager.insertOrUpdateSessionEvents(session)
 
-    override fun addGuidSelectionEventToLastIdentificationIfExists(projectId: String, selectedGuid: String): Completable =
-        sessionEventsLocalDbManager.loadSessions(projectId, false).flatMapCompletable { sessions ->
-            sessions.firstOrNull()?.let { lastSessionClosed ->
-                lastSessionClosed.events
-                    .filterIsInstance(CalloutEvent::class.java)
-                    .filter { it.parameters.action == CalloutAction.IDENTIFY }
-                    .take(1)
-                    .also {
-                        lastSessionClosed.events.add(GuidSelectionEvent(
-                            lastSessionClosed.nowRelativeToStartTime(timeHelper),
-                            selectedGuid
-                        ))
-                        return@flatMapCompletable insertOrUpdateSession(lastSessionClosed)
-                    }
-
-                return@flatMapCompletable Completable.error(Throwable("No sessions closed"))
-            }
+    /** @throws SessionNotFoundException */
+    override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
+        sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable {
+            it.events.add(GuidSelectionEvent(
+                it.nowRelativeToStartTime(timeHelper),
+                selectedGuid
+            ))
+            insertOrUpdateSession(it)
         }
 
-    override fun syncSessions(projectId: String): Completable {
-        return sessionEventsLocalDbManager.loadSessions(projectId).flatMap { sessions ->
-            if(sessions.size > 0 ) {
-                sessions.forEach {
-                    forceSessionToCloseIfOpenAndNotInProgress(it, timeHelper)
-                    it.relativeUploadTime = it.nowRelativeToStartTime(timeHelper)
-                    sessionEventsLocalDbManager.insertOrUpdateSessionEvents(it).blockingAwait()
-                }
-
-                sessions.filter { it.isClose() }.toTypedArray().let {
-                    sessionsApi.uploadSessions(projectId, hashMapOf("sessions" to it))
-                }
+    /** @throws NoSessionsFoundException */
+    override fun syncSessions(projectId: String): Completable =
+        sessionEventsLocalDbManager.loadSessions(projectId).flatMap { sessions ->
+            if (sessions.size > 0) {
+                closeAnyOpenSessionsAndUpdateUploadTime(sessions)
+                uploadClosedSessions(sessions, projectId)
             } else {
-                throw Throwable("No sessions To upload")
+                throw NoSessionsFoundException()
             }
         }.flatMapCompletable {
-            if (!it.isError && it.response()?.code() == 200) {
+            if (uploadSessionSucceeded(it)) {
                 sessionEventsLocalDbManager.deleteSessions(projectId, false)
             } else {
                 Completable.complete()
             }
         }
+
+    private fun closeAnyOpenSessionsAndUpdateUploadTime(sessions: ArrayList<SessionEvents>) {
+        sessions.forEach {
+            forceSessionToCloseIfOpenAndNotInProgress(it, timeHelper)
+            it.relativeUploadTime = it.nowRelativeToStartTime(timeHelper)
+            sessionEventsLocalDbManager.insertOrUpdateSessionEvents(it).blockingAwait()
+        }
     }
+
+    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Unit>> {
+        return sessions.filter { it.isClosed() }.toTypedArray().let {
+            sessionsApi.uploadSessions(projectId, hashMapOf("sessions" to it))
+        }
+    }
+
+    private fun uploadSessionSucceeded(it: Result<Unit>) =
+        !it.isError && it.response()?.code() == 200
 
     private fun forceSessionToCloseIfOpenAndNotInProgress(it: SessionEvents, timeHelper: TimeHelper) {
         if (it.isOpen() && !it.isPossiblyInProgress(timeHelper)) {
@@ -135,20 +146,20 @@ open class SessionEventsManagerImpl(private val ctx: Context,
     }
 
     override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: Verification?) {
-        updateSessionInBackground({
-            it.events.add(OneToOneMatchEvent(
-                it.timeRelativeToStartTime(startTimeVerification),
-                it.nowRelativeToStartTime(timeHelper),
+        updateSessionInBackground({ session ->
+            session.events.add(OneToOneMatchEvent(
+                session.timeRelativeToStartTime(startTimeVerification),
+                session.nowRelativeToStartTime(timeHelper),
                 preferencesManager.patientId,
                 match?.let { MatchCandidate(it.guid, match.confidence) }))
         })
     }
 
     override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<Identification>, matchSize: Int) {
-        updateSessionInBackground({
-            it.events.add(OneToManyMatchEvent(
-                it.timeRelativeToStartTime(startTimeIdentification),
-                it.nowRelativeToStartTime(timeHelper),
+        updateSessionInBackground({ session ->
+            session.events.add(OneToManyMatchEvent(
+                session.timeRelativeToStartTime(startTimeIdentification),
+                session.nowRelativeToStartTime(timeHelper),
                 OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
                 matches.map { MatchCandidate(it.guid, it.confidence) }.toList().toTypedArray()))
         })
@@ -165,17 +176,17 @@ open class SessionEventsManagerImpl(private val ctx: Context,
     }
 
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
-        updateSessionInBackground({
-            val scannerConnectivityEvents = it.events.filterIsInstance(ScannerConnectionEvent::class.java)
+        updateSessionInBackground({ session ->
+            val scannerConnectivityEvents = session.events.filterIsInstance(ScannerConnectionEvent::class.java)
             scannerConnectivityEvents.forEach { it.scannerInfo.hardwareVersion = hardwareVersion }
         })
     }
 
     override fun addPersonCreationEventInBackground(person: Person) {
-        updateSessionInBackground({
-            it.events.add(PersonCreationEvent(
-                it.nowRelativeToStartTime(timeHelper),
-                extractCaptureEventIdsBasedOnPersonTemplate(it, person.fingerprints.map { Utils.byteArrayToBase64(it.templateBytes) })
+        updateSessionInBackground({ session ->
+            session.events.add(PersonCreationEvent(
+                session.nowRelativeToStartTime(timeHelper),
+                extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { Utils.byteArrayToBase64(it.templateBytes) })
             ))
         })
     }

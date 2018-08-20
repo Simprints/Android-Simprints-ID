@@ -151,7 +151,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
         sessions[1].also {
             assertEquals(it.id, oldSession.id)
-            assertTrue(it.isClose())
+            assertTrue(it.isClosed())
             val finalEvent = it.events.find { it is ArtificialTerminationEvent } as ArtificialTerminationEvent?
             assertEquals(finalEvent?.reason, ArtificialTerminationEvent.Reason.NEW_SESSION)
         }
@@ -311,7 +311,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     private fun createAndSaveFakeCloseSession(projectId: String = testProjectId, id: String = "close_session"): String =
         timeHelper.let {
             createFakeSession(it, projectId, id).apply {
-                startTime = it.msSinceBoot() - 1000
+                startTime = it.now() - 1000
                 relativeEndTime = nowRelativeToStartTime(it) - 10
             }.also { saveSessionInDb(it) }.id
         }
@@ -319,7 +319,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     private fun createAndSaveFakeOpenSession(projectId: String = testProjectId, id: String = "open_session") =
         timeHelper.let {
             createFakeSession(it, projectId, id).apply {
-                startTime = it.msSinceBoot() - 1000
+                startTime = it.now() - 1000
                 relativeEndTime = 0
             }.also { saveSessionInDb(it) }.id
         }
@@ -327,7 +327,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     private fun createAndSaveFakeExpiredOpenSession(projectId: String = testProjectId, id: String = "open_expired_session") =
         timeHelper.let {
             createFakeSession(it, projectId, id).apply {
-                startTime = it.msSinceBoot() - SessionEvents.GRACE_PERIOD - 1000
+                startTime = it.now() - SessionEvents.GRACE_PERIOD - 1000
                 relativeEndTime = 0
             }.also { saveSessionInDb(it) }.id
         }
@@ -344,7 +344,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             libVersionName = "some_version",
             language = "en",
             device = Device(),
-            startTime = timeHelper?.msSinceBoot() ?: 0)
+            startTime = timeHelper?.now() ?: 0)
 
     private fun signOut() {
         remoteDbManager.signOutOfRemoteDb()

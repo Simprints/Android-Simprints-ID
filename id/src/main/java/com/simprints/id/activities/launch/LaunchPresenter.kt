@@ -71,7 +71,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     init {
         (activity.application as Application).component.inject(this)
-        startConsentEventTime = timeHelper.msSinceBoot()
+        startConsentEventTime = timeHelper.now()
     }
 
     override fun start() {
@@ -131,7 +131,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun handleSetupFinished() {
-        preferencesManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
+        preferencesManager.msSinceBootOnLoadEnd = timeHelper.now()
         // If it is the first time the launch process finishes, wait for consent confirmation
         // Else, go directly to the collectFingerprintsActivity
         if (!consentConfirmed) {
@@ -247,7 +247,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
-        preferencesManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
+        preferencesManager.msSinceBootOnSessionEnd = timeHelper.now()
         dataManager.saveSession()
         view.setResultAndFinish(resultCode, resultData)
     }

@@ -62,7 +62,7 @@ class LoginPresenter(val view: LoginContract.View,
 
     private fun doAuthenticate(suppliedProjectId: String, suppliedUserId: String, suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
         loginInfoManager.cleanCredentials()
-        startTimeLogin = timeHelper.msSinceBoot()
+        startTimeLogin = timeHelper.now()
         projectAuthenticator.authenticate(
             NonceScope(suppliedProjectId, suppliedUserId),
             suppliedProjectSecret,
@@ -90,7 +90,7 @@ class LoginPresenter(val view: LoginContract.View,
         sessionEventsManager.updateSessionInBackground({
             it.events.add(AuthenticationEvent(
                 it.timeRelativeToStartTime(startTimeLogin),
-                it.timeRelativeToStartTime(timeHelper.msSinceBoot()),
+                it.timeRelativeToStartTime(timeHelper.now()),
                 LoginInfo(preferencesManager.projectId, preferencesManager.userId),
                 result))
         })

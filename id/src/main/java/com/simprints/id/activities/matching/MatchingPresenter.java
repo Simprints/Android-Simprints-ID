@@ -85,11 +85,11 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
     @Override
     public void start() {
-        preferencesManager.setMsSinceBootOnMatchStart(timeHelper.msSinceBoot());
+        preferencesManager.setMsSinceBootOnMatchStart(timeHelper.now());
         // TODO : Use polymorphism
         switch (preferencesManager.getCalloutAction()) {
             case IDENTIFY:
-                startTimeIdentification = timeHelper.msSinceBoot();
+                startTimeIdentification = timeHelper.now();
 
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
@@ -106,7 +106,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 matchingView.setIdentificationProgressLoadingStart();
                 break;
             case VERIFY:
-                startTimeVerification = timeHelper.msSinceBoot();
+                startTimeVerification = timeHelper.now();
 
                 matchingView.setVerificationProgress();
                 onVerifyStart();

@@ -44,10 +44,12 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         val callbackSent = try {
             checkCalloutParameters(projectId, apiKey, sessionId, selectedGuid)
             dbManager.updateIdentification(loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId ?: "")
-
-            sessionEventsManager
-                .addGuidSelectionEventToLastIdentificationIfExists(selectedGuid = selectedGuid)
-                .subscribeBy(onError = { it.printStackTrace() })
+            // STOPSHIP : write tests
+            sessionId?.let {
+                sessionEventsManager
+                    .addGuidSelectionEventToLastIdentificationIfExists(selectedGuid, sessionId)
+                    .subscribeBy(onError = { e -> analyticsManager.logThrowable(e) })
+            }
             true
         } catch (error: InvalidCalloutParameterError) {
             analyticsManager.logError(error)

@@ -2,6 +2,6 @@ package com.simprints.id.tools
 
 interface TimeHelper {
 
-    fun msSinceBoot(): Long
+    fun now(): Long
     fun msBetweenNowAndTime(time: Long): Long
 }
