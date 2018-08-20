@@ -96,9 +96,10 @@ open class AppModuleForAnyTests(app: Application,
                                              sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                              preferencesManager: PreferencesManager,
                                              timeHelper: TimeHelper,
-                                             remoteDbManager: RemoteDbManager): SessionEventsManager =
+                                             remoteDbManager: RemoteDbManager,
+                                             analyticsManager: AnalyticsManager): SessionEventsManager =
 
-        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, loginInfoManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, remoteDbManager) }
+        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, loginInfoManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, remoteDbManager, analyticsManager) }
 
     override fun provideLocalEventDbManager(ctx: Context,
                                             secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
