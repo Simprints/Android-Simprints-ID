@@ -93,7 +93,10 @@ open class SessionEventsManagerImpl(private val ctx: Context,
             Completable.complete()
         }
 
-    private fun insertOrUpdateSession(session: SessionEvents): Completable = sessionEventsLocalDbManager.insertOrUpdateSessionEvents(session)
+    private fun insertOrUpdateSession(session: SessionEvents): Completable =
+        sessionEventsLocalDbManager.insertOrUpdateSessionEvents(session).doOnComplete {
+            this.activeSession = session
+        }
 
     /** @throws SessionNotFoundException */
     override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
@@ -166,7 +169,6 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         })
     }
 
-
     override fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo) {
         updateSessionInBackground({
             it.events.add(ScannerConnectionEvent(
@@ -220,5 +222,4 @@ open class SessionEventsManagerImpl(private val ctx: Context,
             .filterIsInstance(FingerprintCaptureEvent::class.java)
             .filter { it.fingerprint?.template in personTemplates }
             .map { it.id }
-
 }

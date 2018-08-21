@@ -38,7 +38,6 @@ open class AppModuleForAnyTests(app: Application,
                                 open var sessionEventsManagerRule: DependencyRule = RealRule,
                                 open var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
                                 open var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
-                                open var settingsPreferencesManagerRule: DependencyRule = RealRule,
                                 open var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
                                 open var simNetworkUtilsRule: DependencyRule = RealRule) : AppModule(app) {
 
@@ -107,5 +106,4 @@ open class AppModuleForAnyTests(app: Application,
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
-
 }

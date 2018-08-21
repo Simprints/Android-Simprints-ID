@@ -17,12 +17,10 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
-import com.simprints.id.shared.DependencyRule
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.mock
-import com.simprints.id.shared.whenever
+import com.simprints.id.shared.*
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.tools.TimeHelper
@@ -30,6 +28,7 @@ import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.utils.PeopleGeneratorUtils
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
+import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
@@ -65,9 +64,14 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
     @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
+    @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var timeHelper: TimeHelper
+
+    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
+        PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
+    }
 
     override var module by lazyVar {
         AppModuleForAndroidTests(
@@ -93,11 +97,9 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         realmSessionEventsManager.deleteSessions().blockingAwait()
         signOut()
 
-        mockValidCaptures()
-    }
-
-    private fun mockValidCaptures() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+        whenever(settingsPreferencesManagerSpy.fingerStatus).thenReturn(hashMapOf(
+            FingerIdentifier.LEFT_THUMB to true,
+            FingerIdentifier.LEFT_INDEX_FINGER to true))
     }
 
     @After
@@ -159,8 +161,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
     @Test
     fun userRefusesConsent_sessionShouldNotHaveTheLocation() {
-
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf()))
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
 
         launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
@@ -176,8 +177,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
     @Test
     fun userAcceptsConsent_sessionShouldHaveTheLocation() {
-
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf()))
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
 
         launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
@@ -205,6 +205,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
     @Test
     fun enrol_shouldGenerateTheRightEvents() {
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
 
         // Launch and sign in
         launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
@@ -226,6 +227,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     @Test
     fun verify_shouldGenerateTheRightEvents() {
         val guid = "123e4567-e89b-12d3-a456-426655440000"
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
 
         mockLocalToAddFakePersonAfterLogin(guid)
 
@@ -247,6 +249,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     @Test
     fun identify_shouldGenerateTheRightEvents() {
         val guid = "123e4567-e89b-12d3-a456-426655440000"
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+
         mockLocalToAddFakePersonAfterLogin(guid)
 
         launchActivityIdentify(calloutCredentials, simprintsActionTestRule)
@@ -254,6 +258,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         pressSignIn()
 
         fullHappyWorkflow()
+
         matchingActivityIdentificationCheckFinished(simprintsActionTestRule)
 
         sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).test().also {
@@ -269,14 +274,14 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_GOOD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_INDEX_GOOD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_INDEX_BAD_SCAN)))
+            MockFinger.PERSON_1_VERSION_1_LEFT_INDEX_GOOD_SCAN)))
 
         launchActivityIdentify(calloutCredentials, simprintsActionTestRule)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
 
-        fullHappyWorkflow()
+        fullHappyWorkflow(3)
+
         matchingActivityIdentificationCheckFinished(simprintsActionTestRule)
 
         val personCreatedArg = argumentCaptor<Person>()
