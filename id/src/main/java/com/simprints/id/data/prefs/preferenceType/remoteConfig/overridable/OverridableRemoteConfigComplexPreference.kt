@@ -1,6 +1,6 @@
 package com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable
 
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
@@ -10,12 +10,11 @@ import com.simprints.id.tools.serializers.Serializer
 import kotlin.reflect.KProperty
 
 class OverridableRemoteConfigComplexPreference<T : Any>(prefs: ImprovedSharedPreferences,
-                                                        remoteConfig: FirebaseRemoteConfig,
-                                                        remoteConfigDefaults: MutableMap<String, Any>,
+                                                        remoteConfigWrapper: RemoteConfigWrapper,
                                                         key: String,
                                                         defValue: T,
                                                         serializer: Serializer<T>)
-    : RemoteConfigComplexPreference<T>(prefs, remoteConfig, remoteConfigDefaults, key, defValue, serializer),
+    : RemoteConfigComplexPreference<T>(prefs, remoteConfigWrapper, key, defValue, serializer),
     OverridableRemoteConfigPreference {
 
     override val isOverriddenFlagKey = key + IS_OVERRIDDEN_KEY_SUFFIX
