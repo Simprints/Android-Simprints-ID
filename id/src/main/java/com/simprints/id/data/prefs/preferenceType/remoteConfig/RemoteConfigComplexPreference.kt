@@ -20,11 +20,15 @@ open class RemoteConfigComplexPreference<T : Any>(prefs: ImprovedSharedPreferenc
     }
 
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        serializedValue = remoteConfig.getString(key)
-        return getBackingPreferenceValue(thisRef, property)
+        setSerializedPrefValueToRemoteConfigValue()
+        return getAndDeserializePrefValue(thisRef, property)
     }
 
-    protected fun getBackingPreferenceValue(thisRef: Any?, property: KProperty<*>): T =
+    private fun setSerializedPrefValueToRemoteConfigValue() {
+        serializedValue = remoteConfig.getString(key)
+    }
+
+    protected fun getAndDeserializePrefValue(thisRef: Any?, property: KProperty<*>): T =
         try {
             super.getValue(thisRef, property)
         } catch (e: InvalidParameterException) {
