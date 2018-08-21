@@ -13,7 +13,6 @@ interface DashboardContract {
         fun launchAlertView(error: ALERT_TYPE)
         fun notifyCardViewChanged(position: Int)
         fun getStringWithParams(stringRes: Int, currentValue: Int = 0, maxValue: Int = 0): String
-        fun setNotification(language: String)
         fun updateNotification(language: String, progress: Int)
         fun cancelNotification(language: String)
         fun completeNotification(language: String)

@@ -3,6 +3,7 @@ package com.simprints.id.tools.extensions
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.provider.Settings
 
 // TODO: consider switching to an instance ID for privacy reasons (read https://developer.android.com/training/articles/user-data-ids.html)
@@ -16,3 +17,6 @@ val Context.packageVersionName: String
     } catch (e: PackageManager.NameNotFoundException) {
         "Version Name Not Found"
     }
+
+fun Context.isXLargeTablet(): Boolean =
+    resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_XLARGE
