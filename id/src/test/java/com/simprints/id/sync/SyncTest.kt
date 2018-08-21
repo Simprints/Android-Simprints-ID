@@ -34,8 +34,8 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper
-import com.simprints.id.tools.utils.PeopleGeneratorUtils
-import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople
+import com.simprints.id.shared.PeopleGeneratorUtils
+import com.simprints.id.shared.PeopleGeneratorUtils.getRandomPeople
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single

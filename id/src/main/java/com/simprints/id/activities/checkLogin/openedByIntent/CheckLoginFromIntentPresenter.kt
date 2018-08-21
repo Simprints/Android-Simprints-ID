@@ -7,6 +7,7 @@ import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEven
 import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEvent.Result.AUTHORIZED
 import com.simprints.id.data.analytics.eventData.models.events.CallbackEvent
 import com.simprints.id.data.analytics.eventData.models.events.CalloutEvent
+import com.simprints.id.data.analytics.eventData.models.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.analytics.eventData.models.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.data.db.local.LocalDbManager
@@ -17,6 +18,7 @@ import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.session.callout.Callout
+import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -29,17 +31,15 @@ import javax.inject.Inject
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     component: AppComponent) : CheckLoginPresenter(view, component), CheckLoginFromIntentContract.Presenter {
 
-    @Inject
-    lateinit var remoteConfigFetcher: RemoteConfigFetcher
+    @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var possibleLegacyApiKey: String = ""
     private var setupFailed: Boolean = false
 
-    @Inject
-    lateinit var sessionEventsManager: SessionEventsManager
-    @Inject
-    lateinit var dbManager: LocalDbManager
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var dbManager: LocalDbManager
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
 
     init {
         component.inject(this)
@@ -146,7 +146,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             it.databaseInfo = DatabaseInfo(dbCount)
             it.events.apply {
                 add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), view.parseCallout()))
-                add(view.buildConnectionEvent(it))
+                add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
                 addAuthorizationEvent(it, AUTHORIZED)
             }
         })

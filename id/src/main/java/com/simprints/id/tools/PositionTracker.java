@@ -26,15 +26,11 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.simprints.id.Application;
 import com.simprints.id.data.analytics.eventData.SessionEventsManager;
-import com.simprints.id.data.analytics.eventData.models.session.SessionEvents;
 import com.simprints.id.data.prefs.PreferencesManager;
 
 import java.util.Locale;
 
 import javax.inject.Inject;
-
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
 
 @SuppressWarnings("UnusedParameters")
 public class PositionTracker implements

@@ -25,10 +25,8 @@ import com.simprints.id.testUtils.retrofit.mockServer.mockServerProblemResponse
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.setupLocalAndRemoteManagersForApiTesting
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.tools.utils.PeopleGeneratorUtils
+import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.libcommon.Person
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After

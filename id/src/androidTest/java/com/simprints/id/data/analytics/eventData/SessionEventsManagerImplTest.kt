@@ -25,7 +25,7 @@ import com.simprints.id.testSnippets.*
 import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.tools.utils.PeopleGeneratorUtils
+import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
 import com.simprints.libsimprints.FingerIdentifier
