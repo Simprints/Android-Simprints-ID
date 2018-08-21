@@ -15,4 +15,7 @@
     <color name="simprints_separator">#FFC0C0C0</color>
     <color name="simprints_main_bg">#FFEEEEEE</color>
     <color name="simprints_alert_orange">#ffcc00</color>
+
+    <color name="simprints_scan_button_gray">#FF888888</color>
+
 </resources>
