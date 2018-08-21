@@ -5,18 +5,21 @@ import android.content.SharedPreferences
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.prefs.sync.SyncPreferencesManager
+import com.simprints.id.data.prefs.sync.people.SyncPeoplePreferencesManager
+import com.simprints.id.data.prefs.sync.sessions.SyncSessionsPreferencesManager
 
 class PreferencesManagerImpl(sessionState: SessionStatePreferencesManager,
                              settings: SettingsPreferencesManager,
                              lastEvents: RecentEventsPreferencesManager,
-                             sync: SyncPreferencesManager,
+                             syncPeoplePreferencesManager: SyncPeoplePreferencesManager,
+                             syncSessionsPreferencesManager: SyncSessionsPreferencesManager,
                              context: Context)
     : PreferencesManager,
     SessionStatePreferencesManager by sessionState,
     SettingsPreferencesManager by settings,
     RecentEventsPreferencesManager by lastEvents,
-    SyncPreferencesManager by sync {
+    SyncPeoplePreferencesManager by syncPeoplePreferencesManager,
+    SyncSessionsPreferencesManager by syncSessionsPreferencesManager {
 
     companion object {
         const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"

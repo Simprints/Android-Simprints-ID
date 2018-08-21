@@ -4,11 +4,13 @@ import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncCategory
@@ -19,6 +21,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -31,6 +34,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncManager: SyncManager
+    @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
+    @Inject lateinit var longConsentManager: LongConsentManager
 
     private var started: AtomicBoolean = AtomicBoolean(false)
 
@@ -52,12 +57,14 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun start() {
-
+        remoteConfigFetcher.forceDoFetchInBackgroundAndActivate() // STOPSHIP flick back to scheduled mode
         if (!started.getAndSet(true) || hasSyncGroupChangedSinceLastRun()) {
             initCards()
         } else {
             SyncService.catchUpWithSyncServiceIfStillRunning(syncManager, preferencesManager, loginInfoManager)
         }
+
+        downloadAllLongConsents()
     }
 
     private fun hasSyncGroupChangedSinceLastRun(): Boolean {
@@ -164,5 +171,27 @@ class DashboardPresenter(private val view: DashboardContract.View,
     override fun logout() {
         loginInfoManager.cleanCredentials()
         dbManager.signOut()
+    }
+
+    private fun downloadAllLongConsents() =
+        longConsentManager.languages.forEach { language ->
+            if (!longConsentManager.checkIfLongConsentExists(language))
+                longConsentManager.downloadLongConsent(language)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onNext = {
+                            if (it > 1) {
+                                view.updateNotification(language, it)
+                            }
+                        }, onError = {
+                            view.cancelNotification(language)
+                        }, onComplete = {
+                            view.completeNotification(language)
+                        })
+        }
+
+    override fun userDidWantToLogout() {
+        view.showConfirmationDialogForLogout()
     }
 }

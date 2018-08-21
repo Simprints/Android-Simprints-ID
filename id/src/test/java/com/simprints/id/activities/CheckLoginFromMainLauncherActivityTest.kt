@@ -40,9 +40,9 @@ class CheckLoginFromMainLauncherActivityTest : DaggerForTests() {
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            localDbManagerRule = MockRule(),
-            remoteDbManagerRule = MockRule(),
-            secureDataManagerRule = MockRule())
+            localDbManagerRule = MockRule,
+            remoteDbManagerRule = MockRule,
+            secureDataManagerRule = MockRule)
     }
 
     @Before

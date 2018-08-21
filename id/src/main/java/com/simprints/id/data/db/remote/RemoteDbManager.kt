@@ -1,14 +1,15 @@
 package com.simprints.id.data.db.remote
 
 import com.google.firebase.FirebaseApp
+import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
-import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
@@ -66,6 +67,7 @@ interface RemoteDbManager {
     fun loadProjectFromRemote(projectId: String): Single<Project>
 
     fun getPeopleApiClient(): Single<PeopleRemoteInterface>
+    fun getSessionsApiClient(): Single<SessionsRemoteInterface>
 
     fun getProjectApiClient(): Single<ProjectRemoteInterface>
 }

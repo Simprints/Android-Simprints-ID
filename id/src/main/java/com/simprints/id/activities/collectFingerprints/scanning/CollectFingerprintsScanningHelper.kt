@@ -7,6 +7,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -171,7 +172,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         when (currentFingerStatus) {
             GOOD_SCAN ->
                 askIfWantRescan()
-            RESCAN_GOOD_SCAN, BAD_SCAN, NOT_COLLECTED, NO_FINGER_DETECTED ->
+            RESCAN_GOOD_SCAN, BAD_SCAN, NOT_COLLECTED, NO_FINGER_DETECTED, FINGER_SKIPPED ->
                 startContinuousCapture()
             COLLECTING ->
                 stopContinuousCapture()
@@ -246,6 +247,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             presenter.showSplashAndAddNewFingerIfNecessary()
         }
         presenter.checkScannedFingersAndCreateMapToShowDialog()
+        presenter.addCaptureEventInSession(finger)
     }
 
     private fun parseTemplateAndAddToCurrentFinger(finger: Finger) =
@@ -281,5 +283,11 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     fun stopReconnecting() {
         setup.stop()
+    }
+
+    fun setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger() {
+        currentFingerStatus = Finger.Status.FINGER_SKIPPED
+        presenter.currentFinger().numberOfBadScans = CollectFingerprintsPresenter.numberOfBadScansRequiredToAutoAddNewFinger
+        presenter.refreshDisplay()
     }
 }

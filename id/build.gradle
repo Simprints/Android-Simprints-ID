@@ -21,15 +21,17 @@ kapt {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 27
     buildToolsVersion "27.0.3"
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 27
         multiDexEnabled true
         versionCode 99
         versionName "2018.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //testInstrumentationRunner "com.simprints.id.UiTestsRunner" //To use custom TestApplication
+
     }
 
     //Add those properties in ~/.gradle/gradle.properties
@@ -69,7 +71,7 @@ android {
             ext.enableCrashlytics = false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
-            manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: false]
+            manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
         }
 //        endToEndTesting {
 //            initWith debug
@@ -137,17 +139,19 @@ def assembleTaskForEndToEndTest() {
 }
 
 project.afterEvaluate {
-    if (gradle.startParameter.taskNames.findAll {it.contains(connectedTaskForEndToEndTest())}.size() > 0) {
+    if (gradle.startParameter.taskNames.findAll {
+        it.contains(connectedTaskForEndToEndTest())
+    }.size() > 0) {
         project.(connectedTaskForEndToEndTest()).doFirst {
             def originalProvider = deviceProvider
             deviceProvider = [
-                getName       : { originalProvider.getName() },
-                init          : { originalProvider.init() },
-                terminate     : { originalProvider.terminate() },
-                getDevices    : { filterDevices(originalProvider.getDevices()) },
-                getTimeoutInMs: { originalProvider.getTimeoutInMs() },
-                isConfigured  : { originalProvider.isConfigured() },
-                getMaxThreads : { originalProvider.getMaxThreads() }
+                    getName       : { originalProvider.getName() },
+                    init          : { originalProvider.init() },
+                    terminate     : { originalProvider.terminate() },
+                    getDevices    : { filterDevices(originalProvider.getDevices()) },
+                    getTimeoutInMs: { originalProvider.getTimeoutInMs() },
+                    isConfigured  : { originalProvider.isConfigured() },
+                    getMaxThreads : { originalProvider.getMaxThreads() }
             ] as DeviceProvider
         }
     }
@@ -183,6 +187,7 @@ repositories {
     maven { url "https://maven.google.com" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://maven.fabric.io/public" }
+    maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
 }
 
 android {
@@ -207,6 +212,7 @@ dependencies {
     implementation "com.google.dagger:dagger-android:$dagger_version"
     implementation "com.google.dagger:dagger-android-support:$dagger_version"
     implementation "com.google.dagger:dagger:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kaptAndroidTest "com.google.dagger:dagger-compiler:$dagger_version"
     kaptTest "com.google.dagger:dagger-compiler:$dagger_version"
@@ -234,16 +240,15 @@ dependencies {
     implementation "com.google.android.gms:play-services-safetynet:$google_version"
 
     // Databases
-    implementation "com.michaelpardo:activeandroid:$active_android_version"
-    implementation "com.google.firebase:firebase-database:$google_version"
-    implementation "com.google.firebase:firebase-firestore:$google_version"
+    implementation "com.google.firebase:firebase-database:16.0.1"
+    implementation "com.google.firebase:firebase-firestore:17.0.3"
 
     // Firebase
-    implementation "com.google.firebase:firebase-core:$google_version"
-    implementation "com.google.firebase:firebase-auth:$google_version"
-    implementation "com.google.firebase:firebase-config:$google_version"
-    implementation "com.google.firebase:firebase-perf:$google_version"
-    implementation "com.google.firebase:firebase-storage:$google_version"
+    implementation "com.google.firebase:firebase-core:16.0.1"
+    implementation "com.google.firebase:firebase-auth:16.0.2"
+    implementation "com.google.firebase:firebase-config:16.0.0"
+    implementation "com.google.firebase:firebase-perf:16.0.0"
+    implementation "com.google.firebase:firebase-storage:16.0.1"
 
     // Analytics
     implementation("com.crashlytics.sdk.android:crashlytics:$crashlytics_version@aar") {
@@ -286,30 +291,41 @@ dependencies {
     testImplementation 'org.robolectric:shadows-multidex:3.7.1'
     testImplementation 'com.android.support.test:monitor:1.0.2'
 
+    testImplementation "com.google.truth:truth:0.42"
+    androidTestImplementation("com.google.truth:truth:0.42"){
+        exclude group: "com.google.guava"
+        exclude group: "com.google.errorprone"
+    }
+
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"
     testImplementation 'com.squareup.okhttp3:mockwebserver:3.9.1'
 
     // 3.10 hangs around with roboeletric
     testImplementation 'com.nhaarman:mockito-kotlin:1.5.0'
+    androidTestImplementation 'com.nhaarman:mockito-kotlin:1.5.0'
 
     // Android test
     androidTestImplementation 'org.mockito:mockito-core:2.18.3'
     androidTestImplementation 'org.mockito:mockito-android:2.18.3'
 
-    androidTestImplementation('com.schibsted.spain:barista:1.7.0') {
+    androidTestImplementation('com.schibsted.spain:barista:2.5.0') {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"
+        exclude group: "org.jetbrains.kotlin"
+        exclude group: "com.google.guava"
     }
     androidTestImplementation 'com.simprints:cerberus-library:2018.1.1-dev-1'
     androidTestImplementation 'com.simprints:remote-admin-client:2017.4.0-dev-5'
-    androidTestImplementation "com.simprints:mockscanner:2018.2.2"
+    androidTestImplementation "com.simprints:mockscanner:2018.3.0-dev0"
+    testImplementation "com.simprints:mockscanner:2018.3.0-dev0"
     androidTestImplementation 'joda-time:joda-time:2.9.9'
 
     //UI
     implementation 'com.github.michael-rapp:android-material-dialog:4.3.3'
     implementation "com.android.support:cardview-v7:$support_version"
-
+    implementation "com.android.support:preference-v7:$support_version"
+    implementation "com.android.support:support-fragment:$support_version"
 
     //Inject in tests
     testImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.4'

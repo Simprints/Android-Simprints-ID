@@ -6,6 +6,7 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
+import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
@@ -220,6 +221,12 @@ class FirebaseManagerImpl(private val appContext: Context,
                 .handleResponse(::defaultResponseErrorHandling)
         }
 
+    override fun getSessionsApiClient(): Single<SessionsRemoteInterface> =
+        getCurrentFirestoreToken()
+            .flatMap {
+                Single.just(buildSessionsApi(it))
+            }
+
     override fun getPeopleApiClient(): Single<PeopleRemoteInterface> =
         getCurrentFirestoreToken()
             .flatMap {
@@ -227,6 +234,7 @@ class FirebaseManagerImpl(private val appContext: Context,
             }
 
     private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api
+    private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(SessionsRemoteInterface::class.java, SessionsRemoteInterface.baseUrl, authToken).api
 
     override fun getProjectApiClient(): Single<ProjectRemoteInterface> =
         getCurrentFirestoreToken()

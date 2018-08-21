@@ -5,7 +5,6 @@ import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.ALERT_TYPE
 
-
 interface LaunchContract {
 
     interface View : BaseView<Presenter> {
@@ -19,6 +18,10 @@ interface LaunchContract {
         fun goToRefusalActivity()
         fun doLaunchAlert(alertType: ALERT_TYPE)
         fun doVibrateIfNecessary(doVibrate: Boolean)
+
+        fun setTextToGeneralConsent(generalConsentText: String)
+        fun addParentalConsentTabWithText(parentalConsentText: String)
+        fun isCurrentTabParental(): Boolean
     }
 
     interface Presenter : BasePresenter {
@@ -28,10 +31,11 @@ interface LaunchContract {
         fun updatePositionTracker(requestCode: Int, resultCode: Int, data: Intent?)
 
         fun handleOnRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray)
-        fun handleOnBackOrDeclinePressed()
         fun handleOnDestroy()
 
         fun tearDownAppWithResult(resultCode: Int, resultData: Intent?)
         fun confirmConsentAndContinueToNextActivity()
+        fun handleDeclinePressed()
+        fun handleOnBackPressed()
     }
 }

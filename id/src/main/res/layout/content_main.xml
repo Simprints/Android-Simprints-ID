@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -40,10 +41,17 @@
             android:minHeight="10dp"
             android:progressDrawable="@drawable/timer_progress_bar" />
 
-        <View
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/missingFingerText"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_weight=".5" />
+            android:layout_weight=".5"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="40dp"
+            android:layout_gravity="start"
+            android:textSize="15sp"
+            android:textColor="@color/colorAccent"
+            android:text="@string/missing_finger" />
 
         <LinearLayout
             android:id="@+id/indicator_layout"
@@ -78,29 +86,5 @@
             android:layout_weight="1" />
 
     </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/try_different_finger_splash"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/translucent"
-        android:visibility="invisible">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="40sp"
-            android:layout_marginEnd="40sp"
-            android:layout_marginTop="80sp"
-            android:layout_marginBottom="80sp"
-            android:layout_gravity="center"
-            android:padding="20sp"
-            android:gravity="center"
-            android:background="@color/simprints_blue"
-            android:textColor="@color/simprints_white"
-            android:textSize="24sp"
-            android:text="@string/try_different_finger_splash_text"/>
-
-    </FrameLayout>
 
 </FrameLayout>

@@ -4,19 +4,23 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
+import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
+import com.simprints.id.shared.DependencyRule.MockRule
+import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
@@ -54,20 +58,24 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
     private lateinit var sharedPrefs: SharedPreferences
 
+    @Inject lateinit var sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var analyticsManagerSpy: AnalyticsManager
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var dbManager: DbManager
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            analyticsManagerRule = SpyRule(),
-            localDbManagerRule = MockRule(),
-            remoteDbManagerRule = MockRule())
+            analyticsManagerRule = SpyRule,
+            localDbManagerRule = MockRule,
+            remoteDbManagerRule = MockRule,
+            sessionEventsLocalDbManagerRule = MockRule)
     }
 
     @Before
     override fun setUp() {
+        FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as TestApplication)
         super.setUp()
         testAppComponent.inject(this)
@@ -75,6 +83,11 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
         sharedPrefs = getRoboSharedPreferences()
         initLogInStateMock(sharedPrefs, remoteDbManagerMock)
+
+        setupLocalAndRemoteManagersForApiTesting(
+            localDbManagerSpy = localDbManagerMock,
+            remoteDbManagerSpy = remoteDbManagerMock,
+            sessionEventsLocalDbManagerMock = sessionEventsLocalDbManagerMock)
     }
 
     @Test

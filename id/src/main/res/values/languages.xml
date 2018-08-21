@@ -26,4 +26,31 @@
             Chichewa
         </item>
     </string-array>
+    <string-array name="language_values">
+        <item>
+            en
+        </item>
+        <item>
+            ne
+        </item>
+        <item>
+            bn
+        </item>
+        <item>
+            ps
+        </item>
+        <item>
+            fa-rAF
+        </item>
+        <item>
+            so
+        </item>
+        <item>
+            ha
+        </item>
+        <item>
+            ny
+        </item>
+    </string-array>
+
 </resources>

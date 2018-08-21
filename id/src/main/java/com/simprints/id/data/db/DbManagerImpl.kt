@@ -1,5 +1,7 @@
 package com.simprints.id.data.db
 
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.events.EnrollmentEvent
 import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
@@ -18,6 +20,7 @@ import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
@@ -36,7 +39,9 @@ class DbManagerImpl(override val local: LocalDbManager,
                     override val remote: RemoteDbManager,
                     private val secureDataManager: SecureDataManager,
                     private val loginInfoManager: LoginInfoManager,
-                    private val preferencesManager: PreferencesManager) : DbManager {
+                    private val preferencesManager: PreferencesManager,
+                    private val sessionEventsManager: SessionEventsManager,
+                    private val timeHelper: TimeHelper) : DbManager {
 
     override fun initialiseDb() {
         remote.initialiseRemoteDb()
@@ -77,13 +82,20 @@ class DbManagerImpl(override val local: LocalDbManager,
             loginInfoManager.getSignedInUserIdOrEmpty(),
             preferencesManager.moduleId))
 
-    override fun savePerson(fbPerson: fb_Person): Completable =
+    override fun savePerson(fbPerson: fb_Person): Completable = // TODO Investigate this interesting nested subscription
         local.insertOrUpdatePersonInLocal(rl_Person(fbPerson))
             .doOnComplete {
-                uploadPersonAndDownloadAgain(fbPerson)
+                sessionEventsManager.updateSession({
+                    it.events.add(EnrollmentEvent(
+                        it.nowRelativeToStartTime(timeHelper),
+                        fbPerson.patientId
+                    ))
+                }).andThen(uploadPersonAndDownloadAgain(fbPerson))
                     .updatePersonInLocal()
                     .subscribeOn(Schedulers.io())
-                    .subscribeBy(onComplete = {}, onError = { it.printStackTrace() })
+                    .subscribeBy(onComplete = {}, onError = {
+                        it.printStackTrace()
+                    })
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -104,12 +116,12 @@ class DbManagerImpl(override val local: LocalDbManager,
                             guid: String,
                             callback: DataCallback) {
 
-        local.loadPersonFromLocal(guid).subscribe({
+        local.loadPersonFromLocal(guid).subscribeBy(onSuccess = {
             destinationList.add(it)
-            callback.onSuccess()
-        }, {
+            callback.onSuccess(false)
+        }, onError = { e ->
             remote.downloadPerson(guid, projectId).subscribeBy(
-                onSuccess = { destinationList.add(rl_Person(it).libPerson); callback.onSuccess() },
+                onSuccess = { destinationList.add(rl_Person(it).libPerson); callback.onSuccess(true) },
                 onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
         })
     }
@@ -121,7 +133,7 @@ class DbManagerImpl(override val local: LocalDbManager,
             Constants.GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = preferencesManager.moduleId).blockingGet().map { it.libPerson }
         }
         destinationList.addAll(result)
-        callback?.onSuccess()
+        callback?.onSuccess(false)
     }
 
     override fun loadProject(projectId: String): Single<Project> =

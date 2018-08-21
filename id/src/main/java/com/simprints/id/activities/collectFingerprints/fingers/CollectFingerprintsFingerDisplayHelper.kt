@@ -3,14 +3,12 @@ package com.simprints.id.activities.collectFingerprints.fingers
 import android.app.Activity
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
-import android.view.View
 import com.simprints.id.Application
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.FingerPageAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
 import com.simprints.id.tools.extensions.isFingerNotCollectable
-import com.simprints.id.tools.extensions.isFingerRequired
 import com.simprints.libcommon.FingerConfig
 import com.simprints.libcommon.ScanConfig
 import com.simprints.libsimprints.FingerIdentifier
@@ -26,22 +24,14 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
 
     init {
         ((view as Activity).application as Application).component.inject(this)
-        clearAndPopulateFingerArraysWithDefaultFingers()
+        clearAndPopulateFingerArrays()
         initPageAdapter()
         initViewPager()
     }
 
-    fun clearAndPopulateFingerArraysWithDefaultFingers() {
-        loadFingerStatusAndRefreshWithDefaultFingers()
+    fun clearAndPopulateFingerArrays() {
         clearFingerArrays()
         populateFingerArrays()
-    }
-
-    private fun loadFingerStatusAndRefreshWithDefaultFingers() {
-        val fingerStatus = preferencesManager.fingerStatus as MutableMap
-        fingerStatus[FingerIdentifier.LEFT_THUMB] = true
-        fingerStatus[FingerIdentifier.LEFT_INDEX_FINGER] = true
-        preferencesManager.fingerStatus = fingerStatus
     }
 
     private fun clearFingerArrays() {
@@ -61,16 +51,13 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
     }
 
     private fun createFinger(id: FingerIdentifier): Finger {
-        val isFingerActive = isFingerRequired(id) || wasFingerAddedByUser(id)
+        val isFingerActive = isFingerRequired(id)
         val fingerPriority = defaultScanConfig.getPriority(id)
         val fingerOrder = defaultScanConfig.getOrder(id)
         return Finger(id, isFingerActive, fingerPriority, fingerOrder)
     }
 
-    private fun isFingerRequired(identifier: FingerIdentifier) = defaultScanConfig.isFingerRequired(identifier)
-
-    private fun wasFingerAddedByUser(identifier: FingerIdentifier) =
-        preferencesManager.fingerStatusPersist && preferencesManager.fingerStatus[identifier] == true
+    private fun isFingerRequired(identifier: FingerIdentifier) = preferencesManager.fingerStatus[identifier] == true
 
     private fun refreshWhichFingerIsLast() {
         presenter.activeFingers.forEach { it.isLastFinger = false }
@@ -140,10 +127,9 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
         }
     }
 
-    fun showSplashAndAddNewFinger() {
+    fun showSplashAndNudgeAndAddNewFinger() {
         showTryDifferentFingerSplash()
         Handler().postDelayed({
-            hideTryDifferentFingerSplash()
             handleAutoAddFinger()
             doNudgeIfNecessary()
         }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
@@ -151,21 +137,12 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
 
     fun showSplashAndNudgeIfNecessary() {
         showTryDifferentFingerSplash()
-        Handler().postDelayed({
-            hideTryDifferentFingerSplash()
-            doNudgeIfNecessary()
-        }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
+        doNudgeIfNecessary()
     }
 
 
     private fun showTryDifferentFingerSplash() {
-        view.tryDifferentFingerSplash.visibility = View.VISIBLE
-        presenter.isTryDifferentFingerSplashShown = true
-    }
-
-    private fun hideTryDifferentFingerSplash() {
-        view.tryDifferentFingerSplash.visibility = View.GONE
-        presenter.isTryDifferentFingerSplashShown = false
+        view.showSplashScreen()
     }
 
     companion object {
@@ -173,7 +150,7 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
         private const val FAST_SWIPE_SPEED = 100
         private const val SLOW_SWIPE_SPEED = 1000
 
-        private const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 1500
+        const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 2000
 
         private val defaultScanConfig = ScanConfig().apply {
             set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0, 0)

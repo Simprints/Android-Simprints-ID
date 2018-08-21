@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="preferences_general"
+        android:title="@string/settings_general">
+        <ListPreference
+            android:entries="@array/language_array"
+            android:entryValues="@array/language_values"
+            android:key="@string/select_language_preference"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/settings_language" />
+
+        <MultiSelectListPreference
+            android:entries="@array/finger_array"
+            android:entryValues="@array/finger_values"
+            android:key="@string/select_fingers_preference"
+            android:summary="@string/settings_fingers_subtext"
+            android:title="@string/settings_fingers" />
+
+        <SwitchPreference
+            android:key="@string/sync_upon_launch_preference"
+            android:summary="@string/settings_sync_launch_subtext"
+            android:title="@string/settings_sync_launch" />
+
+        <SwitchPreference
+            android:key="@string/background_sync_preference"
+            android:summary="@string/settings_background_sync_subtext"
+            android:title="@string/settings_background_sync" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:layout="@layout/line_separator" />
+
+    <PreferenceCategory android:title="@string/settings_about">
+        <Preference
+            android:key="@string/app_version_preference"
+            android:title="@string/about_app_version" />
+
+        <Preference
+            android:key="@string/scanner_version_preference"
+            android:title="@string/about_scanner_version" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

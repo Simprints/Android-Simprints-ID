@@ -9,6 +9,12 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
+import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.SessionEventsManagerImpl
+import com.simprints.id.data.analytics.eventData.realm.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.consent.LongConsentManager
+import com.simprints.id.data.consent.LongConsentManagerImpl
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
@@ -27,12 +33,15 @@ import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.services.progress.notifications.NotificationFactory
+import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
+import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.*
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
-import com.simprints.id.tools.utils.NetworkUtils
+import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Module
@@ -68,8 +77,10 @@ open class AppModule(val app: Application) {
                               remoteDbManager: RemoteDbManager,
                               secureDataManager: SecureDataManager,
                               loginInfoManager: LoginInfoManager,
-                              preferencesManager: PreferencesManager): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager)
+                              preferencesManager: PreferencesManager,
+                              sessionEventsManager: SessionEventsManager,
+                              timeHelper: TimeHelper): DbManager =
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper)
 
     @Provides
     @Singleton
@@ -111,11 +122,16 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
+    open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager):
+        LongConsentManager = LongConsentManagerImpl(ctx, loginInfoManager)
+
+    @Provides
+    @Singleton
     fun provideAppState(): AppState = AppState()
 
     @Provides
     @Singleton
-    fun provideNetworkUtils(): NetworkUtils = NetworkUtils(app)
+    open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
     @Singleton
@@ -128,8 +144,11 @@ open class AppModule(val app: Application) {
                      loginInfoManager: LoginInfoManager,
                      analyticsManager: AnalyticsManager,
                      appState: AppState,
-                     networkUtils: NetworkUtils,
-                     bluetoothComponentAdapter: BluetoothComponentAdapter): Setup = Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, networkUtils, bluetoothComponentAdapter)
+                     simNetworkUtils: SimNetworkUtils,
+                     bluetoothComponentAdapter: BluetoothComponentAdapter,
+                     sessionEventsManager: SessionEventsManager,
+                     timeHelper: TimeHelper): Setup =
+        Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, simNetworkUtils, bluetoothComponentAdapter, sessionEventsManager, timeHelper)
 
     @Provides
     @Singleton
@@ -154,4 +173,29 @@ open class AppModule(val app: Application) {
     @Provides
     fun provideSyncManager(analyticsManager: AnalyticsManager, syncClient: SyncClient): SyncManager =
         SyncManager(analyticsManager, syncClient)
+
+    @Provides
+    @Singleton
+    open fun provideLocalEventDbManager(ctx: Context,
+                                        secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+        RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
+
+    @Provides
+    @Singleton
+    open fun provideSessionEventsManager(ctx: Context,
+                                         loginInfoManager: LoginInfoManager,
+                                         sessionEventsLocalDbManager: SessionEventsLocalDbManager,
+                                         preferencesManager: PreferencesManager,
+                                         timeHelper: TimeHelper,
+                                         remoteDbManager: RemoteDbManager,
+                                         analyticsManager: AnalyticsManager): SessionEventsManager =
+        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, remoteDbManager, analyticsManager)
+
+    @Provides
+    open fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
+        ScheduledPeopleSyncManager(preferencesManager)
+
+    @Provides
+    open fun provideScheduledSessionsSyncManager(preferencesManager: PreferencesManager): ScheduledSessionsSyncManager =
+        ScheduledSessionsSyncManager(preferencesManager)
 }
