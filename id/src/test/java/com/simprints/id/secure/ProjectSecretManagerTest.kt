@@ -1,7 +1,6 @@
 package com.simprints.id.secure
 
 import com.google.firebase.FirebaseApp
-import com.simprints.id.Application
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
@@ -41,8 +40,6 @@ class ProjectSecretManagerTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun validPublicKeyAndProjectSecret_shouldEncryptAndStoreIt() {
-       val app = RuntimeEnvironment.application as Application
-
        assertEquals(loginInfoManager.getEncryptedProjectSecretOrEmpty(), "")
 
        val projectSecretManager = ProjectSecretManager(loginInfoManager)

@@ -44,7 +44,6 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         val callbackSent = try {
             checkCalloutParameters(projectId, apiKey, sessionId, selectedGuid)
             dbManager.updateIdentification(loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId ?: "")
-            // STOPSHIP : write tests
             sessionId?.let {
                 sessionEventsManager
                     .addGuidSelectionEventToLastIdentificationIfExists(selectedGuid, sessionId)
@@ -80,7 +79,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     }
 
     private fun checkSessionId(sessionId: String?) {
-        if (sessionId == null || sessionId != preferencesManager.sessionId) {
+        if (sessionId == null) {
             throw InvalidCalloutParameterError.forParameter(SIMPRINTS_SESSION_ID)
         }
     }
