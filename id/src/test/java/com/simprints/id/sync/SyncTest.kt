@@ -2,8 +2,7 @@ package com.simprints.id.sync
 
 import com.google.firebase.FirebaseApp
 import com.google.gson.stream.JsonReader
-import com.simprints.id.data.DataManager
-import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
@@ -35,8 +34,8 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper
-import com.simprints.id.tools.utils.PeopleGeneratorUtils
-import com.simprints.id.tools.utils.PeopleGeneratorUtils.getRandomPeople
+import com.simprints.id.shared.PeopleGeneratorUtils
+import com.simprints.id.shared.PeopleGeneratorUtils.getRandomPeople
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single

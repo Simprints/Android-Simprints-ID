@@ -5,8 +5,8 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -38,7 +38,6 @@ open class AppModuleForAnyTests(app: Application,
                                 open var sessionEventsManagerRule: DependencyRule = RealRule,
                                 open var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
                                 open var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
-                                open var settingsPreferencesManagerRule: DependencyRule = RealRule,
                                 open var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
                                 open var simNetworkUtilsRule: DependencyRule = RealRule) : AppModule(app) {
 
@@ -96,9 +95,10 @@ open class AppModuleForAnyTests(app: Application,
                                              sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                              preferencesManager: PreferencesManager,
                                              timeHelper: TimeHelper,
-                                             remoteDbManager: RemoteDbManager): SessionEventsManager =
+                                             remoteDbManager: RemoteDbManager,
+                                             analyticsManager: AnalyticsManager): SessionEventsManager =
 
-        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, loginInfoManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, remoteDbManager) }
+        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, loginInfoManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, remoteDbManager, analyticsManager) }
 
     override fun provideLocalEventDbManager(ctx: Context,
                                             secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
@@ -106,5 +106,4 @@ open class AppModuleForAnyTests(app: Application,
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
-
 }

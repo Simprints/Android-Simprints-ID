@@ -124,10 +124,11 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
             preferencesManager.deviceId)
     }
 
-    private fun logUserProperties(userId: String, project_id: String, moduleId: String, deviceId: String) {
-        Timber.d("AnalyticsManagerImpl.logUserProperties(userId=$userId, project_id=$project_id,moduleId=$moduleId, deviceIde=$deviceId)")
+    private fun logUserProperties(userId: String, projectId: String, moduleId: String, deviceId: String) {
+        Timber.d("AnalyticsManagerImpl.logUserProperties(userId=$userId, apiKey=$projectId, projectId=$projectId, moduleId=$moduleId, deviceIde=$deviceId)")
         firebaseAnalytics.setUserId(userId)
-        firebaseAnalytics.setUserProperty("project_id", project_id)
+        firebaseAnalytics.setUserProperty("api_key", projectId)
+        firebaseAnalytics.setUserProperty("project_id", projectId)
         firebaseAnalytics.setUserProperty("module_id", moduleId)
         firebaseAnalytics.setUserProperty("device_id", deviceId)
     }

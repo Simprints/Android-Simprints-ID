@@ -8,8 +8,8 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
 import com.simprints.id.data.analytics.AnalyticsManager;
-import com.simprints.id.data.analytics.events.SessionEventsManager;
-import com.simprints.id.data.analytics.events.models.SessionEvents;
+import com.simprints.id.data.analytics.eventData.SessionEventsManager;
+import com.simprints.id.data.analytics.eventData.models.session.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.DbManager;
@@ -75,21 +75,23 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         component.inject(this);
         this.matchingView = matchingView;
         this.probe = probe;
-        sessionEventsManager.getCurrentSession(loginInfoManager.getSignedInProjectId()).subscribe(new BiConsumer<SessionEvents, Throwable>() {
+        sessionEventsManager.getCurrentSession(loginInfoManager.getSignedInProjectIdOrEmpty()).subscribe(new BiConsumer<SessionEvents, Throwable>() {
             @Override
             public void accept(SessionEvents sessionEvents, Throwable throwable) throws Exception {
-                sessionId = sessionEvents.getId();
+                if (sessionEvents != null && throwable == null) {
+                    sessionId = sessionEvents.getId();
+                }
             }
         });
     }
 
     @Override
     public void start() {
-        preferencesManager.setMsSinceBootOnMatchStart(timeHelper.msSinceBoot());
+        preferencesManager.setMsSinceBootOnMatchStart(timeHelper.now());
         // TODO : Use polymorphism
         switch (preferencesManager.getCalloutAction()) {
             case IDENTIFY:
-                startTimeIdentification = timeHelper.msSinceBoot();
+                startTimeIdentification = timeHelper.now();
 
                 final Runnable onMatchStartRunnable = new Runnable() {
                     @Override
@@ -106,7 +108,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 matchingView.setIdentificationProgressLoadingStart();
                 break;
             case VERIFY:
-                startTimeVerification = timeHelper.msSinceBoot();
+                startTimeVerification = timeHelper.now();
 
                 matchingView.setVerificationProgress();
                 onVerifyStart();
@@ -192,7 +194,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         try {
             dbManager.loadPerson(
                 candidates,
-                loginInfoManager.getSignedInProjectId(),
+                loginInfoManager.getSignedInProjectIdOrEmpty(),
                 guid,
                 wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {

@@ -21,10 +21,12 @@ class OverridableRemoteConfigPrimitivePreference<T : Any>(prefs: ImprovedSharedP
 
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T =
         if (isOverriddenFlag) {
-            value
+            getPrefsValue()
         } else {
-            super.getValue(thisRef, property)
+            getRemoteConfigValue()
         }
+
+    private fun getPrefsValue() = value
 
     /**
      * Current override behaviour: if the user sets this preference, it becomes overridden

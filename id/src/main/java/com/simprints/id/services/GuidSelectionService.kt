@@ -4,7 +4,7 @@ import android.app.IntentService
 import android.content.Intent
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.events.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -44,11 +44,11 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         val callbackSent = try {
             checkCalloutParameters(projectId, apiKey, sessionId, selectedGuid)
             dbManager.updateIdentification(loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId ?: "")
-
-            //StopShip: write tests
-            sessionEventsManager
-                .addGuidSelectionEventToLastIdentificationIfExists(selectedGuid = selectedGuid)
-                .subscribeBy(onError = { it.printStackTrace() })
+            sessionId?.let {
+                sessionEventsManager
+                    .addGuidSelectionEventToLastIdentificationIfExists(selectedGuid, sessionId)
+                    .subscribeBy(onError = { e -> analyticsManager.logThrowable(e) })
+            }
             true
         } catch (error: InvalidCalloutParameterError) {
             analyticsManager.logError(error)
@@ -79,7 +79,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     }
 
     private fun checkSessionId(sessionId: String?) {
-        if (sessionId == null || sessionId != preferencesManager.sessionId) {
+        if (sessionId == null) {
             throw InvalidCalloutParameterError.forParameter(SIMPRINTS_SESSION_ID)
         }
     }

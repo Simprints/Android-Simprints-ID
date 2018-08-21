@@ -27,5 +27,4 @@ interface AppComponentForTests : AppComponent {
     fun inject(alertActivityTest: AlertActivityTest)
     fun inject(launchActivityTest: LaunchActivityTest)
     fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
-    fun inject(collectFingerprintsActivityTest: CollectFingerprintsActivityTest)
 }

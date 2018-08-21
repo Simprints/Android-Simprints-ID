@@ -8,11 +8,11 @@ import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.events.SessionEventsManager
-import com.simprints.id.data.analytics.events.models.ConsentEvent
-import com.simprints.id.data.analytics.events.models.ConsentEvent.Result.*
-import com.simprints.id.data.analytics.events.models.ConsentEvent.Type.INDIVIDUAL
-import com.simprints.id.data.analytics.events.models.ConsentEvent.Type.PARENTAL
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent
+import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Result.*
+import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.INDIVIDUAL
+import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -71,7 +71,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     init {
         (activity.application as Application).component.inject(this)
-        startConsentEventTime = timeHelper.msSinceBoot()
+        startConsentEventTime = timeHelper.now()
     }
 
     override fun start() {
@@ -107,7 +107,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     private fun scheduleSessionsSyncIfNecessary() {
         if (preferencesManager.scheduledSessionsSyncWorkRequestId.isEmpty()) {
-            scheduledSessionsSyncManager.scheduleSyncIfNecessary() // STOPSHIP : inject preferencesManager instead
+            scheduledSessionsSyncManager.scheduleSyncIfNecessary()
         }
     }
 
@@ -131,7 +131,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun handleSetupFinished() {
-        preferencesManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
+        preferencesManager.msSinceBootOnLoadEnd = timeHelper.now()
         // If it is the first time the launch process finishes, wait for consent confirmation
         // Else, go directly to the collectFingerprintsActivity
         if (!consentConfirmed) {
@@ -193,7 +193,11 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
                 ConsentEvent(
                     it.timeRelativeToStartTime(startConsentEventTime),
                     it.nowRelativeToStartTime(timeHelper),
-                    if (view.isCurrentTabParental()) { PARENTAL } else { INDIVIDUAL },
+                    if (view.isCurrentTabParental()) {
+                        PARENTAL
+                    } else {
+                        INDIVIDUAL
+                    },
                     result))
 
             if (result == DECLINED || result == NO_RESPONSE) {
@@ -243,7 +247,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
-        preferencesManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
+        preferencesManager.msSinceBootOnSessionEnd = timeHelper.now()
         dataManager.saveSession()
         view.setResultAndFinish(resultCode, resultData)
     }

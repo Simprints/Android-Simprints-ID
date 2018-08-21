@@ -3,8 +3,8 @@ package com.simprints.id.activities.refusal
 import android.app.Activity
 import com.simprints.id.R
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.events.SessionEventsManager
-import com.simprints.id.data.analytics.events.models.RefusalEvent
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.events.RefusalEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
 import com.simprints.id.di.AppComponent
@@ -28,7 +28,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     init {
         component.inject(this)
-        refusalStartTime = timeHelper.msSinceBoot()
+        refusalStartTime = timeHelper.now()
     }
 
     override fun start() {
@@ -48,17 +48,15 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleSubmitButtonClick(reason: REFUSAL_FORM_REASON?, refusalText: String) {
-        reason.let {
-            saveRefusalFormInDb(getRefusalForm(refusalText))
-        }
+        saveRefusalFormInDb(getRefusalForm(refusalText))
         view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
 
-        reason?.let {
+        reason?.let { refusalReason ->
             sessionEventsManager.updateSessionInBackground({
                 it.events.add(RefusalEvent(
                     it.timeRelativeToStartTime(refusalStartTime),
                     it.nowRelativeToStartTime(timeHelper),
-                    RefusalEvent.Answer.fromRefusalReason(reason),
+                    RefusalEvent.Answer.fromRefusalReason(refusalReason),
                     refusalText))
             })
         }

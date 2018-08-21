@@ -37,16 +37,12 @@ class LongConsentNotification(val context: Context) {
             }
     }
 
-    fun setNotification(language: String) {
-        builder.setContentTitle(String.format(channelContentTitle, language))
-        builder.setProgress(100, 0, false)
-        notificationManager.notify(languageToId(language), builder.build())
-    }
-
-    fun updateNotification(language: String, progress: Int) {
+    fun updateNotification(language: String, progress: Int = 0) {
+        if (progress > 0) {
+            builder.setContentText(String.format(downloadProgress, progress))
+        }
         builder.setContentTitle(String.format(channelContentTitle, language))
         builder.setProgress(100, progress, false)
-        builder.setContentText(String.format(downloadProgress, progress))
         notificationManager.notify(languageToId(language), builder.build())
     }
 
@@ -58,6 +54,6 @@ class LongConsentNotification(val context: Context) {
         notificationManager.notify(languageToId(language), builder.build())
     }
 
-    private fun languageToId(language: String): Int = language.map { it.toInt() }.sum()
+    private fun languageToId(language: String): Int = language.hashCode()
 
 }

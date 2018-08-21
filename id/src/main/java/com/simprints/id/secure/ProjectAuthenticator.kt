@@ -11,7 +11,6 @@ import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsExce
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.*
-import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -27,7 +26,6 @@ open class ProjectAuthenticator(component: AppComponent,
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var scheduledPeopleSyncManager: ScheduledPeopleSyncManager
 
     private val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
     private val publicKeyManager = PublicKeyManager(secureApiClient)
@@ -50,7 +48,6 @@ open class ProjectAuthenticator(component: AppComponent,
             .signIn(nonceScope.projectId)
             .fetchProjectInfo(nonceScope.projectId)
             .storeCredentials(nonceScope.userId)
-            .scheduleSync()
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
@@ -98,11 +95,5 @@ open class ProjectAuthenticator(component: AppComponent,
         flatMapCompletable {
             loginInfoManager.storeCredentials(it.id, it.legacyId, userId)
             Completable.complete()
-        }
-
-    private fun Completable.scheduleSync(): Completable =
-        andThen {
-            scheduledPeopleSyncManager.scheduleSyncIfNecessary()
-            it.onComplete()
         }
 }

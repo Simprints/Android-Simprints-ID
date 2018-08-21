@@ -1,10 +1,10 @@
 package com.simprints.id.activities.login
 
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.events.SessionEventsManager
-import com.simprints.id.data.analytics.events.models.AuthenticationEvent
-import com.simprints.id.data.analytics.events.models.AuthenticationEvent.LoginInfo
-import com.simprints.id.data.analytics.events.models.AuthenticationEvent.Result.*
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.events.AuthenticationEvent
+import com.simprints.id.data.analytics.eventData.models.events.AuthenticationEvent.LoginInfo
+import com.simprints.id.data.analytics.eventData.models.events.AuthenticationEvent.Result.*
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -62,7 +62,7 @@ class LoginPresenter(val view: LoginContract.View,
 
     private fun doAuthenticate(suppliedProjectId: String, suppliedUserId: String, suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
         loginInfoManager.cleanCredentials()
-        startTimeLogin = timeHelper.msSinceBoot()
+        startTimeLogin = timeHelper.now()
         projectAuthenticator.authenticate(
             NonceScope(suppliedProjectId, suppliedUserId),
             suppliedProjectSecret,
@@ -90,7 +90,7 @@ class LoginPresenter(val view: LoginContract.View,
         sessionEventsManager.updateSessionInBackground({
             it.events.add(AuthenticationEvent(
                 it.timeRelativeToStartTime(startTimeLogin),
-                it.nowRelativeToStartTime(timeHelper),
+                it.timeRelativeToStartTime(timeHelper.now()),
                 LoginInfo(preferencesManager.projectId, preferencesManager.userId),
                 result))
         })
