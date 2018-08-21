@@ -14,10 +14,35 @@ class RemoteConfigWrapper(private val remoteConfig: FirebaseRemoteConfig) {
         remoteConfig.setDefaults(remoteConfigDefaults)
     }
 
-    fun getString(key: String): String? = remoteConfig.getString(key)
-    fun getBoolean(key: String): Boolean? = remoteConfig.getBoolean(key)
-    fun getLong(key: String): Long? = remoteConfig.getLong(key)
-    fun getDouble(key: String): Double? = remoteConfig.getDouble(key)
-    fun getByteArray(key: String): ByteArray? = remoteConfig.getByteArray(key)
+    fun getString(key: String): String? = getProjectValOtherwiseLocalVal(key, { getString(it) }, { getLocalString(it) })
+    fun getBoolean(key: String): Boolean? = getProjectValOtherwiseLocalVal(key, { getBoolean(it) }, { getLocalBoolean(it) })
+    fun getLong(key: String): Long? = getProjectValOtherwiseLocalVal(key, { getLong(it) }, { getLocalLong(it) })
+    fun getDouble(key: String): Double? = getProjectValOtherwiseLocalVal(key, { getDouble(it) }, { getLocalDouble(it) })
 
+    private inline fun <reified T> getProjectValOtherwiseLocalVal(key: String, remoteGet: FirebaseRemoteConfig.(String) -> T?, localGet: (String) -> T?) =
+        if (isProjectSpecificMode()) {
+            remoteConfig.remoteGet(key)
+        } else {
+            localGet(key)
+        }
+
+    private fun isProjectSpecificMode(): Boolean {
+        return true
+    }
+
+    private fun getLocalString(key: String): String? {
+        TODO()
+    }
+
+    private fun getLocalBoolean(key: String): Boolean? {
+        TODO()
+    }
+
+    private fun getLocalLong(key: String): Long? {
+        TODO()
+    }
+
+    private fun getLocalDouble(key: String): Double? {
+        TODO()
+    }
 }
