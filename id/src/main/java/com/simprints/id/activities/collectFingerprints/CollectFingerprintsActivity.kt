@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -11,7 +12,6 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.TextView
 import com.simprints.id.R
 import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE
@@ -103,7 +103,7 @@ class CollectFingerprintsActivity :
         val activeStatus = viewPresenter.currentFinger().status
         scan_button.setText(activeStatus.buttonTextId)
         scan_button.setTextColor(activeStatus.buttonTextColor)
-        scan_button.setBackgroundColor(activeStatus.buttonBgColor)
+        scan_button.setBackgroundColor(ContextCompat.getColor(this, activeStatus.buttonBgColorRes))
 
         timeoutBar.setProgressBar(activeStatus)
     }
@@ -151,8 +151,7 @@ class CollectFingerprintsActivity :
             REFUSAL_ACTIVITY_REQUEST, ALERT_ACTIVITY_REQUEST_CODE ->
                 if (resultCode == RESULT_TRY_AGAIN)
                     viewPresenter.handleTryAgainFromDifferentActivity()
-                else
-                    setResultAndFinish(resultCode, data)
+                else setResultAndFinish(resultCode, data)
             else -> setResultAndFinish(resultCode, data)
         }
 
