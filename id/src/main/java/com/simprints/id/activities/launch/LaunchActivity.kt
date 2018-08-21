@@ -33,9 +33,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         setupConsentTabs()
         setClickListenerToPrivacyNotice()
 
-        generalConsentTextView.movementMethod = ScrollingMovementMethod()
-        parentalConsentTextView.movementMethod = ScrollingMovementMethod()
-
         viewPresenter = LaunchPresenter(this)
         viewPresenter.start()
     }
@@ -84,6 +81,9 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_parental_title)).setContent(R.id.parentalConsentTextView)
 
         tabHost.addTab(generalConsentTab)
+
+        generalConsentTextView.movementMethod = ScrollingMovementMethod()
+        parentalConsentTextView.movementMethod = ScrollingMovementMethod()
     }
 
     override fun setTextToGeneralConsent(generalConsentText: String) {

@@ -136,8 +136,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         this.launchAlert(error)
     }
 
-    override fun setNotification(language: String) = notification.setNotification(language)
-
     override fun updateNotification(language: String, progress: Int) = notification.updateNotification(language, progress)
 
     override fun cancelNotification(language: String) = notification.failedNotification(language)

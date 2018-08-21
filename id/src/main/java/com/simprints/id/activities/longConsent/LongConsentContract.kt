@@ -7,16 +7,13 @@ interface LongConsentContract {
 
     interface View : BaseView<Presenter> {
 
-        fun setLongConsentText(text: String)
-
         var showProgressBar: Boolean
+
+        fun setLongConsentText(text: String)
 
         fun setDefaultLongConsent()
 
     }
 
-    interface Presenter : BasePresenter {
-
-    }
+    interface Presenter : BasePresenter
 }
-

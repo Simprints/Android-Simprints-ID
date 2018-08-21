@@ -34,34 +34,28 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     }
 
     private fun loadValueAndBindChangeListener(preference: Preference) {
-        when (preference) {
-            is ListPreference -> {
-                if (preference.key == view.getKeyForLanguagePreference()) {
-                    loadLanguagePreference(preference)
-                    preference.setChangeListener { value: String -> handleLanguagePreferenceChanged(preference, value) }
-                }
+        when (preference.key) {
+            view.getKeyForLanguagePreference() -> {
+                loadLanguagePreference(preference as ListPreference)
+                preference.setChangeListener { value: String -> handleLanguagePreferenceChanged(preference, value) }
             }
-            is MultiSelectListPreference -> {
-                if (preference.key == view.getKeyForDefaultFingersPreference()) {
-                    loadDefaultFingersPreference(preference)
-                    preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
-                }
+            view.getKeyForDefaultFingersPreference() -> {
+                loadDefaultFingersPreference(preference as MultiSelectListPreference)
+                preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
             }
-            is SwitchPreference -> {
-                if (preference.key == view.getKeyForSyncUponLaunchPreference()) {
-                    loadSyncUponLaunchPreference(preference)
-                    preference.setChangeListener { value: Boolean -> handleSyncUponLaunchChanged(value) }
-                } else if (preference.key == view.getKeyForBackgroundSyncPreference()) {
-                    loadBackgroundSyncPreference(preference)
-                    preference.setChangeListener { value: Boolean -> handleBackgroundSyncChanged(value) }
-                }
+            view.getKeyForSyncUponLaunchPreference() -> {
+                loadSyncUponLaunchPreference(preference as SwitchPreference)
+                preference.setChangeListener { value: Boolean -> handleSyncUponLaunchChanged(value) }
             }
-            else -> {
-                if (preference.key == view.getKeyForAppVersionPreference()) {
-                    loadAppVersionInPreference(preference)
-                } else if (preference.key == view.getKeyForScannerVersionPreference()) {
-                    loadScannerVersionInPreference(preference)
-                }
+            view.getKeyForBackgroundSyncPreference() -> {
+                loadBackgroundSyncPreference(preference as SwitchPreference)
+                preference.setChangeListener { value: Boolean -> handleBackgroundSyncChanged(value) }
+            }
+            view.getKeyForAppVersionPreference() -> {
+                loadAppVersionInPreference(preference)
+            }
+            view.getKeyForScannerVersionPreference() -> {
+                loadScannerVersionInPreference(preference)
             }
         }
     }
@@ -143,12 +137,8 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     private fun getHashSetFromFingersMap(fingersMap: Map<FingerIdentifier, Boolean>) =
         fingersMap.filter { it.value }.keys.map { it.toString() }.toHashSet()
 
-    private fun getMapFromFingersHash(fingersHash: HashSet<String>): Map<FingerIdentifier, Boolean> {
-        val map = mutableMapOf<FingerIdentifier, Boolean>()
-        fingersHash.forEach {
-            val fingerIdentifier = FingerIdentifier.valueOf(it)
-            map[fingerIdentifier] = true
+    private fun getMapFromFingersHash(fingersHash: HashSet<String>): Map<FingerIdentifier, Boolean> =
+        mutableMapOf<FingerIdentifier, Boolean>().apply {
+            fingersHash.map { FingerIdentifier.valueOf(it) }.forEach { this[it] = true }
         }
-        return map
-    }
 }

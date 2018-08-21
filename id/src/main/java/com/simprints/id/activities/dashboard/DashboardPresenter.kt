@@ -179,14 +179,16 @@ class DashboardPresenter(private val view: DashboardContract.View,
                 longConsentManager.downloadLongConsent(language)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        if (it > 1)
-                            view.updateNotification(language, it)
-                    }, {
-                        view.cancelNotification(language)
-                    }, {
-                        view.completeNotification(language)
-                    })
+                    .subscribeBy(
+                        onNext = {
+                            if (it > 1) {
+                                view.updateNotification(language, it)
+                            }
+                        }, onError = {
+                            view.cancelNotification(language)
+                        }, onComplete = {
+                            view.completeNotification(language)
+                        })
         }
 
     override fun userDidWantToLogout() {

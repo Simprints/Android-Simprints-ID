@@ -8,33 +8,22 @@ import javax.inject.Inject
 class LongConsentPresenter(val view: LongConsentContract.View,
                            component: AppComponent) : LongConsentContract.Presenter {
 
-    @Inject
-    lateinit var longConsentManager: LongConsentManager
-    @Inject
-    lateinit var preferences: PreferencesManager
-
-    companion object {
-        private const val ENGLISH_LANGUAGE_CODE = "en"
-    }
+    @Inject lateinit var longConsentManager: LongConsentManager
+    @Inject lateinit var preferences: PreferencesManager
 
     init {
         component.inject(this)
     }
 
     override fun start() {
-
-        val selectedLanguage: String = preferences.language.let {
-            if (it.isBlank()) ENGLISH_LANGUAGE_CODE else it
-        }
-
-        if (longConsentManager.checkIfLongConsentExists(selectedLanguage)) {
-            val longConsentText = longConsentManager.getLongConsentText(selectedLanguage)
+        if (longConsentManager.checkIfLongConsentExists(preferences.language)) {
+            val longConsentText = longConsentManager.getLongConsentText(preferences.language)
             view.setLongConsentText(longConsentText)
-        } else
+        } else {
             view.setDefaultLongConsent()
+        }
 
         view.showProgressBar = false
     }
 
 }
-
