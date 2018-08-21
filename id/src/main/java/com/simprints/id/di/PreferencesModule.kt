@@ -42,13 +42,13 @@ open class PreferencesModule {
 
     @Provides @Singleton open fun provideRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
 
-    @Provides @Singleton fun provideRemoteConfigWrapper(remoteConfig: FirebaseRemoteConfig): RemoteConfigWrapper = RemoteConfigWrapper(remoteConfig)
-
     @Provides @Singleton fun provideRemoteConfigFetcher(remoteConfig: FirebaseRemoteConfig): RemoteConfigFetcher = RemoteConfigFetcher(remoteConfig)
 
     @Provides @Singleton fun provideSharedPreferences(app: Application): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
 
     @Provides @Singleton fun provideImprovedSharedPreferences(basePrefs: SharedPreferences): ImprovedSharedPreferences = ImprovedSharedPreferencesImpl(basePrefs)
+
+    @Provides @Singleton fun provideRemoteConfigWrapper(remoteConfig: FirebaseRemoteConfig, prefs: ImprovedSharedPreferences): RemoteConfigWrapper = RemoteConfigWrapper(remoteConfig, prefs)
 
     @Provides @Singleton fun provideScannerAttributesPreferencesManager(prefs: ImprovedSharedPreferences): ScannerAttributesPreferencesManager = ScannerAttributesPreferencesManagerImpl(prefs)
 
