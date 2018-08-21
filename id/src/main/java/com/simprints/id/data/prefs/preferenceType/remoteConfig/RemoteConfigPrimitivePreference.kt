@@ -35,7 +35,6 @@ open class RemoteConfigPrimitivePreference<T : Any>(prefs: ImprovedSharedPrefere
             is Double -> remoteConfigWrapper.getDouble(key)
             is Float -> remoteConfigWrapper.getDouble(key)?.toFloat()
             is String -> remoteConfigWrapper.getString(key)
-            is ByteArray -> remoteConfigWrapper.getByteArray(key)
             else -> throw NonPrimitiveTypeError.forTypeOf(defValue)
         } ?: defValue) as T
 }
