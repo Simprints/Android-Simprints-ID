@@ -1,6 +1,6 @@
 package com.simprints.id.data.prefs.preferenceType.remoteConfig
 
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.tools.serializers.Serializer
@@ -8,15 +8,14 @@ import java.security.InvalidParameterException
 import kotlin.reflect.KProperty
 
 open class RemoteConfigComplexPreference<T : Any>(prefs: ImprovedSharedPreferences,
-                                                  private val remoteConfig: FirebaseRemoteConfig,
-                                                  remoteConfigDefaults: MutableMap<String, Any>,
+                                                  private val remoteConfigWrapper: RemoteConfigWrapper,
                                                   private val key: String,
                                                   private val defValue: T,
                                                   serializer: Serializer<T>)
     : ComplexPreference<T>(prefs, key, defValue, serializer) {
 
     init {
-        remoteConfigDefaults[key] = serializedDefValue
+        remoteConfigWrapper.prepareDefaultValue(key, serializedDefValue)
     }
 
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
@@ -25,7 +24,7 @@ open class RemoteConfigComplexPreference<T : Any>(prefs: ImprovedSharedPreferenc
     }
 
     private fun setSerializedPrefValueToRemoteConfigValue() {
-        serializedValue = remoteConfig.getString(key)
+        serializedValue = remoteConfigWrapper.getString(key)?: serializedDefValue
     }
 
     protected fun getAndDeserializePrefValue(thisRef: Any?, property: KProperty<*>): T =

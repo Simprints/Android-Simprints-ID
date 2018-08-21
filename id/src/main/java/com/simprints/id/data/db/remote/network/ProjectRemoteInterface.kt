@@ -16,4 +16,8 @@ interface ProjectRemoteInterface {
     @GET("projects/{projectId}")
     fun requestProject(
         @Path("projectId") projectId: String): Single<Response<Project>>
+
+    @GET("projects/{projectId}/config")
+    fun requestProjectConfig(
+        @Path("projectId") projectId: String): Single<Response<Project>>
 }
