@@ -19,6 +19,7 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
+import org.json.JSONObject
 import java.io.IOException
 
 interface RemoteDbManager {
@@ -65,7 +66,7 @@ interface RemoteDbManager {
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
 
     fun loadProjectFromRemote(projectId: String): Single<Project>
-    fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<String>
+    fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JSONObject>
 
     fun getPeopleApiClient(): Single<PeopleRemoteInterface>
     fun getSessionsApiClient(): Single<SessionsRemoteInterface>

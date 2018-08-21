@@ -35,6 +35,7 @@ import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.jetbrains.anko.doAsync
+import org.json.JSONObject
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
@@ -221,7 +222,7 @@ class FirebaseManagerImpl(private val appContext: Context,
                 .handleResponse(::defaultResponseErrorHandling)
         }
 
-    override fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<String> =
+    override fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JSONObject> =
         getProjectApiClient().flatMap {
             it.requestProjectConfig(projectId)
                 .retry(::retryCriteria)

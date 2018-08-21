@@ -16,6 +16,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
+import org.json.JSONObject
 import java.io.IOException
 import javax.inject.Inject
 
@@ -101,14 +102,14 @@ open class ProjectAuthenticator(component: AppComponent,
             Completable.complete()
         }
 
-    private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<String> =
+    private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<JSONObject> =
         andThen(
             dbManager.remote.loadProjectRemoteConfigSettingsJsonString(projectId)
         )
 
-    private fun Single<out String>.storeProjectRemoteConfigSettings(): Completable =
+    private fun Single<out JSONObject>.storeProjectRemoteConfigSettings(): Completable =
         flatMapCompletable {
-            remoteConfigWrapper.projectSettingsJsonString = it
+            remoteConfigWrapper.projectSettingsJsonString = it.toString()
             Completable.complete()
         }
 }
