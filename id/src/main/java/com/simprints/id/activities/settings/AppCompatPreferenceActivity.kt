@@ -27,9 +27,6 @@ abstract class AppCompatPreferenceActivity : PreferenceActivity() {
         delegate.onPostCreate(savedInstanceState)
     }
 
-    val supportActionBar: ActionBar?
-        get() = delegate.supportActionBar
-
     fun setSupportActionBar(toolbar: Toolbar?) {
         delegate.setSupportActionBar(toolbar)
         delegate.supportActionBar?.setDisplayHomeAsUpEnabled(true)
