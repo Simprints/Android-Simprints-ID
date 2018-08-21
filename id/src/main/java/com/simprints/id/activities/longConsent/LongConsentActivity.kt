@@ -7,22 +7,19 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.LanguageHelper
-import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.activity_long_consent.*
 import javax.inject.Inject
 
 class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
 
-    @Inject
-    lateinit var preferences: PreferencesManager
+    @Inject lateinit var preferences: PreferencesManager
 
     override lateinit var viewPresenter: LongConsentContract.Presenter
 
     override var showProgressBar: Boolean = true
         set(value) {
             field = value
-            if (value) longConsent_progressBar.visibility = View.VISIBLE
-            else longConsent_progressBar.visibility = View.INVISIBLE
+            longConsent_progressBar.visibility = if (value) View.VISIBLE else View.INVISIBLE
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,14 +29,18 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
         LanguageHelper.setLanguage(this, preferences.language)
         setContentView(R.layout.activity_long_consent)
 
+        initActionBar()
+
+        viewPresenter = LongConsentPresenter(this, component)
+        viewPresenter.start()
+    }
+
+    private fun initActionBar() {
         setSupportActionBar(longConsentToolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setTitle(R.string.privacy_notice_title)
-
-        viewPresenter = LongConsentPresenter(this, component)
-        viewPresenter.start()
     }
 
     override fun onSupportNavigateUp(): Boolean {

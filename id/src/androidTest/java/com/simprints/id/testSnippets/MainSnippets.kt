@@ -39,12 +39,13 @@ fun launchActivityVerify(calloutCredentials: CalloutCredentials,
         verifyGuidExtra = guid)
 }
 
-fun fullHappyWorkflow() {
+fun fullHappyWorkflow(numberOfScans: Int = 2, dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
     log("fullHappyWorkflow")
     setupActivityAndContinue()
-    collectFingerprintsPressScan()
-    collectFingerprintsPressScan()
-    checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm()
+
+    (0 until numberOfScans).forEach { collectFingerprintsPressScan() }
+
+    checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm(dialogResult)
 }
 
 fun setupActivityAndContinue() {
@@ -90,8 +91,17 @@ fun collectFingerprintsPressScan() {
     log("collectFingerprintsPressScan")
     WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
         onView(withId(R.id.scan_button))
+            .check(matches(not(withText(R.string.cancel_button))))
+            .perform(click())
+    }
+    Thread.sleep(500) //Wait for ViewPager animation
+}
+
+fun skipFinger() {
+    log("skipFinger")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+        onView(withId(R.id.missingFingerText))
             .check(matches(isDisplayed()))
-            .check(matches(anyOf(withText(R.string.scan), withText(R.string.rescan_label))))
             .perform(click())
     }
 }
@@ -109,14 +119,14 @@ fun waitForSplashScreenAppearsAndDisappears() {
     }
 }
 
-private fun checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm() {
+private fun checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm(dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
     WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
         onView(withText(getResourceString(R.string.confirm_fingers_dialog_title)))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
         onView(withId(android.R.id.message))
             .inRoot(isDialog())
-            .check(matches(withText("✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n")))
+            .check(matches(withText(dialogResult)))
             .check(matches(isDisplayed()))
         onView(withId(android.R.id.button1)).perform(click())
     }

@@ -1,10 +1,15 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.analytics.events.SessionEventsManager
-import com.simprints.id.data.analytics.events.models.*
-import com.simprints.id.data.analytics.events.models.AuthorizationEvent.Info
-import com.simprints.id.data.analytics.events.models.AuthorizationEvent.Result.AUTHORIZED
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEvent
+import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEvent.Info
+import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEvent.Result.AUTHORIZED
+import com.simprints.id.data.analytics.eventData.models.events.CallbackEvent
+import com.simprints.id.data.analytics.eventData.models.events.CalloutEvent
+import com.simprints.id.data.analytics.eventData.models.events.ConnectivitySnapshotEvent
+import com.simprints.id.data.analytics.eventData.models.session.DatabaseInfo
+import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
@@ -13,7 +18,9 @@ import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.session.callout.Callout
-import com.simprints.id.session.sessionParameters.SessionParameters
+import com.simprints.id.tools.utils.SimNetworkUtils
+import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.subscribeBy
@@ -32,6 +39,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var dbManager: LocalDbManager
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
 
     init {
         component.inject(this)
@@ -41,8 +49,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         view.checkCallingAppIsFromKnownSource()
 
         try {
-            val callout = view.parseCallout()
-            extractSessionParametersOrThrow(callout)
+            extractSessionParametersOrThrow()
             setLastUser()
         } catch (exception: InvalidCalloutError) {
             view.openAlertActivityForError(exception.alertType)
@@ -60,13 +67,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    private fun extractSessionParametersOrThrow(callout: Callout): SessionParameters {
+    private fun extractSessionParametersOrThrow() {
+        val callout = view.parseCallout()
         analyticsManager.logCallout(callout)
         val sessionParameters = sessionParametersExtractor.extractFrom(callout)
         possibleLegacyApiKey = sessionParameters.apiKey
         preferencesManager.sessionParameters = sessionParameters
         analyticsManager.logUserProperties()
-        return sessionParameters
     }
 
     override fun handleNotSignedInUser() {
@@ -102,11 +109,17 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     /** @throws DifferentUserIdSignedInException */
     override fun isUserIdStoredAndMatches() =
-        if (preferencesManager.userId != loginInfoManager.getSignedInUserIdOrEmpty())
-            throw DifferentUserIdSignedInException()
-        else loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()
+        //if (dataManager.userId != dataManager.getSignedInUserIdOrEmpty())
+        //    throw DifferentUserIdSignedInException()
+        //else
+        /** Hack to support multiple users: we do not check if the signed UserId
+        matches the userId from the Intent */
+        loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()
 
     override fun handleSignedInUser() {
+        /** Hack to support multiple users: If all login checks success, then we consider
+         *  the userId in the Intent as new signed User */
+        loginInfoManager.signedInUserId = preferencesManager.userId
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
         initSessionEvents(loginInfoManager.getSignedInProjectIdOrEmpty())
         view.openLaunchActivity()
@@ -116,27 +129,33 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
         try {
             Singles.zip(
-                sessionEventsManager.createSession(projectId),
-                analyticsManager.analyticsId.onErrorReturn { "" },
-                dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }) { session: SessionEvents, gaId: String, count: Int ->
-                    session.apply {
-                        analyticsId = gaId
-                        databaseInfo = DatabaseInfo(count)
-                        events.apply {
-                            add(CalloutEvent(session.nowRelativeToStartTime(timeHelper), view.parseCallout()))
-                            add(view.buildConnectionEvent(session))
-                            addAuthorizationEvent(session, AUTHORIZED)
-                        }
-                    }
+                createSessionEvents(projectId),
+                fetchAnalyticsId(),
+                fetchPeopleCountInLocalDatabase()) { _: SessionEvents, gaId: String, dbCount: Int ->
+                return@zip Pair(gaId, dbCount)
 
-                    return@zip session
-            }.flatMapCompletable {
-                sessionEventsManager.insertOrUpdateSession(it)
-            }.subscribeBy(onComplete = { }, onError = { it.printStackTrace() })
+            }.flatMapCompletable { gaIdAndDbCount ->
+                populateSessionWithAnalyticsIdAndDbInfo(gaIdAndDbCount.first, gaIdAndDbCount.second)
+            }.subscribeBy(onError = { it.printStackTrace() })
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
+
+    private fun createSessionEvents(projectId: String): Single<SessionEvents> = sessionEventsManager.createSession(projectId)
+    private fun fetchAnalyticsId(): Single<String> = analyticsManager.analyticsId.onErrorReturn { "" }
+    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }
+    private fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, dbCount: Int): Completable =
+        sessionEventsManager.updateSession({
+            it.analyticsId = gaId
+            it.databaseInfo = DatabaseInfo(dbCount)
+            it.events.apply {
+                add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), view.parseCallout()))
+                add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
+                addAuthorizationEvent(it, AUTHORIZED)
+            }
+        })
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.events.add(AuthorizationEvent(
@@ -144,7 +163,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             result,
             if (result == AUTHORIZED) {
                 Info(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
-            } else { null }
+            } else {
+                null
+            }
         ))
     }
 
@@ -154,8 +175,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             it.closeIfRequired(timeHelper)
         }).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onComplete = {
-            }, onError = {
+            .subscribeBy(onComplete = {}, onError = {
                 it.printStackTrace()
             })
     }

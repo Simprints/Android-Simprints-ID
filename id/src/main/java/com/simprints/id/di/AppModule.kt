@@ -9,10 +9,10 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
-import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.events.SessionEventsManager
-import com.simprints.id.data.analytics.events.SessionEventsManagerImpl
-import com.simprints.id.data.analytics.events.realm.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.SessionEventsManagerImpl
+import com.simprints.id.data.analytics.eventData.realm.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
 import com.simprints.id.data.db.DbManager
@@ -187,8 +187,9 @@ open class AppModule(val app: Application) {
                                          sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                          preferencesManager: PreferencesManager,
                                          timeHelper: TimeHelper,
-                                         remoteDbManager: RemoteDbManager): SessionEventsManager =
-        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, remoteDbManager)
+                                         remoteDbManager: RemoteDbManager,
+                                         analyticsManager: AnalyticsManager): SessionEventsManager =
+        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, remoteDbManager, analyticsManager)
 
     @Provides
     open fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =

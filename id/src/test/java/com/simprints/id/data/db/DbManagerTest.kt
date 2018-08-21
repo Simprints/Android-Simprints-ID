@@ -3,7 +3,7 @@ package com.simprints.id.data.db
 import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.simprints.id.data.analytics.events.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -25,7 +25,7 @@ import com.simprints.id.testUtils.retrofit.mockServer.mockServerProblemResponse
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.setupLocalAndRemoteManagersForApiTesting
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.tools.utils.PeopleGeneratorUtils
+import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.libcommon.Person
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer

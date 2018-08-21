@@ -53,6 +53,8 @@
 -keep class com.simprints.id.session.Session { *; }
 -keep class com.simprints.id.data.db.remote.models.** { *; }
 -keep class com.simprints.id.data.db.sync.models** { *; }
+-keep class com.simprints.id.data.analytics.events.models.** { *; }
+-keep class com.simprints.id.data.analytics.events.realm.** { *; }
 
 # For Realm
 -keepnames public class * extends io.realm.RealmObject

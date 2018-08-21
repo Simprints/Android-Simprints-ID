@@ -27,8 +27,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 27
         multiDexEnabled true
-        versionCode 96
-        versionName "2018.3.0-dev6"
+        versionCode 99
+        versionName "2018.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunner "com.simprints.id.UiTestsRunner" //To use custom TestApplication
 
@@ -317,8 +317,8 @@ dependencies {
     }
     androidTestImplementation 'com.simprints:cerberus-library:2018.1.1-dev-1'
     androidTestImplementation 'com.simprints:remote-admin-client:2017.4.0-dev-5'
-    androidTestImplementation "com.simprints:mockscanner:2018.2.3"
-    testImplementation "com.simprints:mockscanner:2018.2.3"
+    androidTestImplementation "com.simprints:mockscanner:2018.3.0-dev0"
+    testImplementation "com.simprints:mockscanner:2018.3.0-dev0"
     androidTestImplementation 'joda-time:joda-time:2.9.9'
 
     //UI

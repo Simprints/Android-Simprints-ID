@@ -6,7 +6,7 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.events.SessionsRemoteInterface
+import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
@@ -115,8 +115,9 @@ class FirebaseManagerImpl(private val appContext: Context,
     private fun isFirestoreSignedInUserAsExpected(projectId: String, userId: String): Boolean {
         val firestoreUser = getFirebaseAuth(firestoreFirebaseApp).currentUser ?: return false
 
-        /* return firestoreUser.uid == "$projectId.$userId" */
-        // Loosy rule to have login no user specific.
+        //return firestoreUser.uid == "$projectId.$userId"
+        /** Hack to support multiple users:
+        Loosey condition to make the check not user specific */
         return firestoreUser.uid.contains(projectId)
     }
 
