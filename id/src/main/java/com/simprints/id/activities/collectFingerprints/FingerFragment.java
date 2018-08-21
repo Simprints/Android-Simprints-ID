@@ -1,9 +1,9 @@
 package com.simprints.id.activities.collectFingerprints;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,13 +49,13 @@ public class FingerFragment extends Fragment {
         FingerRes fingerRes = FingerRes.get(finger);
 
         resultText.setText(finger.getStatus().getTextResult());
-        resultText.setTextColor(finger.getStatus().getTextResultColor());
+        resultText.setTextColor(getResources().getColor(finger.getStatus().getTextResultColorRes()));
         fingerNumber.setText(fingerRes.getNameId());
         fingerNumber.setTextColor(getResources().getColor(R.color.simprints_blue));
-        if(finger.isLastFinger() && (finger.getStatus() == Finger.Status.GOOD_SCAN
-                || finger.getStatus() == Finger.Status.RESCAN_GOOD_SCAN)) {
+        if (finger.isLastFinger() && (finger.getStatus() == Finger.Status.GOOD_SCAN
+            || finger.getStatus() == Finger.Status.RESCAN_GOOD_SCAN)) {
             directionText.setText(R.string.last_scan_message);
-        }else{
+        } else {
             directionText.setText(finger.getStatus().getTextDirection());
         }
         directionText.setTextColor(finger.getStatus().getTextDirectionColor());
