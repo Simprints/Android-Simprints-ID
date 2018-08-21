@@ -2,24 +2,37 @@ package com.simprints.id.activities.launch
 
 import android.app.Activity
 import android.content.Intent
+import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
 import com.simprints.id.controllers.Setup
 import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent
+import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Result.*
+import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.INDIVIDUAL
+import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.services.scheduledSync.ScheduledSyncManager
+import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
+import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
+import com.simprints.id.domain.consent.GeneralConsent
+import com.simprints.id.domain.consent.ParentalConsent
+import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.id.tools.*
+import com.simprints.id.tools.AppState
+import com.simprints.id.tools.Log
+import com.simprints.id.tools.PositionTracker
+import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
 import javax.inject.Inject
-
 
 class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
 
@@ -28,9 +41,12 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var syncManager: SyncManager
+    @Inject lateinit var scheduledPeopleSyncManager: ScheduledPeopleSyncManager
+    @Inject lateinit var scheduledSessionsSyncManager: ScheduledSessionsSyncManager
     @Inject lateinit var appState: AppState
     @Inject lateinit var setup: Setup
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
 
     private val activity = view as Activity
     private lateinit var positionTracker: PositionTracker
@@ -51,16 +67,21 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         }
     }
 
+    private var startConsentEventTime: Long = 0
+
     init {
         (activity.application as Application).component.inject(this)
+        startConsentEventTime = timeHelper.now()
     }
 
     override fun start() {
         view.setLanguage(preferencesManager.language)
         initPositionTracker()
         initSetup()
-        initBackgroundSync()
-        scheduleSyncIfNecessary()
+        initBackgroundSyncIfNecessary()
+        schedulePeopleSyncIfNecessary()
+        scheduleSessionsSyncIfNecessary()
+        setupConsentTabs()
     }
 
     private fun initPositionTracker() {
@@ -72,13 +93,21 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         setup.start(activity, setupCallback)
     }
 
-    private fun initBackgroundSync() {
-        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.AT_LAUNCH)
+    private fun initBackgroundSyncIfNecessary() {
+        if (preferencesManager.syncOnCallout) {
+            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.AT_LAUNCH)
+        }
     }
 
-    private fun scheduleSyncIfNecessary() {
-        if (preferencesManager.scheduledSyncWorkRequestId.isEmpty()) {
-            ScheduledSyncManager(preferencesManager).scheduleSyncIfNecessary()
+    private fun schedulePeopleSyncIfNecessary() {
+        if (preferencesManager.scheduledPeopleSyncWorkRequestId.isEmpty()) {
+            scheduledPeopleSyncManager.scheduleSyncIfNecessary()
+        }
+    }
+
+    private fun scheduleSessionsSyncIfNecessary() {
+        if (preferencesManager.scheduledSessionsSyncWorkRequestId.isEmpty()) {
+            scheduledSessionsSyncManager.scheduleSyncIfNecessary()
         }
     }
 
@@ -102,7 +131,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun handleSetupFinished() {
-        preferencesManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
+        preferencesManager.msSinceBootOnLoadEnd = timeHelper.now()
         // If it is the first time the launch process finishes, wait for consent confirmation
         // Else, go directly to the collectFingerprintsActivity
         if (!consentConfirmed) {
@@ -115,12 +144,69 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         }
     }
 
+    private fun setupConsentTabs() {
+        view.setTextToGeneralConsent(getGeneralConsentText())
+        if (preferencesManager.parentalConsentExists) {
+            view.addParentalConsentTabWithText(getParentalConsentText())
+        }
+    }
+
+    private fun getGeneralConsentText(): String {
+        val generalConsent = try {
+            JsonHelper.gson.fromJson(preferencesManager.generalConsentOptionsJson, GeneralConsent::class.java)
+        } catch (e: JsonSyntaxException) {
+            analyticsManager.logError(MalformedConsentTextError("Malformed General Consent Text Error", e))
+            GeneralConsent()
+        }
+        return generalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
+    }
+
+    private fun getParentalConsentText(): String {
+        val parentalConsent = try {
+            JsonHelper.gson.fromJson(preferencesManager.parentalConsentOptionsJson, ParentalConsent::class.java)
+        } catch (e: JsonSyntaxException) {
+            analyticsManager.logError(MalformedConsentTextError("Malformed Parental Consent Text Error", e))
+            ParentalConsent()
+        }
+        return parentalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
+    }
+
     override fun handleOnRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         positionTracker.onRequestPermissionsResult(requestCode, permissions, grantResults)
         setup.onRequestPermissionsResult(activity, requestCode, permissions, grantResults)
     }
 
-    override fun handleOnBackOrDeclinePressed() {
+    override fun handleOnBackPressed() {
+        addConsentEvent(NO_RESPONSE)
+        handleOnBackOrDeclinePressed()
+    }
+
+    override fun handleDeclinePressed() {
+        addConsentEvent(DECLINED)
+        handleOnBackOrDeclinePressed()
+    }
+
+    private fun addConsentEvent(result: ConsentEvent.Result) {
+
+        sessionEventsManager.updateSessionInBackground({
+            it.events.add(
+                ConsentEvent(
+                    it.timeRelativeToStartTime(startConsentEventTime),
+                    it.nowRelativeToStartTime(timeHelper),
+                    if (view.isCurrentTabParental()) {
+                        PARENTAL
+                    } else {
+                        INDIVIDUAL
+                    },
+                    result))
+
+            if (result == DECLINED || result == NO_RESPONSE) {
+                it.location = null
+            }
+        })
+    }
+
+    private fun handleOnBackOrDeclinePressed() {
         launchOutOfFocus = true
         setup.stop()
         view.goToRefusalActivity()
@@ -161,12 +247,14 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
-        preferencesManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
+        preferencesManager.msSinceBootOnSessionEnd = timeHelper.now()
         dataManager.saveSession()
         view.setResultAndFinish(resultCode, resultData)
     }
 
     override fun confirmConsentAndContinueToNextActivity() {
+        addConsentEvent(ACCEPTED)
+
         consentConfirmed = true
         waitingForConfirmation = false
         appState.scanner.unregisterButtonListener(scannerButton)

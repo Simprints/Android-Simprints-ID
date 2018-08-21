@@ -8,13 +8,15 @@ import android.support.v4.content.res.ResourcesCompat
 import android.view.View
 import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.IntentKeys
+import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.testUtils.extensions.showOnScreen
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.createRoboAlertActivity
+import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.delegates.lazyVar
 import junit.framework.Assert
 import kotlinx.android.synthetic.main.activity_alert.*
@@ -25,17 +27,21 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
+import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
 class AlertActivityTest : DaggerForTests() {
 
+    @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
+
     override var module by lazyVar {
         AppModuleForTests(app,
-            remoteDbManagerRule = MockRule(),
-            localDbManagerRule = MockRule(),
-            analyticsManagerRule = MockRule(),
-            secureDataManagerRule = MockRule())
+            remoteDbManagerRule = MockRule,
+            localDbManagerRule = MockRule,
+            analyticsManagerRule = MockRule,
+            secureDataManagerRule = MockRule,
+            sessionEventsLocalDbManagerRule = MockRule)
     }
 
     @Before
@@ -44,6 +50,8 @@ class AlertActivityTest : DaggerForTests() {
         app = (RuntimeEnvironment.application as TestApplication)
         super.setUp()
         testAppComponent.inject(this)
+
+        setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
     }
 
     @Test

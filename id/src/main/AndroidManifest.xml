@@ -94,12 +94,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.SettingsActivity"
-            android:label="@string/settings_title"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.ActionBar" />
-        <activity
             android:name=".activities.login.LoginActivity"
             android:label="@string/login_title"
             android:launchMode="singleTop"
@@ -121,10 +115,11 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.PrivacyActivity"
-            android:label="@string/privacy_label"
+            android:name=".activities.settings.SettingsActivity"
+            android:label="@string/title_activity_settings"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.ActionBar" />
         <activity
             android:name=".activities.refusal.RefusalActivity"
             android:label="@string/refusal_label"
@@ -136,16 +131,22 @@
             android:label="@string/dashboard_label"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.longConsent.LongConsentActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity android:name=".activities.collectFingerprints.SplashScreenActivity"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
 
         <service
-            android:name="com.simprints.id.services.GuidSelectionService"
+            android:name=".services.GuidSelectionService"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
             </intent-filter>
         </service>
-
         <service
             android:name=".services.sync.SyncService"
             android:exported="false" />
@@ -159,15 +160,15 @@
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
-
         <meta-data
             android:name="firebase_analytics_collection_enabled"
             android:value="${firebase_analytics_collection_enabled}" />
-
         <meta-data
             android:name="firebase_performance_logcat_enabled"
             android:value="${firebase_performance_logcat_enabled}" />
-
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

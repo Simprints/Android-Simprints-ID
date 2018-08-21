@@ -58,7 +58,6 @@ class SecureDataManagerTest : DaggerForAndroidTests() {
     @Test
     fun createLocalDbKeysForSameProjectId_shouldProduceTheSameLocalKey() {
 
-        val app = InstrumentationRegistry.getTargetContext().applicationContext as Application
         val keystoreManager = KeystoreManagerImpl(InstrumentationRegistry.getTargetContext())
         val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
 
@@ -74,7 +73,6 @@ class SecureDataManagerTest : DaggerForAndroidTests() {
     @Test
     fun noLocalKey_shouldThrowAnError() {
 
-        val app = InstrumentationRegistry.getTargetContext().applicationContext as Application
         val keystoreManager = KeystoreManagerImpl(InstrumentationRegistry.getTargetContext())
         val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
 
@@ -86,7 +84,6 @@ class SecureDataManagerTest : DaggerForAndroidTests() {
     @Test
     fun invalidEncryptedData_shouldThrowAnError() {
 
-        val app = InstrumentationRegistry.getTargetContext().applicationContext as Application
         val keystoreManager = spy(KeystoreManagerImpl(InstrumentationRegistry.getTargetContext()))
         doReturn("wrong_encryption").`when`(keystoreManager).encryptString(anyNotNull())
         val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)

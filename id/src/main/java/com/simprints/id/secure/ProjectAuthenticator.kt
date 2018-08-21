@@ -3,16 +3,14 @@ package com.simprints.id.secure
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Project
+import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.*
-import com.simprints.id.services.scheduledSync.ScheduledSyncManager
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,7 +23,6 @@ open class ProjectAuthenticator(component: AppComponent,
                                 secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
                                 private val attestationManager: AttestationManager = AttestationManager()) {
 
-    @Inject lateinit var prefercesManager: PreferencesManager
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
@@ -51,7 +48,6 @@ open class ProjectAuthenticator(component: AppComponent,
             .signIn(nonceScope.projectId)
             .fetchProjectInfo(nonceScope.projectId)
             .storeCredentials(nonceScope.userId)
-            .scheduleSync()
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
@@ -99,11 +95,5 @@ open class ProjectAuthenticator(component: AppComponent,
         flatMapCompletable {
             loginInfoManager.storeCredentials(it.id, it.legacyId, userId)
             Completable.complete()
-        }
-
-    private fun Completable.scheduleSync(): Completable =
-        andThen {
-            ScheduledSyncManager(prefercesManager).scheduleSyncIfNecessary()
-            it.onComplete()
         }
 }

@@ -6,19 +6,20 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
-import com.simprints.id.data.DataManager
+import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
-import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.createRoboLoginActivity
 import com.simprints.id.testUtils.roboletric.injectHowToResolveScannerAppIntent
+import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.scannerAppIntent
 import io.reactivex.Completable
@@ -48,14 +49,15 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
         const val DEFAULT_USER_ID = "some_user_id"
     }
 
-    @Inject lateinit var dataManager: DataManager
     @Inject lateinit var dbManagerSpy: DbManager
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            localDbManagerRule = MockRule(),
-            dbManagerRule = MockRule())
+            localDbManagerRule = MockRule,
+            dbManagerRule = MockRule,
+            sessionEventsLocalDbManagerRule = MockRule)
     }
 
     @Before
@@ -65,6 +67,8 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
         super.setUp()
         testAppComponent.inject(this)
         dbManagerSpy.initialiseDb()
+
+        setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
     }
 
     @Test

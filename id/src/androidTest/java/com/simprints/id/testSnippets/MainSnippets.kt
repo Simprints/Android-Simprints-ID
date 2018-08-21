@@ -1,11 +1,9 @@
 package com.simprints.id.testSnippets
 
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.Espresso.pressBack
 import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.contrib.DrawerActions
-import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
 import android.support.test.espresso.matcher.RootMatchers.isDialog
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
@@ -17,7 +15,6 @@ import com.simprints.libsimprints.*
 import com.simprints.remoteadminclient.ApiException
 import org.hamcrest.Matchers.*
 import org.junit.Assert.*
-
 
 fun launchActivityEnrol(calloutCredentials: CalloutCredentials,
                         enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
@@ -42,57 +39,94 @@ fun launchActivityVerify(calloutCredentials: CalloutCredentials,
         verifyGuidExtra = guid)
 }
 
-fun fullHappyWorkflow() {
+fun fullHappyWorkflow(numberOfScans: Int = 2, dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
     log("fullHappyWorkflow")
     setupActivityAndContinue()
-    collectFingerprintsPressScan()
-    collectFingerprintsPressScan()
-    checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm()
+
+    (0 until numberOfScans).forEach { collectFingerprintsPressScan() }
+
+    checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm(dialogResult)
 }
 
-private fun setupActivityAndContinue() {
+fun setupActivityAndContinue() {
     log("setupActivityAndContinue")
     setupActivity()
     setupActivityContinue()
 }
 
-private fun setupActivity() {
+fun setupActivityAndDecline() {
+    log("setupActivityAndDecline")
+    setupActivity()
+    setupActivityDecine()
+}
+
+fun setupActivity() {
     log("setupActivity")
     WaitingUtils.tryOnUiUntilTimeout(10000, 50) {
         ActivityUtils.grantPermissions()
-        onView(withId(R.id.consentTextView))
+        onView(withId(R.id.generalConsentTextView))
             .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.short_consent)))
     }
 }
 
 private fun setupActivityContinue() {
     log("setupActivityContinue")
-    WaitingUtils.tryOnUiUntilTimeout(12000, 500) {
+    WaitingUtils.tryOnUiUntilTimeout(15000, 500) {
         onView(withId(R.id.consentAcceptButton))
             .check(matches(isDisplayed()))
             .perform(click())
     }
 }
 
-private fun collectFingerprintsPressScan() {
-    log("collectFingerprintsPressScan")
-    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
-        onView(withId(R.id.scan_button))
+fun setupActivityDecine() {
+    log("setupActivityContinue")
+    WaitingUtils.tryOnUiUntilTimeout(12000, 500) {
+        onView(withId(R.id.consentDeclineButton))
             .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.scan)))
             .perform(click())
     }
 }
 
-private fun checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm() {
+fun collectFingerprintsPressScan() {
+    log("collectFingerprintsPressScan")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+        onView(withId(R.id.scan_button))
+            .check(matches(not(withText(R.string.cancel_button))))
+            .perform(click())
+    }
+    Thread.sleep(500) //Wait for ViewPager animation
+}
+
+fun skipFinger() {
+    log("skipFinger")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+        onView(withId(R.id.missingFingerText))
+            .check(matches(isDisplayed()))
+            .perform(click())
+    }
+}
+
+fun waitForSplashScreenAppearsAndDisappears() {
+    log("checkSplashScreen")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+        onView(withId(R.id.splashGetReady))
+            .check(matches(isDisplayed()))
+    }
+
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+        onView(withId(R.id.splashGetReady))
+            .check(doesNotExist())
+    }
+}
+
+private fun checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm(dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
     WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
         onView(withText(getResourceString(R.string.confirm_fingers_dialog_title)))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
         onView(withId(android.R.id.message))
             .inRoot(isDialog())
-            .check(matches(withText("✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n")))
+            .check(matches(withText(dialogResult)))
             .check(matches(isDisplayed()))
         onView(withId(android.R.id.button1)).perform(click())
     }

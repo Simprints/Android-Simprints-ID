@@ -1,5 +1,6 @@
 package com.simprints.id.controllers;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -7,6 +8,9 @@ import android.support.annotation.Nullable;
 
 import com.simprints.id.R;
 import com.simprints.id.data.analytics.AnalyticsManager;
+import com.simprints.id.data.analytics.eventData.SessionEventsManager;
+import com.simprints.id.data.analytics.eventData.models.events.CandidateReadEvent;
+import com.simprints.id.data.analytics.eventData.models.events.ScannerConnectionEvent;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.DbManager;
@@ -20,7 +24,8 @@ import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.AppState;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
-import com.simprints.id.tools.utils.NetworkUtils;
+import com.simprints.id.tools.TimeHelper;
+import com.simprints.id.tools.utils.SimNetworkUtils;
 import com.simprints.libcommon.Person;
 import com.simprints.libscanner.SCANNER_ERROR;
 import com.simprints.libscanner.Scanner;
@@ -33,30 +38,33 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_OFFLINE;
-import static com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_ONLINE;
 import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
 import static com.simprints.libscanner.ScannerUtils.convertAddressToSerial;
 
 public class Setup {
 
-    private final NetworkUtils networkUtils;
+    private final SimNetworkUtils simNetworkUtils;
     private BluetoothComponentAdapter bluetoothAdapter;
+    private long startCandidateSearchTime = 0;
 
     public Setup(PreferencesManager preferencesManager,
-                  DbManager dbManager,
-                  LoginInfoManager loginInfoManager,
-                  AnalyticsManager analyticsManager,
-                  AppState appState,
-                  NetworkUtils networkUtils,
-                  BluetoothComponentAdapter bluetoothAdapter) {
+                 DbManager dbManager,
+                 LoginInfoManager loginInfoManager,
+                 AnalyticsManager analyticsManager,
+                 AppState appState,
+                 SimNetworkUtils simNetworkUtils,
+                 BluetoothComponentAdapter bluetoothAdapter,
+                 SessionEventsManager sessionEventsManager,
+                 TimeHelper timeHelper) {
         this.analyticsManager = analyticsManager;
         this.loginInfoManager = loginInfoManager;
         this.dbManager = dbManager;
         this.preferencesManager = preferencesManager;
         this.appState = appState;
-        this.networkUtils = networkUtils;
+        this.simNetworkUtils = simNetworkUtils;
         this.bluetoothAdapter = bluetoothAdapter;
+        this.sessionEventsManager = sessionEventsManager;
+        this.timeHelper = timeHelper;
     }
 
 
@@ -70,10 +78,12 @@ public class Setup {
 
     private volatile Boolean paused = false;
 
+    private SessionEventsManager sessionEventsManager;
     private PreferencesManager preferencesManager;
     private LoginInfoManager loginInfoManager;
     private DbManager dbManager;
     private AnalyticsManager analyticsManager;
+    private TimeHelper timeHelper;
 
     // Singletons
     private AppState appState;
@@ -172,6 +182,13 @@ public class Setup {
                     uiResetSinceConnection = false;
                     preferencesManager.setScannerId(appState.getScanner().getScannerId());
                     analyticsManager.logScannerProperties();
+
+                    sessionEventsManager.addEventForScannerConnectivityInBackground(
+                        new ScannerConnectionEvent.ScannerInfo(
+                            preferencesManager.getScannerId(),
+                            preferencesManager.getMacAddress(),
+                            preferencesManager.getHardwareVersionString()));
+
                     goOn(activity);
                 } else {
                     analyticsManager.logError(new NullScannerError("Null values in onSuccess Setup.connectToScanner()"));
@@ -208,6 +225,7 @@ public class Setup {
     }
 
     // STEP 4
+    @SuppressLint("CheckResult")
     private void checkIfVerifyAndGuidExists(@NonNull final Activity activity) {
         if (preferencesManager.getCalloutAction() != CalloutAction.VERIFY) {
             guidExists = true;
@@ -216,11 +234,12 @@ public class Setup {
         }
 
         onProgress(70, R.string.launch_checking_person_in_db);
+        startCandidateSearchTime = timeHelper.now();
 
         List<Person> loadedPerson = new ArrayList<>();
         final String guid = preferencesManager.getPatientId();
         try {
-            dbManager.loadPerson(loadedPerson, loginInfoManager.getSignedInProjectId(), guid, wrapCallback("loading people from dbManager", newLoadPersonCallback(activity, guid)));
+            dbManager.loadPerson(loadedPerson, loginInfoManager.getSignedInProjectIdOrEmpty(), guid, wrapCallback("loading people from dbManager", newLoadPersonCallback(activity, guid)));
         } catch (UninitializedDataManagerError error) {
             analyticsManager.logError(error);
             onAlert(ALERT_TYPE.UNEXPECTED_ERROR);
@@ -230,10 +249,15 @@ public class Setup {
     private DataCallback newLoadPersonCallback(@NonNull final Activity activity, final String guid) {
         return new DataCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(boolean isDataFromRemote) {
                 Timber.d("Setup: GUID found.");
                 guidExists = true;
                 goOn(activity);
+
+                saveEventForCandidateReadInBackgroundNotFound(
+                    guid,
+                    isDataFromRemote ? CandidateReadEvent.LocalResult.NOT_FOUND : CandidateReadEvent.LocalResult.FOUND,
+                    isDataFromRemote ? CandidateReadEvent.RemoteResult.FOUND : CandidateReadEvent.RemoteResult.NOT_FOUND);
             }
 
             @Override
@@ -256,16 +280,25 @@ public class Setup {
         };
     }
 
-    private void saveNotFoundVerification(Person probe) {
-        if (networkUtils.isConnected()) {
+    private void saveNotFoundVerification(final Person probe) {
+        if (simNetworkUtils.isConnected()) {
             // We've synced with the online dbManager and they're not in the dbManager
-            dbManager.saveVerification(probe, null, GUID_NOT_FOUND_ONLINE);
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE);
+            saveEventForCandidateReadInBackgroundNotFound(probe.getGuid(), CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND);
+
         } else {
             // We're offline but might find the person if we sync
-            dbManager.saveVerification(probe, null, GUID_NOT_FOUND_OFFLINE);
             onAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE);
+            saveEventForCandidateReadInBackgroundNotFound(probe.getGuid(), CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.OFFLINE);
         }
+    }
+
+    private void saveEventForCandidateReadInBackgroundNotFound(String guid, CandidateReadEvent.LocalResult localResult, CandidateReadEvent.RemoteResult remoteResult) {
+        sessionEventsManager.addEventForCandidateReadInBackground(
+            guid,
+            startCandidateSearchTime,
+            localResult,
+            remoteResult);
     }
 
     // STEP 5
@@ -304,6 +337,7 @@ public class Setup {
                 if (appState != null && appState.getScanner() != null) {
                     Timber.d("Setup: UN20 ready.");
                     preferencesManager.setHardwareVersion(appState.getScanner().getUcVersion());
+                    sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(preferencesManager.getHardwareVersionString());
                     Setup.this.onSuccess();
                 } else {
                     analyticsManager.logError(new NullScannerError("Null values in onSuccess Setup.wakeUpUn20()"));

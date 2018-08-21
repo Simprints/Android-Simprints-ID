@@ -2,16 +2,17 @@ package com.simprints.id.activities.dashboard
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
 import android.view.Menu
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.PrivacyActivity
-import com.simprints.id.activities.SettingsActivity
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
+import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.data.DataManager
+import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.LanguageHelper
@@ -21,18 +22,22 @@ import kotlinx.android.synthetic.main.content_dashboard.*
 import org.jetbrains.anko.support.v4.onRefresh
 import javax.inject.Inject
 
-class DashboardActivity : AppCompatActivity(), DashboardContract.View{
+class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
-    @Inject lateinit var dataManager: DataManager
-    @Inject lateinit var preferences: PreferencesManager
+    @Inject
+    lateinit var preferences: PreferencesManager
+    @Inject
+    lateinit var loginInfoManager: LoginInfoManager
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
-        private const val PRIVACY_ACTIVITY_REQUEST_CODE = 2
+        private const val LONG_CONSENT_ACTIVITY_REQUEST_CODE = 2
     }
 
     override lateinit var viewPresenter: DashboardContract.Presenter
     private lateinit var cardsViewAdapter: DashboardCardAdapter
+    private var confirmationLogoutDialog: AlertDialog.Builder? = null
+    private lateinit var notification: LongConsentNotification
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +46,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View{
         component.inject(this)
         setSupportActionBar(dashboardToolbar)
         LanguageHelper.setLanguage(this, preferences.language)
+        notification = LongConsentNotification(this)
 
         viewPresenter = DashboardPresenter(this, component)
         setMenuItemClickListener()
@@ -99,13 +105,21 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View{
         dashboardToolbar.setOnMenuItemClickListener { menuItem ->
 
             val id = menuItem.itemId
-            when(id) {
-                R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, PrivacyActivity::class.java), PRIVACY_ACTIVITY_REQUEST_CODE)
+            when (id) {
+                R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, LongConsentActivity::class.java), LONG_CONSENT_ACTIVITY_REQUEST_CODE)
                 R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
-                R.id.menuLogout -> logout()
+                R.id.menuLogout -> viewPresenter.userDidWantToLogout()
             }
             true
         }
+    }
+
+    override fun showConfirmationDialogForLogout() {
+        confirmationLogoutDialog = AlertDialog.Builder(this)
+            .setTitle(R.string.confirmation_logout_title)
+            .setMessage(R.string.confirmation_logout_message)
+            .setPositiveButton(android.R.string.yes) { _, _ -> logout() }
+            .setNegativeButton(android.R.string.no, null).apply { show() }
     }
 
     private fun logout() {
@@ -121,4 +135,10 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View{
     override fun launchAlertView(error: ALERT_TYPE) {
         this.launchAlert(error)
     }
+
+    override fun updateNotification(language: String, progress: Int) = notification.updateNotification(language, progress)
+
+    override fun cancelNotification(language: String) = notification.failedNotification(language)
+
+    override fun completeNotification(language: String) = notification.completeNotification(language)
 }

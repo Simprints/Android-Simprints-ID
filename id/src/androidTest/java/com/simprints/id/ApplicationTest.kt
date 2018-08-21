@@ -21,7 +21,7 @@ class ApplicationTest {
 
     @Rule
     @JvmField
-    val loginTestRule = ActivityTestRule(CheckLoginFromMainLauncherActivity::class.java, false, true)
+    val loginTestRule = ActivityTestRule(CheckLoginFromMainLauncherActivity::class.java, false, false)
 
     @Test
     fun rxJavaUndeliverableExceptionHappens_shouldBeHandled() {
