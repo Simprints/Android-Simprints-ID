@@ -16,7 +16,6 @@ interface CheckLoginFromIntentContract {
         fun checkCallingAppIsFromKnownSource()
         fun parseCallout(): Callout
         fun finishCheckLoginFromIntentActivity()
-        fun buildConnectionEvent(sessionEvents: SessionEvents): ConnectivitySnapshotEvent
     }
 
     interface Presenter : BasePresenter {

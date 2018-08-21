@@ -30,7 +30,6 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var simNetworkUtils: SimNetworkUtils
 
     companion object {
         const val LOGIN_REQUEST_CODE: Int = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 1
@@ -105,7 +104,4 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
             finish()
         }
     }
-
-    override fun buildConnectionEvent(sessionEvents: SessionEvents): ConnectivitySnapshotEvent =
-        ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, sessionEvents, timeHelper)
 }

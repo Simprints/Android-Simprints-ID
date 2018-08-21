@@ -6,7 +6,7 @@ import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.domain.Constants.GROUP.*
-import com.simprints.id.tools.utils.PeopleGeneratorUtils
+import com.simprints.id.shared.PeopleGeneratorUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File

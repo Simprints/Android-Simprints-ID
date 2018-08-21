@@ -1,4 +1,4 @@
-package com.simprints.id.tools.utils
+package com.simprints.id.shared
 
 import com.simprints.id.data.db.local.realm.models.rl_Fingerprint
 import com.simprints.id.data.db.local.realm.models.rl_Person
