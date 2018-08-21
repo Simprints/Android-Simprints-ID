@@ -19,21 +19,24 @@ open class RemoteConfigPrimitivePreference<T : Any>(prefs: ImprovedSharedPrefere
 
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         try {
-            @Suppress("UNCHECKED_CAST")
-            value = when (defValue) {
-                is Boolean -> remoteConfig.getBoolean(key)
-                is Long -> remoteConfig.getLong(key)
-                is Int -> remoteConfig.getLong(key).toInt()
-                is Short -> remoteConfig.getLong(key).toShort()
-                is Double -> remoteConfig.getDouble(key)
-                is Float -> remoteConfig.getDouble(key).toFloat()
-                is String -> remoteConfig.getString(key)
-                is ByteArray -> remoteConfig.getByteArray(key)
-                else -> throw NonPrimitiveTypeError.forTypeOf(defValue)
-            } as T
-            return value
+            value = getRemoteConfigValue()
         } catch (e: ClassCastException) {
-            return value
+            e.printStackTrace()
         }
+        return value
     }
+
+    @Suppress("UNCHECKED_CAST")
+    protected fun getRemoteConfigValue(): T =
+        when (defValue) {
+            is Boolean -> remoteConfig.getBoolean(key)
+            is Long -> remoteConfig.getLong(key)
+            is Int -> remoteConfig.getLong(key).toInt()
+            is Short -> remoteConfig.getLong(key).toShort()
+            is Double -> remoteConfig.getDouble(key)
+            is Float -> remoteConfig.getDouble(key).toFloat()
+            is String -> remoteConfig.getString(key)
+            is ByteArray -> remoteConfig.getByteArray(key)
+            else -> throw NonPrimitiveTypeError.forTypeOf(defValue)
+        } as T
 }
