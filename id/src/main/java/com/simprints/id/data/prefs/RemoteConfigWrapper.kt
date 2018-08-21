@@ -10,7 +10,9 @@ class RemoteConfigWrapper(private val remoteConfig: FirebaseRemoteConfig, prefs:
 
     var projectSettingsJsonString by PrimitivePreference(prefs, PROJECT_SETTINGS_JSON_STRING_KEY, PROJECT_SETTINGS_JSON_STRING_DEFAULT)
 
-    private val remoteConfigDefaults = mutableMapOf<String, Any>()
+    private val remoteConfigDefaults = mutableMapOf<String, Any>().also {
+        it[PROJECT_SPECIFIC_MODE_KEY] = PROJECT_SPECIFIC_MODE_DEFAULT
+    }
 
     fun <T : Any> prepareDefaultValue(key: String, default: T) {
         remoteConfigDefaults[key] = default
@@ -39,12 +41,13 @@ class RemoteConfigWrapper(private val remoteConfig: FirebaseRemoteConfig, prefs:
             null
         }
 
-    private fun isProjectSpecificMode(): Boolean {
-        return true // TODO
-    }
+    private fun isProjectSpecificMode(): Boolean = remoteConfig.getBoolean(PROJECT_SPECIFIC_MODE_KEY)
 
     companion object {
         private const val PROJECT_SETTINGS_JSON_STRING_KEY = "ProjectSettingsJsonString"
         private const val PROJECT_SETTINGS_JSON_STRING_DEFAULT = ""
+
+        private const val PROJECT_SPECIFIC_MODE_KEY = "ProjectSpecificMode"
+        private const val PROJECT_SPECIFIC_MODE_DEFAULT = false
     }
 }

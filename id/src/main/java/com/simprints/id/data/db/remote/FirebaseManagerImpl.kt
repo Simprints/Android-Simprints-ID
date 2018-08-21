@@ -221,6 +221,13 @@ class FirebaseManagerImpl(private val appContext: Context,
                 .handleResponse(::defaultResponseErrorHandling)
         }
 
+    override fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<String> =
+        getProjectApiClient().flatMap {
+            it.requestProjectConfig(projectId)
+                .retry(::retryCriteria)
+                .handleResponse(::defaultResponseErrorHandling)
+        }
+
     override fun getSessionsApiClient(): Single<SessionsRemoteInterface> =
         getCurrentFirestoreToken()
             .flatMap {

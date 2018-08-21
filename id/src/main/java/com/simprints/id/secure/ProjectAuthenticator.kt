@@ -3,6 +3,7 @@ package com.simprints.id.secure
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Project
@@ -26,6 +27,7 @@ open class ProjectAuthenticator(component: AppComponent,
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
 
     private val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
     private val publicKeyManager = PublicKeyManager(secureApiClient)
@@ -48,6 +50,8 @@ open class ProjectAuthenticator(component: AppComponent,
             .signIn(nonceScope.projectId)
             .fetchProjectInfo(nonceScope.projectId)
             .storeCredentials(nonceScope.userId)
+            .fetchProjectRemoteConfigSettings(nonceScope.projectId)
+            .storeProjectRemoteConfigSettings()
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
@@ -94,6 +98,17 @@ open class ProjectAuthenticator(component: AppComponent,
     private fun Single<out Project>.storeCredentials(userId: String): Completable =
         flatMapCompletable {
             loginInfoManager.storeCredentials(it.id, it.legacyId, userId)
+            Completable.complete()
+        }
+
+    private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<String> =
+        andThen(
+            dbManager.remote.loadProjectRemoteConfigSettingsJsonString(projectId)
+        )
+
+    private fun Single<out String>.storeProjectRemoteConfigSettings(): Completable =
+        flatMapCompletable {
+            remoteConfigWrapper.projectSettingsJsonString = it
             Completable.complete()
         }
 }

@@ -65,6 +65,7 @@ interface RemoteDbManager {
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
 
     fun loadProjectFromRemote(projectId: String): Single<Project>
+    fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<String>
 
     fun getPeopleApiClient(): Single<PeopleRemoteInterface>
     fun getSessionsApiClient(): Single<SessionsRemoteInterface>
