@@ -44,10 +44,10 @@ class RemoteConfigWrapper(private val remoteConfig: FirebaseRemoteConfig, prefs:
     private fun isProjectSpecificMode(): Boolean = remoteConfig.getBoolean(PROJECT_SPECIFIC_MODE_KEY)
 
     companion object {
-        private const val PROJECT_SETTINGS_JSON_STRING_KEY = "ProjectSettingsJsonString"
-        private const val PROJECT_SETTINGS_JSON_STRING_DEFAULT = ""
+        const val PROJECT_SETTINGS_JSON_STRING_KEY = "ProjectSettingsJsonString"
+        const val PROJECT_SETTINGS_JSON_STRING_DEFAULT = ""
 
-        private const val PROJECT_SPECIFIC_MODE_KEY = "ProjectSpecificMode"
-        private const val PROJECT_SPECIFIC_MODE_DEFAULT = false
+        const val PROJECT_SPECIFIC_MODE_KEY = "ProjectSpecificMode"
+        const val PROJECT_SPECIFIC_MODE_DEFAULT = false
     }
 }

@@ -40,6 +40,8 @@ class SettingsPreferencesManagerTest : DaggerForTests() {
         app = (RuntimeEnvironment.application as TestApplication)
         super.setUp()
         testAppComponent.inject(this)
+
+        whenever(remoteConfigSpy.getBoolean(RemoteConfigWrapper.PROJECT_SPECIFIC_MODE_KEY)).thenReturn(true)
     }
 
     @Test
