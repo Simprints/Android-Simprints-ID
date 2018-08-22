@@ -56,8 +56,8 @@ interface CollectFingerprintsContract {
 
         // Lifecycle
         fun getTitle(): String
-        fun handleOnStart()
-        fun handleOnStop()
+        fun handleOnResume()
+        fun handleOnPause()
         fun handleConfirmFingerprintsAndContinue()
         fun handleBackPressedWhileScanning()
         fun handleOnBackPressedToLeave()

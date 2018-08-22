@@ -70,7 +70,6 @@
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
     <string name="good_scan_direction">Swipe left to next finger</string>
-    <string name="last_scan_message">Press arrow to continue</string>
     <string name="please_scan">Please scan</string>
     <string name="poor_scan_direction">Please re-scan</string>
     <string name="scanning">Scanning…</string>
