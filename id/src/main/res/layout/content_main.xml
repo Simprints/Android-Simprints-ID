@@ -75,10 +75,12 @@
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
             android:layout_weight="1"
+            android:fontFamily="@font/muli_extralight"
             android:longClickable="true"
             android:text="@string/scan"
             android:textColor="#7F000000"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <View
             android:layout_width="match_parent"
