@@ -5,7 +5,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-
 class ScheduledPeopleSyncManager(private val preferencesManager: PreferencesManager) {
 
     fun scheduleSyncIfNecessary() {

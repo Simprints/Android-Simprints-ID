@@ -100,9 +100,9 @@ open class AppModuleForAnyTests(app: Application,
 
         sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, loginInfoManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, remoteDbManager, analyticsManager) }
 
-    override fun provideLocalEventDbManager(ctx: Context,
+    override fun provideSessionEventsLocalDbManager(ctx: Context,
                                             secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
-        sessionEventsLocalDbManagerRule.resolveDependency { super.provideLocalEventDbManager(ctx, secureDataManager) }
+        sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager) }
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }

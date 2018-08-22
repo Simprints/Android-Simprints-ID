@@ -176,8 +176,8 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideLocalEventDbManager(ctx: Context,
-                                        secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+    open fun provideSessionEventsLocalDbManager(ctx: Context,
+                                                secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
         RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
 
     @Provides

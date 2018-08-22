@@ -11,7 +11,6 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
-import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
@@ -34,6 +33,10 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                                     private val remoteDbManager: RemoteDbManager,
                                     private val analyticsManager: AnalyticsManager) : SessionEventsManager {
 
+    companion object {
+        const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
+    }
+
     private var activeSession: SessionEvents? = null
 
     var sessionsApi: SessionsRemoteInterface by lazyVar {
@@ -47,16 +50,12 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         activeSession = it
     }
 
-    override fun createSession(projectId: String): Single<SessionEvents> =
-        if (projectId.isNotEmpty()) {
-            createSessionWithAvailableInfo(projectId).let {
-                activeSession = it
-                closeLastSessionsIfPending()
-                    .andThen(insertOrUpdateSession(it))
-                    .toSingle { it }
-            }
-        } else {
-            Single.error<SessionEvents>(SimprintsError("Project ID Empty when creating session"))
+    override fun createSession(): Single<SessionEvents> =
+        createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN).let {
+            activeSession = it
+            closeLastSessionsIfPending()
+                .andThen(insertOrUpdateSession(it))
+                .toSingle { it }
         }
 
     private fun createSessionWithAvailableInfo(projectId: String): SessionEvents =
@@ -119,7 +118,9 @@ open class SessionEventsManagerImpl(private val ctx: Context,
             }
         }.flatMapCompletable {
             if (uploadSessionSucceeded(it)) {
-                sessionEventsLocalDbManager.deleteSessions(projectId, false)
+                sessionEventsLocalDbManager.deleteSessions(projectId, false).doFinally {
+                    sessionEventsLocalDbManager.deleteSessions(PROJECT_ID_FOR_NOT_SIGNED_IN)
+                }
             } else {
                 Completable.complete()
             }

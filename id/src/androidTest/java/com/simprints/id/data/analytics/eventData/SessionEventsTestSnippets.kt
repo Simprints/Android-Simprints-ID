@@ -10,6 +10,8 @@ import org.junit.Assert.assertNotNull
 fun verifyEventsAfterEnrolment(events: List<Event>) {
     Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
         CalloutEvent::class.java,
+        AuthorizationEvent::class.java,
+        AuthenticationEvent::class.java,
         ConnectivitySnapshotEvent::class.java,
         AuthorizationEvent::class.java,
         ScannerConnectionEvent::class.java,
@@ -25,6 +27,8 @@ fun verifyEventsAfterEnrolment(events: List<Event>) {
 fun verifyEventsAfterVerification(events: List<Event>) {
     Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
         CalloutEvent::class.java,
+        AuthorizationEvent::class.java,
+        AuthenticationEvent::class.java,
         ConnectivitySnapshotEvent::class.java,
         AuthorizationEvent::class.java,
         ScannerConnectionEvent::class.java,
@@ -41,6 +45,8 @@ fun verifyEventsAfterVerification(events: List<Event>) {
 fun verifyEventsAfterIdentification(events: List<Event>) {
     Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
         CalloutEvent::class.java,
+        AuthorizationEvent::class.java,
+        AuthenticationEvent::class.java,
         ConnectivitySnapshotEvent::class.java,
         AuthorizationEvent::class.java,
         ScannerConnectionEvent::class.java,
@@ -53,7 +59,7 @@ fun verifyEventsAfterIdentification(events: List<Event>) {
     ))
 }
 
-fun verifySessionIsOpen(sessionEvents: SessionEvents){
+fun verifySessionIsOpen(sessionEvents: SessionEvents) {
     assertNotNull(sessionEvents)
     assertNotNull(sessionEvents.id)
     assertNotSame(sessionEvents.startTime, 0L)
