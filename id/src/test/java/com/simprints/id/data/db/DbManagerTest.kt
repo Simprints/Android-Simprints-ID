@@ -11,8 +11,7 @@ import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
-import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.id.shared.DependencyRule.SpyRule
+import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.id.shared.createMockBehaviorService
 import com.simprints.id.shared.whenever
@@ -33,8 +32,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -57,7 +55,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     override var module by lazyVar {
         AppModuleForTests(
             app,
-            localDbManagerRule = SpyRule,
+            localDbManagerRule = ReplaceRule { spy(LocalDbManager::class.java) },
             remoteDbManagerRule = SpyRule,
             sessionEventsLocalDbManagerRule = MockRule
         )
