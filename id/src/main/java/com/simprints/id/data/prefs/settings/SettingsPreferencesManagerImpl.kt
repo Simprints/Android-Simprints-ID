@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.settings
 
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
@@ -18,7 +18,7 @@ import com.simprints.libsimprints.FingerIdentifier
 
 
 open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
-                                     private val remoteConfig: FirebaseRemoteConfig,
+                                     private val remoteConfigWrapper: RemoteConfigWrapper,
                                      private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                      groupSerializer: Serializer<Constants.GROUP>)
     : SettingsPreferencesManager {
@@ -107,7 +107,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Should the UI automatically slide forward?
     override var nudgeMode: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)
 
     // Has the CHW given consent to use Simprints ID?
     override var consent: Boolean
@@ -115,15 +115,15 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Threshold that determines the UI feedback for a given fingerprint quality
     override var qualityThreshold: Int
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, QUALITY_THRESHOLD_KEY, QUALITY_THRESHOLD_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, QUALITY_THRESHOLD_KEY, QUALITY_THRESHOLD_DEFAULT)
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
     override var returnIdCount: Int
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, NB_IDS_KEY, NB_IDS_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, NB_IDS_KEY, NB_IDS_DEFAULT)
 
     // Selected language
     override var language: String
-        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, LANGUAGE_KEY, LANGUAGE_DEFAULT)
+        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LANGUAGE_KEY, LANGUAGE_DEFAULT)
 
     // Active language position to be displayed in the list
     override var languagePosition: Int
@@ -131,67 +131,67 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Matcher type
     override var matcherType: Int
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, MATCHER_TYPE_KEY, MATCHER_TYPE_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, MATCHER_TYPE_KEY, MATCHER_TYPE_DEFAULT)
 
     // Timeout seconds
     override var timeoutS: Int
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, TIMEOUT_KEY, TIMEOUT_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, TIMEOUT_KEY, TIMEOUT_DEFAULT)
 
     // Sync group. Default is user
     override var syncGroup: Constants.GROUP
-        by RemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
 
     // Match group. Default is user
     override var matchGroup: Constants.GROUP
-        by RemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT, groupSerializer)
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT, groupSerializer)
 
     // Is the vibrate on
     override var vibrateMode: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, VIBRATE_KEY, VIBRATE_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, VIBRATE_KEY, VIBRATE_DEFAULT)
 
     // The number of seconds the screens pauses for when a match is complete
     override var matchingEndWaitTimeSeconds: Int
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
 
     // The map of default fingers
     /** @throws JsonSyntaxException */
     override var fingerStatus: Map<FingerIdentifier, Boolean>
-        by OverridableRemoteConfigComplexPreference(prefs, remoteConfig, remoteConfigDefaults, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
+        by OverridableRemoteConfigComplexPreference(prefs, remoteConfigWrapper, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
 
     override var syncOnCallout: Boolean
-        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SYNC_ON_CALLOUT_KEY, SYNC_ON_CALLOUT_DEFAULT)
+        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SYNC_ON_CALLOUT_KEY, SYNC_ON_CALLOUT_DEFAULT)
 
     override var scheduledBackgroundSync: Boolean
-        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_KEY, SCHEDULED_BACKGROUND_SYNC_DEFAULT)
+        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_KEY, SCHEDULED_BACKGROUND_SYNC_DEFAULT)
     override var scheduledBackgroundSyncOnlyOnWifi: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT)
     override var scheduledBackgroundSyncOnlyWhenCharging: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT)
     override var scheduledBackgroundSyncOnlyWhenNotLowBattery: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT)
 
     // Name of the partner's program
     override var programName: String
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PROGRAM_NAME_KEY, PROGRAM_NAME_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PROGRAM_NAME_KEY, PROGRAM_NAME_DEFAULT)
     // Name of the partner's organization
     override var organizationName: String
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, ORGANIZATION_NAME_KEY, ORGANIZATION_NAME_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, ORGANIZATION_NAME_KEY, ORGANIZATION_NAME_DEFAULT)
 
     // Whether the parental consent should be shown
     override var parentalConsentExists: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PARENTAL_CONSENT_EXISTS_KEY, PARENTAL_CONSENT_EXISTS_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PARENTAL_CONSENT_EXISTS_KEY, PARENTAL_CONSENT_EXISTS_DEFAULT)
     // The options of the general consent as a JSON string of booleans
     override var generalConsentOptionsJson: String
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, GENERAL_CONSENT_OPTIONS_JSON_KEY, GENERAL_CONSENT_OPTIONS_JSON_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, GENERAL_CONSENT_OPTIONS_JSON_KEY, GENERAL_CONSENT_OPTIONS_JSON_DEFAULT)
     // The options of the parental consent as a JSON string of booleans
     override var parentalConsentOptionsJson: String
-        by RemoteConfigPrimitivePreference(prefs, remoteConfig, remoteConfigDefaults, PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT)
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT)
 
     init {
-        remoteConfig.setDefaults(remoteConfigDefaults)
+        remoteConfigWrapper.registerAllPreparedDefaultValues()
     }
 
-    override fun getRemoteConfigStringPreference(key: String) = remoteConfig.getString(key)?: throw NoSuchPreferenceError.forKey(key)
+    override fun getRemoteConfigStringPreference(key: String) = remoteConfigWrapper.getString(key)?: throw NoSuchPreferenceError.forKey(key)
 
     override fun <T : Any> getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T = serializer.deserialize(getRemoteConfigStringPreference(key))
 

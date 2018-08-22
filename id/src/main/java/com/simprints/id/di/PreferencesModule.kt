@@ -7,6 +7,7 @@ import com.simprints.id.Application
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.RemoteConfigFetcher
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferencesImpl
@@ -47,6 +48,8 @@ open class PreferencesModule {
 
     @Provides @Singleton fun provideImprovedSharedPreferences(basePrefs: SharedPreferences): ImprovedSharedPreferences = ImprovedSharedPreferencesImpl(basePrefs)
 
+    @Provides @Singleton fun provideRemoteConfigWrapper(remoteConfig: FirebaseRemoteConfig, prefs: ImprovedSharedPreferences): RemoteConfigWrapper = RemoteConfigWrapper(remoteConfig, prefs)
+
     @Provides @Singleton fun provideScannerAttributesPreferencesManager(prefs: ImprovedSharedPreferences): ScannerAttributesPreferencesManager = ScannerAttributesPreferencesManagerImpl(prefs)
 
     @Provides @Singleton fun provideSessionParametersPreferencesManager(prefs: ImprovedSharedPreferences,
@@ -70,9 +73,9 @@ open class PreferencesModule {
                                                                             locationSerializer)
 
     @Provides @Singleton open fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences,
-                                                               remoteConfig: FirebaseRemoteConfig,
+                                                               remoteConfigWrapper: RemoteConfigWrapper,
                                                                @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                                                               @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, remoteConfig, fingerIdToBooleanSerializer, groupSerializer)
+                                                               @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer)
 
     @Provides @Singleton fun provideSyncPeoplePreferencesManager(prefs: ImprovedSharedPreferences): SyncPeoplePreferencesManager = SyncPeoplePreferencesManagerImpl(prefs)
     @Provides @Singleton fun provideSyncSessionsPreferencesManager(prefs: ImprovedSharedPreferences): SyncSessionsPreferencesManager = SyncSessionsPreferencesManagerImpl(prefs)
