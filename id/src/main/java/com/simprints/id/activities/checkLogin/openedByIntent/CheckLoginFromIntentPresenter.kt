@@ -51,15 +51,15 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     override fun setup() {
         view.checkCallingAppIsFromKnownSource()
-        try {
-            sessionEventsManager.createSession().doFinally {
+        sessionEventsManager.createSession().doFinally {
+            try {
                 extractSessionParametersOrThrow()
                 setLastUser()
-            }.subscribeBy(onError = { it.printStackTrace() })
-        } catch (exception: InvalidCalloutError) {
-            view.openAlertActivityForError(exception.alertType)
-            setupFailed = true
-        }
+            } catch (exception: InvalidCalloutError) {
+                view.openAlertActivityForError(exception.alertType)
+                setupFailed = true
+            }
+        }.subscribeBy(onError = { it.printStackTrace() })
     }
 
     private fun setLastUser() {

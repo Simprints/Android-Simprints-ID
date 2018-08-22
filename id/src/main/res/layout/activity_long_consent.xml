@@ -27,7 +27,7 @@
             android:id="@+id/longConsent_ScrollView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/simprints_blue"
+            android:background="@color/simprints_white"
             android:paddingTop="5dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp">
@@ -36,7 +36,6 @@
                 android:id="@+id/longConsent_TextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/simprints_white"
                 android:textSize="16sp"
                 tools:ignore="InefficientWeight" />
         </ScrollView>

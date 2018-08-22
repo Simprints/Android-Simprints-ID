@@ -79,15 +79,15 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
         app = (RuntimeEnvironment.application as TestApplication)
         super.setUp()
         testAppComponent.inject(this)
-        dbManager.initialiseDb()
-
-        sharedPrefs = getRoboSharedPreferences()
-        initLogInStateMock(sharedPrefs, remoteDbManagerMock)
-
         setupLocalAndRemoteManagersForApiTesting(
             localDbManagerSpy = localDbManagerMock,
             remoteDbManagerSpy = remoteDbManagerMock,
             sessionEventsLocalDbManagerMock = sessionEventsLocalDbManagerMock)
+
+        sharedPrefs = getRoboSharedPreferences()
+        initLogInStateMock(sharedPrefs, remoteDbManagerMock)
+
+        dbManager.initialiseDb()
     }
 
     @Test
