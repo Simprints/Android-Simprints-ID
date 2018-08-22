@@ -31,15 +31,19 @@ import javax.inject.Inject
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     component: AppComponent) : CheckLoginPresenter(view, component), CheckLoginFromIntentContract.Presenter {
 
-    @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
+    @Inject
+    lateinit var remoteConfigFetcher: RemoteConfigFetcher
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var possibleLegacyApiKey: String = ""
     private var setupFailed: Boolean = false
 
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
-    @Inject lateinit var dbManager: LocalDbManager
-    @Inject lateinit var simNetworkUtils: SimNetworkUtils
+    @Inject
+    lateinit var sessionEventsManager: SessionEventsManager
+    @Inject
+    lateinit var dbManager: LocalDbManager
+    @Inject
+    lateinit var simNetworkUtils: SimNetworkUtils
 
     init {
         component.inject(this)
@@ -47,10 +51,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     override fun setup() {
         view.checkCallingAppIsFromKnownSource()
-
         try {
-            extractSessionParametersOrThrow()
-            setLastUser()
+            sessionEventsManager.createSession().doFinally {
+                extractSessionParametersOrThrow()
+                setLastUser()
+            }.subscribeBy(onError = { it.printStackTrace() })
         } catch (exception: InvalidCalloutError) {
             view.openAlertActivityForError(exception.alertType)
             setupFailed = true
@@ -109,9 +114,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     /** @throws DifferentUserIdSignedInException */
     override fun isUserIdStoredAndMatches() =
-        //if (dataManager.userId != dataManager.getSignedInUserIdOrEmpty())
-        //    throw DifferentUserIdSignedInException()
-        //else
+    //if (dataManager.userId != dataManager.getSignedInUserIdOrEmpty())
+    //    throw DifferentUserIdSignedInException()
+    //else
         /** Hack to support multiple users: we do not check if the signed UserId
         matches the userId from the Intent */
         loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()
@@ -121,33 +126,30 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
          *  the userId in the Intent as new signed User */
         loginInfoManager.signedInUserId = preferencesManager.userId
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
-        initSessionEvents(loginInfoManager.getSignedInProjectIdOrEmpty())
+        addInfoIntoSessionEventsAfterUserSignIn()
         view.openLaunchActivity()
     }
 
-    private fun initSessionEvents(projectId: String) {
+    private fun addInfoIntoSessionEventsAfterUserSignIn() {
 
         try {
             Singles.zip(
-                createSessionEvents(projectId),
                 fetchAnalyticsId(),
-                fetchPeopleCountInLocalDatabase()) { _: SessionEvents, gaId: String, dbCount: Int ->
+                fetchPeopleCountInLocalDatabase()) { gaId: String, dbCount: Int ->
                 return@zip Pair(gaId, dbCount)
-
             }.flatMapCompletable { gaIdAndDbCount ->
                 populateSessionWithAnalyticsIdAndDbInfo(gaIdAndDbCount.first, gaIdAndDbCount.second)
             }.subscribeBy(onError = { it.printStackTrace() })
-
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private fun createSessionEvents(projectId: String): Single<SessionEvents> = sessionEventsManager.createSession(projectId)
     private fun fetchAnalyticsId(): Single<String> = analyticsManager.analyticsId.onErrorReturn { "" }
     private fun fetchPeopleCountInLocalDatabase(): Single<Int> = dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }
     private fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, dbCount: Int): Completable =
         sessionEventsManager.updateSession({
+            it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             it.analyticsId = gaId
             it.databaseInfo = DatabaseInfo(dbCount)
             it.events.apply {

@@ -62,12 +62,18 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     @JvmField
     val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
-    @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
-    @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
-    @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
-    @Inject lateinit var remoteDbManager: RemoteDbManager
-    @Inject lateinit var localDbManager: LocalDbManager
-    @Inject lateinit var timeHelper: TimeHelper
+    @Inject
+    lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
+    @Inject
+    lateinit var sessionEventsManagerSpy: SessionEventsManager
+    @Inject
+    lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
+    @Inject
+    lateinit var remoteDbManager: RemoteDbManager
+    @Inject
+    lateinit var localDbManager: LocalDbManager
+    @Inject
+    lateinit var timeHelper: TimeHelper
 
     override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
         PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
@@ -108,7 +114,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
     @Test
     fun createSession_shouldReturnASession() {
-        sessionEventsManagerSpy.createSession(testProjectId).test().also {
+        sessionEventsManagerSpy.createSession().test().also {
             it.awaitTerminalEvent()
             it.assertComplete()
             verifySessionIsOpen(it.values().first())
@@ -143,7 +149,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         assertEquals(oldSession.relativeEndTime, 0)
         realmSessionEventsManager.insertOrUpdateSessionEvents(oldSession).blockingAwait()
 
-        sessionEventsManagerSpy.createSession(testProjectId).test().awaitTerminalEvent()
+        sessionEventsManagerSpy.createSession().blockingGet()
+        sessionEventsManagerSpy.updateSession({ it.projectId = testProjectId }).blockingGet()
 
         val sessions = realmSessionEventsManager.loadSessions(testProjectId).blockingGet()
 
@@ -295,13 +302,14 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             val personCreatedForMatchingActivity = personCreatedArg.firstValue
             val personCreationEvent = session.events.filterIsInstance(PersonCreationEvent::class.java)[0]
             val usefulTemplatesFromEvents = session.events
-                                                          .filterIsInstance(FingerprintCaptureEvent::class.java)
-                                                          .filter { it.id in personCreationEvent.fingerprintCaptureIds }
-                                                          .map { it.fingerprint?.template }
+                .filterIsInstance(FingerprintCaptureEvent::class.java)
+                .filter { it.id in personCreationEvent.fingerprintCaptureIds }
+                .map { it.fingerprint?.template }
 
             Truth.assertThat(usefulTemplatesFromEvents)
                 .containsExactlyElementsIn(personCreatedForMatchingActivity.fingerprints.map {
-                    Utils.byteArrayToBase64(it.templateBytes) })
+                    Utils.byteArrayToBase64(it.templateBytes)
+                })
         }
     }
 
@@ -314,7 +322,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     }
 
     private fun createAndSaveFakeCloseSession(projectId: String = testProjectId, id: String = "close_session"): String =
-        timeHelper.let {
+        timeHelper.let { it ->
             createFakeSession(it, projectId, id).apply {
                 startTime = it.now() - 1000
                 relativeEndTime = nowRelativeToStartTime(it) - 10

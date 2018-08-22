@@ -261,10 +261,14 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     override fun handleOnResume() {
-        appState.scanner.registerButtonListener(scannerButton)
+        if (waitingForConfirmation) {
+            appState.scanner.registerButtonListener(scannerButton)
+        }
     }
 
     override fun handleOnPause() {
-        appState.scanner.unregisterButtonListener(scannerButton)
+        if (appState.scanner != null) {
+            appState.scanner.unregisterButtonListener(scannerButton)
+        }
     }
 }
