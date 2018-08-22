@@ -69,9 +69,9 @@ class CollectFingerprintsActivity :
         setListenerToMissingFinger()
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewPresenter.handleOnStart()
+    override fun onResume() {
+        super.onResume()
+        viewPresenter.handleOnResume()
     }
 
     override fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean) {
@@ -160,9 +160,9 @@ class CollectFingerprintsActivity :
         finish()
     }
 
-    override fun onStop() {
-        super.onStop()
-        viewPresenter.handleOnStop()
+    override fun onPause() {
+        super.onPause()
+        viewPresenter.handleOnPause()
     }
 
     override fun doLaunchAlert(alertType: ALERT_TYPE) {

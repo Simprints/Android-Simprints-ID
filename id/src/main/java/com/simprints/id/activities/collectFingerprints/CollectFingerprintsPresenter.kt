@@ -163,11 +163,11 @@ class CollectFingerprintsPresenter(private val context: Context,
         scanningHelper.reconnect()
     }
 
-    override fun handleOnStart() {
+    override fun handleOnResume() {
         scanningHelper.startListeners()
     }
 
-    override fun handleOnStop() {
+    override fun handleOnPause() {
         scanningHelper.stopListeners()
     }
 
@@ -306,8 +306,10 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleMissingFingerClick() {
-        scanningHelper.setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger()
-        showSplashAndAddNewFingerIfNecessary()
+        if(!currentFinger().isCollecting) {
+            scanningHelper.setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger()
+            showSplashAndAddNewFingerIfNecessary()
+        }
     }
 
     companion object {
