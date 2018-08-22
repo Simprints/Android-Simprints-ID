@@ -3,6 +3,7 @@ package com.simprints.id.testUtils.roboletric
 import android.content.SharedPreferences
 import com.google.gson.JsonObject
 import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.anyOrNull
 import com.simprints.id.activities.CheckLoginFromIntentActivityTest
 import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -25,7 +26,7 @@ const val SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY = "SHARED_PREFS_FOR_MOCK_LOCAL_DB_K
 
 fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteDbManagerMock: RemoteDbManager) {
     val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }
-    val projectSettings = JsonObject().apply{ addProperty("key", "value") }
+    val projectSettings = JsonObject().apply { addProperty("key", "value") }
     whenever(localDbManagerMock.loadProjectFromLocal(anyNotNull())).thenReturn(Single.just(project))
     whenever(remoteDbManagerMock.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(project))
     whenever(localDbManagerMock.saveProjectIntoLocal(anyNotNull())).thenReturn(Completable.complete())
@@ -84,6 +85,7 @@ fun setupLocalAndRemoteManagersForApiTesting(mockServer: MockWebServer? = null,
 }
 
 fun setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager) {
-    whenever(sessionEventsLocalDbManagerMock.loadSessions(any(), any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
+    //doReturn(Single.create<ArrayList<SessionEvents>> { it.onError(IllegalStateException()) }).`when`(sessionEventsLocalDbManagerMock).loadSessions(anyOrNull(), anyOrNull())
+    whenever(sessionEventsLocalDbManagerMock.loadSessions(anyOrNull(), anyOrNull())).thenReturn(Single.create { it.onError(IllegalStateException()) })
     whenever(sessionEventsLocalDbManagerMock.insertOrUpdateSessionEvents(any())).thenReturn(Completable.complete())
 }
