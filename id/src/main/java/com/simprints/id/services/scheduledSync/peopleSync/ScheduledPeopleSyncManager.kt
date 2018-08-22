@@ -32,7 +32,7 @@ class ScheduledPeopleSyncManager(private val preferencesManager: PreferencesMana
     }
 
     companion object {
-        private const val SYNC_REPEAT_INTERVAL = 10L
-        private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
+        private const val SYNC_REPEAT_INTERVAL = 6L
+        private val SYNC_REPEAT_UNIT = TimeUnit.HOURS
     }
 }
