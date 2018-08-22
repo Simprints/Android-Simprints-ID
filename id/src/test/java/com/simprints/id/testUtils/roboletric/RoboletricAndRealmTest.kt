@@ -1,6 +1,7 @@
 package com.simprints.id.testUtils.roboletric
 
 import android.content.SharedPreferences
+import com.google.gson.JsonObject
 import com.nhaarman.mockito_kotlin.any
 import com.simprints.id.activities.CheckLoginFromIntentActivityTest
 import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
@@ -24,9 +25,11 @@ const val SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY = "SHARED_PREFS_FOR_MOCK_LOCAL_DB_K
 
 fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteDbManagerMock: RemoteDbManager) {
     val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }
+    val projectSettings = JsonObject().apply{ addProperty("key", "value") }
     whenever(localDbManagerMock.loadProjectFromLocal(anyNotNull())).thenReturn(Single.just(project))
     whenever(remoteDbManagerMock.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(project))
     whenever(localDbManagerMock.saveProjectIntoLocal(anyNotNull())).thenReturn(Completable.complete())
+    whenever(remoteDbManagerMock.loadProjectRemoteConfigSettingsJsonString(anyNotNull())).thenReturn(Single.just(projectSettings))
 }
 
 fun initLogInStateMock(sharedPrefs: SharedPreferences,
