@@ -54,7 +54,7 @@ public class FingerFragment extends Fragment {
         fingerNumber.setTextColor(getResources().getColor(R.color.simprints_blue));
         if (finger.isLastFinger() && (finger.getStatus() == Finger.Status.GOOD_SCAN
             || finger.getStatus() == Finger.Status.RESCAN_GOOD_SCAN)) {
-            directionText.setText(R.string.last_scan_message);
+            directionText.setText(R.string.empty);
         } else {
             directionText.setText(finger.getStatus().getTextDirection());
         }
