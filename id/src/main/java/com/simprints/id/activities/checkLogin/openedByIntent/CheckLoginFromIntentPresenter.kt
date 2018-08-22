@@ -19,6 +19,7 @@ import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.id.tools.utils.StringsUtils
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -43,6 +44,15 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     init {
         component.inject(this)
+        initSession()
+    }
+
+    private fun initSession() {
+        preferencesManager.initializeSessionState(newSessionId(), timeHelper.now())
+    }
+
+    private fun newSessionId(): String {
+        return StringsUtils.randomUUID()
     }
 
     override fun setup() {
@@ -133,11 +143,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 fetchAnalyticsId(),
                 fetchPeopleCountInLocalDatabase()) { _: SessionEvents, gaId: String, dbCount: Int ->
                 return@zip Pair(gaId, dbCount)
-
             }.flatMapCompletable { gaIdAndDbCount ->
                 populateSessionWithAnalyticsIdAndDbInfo(gaIdAndDbCount.first, gaIdAndDbCount.second)
             }.subscribeBy(onError = { it.printStackTrace() })
-
         } catch (e: Exception) {
             e.printStackTrace()
         }

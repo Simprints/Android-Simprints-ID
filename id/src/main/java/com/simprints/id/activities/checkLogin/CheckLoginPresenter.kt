@@ -12,7 +12,6 @@ import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractor
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.utils.StringsUtils
 import javax.inject.Inject
 
 abstract class CheckLoginPresenter(
@@ -29,15 +28,6 @@ abstract class CheckLoginPresenter(
 
     init {
         component.inject(this)
-        initSession()
-    }
-
-    private fun initSession() {
-        preferencesManager.initializeSessionState(newSessionId(), timeHelper.now())
-    }
-
-    private fun newSessionId(): String {
-        return StringsUtils.randomUUID()
     }
 
     protected fun checkSignedInStateAndMoveOn() {
