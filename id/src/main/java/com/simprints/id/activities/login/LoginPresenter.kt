@@ -82,12 +82,16 @@ class LoginPresenter(val view: LoginContract.View,
     }
 
     private fun handleSignInSuccess() {
-        addAuthenticatedEvent(AUTHENTICATED)
+        addAuthenticatedEventAndUpdateProjectIdIfRequired(AUTHENTICATED)
         view.handleSignInSuccess()
     }
 
-    private fun addAuthenticatedEvent(result: AuthenticationEvent.Result) {
+    private fun addAuthenticatedEventAndUpdateProjectIdIfRequired(result: AuthenticationEvent.Result) {
         sessionEventsManager.updateSessionInBackground({
+            if (result == AUTHENTICATED) {
+                it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+            }
+
             it.events.add(AuthenticationEvent(
                 it.timeRelativeToStartTime(startTimeLogin),
                 it.timeRelativeToStartTime(timeHelper.now()),
@@ -108,7 +112,7 @@ class LoginPresenter(val view: LoginContract.View,
             else -> view.handleSignInFailedUnknownReason().also { reason = TECHNICAL_FAILURE }
         }
 
-        addAuthenticatedEvent(reason)
+        addAuthenticatedEventAndUpdateProjectIdIfRequired(reason)
     }
 
     private fun logSignInError(e: Throwable) {

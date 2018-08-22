@@ -60,7 +60,7 @@ class GuidSelectionServiceTest : DaggerForAndroidTests() {
     fun testWithStartedService() {
         launchActivityEnrol(calloutCredentials, scanTestRule)
 
-        var session = sessionEventsManagerSpy.createSession(calloutCredentials.projectId).blockingGet()
+        var session = sessionEventsManagerSpy.createSession().blockingGet()
 
         val simHelper = SimHelper(calloutCredentials.projectId, calloutCredentials.userId)
         simHelper.confirmIdentity(app, session.id, "some_guid_confirmed")

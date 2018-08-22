@@ -30,7 +30,7 @@ abstract class CheckLoginPresenter(
     init {
         component.inject(this)
         initSession()
-    }
+    }gi
 
     private fun initSession() {
         preferencesManager.initializeSessionState(newSessionId(), timeHelper.now())

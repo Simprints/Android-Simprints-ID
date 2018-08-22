@@ -14,7 +14,7 @@ interface SessionEventsManager {
 
     val loginInfoManager: LoginInfoManager
 
-    fun createSession(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty()): Single<SessionEvents>
+    fun createSession(): Single<SessionEvents>
     fun getCurrentSession(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty() ): Single<SessionEvents>
 
     fun updateSession(block: (sessionEvents: SessionEvents) -> Unit,
