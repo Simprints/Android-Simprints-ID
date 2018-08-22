@@ -34,7 +34,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                                     private val analyticsManager: AnalyticsManager) : SessionEventsManager {
 
     companion object {
-        val PROJECT_ID_FOR_USER_NOT_SIGNED_ID = "USER_NOT_SIGNED_ID"
+        const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
     }
 
     private var activeSession: SessionEvents? = null
@@ -51,7 +51,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
     }
 
     override fun createSession(): Single<SessionEvents> =
-        createSessionWithAvailableInfo(PROJECT_ID_FOR_USER_NOT_SIGNED_ID).let {
+        createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN).let {
             activeSession = it
             closeLastSessionsIfPending()
                 .andThen(insertOrUpdateSession(it))
@@ -119,7 +119,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         }.flatMapCompletable {
             if (uploadSessionSucceeded(it)) {
                 sessionEventsLocalDbManager.deleteSessions(projectId, false).doFinally {
-                    sessionEventsLocalDbManager.deleteSessions(PROJECT_ID_FOR_USER_NOT_SIGNED_ID)
+                    sessionEventsLocalDbManager.deleteSessions(PROJECT_ID_FOR_NOT_SIGNED_IN)
                 }
             } else {
                 Completable.complete()
