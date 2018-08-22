@@ -5,6 +5,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
+import com.google.gson.JsonElement
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
@@ -217,6 +218,13 @@ class FirebaseManagerImpl(private val appContext: Context,
     override fun loadProjectFromRemote(projectId: String): Single<Project> =
         getProjectApiClient().flatMap {
             it.requestProject(projectId)
+                .retry(::retryCriteria)
+                .handleResponse(::defaultResponseErrorHandling)
+        }
+
+    override fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JsonElement> =
+        getProjectApiClient().flatMap {
+            it.requestProjectConfig(projectId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
         }

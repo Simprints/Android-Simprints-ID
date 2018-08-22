@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.remote
 
 import com.google.firebase.FirebaseApp
+import com.google.gson.JsonElement
 import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
@@ -65,6 +66,7 @@ interface RemoteDbManager {
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
 
     fun loadProjectFromRemote(projectId: String): Single<Project>
+    fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JsonElement>
 
     fun getPeopleApiClient(): Single<PeopleRemoteInterface>
     fun getSessionsApiClient(): Single<SessionsRemoteInterface>
