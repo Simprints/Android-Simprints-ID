@@ -10,9 +10,12 @@
     <color name="simprints_blue">#00B3D1</color>
     <color name="simprints_white">#ffffff</color>
     <color name="simprints_grey">#a3a3a3</color>
-    <color name="simprints_green">#FF00CC00</color>
-    <color name="simprints_red">#FFCC0000</color>
+    <color name="simprints_green">#2B9962</color>
+    <color name="simprints_red">#CE4141</color>
     <color name="simprints_separator">#FFC0C0C0</color>
     <color name="simprints_main_bg">#FFEEEEEE</color>
     <color name="simprints_alert_orange">#ffcc00</color>
+
+    <color name="simprints_scan_button_gray">#FF888888</color>
+
 </resources>
