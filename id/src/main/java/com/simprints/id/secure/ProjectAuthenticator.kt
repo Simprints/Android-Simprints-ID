@@ -1,6 +1,7 @@
 package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.google.gson.JsonElement
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -16,7 +17,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
-import org.json.JSONObject
 import java.io.IOException
 import javax.inject.Inject
 
@@ -102,12 +102,12 @@ open class ProjectAuthenticator(component: AppComponent,
             Completable.complete()
         }
 
-    private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<JSONObject> =
+    private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<JsonElement> =
         andThen(
             dbManager.remote.loadProjectRemoteConfigSettingsJsonString(projectId)
         )
 
-    private fun Single<out JSONObject>.storeProjectRemoteConfigSettings(): Completable =
+    private fun Single<out JsonElement>.storeProjectRemoteConfigSettings(): Completable =
         flatMapCompletable {
             remoteConfigWrapper.projectSettingsJsonString = it.toString()
             Completable.complete()

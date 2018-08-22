@@ -5,6 +5,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
+import com.google.gson.JsonElement
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
@@ -35,7 +36,6 @@ import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.jetbrains.anko.doAsync
-import org.json.JSONObject
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
@@ -222,7 +222,7 @@ class FirebaseManagerImpl(private val appContext: Context,
                 .handleResponse(::defaultResponseErrorHandling)
         }
 
-    override fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JSONObject> =
+    override fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JsonElement> =
         getProjectApiClient().flatMap {
             it.requestProjectConfig(projectId)
                 .retry(::retryCriteria)
