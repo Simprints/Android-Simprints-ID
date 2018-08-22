@@ -30,10 +30,7 @@ class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
                         add(Connection(it.typeName, it.detailedState))
                     }
                 }
-            } catch (e: Exception) {
-                //The API
-                e.printStackTrace()
-            }
+            } catch (e: Exception) { }
         }
 
     override var mobileNetworkType: String? =
