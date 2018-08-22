@@ -257,7 +257,14 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
         consentConfirmed = true
         waitingForConfirmation = false
-        appState.scanner.unregisterButtonListener(scannerButton)
         view.continueToNextActivity()
+    }
+
+    override fun handleOnResume() {
+        appState.scanner.registerButtonListener(scannerButton)
+    }
+
+    override fun handleOnPause() {
+        appState.scanner.unregisterButtonListener(scannerButton)
     }
 }

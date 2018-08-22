@@ -32,6 +32,8 @@ interface LaunchContract {
 
         fun handleOnRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray)
         fun handleOnDestroy()
+        fun handleOnResume()
+        fun handleOnPause()
 
         fun tearDownAppWithResult(resultCode: Int, resultData: Intent?)
         fun confirmConsentAndContinueToNextActivity()
