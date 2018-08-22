@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.remote.network
 
+import com.google.gson.JsonElement
 import com.simprints.id.domain.Project
 import com.simprints.id.network.NetworkConstants
 import io.reactivex.Single
@@ -20,5 +21,5 @@ interface ProjectRemoteInterface {
 
     @GET("projects/{projectId}/config")
     fun requestProjectConfig(
-        @Path("projectId") projectId: String): Single<Response<JSONObject>>
+        @Path("projectId") projectId: String): Single<Response<JsonElement>>
 }
