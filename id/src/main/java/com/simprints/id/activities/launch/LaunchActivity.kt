@@ -37,6 +37,11 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         viewPresenter.start()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewPresenter.handleOnResume()
+    }
+
     private fun setButtonClickListeners() {
         consentDeclineButton.setOnClickListener { viewPresenter.handleDeclinePressed() }
         consentAcceptButton.setOnClickListener { viewPresenter.confirmConsentAndContinueToNextActivity() }
@@ -108,6 +113,11 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override fun onBackPressed() {
         viewPresenter.handleOnBackPressed()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewPresenter.handleOnPause()
     }
 
     override fun onDestroy() {
