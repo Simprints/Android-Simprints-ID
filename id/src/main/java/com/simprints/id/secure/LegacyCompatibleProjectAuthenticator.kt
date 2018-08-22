@@ -16,7 +16,7 @@ import java.io.IOException
 
 class LegacyCompatibleProjectAuthenticator(component: AppComponent,
                                            safetyNetClient: SafetyNetClient,
-                                           secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
+                                           secureApiClient: SecureApiInterface,
                                            attestationManager: AttestationManager = AttestationManager()
 ) : ProjectAuthenticator(component, safetyNetClient, secureApiClient, attestationManager) {
 
