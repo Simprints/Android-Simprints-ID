@@ -11,7 +11,6 @@ import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
-import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.*
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -22,7 +21,7 @@ import javax.inject.Inject
 
 open class ProjectAuthenticator(component: AppComponent,
                                 private val safetyNetClient: SafetyNetClient,
-                                secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
+                                secureApiClient: SecureApiInterface,
                                 private val attestationManager: AttestationManager = AttestationManager()) {
 
     @Inject lateinit var secureDataManager: SecureDataManager

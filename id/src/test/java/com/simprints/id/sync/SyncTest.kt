@@ -29,7 +29,7 @@ import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.mockServer.assertPathUrlParam
 import com.simprints.id.testUtils.mockServer.assertQueryUrlParam
-import com.simprints.id.testUtils.retrofit.createMockBehaviorService
+import com.simprints.id.shared.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar

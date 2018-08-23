@@ -16,6 +16,7 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
+import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
 import com.simprints.id.shared.DependencyRule.RealRule
@@ -39,7 +40,8 @@ open class AppModuleForAnyTests(app: Application,
                                 open var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
                                 open var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
                                 open var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
-                                open var simNetworkUtilsRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var simNetworkUtilsRule: DependencyRule = RealRule,
+                                open var secureApiInterfaceRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -84,11 +86,14 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
         bluetoothComponentAdapterRule.resolveDependency { super.provideBluetoothComponentAdapter() }
 
+    override fun provideSecureApiInterface(): SecureApiInterface =
+        secureApiInterfaceRule.resolveDependency { super.provideSecureApiInterface() }
+
     override fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
         scheduledPeopleSyncManagerRule.resolveDependency { super.provideScheduledPeopleSyncManager(preferencesManager) }
 
-    override fun provideScheduledSessionsSyncManager(preferencesManager: PreferencesManager): ScheduledSessionsSyncManager =
-        scheduledSessionsSyncManagerRule.resolveDependency { super.provideScheduledSessionsSyncManager(preferencesManager) }
+    override fun provideScheduledSessionsSyncManager(): ScheduledSessionsSyncManager =
+        scheduledSessionsSyncManagerRule.resolveDependency { super.provideScheduledSessionsSyncManager() }
 
     override fun provideSessionEventsManager(ctx: Context,
                                              loginInfoManager: LoginInfoManager,

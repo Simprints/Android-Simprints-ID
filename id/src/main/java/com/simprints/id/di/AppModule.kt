@@ -32,6 +32,8 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
+import com.simprints.id.network.SimApiClient
+import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.progress.notifications.NotificationFactory
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
@@ -138,6 +140,9 @@ open class AppModule(val app: Application) {
     open fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter = AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
 
     @Provides
+    open fun provideSecureApiInterface(): SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api
+
+    @Provides
     @Singleton
     fun provideSetup(preferencesManager: PreferencesManager,
                      dbManager: DbManager,
@@ -196,6 +201,6 @@ open class AppModule(val app: Application) {
         ScheduledPeopleSyncManager(preferencesManager)
 
     @Provides
-    open fun provideScheduledSessionsSyncManager(preferencesManager: PreferencesManager): ScheduledSessionsSyncManager =
-        ScheduledSessionsSyncManager(preferencesManager)
+    open fun provideScheduledSessionsSyncManager(): ScheduledSessionsSyncManager =
+        ScheduledSessionsSyncManager()
 }

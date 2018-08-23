@@ -12,6 +12,7 @@ import com.simprints.id.activities.IntentKeys
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
+import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.scannerAppIntent
@@ -31,6 +32,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override lateinit var viewPresenter: LoginContract.Presenter
     @Inject lateinit var preferences: PreferencesManager
+    @Inject lateinit var secureApiInterface: SecureApiInterface
 
     private var possibleLegacyProjectId: String? = null
     val app by lazy {
@@ -55,7 +57,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
         val projectAuthenticator = LegacyCompatibleProjectAuthenticator(
             component,
-            SafetyNet.getClient(this))
+            SafetyNet.getClient(this),
+            secureApiInterface)
 
         viewPresenter = LoginPresenter(this, component, projectAuthenticator)
         viewPresenter.start()

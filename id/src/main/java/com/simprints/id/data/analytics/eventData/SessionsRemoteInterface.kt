@@ -15,5 +15,5 @@ interface SessionsRemoteInterface {
 
     @POST("projects/{projectId}/sessions")
     fun uploadSessions(@Path("projectId") projectId: String,
-                       @Body sessionsJson: HashMap<String, Array<SessionEvents>>): Single<Result<Unit>>
+                       @Body sessionsJson: HashMap<String, Array<SessionEvents>>): Single<Result<Void>>
 }

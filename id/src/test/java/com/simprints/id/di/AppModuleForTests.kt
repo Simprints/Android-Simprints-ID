@@ -21,22 +21,24 @@ open class AppModuleForTests(app: Application,
                              override var sessionEventsLocalDbManagerRule: DependencyRule = MockRule, //Roboletric doesn't support Realm
                              override var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
                              override var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
-                             override var simNetworkUtilsRule: DependencyRule = RealRule)
+                             override var simNetworkUtilsRule: DependencyRule = RealRule,
+                             override var secureApiInterfaceRule: DependencyRule = RealRule)
     : AppModuleForAnyTests(
     app,
-    localDbManagerRule,
-    remoteDbManagerRule,
-    dbManagerRule,
-    secureDataManagerRule,
-    dataManagerRule,
-    loginInfoManagerRule,
-    analyticsManagerRule,
-    bluetoothComponentAdapterRule,
-    sessionEventsManagerRule,
-    sessionEventsLocalDbManagerRule,
-    scheduledPeopleSyncManagerRule,
-    scheduledSessionsSyncManagerRule,
-    simNetworkUtilsRule) {
+    localDbManagerRule = localDbManagerRule,
+    remoteDbManagerRule = remoteDbManagerRule,
+    dbManagerRule = dbManagerRule,
+    secureDataManagerRule = secureDataManagerRule,
+    dataManagerRule = dataManagerRule,
+    loginInfoManagerRule = loginInfoManagerRule,
+    analyticsManagerRule = analyticsManagerRule,
+    bluetoothComponentAdapterRule = bluetoothComponentAdapterRule,
+    sessionEventsManagerRule = sessionEventsManagerRule,
+    sessionEventsLocalDbManagerRule = sessionEventsLocalDbManagerRule,
+    scheduledPeopleSyncManagerRule = scheduledPeopleSyncManagerRule,
+    scheduledSessionsSyncManagerRule = scheduledSessionsSyncManagerRule,
+    simNetworkUtilsRule = simNetworkUtilsRule,
+    secureApiInterfaceRule = secureApiInterfaceRule) {
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
 }

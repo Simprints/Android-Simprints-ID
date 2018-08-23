@@ -18,7 +18,6 @@ import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTemplates.HappyWifi
 import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
@@ -32,7 +31,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, DaggerForAndroidTests() {
+class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     private val calloutCredentials = CalloutCredentials(
         "bWOFHInKA2YaQwrxZ7uJ",
@@ -76,7 +75,6 @@ class AuthTestsHappyWifi : FirstUseLocal, HappyWifi, DaggerForAndroidTests() {
 
     @Before
     override fun setUp() {
-        super<HappyWifi>.setUp()
         app = InstrumentationRegistry.getTargetContext().applicationContext as Application
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
