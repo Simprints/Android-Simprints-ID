@@ -87,8 +87,8 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
         scheduledPeopleSyncManagerRule.resolveDependency { super.provideScheduledPeopleSyncManager(preferencesManager) }
 
-    override fun provideScheduledSessionsSyncManager(preferencesManager: PreferencesManager): ScheduledSessionsSyncManager =
-        scheduledSessionsSyncManagerRule.resolveDependency { super.provideScheduledSessionsSyncManager(preferencesManager) }
+    override fun provideScheduledSessionsSyncManager(): ScheduledSessionsSyncManager =
+        scheduledSessionsSyncManagerRule.resolveDependency { super.provideScheduledSessionsSyncManager() }
 
     override fun provideSessionEventsManager(ctx: Context,
                                              loginInfoManager: LoginInfoManager,
