@@ -188,6 +188,13 @@ repositories {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://maven.fabric.io/public" }
     maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+    maven {
+        url "http://178.62.61.39:8081/artifactory/libs-release-local"
+        credentials {
+            username = "${SIMPRINTS_ARTIFACTORY_USERNAME}"
+            password = "${SIMPRINTS_ARTIFACTORY_PASSWORD}"
+        }
+    }
 }
 
 android {
