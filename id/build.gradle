@@ -188,6 +188,13 @@ repositories {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://maven.fabric.io/public" }
     maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+    maven {
+        url "http://178.62.61.39:8081/artifactory/libs-release-local"
+        credentials {
+            username = "${SIMPRINTS_ARTIFACTORY_USERNAME}"
+            password = "${SIMPRINTS_ARTIFACTORY_PASSWORD}"
+        }
+    }
 }
 
 android {
@@ -263,6 +270,7 @@ dependencies {
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
+    androidTestImplementation "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
 
@@ -306,8 +314,8 @@ dependencies {
     androidTestImplementation 'com.nhaarman:mockito-kotlin:1.5.0'
 
     // Android test
-    androidTestImplementation 'org.mockito:mockito-core:2.18.3'
-    androidTestImplementation 'org.mockito:mockito-android:2.18.3'
+    androidTestImplementation "org.mockito:mockito-core:$mockito_version"
+    androidTestImplementation "org.mockito:mockito-android:$mockito_version"
 
     androidTestImplementation('com.schibsted.spain:barista:2.5.0') {
         exclude group: "com.android.support"
@@ -315,7 +323,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlin"
         exclude group: "com.google.guava"
     }
-    androidTestImplementation 'com.simprints:cerberus-library:2018.1.1-dev-1'
+
     androidTestImplementation 'com.simprints:remote-admin-client:2017.4.0-dev-5'
     androidTestImplementation "com.simprints:mockscanner:2018.3.0-dev0"
     testImplementation "com.simprints:mockscanner:2018.3.0-dev0"

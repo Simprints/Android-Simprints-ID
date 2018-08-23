@@ -21,7 +21,6 @@ import com.simprints.id.shared.DependencyRule.ReplaceRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTemplates.HappyWifi
 import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.testTools.log
 import com.simprints.id.tools.RandomGenerator
@@ -36,7 +35,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, HappyWifi {
+class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal {
 
     private val calloutCredentials = CalloutCredentials(
         "bWOFHInKA2YaQwrxZ7uJ",
@@ -104,7 +103,6 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal, Hap
     @Before
     override fun setUp() {
         log("HappyWorkflowAllMainFeatures.setUp()")
-        super<HappyWifi>.setUp()
         app = InstrumentationRegistry.getTargetContext().applicationContext as Application
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)

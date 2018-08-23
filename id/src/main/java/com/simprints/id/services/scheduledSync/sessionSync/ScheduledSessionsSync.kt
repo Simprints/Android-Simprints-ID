@@ -1,11 +1,13 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
+import android.annotation.SuppressLint
 import androidx.work.Worker
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
+import com.simprints.id.tools.Log
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.rxkotlin.subscribeBy
 import java.util.concurrent.LinkedBlockingQueue
@@ -18,10 +20,12 @@ class ScheduledSessionsSync : Worker() {
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var timeHelper: TimeHelper
 
+    @SuppressLint("WrongThread")
     override fun doWork(): Result {
         val result = LinkedBlockingQueue<Result>()
 
         if (applicationContext is Application) {
+            Log.d(this@ScheduledSessionsSync, "ScheduledSessionsSync - doWork")
             (applicationContext as Application).component.inject(this)
             uploadSessions(result)
         }

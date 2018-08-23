@@ -1,39 +1,29 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.work.*
-import com.simprints.id.data.prefs.PreferencesManager
-import java.util.*
 import java.util.concurrent.TimeUnit
 
-class ScheduledSessionsSyncManager(private val preferencesManager: PreferencesManager) {
+class ScheduledSessionsSyncManager {
 
-    fun scheduleSyncIfNecessary() {
-        val scheduledSyncRequest = createRequestAndSaveId()
-        WorkManager.getInstance()?.enqueue(scheduledSyncRequest)
-    }
+    fun scheduleSyncIfNecessary() = createAndEnqueueRequest()
 
-    private fun createRequestAndSaveId(): PeriodicWorkRequest {
-        val scheduledSyncRequest =
-            PeriodicWorkRequestBuilder<ScheduledSessionsSync>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
-                .setConstraints(getConstraints())
-                .build()
-        saveWorkRequestId(scheduledSyncRequest.id)
-        return scheduledSyncRequest
-    }
+    private fun createAndEnqueueRequest(): PeriodicWorkRequest =
+        PeriodicWorkRequestBuilder<ScheduledSessionsSync>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
+            .setConstraints(getConstraints())
+            .addTag(WORKER_TAG)
+            .build().also {
+                WorkManager.getInstance().enqueueUniquePeriodicWork(WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, it)
+            }
 
-    //StopShip: check conditions
     private fun getConstraints() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .setRequiresBatteryNotLow(true)
         .setRequiredNetworkType(NetworkType.UNMETERED)
         .build()
 
-    private fun saveWorkRequestId(id: UUID) {
-        preferencesManager.scheduledSessionsSyncWorkRequestId = id.toString()
-    }
-
     companion object {
-        private const val SYNC_REPEAT_INTERVAL = 6L
-        private val SYNC_REPEAT_UNIT = TimeUnit.HOURS
+        private const val SYNC_REPEAT_INTERVAL = 15L //StopShip: change to 6h
+        private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
+        private const val WORKER_TAG = "SYNC_SESSIONS_WORKER"
     }
 }
