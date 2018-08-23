@@ -29,7 +29,6 @@ import com.simprints.libscanner.SCANNER_ERROR.*
 import com.simprints.libscanner.ScannerCallback
 import javax.inject.Inject
 
-
 class CollectFingerprintsScanningHelper(private val context: Context,
                                         private val view: CollectFingerprintsContract.View,
                                         private val presenter: CollectFingerprintsContract.Presenter) {
@@ -48,7 +47,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         if (presenter.isConfirmDialogShown)
             presenter.handleConfirmFingerprintsAndContinue()
         else if (shouldEnableScanButton())
-            toggleContinuousCapture()
+            presenter.handleScannerButtonPressed()
     }
 
     private fun shouldEnableScanButton() = !presenter.currentFinger().isGoodScan &&
@@ -73,7 +72,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         TimeoutBar(context.applicationContext, view.progressBar, preferencesManager.timeoutS * 1000)
 
     // Creates a progress dialog when the scan gets disconnected
-    private fun initUn20Dialog(): ProgressDialog = 
+    private fun initUn20Dialog(): ProgressDialog =
         ProgressDialog(context).also {
             it.isIndeterminate = true
             it.setCanceledOnTouchOutside(false)

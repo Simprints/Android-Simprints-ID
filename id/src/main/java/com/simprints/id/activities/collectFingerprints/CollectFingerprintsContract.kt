@@ -5,14 +5,12 @@ import android.content.Intent
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.TextView
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.tools.TimeoutBar
-
 
 interface CollectFingerprintsContract {
 
@@ -47,7 +45,7 @@ interface CollectFingerprintsContract {
         var indicatorLayout: LinearLayout
     }
 
-    interface Presenter: BasePresenter {
+    interface Presenter : BasePresenter {
 
         // Common
         val activeFingers: ArrayList<Finger>
@@ -82,5 +80,6 @@ interface CollectFingerprintsContract {
         fun doNudgeIfNecessary()
         fun handleMissingFingerClick()
         fun addCaptureEventInSession(finger: Finger)
+        fun handleScannerButtonPressed()
     }
 }
