@@ -201,6 +201,6 @@ open class AppModule(val app: Application) {
         ScheduledPeopleSyncManager(preferencesManager)
 
     @Provides
-    open fun provideScheduledSessionsSyncManager(preferencesManager: PreferencesManager): ScheduledSessionsSyncManager =
-        ScheduledSessionsSyncManager(preferencesManager)
+    open fun provideScheduledSessionsSyncManager(): ScheduledSessionsSyncManager =
+        ScheduledSessionsSyncManager()
 }
