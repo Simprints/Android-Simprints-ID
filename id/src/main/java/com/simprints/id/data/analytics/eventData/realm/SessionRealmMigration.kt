@@ -9,7 +9,7 @@ import io.realm.annotations.RealmModule
 
 internal class SessionRealmMigration : RealmMigration {
 
-    @RealmModule(classes = [DatabaseInfo::class, Device::class, Location::class, RlEvent::class, RlSessionEvents::class])
+    @RealmModule(classes = [DatabaseInfo::class, Device::class, Location::class, RlEvent::class, RlSession::class])
     class SessionModule
 
     companion object {

@@ -9,7 +9,7 @@ import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 
-open class RlSessionEvents: RealmObject {
+open class RlSession: RealmObject {
 
     @PrimaryKey
     lateinit var id: String

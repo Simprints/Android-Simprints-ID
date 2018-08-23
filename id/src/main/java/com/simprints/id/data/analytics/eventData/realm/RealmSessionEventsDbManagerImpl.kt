@@ -49,14 +49,14 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     override fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents): Completable =
         getRealmInstance().flatMapCompletable { realm ->
             realm.executeTransaction {
-                it.insertOrUpdate(RlSessionEvents(sessionEvents))
+                it.insertOrUpdate(RlSession(sessionEvents))
             }
             Completable.complete()
         }
 
     override fun loadSessions(projectId: String?, openSession: Boolean?): Single<ArrayList<SessionEvents>> =
         getRealmInstance().map { realm ->
-            val query = realm.where(RlSessionEvents::class.java).apply {
+            val query = realm.where(RlSession::class.java).apply {
                 addQueryParamForProjectId(projectId, this)
                 addQueryParamForOpenSession(openSession, this)
 
@@ -68,7 +68,7 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     /** @throws SessionNotFoundException */
     override fun loadSessionById(sessionId: String): Single<SessionEvents> =
         getRealmInstance().map { realm ->
-            val query = realm.where(RlSessionEvents::class.java).apply {
+            val query = realm.where(RlSession::class.java).apply {
                 equalTo(RealmSessionEventsDbManagerImpl.SESSION_ID, sessionId)
             }
             SessionEvents(query.findFirst()?: throw SessionNotFoundException())
@@ -77,7 +77,7 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     override fun deleteSessions(projectId: String?, openSession: Boolean?): Completable =
         getRealmInstance().flatMapCompletable { realm ->
             realm.executeTransaction {
-                val query = it.where(RlSessionEvents::class.java).apply {
+                val query = it.where(RlSession::class.java).apply {
                     addQueryParamForProjectId(projectId, this)
                     addQueryParamForOpenSession(openSession, this)
                 }
@@ -103,13 +103,13 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         Single.just(it)
     } ?: throw RealmUninitialisedError("No valid realm Config")
 
-    private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<RlSessionEvents>) {
+    private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<RlSession>) {
         projectId?.let {
             query.equalTo(RealmSessionEventsDbManagerImpl.PROJECT_ID, projectId)
         }
     }
 
-    private fun addQueryParamForOpenSession(openSession: Boolean?, query: RealmQuery<RlSessionEvents>) {
+    private fun addQueryParamForOpenSession(openSession: Boolean?, query: RealmQuery<RlSession>) {
         openSession?.let {
             if (it) {
                 query.equalTo(RealmSessionEventsDbManagerImpl.END_TIME, 0L)
