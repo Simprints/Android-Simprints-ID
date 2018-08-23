@@ -21,10 +21,6 @@ import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimesta
 import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimestampsPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.id.data.prefs.sync.people.SyncPeoplePreferencesManager
-import com.simprints.id.data.prefs.sync.people.SyncPeoplePreferencesManagerImpl
-import com.simprints.id.data.prefs.sync.sessions.SyncSessionsPreferencesManager
-import com.simprints.id.data.prefs.sync.sessions.SyncSessionsPreferencesManagerImpl
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
 import com.simprints.id.session.callout.CalloutAction
@@ -34,7 +30,6 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Named
 import javax.inject.Singleton
-
 
 @Module
 @JvmSuppressWildcards(false)
@@ -77,14 +72,9 @@ open class PreferencesModule {
                                                                @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                                                @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer)
 
-    @Provides @Singleton fun provideSyncPeoplePreferencesManager(prefs: ImprovedSharedPreferences): SyncPeoplePreferencesManager = SyncPeoplePreferencesManagerImpl(prefs)
-    @Provides @Singleton fun provideSyncSessionsPreferencesManager(prefs: ImprovedSharedPreferences): SyncSessionsPreferencesManager = SyncSessionsPreferencesManagerImpl(prefs)
-
     @Provides @Singleton fun providePreferencesManager(sessionStatePreferencesManager: SessionStatePreferencesManager,
                                                        settingsPreferencesManager: SettingsPreferencesManager,
                                                        lastEventsPreferencesManager: RecentEventsPreferencesManager,
-                                                       syncPeoplePreferencesManager: SyncPeoplePreferencesManager,
-                                                       syncSessionsPreferencesManager:SyncSessionsPreferencesManager,
                                                        app: Application): PreferencesManager =
-        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, lastEventsPreferencesManager, syncPeoplePreferencesManager, syncSessionsPreferencesManager, app)
+        PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, lastEventsPreferencesManager, app)
 }
