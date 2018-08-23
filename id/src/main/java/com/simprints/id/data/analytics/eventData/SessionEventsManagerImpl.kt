@@ -118,9 +118,9 @@ open class SessionEventsManagerImpl(private val ctx: Context,
             }
         }.flatMapCompletable {
             if (uploadSessionSucceeded(it)) {
-                sessionEventsLocalDbManager.deleteSessions(projectId, false).doFinally {
-                    sessionEventsLocalDbManager.deleteSessions(PROJECT_ID_FOR_NOT_SIGNED_IN)
-                }
+                sessionEventsLocalDbManager
+                    .deleteSessions(projectId, false)
+                    .onErrorComplete().andThen(sessionEventsLocalDbManager.deleteSessions(PROJECT_ID_FOR_NOT_SIGNED_IN))
             } else {
                 Completable.complete()
             }
@@ -134,14 +134,14 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         }
     }
 
-    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Unit>> {
+    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Void>> {
         return sessions.filter { it.isClosed() }.toTypedArray().let {
             sessionsApi.uploadSessions(projectId, hashMapOf("sessions" to it))
         }
     }
 
-    private fun uploadSessionSucceeded(it: Result<Unit>) =
-        !it.isError && it.response()?.code() == 200
+    private fun uploadSessionSucceeded(it: Result<Void>) =
+        !it.isError && it.response()?.code() == 201
 
     private fun forceSessionToCloseIfOpenAndNotInProgress(it: SessionEvents, timeHelper: TimeHelper) {
         if (it.isOpen() && !it.isPossiblyInProgress(timeHelper)) {

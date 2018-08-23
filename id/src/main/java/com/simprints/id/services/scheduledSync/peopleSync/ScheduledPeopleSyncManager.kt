@@ -7,19 +7,15 @@ import java.util.concurrent.TimeUnit
 
 class ScheduledPeopleSyncManager(private val preferencesManager: PreferencesManager) {
 
-    fun scheduleSyncIfNecessary() {
-        val scheduledSyncRequest = createRequestAndSaveId()
-        WorkManager.getInstance().enqueue(scheduledSyncRequest)
-    }
+    fun scheduleSyncIfNecessary() = createAndEnqueueRequest()
 
-    private fun createRequestAndSaveId(): PeriodicWorkRequest {
-        val scheduledSyncRequest =
-            PeriodicWorkRequestBuilder<ScheduledPeopleSync>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
-                .setConstraints(getConstraints())
-                .build()
-        saveWorkRequestId(scheduledSyncRequest.id)
-        return scheduledSyncRequest
-    }
+    private fun createAndEnqueueRequest(): PeriodicWorkRequest =
+        PeriodicWorkRequestBuilder<ScheduledPeopleSync>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
+            .setConstraints(getConstraints())
+            .addTag(ScheduledPeopleSyncManager.WORKER_TAG)
+            .build().also {
+                WorkManager.getInstance().enqueueUniquePeriodicWork(WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, it)
+            }
 
     private fun getConstraints() = Constraints.Builder()
         .setRequiredNetworkType(if (preferencesManager.scheduledBackgroundSyncOnlyOnWifi) NetworkType.UNMETERED else NetworkType.CONNECTED)
@@ -27,12 +23,9 @@ class ScheduledPeopleSyncManager(private val preferencesManager: PreferencesMana
         .setRequiresCharging(preferencesManager.scheduledBackgroundSyncOnlyWhenCharging)
         .build()
 
-    private fun saveWorkRequestId(id: UUID) {
-        preferencesManager.scheduledPeopleSyncWorkRequestId = id.toString()
-    }
-
     companion object {
-        private const val SYNC_REPEAT_INTERVAL = 6L
-        private val SYNC_REPEAT_UNIT = TimeUnit.HOURS
+        private const val SYNC_REPEAT_INTERVAL = 15L
+        private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
+        private const val WORKER_TAG = "SYNC_PEOPLE_WORKER"
     }
 }
