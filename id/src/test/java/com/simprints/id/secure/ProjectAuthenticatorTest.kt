@@ -12,10 +12,9 @@ import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.shared.DependencyRule.*
-import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.retrofit.createMockBehaviorService
+import com.simprints.id.shared.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.getRoboSharedPreferences
 import com.simprints.id.testUtils.roboletric.initLogInStateMock
