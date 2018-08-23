@@ -1,6 +1,5 @@
 package com.simprints.id.data.db
 
-import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
@@ -12,12 +11,12 @@ import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
-import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.id.shared.DependencyRule.SpyRule
+import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.shared.PeopleGeneratorUtils
+import com.simprints.id.shared.createMockBehaviorService
 import com.simprints.id.shared.whenever
 import com.simprints.id.sync.SimApiMock
 import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.retrofit.createMockBehaviorService
 import com.simprints.id.testUtils.retrofit.mockServer.mockNotFoundResponse
 import com.simprints.id.testUtils.retrofit.mockServer.mockResponseForDownloadPatient
 import com.simprints.id.testUtils.retrofit.mockServer.mockResponseForUploadPatient
@@ -25,7 +24,6 @@ import com.simprints.id.testUtils.retrofit.mockServer.mockServerProblemResponse
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.setupLocalAndRemoteManagersForApiTesting
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.libcommon.Person
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
@@ -54,12 +52,13 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var sessionEventsLocalDbManagerSpy: SessionEventsLocalDbManager
     @Inject lateinit var dbManager: DbManager
 
-    override var module: AppModuleForTests by lazyVar {
-        object : AppModuleForTests(app, localDbManagerRule = SpyRule, remoteDbManagerRule = SpyRule, sessionEventsLocalDbManagerRule = MockRule) {
-            override fun provideLocalDbManager(ctx: Context): LocalDbManager {
-                return spy(LocalDbManager::class.java)
-            }
-        }
+    override var module by lazyVar {
+        AppModuleForTests(
+            app,
+            localDbManagerRule = ReplaceRule { spy(LocalDbManager::class.java) },
+            remoteDbManagerRule = SpyRule,
+            sessionEventsLocalDbManagerRule = MockRule
+        )
     }
 
     @Before

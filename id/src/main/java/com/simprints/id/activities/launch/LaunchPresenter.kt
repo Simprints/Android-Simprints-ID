@@ -100,15 +100,15 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun schedulePeopleSyncIfNecessary() {
-        if (preferencesManager.scheduledPeopleSyncWorkRequestId.isEmpty()) {
+        if (preferencesManager.scheduledBackgroundSync) {
             scheduledPeopleSyncManager.scheduleSyncIfNecessary()
+        } else {
+            scheduledPeopleSyncManager.deleteSyncIfNecessary()
         }
     }
 
     private fun scheduleSessionsSyncIfNecessary() {
-        if (preferencesManager.scheduledSessionsSyncWorkRequestId.isEmpty()) {
-            scheduledSessionsSyncManager.scheduleSyncIfNecessary()
-        }
+        scheduledSessionsSyncManager.scheduleSyncIfNecessary()
     }
 
     private val setupCallback = object : SetupCallback {

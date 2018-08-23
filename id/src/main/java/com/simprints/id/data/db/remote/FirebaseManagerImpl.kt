@@ -40,7 +40,7 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 
-class FirebaseManagerImpl(private val appContext: Context,
+open class FirebaseManagerImpl(private val appContext: Context,
                           private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
     RemoteDbManager {
 
