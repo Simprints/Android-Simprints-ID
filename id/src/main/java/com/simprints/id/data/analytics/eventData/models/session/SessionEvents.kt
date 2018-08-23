@@ -2,7 +2,7 @@ package com.simprints.id.data.analytics.eventData.models.session
 
 import com.simprints.id.data.analytics.eventData.models.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventData.models.events.Event
-import com.simprints.id.data.analytics.eventData.realm.RlSessionEvents
+import com.simprints.id.data.analytics.eventData.realm.RlSession
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.SkipSerialisationProperty
 import java.util.*
@@ -38,20 +38,20 @@ open class SessionEvents {
     fun isClosed(): Boolean = relativeEndTime > 0
     fun isOpen(): Boolean = !isClosed()
 
-    constructor(rlSessionEvents: RlSessionEvents) : this(
-        id = rlSessionEvents.id,
-        projectId = rlSessionEvents.projectId,
-        appVersionName = rlSessionEvents.appVersionName,
-        libVersionName = rlSessionEvents.libVersionName,
-        language = rlSessionEvents.language,
-        device = rlSessionEvents.device ?: Device(),
-        startTime = rlSessionEvents.startTime) {
-        this.events = ArrayList(rlSessionEvents.getEvents())
-        this.relativeEndTime = rlSessionEvents.relativeEndTime
-        this.relativeUploadTime = rlSessionEvents.relativeUploadTime
-        this.databaseInfo = rlSessionEvents.databaseInfo
-        this.location = rlSessionEvents.location
-        this.analyticsId = rlSessionEvents.analyticsId
+    constructor(rlSession: RlSession) : this(
+        id = rlSession.id,
+        projectId = rlSession.projectId,
+        appVersionName = rlSession.appVersionName,
+        libVersionName = rlSession.libVersionName,
+        language = rlSession.language,
+        device = rlSession.device ?: Device(),
+        startTime = rlSession.startTime) {
+        this.events = ArrayList(rlSession.getEvents())
+        this.relativeEndTime = rlSession.relativeEndTime
+        this.relativeUploadTime = rlSession.relativeUploadTime
+        this.databaseInfo = rlSession.databaseInfo
+        this.location = rlSession.location
+        this.analyticsId = rlSession.analyticsId
     }
 
     constructor(id: String = UUID.randomUUID().toString(),
