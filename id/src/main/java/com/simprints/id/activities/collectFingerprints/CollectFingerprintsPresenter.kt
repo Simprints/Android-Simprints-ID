@@ -115,11 +115,15 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleBackPressedWhileScanning() {
-        startCapturing()
+        stopCapturing()
     }
 
     override fun handleScannerButtonPressed() {
         startCapturing()
+    }
+
+    private fun stopCapturing() {
+        scanningHelper.toggleContinuousCapture()
     }
 
     private fun startCapturing() {
