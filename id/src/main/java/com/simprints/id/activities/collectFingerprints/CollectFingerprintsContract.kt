@@ -72,14 +72,13 @@ interface CollectFingerprintsContract {
         // Finger
         var isTryDifferentFingerSplashShown: Boolean
         var isNudging: Boolean
+        fun resolveFingerTerminalConditionTriggered()
 
         fun currentFinger(): Finger
         fun viewPagerOnPageSelected(position: Int)
-        fun checkScannedFingersAndCreateMapToShowDialog()
-        fun showSplashAndAddNewFingerIfNecessary()
-        fun doNudgeIfNecessary()
         fun handleMissingFingerClick()
-        fun addCaptureEventInSession(finger: Finger)
+        fun fingerHasSatisfiedTerminalCondition(finger: Finger): Boolean
+        fun handleCaptureSuccess()
         fun handleScannerButtonPressed()
     }
 }
