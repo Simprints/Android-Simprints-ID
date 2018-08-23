@@ -86,8 +86,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun initScanButtonListeners() {
         view.scanButton.setOnClickListener {
-            lastCaptureStartedAt = timeHelper.now()
-            scanningHelper.toggleContinuousCapture()
+            startCapturing()
         }
         view.scanButton.setOnLongClickListener { resetFingerState() }
     }
@@ -116,6 +115,15 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleBackPressedWhileScanning() {
+        startCapturing()
+    }
+
+    override fun handleScannerButtonPressed() {
+        startCapturing()
+    }
+
+    private fun startCapturing() {
+        lastCaptureStartedAt = timeHelper.now()
         scanningHelper.toggleContinuousCapture()
     }
 
@@ -306,7 +314,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleMissingFingerClick() {
-        if(!currentFinger().isCollecting) {
+        if (!currentFinger().isCollecting) {
             scanningHelper.setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger()
             showSplashAndAddNewFingerIfNecessary()
         }
