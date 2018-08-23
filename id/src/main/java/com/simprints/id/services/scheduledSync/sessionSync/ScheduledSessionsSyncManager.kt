@@ -22,7 +22,7 @@ class ScheduledSessionsSyncManager {
         .build()
 
     companion object {
-        private const val SYNC_REPEAT_INTERVAL = 15L
+        private const val SYNC_REPEAT_INTERVAL = 15L //StopShip: change to 6h
         private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
         private const val WORKER_TAG = "SYNC_SESSIONS_WORKER"
     }

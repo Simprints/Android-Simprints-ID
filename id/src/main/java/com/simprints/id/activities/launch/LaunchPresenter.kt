@@ -100,7 +100,11 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun schedulePeopleSyncIfNecessary() {
-        scheduledPeopleSyncManager.scheduleSyncIfNecessary()
+        if (preferencesManager.scheduledBackgroundSync) {
+            scheduledPeopleSyncManager.scheduleSyncIfNecessary()
+        } else {
+            scheduledPeopleSyncManager.deleteSyncIfNecessary()
+        }
     }
 
     private fun scheduleSessionsSyncIfNecessary() {
