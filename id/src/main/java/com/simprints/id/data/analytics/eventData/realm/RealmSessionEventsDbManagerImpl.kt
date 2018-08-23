@@ -4,8 +4,6 @@ import android.content.Context
 import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.EncryptionMigration
-import com.simprints.id.data.db.local.realm.RealmConfig
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
@@ -39,7 +37,6 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
             if (this.localDbKey == null) {
                 Realm.init(appContext)
                 val localKey = generateDbKeyIfRequired().also { this.localDbKey = it }
-                EncryptionMigration(localKey, appContext)
                 createAndSaveRealmConfig(localKey)
             }
         } catch (e: Exception) {
@@ -99,7 +96,7 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     }
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
-        Single.just(RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        Single.just(SessionRealmConfig.get(localDbKey.projectId, localDbKey.value)
             .also { realmConfig = it })
 
     private fun getRealmConfig(): Single<RealmConfiguration> = realmConfig?.let {
