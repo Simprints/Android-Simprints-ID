@@ -103,8 +103,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(ParentalConsent())
     }
 
-    private val remoteConfigDefaults = mutableMapOf<String, Any>()
-
     // Should the UI automatically slide forward?
     override var nudgeMode: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)
