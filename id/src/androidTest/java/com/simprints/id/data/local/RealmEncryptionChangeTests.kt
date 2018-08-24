@@ -2,7 +2,7 @@ package com.simprints.id.data.local
 
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.RealmConfig
+import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import io.realm.Realm
@@ -15,7 +15,7 @@ import java.io.File
 @RunWith(AndroidJUnit4::class)
 class RealmEncryptionChangeTests : RealmTestsBase() {
 
-    private val legacyConfig = RealmConfig.get(localDbKey.legacyApiKey.substring(0, 8), localDbKey.legacyRealmKey, localDbKey.projectId)
+    private val legacyConfig = PeopleRealmConfig.get(localDbKey.legacyApiKey.substring(0, 8), localDbKey.legacyRealmKey, localDbKey.projectId)
 
     init {
         deleteRealmFiles(legacyConfig)
