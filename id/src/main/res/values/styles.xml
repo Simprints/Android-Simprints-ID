@@ -34,7 +34,7 @@
     </style>
     
     <style name="SimprintsTextViewStyle" parent="android:Widget.TextView">
-        <item name="android:fontFamily">@font/muli_extralight</item>
+        <item name="android:fontFamily">@font/muli</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
