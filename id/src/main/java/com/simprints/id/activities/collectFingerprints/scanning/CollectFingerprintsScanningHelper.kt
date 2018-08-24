@@ -73,11 +73,11 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     // Creates a progress dialog when the scan gets disconnected
     private fun initUn20Dialog(): ProgressDialog =
-        ProgressDialog(context).also {
-            it.isIndeterminate = true
-            it.setCanceledOnTouchOutside(false)
-            it.setMessage(context.getString(R.string.reconnecting_message))
-            it.setOnCancelListener { view.cancelAndFinish() }
+        ProgressDialog(context).also { dialog ->
+            dialog.isIndeterminate = true
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.setMessage(context.getString(R.string.reconnecting_message))
+            dialog.setOnCancelListener { view.cancelAndFinish() }
         }
 
     private val setupCallback = object : SetupCallback {
@@ -236,45 +236,32 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun handleCaptureSuccess() {
-        val finger = presenter.currentFinger()
+        val template = appState.scanner.template
         val quality = appState.scanner.imageQuality
-        parseTemplateAndAddToCurrentFinger(finger)
-        setGoodOrBadScanAndNudgeIfNecessary(quality)
+        parseTemplateAndAddToCurrentFinger(template)
+        setGoodOrBadScanFingerStatusToCurrentFinger(quality)
         Vibrate.vibrate(context, preferencesManager.vibrateMode)
         presenter.refreshDisplay()
-        if (currentFingerStatus == BAD_SCAN) {
-            presenter.showSplashAndAddNewFingerIfNecessary()
-        }
-        presenter.checkScannedFingersAndCreateMapToShowDialog()
-        presenter.addCaptureEventInSession(finger)
+        presenter.handleCaptureSuccess()
     }
 
-    private fun parseTemplateAndAddToCurrentFinger(finger: Finger) =
+    private fun parseTemplateAndAddToCurrentFinger(template: ByteArray) =
         try {
             presenter.currentFinger().template =
-                Fingerprint(finger.id, appState.scanner.template)
+                Fingerprint(presenter.currentFinger().id, template)
         } catch (e: IllegalArgumentException) {
             // TODO : change exceptions in libcommon
             analyticsManager.logError(SimprintsError("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
             resetUIFromError()
         }
 
-    private fun setGoodOrBadScanAndNudgeIfNecessary(quality: Int) =
+    private fun setGoodOrBadScanFingerStatusToCurrentFinger(quality: Int) =
         if (quality >= preferencesManager.qualityThreshold) {
-            handleGoodScan()
+            currentFingerStatus = Finger.Status.GOOD_SCAN
         } else {
-            handleBadScan()
+            currentFingerStatus = Finger.Status.BAD_SCAN
+            presenter.currentFinger().numberOfBadScans += 1
         }
-
-    private fun handleGoodScan() {
-        currentFingerStatus = Finger.Status.GOOD_SCAN
-        presenter.doNudgeIfNecessary()
-    }
-
-    private fun handleBadScan() {
-        currentFingerStatus = Finger.Status.BAD_SCAN
-        presenter.currentFinger().numberOfBadScans += 1
-    }
 
     fun resetScannerUi() {
         appState.scanner.resetUI(null)
