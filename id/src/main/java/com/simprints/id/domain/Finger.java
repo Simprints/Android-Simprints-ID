@@ -198,8 +198,8 @@ public class Finger implements Parcelable, Comparable<Finger>{
             R.string.poor_scan_direction),
         FINGER_SKIPPED(R.drawable.ic_alert_selected, R.drawable.ic_alert_deselected,
             R.string.rescan_label, R.color.simprints_red,
-            R.string.poor_scan_message, R.color.simprints_red,
-            R.string.poor_scan_direction);
+            R.string.finger_skipped_message, R.color.simprints_red,
+            R.string.good_scan_direction);
 
         private int dotSelectedDrawableId;
         private int dotDeselectedDrawableId;
