@@ -25,6 +25,9 @@
         <item>
             Chichewa
         </item>
+        <item>
+            Chinyanja
+        </item>
     </string-array>
     <string-array name="language_values">
         <item>
@@ -50,6 +53,9 @@
         </item>
         <item>
             ny
+        </item>
+        <item>
+            ty
         </item>
     </string-array>
 

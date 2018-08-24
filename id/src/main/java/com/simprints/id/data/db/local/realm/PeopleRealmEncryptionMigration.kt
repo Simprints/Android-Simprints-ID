@@ -6,7 +6,7 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File
 
-class EncryptionMigration(localDbKey: LocalDbKey, private val appContext: Context) {
+class PeopleRealmEncryptionMigration(localDbKey: LocalDbKey, private val appContext: Context) {
 
     companion object {
         private const val LEGACY_APP_KEY_LENGTH: Int = 8
@@ -26,7 +26,7 @@ class EncryptionMigration(localDbKey: LocalDbKey, private val appContext: Contex
             return false
 
         val legacyConfig = getLegacyConfig(dbKey.legacyApiKey, dbKey.legacyRealmKey, dbKey.projectId)
-        val newConfig = RealmConfig.get(dbKey.projectId, dbKey.value, dbKey.projectId)
+        val newConfig = PeopleRealmConfig.get(dbKey.projectId, dbKey.value, dbKey.projectId)
 
         return File(legacyConfig.path).exists() && !File(newConfig.path).exists()
     }
@@ -42,7 +42,7 @@ class EncryptionMigration(localDbKey: LocalDbKey, private val appContext: Contex
     }
 
     private fun getLegacyConfig(legacyApiKey: String, legacyDatabaseKey: ByteArray, projectId: String): RealmConfiguration =
-        RealmConfig.get(legacyApiKey.substring(0, LEGACY_APP_KEY_LENGTH), legacyDatabaseKey, projectId)
+        PeopleRealmConfig.get(legacyApiKey.substring(0, LEGACY_APP_KEY_LENGTH), legacyDatabaseKey, projectId)
 
     private fun deleteRealm(config: RealmConfiguration) {
         Realm.deleteRealm(config)

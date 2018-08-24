@@ -1,10 +1,18 @@
 package com.simprints.id.data.db.local.realm
 
+import com.simprints.id.data.db.local.realm.models.rl_Fingerprint
+import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_Project
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.domain.Constants
 import io.realm.*
+import io.realm.annotations.RealmModule
 import java.util.*
 
-internal class Migration(val projectId: String) : RealmMigration {
+internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
+
+    @RealmModule(classes = [rl_Fingerprint::class, rl_Person::class, rl_Project::class, rl_SyncInfo::class])
+    class PeopleModule
 
     companion object {
         const val REALM_SCHEMA_VERSION: Long = 2
@@ -40,6 +48,7 @@ internal class Migration(val projectId: String) : RealmMigration {
         const val PERSON_CREATE_TIME = "createdAt"
 
         const val FINGERPRINT_PERSON = "person"
+
     }
 
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
@@ -126,10 +135,10 @@ internal class Migration(val projectId: String) : RealmMigration {
         this.addField(name, Date::class.java).setRequired(name, true)
 
     override fun hashCode(): Int {
-        return Migration.hashCode()
+        return PeopleRealmMigration.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is Migration
+        return other is PeopleRealmMigration
     }
 }
