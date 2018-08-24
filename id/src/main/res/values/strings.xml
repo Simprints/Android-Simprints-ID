@@ -76,6 +76,8 @@
     <string name="good_scan_message">Good Scan</string>
     <string name="poor_scan_message">Poor Scan</string>
     <string name="no_finger_detected_message">No finger detected</string>
+    <string name="finger_skipped_message">Finger skipped</string>
+    <string name="no_fingers_scanned">Please scan at least 1 required finger</string>
     <string name="reconnecting_message">Reconnecting…</string>
     <string name="add_finger_dialog_title">Add Finger(s)</string>
     <string name="confirm_fingers_dialog_title">Fingers Scanned</string>
