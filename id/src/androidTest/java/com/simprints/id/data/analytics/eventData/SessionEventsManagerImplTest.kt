@@ -36,6 +36,8 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.realm.Realm
 import junit.framework.Assert.*
+import okhttp3.Protocol
+import okhttp3.Request
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -132,7 +134,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
         whenever(sessionManagerImpl.sessionsApi.uploadSessions(
             anyNotNull(),
-            anyNotNull())).thenReturn(Single.just(Result.response(Response.success(Unit))))
+            anyNotNull())).thenReturn(Single.just(Result.response(buildSuccessfulUploadSessionResponse())))
 
         sessionEventsManagerSpy.syncSessions(testProjectId).test().also {
             it.awaitTerminalEvent()
@@ -142,6 +144,14 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             assertEquals(sessions[0].id, openSessionId)
         }
     }
+
+    private fun buildSuccessfulUploadSessionResponse() =
+        Response.success<Void?>(null, okhttp3.Response.Builder() //
+            .code(201)
+            .message("OK")
+            .protocol(Protocol.HTTP_1_1)
+            .request(Request.Builder().url("http://localhost/").build())
+            .build())
 
     @Test
     fun createSession_shouldStopPreviousSessions() {
@@ -280,6 +290,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     fun multipleScans_shouldGenerateACreatePersonEventWithRightTemplates() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
+            MockFinger.PERSON_1_VERSION_2_LEFT_INDEX_GOOD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_GOOD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_INDEX_GOOD_SCAN)))
 
@@ -287,7 +298,14 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
 
-        fullHappyWorkflow(3)
+        setupActivityAndContinue()
+
+        collectFingerprintsPressScan()
+        skipFinger()
+        collectFingerprintsPressScan()
+        collectFingerprintsPressScan()
+
+        checkIfDialogIsDisplayedWithResultAndClickConfirm("× LEFT THUMB\n✓ LEFT INDEX FINGER\n✓ RIGHT THUMB\n")
 
         matchingActivityIdentificationCheckFinished(simprintsActionTestRule)
 
@@ -310,6 +328,12 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
                 .containsExactlyElementsIn(personCreatedForMatchingActivity.fingerprints.map {
                     Utils.byteArrayToBase64(it.templateBytes)
                 })
+
+            val skippedEvent = session.events
+                .filterIsInstance(FingerprintCaptureEvent::class.java)
+                .findLast { it.result == FingerprintCaptureEvent.Result.SKIPPED }
+
+            assertNotNull(skippedEvent)
         }
     }
 

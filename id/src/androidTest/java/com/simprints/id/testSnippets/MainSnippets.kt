@@ -45,7 +45,7 @@ fun fullHappyWorkflow(numberOfScans: Int = 2, dialogResult: String = "✓ LEFT T
 
     (0 until numberOfScans).forEach { collectFingerprintsPressScan() }
 
-    checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm(dialogResult)
+    checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult)
 }
 
 fun setupActivityAndContinue() {
@@ -104,6 +104,7 @@ fun skipFinger() {
             .check(matches(isDisplayed()))
             .perform(click())
     }
+    Thread.sleep(2500) //Wait for ViewPager animation
 }
 
 fun waitForSplashScreenAppearsAndDisappears() {
@@ -119,7 +120,7 @@ fun waitForSplashScreenAppearsAndDisappears() {
     }
 }
 
-private fun checkIfDialogIsDisplayedWithTwoGoodScansAndClickConfirm(dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
+fun checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
     WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
         onView(withText(getResourceString(R.string.confirm_fingers_dialog_title)))
             .inRoot(isDialog())

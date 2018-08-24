@@ -16,11 +16,8 @@ import com.simprints.libsimprints.Constants
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
 
-
 class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
-
-    private var reason: REFUSAL_FORM_REASON? = null
     override lateinit var viewPresenter: RefusalContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +36,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     }
 
     private fun setButtonClickListeners() {
-        btSubmitRefusalForm.setOnClickListener { viewPresenter.handleSubmitButtonClick(reason, getRefusalText()) }
+        btSubmitRefusalForm.setOnClickListener { viewPresenter.handleSubmitButtonClick(getRefusalText()) }
         btScanFingerprints.setOnClickListener { viewPresenter.handleScanFingerprintsClick() }
     }
 
