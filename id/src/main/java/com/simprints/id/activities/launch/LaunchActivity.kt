@@ -30,7 +30,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setButtonClickListeners()
-        setupConsentTabs()
         setClickListenerToPrivacyNotice()
 
         viewPresenter = LaunchPresenter(this)
@@ -54,6 +53,11 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     }
 
     override fun setLanguage(language: String) = LanguageHelper.setLanguage(this, language)
+
+    override fun initTextsInButtons() {
+        consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
+        consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
+    }
 
     override fun handleSetupProgress(progress: Int, detailsId: Int) {
         launchProgressBar.progress = progress
@@ -80,7 +84,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun setupConsentTabs() {
+    override fun initConsentTabs() {
         tabHost.setup()
         generalConsentTab = tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_general_title)).setContent(R.id.generalConsentTextView)
         parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_parental_title)).setContent(R.id.parentalConsentTextView)
