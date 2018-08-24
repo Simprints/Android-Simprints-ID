@@ -76,12 +76,14 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     override fun start() {
         view.setLanguage(preferencesManager.language)
+        view.initTextsInButtons()
+        view.initConsentTabs()
         initPositionTracker()
         initSetup()
         initBackgroundSyncIfNecessary()
         schedulePeopleSyncIfNecessary()
         scheduleSessionsSyncIfNecessary()
-        setupConsentTabs()
+        setTextToConsentTabs()
     }
 
     private fun initPositionTracker() {
@@ -144,7 +146,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         }
     }
 
-    private fun setupConsentTabs() {
+    private fun setTextToConsentTabs() {
         view.setTextToGeneralConsent(getGeneralConsentText())
         if (preferencesManager.parentalConsentExists) {
             view.addParentalConsentTabWithText(getParentalConsentText())
