@@ -4,23 +4,23 @@ import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import android.util.Base64
-import android.util.Base64.NO_WRAP
-import com.simprints.mockscanner.MockBluetoothAdapter
-import com.simprints.mockscanner.MockScannerManager
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.RealmConfig
+import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
-import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.shared.DependencyRule.MockRule
+import com.simprints.id.shared.DependencyRule.ReplaceRule
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
+import com.simprints.id.testTemplates.FirstUseLocal.Companion.realmKey
 import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.mockscanner.MockBluetoothAdapter
+import com.simprints.mockscanner.MockScannerManager
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Before
@@ -39,7 +39,6 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
         "the_lone_user",
         "d95bacc0-7acb-4ff0-98b3-ae6ecbf7398f")
 
-    private val realmKey = Base64.decode("Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ==", NO_WRAP)
     private val localDbKey = LocalDbKey(
         calloutCredentials.projectId,
         realmKey,
@@ -56,7 +55,7 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     private val invalidSecret = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
 
-    override var realmConfiguration: RealmConfiguration? = null
+    override var peopleRealmConfiguration: RealmConfiguration? = null
 
     @Rule
     @JvmField
@@ -83,7 +82,7 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
         app.initDependencies()
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        realmConfiguration = RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        peopleRealmConfiguration = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
         super<FirstUseLocal>.setUp()
 
         signOut()

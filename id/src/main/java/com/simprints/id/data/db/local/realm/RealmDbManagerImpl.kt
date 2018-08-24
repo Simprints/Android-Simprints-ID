@@ -54,8 +54,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
 
     override fun signInToLocal(localDbKey: LocalDbKey) {
         this.localDbKey = localDbKey
-        EncryptionMigration(localDbKey, appContext)
-        getRealmInstance().map { realm -> realm.use { } }.toCompletable()
+        PeopleRealmEncryptionMigration(localDbKey, appContext)
     }
 
     override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable =
@@ -190,7 +189,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     } ?: throw RealmUninitialisedError("No valid realm Config")
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
-        Single.just(RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        Single.just(PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
             .also { realmConfig = it })
 
     private fun getRealmInstance(): Single<Realm> = getRealmConfig()
