@@ -5,10 +5,9 @@ import com.simprints.id.activities.BaseView
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
 import com.simprints.id.domain.ALERT_TYPE
 
-
 interface RefusalContract {
 
-    interface View: BaseView<Presenter> {
+    interface View : BaseView<Presenter> {
 
         fun doLaunchAlert(alertType: ALERT_TYPE)
 
@@ -23,9 +22,9 @@ interface RefusalContract {
         fun enableRefusalText()
     }
 
-    interface Presenter: BasePresenter {
+    interface Presenter : BasePresenter {
 
-        fun handleSubmitButtonClick(reason: REFUSAL_FORM_REASON?, refusalText: String)
+        fun handleSubmitButtonClick(refusalText: String)
 
         fun handleScanFingerprintsClick()
 
