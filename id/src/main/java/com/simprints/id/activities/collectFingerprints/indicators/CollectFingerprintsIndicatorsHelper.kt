@@ -28,7 +28,7 @@ class CollectFingerprintsIndicatorsHelper(private val context: Context,
             indicator.setOnClickListener { view.viewPager.currentItem = i }
             indicators.add(indicator)
             view.indicatorLayout.addView(indicator, LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT))
+                0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
         }
     }
 
