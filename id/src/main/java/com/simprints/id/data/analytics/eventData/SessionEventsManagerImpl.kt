@@ -90,7 +90,9 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                 insertOrUpdateSession(it).blockingAwait()
             }
             Completable.complete()
-        }
+        }.doOnError {
+            analyticsManager.logThrowable(it)
+        }.onErrorComplete()
 
     private fun insertOrUpdateSession(session: SessionEvents): Completable =
         sessionEventsLocalDbManager.insertOrUpdateSessionEvents(session).doOnComplete {
@@ -134,13 +136,13 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         }
     }
 
-    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Void>> {
+    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Void?>> {
         return sessions.filter { it.isClosed() }.toTypedArray().let {
             sessionsApi.uploadSessions(projectId, hashMapOf("sessions" to it))
         }
     }
 
-    private fun uploadSessionSucceeded(it: Result<Void>) =
+    private fun uploadSessionSucceeded(it: Result<Void?>) =
         !it.isError && it.response()?.code() == 201
 
     private fun forceSessionToCloseIfOpenAndNotInProgress(it: SessionEvents, timeHelper: TimeHelper) {
@@ -221,6 +223,6 @@ open class SessionEventsManagerImpl(private val ctx: Context,
     private fun extractCaptureEventIdsBasedOnPersonTemplate(sessionEvents: SessionEvents, personTemplates: List<String>): List<String> =
         sessionEvents.events
             .filterIsInstance(FingerprintCaptureEvent::class.java)
-            .filter { it.fingerprint?.template in personTemplates }
+            .filter { it.fingerprint?.template in personTemplates && it.result != FingerprintCaptureEvent.Result.SKIPPED }
             .map { it.id }
 }
