@@ -13,6 +13,7 @@ import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libsimprints.RefusalForm
+import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class RefusalPresenter(private val view: RefusalContract.View,
@@ -47,19 +48,22 @@ class RefusalPresenter(private val view: RefusalContract.View,
         }
     }
 
-    override fun handleSubmitButtonClick(reason: REFUSAL_FORM_REASON?, refusalText: String) {
+    override fun handleSubmitButtonClick(refusalText: String) {
         saveRefusalFormInDb(getRefusalForm(refusalText))
-        view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
-
         reason?.let { refusalReason ->
-            sessionEventsManager.updateSessionInBackground({
+            sessionEventsManager.updateSession({
                 it.events.add(RefusalEvent(
                     it.timeRelativeToStartTime(refusalStartTime),
                     it.nowRelativeToStartTime(timeHelper),
                     RefusalEvent.Answer.fromRefusalReason(refusalReason),
                     refusalText))
+            }).subscribeBy(onError = {
+                analyticsManager.logThrowable(it)
+                view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
+            }, onComplete = {
+                view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
             })
-        }
+        } ?: view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
     }
 
     override fun handleScanFingerprintsClick() {
