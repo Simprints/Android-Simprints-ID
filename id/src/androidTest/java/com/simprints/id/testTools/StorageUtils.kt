@@ -8,9 +8,8 @@ import java.io.File
 
 object StorageUtils {
 
-    fun clearApplicationData(context: Context, realmConfiguration: RealmConfiguration) {
+    fun clearApplicationData(context: Context) {
         clearSharedPrefs(context)
-        clearRealmDatabase(realmConfiguration)
     }
 
     private fun clearCache(context: Context) {
@@ -53,7 +52,7 @@ object StorageUtils {
         context.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE).edit().clear().commit()
     }
 
-    private fun clearRealmDatabase(realmConfiguration: RealmConfiguration?) {
+    fun clearRealmDatabase(realmConfiguration: RealmConfiguration?) {
         if (realmConfiguration != null) {
             val realm = Realm.getInstance(realmConfiguration)
             try {
