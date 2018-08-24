@@ -3,7 +3,6 @@ package com.simprints.id.data.analytics.eventData.realm
 import com.simprints.id.data.analytics.eventData.models.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventData.models.session.Device
 import com.simprints.id.data.analytics.eventData.models.session.Location
-import com.simprints.id.data.db.local.realm.PeopleRealmMigration
 import io.realm.DynamicRealm
 import io.realm.RealmMigration
 import io.realm.annotations.RealmModule
@@ -20,10 +19,10 @@ internal class SessionRealmMigration : RealmMigration {
     override fun migrate(realm: DynamicRealm?, oldVersion: Long, newVersion: Long) {}
 
     override fun hashCode(): Int {
-        return PeopleRealmMigration.hashCode()
+        return SessionRealmMigration.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is PeopleRealmMigration
+        return other is SessionRealmMigration
     }
 }
