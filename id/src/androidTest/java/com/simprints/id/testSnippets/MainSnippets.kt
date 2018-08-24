@@ -104,7 +104,6 @@ fun skipFinger() {
             .check(matches(isDisplayed()))
             .perform(click())
     }
-    Thread.sleep(2500) //Wait for ViewPager animation
 }
 
 fun waitForSplashScreenAppearsAndDisappears() {
