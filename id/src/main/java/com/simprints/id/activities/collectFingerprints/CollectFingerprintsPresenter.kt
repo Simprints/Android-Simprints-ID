@@ -320,6 +320,9 @@ class CollectFingerprintsPresenter(private val context: Context,
     override fun handleMissingFingerClick() {
         if (!currentFinger().isCollecting) {
             scanningHelper.setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger()
+            lastCaptureStartedAt = timeHelper.now()
+            addCaptureEventInSession(currentFinger())
+
             showSplashAndAddNewFingerIfNecessary()
         }
     }
