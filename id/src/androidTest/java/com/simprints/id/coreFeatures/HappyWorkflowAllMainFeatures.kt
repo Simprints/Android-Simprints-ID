@@ -4,10 +4,6 @@ import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import android.util.Base64
-import com.simprints.mockscanner.MockBluetoothAdapter
-import com.simprints.mockscanner.MockFinger
-import com.simprints.mockscanner.MockScannerManager
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.db.local.models.LocalDbKey
@@ -21,10 +17,14 @@ import com.simprints.id.shared.DependencyRule.ReplaceRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
+import com.simprints.id.testTemplates.FirstUseLocal.Companion.realmKey
 import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.testTools.log
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.mockscanner.MockBluetoothAdapter
+import com.simprints.mockscanner.MockFinger
+import com.simprints.mockscanner.MockScannerManager
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Before
@@ -43,7 +43,6 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal {
         "the_lone_user",
         "d95bacc0-7acb-4ff0-98b3-ae6ecbf7398f")
 
-    private val realmKey = Base64.decode("Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ==", Base64.NO_WRAP)
     private val localDbKey = LocalDbKey(
         calloutCredentials.projectId,
         realmKey,
@@ -51,7 +50,7 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal {
 
     private val projectSecret = "Z8nRspDoiQg1QpnDdKE6U7fQKa0GjpQOwnJ4OcSFWulAcIk4+LP9wrtDn8fRmqacLvkmtmOLl+Kxo1emXLsZ0Q=="
 
-    override var realmConfiguration: RealmConfiguration? = null
+    override var peopleRealmConfiguration: RealmConfiguration? = null
 
     @Rule
     @JvmField
@@ -112,7 +111,7 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal {
         app.initDependencies()
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        realmConfiguration = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        peopleRealmConfiguration = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
         super<FirstUseLocal>.setUp()
 
         signOut()

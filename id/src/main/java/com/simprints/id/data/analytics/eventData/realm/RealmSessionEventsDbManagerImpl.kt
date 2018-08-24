@@ -22,6 +22,8 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         const val END_TIME = "relativeEndTime"
         const val START_TIME = "startTime"
         const val SESSION_ID = "id"
+
+        const val SESSIONS_REALM_DB_FILE_NAME = "event_data"
     }
 
     private var realmConfig: RealmConfiguration? = null
@@ -88,11 +90,11 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
 
     private fun generateDbKeyIfRequired(): LocalDbKey {
         try {
-            secureDataManager.getLocalDbKeyOrThrow("event_data")
+            secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
         } catch (e: Exception) {
-            secureDataManager.setLocalDatabaseKey("event_data", null)
+            secureDataManager.setLocalDatabaseKey(SESSIONS_REALM_DB_FILE_NAME, null)
         }
-        return secureDataManager.getLocalDbKeyOrThrow("event_data")
+        return secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
     }
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
