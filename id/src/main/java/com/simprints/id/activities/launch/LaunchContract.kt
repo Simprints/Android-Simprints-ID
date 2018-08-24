@@ -13,6 +13,8 @@ interface LaunchContract {
         fun handleSetupFinished()
 
         fun setLanguage(language: String)
+        fun initTextsInButtons()
+        fun initConsentTabs()
         fun setResultAndFinish(resultCode: Int, resultData: Intent?)
         fun continueToNextActivity()
         fun goToRefusalActivity()
