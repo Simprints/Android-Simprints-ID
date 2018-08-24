@@ -27,8 +27,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 27
         multiDexEnabled true
-        versionCode 101
-        versionName "2018.3.0-dev7"
+        versionCode 102
+        versionName "2018.3.0-dev8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunner "com.simprints.id.UiTestsRunner" //To use custom TestApplication
 
@@ -57,7 +57,7 @@ android {
                 // Check in the Translations Editor for crucial translations that may be missing
                 disable "MissingTranslation"
                 abortOnError true
-                fatal 'StopShip'
+//                fatal 'StopShip'
                 checkReleaseBuilds true
             }
             minifyEnabled true
