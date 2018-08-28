@@ -75,11 +75,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleChangesInRefusalText(refusalText: String) {
-        if (refusalText.isEmpty()) {
-            view.disableSubmitButton()
-        } else {
-            view.enableSubmitButton()
-        }
+        view.enableSubmitButton()
     }
 
     private fun getRefusalForm(refusalText: String) = RefusalForm(reason.toString(), refusalText)

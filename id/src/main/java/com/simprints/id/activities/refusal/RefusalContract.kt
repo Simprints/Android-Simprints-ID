@@ -15,8 +15,6 @@ interface RefusalContract {
 
         fun scrollToBottom()
 
-        fun disableSubmitButton()
-
         fun enableSubmitButton()
 
         fun enableRefusalText()
