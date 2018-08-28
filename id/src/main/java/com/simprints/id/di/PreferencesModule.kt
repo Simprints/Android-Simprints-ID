@@ -35,46 +35,69 @@ import javax.inject.Singleton
 @JvmSuppressWildcards(false)
 open class PreferencesModule {
 
-    @Provides @Singleton open fun provideRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+    @Provides
+    @Singleton
+    open fun provideRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
 
-    @Provides @Singleton fun provideRemoteConfigFetcher(remoteConfig: FirebaseRemoteConfig): RemoteConfigFetcher = RemoteConfigFetcher(remoteConfig)
+    @Provides
+    @Singleton
+    fun provideRemoteConfigFetcher(remoteConfig: FirebaseRemoteConfig): RemoteConfigFetcher = RemoteConfigFetcher(remoteConfig)
 
-    @Provides @Singleton fun provideSharedPreferences(app: Application): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(app: Application): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
 
-    @Provides @Singleton fun provideImprovedSharedPreferences(basePrefs: SharedPreferences): ImprovedSharedPreferences = ImprovedSharedPreferencesImpl(basePrefs)
+    @Provides
+    @Singleton
+    fun provideImprovedSharedPreferences(basePrefs: SharedPreferences): ImprovedSharedPreferences = ImprovedSharedPreferencesImpl(basePrefs)
 
-    @Provides @Singleton fun provideRemoteConfigWrapper(remoteConfig: FirebaseRemoteConfig, prefs: ImprovedSharedPreferences): RemoteConfigWrapper = RemoteConfigWrapper(remoteConfig, prefs)
+    @Provides
+    @Singleton
+    fun provideRemoteConfigWrapper(remoteConfig: FirebaseRemoteConfig, prefs: ImprovedSharedPreferences): RemoteConfigWrapper = RemoteConfigWrapper(remoteConfig, prefs)
 
-    @Provides @Singleton fun provideScannerAttributesPreferencesManager(prefs: ImprovedSharedPreferences): ScannerAttributesPreferencesManager = ScannerAttributesPreferencesManagerImpl(prefs)
+    @Provides
+    @Singleton
+    fun provideScannerAttributesPreferencesManager(prefs: ImprovedSharedPreferences): ScannerAttributesPreferencesManager = ScannerAttributesPreferencesManagerImpl(prefs)
 
-    @Provides @Singleton fun provideSessionParametersPreferencesManager(prefs: ImprovedSharedPreferences,
-                                                                             @Named("CalloutActionSerializer") calloutActionSerializer: Serializer<CalloutAction>): SessionParametersPreferencesManager = SessionParametersPreferencesManagerImpl(prefs, calloutActionSerializer)
+    @Provides
+    @Singleton
+    fun provideSessionParametersPreferencesManager(prefs: ImprovedSharedPreferences,
+                                                   @Named("CalloutActionSerializer") calloutActionSerializer: Serializer<CalloutAction>): SessionParametersPreferencesManager = SessionParametersPreferencesManagerImpl(prefs, calloutActionSerializer)
 
-    @Provides @Singleton fun provideSessionTimestampsPreferencesManager(prefs: ImprovedSharedPreferences): SessionTimestampsPreferencesManager = SessionTimestampsPreferencesManagerImpl(prefs)
+    @Provides
+    @Singleton
+    fun provideSessionTimestampsPreferencesManager(prefs: ImprovedSharedPreferences): SessionTimestampsPreferencesManager = SessionTimestampsPreferencesManagerImpl(prefs)
 
-    @Provides @Singleton fun provideSessionStatePreferencesManager(ctx: Context,
-                                                                   prefs: ImprovedSharedPreferences,
-                                                                   scannerAttributesPreferencesManager: ScannerAttributesPreferencesManager,
-                                                                   sessionParametersPreferencesManager: SessionParametersPreferencesManager,
-                                                                   sessionTimestampsPreferencesManager: SessionTimestampsPreferencesManager,
-                                                                   @Named("LocationSerializer") locationSerializer: Serializer<Location>): SessionStatePreferencesManager =
+    @Provides
+    @Singleton
+    fun provideSessionStatePreferencesManager(ctx: Context,
+                                              prefs: ImprovedSharedPreferences,
+                                              scannerAttributesPreferencesManager: ScannerAttributesPreferencesManager,
+                                              sessionParametersPreferencesManager: SessionParametersPreferencesManager,
+                                              sessionTimestampsPreferencesManager: SessionTimestampsPreferencesManager,
+                                              @Named("LocationSerializer") locationSerializer: Serializer<Location>): SessionStatePreferencesManager =
 
-                                                                        SessionStatePreferencesManagerImpl(
-                                                                            ctx,
-                                                                            prefs,
-                                                                            scannerAttributesPreferencesManager,
-                                                                            sessionParametersPreferencesManager,
-                                                                            sessionTimestampsPreferencesManager,
-                                                                            locationSerializer)
+        SessionStatePreferencesManagerImpl(
+            ctx,
+            prefs,
+            scannerAttributesPreferencesManager,
+            sessionParametersPreferencesManager,
+            sessionTimestampsPreferencesManager,
+            locationSerializer)
 
-    @Provides @Singleton open fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences,
-                                                               remoteConfigWrapper: RemoteConfigWrapper,
-                                                               @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                                                               @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer)
+    @Provides
+    @Singleton
+    open fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences,
+                                               remoteConfigWrapper: RemoteConfigWrapper,
+                                               @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
+                                               @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>,
+                                               @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer, languagesStringArraySerializer)
 
-    @Provides @Singleton fun providePreferencesManager(sessionStatePreferencesManager: SessionStatePreferencesManager,
-                                                       settingsPreferencesManager: SettingsPreferencesManager,
-                                                       lastEventsPreferencesManager: RecentEventsPreferencesManager,
-                                                       app: Application): PreferencesManager =
+    @Provides
+    @Singleton
+    fun providePreferencesManager(sessionStatePreferencesManager: SessionStatePreferencesManager,
+                                  settingsPreferencesManager: SettingsPreferencesManager,
+                                  lastEventsPreferencesManager: RecentEventsPreferencesManager,
+                                  app: Application): PreferencesManager =
         PreferencesManagerImpl(sessionStatePreferencesManager, settingsPreferencesManager, lastEventsPreferencesManager, app)
 }
