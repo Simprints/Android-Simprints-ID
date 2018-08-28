@@ -14,6 +14,7 @@ interface SettingsPreferencesManager {
     var returnIdCount: Int
     var language: String
     var languagePosition: Int
+    var projectLanguages: Array<String>
     var matcherType: Int
     var timeoutS: Int
     var syncGroup: Constants.GROUP

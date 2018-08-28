@@ -18,9 +18,10 @@ import com.simprints.libsimprints.FingerIdentifier
 
 
 open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
-                                     private val remoteConfigWrapper: RemoteConfigWrapper,
-                                     private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                                     groupSerializer: Serializer<Constants.GROUP>)
+                                          private val remoteConfigWrapper: RemoteConfigWrapper,
+                                          private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
+                                          groupSerializer: Serializer<Constants.GROUP>,
+                                          languagesStringArraySerializer: Serializer<Array<String>>)
     : SettingsPreferencesManager {
 
     companion object {
@@ -37,8 +38,11 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val NB_IDS_KEY = "NbOfIdsInt"
         const val NB_IDS_DEFAULT = 10
 
-        private const val LANGUAGE_KEY = "SelectedLanguage"
-        private const val LANGUAGE_DEFAULT = "en"
+        const val PROJECT_LANGUAGES_POSITION_KEY = "ProjectLanguages"
+        val PROJECT_LANGUAGES_POSITION_DEFAULT = arrayOf("en")
+
+        const val LANGUAGE_KEY = "SelectedLanguage"
+        const val LANGUAGE_DEFAULT = "en"
 
         const val LANGUAGE_POSITION_KEY = "SelectedLanguagePosition"
         const val LANGUAGE_POSITION_DEFAULT = 0
@@ -119,6 +123,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var returnIdCount: Int
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, NB_IDS_KEY, NB_IDS_DEFAULT)
 
+    override var projectLanguages: Array<String>
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PROJECT_LANGUAGES_POSITION_KEY, PROJECT_LANGUAGES_POSITION_DEFAULT, languagesStringArraySerializer)
+
     // Selected language
     override var language: String
         by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LANGUAGE_KEY, LANGUAGE_DEFAULT)
@@ -189,7 +196,8 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         remoteConfigWrapper.registerAllPreparedDefaultValues()
     }
 
-    override fun getRemoteConfigStringPreference(key: String) = remoteConfigWrapper.getString(key)?: throw NoSuchPreferenceError.forKey(key)
+    override fun getRemoteConfigStringPreference(key: String) = remoteConfigWrapper.getString(key)
+        ?: throw NoSuchPreferenceError.forKey(key)
 
     override fun <T : Any> getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T = serializer.deserialize(getRemoteConfigStringPreference(key))
 

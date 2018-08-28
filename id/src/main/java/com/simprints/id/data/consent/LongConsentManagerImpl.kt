@@ -6,6 +6,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.R
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import io.reactivex.BackpressureStrategy
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import java.io.BufferedReader
 import java.io.File
@@ -35,26 +36,28 @@ class LongConsentManagerImpl(context: Context,
             filePath.mkdirs()
     }
 
-    override fun downloadLongConsent(language: String):
-        Flowable<Int> = Flowable.create<Int>({ emitter ->
-
-        if (language.isBlank()) emitter.apply {
-            onError(IllegalStateException("Invalid language choice: $language"))
+    override fun downloadAllLongConsents(languages: Array<String>): Completable {
+        val downloadTasks = mutableListOf<Completable>()
+        languages.forEach { language ->
+            if (!checkIfLongConsentExists(language))
+                downloadTasks.add(downloadLongConsentWithProgress(language).ignoreElements())
         }
+        return Completable.mergeDelayError(downloadTasks)
+    }
 
-        val file = File(filePath, "$language.$FILE_TYPE")
-
-        firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
-
-        getFileDownloadTask(language, file)
-            .addOnSuccessListener {
-                emitter.onComplete()
-            }.addOnFailureListener {
-                emitter.onError(it)
-            }.addOnProgressListener {
-                emitter.onNext(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
-            }
-    }, BackpressureStrategy.BUFFER)
+    override fun downloadLongConsentWithProgress(language: String): Flowable<Int> = Flowable.create<Int>(
+        { emitter ->
+            firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
+            val file = createFileForLanguage(language)
+            getFileDownloadTask(language, file)
+                .addOnSuccessListener {
+                    emitter.onComplete()
+                }.addOnFailureListener {
+                    emitter.onError(it)
+                }.addOnProgressListener {
+                    emitter.onNext(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
+                }
+        }, BackpressureStrategy.BUFFER)
 
     private fun getFileDownloadTask(language: String, file: File): FileDownloadTask =
         firebaseStorage.getReference(FILE_PATH)
@@ -74,7 +77,7 @@ class LongConsentManagerImpl(context: Context,
 
     override fun getLongConsentText(language: String): String {
 
-        val br: BufferedReader = File(filePath, "$language.$FILE_TYPE").bufferedReader()
+        val br: BufferedReader = createFileForLanguage(language).bufferedReader()
         val fileContent = StringBuffer("")
 
         br.forEachLine {
@@ -84,6 +87,6 @@ class LongConsentManagerImpl(context: Context,
         return fileContent.toString()
     }
 
-    override val languages: Array<String> = context.resources.getStringArray(R.array.language_values)
-        ?: arrayOf(DEFAULT_LANGUAGE)
+    private fun createFileForLanguage(language: String): File =
+        File(filePath, "$language.$FILE_TYPE")
 }
