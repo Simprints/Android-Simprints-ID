@@ -94,7 +94,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     }
 
     private fun loadScannerVersionInPreference(preference: Preference) {
-        preference.summary = preferencesManager.scannerId
+        preference.summary = preferencesManager.hardwareVersionString
     }
 
     private fun handleSyncUponLaunchChanged(value: Boolean): Boolean {

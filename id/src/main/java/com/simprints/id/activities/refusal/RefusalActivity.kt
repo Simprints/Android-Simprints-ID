@@ -74,10 +74,6 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         }
     }
 
-    override fun disableSubmitButton() {
-        btSubmitRefusalForm.isEnabled = false
-    }
-
     override fun enableSubmitButton() {
         btSubmitRefusalForm.isEnabled = true
     }
