@@ -55,7 +55,7 @@ open class ProjectAuthenticator(component: AppComponent,
             .fetchProjectInfo(nonceScope.projectId)
             .storeCredentials(nonceScope.userId)
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
-            .storeProjectRemoteConfigSettings()
+            .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
             .fetchProjectLongConsentTexts()
             .observeOn(AndroidSchedulers.mainThread())
 
@@ -111,14 +111,14 @@ open class ProjectAuthenticator(component: AppComponent,
             dbManager.remote.loadProjectRemoteConfigSettingsJsonString(projectId)
         )
 
-    private fun Single<out JsonElement>.storeProjectRemoteConfigSettings(): Completable =
-        flatMapCompletable {
+    private fun Single<out JsonElement>.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(): Single<Array<String>> =
+        flatMap {
             remoteConfigWrapper.projectSettingsJsonString = it.toString()
-            Completable.complete()
+            Single.just(preferencesManager.projectLanguages)
         }
 
-    private fun Completable.fetchProjectLongConsentTexts(): Completable =
-        andThen(
-            longConsentManager.downloadAllLongConsents(preferencesManager.projectLanguages)
-        )
+    private fun Single<out Array<String>>.fetchProjectLongConsentTexts(): Completable =
+        flatMapCompletable { languages ->
+            longConsentManager.downloadAllLongConsents(languages)
+        }
 }
