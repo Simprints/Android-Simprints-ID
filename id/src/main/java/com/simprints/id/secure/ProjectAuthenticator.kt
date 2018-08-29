@@ -2,8 +2,10 @@ package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
+import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.AppComponent
@@ -28,6 +30,8 @@ open class ProjectAuthenticator(component: AppComponent,
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
+    @Inject lateinit var longConsentManager: LongConsentManager
+    @Inject lateinit var preferencesManager: PreferencesManager
 
     private val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
     private val publicKeyManager = PublicKeyManager(secureApiClient)
@@ -51,7 +55,8 @@ open class ProjectAuthenticator(component: AppComponent,
             .fetchProjectInfo(nonceScope.projectId)
             .storeCredentials(nonceScope.userId)
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
-            .storeProjectRemoteConfigSettings()
+            .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
+            .fetchProjectLongConsentTexts()
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
@@ -106,9 +111,14 @@ open class ProjectAuthenticator(component: AppComponent,
             dbManager.remote.loadProjectRemoteConfigSettingsJsonString(projectId)
         )
 
-    private fun Single<out JsonElement>.storeProjectRemoteConfigSettings(): Completable =
-        flatMapCompletable {
+    private fun Single<out JsonElement>.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(): Single<Array<String>> =
+        flatMap {
             remoteConfigWrapper.projectSettingsJsonString = it.toString()
-            Completable.complete()
+            Single.just(preferencesManager.projectLanguages)
+        }
+
+    private fun Single<out Array<String>>.fetchProjectLongConsentTexts(): Completable =
+        flatMapCompletable { languages ->
+            longConsentManager.downloadAllLongConsents(languages)
         }
 }

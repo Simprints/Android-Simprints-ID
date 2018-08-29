@@ -42,6 +42,8 @@ class SerializerModule {
                                                                 @Named("BooleanSerializer") booleanSerializer: Serializer<Boolean>,
                                                                 gson: Gson): Serializer<Map<FingerIdentifier, Boolean>> = MapSerializer(fingerIdentifierSerializer, booleanSerializer, gson)
 
+    @Provides @Singleton @Named("LanguagesStringArraySerializer") fun provideLanguagesStringArraySerializer(): Serializer<Array<String>> = LanguagesStringArraySerializer()
+
     //Action
     @Provides @Singleton @Named("ActionReader") fun provideActionReader(): Reader<CalloutAction> = ActionReader()
     @Provides @Singleton @Named("InvalidActionError") fun provideInvalidActionError(): Error = InvalidCalloutError(ALERT_TYPE.INVALID_INTENT_ACTION)

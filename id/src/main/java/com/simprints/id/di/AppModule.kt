@@ -124,8 +124,8 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager):
-        LongConsentManager = LongConsentManagerImpl(ctx, loginInfoManager)
+    open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, analyticsManager: AnalyticsManager):
+        LongConsentManager = LongConsentManagerImpl(ctx, loginInfoManager, analyticsManager)
 
     @Provides
     @Singleton

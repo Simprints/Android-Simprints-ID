@@ -7,13 +7,19 @@ interface LongConsentContract {
 
     interface View : BaseView<Presenter> {
 
-        var showProgressBar: Boolean
-
         fun setLongConsentText(text: String)
 
-        fun setDefaultLongConsent()
+        fun setNoPrivacyNoticeFound()
 
+        fun setDownloadProgress(progress: Int)
+
+        fun setDownloadInProgress(inProgress: Boolean)
+
+        fun showDownloadErrorToast()
     }
 
-    interface Presenter : BasePresenter
+    interface Presenter : BasePresenter {
+
+        fun downloadLongConsent()
+    }
 }

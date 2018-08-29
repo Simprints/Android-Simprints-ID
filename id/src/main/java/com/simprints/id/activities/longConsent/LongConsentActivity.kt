@@ -2,11 +2,13 @@ package com.simprints.id.activities.longConsent
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.method.ScrollingMovementMethod
 import android.view.View
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.LanguageHelper
+import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_long_consent.*
 import javax.inject.Inject
 
@@ -15,12 +17,6 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
     @Inject lateinit var preferences: PreferencesManager
 
     override lateinit var viewPresenter: LongConsentContract.Presenter
-
-    override var showProgressBar: Boolean = true
-        set(value) {
-            field = value
-            longConsent_progressBar.visibility = if (value) View.VISIBLE else View.INVISIBLE
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,8 +46,31 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
 
     override fun setLongConsentText(text: String) {
         longConsent_TextView.text = text
-        longConsent_ScrollView.requestLayout()
+        longConsent_TextView.movementMethod = ScrollingMovementMethod()
+        longConsent_downloadButton.visibility = View.GONE
+        longConsent_noPrivacyNoticeText.visibility = View.GONE
+        longConsent_downloadProgressBar.visibility = View.GONE
+        longConsent_TextView.visibility = View.VISIBLE
     }
 
-    override fun setDefaultLongConsent() = setLongConsentText(getString(R.string.long_consent))
+    override fun setNoPrivacyNoticeFound() {
+        longConsent_TextView.visibility = View.GONE
+        longConsent_downloadButton.visibility = View.VISIBLE
+        longConsent_noPrivacyNoticeText.visibility = View.VISIBLE
+        longConsent_downloadProgressBar.visibility = View.INVISIBLE
+        longConsent_downloadButton.setOnClickListener { viewPresenter.downloadLongConsent() }
+    }
+
+    override fun setDownloadProgress(progress: Int) {
+        longConsent_downloadProgressBar.progress = progress
+    }
+
+    override fun setDownloadInProgress(inProgress: Boolean) {
+        longConsent_downloadProgressBar.visibility = if (inProgress) View.VISIBLE else View.INVISIBLE
+        longConsent_downloadButton.isEnabled = !inProgress
+    }
+
+    override fun showDownloadErrorToast() {
+        showToast(R.string.long_consent_failed_to_download)
+    }
 }
