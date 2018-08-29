@@ -39,7 +39,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val NB_IDS_DEFAULT = 10
 
         const val PROJECT_LANGUAGES_POSITION_KEY = "ProjectLanguages"
-        val PROJECT_LANGUAGES_POSITION_DEFAULT = arrayOf("en")
+        val PROJECT_LANGUAGES_POSITION_DEFAULT = arrayOf<String>()
 
         const val LANGUAGE_KEY = "SelectedLanguage"
         const val LANGUAGE_DEFAULT = "en"
@@ -123,6 +123,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var returnIdCount: Int
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, NB_IDS_KEY, NB_IDS_DEFAULT)
 
+    // What languages should be selectable for this project. Serialize as commas separated list. The empty list defaults to all languages
     override var projectLanguages: Array<String>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PROJECT_LANGUAGES_POSITION_KEY, PROJECT_LANGUAGES_POSITION_DEFAULT, languagesStringArraySerializer)
 

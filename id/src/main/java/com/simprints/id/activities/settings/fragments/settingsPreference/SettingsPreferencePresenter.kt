@@ -21,7 +21,37 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     }
 
     override fun start() {
+        configureAvailableLanguageEntriesFromProjectLanguages()
         loadPreferenceValuesAndBindThemToChangeListeners()
+    }
+
+    private fun configureAvailableLanguageEntriesFromProjectLanguages() {
+        val availableLanguages = preferencesManager.projectLanguages
+        val languageCodeToName = view.getLanguageCodeAndNamePairs()
+
+        val (availableLanguageNames, availableLanguageCodes) = computeAvailableLanguageNamesAndCodes(availableLanguages, languageCodeToName)
+
+        val preference = view.getPreferenceForLanguage() as ListPreference
+        preference.entries = availableLanguageNames.toTypedArray()
+        preference.entryValues = availableLanguageCodes.toTypedArray()
+    }
+
+    private fun computeAvailableLanguageNamesAndCodes(availableLanguages: Array<String>, languageCodeToName: Map<String, String>): Pair<MutableList<String>, MutableList<String>> {
+        val availableLanguageNames = mutableListOf<String>()
+        val availableLanguageCodes = mutableListOf<String>()
+        availableLanguages.forEach { code ->
+            val name = languageCodeToName[code]
+            if (name != null) {
+                availableLanguageNames.add(name)
+                availableLanguageCodes.add(code)
+            }
+        }
+
+        if (availableLanguageNames.isEmpty()) {
+            availableLanguageNames.addAll(languageCodeToName.values)
+            availableLanguageCodes.addAll(languageCodeToName.keys)
+        }
+        return Pair(availableLanguageNames, availableLanguageCodes)
     }
 
     private fun loadPreferenceValuesAndBindThemToChangeListeners() {

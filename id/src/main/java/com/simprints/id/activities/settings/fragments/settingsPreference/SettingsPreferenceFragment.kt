@@ -34,6 +34,12 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
         return super.onOptionsItemSelected(item)
     }
 
+    override fun getLanguageCodeAndNamePairs(): Map<String, String> {
+        val languageCodes = resources.getStringArray(R.array.language_values)
+        val languageNames = resources.getStringArray(R.array.language_array)
+        return languageCodes.zip(languageNames).toMap()
+    }
+
     override fun getPreferenceForLanguage(): Preference =
         findPreference(getKeyForLanguagePreference())
 
