@@ -8,6 +8,9 @@ import com.simprints.id.activities.BaseView
 interface SettingsPreferenceContract {
 
     interface  View: BaseView<Presenter> {
+
+        fun getLanguageCodeAndNamePairs(): Map<String, String>
+
         fun getPreferenceForLanguage(): Preference
 
         fun getPreferenceForDefaultFingers(): Preference
