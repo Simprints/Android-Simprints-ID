@@ -3,7 +3,7 @@ package com.simprints.id.data.consent
 import android.content.Context
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.id.R
+import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
@@ -12,7 +12,8 @@ import java.io.BufferedReader
 import java.io.File
 
 class LongConsentManagerImpl(context: Context,
-                             private val loginInfoManager: LoginInfoManager) : LongConsentManager {
+                             private val loginInfoManager: LoginInfoManager,
+                             private val analyticsManager: AnalyticsManager) : LongConsentManager {
 
     companion object {
         private const val FILE_PATH = "long-consents"
@@ -23,10 +24,14 @@ class LongConsentManagerImpl(context: Context,
     }
 
     private val filePath: File
-    private val firebaseStorage = FirebaseStorage.getInstance() // TODO : migrate to FirebaseManager whenever it exists
+    private val firebaseStorage = FirebaseStorage.getInstance()
 
     init {
-        filePath = File(context.filesDir.absolutePath +
+        filePath = createLocalFilePath(context)
+    }
+
+    private fun createLocalFilePath(context: Context): File {
+        val filePath = File(context.filesDir.absolutePath +
             File.separator +
             FILE_PATH +
             File.separator +
@@ -34,13 +39,20 @@ class LongConsentManagerImpl(context: Context,
 
         if (!filePath.exists())
             filePath.mkdirs()
+
+        return filePath
     }
 
     override fun downloadAllLongConsents(languages: Array<String>): Completable {
         val downloadTasks = mutableListOf<Completable>()
         languages.forEach { language ->
             if (!checkIfLongConsentExists(language))
-                downloadTasks.add(downloadLongConsentWithProgress(language).ignoreElements())
+                downloadTasks.add(
+                    downloadLongConsentWithProgress(language)
+                        .ignoreElements()
+                        .doOnError { analyticsManager.logThrowable(it) }
+                        .onErrorComplete()
+                )
         }
         return Completable.mergeDelayError(downloadTasks)
     }
