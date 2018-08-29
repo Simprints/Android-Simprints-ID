@@ -38,7 +38,6 @@
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
     <string name="good_scan_direction">د بلي ګوتې لپاره چپ خواته پر صفحې ګوته راکیکاږئ</string>
-    <string name="last_scan_message">د دوام لپاره د تیر پر علامه ګوته راکیکاږئ</string>
     <string name="please_scan">په مهربانۍ سره سکن یې کړئ</string>
     <string name="poor_scan_direction">په مهربانۍ سره بیا سکن کړئ</string>
     <string name="scanning">د سکن کولو په حال کې …</string>
@@ -56,25 +55,6 @@
 
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
-    <!-- Menu Titles -->
-    <string name="action_settings">تنظیمات</string>
-    <string name="menu_header">Simprints آی دی دستگاه</string>
-    <string name="menu_subheader">Every person counts!</string>
-    <!-- Menu Labels -->
-    <string name="fingerprints_menu">د ګوتې نښان</string>
-    <string name="help_menu">مرسته</string>
-    <string name="about_menu">معلومات</string>
-    <string name="help_and_support_menu">مرسته او ملاتړ</string>
-    <string name="configuration_menu">تنظیمات</string>
-    <string name="nav_add_finger">ګوته اضافه کړئ</string>
-    <string name="nav_select_finger">ګوته انتخاب کړئ</string>
-    <string name="nav_settings">تنظیمات</string>
-    <string name="nav_sync">همګامه کېدل</string>
-    <string name="nav_offline">آفلاین</string>
-    <string name="nav_sync_complete">همګامول یا تنظیمول تکمیل شو</string>
-    <string name="nav_sync_failed">همګامول ناکامه شو</string>
-    <string name="privacy_and_consent">محرمیت او رضایت</string>
-    <string name="persistence_label">دغه تنظیمات مو د بل وخت لپاره په یاد وي</string>
     <!-- Sync Button Text -->
     <string name="sync_data">د معلوماتو همګامول</string>
     <string name="syncing">همګامول…</string>
@@ -171,7 +151,6 @@
 
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-    <string name="settings_select_language">د ژبې انتخاب</string>
     <string name="nudge_mode_checkbox_name">Nudge Mode</string>
     <string name="vibrate">لرزه کول</string>
     <string name="quality_threshold_empty">د کیفیت کچه:</string>
@@ -194,10 +173,7 @@
     <string name="button_submit">سپارل</string>
     <string name="button_scan_prints">اوکی</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_here">سکنر شتون نلری</string>
     <string name="scanner_not_working">سکنر کار نه ورکوي</string>
-    <string name="unable_to_capture_a_good_scan">نشي کولي څو ښه سکن واخلي</string>
-    <string name="beneficiary_was_physically_unable">ګټه اخیستونکی له فزیکي پلوه نشو کولی څو د خپلې ګوټې نښان راکړي (د بیلګې په توګه: د درد احساس یې کاوه او یا یې ګوټې نه وې)</string>
     <string name="beneficiary_refused">ګټه اخیستونکی انکار وکړ</string>
     <string name="other">نور</string>
     <!-- Text Prompt -->
