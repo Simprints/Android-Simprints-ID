@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
+import com.simprints.id.domain.Finger
 
 
 class CollectFingerprintsIndicatorsHelper(private val context: Context,
@@ -22,10 +23,10 @@ class CollectFingerprintsIndicatorsHelper(private val context: Context,
     fun initIndicators() {
         view.indicatorLayout.removeAllViewsInLayout()
         indicators.clear()
-        presenter.activeFingers.indices.forEach { i ->
+        presenter.activeFingers.indices.forEach { fingerPosition ->
             val indicator = ImageView(context)
             indicator.adjustViewBounds = true
-            indicator.setOnClickListener { view.viewPager.currentItem = i }
+            indicator.setOnClickListener { handleIndicatorClick(fingerPosition) }
             indicators.add(indicator)
             view.indicatorLayout.addView(indicator, LinearLayout.LayoutParams(
                 0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
@@ -37,6 +38,12 @@ class CollectFingerprintsIndicatorsHelper(private val context: Context,
             val selected = presenter.currentActiveFingerNo == i
             val finger = presenter.activeFingers[i]
             indicators[i].setImageResource(finger.status.getDrawableId(selected))
+        }
+    }
+
+    private fun handleIndicatorClick(fingerPosition: Int) {
+        if (presenter.currentFinger().status != Finger.Status.COLLECTING) {
+            view.viewPager.currentItem = fingerPosition
         }
     }
 }
