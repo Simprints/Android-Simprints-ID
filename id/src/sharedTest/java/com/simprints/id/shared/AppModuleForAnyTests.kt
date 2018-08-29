@@ -7,6 +7,7 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -41,7 +42,8 @@ open class AppModuleForAnyTests(app: Application,
                                 open var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
                                 open var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
                                 open var simNetworkUtilsRule: DependencyRule = RealRule,
-                                open var secureApiInterfaceRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var secureApiInterfaceRule: DependencyRule = RealRule,
+                                open var longConsentManagerRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -111,4 +113,7 @@ open class AppModuleForAnyTests(app: Application,
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
+
+    override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, analyticsManager: AnalyticsManager): LongConsentManager =
+        longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, analyticsManager) }
 }

@@ -3,15 +3,17 @@ package com.simprints.id.data.consent
 import android.content.Context
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.id.R
+import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import io.reactivex.BackpressureStrategy
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import java.io.BufferedReader
 import java.io.File
 
 class LongConsentManagerImpl(context: Context,
-                             private val loginInfoManager: LoginInfoManager) : LongConsentManager {
+                             private val loginInfoManager: LoginInfoManager,
+                             private val analyticsManager: AnalyticsManager) : LongConsentManager {
 
     companion object {
         private const val FILE_PATH = "long-consents"
@@ -22,10 +24,14 @@ class LongConsentManagerImpl(context: Context,
     }
 
     private val filePath: File
-    private val firebaseStorage = FirebaseStorage.getInstance() // TODO : migrate to FirebaseManager whenever it exists
+    private val firebaseStorage = FirebaseStorage.getInstance()
 
     init {
-        filePath = File(context.filesDir.absolutePath +
+        filePath = createLocalFilePath(context)
+    }
+
+    private fun createLocalFilePath(context: Context): File {
+        val filePath = File(context.filesDir.absolutePath +
             File.separator +
             FILE_PATH +
             File.separator +
@@ -33,28 +39,37 @@ class LongConsentManagerImpl(context: Context,
 
         if (!filePath.exists())
             filePath.mkdirs()
+
+        return filePath
     }
 
-    override fun downloadLongConsent(language: String):
-        Flowable<Int> = Flowable.create<Int>({ emitter ->
-
-        if (language.isBlank()) emitter.apply {
-            onError(IllegalStateException("Invalid language choice: $language"))
+    override fun downloadAllLongConsents(languages: Array<String>): Completable {
+        val downloadTasks = mutableListOf<Completable>()
+        languages.forEach { language ->
+            if (!checkIfLongConsentExists(language))
+                downloadTasks.add(
+                    downloadLongConsentWithProgress(language)
+                        .ignoreElements()
+                        .doOnError { analyticsManager.logThrowable(it) }
+                        .onErrorComplete()
+                )
         }
+        return Completable.mergeDelayError(downloadTasks)
+    }
 
-        val file = File(filePath, "$language.$FILE_TYPE")
-
-        firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
-
-        getFileDownloadTask(language, file)
-            .addOnSuccessListener {
-                emitter.onComplete()
-            }.addOnFailureListener {
-                emitter.onError(it)
-            }.addOnProgressListener {
-                emitter.onNext(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
-            }
-    }, BackpressureStrategy.BUFFER)
+    override fun downloadLongConsentWithProgress(language: String): Flowable<Int> = Flowable.create<Int>(
+        { emitter ->
+            firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
+            val file = createFileForLanguage(language)
+            getFileDownloadTask(language, file)
+                .addOnSuccessListener {
+                    emitter.onComplete()
+                }.addOnFailureListener {
+                    emitter.onError(it)
+                }.addOnProgressListener {
+                    emitter.onNext(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
+                }
+        }, BackpressureStrategy.BUFFER)
 
     private fun getFileDownloadTask(language: String, file: File): FileDownloadTask =
         firebaseStorage.getReference(FILE_PATH)
@@ -74,7 +89,7 @@ class LongConsentManagerImpl(context: Context,
 
     override fun getLongConsentText(language: String): String {
 
-        val br: BufferedReader = File(filePath, "$language.$FILE_TYPE").bufferedReader()
+        val br: BufferedReader = createFileForLanguage(language).bufferedReader()
         val fileContent = StringBuffer("")
 
         br.forEachLine {
@@ -84,6 +99,6 @@ class LongConsentManagerImpl(context: Context,
         return fileContent.toString()
     }
 
-    override val languages: Array<String> = context.resources.getStringArray(R.array.language_values)
-        ?: arrayOf(DEFAULT_LANGUAGE)
+    private fun createFileForLanguage(language: String): File =
+        File(filePath, "$language.$FILE_TYPE")
 }

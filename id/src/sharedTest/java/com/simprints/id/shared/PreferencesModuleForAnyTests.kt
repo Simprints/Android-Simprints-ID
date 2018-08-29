@@ -20,6 +20,7 @@ open class PreferencesModuleForAnyTests(open var remoteConfigRule: DependencyRul
     override fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences,
                                                    remoteConfigWrapper: RemoteConfigWrapper,
                                                    fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                                                   groupSerializer: Serializer<Constants.GROUP>): SettingsPreferencesManager =
-        settingsPreferencesManagerRule.resolveDependency { super.provideSettingsPreferencesManager(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer) }
+                                                   groupSerializer: Serializer<Constants.GROUP>,
+                                                   languagesStringArraySerializer: Serializer<Array<String>>): SettingsPreferencesManager =
+        settingsPreferencesManagerRule.resolveDependency { super.provideSettingsPreferencesManager(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer, languagesStringArraySerializer) }
 }

@@ -248,6 +248,9 @@
 
 
     <!-- Long Consent Activity : the screen where the user can find the long consent form -->
+    <string name="long_consent_download_button_text">Download Privacy Notice</string>
+    <string name="long_consent_no_privacy_notice_found_text">Privacy notice not downloaded yet for this language.</string>
+    <string name="long_consent_failed_to_download">Failed to download privacy notice.</string>
     <!-- Long Consent -->
     <string name="developmentworker_consent_checkbox">I agree to Simprints using this data in these ways.</string>
     <string name="long_consent">
