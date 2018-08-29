@@ -114,6 +114,6 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
 
-    override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager): LongConsentManager =
-        longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager) }
+    override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, analyticsManager: AnalyticsManager): LongConsentManager =
+        longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, analyticsManager) }
 }
