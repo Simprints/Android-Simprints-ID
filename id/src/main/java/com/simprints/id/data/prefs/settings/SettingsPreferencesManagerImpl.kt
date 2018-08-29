@@ -89,7 +89,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY = "ScheduledBackgroundSyncOnlyWhenCharging"
         const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT = false
         const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY = "ScheduledBackgroundSyncOnlyWhenNotLowBattery"
-        private const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT = true
+        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT = true
 
         const val PROGRAM_NAME_KEY = "ProgramName"
         const val PROGRAM_NAME_DEFAULT = "this program"

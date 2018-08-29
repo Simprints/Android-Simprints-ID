@@ -38,7 +38,6 @@
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
     <string name="good_scan_direction">अर्को औंलाको लागि देब्रे तर्फ सार्नुहोस </string>
-    <string name="last_scan_message">अगाढी बढ्नको लागि तीरमा थिच्नुहोस </string>
     <string name="please_scan">स्क्यान गर्नुहोस</string>
     <string name="poor_scan_direction">कृपया फेरी स्क्यान गर्नुहोस </string>
     <string name="scanning">स्क्यान हुँदै छ </string>
@@ -55,25 +54,6 @@
 
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
-    <!-- Menu Titles -->
-    <string name="action_settings">सेटिंगहरु</string>
-    <string name="menu_header">सिम्प्रिन्ट्स ID</string>
-    <string name="menu_subheader">प्रत्येक व्यक्ति मुल्यवान छ </string>
-    <!-- Menu Labels -->
-    <string name="fingerprints_menu">औंलाको छापहरु </string>
-    <string name="help_menu">सहयोग </string>
-    <string name="about_menu">"एप्लिकेसनको बारेमा "</string>
-    <string name="help_and_support_menu">सहयोग र समर्थन </string>
-    <string name="configuration_menu">कन्फिगरेसन </string>
-    <string name="nav_add_finger">अर्को औंला थप्नुहोस </string>
-    <string name="nav_select_finger">औंला छान्नुहोस्</string>
-    <string name="nav_settings">सेटिंगहरु</string>
-    <string name="nav_sync">समक्रमण</string>
-    <string name="nav_sync_failed">समक्रमण असफल</string>
-    <string name="nav_sync_complete">समक्रमण  पूरा</string>
-    <string name="nav_offline">अफलाइन</string>
-    <string name="privacy_and_consent"><![CDATA[गोपनियता तथा स्वीकृति]]></string>
-    <string name="persistence_label">"यी सेटिङ्हरू अर्को पालीको लागि याद रहोस "</string>
     <!-- Sync Button Text -->
     <string name="sync_data">डेटा समक्रमण गर्नुहोस्</string>
     <string name="syncing">समक्रमण हुँदै…</string>
@@ -169,7 +149,6 @@
 
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-    <string name="settings_select_language">भाषा चयन गर्नुहोस्</string>
     <string name="nudge_mode_checkbox_name">बटन प्रणाली </string>
     <string name="vibrate">कम्पन</string>
     <string name="quality_threshold_empty">न्युनतम आवश्यक स्तर :</string>
@@ -192,10 +171,7 @@
     <string name="button_submit">पेश गर्नुहोस्</string>
     <string name="button_scan_prints">औँठाछापहरू स्क्यान गर्नुहोस्</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_here">स्क्यानर यहाँ छैन</string>
     <string name="scanner_not_working">स्क्यानरले कार्य गरिरहेको छैन</string>
-    <string name="unable_to_capture_a_good_scan">राम्रो स्क्यान क्याप्चर गर्न असक्षम भयो</string>
-    <string name="beneficiary_was_physically_unable">उत्तराधिकारी औँठाछापहरू उपलब्ध गराउन शारीरिक रूपमा असक्षम हुनुहुन्थ्यो (जस्तै, एकदमै कष्टकर, हातका अंगहरू नभएको)</string>
     <string name="beneficiary_refused">लाभार्थीले अस्वीकार गर्नुभयो</string>
     <string name="other">अन्य</string>
     <!-- Text Prompt -->

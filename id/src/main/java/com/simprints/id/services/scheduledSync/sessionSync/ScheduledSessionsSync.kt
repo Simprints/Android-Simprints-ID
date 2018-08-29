@@ -48,6 +48,7 @@ class ScheduledSessionsSync : Worker() {
     private fun handleError(it: Throwable, result: LinkedBlockingQueue<Result>) =
         when (it) {
             is NoSessionsFoundException -> {
+                result.put(Result.SUCCESS)
             }
             else -> {
                 it.printStackTrace()
