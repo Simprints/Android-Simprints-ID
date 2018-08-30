@@ -1,6 +1,7 @@
 package com.simprints.id.activities.collectFingerprints
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
@@ -56,6 +57,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     override var isTryDifferentFingerSplashShown = false
     override var isNudging = false
     private var lastCaptureStartedAt: Long = 0
+    private var confirmDialog: AlertDialog? = null
 
     init {
         ((view as Activity).application as Application).component.inject(this)
@@ -214,6 +216,8 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleConfirmFingerprintsAndContinue() {
+        dismissConfirmDialogIfStillShowing()
+
         val fingerprints = activeFingers
             .filter { fingerHasSatisfiedTerminalCondition(it) }
             .filter { !it.isFingerSkipped }
@@ -225,6 +229,14 @@ class CollectFingerprintsPresenter(private val context: Context,
             handleRestart()
         } else {
             proceedToFinish(fingerprints)
+        }
+    }
+
+    private fun dismissConfirmDialogIfStillShowing() {
+        confirmDialog?.let {
+            if (it.isShowing) {
+                it.dismiss()
+            }
         }
     }
 
@@ -291,11 +303,10 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun createMapAndShowDialog() {
         isConfirmDialogShown = true
-        ConfirmFingerprintsDialog(context, createMapForScannedFingers(),
+        confirmDialog = ConfirmFingerprintsDialog(context, createMapForScannedFingers(),
             callbackConfirm = { handleConfirmFingerprintsAndContinue() },
             callbackRestart = { handleRestart() })
-            .create()
-            .show()
+            .create().also { it.show() }
     }
 
     private fun createMapForScannedFingers(): MutableMap<String, Boolean> =
@@ -310,6 +321,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper.handleFingersChanged()
         fingerDisplayHelper.resetFingerIndexToBeginning()
         isConfirmDialogShown = false
+        confirmDialog = null
     }
 
     override fun handleMissingFingerClick() {
