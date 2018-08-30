@@ -85,6 +85,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         AppModuleForAndroidTests(
             app,
             localDbManagerRule = DependencyRule.SpyRule,
+            remoteDbManagerRule = DependencyRule.SpyRule,
             sessionEventsManagerRule = DependencyRule.SpyRule,
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter }
         )
@@ -129,12 +130,13 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         val openSessionId = createAndSaveFakeOpenSession()
         createAndSaveFakeExpiredOpenSession()
 
-        val sessionManagerImpl = (sessionEventsManagerSpy as SessionEventsManagerImpl)
-        sessionManagerImpl.sessionsApi = mock()
+        val mockSessionsApi = mock<SessionsRemoteInterface>()
 
-        whenever(sessionManagerImpl.sessionsApi.uploadSessions(
+        whenever(mockSessionsApi.uploadSessions(
             anyNotNull(),
             anyNotNull())).thenReturn(Single.just(Result.response(buildSuccessfulUploadSessionResponse())))
+
+        whenever(remoteDbManager.getSessionsApiClient()).thenReturn(Single.just(mockSessionsApi))
 
         sessionEventsManagerSpy.syncSessions(testProjectId).test().also {
             it.awaitTerminalEvent()
@@ -146,7 +148,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     }
 
     private fun buildSuccessfulUploadSessionResponse() =
-        Response.success<Void?>(null, okhttp3.Response.Builder() //
+        Response.success<Unit>(null, okhttp3.Response.Builder() //
             .code(201)
             .message("OK")
             .protocol(Protocol.HTTP_1_1)

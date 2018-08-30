@@ -13,7 +13,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
@@ -38,10 +37,6 @@ open class SessionEventsManagerImpl(private val ctx: Context,
     }
 
     private var activeSession: SessionEvents? = null
-
-    var sessionsApi: SessionsRemoteInterface by lazyVar {
-        remoteDbManager.getSessionsApiClient().blockingGet()
-    }
 
     //as default, the manager tries to load the last open activeSession for a specific project
     override fun getCurrentSession(projectId: String): Single<SessionEvents> = activeSession?.let {
@@ -116,7 +111,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                 closeAnyOpenSessionsAndUpdateUploadTime(sessions)
                 uploadClosedSessions(sessions, projectId)
             } else {
-                throw NoSessionsFoundException()
+                Single.error(NoSessionsFoundException())
             }
         }.flatMapCompletable {
             if (uploadSessionSucceeded(it)) {
@@ -136,13 +131,14 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         }
     }
 
-    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Void?>> {
-        return sessions.filter { it.isClosed() }.toTypedArray().let {
-            sessionsApi.uploadSessions(projectId, hashMapOf("sessions" to it))
+    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Unit>> =
+        sessions.filter { it.isClosed() }.toTypedArray().let { sessionsArray ->
+            remoteDbManager.getSessionsApiClient().flatMap {
+                it.uploadSessions(projectId, hashMapOf("sessions" to sessionsArray))
+            }
         }
-    }
 
-    private fun uploadSessionSucceeded(it: Result<Void?>) =
+    private fun uploadSessionSucceeded(it: Result<Unit>) =
         !it.isError && it.response()?.code() == 201
 
     private fun forceSessionToCloseIfOpenAndNotInProgress(it: SessionEvents, timeHelper: TimeHelper) {
