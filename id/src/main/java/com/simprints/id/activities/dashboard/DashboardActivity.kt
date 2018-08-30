@@ -119,7 +119,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
             .setTitle(R.string.confirmation_logout_title)
             .setMessage(R.string.confirmation_logout_message)
             .setPositiveButton(android.R.string.yes) { _, _ -> logout() }
-            .setNegativeButton(android.R.string.no, null).apply { show() }
+            .setNegativeButton(getString(R.string.confirmation_logout_cancel), null).apply { show() }
     }
 
     private fun logout() {
