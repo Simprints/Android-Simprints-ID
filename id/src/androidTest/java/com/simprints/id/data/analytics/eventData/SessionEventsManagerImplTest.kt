@@ -148,7 +148,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     }
 
     private fun buildSuccessfulUploadSessionResponse() =
-        Response.success<Unit>(null, okhttp3.Response.Builder() //
+        Response.success<Void?>(null, okhttp3.Response.Builder() //
             .code(201)
             .message("OK")
             .protocol(Protocol.HTTP_1_1)

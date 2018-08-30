@@ -4,6 +4,8 @@ import com.simprints.id.data.analytics.eventData.models.events.CandidateReadEven
 import com.simprints.id.data.analytics.eventData.models.events.ScannerConnectionEvent
 import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
+import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Verification
@@ -23,6 +25,10 @@ interface SessionEventsManager {
     fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit,
                                   projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty())
 
+    /**
+     * @throws NoSessionsFoundException
+     * @throws SessionUploadFailureException
+     */
     fun syncSessions(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty()): Completable
 
     fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable

@@ -7,6 +7,7 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
+import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
 import com.simprints.id.tools.Log
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.rxkotlin.subscribeBy
@@ -47,9 +48,8 @@ class ScheduledSessionsSync : Worker() {
 
     private fun handleError(it: Throwable, result: LinkedBlockingQueue<Result>) =
         when (it) {
-            is NoSessionsFoundException -> {
-                result.put(Result.SUCCESS)
-            }
+            is NoSessionsFoundException -> result.put(Result.SUCCESS)
+            is SessionUploadFailureException -> result.put(Result.FAILURE)
             else -> {
                 it.printStackTrace()
                 analyticsManager.logThrowable(it)
