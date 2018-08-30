@@ -118,7 +118,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         confirmationLogoutDialog = AlertDialog.Builder(this)
             .setTitle(R.string.confirmation_logout_title)
             .setMessage(R.string.confirmation_logout_message)
-            .setPositiveButton(android.R.string.yes) { _, _ -> logout() }
+            .setPositiveButton(getString(R.string.logout)) { _, _ -> logout() }
             .setNegativeButton(getString(R.string.confirmation_logout_cancel), null).apply { show() }
     }
 
