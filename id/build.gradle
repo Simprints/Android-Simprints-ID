@@ -27,8 +27,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 27
         multiDexEnabled true
-        versionCode 104
-        versionName "2018.3.0-dev10"
+        versionCode 105
+        versionName "2018.3.0-dev11"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunner "com.simprints.id.UiTestsRunner" //To use custom TestApplication
 
@@ -324,9 +324,8 @@ dependencies {
         exclude group: "com.google.guava"
     }
 
-    androidTestImplementation 'com.simprints:remote-admin-client:2017.4.0-dev-5'
-    androidTestImplementation "com.simprints:mockscanner:2018.3.0-dev0"
-    testImplementation "com.simprints:mockscanner:2018.3.0-dev0"
+    androidTestImplementation "com.simprints:mockscanner:2018.3.0"
+    testImplementation "com.simprints:mockscanner:2018.3.0"
     androidTestImplementation 'joda-time:joda-time:2.9.9'
 
     //UI

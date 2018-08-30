@@ -9,11 +9,11 @@
     <string name="consent_share_data_no">Simprints, kungiya mai zaman kanta a kasar brutaniya za su sami dama ga bayanin sawun yatsar ka da wuri na yanzu.&#160;</string>
     <string name="consent_parental_enrol">Ina so in yi amfani da yatsan dan ka domin in yi masu rejista da kungiyar %1$s saboda in gano su nan gaba.&#160;</string>
     <string name="consent_parental_id_verify">Ina so in yi amfani da yatsar danka domin samun rahotun sa tare da kungiyar %1$s.&#160;</string>
-    <string name="consent_parental_share_data_no">Simprints,kungiya mai zaman kanta a kasar brutaniya za su sami dama ga bayanin sawun yatsar ka da wuri na yanzu.&#160;</string>
+    <string name="consent_parental_share_data_no">Simprints, kungiya mai zaman kanta a kasar brutaniya za su sami dama ga bayanin sawun yatsar ka da wuri na yanzu.&#160;</string>
     <string name="consent_privacy_rights">Idan ka amince, zaka iya janye izininka a kowane lokaci kuma ka nemi a share bayananka.&#160;</string>
     <string name="consent_parental_privacy_rights">Idan ka amince, zaka iya janye izininka a kowane lokaci kuma ka nemi a share bayanan danka.&#160;</string>
-    <string name="consent_confirmation">Ka amince in yi amfani da yatsar ka? Ka ce \"Na yarda \"Ban yard aba\" \"Ina da tambayoyi\".</string>
-    <string name="consent_parental_confirmation">Ka amince in yi amfani da yatsar dan ka? Ka ce \"Na yarda\" \"Ban yard aba\" \"Ina da tambayoyi\".</string>
+    <string name="consent_confirmation">Ka amince in yi amfani da yatsar ka? Ka ce \"Na yarda\", \"Ban yard aba\", \"Ina da tambayoyi\".</string>
+    <string name="consent_parental_confirmation">Ka amince in yi amfani da yatsar dan ka? Ka ce \"Na yarda\", \"Ban yard aba\", \"Ina da tambayoyi\".</string>
 
     <string name="launch_consent_decline_button">Ban amince ba</string>
     <string name="launch_consent_accept_button">Na amince</string>
