@@ -12,6 +12,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionNotFoundException
+import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.libcommon.Person
@@ -104,7 +105,10 @@ open class SessionEventsManagerImpl(private val ctx: Context,
             insertOrUpdateSession(it)
         }
 
-    /** @throws NoSessionsFoundException */
+    /**
+     * @throws NoSessionsFoundException
+     * @throws SessionUploadFailureException
+     */
     override fun syncSessions(projectId: String): Completable =
         sessionEventsLocalDbManager.loadSessions(projectId).flatMap { sessions ->
             if (sessions.size > 0) {
@@ -119,7 +123,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                     .deleteSessions(projectId, false)
                     .onErrorComplete().andThen(sessionEventsLocalDbManager.deleteSessions(PROJECT_ID_FOR_NOT_SIGNED_IN))
             } else {
-                Completable.complete()
+                Completable.error(SessionUploadFailureException())
             }
         }
 
@@ -131,14 +135,14 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         }
     }
 
-    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Unit>> =
+    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Void?>> =
         sessions.filter { it.isClosed() }.toTypedArray().let { sessionsArray ->
             remoteDbManager.getSessionsApiClient().flatMap {
                 it.uploadSessions(projectId, hashMapOf("sessions" to sessionsArray))
             }
         }
 
-    private fun uploadSessionSucceeded(it: Result<Unit>) =
+    private fun uploadSessionSucceeded(it: Result<Void?>) =
         !it.isError && it.response()?.code() == 201
 
     private fun forceSessionToCloseIfOpenAndNotInProgress(it: SessionEvents, timeHelper: TimeHelper) {
