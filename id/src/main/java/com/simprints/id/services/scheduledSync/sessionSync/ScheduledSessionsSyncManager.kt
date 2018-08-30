@@ -18,7 +18,6 @@ class ScheduledSessionsSyncManager {
     private fun getConstraints() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .setRequiresBatteryNotLow(true)
-        .setRequiredNetworkType(NetworkType.UNMETERED)
         .build()
 
     companion object {
