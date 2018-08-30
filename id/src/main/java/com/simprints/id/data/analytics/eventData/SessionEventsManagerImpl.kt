@@ -116,7 +116,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                 closeAnyOpenSessionsAndUpdateUploadTime(sessions)
                 uploadClosedSessions(sessions, projectId)
             } else {
-                throw NoSessionsFoundException()
+                Single.error(NoSessionsFoundException())
             }
         }.flatMapCompletable {
             if (uploadSessionSucceeded(it)) {
@@ -136,13 +136,13 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         }
     }
 
-    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Void?>> {
+    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Unit>> {
         return sessions.filter { it.isClosed() }.toTypedArray().let {
             sessionsApi.uploadSessions(projectId, hashMapOf("sessions" to it))
         }
     }
 
-    private fun uploadSessionSucceeded(it: Result<Void?>) =
+    private fun uploadSessionSucceeded(it: Result<Unit>) =
         !it.isError && it.response()?.code() == 201
 
     private fun forceSessionToCloseIfOpenAndNotInProgress(it: SessionEvents, timeHelper: TimeHelper) {
