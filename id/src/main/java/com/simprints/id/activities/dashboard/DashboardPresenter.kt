@@ -59,7 +59,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun start() {
-        remoteConfigFetcher.forceDoFetchInBackgroundAndActivate() // STOPSHIP flick back to scheduled mode
+        remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
         if (!started.getAndSet(true) || hasSyncGroupChangedSinceLastRun()) {
             initCards()
         } else {
