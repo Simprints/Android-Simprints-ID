@@ -6,13 +6,13 @@
 
     <string name="consent_enrol_only">Waxa aan rabaa in aan kaa qaado faro si aan kuugu diiwangaliyo %1$s.&#160;</string>
     <string name="consent_parental_enrol_only">Waxa aan rabaa in aan faro ka qaado ilmahaaga si aan ugu diiwangeliyo %1$s.&#160;</string>
-    <string name="consent_parental_share_data_yes">%1$s iyo hay\'ada Simprint ee saldhigeedu yahay UK waxa ay heli doonaan macluumaadka farahaaga iyo meesha aad hadda joogto.&#160;</string>
-    <string name="consent_share_data_yes">%1$s iyo hay\'adda Simprint ee saldhigeedu yahay UK waxa ay heli doonaan macluumaadka farahaaga iyo meesha aad hadda joogto.&#160;</string>
-    <string name="consent_collect_yes">Hay\'adda Simprint ayaa sidoo kale u isticmaali doonta macluumaadkaaga ujeeddooyin cilmi-baariseed.&#160;</string>
+    <string name="consent_parental_share_data_yes">%1$s iyo hay\'ada Simprints ee saldhigeedu yahay UK waxa ay heli doonaan macluumaadka farahaaga iyo meesha aad hadda joogto.&#160;</string>
+    <string name="consent_share_data_yes">%1$s iyo hay\'adda Simprints ee saldhigeedu yahay UK waxa ay heli doonaan macluumaadka farahaaga iyo meesha aad hadda joogto.&#160;</string>
+    <string name="consent_collect_yes">Hay\'adda Simprints ayaa sidoo kale u isticmaali doonta macluumaadkaaga ujeeddooyin cilmi-baariseed.&#160;</string>
     <string name="consent_privacy_rights">Haddii aad ogoshahay, waad ka noqon kartaa ogolaanshahaaga waqti kasta adiga oo weydiisanaya in macluumaadkaaga la tirtiro.&#160;</string>
     <string name="consent_parental_privacy_rights">Haddii aad ogoshahay, waad ka noqon kartaa ogolaanshahaaga waqti kasta adiga oo weydiisanaya in macluumaadka ilmahaaga tirtiro.&#160;</string>
-    <string name="consent_confirmation">Ma kaa qaadi karaa karaa faraha ? fadlan dheh waan ogolahay, ma rabo ama su\'aal baan qabaa.</string>
-    <string name="consent_parental_confirmation">Ma ka qaadi karaa faraha ilmahaaga ? fadlan dheh waan ogolahay, ma rabo ama su\'aal baan qabaa.</string>
+    <string name="consent_confirmation">Ma kaa qaadi karaa karaa faraha? Fadlan dheh \"Waan ogolahay\", \"Ma rabo\", ama \"Su\'aal baan qabaa\".</string>
+    <string name="consent_parental_confirmation">Ma ka qaadi karaa faraha ilmahaaga? Fadlan dheh \"Waan ogolahay\", \"Ma rabo\", ama \"Su\'aal baan qabaa\".</string>
 
     <string name="launch_consent_decline_button">Diidid</string>
     <string name="launch_consent_accept_button">Aqbalo</string>
