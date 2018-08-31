@@ -12,7 +12,6 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.testTools.*
 import com.simprints.id.testTools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
-import com.simprints.remoteadminclient.ApiException
 import org.hamcrest.Matchers.*
 import org.junit.Assert.*
 
@@ -146,22 +145,6 @@ fun enrolmentReturnedResult(enrolTestRule: ActivityTestRule<CheckLoginFromIntent
     val guid = registration.guid
     assertNotNull(guid)
     return guid
-}
-
-fun enrolmentReceivedOnline(apiKey: String, guid: String) {
-    log("enrolmentReceivedOnline")
-    WaitingUtils.tryOnSystemUntilTimeout(12000, 3000) {
-        val apiInstance = RemoteAdminUtils.configuredApiInstance
-        try {
-            // Check to see if the patient made it to the database
-            val patientsJson = RemoteAdminUtils.getPatientsNode(apiInstance, apiKey)
-            assertNotNull(patientsJson)
-            assertEquals(1, patientsJson.size().toLong())
-            assertTrue(patientsJson.has(guid))
-        } catch (e: ApiException) {
-            assertNull("ApiException", e)
-        }
-    }
 }
 
 fun matchingActivityIdentificationCheckFinished(identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
