@@ -333,7 +333,7 @@
     <string name="login_user_id_hint">User ID</string>
     <string name="login_title">Request Project credentials</string>
     <string name="login_type_project_details">Type manually</string>
-    <string name="requestLogin_message">You need to login in. Please use your client app to open Simprints ID and log in.</string>
+    <string name="requestLogin_message">You need to login. Please use your client app to open Simprints ID and log in.</string>
     <string name="requestLogin_title">Login Required</string>
     <string name="login">Login</string>
     <!-- QR code scanning messages -->
