@@ -3,7 +3,6 @@ package com.simprints.id.tools;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Build;
 
 import java.util.Locale;
 
@@ -20,7 +19,7 @@ public class LanguageHelper {
         return config;
     }
 
-    private static Locale localeFor(String languageString) {
+    public static Locale localeFor(String languageString) {
         Locale locale;
 
         /*

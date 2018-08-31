@@ -4,8 +4,6 @@ import java.security.InvalidParameterException
 
 /**
  * Simple serializer for Boolean objects.
- *
- * @author: Etienne Thiery (etienne@simprints.com)
  */
 class BooleanSerializer : Serializer<Boolean> {
 

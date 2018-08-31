@@ -1,57 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- SetupActivity : the loading screen -->
-    <!-- Consent Text -->
-    <string name="short_consent">Ina so in yi amfani da sawun yatsa da kuma wuri zama don simprints ta iya samun bayanin ka. Idan hakan bai dace ba ko kana da wata tambaya bari in sani, In bahakaba, sanya babban yatsan hagu a na\'ura</string>
-    <string name="confirm_consent">Matsa nan don tabbatar da izini </string>
+    <string name="consent_general_title">Tambayar yarda ta aluma</string>
+    <string name="consent_parental_title">Tambayar yarda ta Iyaye</string>
+    
+    <string name="consent_enrol">Ina so in yi amfani da yatsar Ka domin in yi maka rejista a kungiyar %1$s sabo da in gano ku nan gaba.&#160;</string>
+    <string name="consent_id_verify">Ina so in yi amfani da yatsar ka domin samo rahotun ka tare da kungiyar %1$s.&#160;</string>
+    <string name="consent_share_data_no">Simprints, kungiya mai zaman kanta a kasar brutaniya za su sami dama ga bayanin sawun yatsar ka da wuri na yanzu.&#160;</string>
+    <string name="consent_parental_enrol">Ina so in yi amfani da yatsan dan ka domin in yi masu rejista da kungiyar %1$s saboda in gano su nan gaba.&#160;</string>
+    <string name="consent_parental_id_verify">Ina so in yi amfani da yatsar danka domin samun rahotun sa tare da kungiyar %1$s.&#160;</string>
+    <string name="consent_parental_share_data_no">Simprints, kungiya mai zaman kanta a kasar brutaniya za su sami dama ga bayanin sawun yatsar ka da wuri na yanzu.&#160;</string>
+    <string name="consent_privacy_rights">Idan ka amince, zaka iya janye izininka a kowane lokaci kuma ka nemi a share bayananka.&#160;</string>
+    <string name="consent_parental_privacy_rights">Idan ka amince, zaka iya janye izininka a kowane lokaci kuma ka nemi a share bayanan danka.&#160;</string>
+    <string name="consent_confirmation">Ka amince in yi amfani da yatsar ka? Ka ce \"Na yarda\", \"Ban yard aba\", \"Ina da tambayoyi\".</string>
+    <string name="consent_parental_confirmation">Ka amince in yi amfani da yatsar dan ka? Ka ce \"Na yarda\", \"Ban yard aba\", \"Ina da tambayoyi\".</string>
 
-    <!-- PrivacyActivity : the screen where the user can find the long consent form -->
-    <!-- Long Consent -->
-    <string name="long_consent">
-        <b><u>Dogowar tambayoyin Yarda</u></b>\n\n
-        Idan kun sanya yatsanku a kan na\'urar daukar hoto, zai rubuta bayanai game da sawun yatsa. Zai kuma rikodin wurin da aka kwatanta da wannan samfurin, da kuma lokaci da kwanan wata na scan.\n\n
-
-        Duk waɗannan bayanan naku za a adana ta Simprints Technology Limited, kungiya mai zamar kanta daga Britaniya.\n\n
-
-        Simprints za su yi amfani da bayaninka don taimakawa wajen gane ka a nan gaba, kuma ya dace da ku zuwa ajiyeyen bayani.\n\n
-
-        Simprints zata yi amfani da bayaninka don inganta daidaitattun sabis ɗin, kuma zata iya raba shi tare da wasu masana don wannan dalili.\n\n
-
-        Simprints tana iya amfani da bayaninka don samun ƙarin fahimtar sabis a wurinka\n\n
-
-        Simprints yana fatan cewa aikinsa a nan zai ci gaba da akalla watanni shida, Simprints zata ajiye bayaninka na tsawon lokacin aikinsa, da kuma shekaru 2 bayan wannan aikin ya ƙare. Bayan nan Simprints zata share bayanan ku.\n\n
-
-        Simprints ba zai adana duk wani hotunan yatsa ba\n\n
-
-        Simprints ba zai ba da wani bayani da yake riƙe a kanku a kowace jiha ba, sai dai idan doka ta buƙaci.\n\n
-
-        Ba dole ba ne ka yarda ka ba Simprints kowane bayani don karɓar sabis. Amma idan ba haka ba, to, ƙungiyoyi masu ci gaba zasu iya samo wahalar samun bayananku a nan gaba.\n\n
-
-        Idan kun kasance da farin ciki ga Simprints don adanawa da kuma amfani da bayaninku, amma kun canza tunaninku kuma ba ku so wannan ya ci gaba, to, ku yi magana da ni.\n\n
-
-        <b><u>Rubutun Tambaya da Amsa - tambayoyi na shari\'a</u></b> \n\n
-        <b>Ba ni da farin ciki ga Simprints don ci gaba da amfani da bayanai na. Menene zan yi?</b>\n\n
-        Ba ni da farin ciki ga Simprints don ci gaba da amfani da bayanai na. Menene zan yi? Kuna da damar tambayar Simprints don share bayaninka a kowane lokaci. Don yin haka, dole ne ku ba da yatsanku ga ma\'aikacin ci gaba a ƙarshe, sabõda Simprints ta iya gano ku. Da zarar ka yi haka, Simprints za ta share dukkan bayanan da ta ke da shi da ke da alaka da kai.\n\n
-        <b>Wace ma\'aikata ce Simprints?</b>\n\n
-        Simprints Technology Limited Ƙungiyar NGO ce ta Birtaniya da ke taimakawa kungiyoyi masu ci gaba don daidaita masu samun tallafi da kuma ajiyan.\n\n
-        <b>Wadanne bayanai Simprints zata adana game da ni?</b>\n\n
-        Simprints zata adana bayanai game da yatsun hannunka. Har ila yau zai adana wurin da aka kwatanta da yadda aka yi la\'akari, tare da lokaci da kwanan wata na irin wannan scan.\n\n
-        Simprints ba zai adana duk wani bayanan ganowa game da ku ba, kamar sunanku ko kwanan haihuwarku. Simprints ba zai adana duk wani bayanan sirri naka ba. Simprints ba zai adana duk hotuna na yatsan ka ba.\n\n
-        <b>Menene Simprints zata yi da bayanain ka?</b>\n\n
-        Simprints zata iya amfani da bayaninka don inganta daidaito na sabis, kuma zai iya raba shi tare da wasu masana don wannan dalili.\n\n
-        Simprints iya amfani da bayaninka don samun ƙarin fahimtar sabis na sabis a wurinka.\n\n
-        <b>Har yaushe Simprints zai ci gaba da kasancewa na bayanai?</b>\n\n
-        Simprints yana fatan cewa aikinsa a nan zai ci gaba da akalla watanni shida, Simprints zata ajiye bayaninka na tsawon lokacin aikinsa, da kuma shekaru 2 bayan wannan aikin ya ƙare. Bayan nan Simprints zata share bayanan ku.\n\n
-
-        Simprints ba zai adana duk wani hotunan yatsa ba.\n\n
-
-        Simprints ba zai ba da wani bayani da yake riƙe a kanku a kowace jiha ba, sai dai idan doka ta buƙaci.\n\n
-
-        Ba dole ba ne ka yarda ka ba Simprints kowane bayani don karɓar sabis. Amma idan ba haka ba, to, ƙungiyoyi masu ci gaba zasu iya samo wahalar samun bayananku a nan gaba.\n\n
-
-        <b><u>Development Worker Consent</u></b>\n\n
-        Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
-    </string>
+    <string name="launch_consent_decline_button">Ban amince ba</string>
+    <string name="launch_consent_accept_button">Na amince</string>
 
 </resources>

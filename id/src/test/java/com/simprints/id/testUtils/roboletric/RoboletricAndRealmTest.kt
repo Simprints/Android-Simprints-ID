@@ -1,84 +1,47 @@
 package com.simprints.id.testUtils.roboletric
 
 import android.content.SharedPreferences
+import com.google.gson.JsonObject
 import com.nhaarman.mockito_kotlin.any
-import com.simprints.id.Application
+import com.nhaarman.mockito_kotlin.anyOrNull
 import com.simprints.id.activities.CheckLoginFromIntentActivityTest
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.DbManagerImpl
+import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
-import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManagerImpl
+import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.SecureDataManagerImpl
-import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
-import com.simprints.id.tools.RandomGeneratorImpl
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
 import org.mockito.Mockito
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.spy
 import org.mockito.stubbing.Answer
-import org.robolectric.RuntimeEnvironment
 
 const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
 const val SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY = "SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY"
 
-fun createMockForLocalDbManager(app: Application) {
-    app.localDbManager = Mockito.mock(RealmDbManagerImpl::class.java)
-}
-
-fun createMockForRemoteDbManager(app: Application) {
-    app.remoteDbManager = Mockito.mock(FirebaseManagerImpl::class.java)
-}
-
-fun createMockForSecureDataManager(app: Application) {
-    val mockKeyStore = setupFakeKeyStore()
-    val secureDataManager = SecureDataManagerImpl(mockKeyStore, app.preferencesManager, RandomGeneratorImpl())
-    app.secureDataManager = spy(secureDataManager)
-}
-
-fun setupFakeKeyStore(): KeystoreManager = mock(KeystoreManager::class.java).also {
-    val encryptAnswer = Answer<String> {
-        "enc_" + it.arguments[0] as String
-    }
-    Mockito.doAnswer(encryptAnswer).`when`(it).encryptString(anyNotNull())
-
-    val decryptAnswer = Answer<String> {
-        (it.arguments[0] as String).replace("enc_", "")
-    }
-    Mockito.doAnswer(decryptAnswer).`when`(it).decryptString(anyNotNull())
-}
-
-fun mockLoadProject(app: Application) {
+fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteDbManagerMock: RemoteDbManager) {
     val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }
-    whenever(app.localDbManager.loadProjectFromLocal(anyNotNull())).thenReturn(Single.just(project))
-    whenever(app.remoteDbManager.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(project))
-    whenever(app.localDbManager.saveProjectIntoLocal(anyNotNull())).thenReturn(Completable.complete())
+    val projectSettings = JsonObject().apply { addProperty("key", "value") }
+    whenever(localDbManagerMock.loadProjectFromLocal(anyNotNull())).thenReturn(Single.just(project))
+    whenever(remoteDbManagerMock.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(project))
+    whenever(localDbManagerMock.saveProjectIntoLocal(anyNotNull())).thenReturn(Completable.complete())
+    whenever(remoteDbManagerMock.loadProjectRemoteConfigSettingsJsonString(anyNotNull())).thenReturn(Single.just(projectSettings))
 }
 
-fun createMockForDbManager(app: Application) {
-    val spy = Mockito.spy(app.dbManager)
-    Mockito.doNothing().`when`(spy).initialiseRemoteDb()
-    Mockito.doReturn(Completable.complete()).`when`(spy).signIn(anyNotNull(), anyNotNull())
-    app.dbManager = spy
-}
-
-fun initLogInStateMock(app: Application,
-                       sharedPrefs: SharedPreferences) {
+fun initLogInStateMock(sharedPrefs: SharedPreferences,
+                       remoteDbManagerMock: RemoteDbManager) {
 
     val answer = Answer<Boolean> {
         sharedPrefs.getBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, false)
     }
-    Mockito.doAnswer(answer).`when`(app.remoteDbManager).isSignedIn(anyNotNull(), anyNotNull())
-    whenever(app.remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just(""))
+    Mockito.doAnswer(answer).`when`(remoteDbManagerMock).isSignedIn(anyNotNull(), anyNotNull())
+    whenever(remoteDbManagerMock.getCurrentFirestoreToken()).thenReturn(Single.just(""))
+    whenever(remoteDbManagerMock.signInToRemoteDb(anyNotNull())).thenReturn(Completable.complete())
 }
 
 fun setUserLogInState(logged: Boolean,
@@ -106,16 +69,23 @@ fun setUserLogInState(logged: Boolean,
     editor.commit()
 }
 
-fun getDbManagerWithMockedLocalAndRemoteManagersForApiTesting(mockServer: MockWebServer): Triple<DbManager, LocalDbManager, RemoteDbManager> {
-    PeopleRemoteInterface.baseUrl = mockServer.url("/").toString()
-    val localDbManager = Mockito.spy(LocalDbManager::class.java)
-    whenever(localDbManager.insertOrUpdatePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
-    whenever(localDbManager.loadPersonFromLocal(any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
+fun setupLocalAndRemoteManagersForApiTesting(mockServer: MockWebServer? = null,
+                                             localDbManagerSpy: LocalDbManager,
+                                             remoteDbManagerSpy: RemoteDbManager,
+                                             sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager) {
 
-    val app = RuntimeEnvironment.application as Application
-    val remoteDbManager = Mockito.spy(FirebaseManagerImpl(RuntimeEnvironment.application as Application))
-    whenever(remoteDbManager.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))
+    PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
+    whenever(localDbManagerSpy.insertOrUpdatePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
+    whenever(localDbManagerSpy.loadPersonFromLocal(any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
+    whenever(localDbManagerSpy.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
 
-    val dbManager = DbManagerImpl(localDbManager, remoteDbManager, app.secureDataManager, app.loginInfoManager)
-    return Triple(dbManager, localDbManager, remoteDbManager)
+    setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)
+
+    whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just("someToken"))
+}
+
+fun setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager) {
+    //doReturn(Single.create<ArrayList<SessionEvents>> { it.onError(IllegalStateException()) }).`when`(sessionEventsLocalDbManagerMock).loadSessions(anyOrNull(), anyOrNull())
+    whenever(sessionEventsLocalDbManagerMock.loadSessions(anyOrNull(), anyOrNull())).thenReturn(Single.create { it.onError(IllegalStateException()) })
+    whenever(sessionEventsLocalDbManagerMock.insertOrUpdateSessionEvents(any())).thenReturn(Completable.complete())
 }

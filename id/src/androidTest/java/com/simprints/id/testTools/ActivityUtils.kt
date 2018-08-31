@@ -1,12 +1,17 @@
 package com.simprints.id.testTools
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.support.test.InstrumentationRegistry
+import android.support.test.InstrumentationRegistry.getInstrumentation
+import android.support.test.espresso.core.internal.deps.guava.collect.Iterables
 import android.support.test.rule.ActivityTestRule
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
+import android.support.test.runner.lifecycle.Stage
 import android.view.WindowManager
-import com.schibsted.spain.barista.permission.PermissionGranter
+import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.libsimprints.Constants
 import java.util.*
@@ -64,4 +69,18 @@ object ActivityUtils {
         log("ActivityUtils.grantPermissions(): granting permissions")
         for (permission in permissions) PermissionGranter.allowPermissionsIfNeeded(permission)
     }
+
+    @Throws(Throwable::class)
+    fun getCurrentActivity(): Activity? {
+        getInstrumentation().let {
+            it.waitForIdleSync()
+            val activity = arrayOfNulls<Activity>(1)
+            it.runOnMainSync {
+                val activities = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED)
+                activity[0] = Iterables.getOnlyElement(activities)
+            }
+            return activity[0]
+        }
+    }
+
 }

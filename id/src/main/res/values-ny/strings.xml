@@ -3,49 +3,15 @@
 
     <!-- This language is called Chichewa (as spoken in Malawi) -->
 
-    <!-- SetupActivity : the loading screen -->
-    <!-- Consent Text -->
-    <string name="short_consent">Ndikufuna ndigwiritse ntchito zidindo za dzala zanu komanso malo omwe muli kuti makina ogwiritsa ntchito zidindo za dzala adzathe kupeza uthenga wanu. Ngati zimenezi simukugwirizana nazo kapena muli ndi mafunso, ndidziwitseni. Ngati mukugwirizana nazo, chonde ikani pojambulira dzala chala chanu chachikulu chaku manzere.</string>
-    <string name="confirm_consent">Dinani apa kuti musimikize chilolezo chanu</string>
+    <string name="consent_general_title">Chilolezo</string>
+    
+    <string name="consent_enrol">Ndikufuna kugwiritsa ntchito zidindo za dzala zanu kuti ndikulowetseni mkafukufuku wa %1$s komanso kuti ndidzathe kukuzindikirani mtsogolo.&#160;</string>
+    <string name="consent_id_verify">Ndikufukuna kugwiritsa ntchito zidindo za dzala zanu kuti ndithe kupeza uthenga wanu mkafukufuku wa %1$s.&#160;</string>
+    <string name="consent_share_data_no">Bungwe la Simprints, lomwe ndi bungwe limene silipanga phindu la ndalama, lidzagwiritsa ntchito uthenga okhudzana ndi dzala zanu komanso malo omwe mukupezeka panopa.&#160;</string>
+    <string name="consent_privacy_rights">Ngati mwavomereza kutenga nawo mbali, mutha kusiya kutenga nawo nthawi ina iliyonse ndipo mutha kunena ngati mukufuna kuti uthenga wanu womwe watengedwa utayidwe.&#160;</string>
+    <string name="consent_confirmation">Kodi ndingathe kugwiritsa ntchito zidindo za dzala zanu? Chonde nenani \"Ndikuvomera\", \"Ndikukana\", kapena \"Ndili ndi mafunso.\"</string>
 
-    <!-- PrivacyActivity : the screen where the user can find the long consent form -->
-    <!-- Long Consent -->
-    <string name="long_consent">
-        <b><u>Chilolezo chachiwiri</u></b>\n\n
-        Mukaika chala chanu pa pojambulira zidindo za dzala, makinawa adzasunga uthenga okhudzana ndi chala chanu. Makinawa adzasunganso malo omwe mwajambulitsira dzala zanu, komanso nthawi ndi tsiku lojambulira. \n\n
-        Uthenga onsewu okhudzana ndi inuyo ukasungidwa ndi bungwe lojambula zidindo za dzala lomwe ndi la ku UK.\n\n
-        Bungwe lojambula zidindo za dzala lidzagwiritsa ntchito uthenga wanu kuti lidzathe kukuzindikirani mtsogolo, komanso kuti lidzathe kugwirizanitsa uthenga wanu ndi inuyo.\n\n
-        Bungwe lojambula zidindo za dzala litha kudzagwiritsanso ntchito uthenga wanu pofuna kukonza kuti ntchito zomwe likugwira zizikhala zolondola, ndipo atha kudzagawana ndi ena odzama pa ntchito yogwiritsa ntchito zidindo za dzala pofuna kukwaniritsa zimenezi.\n\n
-        Bungwe lojambula zidindo za dzala lithanso kugwiritsa ntchito uthenga wanu kuti limvetsetse bwino bwino momwe chithandizo chimaperekedwera mdera lanu.\n\n
-        Bungwe lojambula zidindo za dzala likuyembekeza kuti lidzakhala litamaliza ntchito zake kunoko pakutha pa miyezi isanu ndi umodzi. Bungwe limeneli likasunga uthenga wanu kwa nthawi yogwirira ntchito zake, komanso kwa dzaka ziwiri kuchokera pomwe lamaliza ntchito zake. Kenako bungweli lidzataya uthenga wanu.\n\n
-
-        Bungwe lojambula zidindo za dzala sidzasunga  chithunzi china chirichonse za dzala zanu.\n\n
-        Bungwe lojambula zidindo za dzala sidzapereka uthenga wanu wina ulionse omwe likusunga ku boma lina lirironse, pokha pokha patakhala lamulo loyenera kutero.\n\n
-        Simukuyenera kuvomera kupereka uthenga wina ulionse ku bungwe limeneli ndi cholinga choti mulandire chithandizo. Koma ngati simupereka ndekuti kutha kukhala kovuta kuti mabungwe adzachitukuko adzathe kupeza uthenga wanu mtsogolo.\n\n
-        Ngati poyamba munatsangalatsidwa kuti bungwe lojambula zidindo za dzala lisunge ndikugwiritsa ntchito uthenga wanu, koma kenako mwasintha maganizo ndipo simukufuna kuti zimenezi zipitirire, chonde ndiyankhuleni.\n\n
-
-        <b><u>Mafunso ndi mayankho – Mafunso okhudzana ndi malamulo</u></b> \n\n
-        <b>\'Pano sindikufunanso kuti makina ojambula dzala asunge komanso agwiritse ntchito uthenga wanga. Kodi ndikuyenera kutani?</b>\n\n
-        Muli ndi ufulu nthawi ina iriyonse kunena kuti uthenga wanu uchotsedwemo mu makina ojambula dzala. Kuti izi zichitike, mudzayenera kujambulidwa dzala zanu komaliza kuti makina ojambula dzala athe kukuzindikirani. Mukupanga zimenezi, uthenga wina ulionse okhudzana ndi inuyo udzachotsedwamo mu makina ojambula dzala.\n\n
-        <b>Kodi bungwe lojambula zidindo za dzala ndi bungwe lanji?</b>\n\n
-        Bungwe lojambula zidindo za dzala ndi loziyimira pa lokha lochokera ku UK lomwe likuthandiza mabungwe adzachitukuko kuti agwirizanitse anthu opeza chithandizo angati inuyo ndi uthenga wao.\n\n
-        <b>Kodi uthenga wanga omwe ogwiritsa ntchito makina ojambula dzala azisunga ndi otani?</b>\n\n
-        Bungwe lojambula zidindo za dzala lidzasunga uthenga okhudzana ndi zidindo zanu za dzala. Lidzasunganso malo omwe mwajambulidwa dzala, limodzi ndi nthawi komanso tsiku lojambulira.\n\n
-        Bungwe lojambula zidindo za dzala sidzasunga uthenga wina ulionse umene ungathe kukuzindikiritsani, monga dzina lanu kapena tsiku lanu lobadwa. Bungwe limeneli sidzasunga zithunzi za dzala zanu.\n\n
-        <b>Kodi bungwe lojambula zidindo za dzala lidzapanganawo chani uthenga wanga?</b>\n\n
-        Bungwe lojambula zidindo za dzala litha kudzagwiritsa ntchito uthenga wanu pofuna kukonza kuti chithandizo chomwe likupereka chizikhala cholondola. Ndipo atha kudzagawana ndi ena odzama pa ntchito yogwiritsa ntchito zidindo za dzala pofuna kukwaniritsa zimenezi.\n\n
-        Bungwe lojambula zidindo za dzala lithanso kudzagwiritsa ntchito uthenga wanu pofuna kumvetsetsa bwino bwino momwe chithandizo chimaperekedwera mdera lanu.\n\n
-        <b>Kodi bungwe lojambula zidindo za dzala lidzasunga uthenga kwa nthawi yayitali bwanji?</b>\n\n
-        Bungwe lojambula zidindo za dzala likuyembekeza kuti lidzakhala litamaliza ntchito zake kunoko pakutha pa miyezi isanu ndi umodzi. Bungwe limeneli likasunga uthenga wanu kwa nthawi yogwirira ntchito zake, komanso kwa dzaka ziwiri kuchokera pomwe lamaliza ntchito zake. Kenako bungweli lidzataya uthenga wanu.\n\n
-        <b>Kodi bungwe lojambula zidindo za dzala lidzasunga zithunzi za zidindo za dzalazi?</b>\n\n
-        Bungwe lojambula zidindo za dzala sidzasunga chithunzi china chilichonse cha zidindo za dzala.\n\n
-        <b>Kodi bungwe lojambula zidindo za dzala lidzapereka uthenga wanga ku boma?</b>\n\n
-        Bungwe limeneli sidzapereka uthenga wanu wina ulionse omwe likusunga ku boma lina lirironse, pokha pokha patakhala lamulo loyenera kutero.\n\n
-        <b>Kodi ndikuyenera kuvomereza kuti ndijambulidwe zidindo za dzala zanga?</b>\n\n
-        Simukuyenera kuvomera kupereka uthenga wina ulionse ku bungwe limeneli ndi cholinga choti mulandire chithandizo. Koma ngati simupereka ndekuti kutha kukhala kovuta kuti mabungwe adzachitukuko adzathe kupeza uthenga wanu mtsogolo.\n\n
-
-        <b><u>Development Worker Consent</u></b>\n\n
-        Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
-    </string>
+    <string name="launch_consent_decline_button">Kukana</string>
+    <string name="launch_consent_accept_button">Kuvomereza</string>
 
 </resources>

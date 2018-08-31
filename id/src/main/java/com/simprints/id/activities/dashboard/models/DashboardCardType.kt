@@ -6,7 +6,7 @@ enum class DashboardCardType {
     LOCAL_DB,
     REMOTE_DB,
     LAST_SCANNER,
-    LAST_USER,
+    CURRENT_USER,
     LAST_IDENTIFICATION,
     LAST_VERIFICATION,
     LAST_ENROL

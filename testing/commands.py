@@ -59,7 +59,7 @@ def cerberus_app_install_apk_command(build_type: str, device: Device):
     return install_apk_command(CERBERUS_DIR_PATH, CERBERUS_APP_MODULE_NAME, build_type, device)
 
 def cerberus_app_open_apk_command(device: Device):
-    return open_apk_command(CERBERUS_APP_PACKAGE_NAME, CERBERUS_MAIN_ACTIVITY_NAME, device)
+    return open_apk_command(CERBERUS_APP_PACKAGE_NAME, CERBERUS_COLLECT_FINGERPRINTS_ACTIVITY_NAME, device)
 
 def simprints_id_gradlew_command(command: str):
     return gradlew_command(SIMPRINTS_ID_DIR_PATH, SIMPRINTS_ID_MODULE_NAME, command)

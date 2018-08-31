@@ -24,9 +24,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.simprints.id.data.DataManager;
+import com.simprints.id.Application;
+import com.simprints.id.data.analytics.eventData.SessionEventsManager;
+import com.simprints.id.data.prefs.PreferencesManager;
 
 import java.util.Locale;
+
+import javax.inject.Inject;
 
 @SuppressWarnings("UnusedParameters")
 public class PositionTracker implements
@@ -38,12 +42,16 @@ public class PositionTracker implements
     // TODO: make sure that the concurrent reads and writes on this client are safe
     private GoogleApiClient googleApiClient;
     private Activity activity;
-    private DataManager dataManager;
+    private PreferencesManager preferencesManager;
     private LocationRequest locationRequest;
 
-    public PositionTracker(Activity activity, DataManager dataManager) {
+    @Inject SessionEventsManager sessionEventsManager;
+
+    public PositionTracker(Activity activity, PreferencesManager preferencesManager) {
         this.activity = activity;
-        this.dataManager = dataManager;
+        ((Application) activity.getApplicationContext()).getComponent().inject(this);
+
+        this.preferencesManager = preferencesManager;
         locationRequest = new LocationRequest();
         locationRequest.setInterval(5000);
         locationRequest.setFastestInterval(5000);
@@ -161,7 +169,7 @@ public class PositionTracker implements
         {
             Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             if (lastLocation != null) {
-                dataManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(lastLocation));
+                preferencesManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(lastLocation));
             }
             Log.INSTANCE.d(activity, String.format(Locale.UK, "Last location: %s", lastLocation));
         }
@@ -220,11 +228,18 @@ public class PositionTracker implements
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(final Location location) {
         if (location != null) {
-            dataManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(location));
+
+            preferencesManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(location));
+            sessionEventsManager.addLocationToSession(location.getLatitude(), location.getLongitude());
+
             Log.INSTANCE.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
                     location.getLatitude(), location.getLongitude()));
+
+            if(location.hasAccuracy() && location.getAccuracy() < 100) {
+                finish();
+            }
         }
     }
 

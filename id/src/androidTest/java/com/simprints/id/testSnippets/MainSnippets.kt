@@ -1,149 +1,145 @@
 package com.simprints.id.testSnippets
 
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.Espresso.pressBack
 import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.contrib.DrawerActions
-import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
+import android.support.test.espresso.matcher.RootMatchers.isDialog
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import com.simprints.id.R
-import com.simprints.id.activities.launch.LaunchActivity
+import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.testTools.*
 import com.simprints.id.testTools.StringUtils.getResourceString
 import com.simprints.libsimprints.*
-import com.simprints.remoteadminclient.ApiException
-import org.hamcrest.Matchers.anyOf
-import org.hamcrest.Matchers.containsString
+import org.hamcrest.Matchers.*
 import org.junit.Assert.*
 
-
-fun testHappyWorkflowEnrolment(calloutCredentials: CalloutCredentials,
-                               enrolTestRule: ActivityTestRule<LaunchActivity>): String {
-    log("testHappyWorkflowEnrolment")
-    testLaunchActivityEnrol(calloutCredentials, enrolTestRule)
-    testFullHappyWorkflow()
-    testMainActivityEnrolmentCheckFinished(enrolTestRule)
-    val guid = testEnrolmentReturnedResult(enrolTestRule)
-    testEnrolmentReceivedOnline(calloutCredentials.projectId, guid)
-    return guid
-}
-
-fun testHappyWorkflowIdentification(calloutCredentials: CalloutCredentials,
-                                    identifyTestRule: ActivityTestRule<LaunchActivity>,
-                                    guidToLookFor: String) {
-    log("testHappyWorkflowIdentification")
-    testLaunchActivityIdentify(calloutCredentials, identifyTestRule)
-    testFullHappyWorkflow()
-    testMatchingActivityIdentificationCheckFinished(identifyTestRule)
-    testGuidIsTheOnlyReturnedIdentification(identifyTestRule, guidToLookFor)
-}
-
-fun testHappyWorkflowVerification(calloutCredentials: CalloutCredentials,
-                                  verifyTestRule: ActivityTestRule<LaunchActivity>,
-                                  verifyGuid: String) {
-    log("testHappyWorkflowVerification")
-    testLaunchActivityVerify(calloutCredentials, verifyTestRule, verifyGuid)
-    testFullHappyWorkflow()
-    testMatchingActivityVerificationCheckFinished(verifyTestRule)
-    testVerificationSuccessful(verifyTestRule, verifyGuid)
-}
-
-private fun testLaunchActivityEnrol(calloutCredentials: CalloutCredentials,
-                                    enrolTestRule: ActivityTestRule<LaunchActivity>) {
-    log("testLaunchActivityEnrol")
+fun launchActivityEnrol(calloutCredentials: CalloutCredentials,
+                        enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
+    log("launchActivityEnrol")
     ActivityUtils.launchActivityAndRunOnUiThread(calloutCredentials,
         Constants.SIMPRINTS_REGISTER_INTENT, enrolTestRule)
 }
 
-private fun testLaunchActivityIdentify(calloutCredentials: CalloutCredentials,
-                                       identifyTestRule: ActivityTestRule<LaunchActivity>) {
-    log("testLaunchActivityIdentify")
+fun launchActivityIdentify(calloutCredentials: CalloutCredentials,
+                           identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
+    log("launchActivityIdentify")
     ActivityUtils.launchActivityAndRunOnUiThread(calloutCredentials,
         Constants.SIMPRINTS_IDENTIFY_INTENT, identifyTestRule)
 }
 
-private fun testLaunchActivityVerify(calloutCredentials: CalloutCredentials,
-                                     verifyTestRule: ActivityTestRule<LaunchActivity>,
-                                     guid: String?) {
-    log("testLaunchActivityVerify")
+fun launchActivityVerify(calloutCredentials: CalloutCredentials,
+                         verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>,
+                         guid: String?) {
+    log("launchActivityVerify")
     ActivityUtils.launchActivityAndRunOnUiThread(calloutCredentials,
         Constants.SIMPRINTS_VERIFY_INTENT, verifyTestRule,
         verifyGuidExtra = guid)
 }
 
-private fun testFullHappyWorkflow() {
-    log("testFullHappyWorkflow")
-    testSetupActivityAndContinue()
-    testMainActivityPressScan()
-    testMainActivityPressScan()
-    testMainActivityCheckGoodScan()
-    testMainActivityPressContinue()
+fun fullHappyWorkflow(numberOfScans: Int = 2, dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
+    log("fullHappyWorkflow")
+    setupActivityAndContinue()
+
+    (0 until numberOfScans).forEach { collectFingerprintsPressScan() }
+
+    checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult)
 }
 
-private fun testSetupActivityAndContinue() {
-    log("testSetupActivityAndContinue")
-    testSetupActivity()
-    testSetupActivityContinue()
+fun setupActivityAndContinue() {
+    log("setupActivityAndContinue")
+    setupActivity()
+    setupActivityContinue()
 }
 
-private fun testSetupActivity() {
-    log("testSetupActivity")
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
-        onView(withId(R.id.consentTextView))
+fun setupActivityAndDecline() {
+    log("setupActivityAndDecline")
+    setupActivity()
+    setupActivityDecine()
+}
+
+fun setupActivity() {
+    log("setupActivity")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 50) {
+        ActivityUtils.grantPermissions()
+        onView(withId(R.id.generalConsentTextView))
             .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.short_consent)))
-    })
+    }
 }
 
-private fun testSetupActivityContinue() {
-    log("testSetupActivityContinue")
-    WaitingUtils.tryOnUiUntilTimeout(12000, 1000, {
-        onView(withId(R.id.confirmConsentTextView))
+private fun setupActivityContinue() {
+    log("setupActivityContinue")
+    WaitingUtils.tryOnUiUntilTimeout(15000, 500) {
+        onView(withId(R.id.consentAcceptButton))
             .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.confirm_consent)))
             .perform(click())
-    })
+    }
 }
 
-private fun testMainActivityPressScan() {
-    log("testMainActivityPressScan")
-    WaitingUtils.tryOnUiUntilTimeout(10000, 200, {
+fun setupActivityDecine() {
+    log("setupActivityContinue")
+    WaitingUtils.tryOnUiUntilTimeout(12000, 500) {
+        onView(withId(R.id.consentDeclineButton))
+            .check(matches(isDisplayed()))
+            .perform(click())
+    }
+}
+
+fun collectFingerprintsPressScan() {
+    log("collectFingerprintsPressScan")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
         onView(withId(R.id.scan_button))
-            .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.scan)))
+            .check(matches(not(withText(R.string.cancel_button))))
             .perform(click())
-    })
+    }
+    Thread.sleep(500) //Wait for ViewPager animation
 }
 
-private fun testMainActivityCheckGoodScan() {
-    log("testMainActivityCheckGoodScan")
-    WaitingUtils.tryOnUiUntilTimeout(10000, 200, {
-        onView(withId(R.id.scan_button))
-            .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.good_scan_message)))
-    })
-}
-
-private fun testMainActivityPressContinue() {
-    log("testMainActivityPressContinue")
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
-        onView(withId(R.id.action_forward))
+fun skipFinger() {
+    log("skipFinger")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+        onView(withId(R.id.missingFingerText))
             .check(matches(isDisplayed()))
             .perform(click())
-    })
+    }
 }
 
-private fun testMainActivityEnrolmentCheckFinished(enrolTestRule: ActivityTestRule<LaunchActivity>) {
-    log("testMainActivityEnrolmentCheckFinished")
-    WaitingUtils.tryOnSystemUntilTimeout(5000, 500, {
+fun waitForSplashScreenAppearsAndDisappears() {
+    log("checkSplashScreen")
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+        onView(withId(R.id.splashGetReady))
+            .check(matches(isDisplayed()))
+    }
+
+    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+        onView(withId(R.id.splashGetReady))
+            .check(doesNotExist())
+    }
+}
+
+fun checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
+    WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
+        onView(withText(getResourceString(R.string.confirm_fingers_dialog_title)))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+        onView(withId(android.R.id.message))
+            .inRoot(isDialog())
+            .check(matches(withText(dialogResult)))
+            .check(matches(isDisplayed()))
+        onView(withId(android.R.id.button1)).perform(click())
+    }
+}
+
+fun collectFingerprintsEnrolmentCheckFinished(enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
+    log("collectFingerprintsEnrolmentCheckFinished")
+    WaitingUtils.tryOnSystemUntilTimeout(5000, 500) {
         assertTrue(enrolTestRule.activity.isDestroyed)
-    })
+    }
 }
 
-private fun testEnrolmentReturnedResult(enrolTestRule: ActivityTestRule<LaunchActivity>): String {
-    log("testEnrolmentReturnedResult")
+fun enrolmentReturnedResult(enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>): String {
+    log("enrolmentReturnedResult")
     val registration = enrolTestRule.activityResult
         .resultData.getParcelableExtra<Registration>(Constants.SIMPRINTS_REGISTRATION)
     val guid = registration.guid
@@ -151,31 +147,15 @@ private fun testEnrolmentReturnedResult(enrolTestRule: ActivityTestRule<LaunchAc
     return guid
 }
 
-private fun testEnrolmentReceivedOnline(apiKey: String, guid: String) {
-    log("testEnrolmentReceivedOnline")
-    WaitingUtils.tryOnSystemUntilTimeout(12000, 3000, {
-        val apiInstance = RemoteAdminUtils.configuredApiInstance
-        try {
-            // Check to see if the patient made it to the database
-            val patientsJson = RemoteAdminUtils.getPatientsNode(apiInstance, apiKey)
-            assertNotNull(patientsJson)
-            assertEquals(1, patientsJson.size().toLong())
-            assertTrue(patientsJson.has(guid))
-        } catch (e: ApiException) {
-            assertNull("ApiException", e)
-        }
-    })
-}
-
-private fun testMatchingActivityIdentificationCheckFinished(identifyTestRule: ActivityTestRule<LaunchActivity>) {
-    log("testMatchingActivityIdentificationCheckFinished")
-    WaitingUtils.tryOnSystemUntilTimeout(20000, 500, {
+fun matchingActivityIdentificationCheckFinished(identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
+    log("matchingActivityIdentificationCheckFinished")
+    WaitingUtils.tryOnSystemUntilTimeout(20000, 500) {
         assertTrue(identifyTestRule.activity.isDestroyed)
-    })
+    }
 }
 
-private fun testGuidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTestRule<LaunchActivity>, guid: String) {
-    log("testGuidIsTheOnlyReturnedIdentification")
+fun guidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>, guid: String) {
+    log("guidIsTheOnlyReturnedIdentification")
     val identifications = identifyTestRule.activityResult
         .resultData.getParcelableArrayListExtra<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS)
     assertEquals(1, identifications.size.toLong())
@@ -184,15 +164,32 @@ private fun testGuidIsTheOnlyReturnedIdentification(identifyTestRule: ActivityTe
     assertNotEquals(Tier.TIER_5, identifications[0].tier)
 }
 
-private fun testMatchingActivityVerificationCheckFinished(verifyTestRule: ActivityTestRule<LaunchActivity>) {
-    log("testMatchingActivityVerificationCheckFinished")
-    WaitingUtils.tryOnSystemUntilTimeout(5000, 500, {
-        assertTrue(verifyTestRule.activity.isDestroyed)
-    })
+fun twoReturnedIdentificationsOneMatchOneNotMatch(identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>,
+                                            matchGuid: String,
+                                            notMatchGuid: String) {
+    log("twoReturnedIdentificationsOneMatchOneNotMatch")
+    val identifications = identifyTestRule.activityResult
+        .resultData.getParcelableArrayListExtra<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS)
+    assertEquals(2, identifications.size.toLong())
+
+    assertEquals(matchGuid, identifications[0].guid)
+    assertTrue(identifications[0].confidence > 0)
+    assertNotEquals(Tier.TIER_5, identifications[0].tier)
+
+    assertEquals(notMatchGuid, identifications[1].guid)
+    assertTrue(identifications[1].confidence > 0)
+    assertEquals(Tier.TIER_5, identifications[1].tier)
 }
 
-private fun testVerificationSuccessful(verifyTestRule: ActivityTestRule<LaunchActivity>, guid: String) {
-    log("testVerificationSuccessful")
+fun matchingActivityVerificationCheckFinished(verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
+    log("matchingActivityVerificationCheckFinished")
+    WaitingUtils.tryOnSystemUntilTimeout(5000, 500) {
+        assertTrue(verifyTestRule.activity.isDestroyed)
+    }
+}
+
+fun verificationSuccessful(verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>, guid: String) {
+    log("verificationSuccessful")
     val verification = verifyTestRule.activityResult
         .resultData.getParcelableExtra<Verification>(Constants.SIMPRINTS_VERIFICATION)
     assertEquals(guid, verification.guid)
@@ -200,66 +197,11 @@ private fun testVerificationSuccessful(verifyTestRule: ActivityTestRule<LaunchAc
     assertNotEquals(Tier.TIER_5, verification.tier)
 }
 
-fun testHappySync(calloutCredentials: CalloutCredentials, identifyTestRule: ActivityTestRule<LaunchActivity>) {
-    log("testHappySync")
-    testLaunchActivityIdentify(calloutCredentials, identifyTestRule)
-    testSetupActivityAndContinue()
-    testMainActivitySync()
-    testExitFromMainActivity()
-}
-
-private fun testMainActivitySync() {
-    log("testMainActivitySync")
-    testMainActivityOpenDrawer()
-    testMainActivityPressSync()
-    testVerifyUiForSyncStarted()
-    testVerifyUiForSyncCompleted()
-    testMainActivityCloseDrawer()
-}
-
-private fun testMainActivityOpenDrawer() {
-    log("testMainActivityOpenDrawer")
-    WaitingUtils.tryOnUiUntilTimeout(4000, 50, {
-        onView(withId(R.id.drawer_layout))
-            .perform(DrawerActions.open())
-    })
-}
-
-private fun testMainActivityCloseDrawer() {
-    log("testMainActivityCloseDrawer")
-    testPressBackButton()
-}
-
-private fun testMainActivityPressSync() {
-    log("testMainActivityPressSync")
-    WaitingUtils.tryOnUiUntilTimeout(4000, 50, {
-        onView(withId(R.id.nav_view))
-            .perform(navigateTo(R.id.nav_sync))
-    })
-}
-
-private fun testVerifyUiForSyncStarted() {
-    log("testVerifyUiForSyncStarted")
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50, {
-        onView(anyOf(withText(containsString(getResourceString(R.string.syncing))), withText(containsString(getResourceString(R.string.nav_sync_complete)))))
-            .check(matches(isDisplayed()))
-    })
-}
-
-private fun testVerifyUiForSyncCompleted() {
-    log("testVerifyUiForSyncCompleted")
-    WaitingUtils.tryOnUiUntilTimeout(SyncParameters.MEDIUM_DATABASE_SYNC_TIMEOUT_MILLIS, 1000, {
-        onView(withText(containsString(getResourceString(R.string.nav_sync_complete))))
-            .check(matches(isDisplayed()))
-    })
-}
-
-private fun testExitFromMainActivity() {
-    log("testExitFromMainActivity")
-    testPressBackButton()
-}
-
-private fun testPressBackButton() {
-    log("testPressBackButton")
-    pressBack()
+fun verificationNotAMatch(verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>, guid: String) {
+    log("verificationSuccessful")
+    val verification = verifyTestRule.activityResult
+        .resultData.getParcelableExtra<Verification>(Constants.SIMPRINTS_VERIFICATION)
+    assertEquals(guid, verification.guid)
+    assertTrue(verification.confidence > 0)
+    assertEquals(Tier.TIER_5, verification.tier)
 }

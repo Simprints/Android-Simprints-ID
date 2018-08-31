@@ -1,207 +1,163 @@
 package com.simprints.id.activities.launch
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.MotionEvent
+import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.view.WindowManager
-import com.simprints.id.Application
+import android.widget.TabHost
 import com.simprints.id.R
-import com.simprints.id.activities.RefusalActivity
-import com.simprints.id.activities.main.MainActivity
-import com.simprints.id.controllers.Setup
-import com.simprints.id.controllers.SetupCallback
-import com.simprints.id.data.DataManager
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
+import com.simprints.id.activities.longConsent.LongConsentActivity
+import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.tools.AppState
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.Log
-import com.simprints.id.tools.PositionTracker
 import com.simprints.id.tools.Vibrate.vibrate
 import com.simprints.id.tools.extensions.launchAlert
-import com.simprints.libscanner.ButtonListener
-import com.simprints.libscanner.SCANNER_ERROR
-import com.simprints.libscanner.ScannerCallback
 import kotlinx.android.synthetic.main.activity_launch.*
 
-@SuppressLint("HardwareIds")
-open class LaunchActivity : AppCompatActivity() {
+class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
-    companion object {
-        const val MAIN_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1
-    }
-
-    // Scanner button callback
-    private val scannerButton = ButtonListener {
-        if (!launchOutOfFocus) {
-            finishLaunch()
-        }
-    }
-
-    // True iff the user confirmed consent
-    private var consentConfirmed = false
-
-    // True iff the app is waiting for the user to confirm consent
-    private var waitingForConfirmation = false
-
-    // True iff another activity launched by this activity is running
-    private var launchOutOfFocus = false
-
-    private lateinit var app: Application
-    private lateinit var dataManager: DataManager
-    private lateinit var positionTracker: PositionTracker
-    private lateinit var appState: AppState
-    private lateinit var setup: Setup
-    private val timeHelper by lazy { app.timeHelper }
+    override lateinit var viewPresenter: LaunchContract.Presenter
+    private lateinit var generalConsentTab: TabHost.TabSpec
+    private lateinit var parentalConsentTab: TabHost.TabSpec
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        injectDependencies()
-        initView()
-        positionTracker.start()
-        setup.start(this, getSetupCallback())
-    }
-
-    private fun injectDependencies() {
-        app = application as Application
-        dataManager = app.dataManager
-        positionTracker = PositionTracker(this, dataManager)
-        appState = app.appState
-        setup = app.setup
-    }
-
-    private fun initView() {
-        LanguageHelper.setLanguage(this, dataManager.language)
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        setButtonClickListeners()
+        setClickListenerToPrivacyNotice()
+
+        viewPresenter = LaunchPresenter(this)
+        viewPresenter.start()
     }
 
-    // Setup callback
-    private fun getSetupCallback(): SetupCallback =
-        object : SetupCallback {
-            override fun onSuccess() {
-                dataManager.msSinceBootOnLoadEnd = timeHelper.msSinceBoot()
-                // If it is the first time the launch process finishes, wait for consent confirmation
-                // Else, go directly to the main activity
-                if (!consentConfirmed) {
-                    launchProgressBar.progress = 100
-                    confirmConsentTextView.visibility = View.VISIBLE
-                    loadingInfoTextView.visibility = View.INVISIBLE
-                    waitingForConfirmation = true
-                    appState.scanner.registerButtonListener(scannerButton)
-                    vibrate(this@LaunchActivity, dataManager.vibrateMode)
-                } else {
-                    finishLaunch()
-                }
-            }
+    override fun onResume() {
+        super.onResume()
+        viewPresenter.handleOnResume()
+    }
 
-            override fun onProgress(progress: Int, detailsId: Int) {
-                Log.d(this@LaunchActivity, "onprogress")
-                launchProgressBar.progress = progress
-                loadingInfoTextView.setText(detailsId)
-            }
+    private fun setButtonClickListeners() {
+        consentDeclineButton.setOnClickListener { viewPresenter.handleDeclinePressed() }
+        consentAcceptButton.setOnClickListener { viewPresenter.confirmConsentAndContinueToNextActivity() }
+    }
 
-            override fun onError(resultCode: Int) {
-                finishWith(resultCode, null)
-            }
-
-            override fun onAlert(alertType: ALERT_TYPE) {
-                launchAlertAndStopSetup(alertType)
-            }
+    private fun setClickListenerToPrivacyNotice() {
+        privacyNoticeText.setOnClickListener {
+            startActivityForResult(Intent(this, LongConsentActivity::class.java), LONG_CONSENT_ACTIVITY_REQUEST_CODE)
         }
-
-    fun launchAlertAndStopSetup(alertType: ALERT_TYPE) {
-        if (launchOutOfFocus)
-            return
-
-        launchOutOfFocus = true
-        setup.stop()
-        launchAlert(alertType)
     }
 
-    private fun tryAgain() {
-        launchOutOfFocus = false
-        setup.start(this, getSetupCallback())
+    override fun setLanguage(language: String) = LanguageHelper.setLanguage(this, language)
+
+    override fun initTextsInButtons() {
+        consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
+        consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
     }
 
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (waitingForConfirmation) {
-            finishLaunch()
-            return true
-        }
-        return super.onTouchEvent(event)
+    override fun handleSetupProgress(progress: Int, detailsId: Int) {
+        launchProgressBar.progress = progress
+        loadingInfoTextView.setText(detailsId)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        positionTracker.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        setup.onRequestPermissionsResult(this, requestCode, permissions, grantResults)
+    override fun handleSetupFinished() {
+        launchProgressBar.progress = 100
+        consentDeclineButton.visibility = View.VISIBLE
+        consentAcceptButton.visibility = View.VISIBLE
+        loadingInfoTextView.visibility = View.INVISIBLE
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
         when (requestCode) {
-            RESOLUTION_REQUEST, GOOGLE_SERVICE_UPDATE_REQUEST -> positionTracker.onActivityResult(requestCode, resultCode, data)
-            MAIN_ACTIVITY_REQUEST_CODE -> when (resultCode) {
-                RESULT_TRY_AGAIN -> tryAgain()
-
-                Activity.RESULT_CANCELED, Activity.RESULT_OK -> finishWith(resultCode, data)
-            }
-            ALERT_ACTIVITY_REQUEST, REFUSAL_ACTIVITY_REQUEST -> when (resultCode) {
-                RESULT_TRY_AGAIN -> tryAgain()
-
-                else -> finishWith(resultCode, data)
-            }
+            RESOLUTION_REQUEST,
+            GOOGLE_SERVICE_UPDATE_REQUEST ->
+                viewPresenter.updatePositionTracker(requestCode, resultCode, data)
+            COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE,
+            ALERT_ACTIVITY_REQUEST,
+            REFUSAL_ACTIVITY_REQUEST ->
+                whenReturningFromAnotherActivity(resultCode, data)
         }
-
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun onBackPressed() {
-        launchOutOfFocus = true
-        setup.stop()
-        startActivityForResult(Intent(this, RefusalActivity::class.java), REFUSAL_ACTIVITY_REQUEST)
+    override fun initConsentTabs() {
+        tabHost.setup()
+        generalConsentTab = tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_general_title)).setContent(R.id.generalConsentTextView)
+        parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_parental_title)).setContent(R.id.parentalConsentTextView)
+
+        tabHost.addTab(generalConsentTab)
+
+        generalConsentTextView.movementMethod = ScrollingMovementMethod()
+        parentalConsentTextView.movementMethod = ScrollingMovementMethod()
     }
 
-    /**
-     * Close Simprints ID
-     */
-    private fun finishWith(resultCode: Int, resultData: Intent?) {
-        waitingForConfirmation = false
-        setResult(resultCode, resultData)
-        dataManager.msSinceBootOnSessionEnd = timeHelper.msSinceBoot()
-        dataManager.saveSession()
-        finish()
+    override fun setTextToGeneralConsent(generalConsentText: String) {
+        generalConsentTextView.text = generalConsentText
+    }
+
+    override fun addParentalConsentTabWithText(parentalConsentText: String) {
+        tabHost.addTab(parentalConsentTab)
+        parentalConsentTextView.text = parentalConsentText
+    }
+
+    private fun whenReturningFromAnotherActivity(resultCode: Int, data: Intent?) {
+        when (resultCode) {
+            RESULT_TRY_AGAIN -> viewPresenter.tryAgainFromErrorScreen()
+            else -> viewPresenter.tearDownAppWithResult(resultCode, data)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        viewPresenter.handleOnRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onBackPressed() {
+        viewPresenter.handleOnBackPressed()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewPresenter.handleOnPause()
     }
 
     override fun onDestroy() {
-        positionTracker.finish()
-
-        if (appState.scanner != null) {
-            appState.scanner.disconnect(object : ScannerCallback {
-                override fun onSuccess() {
-                    appState.destroy()
-                }
-
-                override fun onFailure(scanner_error: SCANNER_ERROR) {
-                    appState.destroy()
-                }
-            })
-            //appState.scanner = null
-        }
-
-        setup.destroy()
+        viewPresenter.handleOnDestroy()
         super.onDestroy()
     }
 
-    fun finishLaunch() {
-        consentConfirmed = true
-        waitingForConfirmation = false
-        appState.scanner.unregisterButtonListener(scannerButton)
-        startActivityForResult(Intent(this@LaunchActivity, MainActivity::class.java), MAIN_ACTIVITY_REQUEST_CODE)
+    override fun continueToNextActivity() {
+        startActivityForResult(
+            Intent(this@LaunchActivity, CollectFingerprintsActivity::class.java),
+            COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE)
         launchLayout.visibility = View.INVISIBLE
+    }
+
+    override fun goToRefusalActivity() {
+        startActivityForResult(Intent(this, RefusalActivity::class.java), REFUSAL_ACTIVITY_REQUEST)
+    }
+
+    override fun setResultAndFinish(resultCode: Int, resultData: Intent?) {
+        setResult(resultCode, resultData)
+        finish()
+    }
+
+    override fun doLaunchAlert(alertType: ALERT_TYPE) {
+        launchAlert(alertType)
+    }
+
+    override fun isCurrentTabParental(): Boolean = tabHost.currentTab == 1
+
+    override fun doVibrateIfNecessary(doVibrate: Boolean) = vibrate(this, doVibrate)
+
+    companion object {
+        const val COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1
+        private const val LONG_CONSENT_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 2
+
+        const val GENERAL_CONSENT_TAB_TAG = "General"
+        const val PARENTAL_CONSENT_TAB_TAG = "Parental"
     }
 }

@@ -30,6 +30,7 @@ public class Finger implements Parcelable, Comparable<Finger>{
     private boolean lastFinger;
     private int priority;
     private int order;
+    private int numberOfFailedScans;
 
     /**
      * Constructor for the Finger class
@@ -46,6 +47,7 @@ public class Finger implements Parcelable, Comparable<Finger>{
         this.lastFinger = false;
         this.priority = priority;
         this.order = order;
+        this.numberOfFailedScans = 0;
     }
 
 
@@ -138,42 +140,86 @@ public class Finger implements Parcelable, Comparable<Finger>{
         return order;
     }
 
+    public boolean isGoodScan(){
+        return status == Status.GOOD_SCAN;
+    }
+
+    public boolean isBadScan(){
+        return status == Status.BAD_SCAN;
+    }
+
+    public boolean isRescanGoodScan(){
+        return status == Status.RESCAN_GOOD_SCAN;
+    }
+
+    public boolean isCollecting(){
+        return status == Status.COLLECTING;
+    }
+
+    public boolean isNotCollected(){
+        return status == Status.NOT_COLLECTED;
+    }
+
+    public boolean isNoFingerDetected() {
+        return status == Status.NO_FINGER_DETECTED;
+    }
+
+    public boolean isFingerSkipped() {
+        return status == Status.FINGER_SKIPPED;
+    }
+
+    public int getNumberOfBadScans() { return numberOfFailedScans; }
+
+    public void setNumberOfBadScans(int numberOfFailedScans) { this.numberOfFailedScans = numberOfFailedScans; }
+
     public enum Status {
         NOT_COLLECTED(R.drawable.ic_blank_selected, R.drawable.ic_blank_deselected,
-                R.string.scan_label, Color.GRAY, R.string.empty, Color.WHITE,
+                R.string.scan_label, R.color.simprints_scan_button_gray, R.string.empty, android.R.color.white,
                 R.string.please_scan),
         COLLECTING(R.drawable.ic_blank_selected, R.drawable.ic_blank_deselected,
-                R.string.cancel_button, Color.BLUE, R.string.empty, Color.WHITE,
+                R.string.cancel_button, R.color.simprints_blue,
+                R.string.empty, android.R.color.white,
                 R.string.scanning),
         GOOD_SCAN(R.drawable.ic_ok_selected, R.drawable.ic_ok_deselected,
-                R.string.good_scan_message, Color.argb(255, 0, 204, 0),
-                R.string.good_scan_message, Color.GREEN, R.string.good_scan_direction),
+                R.string.good_scan_message, R.color.simprints_green,
+                R.string.good_scan_message,  R.color.simprints_green,
+                R.string.good_scan_direction),
         RESCAN_GOOD_SCAN(R.drawable.ic_ok_selected, R.drawable.ic_ok_deselected,
-                R.string.rescan_label_question, Color.argb(255, 0, 204, 0),
-                R.string.good_scan_message, Color.GREEN, R.string.good_scan_direction),
+                R.string.rescan_label_question,  R.color.simprints_green,
+                R.string.good_scan_message, R.color.simprints_green,
+                R.string.good_scan_direction),
         BAD_SCAN(R.drawable.ic_alert_selected, R.drawable.ic_alert_deselected,
-                R.string.rescan_label, Color.argb(255, 204, 0, 0),
-                R.string.poor_scan_message, Color.RED, R.string.poor_scan_direction);
+                R.string.rescan_label, R.color.simprints_red,
+                R.string.poor_scan_message, R.color.simprints_red,
+                R.string.poor_scan_direction),
+        NO_FINGER_DETECTED(R.drawable.ic_alert_selected, R.drawable.ic_alert_deselected,
+            R.string.rescan_label, R.color.simprints_red,
+            R.string.no_finger_detected_message, R.color.simprints_red,
+            R.string.poor_scan_direction),
+        FINGER_SKIPPED(R.drawable.ic_alert_selected, R.drawable.ic_alert_deselected,
+            R.string.rescan_label, R.color.simprints_red,
+            R.string.finger_skipped_message, R.color.simprints_red,
+            R.string.good_scan_direction);
 
         private int dotSelectedDrawableId;
         private int dotDeselectedDrawableId;
         private int buttonTextId;
         private int buttonTextColor;
-        private int buttonBgColor;
+        private int buttonBgColorRes;
         private int textResult;
-        private int textResultColor;
+        private int textResultColorRes;
         private int textDirection;
         private int textDirectionColor;
 
         Status(int selectedDrawableId, int deselectedDrawableId, int textId,
-               int bgColor, int result, int resultColor, int direction) {
+               int bgColorRes, int result, int resultColorRes, int direction) {
             this.dotSelectedDrawableId = selectedDrawableId;
             this.dotDeselectedDrawableId = deselectedDrawableId;
             this.buttonTextId = textId;
             this.buttonTextColor = Color.WHITE;
-            this.buttonBgColor = bgColor;
+            this.buttonBgColorRes = bgColorRes;
             this.textResult = result;
-            this.textResultColor = resultColor;
+            this.textResultColorRes = resultColorRes;
             this.textDirection = direction;
             this.textDirectionColor = Color.GRAY;
         }
@@ -190,16 +236,16 @@ public class Finger implements Parcelable, Comparable<Finger>{
             return buttonTextColor;
         }
 
-        public int getButtonBgColor() {
-            return buttonBgColor;
+        public int getButtonBgColorRes() {
+            return buttonBgColorRes;
         }
 
         public int getTextResult() {
             return textResult;
         }
 
-        public int getTextResultColor() {
-            return textResultColor;
+        public int getTextResultColorRes() {
+            return textResultColorRes;
         }
 
         public int getTextDirection() {

@@ -37,10 +37,9 @@
     <string name="launch_checking_person_in_db">شخص مذکور ثبت دیتابیس است</string>
 
 
-    <!-- MainActivity : screen where the scanning happens -->
+    <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
     <string name="good_scan_direction">برای انگشت دیگر بالای صفحه به طرف چپ حرکت کنید</string>
-    <string name="last_scan_message">برای ادامه بالای علامه تیر کلیک کنید</string>
     <string name="please_scan">لطفاً اسکن نمایید</string>
     <string name="poor_scan_direction">لطفا دوباره اسکن کنید</string>
     <string name="scanning">در حال اسکن کردن ....</string>
@@ -57,26 +56,7 @@
     <!-- Content Descriptions -->
 
 
-    <!-- activity_main_drawer.xml : menu that comes out from the top left of the MainActivity -->
-    <!-- Menu Titles -->
-    <string name="action_settings">تنظیمات</string>
-    <string name="menu_header">Simprints آی دی دستگاه</string>
-    <string name="menu_subheader">Every person counts!</string>
-    <!-- Menu Labels -->
-    <string name="fingerprints_menu">نشان انگشت</string>
-    <string name="help_menu">کمک</string>
-    <string name="about_menu">معلومات</string>
-    <string name="help_and_support_menu">کمک و حمایت</string>
-    <string name="configuration_menu">تنظیمات</string>
-    <string name="nav_add_finger">انگشت را اضافه کنید</string>
-    <string name="nav_select_finger">انگشت را انتخاب کنید</string>
-    <string name="nav_settings">تنظیمات</string>
-    <string name="nav_sync">همگام سازی</string>
-    <string name="nav_offline">آفلاین</string>
-    <string name="nav_sync_complete">همگام سازی تکمیل گردید</string>
-    <string name="nav_sync_failed">همگام سازی ناکام شد</string>
-    <string name="privacy_and_consent">محرمیت و رضایت</string>
-    <string name="persistence_label">این تنظیمات را برای بار دیگر به یاد داشته باشید</string>
+    <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
     <string name="sync_data">همگام کردن معلومات</string>
     <string name="syncing">همگام کردن…</string>
@@ -174,7 +154,6 @@
 
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-    <string name="settings_select_language">انتخاب لسان</string>
     <string name="vibrate">لرزیدن</string>
     <string name="nudge_mode_checkbox_name">Nudge Mode</string>
     <string name="quality_threshold_empty">آستانه کیفیت:</string>
@@ -197,10 +176,7 @@
     <string name="button_submit">سپردن</string>
     <string name="button_scan_prints">اسکن نمودن نشان انگشتان</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_here">اسکنر وجود ندارد</string>
     <string name="scanner_not_working">اسکنر کار نمیدهد</string>
-    <string name="unable_to_capture_a_good_scan">نمیتواند یک اسکن خوب را بیگیرد</string>
-    <string name="beneficiary_was_physically_unable">مستفید شونده بطور فزیکی قادر نبود تا نشان انگشت خود را مهیا کند (مانند: احساس درد کرد و یا انگشتانش نبود)</string>
     <string name="beneficiary_refused">مستفید شونده انکار نمود</string>
     <string name="other">دیگر</string>
     <!-- Text Prompt -->

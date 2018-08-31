@@ -103,7 +103,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
 
         syncProgressBar.visibility = View.INVISIBLE
 
-        syncDescription.textResource = R.string.nav_sync_failed
+        syncDescription.textResource = R.string.dashboard_card_sync_failed
 
         enableSyncButton(dataModel)
     }

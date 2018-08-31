@@ -1,11 +1,11 @@
 package com.simprints.id.secure
 
-import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.retrofit.FakeResponseInterceptor
-import com.simprints.id.testUtils.retrofit.givenNetworkFailurePercentIs
+import com.simprints.id.shared.givenNetworkFailurePercentIs
 import com.simprints.id.testUtils.roboletric.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
@@ -23,7 +23,7 @@ import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
-class PublicKeyManagerTest : RxJavaTest() {
+class PublicKeyManagerTest : RxJavaTest {
 
     private val validPublicKeyJsonResponse = "{\"value\":\"public_key_from_server\"}"
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
