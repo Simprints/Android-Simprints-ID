@@ -1,15 +1,31 @@
 package com.simprints.id.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
-import com.simprints.id.data.DataManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.events.AlertScreenEvent
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.tools.TimeHelper
+import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
-                     val dataManager: DataManager,
+                     val component: AppComponent,
                      val alertType: ALERT_TYPE) : AlertContract.Presenter {
 
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var sessionManager: SessionEventsManager
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var timeHelper: TimeHelper
+
+    init {
+        component.inject(this)
+    }
+
     override fun start() {
-        dataManager.logAlert(alertType)
+        analyticsManager.logAlert(alertType)
+        checkAlertTypeAndHandleButtons()
         val color = view.getColorForColorRes(alertType.backgroundColor)
         view.setLayoutBackgroundColor(color)
         view.setLeftButtonBackgroundColor(color)
@@ -18,8 +34,10 @@ class AlertPresenter(val view: AlertContract.View,
         view.setAlertImageWithDrawableId(alertType.alertMainDrawableId)
         view.setAlertHintImageWithDrawableId(alertType.alertHintDrawableId)
         view.setAlertMessageWithStringRes(alertType.alertMessageId)
-        view.initLeftButton(alertType)
-        view.initRightButton(alertType)
+
+        sessionManager.updateSessionInBackground({
+            it.events.add(AlertScreenEvent(it.nowRelativeToStartTime(timeHelper), alertType))
+        })
     }
 
     override fun handleLeftButtonClick() {
@@ -43,18 +61,21 @@ class AlertPresenter(val view: AlertContract.View,
 
             else -> {
                 view.setResult(RESULT_CANCELED)
-                if (isACriticalError()) {
-                    view.closeAllActivities()
-                } else {
-                    view.closeActivity()
-                }
+                view.closeAllActivities()
             }
         }
     }
 
-    private fun isACriticalError(): Boolean = alertType == ALERT_TYPE.UNEXPECTED_ERROR
-
     override fun handleBackButton() {
         view.setResult(RESULT_CANCELED)
+    }
+
+    private fun checkAlertTypeAndHandleButtons() {
+        if (alertType.isTwoButton) {
+            view.initLeftButton(alertType)
+        } else {
+            view.hideLeftButton()
+        }
+        view.initRightButton(alertType)
     }
 }

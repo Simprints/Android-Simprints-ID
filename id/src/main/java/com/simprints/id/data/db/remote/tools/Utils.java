@@ -78,14 +78,14 @@ public final class Utils {
     public static DataCallback wrapCallback(@NonNull final String callDescription, @Nullable final DataCallback callback) {
         return new DataCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(final boolean isDataFromRemote) {
                 log(String.format(Locale.UK, "%s -> success", callDescription));
                 // Call back on UI thread
                 if (callback != null)
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-                            callback.onSuccess();
+                            callback.onSuccess(isDataFromRemote);
                         }
                     });
             }

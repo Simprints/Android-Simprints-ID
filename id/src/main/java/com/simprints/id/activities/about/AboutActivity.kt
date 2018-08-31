@@ -7,13 +7,20 @@ import android.view.MenuItem
 import android.view.WindowManager
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.collectFingerprints.confirmFingerprints.ConfirmFingerprintsDialog
+import com.simprints.id.data.DataManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_about.*
+import javax.inject.Inject
 
 class AboutActivity : AppCompatActivity(), AboutContract.View {
+
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var preferencesManager: PreferencesManager
 
     override lateinit var viewPresenter: AboutContract.Presenter
 
@@ -23,10 +30,9 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val app = application as Application
-        val dataManager = app.dataManager
-        LanguageHelper.setLanguage(this, dataManager.language)
+        val component = (application as Application).component
+        component.inject(this)
+        LanguageHelper.setLanguage(this, preferencesManager.language)
 
         setContentView(R.layout.activity_about)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -39,7 +45,7 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
 
         initUi()
 
-        viewPresenter = AboutPresenter(this, dataManager)
+        viewPresenter = AboutPresenter(this, component)
     }
 
     private fun initUi() {

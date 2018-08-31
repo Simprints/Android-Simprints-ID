@@ -29,7 +29,7 @@ import io.realm.RealmQuery
 import io.realm.Sort
 
 //TODO: investigate potential concurrency issues using .use
-class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
+open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
 
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"
@@ -54,8 +54,7 @@ class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
 
     override fun signInToLocal(localDbKey: LocalDbKey) {
         this.localDbKey = localDbKey
-        EncryptionMigration(localDbKey, appContext)
-        getRealmInstance().map { realm -> realm.use { } }.toCompletable()
+        PeopleRealmEncryptionMigration(localDbKey, appContext)
     }
 
     override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable =
@@ -190,7 +189,7 @@ class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
     } ?: throw RealmUninitialisedError("No valid realm Config")
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
-        Single.just(RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        Single.just(PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
             .also { realmConfig = it })
 
     private fun getRealmInstance(): Single<Realm> = getRealmConfig()
@@ -221,7 +220,7 @@ class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
         moduleId = syncParams.moduleId
     )
 
-    private fun updateSyncInfo(syncParams: SyncTaskParameters): Completable =
+    override fun updateSyncInfo(syncParams: SyncTaskParameters): Completable =
         getRealmInstance().map { realm ->
             buildQueryForPerson(realm, syncParams)
                 .equalTo(TO_SYNC_FIELD, false)
@@ -249,6 +248,6 @@ class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
             Constants.GROUP.MODULE -> loadPeopleFromLocal(moduleId = moduleId).blockingGet().map { it.libPerson }
         }
         destinationList.addAll(result)
-        callback?.onSuccess()
+        callback?.onSuccess(false)
     }
 }

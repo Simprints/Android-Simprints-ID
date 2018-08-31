@@ -1,13 +1,11 @@
 package com.simprints.id.secure
 
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.prefs.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.LegacyProject
@@ -16,13 +14,11 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import java.io.IOException
 
-class LegacyCompatibleProjectAuthenticator(loginInfoManager: LoginInfoManager,
-                                           dbManager: DbManager,
-                                           private val secureDataManager: SecureDataManager,
+class LegacyCompatibleProjectAuthenticator(component: AppComponent,
                                            safetyNetClient: SafetyNetClient,
-                                           secureApiClient: SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
+                                           secureApiClient: SecureApiInterface,
                                            attestationManager: AttestationManager = AttestationManager()
-) : ProjectAuthenticator(loginInfoManager, dbManager, safetyNetClient, secureApiClient, attestationManager) {
+) : ProjectAuthenticator(component, safetyNetClient, secureApiClient, attestationManager) {
 
     private val legacyProjectIdManager = LegacyProjectIdManager(secureApiClient)
 

@@ -15,11 +15,17 @@ import com.simprints.id.Application;
 import com.simprints.id.R;
 import com.simprints.id.activities.alert.AlertActivity;
 import com.simprints.id.activities.IntentKeys;
-import com.simprints.id.data.DataManager;
+import com.simprints.id.data.analytics.AnalyticsManager;
+import com.simprints.id.data.prefs.PreferencesManager;
+import com.simprints.id.di.AppComponent;
 import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
 import com.simprints.id.tools.LanguageHelper;
+import com.simprints.id.tools.TimeHelper;
 import com.simprints.libcommon.Person;
+
+import javax.inject.Inject;
+
 import static com.simprints.id.tools.utils.AndroidResourcesHelperImpl.getStringPlural;
 
 public class MatchingActivity extends AppCompatActivity implements MatchingContract.View {
@@ -35,14 +41,17 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     private TextView resultText2;
     private TextView resultText3;
 
+    @Inject PreferencesManager preferencesManager;
+    @Inject AnalyticsManager analyticsManager;
+    @Inject TimeHelper timeHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AppComponent component = ((Application) getApplication()).getComponent();
+        component.inject(this);
 
-        Application app = ((Application) getApplication());
-        DataManager dataManager = app.getDataManager();
-
-        LanguageHelper.setLanguage(this, dataManager.getLanguage());
+        LanguageHelper.setLanguage(this, preferencesManager.getLanguage());
         setContentView(R.layout.activity_matching);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -56,18 +65,13 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         // Create the Presenter, and pass it all the information and handles it needs
         final Bundle extras = getIntent().getExtras();
         if (extras == null) {
-            dataManager.logError(new NoIntentExtrasError("Null extras passed to MatchingActivity"));
+            analyticsManager.logError(new NoIntentExtrasError("Null extras passed to MatchingActivity"));
             launchAlert();
             finish();
             return;
         }
         Person probe = extras.getParcelable(IntentKeys.matchingActivityProbePersonKey);
-        viewPresenter = new MatchingPresenter(
-                this,
-                dataManager,
-                app.getTimeHelper(),
-                probe
-        );
+        viewPresenter = new MatchingPresenter(this, component, probe);
     }
 
     @Override

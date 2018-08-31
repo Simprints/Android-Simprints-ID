@@ -19,4 +19,4 @@ CERBERUS_APP_MODULE_NAME = 'cerberus-app'
 
 SIMPRINTS_ID_PACKAGE_NAME = 'com.simprints.id'
 CERBERUS_APP_PACKAGE_NAME = 'com.simprints.cerberusapp'
-CERBERUS_MAIN_ACTIVITY_NAME = 'activities.main.MainActivity'
+CERBERUS_COLLECT_FINGERPRINTS_ACTIVITY_NAME = 'activities.collectFingerprints.CollectFingerprintsActivity'

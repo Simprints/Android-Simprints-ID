@@ -2,34 +2,35 @@
 
 buildscript {
 
-    ext.active_android_version = "3.1.0-SNAPSHOT"
     ext.anko_version = "0.10.2"
     ext.crashlytics_version = "2.9.1"
     ext.crashlytics_ndk_version = "1.1.4"
-    ext.google_version = "11.6.2"
+    ext.google_version = "15.0.1"
     ext.gradle_version = "3.0.0"
     ext.junit_version = "4.12"
-    ext.kotlin_version = "1.2.31"
+    ext.kotlin_version = "1.2.60"
     ext.libsimprints_version = "1.0.12"
     ext.mockito_version = "2.8.9"
-    ext.rxandroid_version = "2.0.1"
-    ext.rxjava_version = "2.1.7"
+    ext.rxandroid_version = "2.0.2"
+    ext.rxjava_version = "2.1.9"
     ext.support_version = "27.1.1"
-    ext.retrofit_version = "2.4.0-SNAPSHOT"
+    ext.work_version = "1.0.0-alpha05"
+    ext.retrofit_version = "2.4.0"
     ext.okhttp_version = "3.10.0"
     ext.rxkotlin_version = "2.2.0"
+    ext.dagger_version = "2.15"
     ext.variant_for_android_tests = "debug"
 
     repositories {
-        jcenter()
         google()
         maven {
             url "https://maven.fabric.io/public"
         }
+        jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.3'
+        classpath 'com.android.tools.build:gradle:3.2.0-beta05'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -38,7 +39,7 @@ buildscript {
         classpath "io.realm:realm-gradle-plugin:4.3.3"
         classpath "com.google.firebase:firebase-plugins:1.1.4"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.fabric.tools:gradle:1.25.1"
+        classpath "io.fabric.tools:gradle:1.25.4"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath 'com.github.triplet.gradle:play-publisher:1.2.2'
@@ -47,15 +48,8 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
         google()
-        maven {
-            url "http://178.62.61.39:8081/artifactory/libs-release-local"
-            credentials {
-                username = "${SIMPRINTS_ARTIFACTORY_USERNAME}"
-                password = "${SIMPRINTS_ARTIFACTORY_PASSWORD}"
-            }
-        }
+        jcenter()
     }
 }
 

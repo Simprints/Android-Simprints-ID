@@ -5,7 +5,9 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
+import com.google.gson.JsonElement
 import com.simprints.id.Application
+import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
@@ -15,7 +17,7 @@ import com.simprints.id.data.db.remote.tools.Routes
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
-import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
@@ -38,7 +40,7 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 
-class FirebaseManagerImpl(private val appContext: Context,
+open class FirebaseManagerImpl(private val appContext: Context,
                           private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
     RemoteDbManager {
 
@@ -220,6 +222,19 @@ class FirebaseManagerImpl(private val appContext: Context,
                 .handleResponse(::defaultResponseErrorHandling)
         }
 
+    override fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JsonElement> =
+        getProjectApiClient().flatMap {
+            it.requestProjectConfig(projectId)
+                .retry(::retryCriteria)
+                .handleResponse(::defaultResponseErrorHandling)
+        }
+
+    override fun getSessionsApiClient(): Single<SessionsRemoteInterface> =
+        getCurrentFirestoreToken()
+            .flatMap {
+                Single.just(buildSessionsApi(it))
+            }
+
     override fun getPeopleApiClient(): Single<PeopleRemoteInterface> =
         getCurrentFirestoreToken()
             .flatMap {
@@ -227,6 +242,7 @@ class FirebaseManagerImpl(private val appContext: Context,
             }
 
     private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api
+    private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(SessionsRemoteInterface::class.java, SessionsRemoteInterface.baseUrl, authToken).api
 
     override fun getProjectApiClient(): Single<ProjectRemoteInterface> =
         getCurrentFirestoreToken()

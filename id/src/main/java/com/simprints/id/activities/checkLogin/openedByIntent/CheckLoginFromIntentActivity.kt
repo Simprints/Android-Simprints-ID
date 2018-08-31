@@ -9,17 +9,24 @@ import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
-import com.simprints.id.data.DataManager
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.Callout.Companion.toCallout
 import com.simprints.id.tools.InternalConstants
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
+import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
 open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
+
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var timeHelper: TimeHelper
 
     companion object {
         const val LOGIN_REQUEST_CODE: Int = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 1
@@ -30,19 +37,14 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
 
     private val app: Application by lazy { application as Application }
-    private val dataManager: DataManager by lazy { app.dataManager }
-    private val timeHelper by lazy { app.timeHelper }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_login)
+        val component = (application as Application).component
+        component.inject(this)
 
-        viewPresenter = CheckLoginFromIntentPresenter(
-            this,
-            dataManager,
-            app.secureDataManager,
-            app.sessionParametersExtractor,
-            timeHelper)
+        viewPresenter = CheckLoginFromIntentPresenter(this, component)
 
         viewPresenter.setup()
     }
@@ -56,9 +58,9 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         intent.toCallout()
 
     override fun checkCallingAppIsFromKnownSource() {
-        dataManager.callingPackage = getCallingPackageName()
-        if (app.packageManager.isCallingAppFromUnknownSource(dataManager.callingPackage)) {
-            dataManager.logSafeException(CallingAppFromUnknownSourceException())
+        preferencesManager.callingPackage = getCallingPackageName()
+        if (app.packageManager.isCallingAppFromUnknownSource(preferencesManager.callingPackage)) {
+            analyticsManager.logSafeException(CallingAppFromUnknownSourceException())
         }
     }
 
@@ -87,13 +89,14 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
-        // We need to call setResult and finish when the either MainActivity returns a result
+        // We need to call setResult and finish when the either CollectFingerprintsActivity returns a result
         // that needs to be forward back to the calling app or the user tapped on "close" button (RESULT_CANCELED)
         // in a error screen.
         // If the activity doesn't finish, then we check again the SignedInState in onResume.
         if (requestCode == LAUNCH_ACTIVITY_REQUEST_CODE ||
             requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED) {
 
+            viewPresenter.handleActivityResult(requestCode, resultCode, data.toCallout())
             setResult(resultCode, data)
             finish()
         }

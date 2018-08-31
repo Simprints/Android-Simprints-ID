@@ -1,6 +1,7 @@
 package com.simprints.id.secure
 
-import com.simprints.id.exceptions.safe.secure.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.tools.extensions.handleResponse
 import io.reactivex.Single
@@ -16,6 +17,7 @@ class PublicKeyManager(val client: SecureApiInterface) {
 
     private fun handleResponseError(e: HttpException): Nothing =
         when (e.code()) {
+            404 -> throw AuthRequestInvalidCredentialsException()
             in 500..599 -> throw SimprintsInternalServerException()
             else -> throw e
         }

@@ -29,13 +29,29 @@
     <string name="simprints_label" translatable="false">Simprints</string>
     <string name="libsimprints_label" translatable="false">LibSimprints</string>
     <!-- Content Descriptions -->
-    <string name="launch_background_description" translatable="false">Simprint\'s logo as background image</string>
+    <string name="launch_background_description" translatable="false">Simprints\' logo as background image</string>
 
 
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
-    <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your records. If that’s not OK or you have any questions let me know, otherwise please place your left thumb flat on the sensor.</string>
+    <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your records. If that\'s not OK or you have any questions let me know, otherwise please place your left thumb flat on the sensor.</string>
     <string name="confirm_consent">Tap here to confirm consent</string>
+    <string name="consent_enrol_only">I\'d like to use your fingerprints to enrol you in %1$s.&#160;</string>
+    <string name="consent_enrol">I\'d like to use your fingerprints to enrol you in %1$s and identify you in the future.&#160;</string>
+    <string name="consent_id_verify">I\'d like to use your fingerprints to find your records for %1$s.&#160;</string>
+    <string name="consent_share_data_no">Simprints, a UK-based nonprofit, will have access to your fingerprint information and current location.&#160;</string>
+    <string name="consent_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to your fingerprint information and current location.&#160;</string>
+    <string name="consent_collect_yes">Simprints will also use the data for research purposes.&#160;</string>
+    <string name="consent_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your data to be erased.&#160;</string>
+    <string name="consent_confirmation">May I use your fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
+    <string name="consent_parental_enrol_only">I\'d like to use your child\'s fingerprints to enrol them in %1$s.&#160;</string>
+    <string name="consent_parental_enrol">I\'d like to use your child\'s fingerprints to enrol them in %1$s and identify them in the future.&#160;</string>
+    <string name="consent_parental_id_verify">I\'d like to use your child\'s fingerprints to find their records for %1$s.&#160;</string>
+    <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their fingerprint information and current location.&#160;</string>
+    <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their fingerprint information and current location.&#160;</string>
+    <string name="consent_parental_collect_yes">Simprints will also use the data for research purposes.&#160;</string>
+    <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.&#160;</string>
+    <string name="consent_parental_confirmation">May I use your child\'s fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
     <!-- Loading Messages-->
     <string name="loading">Loading</string>
     <string name="updating_database">Updating project database…</string>
@@ -45,18 +61,26 @@
     <string name="launch_wake_un20">Waking up UN20…</string>
     <string name="launch_setup">Setting up Vero…</string>
     <string name="launch_checking_person_in_db">Checking person is in database…</string>
+    <string name="launch_consent_decline_button">Decline</string>
+    <string name="launch_consent_accept_button">Accept</string>
+    <string name="consent_general_title">General Consent</string>
+    <string name="consent_parental_title">Parental Consent</string>
+    <string name="privacy_notice_text"><u>Privacy Notice</u></string>
 
-
-    <!-- MainActivity : screen where the scanning happens -->
+    <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
     <string name="good_scan_direction">Swipe left to next finger</string>
-    <string name="last_scan_message">Press arrow to continue</string>
     <string name="please_scan">Please scan</string>
     <string name="poor_scan_direction">Please re-scan</string>
     <string name="scanning">Scanning…</string>
     <string name="good_scan_message">Good Scan</string>
     <string name="poor_scan_message">Poor Scan</string>
+    <string name="no_finger_detected_message">No finger detected</string>
+    <string name="finger_skipped_message">Finger skipped</string>
+    <string name="no_fingers_scanned">Please scan at least 1 required finger</string>
     <string name="reconnecting_message">Reconnecting…</string>
+    <string name="add_finger_dialog_title">Add Finger(s)</string>
+    <string name="confirm_fingers_dialog_title">Fingers Scanned</string>
     <!-- Button Labels -->
     <string name="rescan_label">Re-scan</string>
     <string name="rescan_label_question">Re-scan?</string>
@@ -64,32 +88,13 @@
     <string name="cancel_button" tools:ignore="ButtonCase">CANCEL</string>
     <string name="ok">OK</string>
     <string name="scan">SCAN</string>
+    <string name="confirm">CONFIRM</string>
+    <string name="restart">RESTART</string>
     <!-- Content Descriptions -->
     <string name="finger_image_description" translatable="false">Hands with arrow pointing to a finger</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
-
-    <!-- activity_main_drawer.xml : menu that comes out from the top left of the MainActivity -->
-    <!-- Menu Titles -->
-    <string name="action_settings">Settings</string>
-    <string name="menu_header">Simprints ID</string>
-    <string name="menu_subheader">Every person counts!</string>
-    <!-- Menu Labels -->
-    <string name="fingerprints_menu">Fingerprints</string>
-    <string name="help_menu">Help</string>
-    <string name="about_menu">About</string>
-    <string name="help_and_support_menu">Help and Support</string>
-    <string name="configuration_menu">Configuration</string>
-    <string name="nav_add_finger">Add Finger</string>
-    <string name="nav_select_finger">Select Finger</string>
-    <string name="nav_settings">Settings</string>
-    <string name="nav_sync">Sync</string>
-    <string name="nav_offline">Offline</string>
-    <string name="nav_sync_complete">Sync Complete</string>
-    <string name="nav_sync_failed">Sync Failed</string>
-    <string name="privacy_and_consent"><![CDATA[Privacy & Consent]]></string>
-    <string name="persistence_label">Remember these settings next time</string>
     <!--SyncerSync Button Text -->
     <string name="sync_data">Sync Data</string>
     <string name="syncing">Syncing…</string>
@@ -176,7 +181,7 @@
     <string name="multiple_scanners_found_message">More than one scanner is paired to the phone, please unpair un-needed scanners</string>
     <string name="disconnected_message">The scanner is unreachable, please make sure it is powered on and close to the phone</string>
     <string name="low_battery_message">Scanner battery low, please charge your scanner</string>
-    <string name="unforeseen_error_message">Sorry, an unforeseen error occurred, press close to continue</string>
+    <string name="unforeseen_error_message">Please try again and if Simprints does not work contact your system administrator</string>
     <string name="alert_api_key_verify_failed_body">"We could not verify your API key, please make sure you are connected to the internet and try again"</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">CLOSE</string>
@@ -192,9 +197,9 @@
     <string name="user_count">User Count:</string>
     <string name="module_count">Module Count:</string>
     <string name="project_count">Project Count:</string>
-    <string name="about_app_version">App Version:</string>
+    <string name="about_app_version">App Version</string>
     <string name="about_libsimprints_version">LibSimprints Version:</string>
-    <string name="about_scanner_version">Scanner Version:</string>
+    <string name="about_scanner_version">Scanner Version</string>
     <!-- Button Labels -->
     <string name="recover_db" translatable="false">Recover DB</string>
     <!-- Recovery dialogs -->
@@ -209,7 +214,6 @@
 
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-    <string name="settings_select_language">Select Language</string>
     <string name="nudge_mode_checkbox_name">Nudge Mode</string>
     <string name="vibrate">Vibrate</string>
     <string name="quality_threshold_empty">Quality Threshold:</string>
@@ -236,17 +240,17 @@
     <string name="button_submit">Submit</string>
     <string name="button_scan_prints">Scan Fingerprints</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_here">Scanner not here</string>
-    <string name="scanner_not_working">Scanner not working</string>
-    <string name="unable_to_capture_a_good_scan">Unable to capture a \'good scan\'</string>
-    <string name="beneficiary_was_physically_unable">Beneficiary was physically unable to give fingerprints (e.g. too painful, missing fingers)</string>
     <string name="beneficiary_refused">Beneficiary refused</string>
+    <string name="scanner_not_working">Scanner not working</string>
     <string name="other">Other</string>
     <!-- Text Prompt -->
-    <string name="hint_other_reason">More info…</string>
+    <string name="hint_other_reason">Additional Information</string>
 
 
-    <!-- PrivacyActivity : the screen where the user can find the long consent form -->
+    <!-- Long Consent Activity : the screen where the user can find the long consent form -->
+    <string name="long_consent_download_button_text">Download Privacy Notice</string>
+    <string name="long_consent_no_privacy_notice_found_text">Privacy notice not downloaded yet for this language.</string>
+    <string name="long_consent_failed_to_download">Failed to download privacy notice.</string>
     <!-- Long Consent -->
     <string name="developmentworker_consent_checkbox">I agree to Simprints using this data in these ways.</string>
     <string name="long_consent">
@@ -296,7 +300,7 @@
     <string name="notification_channel_id">SimprintsID</string>
     <string name="notification_channel_name">Simprints ID notifications</string>
     <string name="notification_channel_description">Notifications from Simprints ID</string>
-    <!--SyncerSync Notifications -->
+    <!-- SyncerSync Notifications -->
     <string name="sync_notification_tag">SimprintsID_sync</string>
     <string name="sync_notification_title">Simprints ID Sync</string>
     <string name="sync_progress_notification_content">Syncing… %1$d/%2$d</string>
@@ -306,6 +310,16 @@
     <string name="sync_error_notification_content">Sync failed.</string>
     <string name="sync_complete_notification_content">Sync completed.</string>
 
+    <!-- Long Consent Download Notifications -->
+    <string name="notification_long_consent_channel_id" translatable="false">notificationLongConsentChannelId</string>
+    <string name="notification_long_consent_channel_title">Long Consent Download Progress</string>
+    <string name="notification_long_consent_channel_content_title">Downloading Language: %1$s</string>
+    <string name="notification_long_consent_progress_download">Downloading… %1$d</string>
+    <string name="notification_long_consent_complete">Complete</string>
+    <string name="notification_long_consent_failed">Failed</string>
+
+    <!-- File Provider Authority Information -->
+    <string name="file_provider_authority" translatable="false">com.simprints.id.fileprovider</string>
 
     <!-- LoginActivity -->
     <!-- TODO: what about translation? -->
@@ -319,7 +333,7 @@
     <string name="login_user_id_hint">User ID</string>
     <string name="login_title">Request Project credentials</string>
     <string name="login_type_project_details">Type manually</string>
-    <string name="requestLogin_message">You need to login in. Please use your client app to open Simprints ID and log in.</string>
+    <string name="requestLogin_message">You need to login. Please use your client app to open Simprints ID and log in.</string>
     <string name="requestLogin_title">Login Required</string>
     <string name="login">Login</string>
     <!-- QR code scanning messages -->
@@ -336,6 +350,10 @@
     <!-- Dashboard Activity -->
     <string name="dashboard_label">Dashboard</string>
     <string name="logout">Logout</string>
+    <string name="confirmation_logout_title">Logout</string>
+    <string name="confirmation_logout_message">Do you want to logout?</string>
+    <string name="confirmation_logout_cancel">Cancel</string>
+
     <string name="hint_graphic">Hint graphic</string>
     <string name="dashboard_sync_status_icon">Synchronisation status icon</string>
     <string name="dashboard_sync_icon">Synchronisation icon</string>
@@ -344,19 +362,50 @@
     <string name="nav_logout">Logout</string>
     <string name="dashboard_card_project_title">Project</string>
 
-    <string name="dashboard_card_localdb_sync_user_title">People enrolled by last user</string>
+    <string name="dashboard_card_localdb_sync_user_title">People enrolled by user</string>
     <string name="dashboard_card_localdb_sync_project_title">People enrolled in project</string>
 
     <string name="dashboard_card_sync_title">Sync info</string>
     <string name="dashboard_card_sync_needed">you may need to sync</string>
     <string name="dashboard_card_sync_last_sync">Last sync: %1$s</string>
     <string name="dashboard_card_sync_action">SYNC</string>
+    <string name="dashboard_card_sync_failed">Sync Failed</string>
 
     <string name="dashboard_card_remotedb_title">People saved on server</string>
-    <string name="dashboard_card_lastscanner_title">Last scanner used</string>
+    <string name="dashboard_card_lastscanner_title">Scanner used</string>
     <string name="dashboard_card_enrol_title">Last Enrol</string>
     <string name="dashboard_card_verification_title">Last Verification</string>
     <string name="dashboard_card_identification_title">Last Identification</string>
-    <string name="dashboard_card_lastuser_title">Last user</string>
+    <string name="dashboard_card_currentuser_title">Current user</string>
+    <string name="menu_privacy_notice">Privacy Notice</string>
+    <string name="privacy_notice_title">Privacy Notice</string>
+
+    <string name="menu_settings">Settings</string>
+    <string name="menu_log_out">Log Out</string>
+    <string name="get_ready">Get Ready</string>
+    <string name="try_another_finger">Let\'s Try Another Finger!</string>
+    <string name="missing_finger"><u>Missing Finger</u></string>
+
+    <!--Settings Activity-->
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_sett">Settings</string>
+    <string name="select_language_preference">select_language</string>
+    <string name="select_fingers_preference">select_fingers</string>
+    <string name="sync_upon_launch_preference">sync_upon_launch</string>
+    <string name="background_sync_preference">background_sync</string>
+    <string name="app_version_preference">app_version</string>
+    <string name="scanner_version_preference">scanner_version</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_fingers">Select default fingers</string>
+    <string name="settings_sync_launch">Sync upon launch</string>
+    <string name="settings_background_sync">Background Sync</string>
+    <string name="settings_general">GENERAL</string>
+    <string name="settings_about">ABOUT</string>
+    <string name="settings_app_version">App Version</string>
+    <string name="settings_scanner_version">Scanner Version</string>
+    <string name="settings_fingers_subtext">Choose the fingers you would like to scan</string>
+    <string name="settings_sync_launch_subtext">Attempt sync each time app is opened</string>
+    <string name="settings_background_sync_subtext">Automatically sync on a set schedule</string>
+    <string name="settings_invalid_selection">Invalid Selection</string>
 
 </resources>

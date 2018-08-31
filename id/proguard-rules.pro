@@ -48,10 +48,13 @@
 
 # Application classes that will be serialized/deserialized over Gson
 -keep class com.simprints.id.secure.models.** { *; }
+-keep class com.simprints.id.domain.consent.** { *; }
 -keep class com.simprints.id.domain.Project { *; }
 -keep class com.simprints.id.session.Session { *; }
 -keep class com.simprints.id.data.db.remote.models.** { *; }
--keep class com.simprints.id.data.db.sync.models** { *; }
+-keep class com.simprints.id.data.db.sync.models.** { *; }
+-keep class com.simprints.id.data.analytics.eventData.models.** { *; }
+-keep class com.simprints.id.data.analytics.eventData.realm.** { *; }
 
 # For Realm
 -keepnames public class * extends io.realm.RealmObject
@@ -68,3 +71,7 @@
 -keep public class * extends java.lang.Throwable
 -keep class com.crashlytics.** { *; }
 -dontwarn com.crashlytics.**
+
+# Dagger
+-dontwarn com.google.errorprone.annotations.**
+

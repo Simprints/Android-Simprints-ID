@@ -26,7 +26,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
             it.get(IntentKeys.alertActivityAlertTypeKey) as ALERT_TYPE
         } ?: ALERT_TYPE.UNEXPECTED_ERROR
 
-        viewPresenter = AlertPresenter(this, app.dataManager, alertType)
+        viewPresenter = AlertPresenter(this, app.component, alertType)
         viewPresenter.start()
     }
 
@@ -42,6 +42,10 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         } else {
             hintGraphic.visibility = View.GONE
         }
+    }
+
+    override fun hideLeftButton() {
+        left_button.visibility = View.GONE
     }
 
     override fun setAlertMessageWithStringRes(stringRes: Int) = message.setText(stringRes)

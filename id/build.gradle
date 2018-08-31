@@ -16,6 +16,10 @@ kotlin {
     }
 }
 
+kapt {
+    generateStubs = true
+}
+
 android {
     compileSdkVersion 27
     buildToolsVersion "27.0.3"
@@ -23,9 +27,11 @@ android {
         minSdkVersion 19
         targetSdkVersion 27
         multiDexEnabled true
-        versionCode 99
-        versionName "2018.2.1"
+        versionCode 107
+        versionName "2018.3.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        //testInstrumentationRunner "com.simprints.id.UiTestsRunner" //To use custom TestApplication
+
     }
 
     //Add those properties in ~/.gradle/gradle.properties
@@ -35,6 +41,12 @@ android {
             storePassword SIMPRINTSID_RELEASE_STORE_PASSWORD
             keyAlias SIMPRINTSID_RELEASE_KEY_ALIAS
             keyPassword SIMPRINTSID_RELEASE_KEY_PASSWORD
+        }
+    }
+
+    bundle {
+        language {
+            enableSplit = false
         }
     }
     
@@ -59,13 +71,13 @@ android {
             ext.enableCrashlytics = false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
-            manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: false]
+            manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
         }
-        endToEndTesting {
-            initWith debug
-            versionNameSuffix "-test"
-            testCoverageEnabled false
-        }
+//        endToEndTesting {
+//            initWith debug
+//            versionNameSuffix "-test"
+//            testCoverageEnabled false
+//        }
     }
     
     applicationVariants.all { variant ->
@@ -127,17 +139,19 @@ def assembleTaskForEndToEndTest() {
 }
 
 project.afterEvaluate {
-    if (gradle.startParameter.taskNames.findAll {it.contains(connectedTaskForEndToEndTest())}.size() > 0) {
+    if (gradle.startParameter.taskNames.findAll {
+        it.contains(connectedTaskForEndToEndTest())
+    }.size() > 0) {
         project.(connectedTaskForEndToEndTest()).doFirst {
             def originalProvider = deviceProvider
             deviceProvider = [
-                getName       : { originalProvider.getName() },
-                init          : { originalProvider.init() },
-                terminate     : { originalProvider.terminate() },
-                getDevices    : { filterDevices(originalProvider.getDevices()) },
-                getTimeoutInMs: { originalProvider.getTimeoutInMs() },
-                isConfigured  : { originalProvider.isConfigured() },
-                getMaxThreads : { originalProvider.getMaxThreads() }
+                    getName       : { originalProvider.getName() },
+                    init          : { originalProvider.init() },
+                    terminate     : { originalProvider.terminate() },
+                    getDevices    : { filterDevices(originalProvider.getDevices()) },
+                    getTimeoutInMs: { originalProvider.getTimeoutInMs() },
+                    isConfigured  : { originalProvider.isConfigured() },
+                    getMaxThreads : { originalProvider.getMaxThreads() }
             ] as DeviceProvider
         }
     }
@@ -169,9 +183,18 @@ buildscript {
 
 repositories {
     mavenCentral()
+    maven { url "https://jitpack.io" }
     maven { url "https://maven.google.com" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     maven { url "https://maven.fabric.io/public" }
+    maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+    maven {
+        url "http://178.62.61.39:8081/artifactory/libs-release-local"
+        credentials {
+            username = "${SIMPRINTS_ARTIFACTORY_USERNAME}"
+            password = "${SIMPRINTS_ARTIFACTORY_PASSWORD}"
+        }
+    }
 }
 
 android {
@@ -192,33 +215,47 @@ dependencies {
     implementation project(':libcommon')
     implementation project(':libsimprints')
 
+    // Dagger
+    implementation "com.google.dagger:dagger-android:$dagger_version"
+    implementation "com.google.dagger:dagger-android-support:$dagger_version"
+    implementation "com.google.dagger:dagger:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+    kaptAndroidTest "com.google.dagger:dagger-compiler:$dagger_version"
+    kaptTest "com.google.dagger:dagger-compiler:$dagger_version"
+
+    compileOnly "org.glassfish:javax.annotation:10.0-b28"
+
     // Kotlin awesomeness
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "org.jetbrains.anko:anko:$anko_version"
     //implementation 'androidx.core:core-ktx:1.0.0-alpha1'
 
     // Support libraries
-    implementation 'com.android.support:multidex:1.0.2'
+    implementation 'com.android.support:multidex:1.0.3'
     implementation "com.android.support:appcompat-v7:$support_version"
     implementation "com.android.support:design:$support_version"
     implementation "com.android.support:support-v4:$support_version"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+
+    // WorkManager
+    implementation "android.arch.work:work-runtime-ktx:$work_version"
 
     // Google
     implementation "com.google.android.gms:play-services-location:$google_version"
     implementation "com.google.android.gms:play-services-safetynet:$google_version"
 
     // Databases
-    implementation "com.michaelpardo:activeandroid:$active_android_version"
-    implementation "com.google.firebase:firebase-database:$google_version"
-    implementation "com.google.firebase:firebase-firestore:$google_version"
+    implementation "com.google.firebase:firebase-database:16.0.1"
+    implementation "com.google.firebase:firebase-firestore:17.0.3"
 
     // Firebase
-    implementation "com.google.firebase:firebase-core:$google_version"
-    implementation "com.google.firebase:firebase-auth:$google_version"
-    implementation "com.google.firebase:firebase-config:$google_version"
-    implementation "com.google.firebase:firebase-perf:$google_version"
-    implementation "com.google.firebase:firebase-storage:$google_version"
+    implementation "com.google.firebase:firebase-core:16.0.1"
+    implementation "com.google.firebase:firebase-auth:16.0.2"
+    implementation "com.google.firebase:firebase-config:16.0.0"
+    implementation "com.google.firebase:firebase-perf:16.0.0"
+    implementation "com.google.firebase:firebase-storage:16.0.1"
 
     // Analytics
     implementation("com.crashlytics.sdk.android:crashlytics:$crashlytics_version@aar") {
@@ -233,6 +270,7 @@ dependencies {
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
+    androidTestImplementation "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
 
@@ -248,7 +286,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin_version"
 
     // Simprints
-    implementation 'com.simprints:libscanner:1.3.1'
+    implementation "com.simprints:libscanner:2018.2.1"
     implementation 'com.simprints:libmatcher:1.3.2'
 
     // Test
@@ -257,9 +295,15 @@ dependencies {
     testImplementation("junit:junit:$junit_version") {
         exclude group: "com.android.support"
     }
-    testImplementation 'org.robolectric:robolectric:3.9-SNAPSHOT'
+    testImplementation 'org.robolectric:robolectric:4.0-alpha-3-SNAPSHOT'
     testImplementation 'org.robolectric:shadows-multidex:3.7.1'
     testImplementation 'com.android.support.test:monitor:1.0.2'
+
+    testImplementation "com.google.truth:truth:0.42"
+    androidTestImplementation("com.google.truth:truth:0.42"){
+        exclude group: "com.google.guava"
+        exclude group: "com.google.errorprone"
+    }
 
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"
@@ -267,22 +311,34 @@ dependencies {
 
     // 3.10 hangs around with roboeletric
     testImplementation 'com.nhaarman:mockito-kotlin:1.5.0'
+    androidTestImplementation 'com.nhaarman:mockito-kotlin:1.5.0'
 
     // Android test
-    androidTestImplementation 'org.mockito:mockito-core:2.15.0'
-    androidTestImplementation 'org.mockito:mockito-android:2.18.3'
+    androidTestImplementation "org.mockito:mockito-core:$mockito_version"
+    androidTestImplementation "org.mockito:mockito-android:$mockito_version"
 
-    androidTestImplementation('com.schibsted.spain:barista:1.7.0') {
+    androidTestImplementation('com.schibsted.spain:barista:2.5.0') {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"
+        exclude group: "org.jetbrains.kotlin"
+        exclude group: "com.google.guava"
     }
-    androidTestImplementation 'com.simprints:cerberus-library:2018.1.1-dev-1'
-    androidTestImplementation 'com.simprints:remote-admin-client:2017.4.0-dev-5'
+
+    androidTestImplementation "com.simprints:mockscanner:2018.3.0"
+    testImplementation "com.simprints:mockscanner:2018.3.0"
     androidTestImplementation 'joda-time:joda-time:2.9.9'
 
     //UI
     implementation 'com.github.michael-rapp:android-material-dialog:4.3.3'
     implementation "com.android.support:cardview-v7:$support_version"
+    implementation "com.android.support:preference-v7:$support_version"
+    implementation "com.android.support:support-fragment:$support_version"
+
+    //Inject in tests
+    testImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.4'
+    androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.4'
+    testImplementation 'com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4'
+    androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4'
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {
