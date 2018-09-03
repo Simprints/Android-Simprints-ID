@@ -13,6 +13,7 @@ import android.support.test.runner.lifecycle.Stage
 import android.view.WindowManager
 import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.libsimprints.Constants
 import java.util.*
 
@@ -68,6 +69,13 @@ object ActivityUtils {
         // Allow all first-app permissions and dismiss the dialog box
         log("ActivityUtils.grantPermissions(): granting permissions")
         for (permission in permissions) PermissionGranter.allowPermissionsIfNeeded(permission)
+    }
+
+    fun launchCollectFingerprintsActivity(collectFingerprintsTestRule: ActivityTestRule<CollectFingerprintsActivity>) {
+        val intent = Intent()
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        collectFingerprintsTestRule.launchActivity(intent)
+        runActivityOnUiThread(collectFingerprintsTestRule)
     }
 
     @Throws(Throwable::class)
