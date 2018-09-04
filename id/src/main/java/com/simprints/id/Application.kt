@@ -1,12 +1,12 @@
 package com.simprints.id
 
-
 import android.support.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.*
+import com.simprints.id.tools.FileLoggingTree
 import io.fabric.sdk.android.Fabric
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
@@ -51,9 +51,9 @@ open class Application : MultiDexApplication() {
     }
 
     open fun initModules() {
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
+        //if (BuildConfig.DEBUG) {
+            Timber.plant(FileLoggingTree())
+        //}
 
         val crashlyticsKit = Crashlytics.Builder()
             .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())

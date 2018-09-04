@@ -7,8 +7,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncTaskParameters
+import timber.log.Timber
 import javax.inject.Inject
-
 
 class ScheduledPeopleSync : Worker() {
 
@@ -19,6 +19,8 @@ class ScheduledPeopleSync : Worker() {
     override fun doWork(): Result {
         if (applicationContext is Application) {
             (applicationContext as Application).component.inject(this)
+
+            Timber.e("ScheduledPeopleSync - doWork")
 
             syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.SCHEDULED_BACKGROUND)
 
