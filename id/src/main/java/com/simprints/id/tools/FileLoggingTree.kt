@@ -23,7 +23,7 @@ class FileLoggingTree : Timber.DebugTree() {
             val fileNameTimeStamp = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
             val logTimeStamp = SimpleDateFormat("E MMM dd yyyy 'at' hh:mm:ss:SSS aaa", Locale.getDefault()).format(Date())
 
-            val file = File("$path/YoScholarDeliveryLogs${File.separator}$fileNameTimeStamp.html")
+            val file = File("$direct${File.separator}$fileNameTimeStamp.html")
 
             file.createNewFile()
 
@@ -31,7 +31,7 @@ class FileLoggingTree : Timber.DebugTree() {
 
                 val fileOutputStream = FileOutputStream(file, true)
 
-                fileOutputStream.write("<p style=\"background:lightgray;\"><strong style=\"background:lightblue;\">&nbsp&nbsp$logTimeStamp :&nbsp&nbsp</strong>&nbsp&nbsp$message</p>".toByteArray())
+                fileOutputStream.write("<p><strong>&nbsp&nbsp$logTimeStamp :&nbsp&nbsp</strong>&nbsp&nbsp$message</p>".toByteArray())
                 fileOutputStream.close()
             }
         } catch (e: Exception) {
