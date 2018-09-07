@@ -15,14 +15,11 @@ class ScheduledSessionsSyncManager {
                 WorkManager.getInstance().enqueueUniquePeriodicWork(WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, it)
             }
 
-    private fun getConstraints() = Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.CONNECTED)
-        .setRequiresBatteryNotLow(true)
-        .build()
+    private fun getConstraints() = Constraints.Builder().build()
 
     companion object {
-        private const val SYNC_REPEAT_INTERVAL = 6L
-        private val SYNC_REPEAT_UNIT = TimeUnit.HOURS
+        private const val SYNC_REPEAT_INTERVAL = 30L
+        private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
         private const val WORKER_TAG = "SYNC_SESSIONS_WORKER"
     }
 }
