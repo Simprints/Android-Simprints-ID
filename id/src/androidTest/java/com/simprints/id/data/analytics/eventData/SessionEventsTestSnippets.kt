@@ -4,14 +4,43 @@ import com.google.common.truth.Truth
 import com.simprints.id.data.analytics.eventData.models.events.*
 import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import junit.framework.Assert.assertNotSame
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.*
+
+fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
+
+    Truth.assertThat(events.map { it.javaClass }).containsAllIn(arrayListOf(
+        AuthorizationEvent::class.java,
+        AuthenticationEvent::class.java,
+        AuthenticationEvent::class.java,
+        AuthorizationEvent::class.java
+    )).inOrder()
+
+    events.filterIsInstance(AuthorizationEvent::class.java).let {
+        assertEquals(it.first().result, AuthorizationEvent.Result.NOT_AUTHORIZED)
+        assertTrue(it.first().userInfo?.userId.isNullOrEmpty())
+        assertTrue(it.first().userInfo?.projectId.isNullOrEmpty())
+
+        assertEquals(it[1].result, AuthorizationEvent.Result.AUTHORIZED)
+        assertFalse(it[1].userInfo?.userId.isNullOrEmpty())
+        assertFalse(it[1].userInfo?.projectId.isNullOrEmpty())
+    }
+
+    events.filterIsInstance(AuthenticationEvent::class.java).let {
+        assertEquals(it.first().result, AuthenticationEvent.Result.BAD_CREDENTIALS)
+        assertEquals(it[1].result, AuthenticationEvent.Result.AUTHENTICATED)
+        it.forEach {
+            assertTrue(it.userInfo.userId.isNotEmpty())
+            assertTrue(it.userInfo.projectId.isNotEmpty())
+        }
+    }
+}
 
 fun verifyEventsAfterEnrolment(events: List<Event>) {
     Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
-        CalloutEvent::class.java,
         AuthorizationEvent::class.java,
         AuthenticationEvent::class.java,
+        AuthenticationEvent::class.java,
+        CalloutEvent::class.java,
         ConnectivitySnapshotEvent::class.java,
         AuthorizationEvent::class.java,
         ScannerConnectionEvent::class.java,
@@ -21,14 +50,14 @@ fun verifyEventsAfterEnrolment(events: List<Event>) {
         PersonCreationEvent::class.java,
         EnrollmentEvent::class.java,
         CallbackEvent::class.java
-    ))
+    )).inOrder()
 }
 
 fun verifyEventsAfterVerification(events: List<Event>) {
     Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
-        CalloutEvent::class.java,
         AuthorizationEvent::class.java,
         AuthenticationEvent::class.java,
+        CalloutEvent::class.java,
         ConnectivitySnapshotEvent::class.java,
         AuthorizationEvent::class.java,
         ScannerConnectionEvent::class.java,
@@ -39,14 +68,14 @@ fun verifyEventsAfterVerification(events: List<Event>) {
         PersonCreationEvent::class.java,
         OneToOneMatchEvent::class.java,
         CallbackEvent::class.java
-    ))
+    )).inOrder()
 }
 
 fun verifyEventsAfterIdentification(events: List<Event>) {
     Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
-        CalloutEvent::class.java,
         AuthorizationEvent::class.java,
         AuthenticationEvent::class.java,
+        CalloutEvent::class.java,
         ConnectivitySnapshotEvent::class.java,
         AuthorizationEvent::class.java,
         ScannerConnectionEvent::class.java,
@@ -56,7 +85,7 @@ fun verifyEventsAfterIdentification(events: List<Event>) {
         PersonCreationEvent::class.java,
         OneToManyMatchEvent::class.java,
         CallbackEvent::class.java
-    ))
+    )).inOrder()
 }
 
 fun verifySessionIsOpen(sessionEvents: SessionEvents) {
