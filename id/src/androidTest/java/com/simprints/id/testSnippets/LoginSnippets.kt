@@ -12,6 +12,7 @@ import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.testTools.WaitingUtils
 import com.simprints.id.testTools.log
 import com.simprints.libsimprints.Constants
+import org.hamcrest.CoreMatchers.not
 
 fun launchAppFromIntentEnrol(calloutCredentials: CalloutCredentials,
                              enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
@@ -34,10 +35,12 @@ fun enterCredentialsDirectly(calloutCredentials: CalloutCredentials, projectSecr
     WaitingUtils.tryOnUiUntilTimeout(10000, 50) {
         onView(withId(R.id.loginEditTextProjectId))
             .check(matches(isDisplayed()))
+            .perform(clearText())
             .perform(typeText(calloutCredentials.projectId))
             .perform(closeSoftKeyboard())
         onView(withId(R.id.loginEditTextProjectSecret))
             .check(matches(isDisplayed()))
+            .perform(clearText())
             .perform(typeText(projectSecret))
             .perform(closeSoftKeyboard())
     }
@@ -49,6 +52,17 @@ fun pressSignIn() {
         .check(matches(isDisplayed()))
         .check(matches(isClickable()))
         .perform(click())
+
+    Thread.sleep(100)
+    WaitingUtils.tryOnUiUntilTimeout(10000, 50) {
+        try {
+            onView(withId(R.id.simProgressDialog))
+                .check(matches(not(isDisplayed())))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            //It throws an exception when simProgressDialog is on the screen anymore
+        }
+    }
 }
 
 fun ensureSignInSuccess() {

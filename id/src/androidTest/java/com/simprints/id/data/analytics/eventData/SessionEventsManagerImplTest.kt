@@ -228,7 +228,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
         // Launch and sign in
         launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        enterCredentialsDirectly(calloutCredentials, projectSecret + "wrong")
         pressSignIn()
 
         // Once signed in proceed to enrol person1
@@ -240,6 +240,26 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             it.assertNoErrors()
 
             verifyEventsAfterEnrolment(it.values().first().events)
+        }
+    }
+
+    @Test
+    fun login_shouldGenerateTheRightEvents() {
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+
+        // Launch and sign in
+        launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret + "wrong")
+        pressSignIn()
+
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+
+        sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).test().also {
+            it.awaitTerminalEvent()
+            it.assertNoErrors()
+
+            verifyEventsForFailedSignedIdFollowedBySucceedSignIn(it.values().first().events)
         }
     }
 
