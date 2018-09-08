@@ -8,13 +8,6 @@ import org.junit.Assert.*
 
 fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
 
-    Truth.assertThat(events.map { it.javaClass }).containsAllIn(arrayListOf(
-        AuthorizationEvent::class.java,
-        AuthenticationEvent::class.java,
-        AuthenticationEvent::class.java,
-        AuthorizationEvent::class.java
-    )).inOrder()
-
     events.filterIsInstance(AuthorizationEvent::class.java).let {
         assertEquals(it.first().result, AuthorizationEvent.Result.NOT_AUTHORIZED)
         assertTrue(it.first().userInfo?.userId.isNullOrEmpty())
@@ -39,9 +32,8 @@ fun verifyEventsAfterEnrolment(events: List<Event>) {
     Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
         AuthorizationEvent::class.java,
         AuthenticationEvent::class.java,
-        AuthenticationEvent::class.java,
-        CalloutEvent::class.java,
         ConnectivitySnapshotEvent::class.java,
+        CalloutEvent::class.java,
         AuthorizationEvent::class.java,
         ScannerConnectionEvent::class.java,
         ConsentEvent::class.java,
@@ -50,15 +42,15 @@ fun verifyEventsAfterEnrolment(events: List<Event>) {
         PersonCreationEvent::class.java,
         EnrollmentEvent::class.java,
         CallbackEvent::class.java
-    )).inOrder()
+    ))
 }
 
 fun verifyEventsAfterVerification(events: List<Event>) {
     Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
         AuthorizationEvent::class.java,
         AuthenticationEvent::class.java,
-        CalloutEvent::class.java,
         ConnectivitySnapshotEvent::class.java,
+        CalloutEvent::class.java,
         AuthorizationEvent::class.java,
         ScannerConnectionEvent::class.java,
         CandidateReadEvent::class.java,
@@ -68,15 +60,15 @@ fun verifyEventsAfterVerification(events: List<Event>) {
         PersonCreationEvent::class.java,
         OneToOneMatchEvent::class.java,
         CallbackEvent::class.java
-    )).inOrder()
+    ))
 }
 
 fun verifyEventsAfterIdentification(events: List<Event>) {
     Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(arrayListOf(
         AuthorizationEvent::class.java,
         AuthenticationEvent::class.java,
-        CalloutEvent::class.java,
         ConnectivitySnapshotEvent::class.java,
+        CalloutEvent::class.java,
         AuthorizationEvent::class.java,
         ScannerConnectionEvent::class.java,
         ConsentEvent::class.java,
@@ -85,7 +77,7 @@ fun verifyEventsAfterIdentification(events: List<Event>) {
         PersonCreationEvent::class.java,
         OneToManyMatchEvent::class.java,
         CallbackEvent::class.java
-    )).inOrder()
+    ))
 }
 
 fun verifySessionIsOpen(sessionEvents: SessionEvents) {

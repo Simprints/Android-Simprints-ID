@@ -142,8 +142,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             it.awaitTerminalEvent()
             it.assertComplete()
             val sessions = realmSessionEventsManager.loadSessions().blockingGet()
-            assertEquals(sessions.size, 1)
-            assertEquals(sessions[0].id, openSessionId)
+            assertEquals(1, sessions.size)
+            assertEquals(openSessionId, sessions[0].id)
         }
     }
 
@@ -228,7 +228,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
         // Launch and sign in
         launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret + "wrong")
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
 
         // Once signed in proceed to enrol person1
@@ -252,8 +252,10 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         enterCredentialsDirectly(calloutCredentials, projectSecret + "wrong")
         pressSignIn()
 
+        Thread.sleep(6000)
         enterCredentialsDirectly(calloutCredentials, projectSecret)
         pressSignIn()
+        setupActivityAndContinue()
 
         sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).test().also {
             it.awaitTerminalEvent()
