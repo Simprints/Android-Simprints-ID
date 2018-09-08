@@ -80,7 +80,6 @@ public enum ALERT_TYPE {
         false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_CALLING_PACKAGE, false),
 
 
-    // TODO: add Unexpected Parameter return code to LibSimprints.
     UNEXPECTED_PARAMETER(R.string.configuration_error_title, R.string.unexpected_parameter_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
             false, R.color.simprints_alert_orange, Constants.SIMPRINTS_CANCELLED, false),

@@ -102,6 +102,4 @@ class PrimitivePreferenceTest {
             val classPref by PrimitivePreference(improvedPrefs, aKey, aClass)
         }
     }
-
-    // TODO: figure out how to test thread safety
 }
