@@ -14,9 +14,9 @@ class ScheduledSessionsSyncManager {
             .build().also {
                 WorkManager.getInstance().enqueueUniquePeriodicWork(WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, it)
             }
-            .also {
-                WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<ScheduledSessionsSync>().build())
-            }
+//            .also {
+//                WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<ScheduledSessionsSync>().build())
+//            }
 
     private fun getConstraints() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
