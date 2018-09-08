@@ -1,6 +1,7 @@
 package com.simprints.id.tools
 
 import android.os.Environment
+import android.util.Log
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
