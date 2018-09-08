@@ -13,6 +13,8 @@ import com.simprints.id.testTools.WaitingUtils
 import com.simprints.id.testTools.log
 import com.simprints.libsimprints.Constants
 import org.hamcrest.CoreMatchers.not
+import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
+import android.support.test.espresso.Espresso.onView
 
 fun launchAppFromIntentEnrol(calloutCredentials: CalloutCredentials,
                              enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
@@ -52,17 +54,6 @@ fun pressSignIn() {
         .check(matches(isDisplayed()))
         .check(matches(isClickable()))
         .perform(click())
-
-    Thread.sleep(100)
-    WaitingUtils.tryOnUiUntilTimeout(10000, 50) {
-        try {
-            onView(withId(R.id.simProgressDialog))
-                .check(matches(not(isDisplayed())))
-        } catch (e: Exception) {
-            e.printStackTrace()
-            //It throws an exception when simProgressDialog is on the screen anymore
-        }
-    }
 }
 
 fun ensureSignInSuccess() {
