@@ -40,13 +40,11 @@ class ScheduledSessionsSync : Worker() {
         val signedInProjectId = loginInfoManager.getSignedInProjectIdOrEmpty()
 
         if (signedInProjectId.isNotEmpty()) {
-            sessionEventsLocalDbManager.loadSessions(signedInProjectId).subscribeBy(
-                onSuccess = {sessionEvents ->
-                    Timber.d(String.format("Session IDs: %s", sessionEvents.forEach { it.id + "\n" }))
-                }
-            )
+            printSessionIdsInDb(signedInProjectId)
+
             sessionEventsManager.syncSessions(signedInProjectId).subscribeBy(onComplete = {
                 Timber.d("ScheduledSessionsSync - onComplete")
+                printSessionIdsInDb(signedInProjectId)
 
                 result.put(Result.SUCCESS)
             }, onError = {
@@ -56,6 +54,11 @@ class ScheduledSessionsSync : Worker() {
                 handleError(it, result)
             })
         }
+    }
+
+    private fun printSessionIdsInDb(signedInProjectId: String) {
+        val sessions = sessionEventsLocalDbManager.loadSessions(signedInProjectId).blockingGet()
+        Timber.d(String.format("Session IDs for $signedInProjectId: %s", sessions.fold("") { result, session -> "$result ${session.id}" }))
     }
 
     private fun handleError(error: Throwable, result: LinkedBlockingQueue<Result>) =
