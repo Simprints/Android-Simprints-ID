@@ -142,8 +142,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             it.awaitTerminalEvent()
             it.assertComplete()
             val sessions = realmSessionEventsManager.loadSessions().blockingGet()
-            assertEquals(sessions.size, 1)
-            assertEquals(sessions[0].id, openSessionId)
+            assertEquals(1, sessions.size)
+            assertEquals(openSessionId, sessions[0].id)
         }
     }
 
@@ -240,6 +240,28 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             it.assertNoErrors()
 
             verifyEventsAfterEnrolment(it.values().first().events)
+        }
+    }
+
+    @Test
+    fun login_shouldGenerateTheRightEvents() {
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+
+        // Launch and sign in
+        launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret + "wrong")
+        pressSignIn()
+
+        Thread.sleep(6000)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        setupActivityAndContinue()
+
+        sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).test().also {
+            it.awaitTerminalEvent()
+            it.assertNoErrors()
+
+            verifyEventsForFailedSignedIdFollowedBySucceedSignIn(it.values().first().events)
         }
     }
 
