@@ -12,6 +12,9 @@ import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.testTools.WaitingUtils
 import com.simprints.id.testTools.log
 import com.simprints.libsimprints.Constants
+import org.hamcrest.CoreMatchers.not
+import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
+import android.support.test.espresso.Espresso.onView
 
 fun launchAppFromIntentEnrol(calloutCredentials: CalloutCredentials,
                              enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
@@ -34,10 +37,12 @@ fun enterCredentialsDirectly(calloutCredentials: CalloutCredentials, projectSecr
     WaitingUtils.tryOnUiUntilTimeout(10000, 50) {
         onView(withId(R.id.loginEditTextProjectId))
             .check(matches(isDisplayed()))
+            .perform(clearText())
             .perform(typeText(calloutCredentials.projectId))
             .perform(closeSoftKeyboard())
         onView(withId(R.id.loginEditTextProjectSecret))
             .check(matches(isDisplayed()))
+            .perform(clearText())
             .perform(typeText(projectSecret))
             .perform(closeSoftKeyboard())
     }

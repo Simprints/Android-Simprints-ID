@@ -123,7 +123,8 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                     .deleteSessions(projectId, false)
                     .onErrorComplete().andThen(sessionEventsLocalDbManager.deleteSessions(PROJECT_ID_FOR_NOT_SIGNED_IN))
             } else {
-                Completable.error(SessionUploadFailureException())
+                val errorDetail = it.response()?.errorBody()?.string() ?: ""
+                Completable.error(SessionUploadFailureException("SessionUploadFailureException $errorDetail"))
             }
         }
 
