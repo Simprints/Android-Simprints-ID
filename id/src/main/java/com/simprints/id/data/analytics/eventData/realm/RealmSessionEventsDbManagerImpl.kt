@@ -91,7 +91,10 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
                 }.findAll()
 
                 sessions.forEach {
-                    deleteSessionChildren(it.id)
+                    it.databaseInfo?.deleteFromRealm()
+                    it.device?.deleteFromRealm()
+                    it.location?.deleteFromRealm()
+                    it.realmEvents.deleteAllFromRealm()
                 }
                 sessions.deleteAllFromRealm()
             }
