@@ -113,7 +113,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         sessionEventsLocalDbManager.loadSessions(projectId).flatMap { sessions ->
             if (sessions.size > 0) {
                 closeAnyOpenSessionsAndUpdateUploadTime(sessions)
-                uploadClosedSessions(sessions, projectId)
+                uploadClosedSessionsIfAny(sessions, projectId)
             } else {
                 Single.error(NoSessionsFoundException())
             }
@@ -123,7 +123,8 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                     .deleteSessions(projectId, false)
                     .onErrorComplete().andThen(sessionEventsLocalDbManager.deleteSessions(PROJECT_ID_FOR_NOT_SIGNED_IN))
             } else {
-                Completable.error(SessionUploadFailureException())
+                val errorDetail = it.response()?.errorBody()?.string() ?: ""
+                Completable.error(SessionUploadFailureException("SessionUploadFailureException $errorDetail"))
             }
         }
 
@@ -135,10 +136,14 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         }
     }
 
-    private fun uploadClosedSessions(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Void?>> =
+    private fun uploadClosedSessionsIfAny(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Void?>> =
         sessions.filter { it.isClosed() }.toTypedArray().let { sessionsArray ->
-            remoteDbManager.getSessionsApiClient().flatMap {
-                it.uploadSessions(projectId, hashMapOf("sessions" to sessionsArray))
+            if (sessionsArray.isNotEmpty()) {
+                remoteDbManager.getSessionsApiClient().flatMap {
+                    it.uploadSessions(projectId, hashMapOf("sessions" to sessionsArray))
+                }
+            } else {
+                Single.error(NoSessionsFoundException())
             }
         }
 
