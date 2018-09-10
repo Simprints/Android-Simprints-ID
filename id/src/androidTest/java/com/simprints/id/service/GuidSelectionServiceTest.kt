@@ -22,6 +22,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 import com.simprints.id.testSnippets.*
+import com.jayway.awaitility.Awaitility
+import com.jayway.awaitility.Duration
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -65,9 +68,8 @@ class GuidSelectionServiceTest : DaggerForAndroidTests() {
         val simHelper = SimHelper(calloutCredentials.projectId, calloutCredentials.userId)
         simHelper.confirmIdentity(app, session.id, "some_guid_confirmed")
 
-        Thread.sleep(1000)
-
         session = sessionEventsManagerSpy.getCurrentSession().blockingGet()
+        Awaitility.await().atMost(10, TimeUnit.SECONDS).pollDelay(Duration.ONE_SECOND).until<Any> { session.events.findLast { it is GuidSelectionEvent } != null }
 
         val potentialGuidSelectionEvent = session.events.findLast { it is GuidSelectionEvent } as GuidSelectionEvent?
         Assert.assertNotNull(potentialGuidSelectionEvent)

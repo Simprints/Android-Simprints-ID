@@ -5,11 +5,14 @@ import com.simprints.id.data.analytics.eventData.models.events.*
 import com.simprints.id.data.analytics.eventData.models.EventType
 import com.simprints.id.tools.json.JsonHelper
 import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
 
 open class RlEvent : RealmObject {
 
-    private var typeEventDescription: String? = null
+    @PrimaryKey
+    lateinit var id: String
 
+    private var typeEventDescription: String? = null
     private var jsonEvent: String? = null
 
     private fun saveType(type: EventType) {
@@ -21,6 +24,7 @@ open class RlEvent : RealmObject {
     constructor() {}
     constructor(event: Event) : this() {
         saveType(event.type)
+        id = event.id
         jsonEvent = JsonHelper.toJson(event)
     }
 
