@@ -23,7 +23,7 @@ import io.reactivex.Single
 import java.io.IOException
 
 interface RemoteDbManager {
-    // TODO : agree on consistent method naming for load/save vs get/put etc
+
     // Lifecycle
     fun initialiseRemoteDb()
 

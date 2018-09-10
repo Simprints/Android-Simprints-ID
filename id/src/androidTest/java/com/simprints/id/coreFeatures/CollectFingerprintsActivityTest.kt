@@ -7,21 +7,28 @@ import android.support.test.runner.AndroidJUnit4
 import android.util.Base64
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.activities.collectFingerprints.ViewPagerCustom
-import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.whenever
-import com.simprints.id.testSnippets.*
+import com.simprints.id.testSnippets.collectFingerprintsPressScan
+import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
+import com.simprints.id.testSnippets.skipFinger
+import com.simprints.id.testSnippets.waitForSplashScreenAppearsAndDisappears
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTools.ActivityUtils.getCurrentActivity
+import com.simprints.id.testTools.ActivityUtils.launchCollectFingerprintsActivity
 import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.ScannerUtils.setupScannerForCollectingFingerprints
+import com.simprints.id.tools.AppState
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
@@ -53,13 +60,11 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
         realmKey,
         calloutCredentials.legacyApiKey)
 
-    private val projectSecret = "Z8nRspDoiQg1QpnDdKE6U7fQKa0GjpQOwnJ4OcSFWulAcIk4+LP9wrtDn8fRmqacLvkmtmOLl+Kxo1emXLsZ0Q=="
-
     override var peopleRealmConfiguration: RealmConfiguration? = null
 
     @Rule
     @JvmField
-    val scanTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+    val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
 
     override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
         PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
@@ -74,6 +79,8 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
     private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
     @Inject lateinit var randomGeneratorMock: RandomGenerator
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var appState: AppState
 
     @Before
     override fun setUp() {
@@ -88,6 +95,8 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
         peopleRealmConfiguration = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
         super<FirstUseLocal>.setUp()
+
+        preferencesManager.calloutAction = CalloutAction.REGISTER
     }
 
     @Test
@@ -96,11 +105,9 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN)))
+        setupScannerForCollectingFingerprints(mockBluetoothAdapter, appState)
+        launchCollectFingerprintsActivity(collectFingerprintsRule)
 
-        launchActivityEnrol(calloutCredentials, scanTestRule)
-
-        signInIfRequired()
-        setupActivityAndContinue()
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
         collectFingerprintsPressScan()
@@ -119,13 +126,10 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN)))
-
+        setupScannerForCollectingFingerprints(mockBluetoothAdapter, appState)
         setupToCollectFourFingerprints()
+        launchCollectFingerprintsActivity(collectFingerprintsRule)
 
-        launchActivityEnrol(calloutCredentials, scanTestRule)
-
-        signInIfRequired()
-        setupActivityAndContinue()
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
         Assert.assertEquals(4, viewPager?.adapter?.count)
@@ -147,11 +151,9 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
             MockFinger.NO_FINGER,
             MockFinger.NO_FINGER,
             MockFinger.NO_FINGER)))
+        setupScannerForCollectingFingerprints(mockBluetoothAdapter, appState)
+        launchCollectFingerprintsActivity(collectFingerprintsRule)
 
-        launchActivityEnrol(calloutCredentials, scanTestRule)
-
-        signInIfRequired()
-        setupActivityAndContinue()
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
         collectFingerprintsPressScan()
@@ -166,10 +168,9 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
     @Test
     fun skipFingerAndMaxNotReached_shouldAddAFinger() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(MockFinger.NO_FINGER)))
-        launchActivityEnrol(calloutCredentials, scanTestRule)
+        setupScannerForCollectingFingerprints(mockBluetoothAdapter, appState)
+        launchCollectFingerprintsActivity(collectFingerprintsRule)
 
-        signInIfRequired()
-        setupActivityAndContinue()
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
         skipFinger()
@@ -183,12 +184,10 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
     @Test
     fun skipFingerAndMaxReached_shouldNotAddAFinger() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(MockFinger.NO_FINGER)))
-        launchActivityEnrol(calloutCredentials, scanTestRule)
-
+        setupScannerForCollectingFingerprints(mockBluetoothAdapter, appState)
         setupToCollectFourFingerprints()
+        launchCollectFingerprintsActivity(collectFingerprintsRule)
 
-        signInIfRequired()
-        setupActivityAndContinue()
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
         skipFinger()
@@ -204,12 +203,5 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
             FingerIdentifier.LEFT_INDEX_FINGER to true,
             FingerIdentifier.RIGHT_THUMB to true,
             FingerIdentifier.RIGHT_INDEX_FINGER to true))
-    }
-
-    private fun signInIfRequired() {
-        if (getCurrentActivity() is LoginActivity) {
-            enterCredentialsDirectly(calloutCredentials, projectSecret)
-            pressSignIn()
-        }
     }
 }
