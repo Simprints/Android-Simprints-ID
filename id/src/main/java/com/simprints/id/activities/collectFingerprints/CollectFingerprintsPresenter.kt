@@ -35,6 +35,7 @@ import com.simprints.libsimprints.Registration
 import io.reactivex.rxkotlin.subscribeBy
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.min
 
 class CollectFingerprintsPresenter(private val context: Context,
                                    private val view: CollectFingerprintsContract.View)
@@ -173,10 +174,13 @@ class CollectFingerprintsPresenter(private val context: Context,
         activeFingers.size < maximumTotalNumberOfFingersForAutoAdding
 
     private fun weHaveTheMinimumNumberOfGoodScans(): Boolean =
-        activeFingers.filter { it.isGoodScan || it.isRescanGoodScan }.size >= targetNumberOfGoodScans
+        activeFingers.filter { it.isGoodScan || it.isRescanGoodScan }.size >= min(targetNumberOfGoodScans, numberOfOriginalFingers())
 
     private fun weHaveTheMinimumNumberOfAnyQualityScans() =
         activeFingers.filter { fingerHasSatisfiedTerminalCondition(it) }.size >= maximumTotalNumberOfFingersForAutoAdding
+
+    private fun numberOfOriginalFingers() =
+        preferencesManager.fingerStatus.filter { it.value }.size
 
     override fun fingerHasSatisfiedTerminalCondition(finger: Finger) =
         ((tooManyBadScans(finger) || finger.isGoodScan || finger.isRescanGoodScan) && finger.template != null) || finger.isFingerSkipped
