@@ -95,10 +95,12 @@ fun verifyEventsAfterIdentification(events: List<Event>, realmForDataEvent: Real
 
 fun checkDbHasOnlyTheExpectedInfo(realmForDataEvent: Realm, nEvents: Int) {
     with(realmForDataEvent) {
-        assertEquals(nEvents, where(RlEvent::class.java).findAll().size)
-        assertEquals(1, where(DatabaseInfo::class.java).findAll().size)
-        assertEquals(1, where(Device::class.java).findAll().size)
-        assertEquals(1, where(Location::class.java).findAll().size)
+        realmForDataEvent.executeTransaction {
+            assertEquals(nEvents, where(RlEvent::class.java).findAll().size)
+            assertEquals(1, where(DatabaseInfo::class.java).findAll().size)
+            assertEquals(1, where(Device::class.java).findAll().size)
+            Truth.assertThat(where(Location::class.java).findAll().size).isIn(arrayListOf(0, 1))
+        }
     }
 }
 
