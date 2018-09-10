@@ -11,6 +11,7 @@ import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
 import com.simprints.id.tools.Log
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import java.util.concurrent.LinkedBlockingQueue
 import javax.inject.Inject
 
@@ -46,14 +47,17 @@ class ScheduledSessionsSync : Worker() {
         }
     }
 
-    private fun handleError(it: Throwable, result: LinkedBlockingQueue<Result>) =
-        when (it) {
+    private fun handleError(error: Throwable, result: LinkedBlockingQueue<Result>) =
+        when (error) {
             is NoSessionsFoundException -> result.put(Result.SUCCESS)
             is SessionUploadFailureException -> result.put(Result.FAILURE)
             else -> {
-                it.printStackTrace()
-                analyticsManager.logThrowable(it)
                 result.put(Result.FAILURE)
+            }
+        }.also {
+            Timber.e(error)
+            if (error !is NoSessionsFoundException) {
+                analyticsManager.logThrowable(error)
             }
         }
 }
