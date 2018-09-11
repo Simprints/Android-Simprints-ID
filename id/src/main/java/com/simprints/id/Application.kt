@@ -51,7 +51,7 @@ open class Application : MultiDexApplication() {
     }
 
     open fun initModules() {
-        if (BuildConfig.ENABLE_LOGGING) {
+        if (BuildConfig.ENABLE_LOGFILE_CREATION) {
             Timber.plant(FileLoggingTree())
         }
 
