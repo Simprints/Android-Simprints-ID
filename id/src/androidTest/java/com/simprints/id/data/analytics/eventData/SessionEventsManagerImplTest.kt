@@ -30,6 +30,7 @@ import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.shared.PeopleGeneratorUtils
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
 import com.simprints.libsimprints.FingerIdentifier
@@ -39,9 +40,11 @@ import com.simprints.mockscanner.MockScannerManager
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.realm.Realm
+import junit.framework.Assert
 import junit.framework.Assert.*
 import okhttp3.Protocol
 import okhttp3.Request
+import org.json.JSONObject
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -125,6 +128,27 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             it.assertComplete()
             verifySessionIsOpen(it.values().first())
         }
+    }
+
+    @Test
+    fun serialiseSession_shouldIgnoreSkipSerialisationProperty() {
+        sessionEventsManagerSpy.createSession().blockingGet()
+        sessionEventsManagerSpy.updateSession({
+            it.databaseInfo = DatabaseInfo(0)
+            it.location = Location(0.0, 0.0)
+        }).blockingGet()
+
+        val session = sessionEventsManagerSpy.getCurrentSession().blockingGet()
+        Assert.assertNotNull(session.device.id)
+        Assert.assertNotNull(session.databaseInfo?.id)
+        Assert.assertNotNull(session.location?.id)
+
+        val jsonString = JsonHelper.toJson(session)
+        val jsonObject = JSONObject(jsonString)
+
+        Assert.assertFalse(jsonObject.getJSONObject("device").has("id"))
+        Assert.assertFalse(jsonObject.getJSONObject("databaseInfo").has("id"))
+        Assert.assertFalse(jsonObject.getJSONObject("location").has("id"))
     }
 
     @Test
