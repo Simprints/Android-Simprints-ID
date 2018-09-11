@@ -65,6 +65,8 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
+
+            buildConfigField 'boolean', 'ENABLE_LOGGING', 'false'
         }
         debug {
             minifyEnabled false
@@ -72,6 +74,8 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
+
+            buildConfigField 'boolean', 'ENABLE_LOGGING', 'true'
         }
 //        endToEndTesting {
 //            initWith debug
