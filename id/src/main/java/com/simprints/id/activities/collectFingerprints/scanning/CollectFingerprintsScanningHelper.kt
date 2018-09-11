@@ -18,7 +18,6 @@ import com.simprints.id.domain.Finger.Status.*
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.exceptions.unsafe.UnexpectedScannerError
 import com.simprints.id.tools.AppState
-import com.simprints.id.tools.Log
 import com.simprints.id.tools.TimeoutBar
 import com.simprints.id.tools.Vibrate
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
@@ -27,6 +26,7 @@ import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.SCANNER_ERROR.*
 import com.simprints.libscanner.ScannerCallback
+import timber.log.Timber
 import javax.inject.Inject
 
 class CollectFingerprintsScanningHelper(private val context: Context,
@@ -82,23 +82,23 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     private val setupCallback = object : SetupCallback {
         override fun onSuccess() {
-            Log.d(this@CollectFingerprintsScanningHelper, "reconnect.onSuccess()")
+            Timber.d( "reconnect.onSuccess()")
             view.un20WakeupDialog.dismiss()
             appState.scanner.registerButtonListener(scannerButtonListener)
         }
 
         override fun onProgress(progress: Int, detailsId: Int) {
-            Log.d(this@CollectFingerprintsScanningHelper, "reconnect.onProgress()")
+            Timber.d( "reconnect.onProgress()")
         }
 
         override fun onError(resultCode: Int) {
-            Log.d(this@CollectFingerprintsScanningHelper, "reconnect.onError()")
+            Timber.d("reconnect.onError()")
             view.un20WakeupDialog.dismiss()
             view.doLaunchAlert(ALERT_TYPE.DISCONNECTED)
         }
 
         override fun onAlert(alertType: ALERT_TYPE) {
-            Log.d(this@CollectFingerprintsScanningHelper, "reconnect.onAlert()")
+            Timber.d( "reconnect.onAlert()")
             view.un20WakeupDialog.dismiss()
             view.doLaunchAlert(alertType)
         }
