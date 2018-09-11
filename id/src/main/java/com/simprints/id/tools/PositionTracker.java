@@ -32,6 +32,8 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 @SuppressWarnings("UnusedParameters")
 public class PositionTracker implements
         GoogleApiClient.ConnectionCallbacks,
@@ -110,7 +112,7 @@ public class PositionTracker implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.INSTANCE.d(activity, "PositionTracker.onConnected");
+        Timber.d("PositionTracker.onConnected");
         if (requestPermission()) {
             getLastLocation();
             startLocationUpdates();
@@ -123,7 +125,7 @@ public class PositionTracker implements
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.INSTANCE.d(activity, String.format(Locale.UK,
+        Timber.d(String.format(Locale.UK,
                 "PositionTracker.onConnectionFailed : %s", connectionResult.toString()));
 
         switch (connectionResult.getErrorCode()) {
@@ -149,17 +151,17 @@ public class PositionTracker implements
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     InternalConstants.LOCATION_PERMISSION_REQUEST
             );
-            Log.INSTANCE.d(activity, "PositionTracker.requestionPermission() -> false");
+            Timber.d( "PositionTracker.requestionPermission() -> false");
             return false;
         } else {
-            Log.INSTANCE.d(activity, "PositionTracker.requestionPermission() -> true");
+            Timber.d( "PositionTracker.requestionPermission() -> true");
             return true;
         }
 
     }
 
     private void getLastLocation() {
-        Log.INSTANCE.d(activity, "PositionTracker.getLastLocation()");
+        Timber.d( "PositionTracker.getLastLocation()");
 
         int locationPermission = ContextCompat.checkSelfPermission(
                 activity, Manifest.permission.ACCESS_FINE_LOCATION
@@ -171,7 +173,7 @@ public class PositionTracker implements
             if (lastLocation != null) {
                 preferencesManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(lastLocation));
             }
-            Log.INSTANCE.d(activity, String.format(Locale.UK, "Last location: %s", lastLocation));
+            Timber.d( String.format(Locale.UK, "Last location: %s", lastLocation));
         }
     }
 
@@ -191,12 +193,12 @@ public class PositionTracker implements
                     switch (status.getStatusCode()) {
 
                         case LocationSettingsStatusCodes.SUCCESS:
-                            Log.INSTANCE.d(activity, "PositionTracker.startLocationUpdates() -> SUCCESS");
+                            Timber.d( "PositionTracker.startLocationUpdates() -> SUCCESS");
                             requestLocationUpdates();
                             break;
 
                         case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            Log.INSTANCE.d(activity, "PositionTracker.startLocationUpdates() -> RESOLUTION");
+                            Timber.d( "PositionTracker.startLocationUpdates() -> RESOLUTION");
                             try {
                                 status.startResolutionForResult(
                                         activity, InternalConstants.RESOLUTION_REQUEST
@@ -206,7 +208,7 @@ public class PositionTracker implements
                             break;
 
                         default:
-                            Log.INSTANCE.d(activity, "PositionTracker.startLocationUpdates() -> FAILURE");
+                            Timber.d( "PositionTracker.startLocationUpdates() -> FAILURE");
                     }
                 }
             });
@@ -214,7 +216,7 @@ public class PositionTracker implements
     }
 
     private void requestLocationUpdates() {
-        Log.INSTANCE.d(activity, "PositionTracker.requestLocationUpdates()");
+        Timber.d( "PositionTracker.requestLocationUpdates()");
         int locationPermission = ContextCompat.checkSelfPermission(
                 activity,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -234,7 +236,7 @@ public class PositionTracker implements
             preferencesManager.setLocation(com.simprints.id.domain.Location.Companion.fromAndroidLocation(location));
             sessionEventsManager.addLocationToSession(location.getLatitude(), location.getLongitude());
 
-            Log.INSTANCE.d(activity, String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
+            Timber.d( String.format(Locale.UK, "PositionTracker.onLocationChanged(%f %f)",
                     location.getLatitude(), location.getLongitude()));
 
             if(location.hasAccuracy() && location.getAccuracy() < 100) {

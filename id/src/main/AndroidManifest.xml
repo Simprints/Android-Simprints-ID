@@ -11,12 +11,13 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <!-- Features -->
     <uses-feature android:name="android.hardware.location.gps" />
 
     <!-- CommCare Permission -->
-    <uses-permission android:name="org.commcare.dalvik.provider.cases.read" />
+    <uses-permission android:name="Mainifest.Manifestorg.commcare.dalvik.provider.cases.read" />
 
     <application
         android:name=".Application"

@@ -49,6 +49,11 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     }
 
     override fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents): Completable =
+        deleteSessionChildren(sessionEvents.id)
+            .onErrorComplete()
+            .andThen(insertOrUpdateSessionEventsInRealm(sessionEvents))
+
+    private fun insertOrUpdateSessionEventsInRealm(sessionEvents: SessionEvents): Completable =
         getRealmInstance().flatMapCompletable { realm ->
             realm.executeTransaction {
                 it.insertOrUpdate(RlSession(sessionEvents))
@@ -73,18 +78,38 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
             val query = realm.where(RlSession::class.java).apply {
                 equalTo(RealmSessionEventsDbManagerImpl.SESSION_ID, sessionId)
             }
-            SessionEvents(query.findFirst()?: throw SessionNotFoundException())
+            SessionEvents(query.findFirst() ?: throw SessionNotFoundException())
         }
 
     override fun deleteSessions(projectId: String?, openSession: Boolean?): Completable =
         getRealmInstance().flatMapCompletable { realm ->
             realm.executeTransaction {
-                val query = it.where(RlSession::class.java).apply {
+
+                val sessions = realm.where(RlSession::class.java).apply {
                     addQueryParamForProjectId(projectId, this)
                     addQueryParamForOpenSession(openSession, this)
+                }.findAll()
+
+                sessions.forEach {
+                    deleteSessionChildren(it.id)
                 }
-                query.findAll().deleteAllFromRealm()
+                sessions.deleteAllFromRealm()
             }
+
+            Completable.complete()
+        }
+
+    private fun deleteSessionChildren(id: String): Completable =
+        getRealmInstance().flatMapCompletable { realm ->
+            realm.executeTransaction {
+                realm.where(RlSession::class.java).equalTo("id", id).findFirst()?.let {
+                    it.databaseInfo?.deleteFromRealm()
+                    it.device?.deleteFromRealm()
+                    it.location?.deleteFromRealm()
+                    it.realmEvents.deleteAllFromRealm()
+                }
+            }
+
             Completable.complete()
         }
 
