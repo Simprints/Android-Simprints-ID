@@ -1,5 +1,6 @@
 package com.simprints.id
 
+import android.content.pm.ApplicationInfo
 import android.support.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
@@ -51,9 +52,9 @@ open class Application : MultiDexApplication() {
     }
 
     open fun initModules() {
-        //if (BuildConfig.DEBUG) {
+        if (isCurrentBuildDebug()) {
             Timber.plant(FileLoggingTree())
-        //}
+        }
 
         val crashlyticsKit = Crashlytics.Builder()
             .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
@@ -80,4 +81,6 @@ open class Application : MultiDexApplication() {
             Timber.d("Undeliverable exception received", exceptionToPrint)
         }
     }
+
+    private fun isCurrentBuildDebug() = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
 }
