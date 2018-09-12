@@ -114,7 +114,6 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         sessionEventsLocalDbManager.loadSessions(projectId).flatMap { sessions ->
             if (sessions.size > 0) {
                 closeAnyOpenSessionsAndUpdateUploadTime(sessions)
-                printClosedSessionIds(sessions)
                 uploadClosedSessionsIfAny(sessions, projectId)
             } else {
                 Single.error(NoSessionsFoundException())
@@ -232,8 +231,4 @@ open class SessionEventsManagerImpl(private val ctx: Context,
             .filterIsInstance(FingerprintCaptureEvent::class.java)
             .filter { it.fingerprint?.template in personTemplates && it.result != FingerprintCaptureEvent.Result.SKIPPED }
             .map { it.id }
-
-    private fun printClosedSessionIds(sessions: ArrayList<SessionEvents>) {
-        Timber.d("Session IDs before uploading %s", sessions.forEach { it.id + "\n" })
-    }
 }
