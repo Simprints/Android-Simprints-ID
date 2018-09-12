@@ -72,11 +72,14 @@ open class SessionEventsManagerImpl(private val ctx: Context,
             block(it)
             insertOrUpdateSession(it)
         }.doOnError {
+            Timber.e(it)
             analyticsManager.logThrowable(it)
         }.onErrorComplete() // because events are low priority, it swallows the exception
 
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit, projectId: String) {
-        updateSession(block, projectId).subscribeBy(onError = { it.printStackTrace() })
+        updateSession(block, projectId).subscribeBy(onError = {
+            it.printStackTrace()
+        })
     }
 
     private fun closeLastSessionsIfPending(): Completable =
