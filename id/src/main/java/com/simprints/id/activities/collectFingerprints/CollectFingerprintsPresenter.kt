@@ -294,7 +294,6 @@ class CollectFingerprintsPresenter(private val context: Context,
             sessionEvents.events.add(FingerprintCaptureEvent(
                 sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
                 sessionEvents.nowRelativeToStartTime(timeHelper),
-                UUID.randomUUID().toString(),
                 finger.id,
                 preferencesManager.qualityThreshold,
                 FingerprintCaptureEvent.Result.fromFingerStatus(finger.status),

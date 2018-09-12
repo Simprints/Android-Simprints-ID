@@ -13,7 +13,7 @@ internal class SessionRealmMigration : RealmMigration {
     class SessionModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 0
+        const val REALM_SCHEMA_VERSION: Long = 1
     }
 
     override fun migrate(realm: DynamicRealm?, oldVersion: Long, newVersion: Long) {}
