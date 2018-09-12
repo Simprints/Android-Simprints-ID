@@ -4,8 +4,6 @@ import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
@@ -13,7 +11,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
-import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncService
@@ -23,8 +20,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -38,7 +33,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
-    @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
     private var started: AtomicBoolean = AtomicBoolean(false)
 
@@ -66,7 +60,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
         } else {
             SyncService.catchUpWithSyncServiceIfStillRunning(syncManager, preferencesManager, loginInfoManager)
         }
-        printsSessionIdsInDb()
     }
 
     private fun hasSyncGroupChangedSinceLastRun(): Boolean {
@@ -168,11 +161,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
         cardsModelsList.findLast { it.type == projectType }.also {
             cardsModelsList.remove(it)
         }
-    }
-
-    private fun printsSessionIdsInDb() {
-        val sessions = sessionEventsLocalDbManager.loadSessions(loginInfoManager.getSignedInProjectIdOrEmpty()).blockingGet()
-        Timber.d("Sessions in Db on launch: %s", sessions.fold("") { result, session -> "$result ${session.id}" })
     }
 
     override fun logout() {
