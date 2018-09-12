@@ -23,6 +23,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import retrofit2.adapter.rxjava2.Result
+import timber.log.Timber
 
 // Class to manage the current activeSession
 open class SessionEventsManagerImpl(private val ctx: Context,
@@ -71,11 +72,14 @@ open class SessionEventsManagerImpl(private val ctx: Context,
             block(it)
             insertOrUpdateSession(it)
         }.doOnError {
+            Timber.e(it)
             analyticsManager.logThrowable(it)
         }.onErrorComplete() // because events are low priority, it swallows the exception
 
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit, projectId: String) {
-        updateSession(block, projectId).subscribeBy(onError = { it.printStackTrace() })
+        updateSession(block, projectId).subscribeBy(onError = {
+            it.printStackTrace()
+        })
     }
 
     private fun closeLastSessionsIfPending(): Completable =
