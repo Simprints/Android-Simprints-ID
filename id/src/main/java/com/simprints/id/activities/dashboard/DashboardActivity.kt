@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DefaultItemAnimator
 import android.view.Menu
 import com.simprints.id.Application
+import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.longConsent.LongConsentActivity
@@ -16,6 +17,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.LanguageHelper
+import com.simprints.id.tools.PermissionManager
 import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
@@ -42,6 +44,10 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
+        if (BuildConfig.BUILD_TYPE === "releaseWithLogfile") {
+            PermissionManager.requestPermissionForWriteStorage(this)
+        }
+
         val component = (application as Application).component
         component.inject(this)
         setSupportActionBar(dashboardToolbar)

@@ -19,7 +19,7 @@ public class PermissionManager {
     private static List<String> requiredPermissions(String callingPackage) {
         List<String> requiredPermissions = new ArrayList<>();
 
-        addRequiredPermissions(requiredPermissions);
+        requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (InternalConstants.COMMCARE_PACKAGE.equalsIgnoreCase(callingPackage))
             requiredPermissions.add(InternalConstants.COMMCARE_PERMISSION);
@@ -38,16 +38,22 @@ public class PermissionManager {
 
     public static void requestAllPermissions(@NonNull Activity activity, String callingPackage) {
         ActivityCompat.requestPermissions(
-                activity,
-                requiredPermissions(callingPackage).toArray(new String[0]),
-                InternalConstants.ALL_PERMISSIONS_REQUEST
+            activity,
+            requiredPermissions(callingPackage).toArray(new String[0]),
+            InternalConstants.ALL_PERMISSIONS_REQUEST
         );
     }
 
-    private static void addRequiredPermissions(List<String> requiredPermissions) {
-        requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        if(BuildConfig.ENABLE_LOGFILE_CREATION) {
-            requiredPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    public static void requestPermissionForWriteStorage(@NonNull Activity activity) {
+        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        if (BuildConfig.BUILD_TYPE == "releaseWithLogfile" &&
+            android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+            ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                activity,
+                new String[]{permission},
+                InternalConstants.ALL_PERMISSIONS_REQUEST
+            );
         }
     }
 }

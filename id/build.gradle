@@ -65,8 +65,9 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
-
-            buildConfigField 'boolean', 'ENABLE_LOGFILE_CREATION', 'false'
+        }
+        releaseWithLogfile {
+            initWith release
         }
         debug {
             minifyEnabled false
@@ -74,8 +75,6 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
-
-            buildConfigField 'boolean', 'ENABLE_LOGFILE_CREATION', 'true'
         }
 //        endToEndTesting {
 //            initWith debug
@@ -85,7 +84,9 @@ android {
     }
     
     applicationVariants.all { variant ->
-        if (variant.buildType.name == "release") {
+        if (variant.buildType.name == "release" ||
+            variant.buildType.name == "releaseWithLogfile") {
+
             buildConfigField("String", "GCP_PROJECT", "\"simprints-152315\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
             buildConfigField("String", "END_POINT", "\"prod\"")
@@ -357,6 +358,7 @@ def copyGoogleServicesJsonTask(variantName, gcpProject) {
 
 copyGoogleServicesJsonTask("debug", getDevProjectId())
 copyGoogleServicesJsonTask("release", "simprints-152315")
+copyGoogleServicesJsonTask("releaseWithLogfile", "simprints-152315")
 copyGoogleServicesJsonTask("endToEndTesting", "simprints-testing")
 
 crashlytics {
