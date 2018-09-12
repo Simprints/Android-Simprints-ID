@@ -43,17 +43,4 @@ public class PermissionManager {
             InternalConstants.ALL_PERMISSIONS_REQUEST
         );
     }
-
-    public static void requestPermissionForWriteStorage(@NonNull Activity activity) {
-        String permission = Manifest.permission.WRITE_EXTERNAL_STORAGE;
-        if (BuildConfig.BUILD_TYPE == "releaseWithLogfile" &&
-            android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-            ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                activity,
-                new String[]{permission},
-                InternalConstants.ALL_PERMISSIONS_REQUEST
-            );
-        }
-    }
 }
