@@ -9,9 +9,8 @@ object SessionRealmConfig {
         .Builder()
         .name("$databaseName.realm")
         .schemaVersion(REALM_SCHEMA_VERSION)
-        .migration(SessionRealmMigration())
+        .deleteRealmIfMigrationNeeded()
         .encryptionKey(key)
         .modules(SessionRealmMigration.SessionModule())
         .build()
-
 }

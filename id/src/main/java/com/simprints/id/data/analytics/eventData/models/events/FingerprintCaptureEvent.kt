@@ -6,7 +6,6 @@ import com.simprints.libsimprints.FingerIdentifier
 
 class FingerprintCaptureEvent(val relativeStartTime: Long,
                               val relativeEndTime: Long,
-                              val id: String,
                               val finger: FingerIdentifier,
                               val qualityThreshold: Int,
                               val result: Result,
