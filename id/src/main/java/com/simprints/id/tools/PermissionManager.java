@@ -7,6 +7,8 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 
+import com.simprints.id.BuildConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +19,7 @@ public class PermissionManager {
     private static List<String> requiredPermissions(String callingPackage) {
         List<String> requiredPermissions = new ArrayList<>();
 
-        requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        addRequiredPermissions(requiredPermissions);
 
         if (InternalConstants.COMMCARE_PACKAGE.equalsIgnoreCase(callingPackage))
             requiredPermissions.add(InternalConstants.COMMCARE_PERMISSION);
@@ -40,5 +42,12 @@ public class PermissionManager {
                 requiredPermissions(callingPackage).toArray(new String[0]),
                 InternalConstants.ALL_PERMISSIONS_REQUEST
         );
+    }
+
+    private static void addRequiredPermissions(List<String> requiredPermissions) {
+        requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        if(BuildConfig.ENABLE_LOGFILE_CREATION) {
+            requiredPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
     }
 }
