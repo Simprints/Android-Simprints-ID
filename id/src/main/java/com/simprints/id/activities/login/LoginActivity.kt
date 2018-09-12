@@ -7,14 +7,12 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.SecureApiInterface
-import com.simprints.id.tools.PermissionManager
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.scannerAppIntent
@@ -46,9 +44,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        if (BuildConfig.BUILD_TYPE === "releaseWithLogfile") {
-            PermissionManager.requestPermissionForWriteStorage(this)
-        }
 
         val component = (application as Application).component
         component.inject(this)
