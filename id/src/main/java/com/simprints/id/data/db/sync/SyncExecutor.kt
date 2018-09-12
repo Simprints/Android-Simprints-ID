@@ -32,7 +32,7 @@ open class SyncExecutor(private val dbManager: DbManager,
         dbManager.remote.getPeopleApiClient().blockingGet()
     }
 
-    fun sync(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> {
+    fun sync(isInterrupted: () -> Boolean = { false }, syncParams: SyncTaskParameters): Observable<Progress> {
         Timber.d("Sync Started")
         return Observable.concat(
             uploadNewPatients(isInterrupted, syncParams),

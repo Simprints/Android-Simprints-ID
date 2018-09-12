@@ -29,7 +29,7 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     private var realmConfig: RealmConfiguration? = null
     private var localDbKey: LocalDbKey? = null
 
-    private fun getRealmInstance(): Single<Realm> = initDbIfRequired().andThen(getRealmConfig()
+    fun getRealmInstance(): Single<Realm> = initDbIfRequired().andThen(getRealmConfig()
         .flatMap {
             Single.just(Realm.getInstance(it))
         })
@@ -73,17 +73,25 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
             val query = realm.where(RlSession::class.java).apply {
                 equalTo(RealmSessionEventsDbManagerImpl.SESSION_ID, sessionId)
             }
-            SessionEvents(query.findFirst()?: throw SessionNotFoundException())
+            SessionEvents(query.findFirst() ?: throw SessionNotFoundException())
         }
 
     override fun deleteSessions(projectId: String?, openSession: Boolean?): Completable =
         getRealmInstance().flatMapCompletable { realm ->
             realm.executeTransaction {
-                val query = it.where(RlSession::class.java).apply {
+
+                val sessions = realm.where(RlSession::class.java).apply {
                     addQueryParamForProjectId(projectId, this)
                     addQueryParamForOpenSession(openSession, this)
+                }.findAll()
+
+                sessions.forEach {
+                    it.databaseInfo?.deleteFromRealm()
+                    it.device?.deleteFromRealm()
+                    it.location?.deleteFromRealm()
+                    it.realmEvents.deleteAllFromRealm()
                 }
-                query.findAll().deleteAllFromRealm()
+                sessions.deleteAllFromRealm()
             }
             Completable.complete()
         }

@@ -11,8 +11,12 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.data.analytics.eventData.models.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventData.models.events.FingerprintCaptureEvent
 import com.simprints.id.data.analytics.eventData.models.events.PersonCreationEvent
+import com.simprints.id.data.analytics.eventData.models.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventData.models.session.Device
+import com.simprints.id.data.analytics.eventData.models.session.Location
 import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
+import com.simprints.id.data.analytics.eventData.realm.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventData.realm.RlEvent
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -26,6 +30,7 @@ import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.shared.PeopleGeneratorUtils
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
 import com.simprints.libsimprints.FingerIdentifier
@@ -35,9 +40,11 @@ import com.simprints.mockscanner.MockScannerManager
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.realm.Realm
+import junit.framework.Assert
 import junit.framework.Assert.*
 import okhttp3.Protocol
 import okhttp3.Request
+import org.json.JSONObject
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -64,18 +71,12 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     @JvmField
     val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
-    @Inject
-    lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
-    @Inject
-    lateinit var sessionEventsManagerSpy: SessionEventsManager
-    @Inject
-    lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
-    @Inject
-    lateinit var remoteDbManager: RemoteDbManager
-    @Inject
-    lateinit var localDbManager: LocalDbManager
-    @Inject
-    lateinit var timeHelper: TimeHelper
+    @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
+    @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
+    @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
+    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var timeHelper: TimeHelper
 
     override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
         PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
@@ -92,6 +93,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     }
 
     private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
+    private val realmForDataEvent
+        get() = (realmSessionEventsManager as RealmSessionEventsDbManagerImpl).getRealmInstance().blockingGet()
 
     @Before
     override fun setUp() {
@@ -103,7 +106,10 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
         app.initDependencies()
 
-        realmSessionEventsManager.deleteSessions().blockingAwait()
+        realmForDataEvent.executeTransaction {
+            it.deleteAll()
+        }
+
         signOut()
 
         whenever(settingsPreferencesManagerSpy.fingerStatus).thenReturn(hashMapOf(
@@ -125,6 +131,27 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     }
 
     @Test
+    fun serialiseSession_shouldIgnoreSkipSerialisationProperty() {
+        sessionEventsManagerSpy.createSession().blockingGet()
+        sessionEventsManagerSpy.updateSession({
+            it.databaseInfo = DatabaseInfo(0)
+            it.location = Location(0.0, 0.0)
+        }).blockingGet()
+
+        val session = sessionEventsManagerSpy.getCurrentSession().blockingGet()
+        Assert.assertNotNull(session.device.id)
+        Assert.assertNotNull(session.databaseInfo?.id)
+        Assert.assertNotNull(session.location?.id)
+
+        val jsonString = JsonHelper.toJson(session)
+        val jsonObject = JSONObject(jsonString)
+
+        Assert.assertFalse(jsonObject.getJSONObject("device").has("id"))
+        Assert.assertFalse(jsonObject.getJSONObject("databaseInfo").has("id"))
+        Assert.assertFalse(jsonObject.getJSONObject("location").has("id"))
+    }
+
+    @Test
     fun sync_shouldClosePendingSessions() {
         createAndSaveFakeCloseSession()
         val openSessionId = createAndSaveFakeOpenSession()
@@ -142,8 +169,15 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             it.awaitTerminalEvent()
             it.assertComplete()
             val sessions = realmSessionEventsManager.loadSessions().blockingGet()
-            assertEquals(sessions.size, 1)
-            assertEquals(sessions[0].id, openSessionId)
+            with(realmForDataEvent) {
+                assertEquals(0, where(RlEvent::class.java).findAll().size)
+                assertEquals(0, where(DatabaseInfo::class.java).findAll().size)
+                assertEquals(1, where(Device::class.java).findAll().size)
+                assertEquals(0, where(Location::class.java).findAll().size)
+            }
+
+            assertEquals(1, sessions.size)
+            assertEquals(openSessionId, sessions[0].id)
         }
     }
 
@@ -239,7 +273,29 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             it.awaitTerminalEvent()
             it.assertNoErrors()
 
-            verifyEventsAfterEnrolment(it.values().first().events)
+            verifyEventsAfterEnrolment(it.values().first().events, realmForDataEvent)
+        }
+    }
+
+    @Test
+    fun login_shouldGenerateTheRightEvents() {
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+
+        // Launch and sign in
+        launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret + "wrong")
+        pressSignIn()
+
+        Thread.sleep(6000)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        setupActivityAndContinue()
+
+        sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).test().also {
+            it.awaitTerminalEvent()
+            it.assertNoErrors()
+
+            verifyEventsForFailedSignedIdFollowedBySucceedSignIn(it.values().first().events)
         }
     }
 
@@ -261,7 +317,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             it.awaitTerminalEvent()
             it.assertNoErrors()
 
-            verifyEventsAfterVerification(it.values().first().events)
+            verifyEventsAfterVerification(it.values().first().events, realmForDataEvent)
         }
     }
 
@@ -284,7 +340,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             it.awaitTerminalEvent()
             it.assertNoErrors()
 
-            verifyEventsAfterIdentification(it.values().first().events)
+            verifyEventsAfterIdentification(it.values().first().events, realmForDataEvent)
         }
     }
 
