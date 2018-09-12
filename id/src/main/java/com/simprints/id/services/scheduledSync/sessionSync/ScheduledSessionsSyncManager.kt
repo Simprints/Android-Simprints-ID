@@ -18,7 +18,10 @@ class ScheduledSessionsSyncManager {
 //                WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<ScheduledSessionsSync>().build())
 //            }
 
-    private fun getConstraints() = Constraints.Builder().build()
+    private fun getConstraints() = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED)
+        .setRequiresBatteryNotLow(true)
+        .build()
 
     companion object {
         private const val SYNC_REPEAT_INTERVAL = 6L
