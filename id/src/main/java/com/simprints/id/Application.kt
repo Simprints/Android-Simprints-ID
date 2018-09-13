@@ -53,8 +53,8 @@ open class Application : MultiDexApplication() {
     open fun initModules() {
         if (isReleaseWithLogfileVariant()) {
             Timber.plant(FileLoggingTree())
-        } else {
-            Timber.plant()
+        } else if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
         }
 
         val crashlyticsKit = Crashlytics.Builder()
