@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import androidx.work.Worker
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
@@ -21,7 +20,6 @@ class ScheduledSessionsSync : Worker() {
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
     @SuppressLint("WrongThread")
     override fun doWork(): Result {
