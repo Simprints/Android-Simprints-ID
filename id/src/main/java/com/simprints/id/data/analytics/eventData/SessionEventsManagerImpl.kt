@@ -10,6 +10,7 @@ import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.exceptions.safe.session.AttemptedToModifyASessionAlreadyClosed
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
@@ -69,8 +70,13 @@ open class SessionEventsManagerImpl(private val ctx: Context,
 
     override fun updateSession(block: (sessionEvents: SessionEvents) -> Unit, projectId: String): Completable =
         getCurrentSession(projectId).flatMapCompletable {
-            block(it)
-            insertOrUpdateSession(it)
+            if (it.isOpen()) {
+                block(it)
+                activeSession = it
+                insertOrUpdateSession(it)
+            } else {
+                throw AttemptedToModifyASessionAlreadyClosed()
+            }
         }.doOnError {
             Timber.e(it)
             analyticsManager.logThrowable(it)

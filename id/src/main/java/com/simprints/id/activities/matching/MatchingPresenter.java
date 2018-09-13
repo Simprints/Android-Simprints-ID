@@ -75,7 +75,9 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         component.inject(this);
         this.matchingView = matchingView;
         this.probe = probe;
-        sessionEventsManager.getCurrentSession(loginInfoManager.getSignedInProjectIdOrEmpty()).subscribe(new BiConsumer<SessionEvents, Throwable>() {
+        sessionEventsManager
+            .getCurrentSession(loginInfoManager.getSignedInProjectIdOrEmpty())
+            .subscribe(new BiConsumer<SessionEvents, Throwable>() {
             @Override
             public void accept(SessionEvents sessionEvents, Throwable throwable) throws Exception {
                 if (sessionEvents != null && throwable == null) {
