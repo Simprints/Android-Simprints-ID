@@ -60,7 +60,10 @@ class LoginPresenter(val view: LoginContract.View,
     private fun areMandatoryCredentialsPresent(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String) =
         possibleProjectId.isNotEmpty() && possibleProjectSecret.isNotEmpty() && possibleUserId.isNotEmpty()
 
-    private fun doAuthenticate(suppliedProjectId: String, suppliedUserId: String, suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
+    private fun doAuthenticate(suppliedProjectId: String,
+                               suppliedUserId: String,
+                               suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
+
         loginInfoManager.cleanCredentials()
         startTimeLogin = timeHelper.now()
         projectAuthenticator.authenticate(
@@ -73,20 +76,23 @@ class LoginPresenter(val view: LoginContract.View,
             .trace("doAuthenticate")
             .subscribeBy(
                 onComplete = {
-                    handleSignInSuccess()
+                    handleSignInSuccess(suppliedProjectId, suppliedUserId)
                 },
-                onError = {
-                    e ->
-                    handleSignInError(e)
+                onError = { e ->
+                    handleSignInError(e, suppliedProjectId, suppliedUserId)
                 })
     }
 
-    private fun handleSignInSuccess() {
-        addAuthenticatedEventAndUpdateProjectIdIfRequired(AUTHENTICATED)
+    private fun handleSignInSuccess(suppliedProjectId: String,
+                                    suppliedUserId: String) {
+        addAuthenticatedEventAndUpdateProjectIdIfRequired(AUTHENTICATED, suppliedProjectId, suppliedUserId)
         view.handleSignInSuccess()
     }
 
-    private fun addAuthenticatedEventAndUpdateProjectIdIfRequired(result: AuthenticationEvent.Result) {
+    private fun addAuthenticatedEventAndUpdateProjectIdIfRequired(result: AuthenticationEvent.Result,
+                                                                  suppliedProjectId: String,
+                                                                  suppliedUserId: String) {
+
         sessionEventsManager.updateSessionInBackground({
             if (result == AUTHENTICATED) {
                 it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
@@ -95,12 +101,14 @@ class LoginPresenter(val view: LoginContract.View,
             it.events.add(AuthenticationEvent(
                 it.timeRelativeToStartTime(startTimeLogin),
                 it.timeRelativeToStartTime(timeHelper.now()),
-                LoginInfo(preferencesManager.projectId, preferencesManager.userId),
+                LoginInfo(suppliedProjectId, suppliedUserId),
                 result))
         })
     }
 
-    private fun handleSignInError(e: Throwable) {
+    private fun handleSignInError(e: Throwable,
+                                  suppliedProjectId: String,
+                                  suppliedUserId: String) {
         logSignInError(e)
         var reason = TECHNICAL_FAILURE
         when (e) {
@@ -112,7 +120,7 @@ class LoginPresenter(val view: LoginContract.View,
             else -> view.handleSignInFailedUnknownReason().also { reason = TECHNICAL_FAILURE }
         }
 
-        addAuthenticatedEventAndUpdateProjectIdIfRequired(reason)
+        addAuthenticatedEventAndUpdateProjectIdIfRequired(reason, suppliedProjectId, suppliedUserId)
     }
 
     private fun logSignInError(e: Throwable) {
