@@ -35,6 +35,7 @@ class SyncClient(context: Context)
     }
 
     private fun startSyncAndObserve(syncParameters: SyncTaskParameters) {
+        Timber.d("startSyncAndObserve()")
         startService()
         connectAnd {
             execute(syncParameters)

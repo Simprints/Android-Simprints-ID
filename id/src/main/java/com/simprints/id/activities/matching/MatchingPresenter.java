@@ -23,7 +23,6 @@ import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.FormatResult;
-import com.simprints.id.tools.Log;
 import com.simprints.id.tools.TimeHelper;
 import com.simprints.libcommon.Person;
 import com.simprints.libmatcher.EVENT;
@@ -42,6 +41,7 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import io.reactivex.functions.BiConsumer;
+import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
@@ -152,7 +152,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         return new DataCallback() {
             @Override
             public void onSuccess(boolean isDataFromRemote) {
-                Log.INSTANCE.d(MatchingPresenter.this, String.format(Locale.UK,
+                Timber.d( String.format(Locale.UK,
                     "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
@@ -207,7 +207,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         return new DataCallback() {
             @Override
             public void onSuccess(boolean isDataFromRemote) {
-                Log.INSTANCE.d(MatchingPresenter.this, "Successfully loaded candidate");
+                Timber.d( "Successfully loaded candidate");
 
                 int matcherType = preferencesManager.getMatcherType();
 

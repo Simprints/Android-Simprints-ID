@@ -25,13 +25,13 @@ import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.AppState
-import com.simprints.id.tools.Log
 import com.simprints.id.tools.PositionTracker
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.ScannerCallback
+import timber.log.Timber
 import javax.inject.Inject
 
 class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
@@ -119,7 +119,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         }
 
         override fun onProgress(progress: Int, detailsId: Int) {
-            Log.d(this@LaunchPresenter, "onProgress")
+            Timber.d( "onProgress")
             view.handleSetupProgress(progress, detailsId)
         }
 

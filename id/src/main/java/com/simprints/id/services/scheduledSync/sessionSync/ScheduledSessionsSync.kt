@@ -8,7 +8,6 @@ import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
-import com.simprints.id.tools.Log
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
@@ -27,7 +26,7 @@ class ScheduledSessionsSync : Worker() {
         val result = LinkedBlockingQueue<Result>()
 
         if (applicationContext is Application) {
-            Log.d(this@ScheduledSessionsSync, "ScheduledSessionsSync - doWork")
+            Timber.d("ScheduledSessionsSync - doWork")
             (applicationContext as Application).component.inject(this)
             uploadSessions(result)
         }
@@ -40,8 +39,13 @@ class ScheduledSessionsSync : Worker() {
 
         if (signedInProjectId.isNotEmpty()) {
             sessionEventsManager.syncSessions(signedInProjectId).subscribeBy(onComplete = {
+                Timber.d("ScheduledSessionsSync - onComplete")
+
                 result.put(Result.SUCCESS)
             }, onError = {
+                Timber.d("ScheduledSessionsSync - onError")
+                Timber.d(it)
+
                 handleError(it, result)
             })
         }

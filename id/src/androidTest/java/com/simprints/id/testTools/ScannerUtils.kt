@@ -1,7 +1,6 @@
 package com.simprints.id.testTools
 
 import com.simprints.id.tools.AppState
-import com.simprints.id.tools.Log
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.Scanner
 import com.simprints.libscanner.ScannerCallback
