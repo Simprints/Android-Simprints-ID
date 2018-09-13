@@ -19,6 +19,7 @@ open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginF
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_login)
+
         val component = (application as Application).component
         component.inject(this)
 

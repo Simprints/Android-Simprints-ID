@@ -1,12 +1,12 @@
 package com.simprints.id
 
-
 import android.support.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.*
+import com.simprints.id.tools.FileLoggingTree
 import io.fabric.sdk.android.Fabric
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
@@ -51,7 +51,9 @@ open class Application : MultiDexApplication() {
     }
 
     open fun initModules() {
-        if (BuildConfig.DEBUG) {
+        if (isReleaseWithLogfileVariant()) {
+            Timber.plant(FileLoggingTree())
+        } else if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
 
@@ -64,6 +66,8 @@ open class Application : MultiDexApplication() {
 
         handleUndeliverableExceptionInRxJava()
     }
+
+    private fun isReleaseWithLogfileVariant(): Boolean = BuildConfig.BUILD_TYPE == "releaseWithLogfile"
 
     // RxJava doesn't allow not handled exceptions, when that happens the app crashes.
     // https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#error-handling

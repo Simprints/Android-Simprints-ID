@@ -7,6 +7,8 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 
+import com.simprints.id.BuildConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,9 +38,9 @@ public class PermissionManager {
 
     public static void requestAllPermissions(@NonNull Activity activity, String callingPackage) {
         ActivityCompat.requestPermissions(
-                activity,
-                requiredPermissions(callingPackage).toArray(new String[0]),
-                InternalConstants.ALL_PERMISSIONS_REQUEST
+            activity,
+            requiredPermissions(callingPackage).toArray(new String[0]),
+            InternalConstants.ALL_PERMISSIONS_REQUEST
         );
     }
 }
