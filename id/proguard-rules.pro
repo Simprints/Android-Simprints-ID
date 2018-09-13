@@ -55,7 +55,10 @@
 -keep class com.simprints.id.data.db.sync.models.** { *; }
 -keep class com.simprints.id.data.analytics.eventData.models.** { *; }
 -keep class com.simprints.id.data.analytics.eventData.realm.** { *; }
-
+-keep class com.simprints.id.tools.utils.SimNetworkUtils$Connection { *; }
+-keep class com.simprints.id.session.callout.** { *; }
+-keepclassmembers enum * { *; }
+gi
 # For Realm
 -keepnames public class * extends io.realm.RealmObject
 
