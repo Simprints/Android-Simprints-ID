@@ -10,6 +10,7 @@ import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.exceptions.safe.session.AttemptedToModifyASessionAlreadyClosed
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
@@ -23,6 +24,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import retrofit2.adapter.rxjava2.Result
+import timber.log.Timber
 
 // Class to manage the current activeSession
 open class SessionEventsManagerImpl(private val ctx: Context,
@@ -68,14 +70,22 @@ open class SessionEventsManagerImpl(private val ctx: Context,
 
     override fun updateSession(block: (sessionEvents: SessionEvents) -> Unit, projectId: String): Completable =
         getCurrentSession(projectId).flatMapCompletable {
-            block(it)
-            insertOrUpdateSession(it)
+            if (it.isOpen()) {
+                block(it)
+                activeSession = it
+                insertOrUpdateSession(it)
+            } else {
+                throw AttemptedToModifyASessionAlreadyClosed()
+            }
         }.doOnError {
+            Timber.e(it)
             analyticsManager.logThrowable(it)
         }.onErrorComplete() // because events are low priority, it swallows the exception
 
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit, projectId: String) {
-        updateSession(block, projectId).subscribeBy(onError = { it.printStackTrace() })
+        updateSession(block, projectId).subscribeBy(onError = {
+            it.printStackTrace()
+        })
     }
 
     private fun closeLastSessionsIfPending(): Completable =
