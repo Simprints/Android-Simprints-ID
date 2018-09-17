@@ -28,7 +28,7 @@ open class SimApiClient<T>(val service: Class<T>,
     }
 
     val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        val logger = HttpLoggingInterceptor()
+        val logger = HttpLoggingInterceptor(TimberLogger())
         logger.level = HttpLoggingInterceptor.Level.HEADERS
         OkHttpClient.Builder()
             .followRedirects(false)

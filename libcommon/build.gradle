@@ -20,6 +20,9 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        releaseWithLogfile {
+            initWith release
+        }
         endToEndTesting {
             initWith debug
             testCoverageEnabled false
