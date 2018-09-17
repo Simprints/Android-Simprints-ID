@@ -5,6 +5,7 @@ import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.Scanner
 import com.simprints.libscanner.ScannerCallback
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
+import timber.log.Timber
 
 object ScannerUtils {
 
@@ -16,16 +17,16 @@ object ScannerUtils {
             override fun onSuccess() {
                 appState.scanner.un20Wakeup(object : ScannerCallback {
                     override fun onSuccess() {
-                        Log.d("Test", "Scanner success un20Wakeup")
+                        Timber.d("Test", "Scanner success un20Wakeup")
                     }
                     override fun onFailure(error: SCANNER_ERROR?) {
-                        Log.d("Test", "Scanner onFailure: $error")
+                        Timber.d("Test", "Scanner onFailure: $error")
                     }
                 })
             }
 
             override fun onFailure(error: SCANNER_ERROR?) {
-                Log.d("Test", "Scanner onFailure: $error")
+                Timber.d("Test", "Scanner onFailure: $error")
             }
         })
     }
