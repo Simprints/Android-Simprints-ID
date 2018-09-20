@@ -14,7 +14,6 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
-import java.io.IOException
 
 interface RemoteDbManager {
 
@@ -43,16 +42,4 @@ interface RemoteDbManager {
 
     fun getFirebaseLegacyApp(): FirebaseApp
     fun getCurrentFirestoreToken(): Single<String>
-
-    // API
-    /**
-     * Following methods can throw:
-     * [IOException] - when the network cuts out
-     * [SimprintsInternalServerException] - when receiving a 5xx HTTP response
-     */
-
-    /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
-
-    //Sessions
-    fun getSessionsApiClient(): Single<SessionsRemoteInterface>
 }

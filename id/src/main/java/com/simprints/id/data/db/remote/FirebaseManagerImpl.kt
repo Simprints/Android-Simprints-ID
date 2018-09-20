@@ -6,7 +6,6 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
@@ -14,7 +13,6 @@ import com.simprints.id.data.db.remote.tools.Routes
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
-import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.session.Session
@@ -169,14 +167,6 @@ open class FirebaseManagerImpl(private val appContext: Context,
             }
             .addOnFailureListener { e -> it.onError(e) }
     }
-
-    override fun getSessionsApiClient(): Single<SessionsRemoteInterface> =
-        getCurrentFirestoreToken()
-            .flatMap {
-                Single.just(buildSessionsApi(it))
-            }
-
-    private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(SessionsRemoteInterface::class.java, SessionsRemoteInterface.baseUrl, authToken).api
 
     companion object {
         const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
