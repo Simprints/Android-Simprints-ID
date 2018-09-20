@@ -58,18 +58,20 @@ interface RemoteDbManager {
      */
 
     /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
-    fun downloadPerson(patientId: String, projectId: String): Single<fb_Person>
 
+    //People
+    fun downloadPerson(patientId: String, projectId: String): Single<fb_Person>
     fun uploadPerson(fbPerson: fb_Person): Completable
     fun uploadPeople(projectId: String, patientsToUpload: ArrayList<fb_Person>): Completable
-
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
+    fun getPeopleApiClient(): Single<PeopleRemoteInterface>
 
+    //Project
     fun loadProjectFromRemote(projectId: String): Single<Project>
     fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JsonElement>
-
-    fun getPeopleApiClient(): Single<PeopleRemoteInterface>
-    fun getSessionsApiClient(): Single<SessionsRemoteInterface>
-
     fun getProjectApiClient(): Single<ProjectRemoteInterface>
+
+
+    //Sessions
+    fun getSessionsApiClient(): Single<SessionsRemoteInterface>
 }

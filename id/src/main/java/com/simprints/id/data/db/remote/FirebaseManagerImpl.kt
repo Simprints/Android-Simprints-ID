@@ -266,7 +266,7 @@ open class FirebaseManagerImpl(private val appContext: Context,
         }
 
     companion object {
-        private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
+        const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
 
         fun getLegacyAppName(): String =
             FirebaseApp.DEFAULT_APP_NAME
