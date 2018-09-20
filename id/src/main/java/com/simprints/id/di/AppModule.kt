@@ -25,6 +25,8 @@ import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.people.RemotePeopleManagerImpl
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManagerImpl
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManagerImpl
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
@@ -198,9 +200,9 @@ open class AppModule(val app: Application) {
                                          sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                          preferencesManager: PreferencesManager,
                                          timeHelper: TimeHelper,
-                                         remoteDbManager: RemoteDbManager,
+                                         sessionEventsManager: RemoteSessionsManager,
                                          analyticsManager: AnalyticsManager): SessionEventsManager =
-        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, remoteDbManager, analyticsManager)
+        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, sessionEventsManager, analyticsManager)
 
     @Provides
     open fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
@@ -217,4 +219,8 @@ open class AppModule(val app: Application) {
     @Provides
     @Singleton
     open fun provideRemoteProjectManager(remoteDbManager: RemoteDbManager): RemoteProjectManager = RemoteProjectManagerImpl(remoteDbManager)
+
+    @Provides
+    @Singleton
+    open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
 }

@@ -7,7 +7,7 @@ import com.simprints.id.data.analytics.eventData.models.events.*
 import com.simprints.id.data.analytics.eventData.models.session.Device
 import com.simprints.id.data.analytics.eventData.models.session.Location
 import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.session.AttemptedToModifyASessionAlreadyClosed
@@ -32,7 +32,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                                     override val loginInfoManager: LoginInfoManager,
                                     private val preferencesManager: PreferencesManager,
                                     private val timeHelper: TimeHelper,
-                                    private val remoteDbManager: RemoteDbManager,
+                                    private val remoteSessionsManager: RemoteSessionsManager,
                                     private val analyticsManager: AnalyticsManager) : SessionEventsManager {
 
     companion object {
@@ -149,7 +149,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
     private fun uploadClosedSessionsIfAny(sessions: ArrayList<SessionEvents>, projectId: String): Single<Result<Void?>> =
         sessions.filter { it.isClosed() }.toTypedArray().let { sessionsArray ->
             if (sessionsArray.isNotEmpty()) {
-                remoteDbManager.getSessionsApiClient().flatMap {
+                remoteSessionsManager.getSessionsApiClient().flatMap {
                     it.uploadSessions(projectId, hashMapOf("sessions" to sessionsArray))
                 }
             } else {
