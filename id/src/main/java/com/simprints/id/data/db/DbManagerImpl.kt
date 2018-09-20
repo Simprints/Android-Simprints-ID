@@ -11,6 +11,8 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.project.RemoteProjectManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -43,6 +45,7 @@ class DbManagerImpl(override val local: LocalDbManager,
                     private val preferencesManager: PreferencesManager,
                     private val sessionEventsManager: SessionEventsManager,
                     override val remotePeopleManager: RemotePeopleManager,
+                    override val remoteProjectManager: RemoteProjectManager,
                     private val timeHelper: TimeHelper) : DbManager {
 
     override fun initialiseDb() {
@@ -148,7 +151,7 @@ class DbManagerImpl(override val local: LocalDbManager,
             }
 
     override fun refreshProjectInfoWithServer(projectId: String): Single<Project> =
-        remote.loadProjectFromRemote(projectId).flatMap {
+        remoteProjectManager.loadProjectFromRemote(projectId).flatMap {
             local.saveProjectIntoLocal(it)
                 .andThen(Single.just(it))
         }.trace("refreshProjectInfoWithServer")

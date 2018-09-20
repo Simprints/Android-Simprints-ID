@@ -5,28 +5,19 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
-import com.google.gson.JsonElement
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
-import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
 import com.simprints.id.data.db.remote.tools.Routes
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.domain.Project
-import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.id.tools.extensions.handleResponse
-import com.simprints.id.tools.extensions.handleResult
 import com.simprints.id.tools.extensions.toMap
 import com.simprints.id.tools.extensions.trace
 import com.simprints.libcommon.Person
@@ -36,9 +27,7 @@ import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.jetbrains.anko.doAsync
-import retrofit2.HttpException
 import timber.log.Timber
-import java.io.IOException
 
 open class FirebaseManagerImpl(private val appContext: Context,
                           private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
@@ -181,49 +170,13 @@ open class FirebaseManagerImpl(private val appContext: Context,
             .addOnFailureListener { e -> it.onError(e) }
     }
 
-    override fun loadProjectFromRemote(projectId: String): Single<Project> =
-        getProjectApiClient().flatMap {
-            it.requestProject(projectId)
-                .retry(::retryCriteria)
-                .handleResponse(::defaultResponseErrorHandling)
-        }
-
-    override fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JsonElement> =
-        getProjectApiClient().flatMap {
-            it.requestProjectConfig(projectId)
-                .retry(::retryCriteria)
-                .handleResponse(::defaultResponseErrorHandling)
-        }
-
     override fun getSessionsApiClient(): Single<SessionsRemoteInterface> =
         getCurrentFirestoreToken()
             .flatMap {
                 Single.just(buildSessionsApi(it))
             }
 
-    private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api
     private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(SessionsRemoteInterface::class.java, SessionsRemoteInterface.baseUrl, authToken).api
-
-    override fun getProjectApiClient(): Single<ProjectRemoteInterface> =
-        getCurrentFirestoreToken()
-            .flatMap {
-                Single.just(buildProjectApi(it))
-            }
-
-    private fun buildProjectApi(authToken: String): ProjectRemoteInterface = SimApiClient(ProjectRemoteInterface::class.java, ProjectRemoteInterface.baseUrl, authToken).api
-
-    private fun retryCriteria(attempts: Int, error: Throwable): Boolean =
-        attempts < RETRY_ATTEMPTS_FOR_NETWORK_CALLS && errorIsWorthRetrying(error)
-
-    private fun errorIsWorthRetrying(error: Throwable): Boolean =
-        error is IOException ||
-            error is HttpException && error.code() != 404 && error.code() !in 500..599
-
-    private fun defaultResponseErrorHandling(e: HttpException): Nothing =
-        when (e.code()) {
-            in 500..599 -> throw SimprintsInternalServerException()
-            else -> throw e
-        }
 
     companion object {
         const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
