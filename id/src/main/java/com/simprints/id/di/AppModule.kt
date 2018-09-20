@@ -23,6 +23,8 @@ import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.people.RemotePeopleManagerImpl
+import com.simprints.id.data.db.remote.project.RemoteProjectManager
+import com.simprints.id.data.db.remote.project.RemoteProjectManagerImpl
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
@@ -84,8 +86,9 @@ open class AppModule(val app: Application) {
                               preferencesManager: PreferencesManager,
                               sessionEventsManager: SessionEventsManager,
                               remotePeopleManager: RemotePeopleManager,
+                              remoteProjectManager: RemoteProjectManager,
                               timeHelper: TimeHelper): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, timeHelper)
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper)
 
     @Provides
     @Singleton
@@ -209,5 +212,9 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun providePeopleDbManager(remoteDbManager: RemoteDbManager): RemotePeopleManager = RemotePeopleManagerImpl(remoteDbManager)
+    open fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): RemotePeopleManager = RemotePeopleManagerImpl(remoteDbManager)
+
+    @Provides
+    @Singleton
+    open fun provideRemoteProjectManager(remoteDbManager: RemoteDbManager): RemoteProjectManager = RemoteProjectManagerImpl(remoteDbManager)
 }

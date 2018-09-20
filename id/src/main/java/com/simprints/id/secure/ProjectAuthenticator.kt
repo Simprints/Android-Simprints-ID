@@ -108,7 +108,7 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<JsonElement> =
         andThen(
-            dbManager.remote.loadProjectRemoteConfigSettingsJsonString(projectId)
+            dbManager.remoteProjectManager.loadProjectRemoteConfigSettingsJsonString(projectId)
         )
 
     private fun Single<out JsonElement>.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(): Single<Array<String>> =

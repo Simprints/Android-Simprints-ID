@@ -5,6 +5,8 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.project.RemoteProjectManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Tokens
@@ -24,6 +26,7 @@ interface DbManager {
     val local: LocalDbManager
     val remote: RemoteDbManager
     val remotePeopleManager: RemotePeopleManager
+    val remoteProjectManager: RemoteProjectManager
 
     // Lifecycle
     fun initialiseDb()
