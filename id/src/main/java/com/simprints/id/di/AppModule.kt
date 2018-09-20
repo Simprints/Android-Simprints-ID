@@ -21,6 +21,8 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManagerImpl
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
@@ -81,8 +83,9 @@ open class AppModule(val app: Application) {
                               loginInfoManager: LoginInfoManager,
                               preferencesManager: PreferencesManager,
                               sessionEventsManager: SessionEventsManager,
+                              remotePeopleManager: RemotePeopleManager,
                               timeHelper: TimeHelper): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper)
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, timeHelper)
 
     @Provides
     @Singleton
@@ -203,4 +206,8 @@ open class AppModule(val app: Application) {
     @Provides
     open fun provideScheduledSessionsSyncManager(): ScheduledSessionsSyncManager =
         ScheduledSessionsSyncManager()
+
+    @Provides
+    @Singleton
+    open fun providePeopleDbManager(remoteDbManager: RemoteDbManager): RemotePeopleManager = RemotePeopleManagerImpl(remoteDbManager)
 }

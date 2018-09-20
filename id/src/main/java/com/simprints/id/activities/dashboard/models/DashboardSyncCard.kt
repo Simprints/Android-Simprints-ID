@@ -4,6 +4,7 @@ import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -29,6 +30,7 @@ class DashboardSyncCard(component: AppComponent,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var remotePeopleManager: RemotePeopleManager
 
     var syncParams by lazyVar {
         SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
@@ -108,7 +110,7 @@ class DashboardSyncCard(component: AppComponent,
     }
 
     private fun updateRemotePeopleCount() {
-        remoteDbManager.getNumberOfPatientsForSyncParams(syncParams)
+        remotePeopleManager.getNumberOfPatientsForSyncParams(syncParams)
             .flatMap {
                 dbManager.calculateNPatientsToDownSync(it, syncParams)
             }

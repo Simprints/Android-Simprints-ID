@@ -6,7 +6,7 @@ import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Completable
 import io.reactivex.Single
 
-interface PeopleDbManager {
+interface RemotePeopleManager {
 
     fun downloadPerson(patientId: String, projectId: String): Single<fb_Person>
     fun uploadPerson(fbPerson: fb_Person): Completable

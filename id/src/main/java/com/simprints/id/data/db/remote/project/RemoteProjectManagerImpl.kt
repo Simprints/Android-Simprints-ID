@@ -12,7 +12,7 @@ import io.reactivex.Single
 import retrofit2.HttpException
 import java.io.IOException
 
-open class ProjectDbManagerImpl(private val remoteDbManager: RemoteDbManager): ProjectDbManager {
+open class RemoteProjectManagerImpl(private val remoteDbManager: RemoteDbManager): RemoteProjectManager {
 
     override fun loadProjectFromRemote(projectId: String): Single<Project> =
         getProjectApiClient().flatMap {

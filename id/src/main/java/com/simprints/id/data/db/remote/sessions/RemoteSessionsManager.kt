@@ -4,7 +4,7 @@ import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
 import io.reactivex.Single
 
 
-interface SessionsDbManager {
+interface RemoteSessionsManager {
 
     fun getSessionsApiClient(): Single<SessionsRemoteInterface>
 }

@@ -181,40 +181,6 @@ open class FirebaseManagerImpl(private val appContext: Context,
             .addOnFailureListener { e -> it.onError(e) }
     }
 
-    // API
-
-    override fun uploadPerson(fbPerson: fb_Person): Completable =
-        uploadPeople(fbPerson.projectId, arrayListOf(fbPerson))
-
-    override fun uploadPeople(projectId: String, patientsToUpload: ArrayList<fb_Person>): Completable =
-        getPeopleApiClient().flatMapCompletable {
-            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload))
-                .retry(::retryCriteria)
-                .handleResult(::defaultResponseErrorHandling)
-        }
-
-    /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
-    override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
-        getPeopleApiClient().flatMap {
-            it.requestPerson(patientId, projectId)
-                .retry(::retryCriteria)
-                .handleResponse {
-                    when (it.code()) {
-                        404 -> throw DownloadingAPersonWhoDoesntExistOnServerException()
-                        in 500..599 -> throw SimprintsInternalServerException()
-                        else -> throw it
-                    }
-                }
-        }
-
-    override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
-        getPeopleApiClient().flatMap {
-            it.requestPeopleCount(syncParams.projectId, syncParams.userId, syncParams.moduleId)
-                .retry(::retryCriteria)
-                .handleResponse(::defaultResponseErrorHandling)
-                .map { it.count }
-        }
-
     override fun loadProjectFromRemote(projectId: String): Single<Project> =
         getProjectApiClient().flatMap {
             it.requestProject(projectId)
@@ -233,12 +199,6 @@ open class FirebaseManagerImpl(private val appContext: Context,
         getCurrentFirestoreToken()
             .flatMap {
                 Single.just(buildSessionsApi(it))
-            }
-
-    override fun getPeopleApiClient(): Single<PeopleRemoteInterface> =
-        getCurrentFirestoreToken()
-            .flatMap {
-                Single.just(buildPeopleApi(it))
             }
 
     private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api
