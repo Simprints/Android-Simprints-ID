@@ -15,10 +15,11 @@ import io.reactivex.Single
 import retrofit2.HttpException
 import java.io.IOException
 
-open class PeopleDbManagerImpl(private val remoteDbManager: RemoteDbManager) : PeopleDbManager {
+
+open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager) : RemotePeopleManager {
 
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
-        remoteDbManager.getPeopleApiClient().flatMap {
+        getPeopleApiClient().flatMap {
             it.requestPerson(patientId, projectId)
                 .retry(::retryCriteria)
                 .handleResponse {

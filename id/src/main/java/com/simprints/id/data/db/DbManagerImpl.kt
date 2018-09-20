@@ -10,6 +10,7 @@ import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -41,6 +42,7 @@ class DbManagerImpl(override val local: LocalDbManager,
                     private val loginInfoManager: LoginInfoManager,
                     private val preferencesManager: PreferencesManager,
                     private val sessionEventsManager: SessionEventsManager,
+                    override val remotePeopleManager: RemotePeopleManager,
                     private val timeHelper: TimeHelper) : DbManager {
 
     override fun initialiseDb() {
@@ -102,9 +104,9 @@ class DbManagerImpl(override val local: LocalDbManager,
             .trace("savePerson")
 
     private fun uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
-        remote
+        remotePeopleManager
             .uploadPerson(fbPerson)
-            .andThen(remote.downloadPerson(fbPerson.patientId, fbPerson.projectId))
+            .andThen(remotePeopleManager.downloadPerson(fbPerson.patientId, fbPerson.projectId))
             .trace("uploadPersonAndDownloadAgain")
 
     private fun Single<out fb_Person>.updatePersonInLocal(): Completable = flatMapCompletable {
@@ -120,7 +122,7 @@ class DbManagerImpl(override val local: LocalDbManager,
             destinationList.add(it)
             callback.onSuccess(false)
         }, onError = { e ->
-            remote.downloadPerson(guid, projectId).subscribeBy(
+            remotePeopleManager.downloadPerson(guid, projectId).subscribeBy(
                 onSuccess = { destinationList.add(rl_Person(it).libPerson); callback.onSuccess(true) },
                 onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
         })
