@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
-import com.simprints.id.controllers.Setup
+import com.simprints.id.controllers.ScannerManager
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -129,10 +129,6 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    fun provideAppState(): AppState = AppState()
-
-    @Provides
-    @Singleton
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
@@ -144,16 +140,8 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    fun provideSetup(preferencesManager: PreferencesManager,
-                     dbManager: DbManager,
-                     loginInfoManager: LoginInfoManager,
-                     analyticsManager: AnalyticsManager,
-                     appState: AppState,
-                     simNetworkUtils: SimNetworkUtils,
-                     bluetoothComponentAdapter: BluetoothComponentAdapter,
-                     sessionEventsManager: SessionEventsManager,
-                     timeHelper: TimeHelper): Setup =
-        Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, simNetworkUtils, bluetoothComponentAdapter, sessionEventsManager, timeHelper)
+    fun provideScannerManager(app: Application): ScannerManager =
+        ScannerManager(app.component)
 
     @Provides
     @Singleton

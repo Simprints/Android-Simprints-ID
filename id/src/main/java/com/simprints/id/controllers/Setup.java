@@ -21,7 +21,7 @@ import com.simprints.id.exceptions.unsafe.NullScannerError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.session.callout.CalloutAction;
-import com.simprints.id.tools.AppState;
+import com.simprints.id.controllers.ScannerManager;
 import com.simprints.id.tools.InternalConstants;
 import com.simprints.id.tools.PermissionManager;
 import com.simprints.id.tools.TimeHelper;
@@ -51,7 +51,7 @@ public class Setup {
                  DbManager dbManager,
                  LoginInfoManager loginInfoManager,
                  AnalyticsManager analyticsManager,
-                 AppState appState,
+                 ScannerManager scannerManager,
                  SimNetworkUtils simNetworkUtils,
                  BluetoothComponentAdapter bluetoothAdapter,
                  SessionEventsManager sessionEventsManager,
@@ -60,7 +60,7 @@ public class Setup {
         this.loginInfoManager = loginInfoManager;
         this.dbManager = dbManager;
         this.preferencesManager = preferencesManager;
-        this.appState = appState;
+        this.scannerManager = scannerManager;
         this.simNetworkUtils = simNetworkUtils;
         this.bluetoothAdapter = bluetoothAdapter;
         this.sessionEventsManager = sessionEventsManager;
@@ -86,7 +86,7 @@ public class Setup {
     private TimeHelper timeHelper;
 
     // Singletons
-    private AppState appState;
+    private ScannerManager scannerManager;
 
     public void stop() {
         paused = true;
@@ -110,13 +110,13 @@ public class Setup {
         }
 
         // Step 2: extractFrom scanner object.
-        if (appState.getScanner() == null) {
+        if (scannerManager.getScanner() == null) {
             this.initScanner(activity);
             return;
         }
 
         // Step 3: connect with scanner. Must be done every time the scanner is not connected
-        if (!appState.getScanner().isConnected()) {
+        if (!scannerManager.getScanner().isConnected()) {
             this.connectToScanner(activity);
             return;
         }
@@ -162,7 +162,7 @@ public class Setup {
 
         Scanner scanner;
         scanner = new Scanner(macAddress, bluetoothAdapter);
-        appState.setScanner(scanner);
+        scannerManager.setScanner(scanner);
 
         preferencesManager.setLastScannerUsed(convertAddressToSerial(macAddress));
 
@@ -174,13 +174,13 @@ public class Setup {
     private void connectToScanner(@NonNull final Activity activity) {
         onProgress(60, R.string.launch_bt_connect);
 
-        appState.getScanner().connect(new ScannerCallback() {
+        scannerManager.getScanner().connect(new ScannerCallback() {
             @Override
             public void onSuccess() {
-                if (appState != null && appState.getScanner() != null) {
+                if (scannerManager != null && scannerManager.getScanner() != null) {
                     Timber.d("Setup: Connected to Vero.");
                     uiResetSinceConnection = false;
-                    preferencesManager.setScannerId(appState.getScanner().getScannerId());
+                    preferencesManager.setScannerId(scannerManager.getScanner().getScannerId());
                     analyticsManager.logScannerProperties();
 
                     sessionEventsManager.addEventForScannerConnectivityInBackground(
@@ -305,7 +305,7 @@ public class Setup {
     private void resetUi(@NonNull final Activity activity) {
         onProgress(80, R.string.launch_setup);
 
-        appState.getScanner().resetUI(new ScannerCallback() {
+        scannerManager.getScanner().resetUI(new ScannerCallback() {
             @Override
             public void onSuccess() {
                 Timber.d("Setup: UI reset.");
@@ -331,12 +331,12 @@ public class Setup {
     private void wakeUpUn20(@NonNull final Activity activity) {
         onProgress(90, R.string.launch_wake_un20);
 
-        appState.getScanner().un20Wakeup(new ScannerCallback() {
+        scannerManager.getScanner().un20Wakeup(new ScannerCallback() {
             @Override
             public void onSuccess() {
-                if (appState != null && appState.getScanner() != null) {
+                if (scannerManager != null && scannerManager.getScanner() != null) {
                     Timber.d("Setup: UN20 ready.");
-                    preferencesManager.setHardwareVersion(appState.getScanner().getUcVersion());
+                    preferencesManager.setHardwareVersion(scannerManager.getScanner().getUcVersion());
                     sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(preferencesManager.getHardwareVersionString());
                     Setup.this.onSuccess();
                 } else {
