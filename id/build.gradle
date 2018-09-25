@@ -345,6 +345,9 @@ dependencies {
     androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4'
     androidTestImplementation 'com.jayway.awaitility:awaitility:1.6.3'
     compile project(path: ':libscanner')
+
+    //Permissions
+    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {

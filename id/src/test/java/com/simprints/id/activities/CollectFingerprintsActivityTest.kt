@@ -12,7 +12,7 @@ package com.simprints.id.activities
 //    @Inject
 //    lateinit var simNetworkUtilsMock: SimNetworkUtils
 //    @Inject
-//    lateinit var appState: AppState
+//    lateinit var scannerManager: ScannerManager
 //
 //    @Inject
 //    lateinit var sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager
@@ -70,12 +70,12 @@ package com.simprints.id.activities
 //            MockFinger.PERSON_1_VERSION_1_LEFT_INDEX_BAD_SCAN,
 //            MockFinger.PERSON_1_VERSION_1_LEFT_INDEX_BAD_SCAN)))
 //
-//        appState.scanner = spy(Scanner("F0:AC:D7:C8:CB:22", mockBluetoothAdapter))
+//        scannerManager.scanner = spy(Scanner("F0:AC:D7:C8:CB:22", mockBluetoothAdapter))
 //
-//        appState.scanner.connect( object : ScannerCallback {
+//        scannerManager.scanner.connect( object : ScannerCallback {
 //            override fun onSuccess() {
 //
-//                appState.scanner.un20Wakeup(object : ScannerCallback {
+//                scannerManager.scanner.un20Wakeup(object : ScannerCallback {
 //                    override fun onFailure(error: SCANNER_ERROR?) {
 //                        Log.d("Test", "Scanner onFailure: $error")
 //                    }
