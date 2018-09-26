@@ -346,8 +346,10 @@ dependencies {
     androidTestImplementation 'com.jayway.awaitility:awaitility:1.6.3'
     compile project(path: ':libscanner')
 
-    //Permissions
+    //Permissions & Locations
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
+    implementation 'pl.charmas.android:android-reactive-location2:2.1@aar'
+
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {
