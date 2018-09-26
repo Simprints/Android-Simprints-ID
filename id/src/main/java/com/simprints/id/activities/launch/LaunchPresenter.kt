@@ -1,7 +1,10 @@
 package com.simprints.id.activities.launch
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -14,17 +17,17 @@ import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Result.*
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.PARENTAL
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.safe.setup.*
 import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
-import com.simprints.id.tools.PositionTracker
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libscanner.ButtonListener
+import com.tbruyelle.rxpermissions2.Permission
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -35,13 +38,14 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     @Inject lateinit var dataManager: DataManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var analyticsManager: AnalyticsManager
-    @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var scannerManager: ScannerManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var sessionEventsManager: SessionEventsManager
 
     private val activity = view as Activity
-    private lateinit var positionTracker: PositionTracker
+
+    private var permissionsAlreadyRequested = false
+
     private var syncSchedulerHelper: SyncSchedulerHelper
 
     // True iff the app is waiting for the user to confirm consent
@@ -70,15 +74,9 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         view.setLanguage(preferencesManager.language)
         view.initTextsInButtons()
         view.initConsentTabs()
-        initPositionTracker()
 
         syncSchedulerHelper.scheduleSyncsAndStartPeopleSyncIfNecessary()
         setTextToConsentTabs()
-    }
-
-    private fun initPositionTracker() {
-        positionTracker = PositionTracker(activity, preferencesManager)
-        positionTracker.start()
     }
 
     private fun startScannerSetup() {
@@ -88,7 +86,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         view.handleSetupProgress(30, R.string.launch_bt_connect)
         scannerManager.scanner?.unregisterButtonListener(scannerButton)
 
-        scannerManager.start()
+        requestPermissionsForLocation().andThen(scannerManager.start())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribeBy(
@@ -118,17 +116,47 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
                 })
     }
 
+    private fun requestPermissionsForLocation(): Completable {
+        val permissionsNeeded = arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        val permissionsToRequest = if (permissionsAlreadyRequested) {
+            0
+        } else {
+            permissionsNeeded.size
+        }
+        val requestForPermissions = view.requestPermissions(arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION))
+
+        return requestForPermissions
+            .take(permissionsToRequest.toLong())
+            .toList()
+            .flatMapCompletable { permissions ->
+                collectLocationIfPermitted(permissions)
+                permissionsAlreadyRequested = true
+                Completable.complete()
+            }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun collectLocationIfPermitted(permissions: List<Permission>) {
+        if (!permissionsAlreadyRequested && permissions.first { it.name == Manifest.permission.ACCESS_FINE_LOCATION }.granted) {
+            val req = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+            view.getLocationProvider()
+                .getUpdatedLocation(req)
+                .firstOrError()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribeBy(onSuccess = {
+                    preferencesManager.location = com.simprints.id.domain.Location.fromAndroidLocation(it)
+                    sessionEventsManager.addLocationToSession(it.latitude, it.longitude)
+                }, onError = { it.printStackTrace() })
+        }
+    }
+
     private fun handleSetupFinished() {
         preferencesManager.msSinceBootOnLoadEnd = timeHelper.now()
-        // If it is the first time the launch process finishes, wait for consent confirmation
-        // Else, go directly to the collectFingerprintsActivity
-        if (waitingForConfirmation) {
-            view.handleSetupFinished()
-            scannerManager.scanner?.registerButtonListener(scannerButton)
-            view.doVibrateIfNecessary(preferencesManager.vibrateMode)
-        } else {
-            confirmConsentAndContinueToNextActivity()
-        }
+        view.handleSetupFinished()
+        scannerManager.scanner?.registerButtonListener(scannerButton)
+        view.doVibrateIfNecessary(preferencesManager.vibrateMode)
     }
 
     private fun setTextToConsentTabs() {
@@ -156,11 +184,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             ParentalConsent()
         }
         return parentalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
-    }
-
-    override fun handleOnRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        positionTracker.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        //setup.onRequestPermissionsResult(activity, requestCode, permissions, grantResults)
     }
 
     override fun handleOnBackPressed() {
@@ -198,12 +221,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         })
     }
 
-    override fun updatePositionTracker(requestCode: Int, resultCode: Int, data: Intent?) {
-        positionTracker.onActivityResult(requestCode, resultCode, data)
-    }
-
     override fun handleOnDestroy() {
-        positionTracker.finish()
         scannerManager.disconnectScannerIfNeeded()
     }
 

@@ -35,7 +35,6 @@ import com.simprints.id.services.GuidSelectionService
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSync
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSync
 import com.simprints.id.services.sync.SyncService
-import com.simprints.id.tools.PositionTracker
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton

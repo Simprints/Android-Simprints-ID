@@ -16,7 +16,11 @@ import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.Vibrate.vibrate
 import com.simprints.id.tools.extensions.launchAlert
+import com.tbruyelle.rxpermissions2.Permission
+import com.tbruyelle.rxpermissions2.RxPermissions
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_launch.*
+import pl.charmas.android.reactivelocation2.ReactiveLocationProvider
 
 class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
@@ -73,9 +77,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            RESOLUTION_REQUEST,
-            GOOGLE_SERVICE_UPDATE_REQUEST ->
-                viewPresenter.updatePositionTracker(requestCode, resultCode, data)
             COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE,
             ALERT_ACTIVITY_REQUEST,
             REFUSAL_ACTIVITY_REQUEST ->
@@ -111,9 +112,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        viewPresenter.handleOnRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
+    override fun requestPermissions(permissions: ArrayList<String>): Observable<Permission> =
+        RxPermissions(this).requestEach(*permissions.toTypedArray())
 
     override fun onBackPressed() {
         viewPresenter.handleOnBackPressed()
@@ -128,6 +128,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         viewPresenter.handleOnDestroy()
         super.onDestroy()
     }
+
+    override fun getLocationProvider(): ReactiveLocationProvider = ReactiveLocationProvider(this)
 
     override fun continueToNextActivity() {
         startActivityForResult(
