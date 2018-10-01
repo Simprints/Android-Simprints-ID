@@ -9,33 +9,47 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.controllers.ScannerManager
-import com.simprints.id.controllers.ScannerManager.SetupStateDone
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.events.CandidateReadEvent
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Result.*
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.PARENTAL
+import com.simprints.id.data.analytics.eventData.models.events.ScannerConnectionEvent
+import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.safe.setup.*
 import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
+import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
+import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.libcommon.Person
 import com.simprints.libscanner.ButtonListener
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
 
     @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
+
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var scannerManager: ScannerManager
@@ -79,44 +93,87 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         setTextToConsentTabs()
     }
 
-    private fun startScannerSetup() {
-        //Permission
-        //Check Person
-
-        view.handleSetupProgress(30, R.string.launch_bt_connect)
-        scannerManager.scanner?.unregisterButtonListener(scannerButton)
-
-        requestPermissionsForLocation().andThen(scannerManager.start())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribeBy(
-                onNext = {
-                    when (it) {
-                        SetupStateDone.DISCONNECT_VERO -> view.handleSetupProgress(15, R.string.launch_bt_connect)
-                        SetupStateDone.INIT_VERO -> view.handleSetupProgress(45, R.string.launch_bt_connect)
-                        SetupStateDone.CONNECTING_TO_VERO -> view.handleSetupProgress(60, R.string.launch_bt_connect)
-                        SetupStateDone.RESET_UI -> view.handleSetupProgress(80, R.string.launch_setup)
-                        SetupStateDone.WAKING_UP_VERO -> view.handleSetupProgress(90, R.string.launch_wake_un20)
-                    }
-                },
-                onComplete = { handleSetupFinished() },
-                onError = {
-                    when (it) {
-                        is BluetoothNotEnabledException -> view.doLaunchAlert(ALERT_TYPE.BLUETOOTH_NOT_ENABLED)
-                        is BluetoothNotSupportedException -> view.doLaunchAlert(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED)
-                        is MultipleScannersPairedException -> view.doLaunchAlert(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS)
-                        is ScannerLowBatteryException -> view.doLaunchAlert(ALERT_TYPE.LOW_BATTERY)
-                        is ScannerNotPairedException -> view.doLaunchAlert(ALERT_TYPE.NOT_PAIRED)
-                        is ScannerUnbondedException -> view.doLaunchAlert(ALERT_TYPE.DISCONNECTED)
-                        is UnknownBluetoothIssueException -> view.doLaunchAlert(ALERT_TYPE.DISCONNECTED)
-                        else -> view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
-                    }
-
-                    analyticsManager.logThrowable(it)
-                })
+    private fun startSetup() {
+        requestPermissionsForLocation(5)
+            .andThen(checkIfVerifyAndGuidExists(15))
+            .andThen(veroTask(30, R.string.launch_bt_connect, scannerManager.disconnectVero()))
+            .andThen(veroTask(45, R.string.launch_bt_connect, scannerManager.initVero()))
+            .andThen(veroTask(60, R.string.launch_bt_connect, scannerManager.connectToVero()) { addBluetoothConnectivityEvent() })
+            .andThen(veroTask(75, R.string.launch_setup, scannerManager.resetVeroUI()))
+            .andThen(veroTask(90, R.string.launch_wake_un20, scannerManager.wakingUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() })
+            .subscribeBy(onError = { it.printStackTrace() }, onComplete = { handleSetupFinished() })
     }
 
-    private fun requestPermissionsForLocation(): Completable {
+    private fun updateBluetoothConnectivityEventWithVeroInfo() {
+        sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(preferencesManager.hardwareVersionString)
+    }
+
+    private fun veroTask(progress: Int, messageRes: Int, task: Completable, callback: (() -> Unit)? = null): Completable =
+        Completable.fromAction { view.handleSetupProgress(progress, messageRes) }
+            .andThen(task)
+            .andThen(Completable.fromAction { callback?.invoke() })
+            .doOnError { manageVeroErrors(it) }
+
+    private fun checkIfVerifyAndGuidExists(progress: Int): Completable =
+        Completable.fromAction { view.handleSetupProgress(progress, R.string.launch_checking_person_in_db) }
+            .andThen(tryToFetchGuid())
+
+    private fun tryToFetchGuid(): Completable {
+        return if (preferencesManager.calloutAction != CalloutAction.VERIFY) {
+            Completable.complete()
+        } else {
+            val guid = preferencesManager.patientId
+            val startCandidateSearchTime = timeHelper.now()
+            localDbManager.loadPersonFromLocal(guid).map { Pair(true, it) }
+                .onErrorResumeNext {
+                    remoteDbManager
+                        .downloadPerson(guid, loginInfoManager.getSignedInProjectIdOrEmpty())
+                        .map { Pair(false, rl_Person(it).libPerson) }
+                }.doOnSuccess {
+                    Timber.d("Setup: GUID found.")
+                    val isPersonFromLocalDb = it.first
+                    saveEventForCandidateReadInBackgroundNotFound(
+                        guid,
+                        startCandidateSearchTime,
+                        if (isPersonFromLocalDb) CandidateReadEvent.LocalResult.NOT_FOUND else CandidateReadEvent.LocalResult.FOUND,
+                        if (isPersonFromLocalDb) CandidateReadEvent.RemoteResult.FOUND else CandidateReadEvent.RemoteResult.NOT_FOUND)
+                }.doOnError {
+                    // For any error, we show the missing guid screen.
+                    saveNotFoundVerification(Person(guid), startCandidateSearchTime)
+                }.ignoreElement()
+        }
+    }
+
+    private fun saveNotFoundVerification(probe: Person, startCandidateSearchTime: Long) {
+        if (simNetworkUtils.isConnected()) {
+            // We've synced with the online dbManager and they're not in the dbManager
+            view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE)
+            saveEventForCandidateReadInBackgroundNotFound(probe.guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND)
+        } else {
+            // We're offline but might find the person if we sync
+            view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE)
+            saveEventForCandidateReadInBackgroundNotFound(probe.guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.OFFLINE)
+        }
+    }
+
+    private fun saveEventForCandidateReadInBackgroundNotFound(guid: String,
+                                                              startCandidateSearchTime: Long,
+                                                              localResult: CandidateReadEvent.LocalResult,
+                                                              remoteResult: CandidateReadEvent.RemoteResult) {
+        sessionEventsManager.addEventForCandidateReadInBackground(
+            guid,
+            startCandidateSearchTime,
+            localResult,
+            remoteResult)
+    }
+
+    private fun manageVeroErrors(it: Throwable) {
+        view.doLaunchAlert(scannerManager.getAlertType(it))
+        analyticsManager.logThrowable(it)
+    }
+
+    private fun requestPermissionsForLocation(progress: Int): Completable {
+        view.handleSetupProgress(0, R.string.launch_checking_permissions)
         val permissionsNeeded = arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
         val permissionsToRequest = if (permissionsAlreadyRequested) {
@@ -124,7 +181,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         } else {
             permissionsNeeded.size
         }
-        val requestForPermissions = view.requestPermissions(arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION))
+        val requestForPermissions = view.requestPermissions(permissionsNeeded)
 
         return requestForPermissions
             .take(permissionsToRequest.toLong())
@@ -241,12 +298,19 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     override fun handleOnResume() {
-        //StopShip
         launchOutOfFocus = false
-        startScannerSetup()
+        startSetup()
     }
 
     override fun handleOnPause() {
         launchOutOfFocus = true
+    }
+
+    private fun addBluetoothConnectivityEvent() {
+        sessionEventsManager.addEventForScannerConnectivityInBackground(
+            ScannerConnectionEvent.ScannerInfo(
+                preferencesManager.scannerId,
+                preferencesManager.macAddress,
+                preferencesManager.hardwareVersionString))
     }
 }

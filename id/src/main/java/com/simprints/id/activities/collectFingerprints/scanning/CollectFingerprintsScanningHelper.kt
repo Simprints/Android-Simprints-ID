@@ -8,10 +8,8 @@ import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
 import com.simprints.id.controllers.ScannerManager
-import com.simprints.id.controllers.SetupCallback
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.Finger.Status.*
 import com.simprints.id.exceptions.unsafe.SimprintsError
@@ -24,6 +22,9 @@ import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.SCANNER_ERROR.*
 import com.simprints.libscanner.ScannerCallback
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -77,38 +78,26 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             dialog.setOnCancelListener { view.cancelAndFinish() }
         }
 
-    private val setupCallback = object : SetupCallback {
-        override fun onSuccess() {
-            Timber.d( "reconnect.onSuccess()")
-            view.un20WakeupDialog.dismiss()
-            scannerManager.scanner?.registerButtonListener(scannerButtonListener)
-        }
-
-        override fun onProgress(progress: Int, detailsId: Int) {
-            Timber.d( "reconnect.onProgress()")
-        }
-
-        override fun onError(resultCode: Int) {
-            Timber.d("reconnect.onError()")
-            view.un20WakeupDialog.dismiss()
-            view.doLaunchAlert(ALERT_TYPE.DISCONNECTED)
-        }
-
-        override fun onAlert(alertType: ALERT_TYPE) {
-            Timber.d( "reconnect.onAlert()")
-            view.un20WakeupDialog.dismiss()
-            view.doLaunchAlert(alertType)
-        }
-    }
-
     fun reconnect() {
         scannerManager.scanner?.unregisterButtonListener(scannerButtonListener)
         (view as Activity).runOnUiThreadIfStillRunning {
             view.un20WakeupDialog.show()
         }
 
-        //StopShip
-        //setup.start(view as CollectFingerprintsActivity, setupCallback)
+        scannerManager.start()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(onComplete = {
+                Timber.d( "reconnect.onSuccess()")
+                view.un20WakeupDialog.dismiss()
+                scannerManager.scanner?.registerButtonListener(scannerButtonListener)
+            }, onError = {
+                it.printStackTrace()
+                Timber.d("reconnect.onError()")
+                view.un20WakeupDialog.dismiss()
+                view.doLaunchAlert(scannerManager.getAlertType(it))
+                analyticsManager.logThrowable(it)
+            })
     }
 
     private fun handleError(scanner_error: SCANNER_ERROR) {
@@ -268,8 +257,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     fun stopReconnecting() {
-        //StopShip
-        //setup.stop()
+        scannerManager.disconnectScannerIfNeeded()
     }
 
     fun setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger() {

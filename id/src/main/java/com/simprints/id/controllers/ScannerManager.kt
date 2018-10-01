@@ -3,10 +3,9 @@ package com.simprints.id.controllers
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.events.ScannerConnectionEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.setup.*
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.Scanner
@@ -15,8 +14,7 @@ import com.simprints.libscanner.ScannerUtils
 import com.simprints.libscanner.ScannerUtils.convertAddressToSerial
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.Completable
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -27,51 +25,33 @@ class ScannerManager(val component: AppComponent) {
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var bluetoothAdapter: BluetoothComponentAdapter
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
-
-    enum class SetupStateDone {
-        DISCONNECT_VERO,
-        INIT_VERO,
-        CONNECTING_TO_VERO,
-        RESET_UI,
-        WAKING_UP_VERO
-    }
 
     init {
         component.inject(this)
     }
 
     @SuppressLint("CheckResult")
-    fun start(): Observable<SetupStateDone> =
-        Observable.create<SetupStateDone> { result ->
-            bluetoothAdapter = AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
+    fun start(): Completable =
+        Completable.fromAction { bluetoothAdapter = AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
+            .andThen(disconnectVero())
+            .andThen(initVero())
+            .andThen(connectToVero())
+            .andThen(resetVeroUI())
+            .andThen(wakingUpVero())
 
-            try {
-                disconnectVero().doOnSuccess { result.onNext(it) }
-                    .flatMap { initVero() }.doOnSuccess { result.onNext(it) }
-                    .flatMap { connectToVero() }.doOnSuccess { result.onNext(it) }
-                    .flatMap { resetUi() }.doOnSuccess { result.onNext(it) }
-                    .flatMap { wakingUpVero() }.doOnSuccess { result.onNext(it) }
-                    .blockingGet()
-
+    fun disconnectVero(): Completable = Completable.create { result ->
+        if (scanner == null) {
+            result.onComplete()
+        } else {
+            scanner?.disconnect(WrapperScannerCallback({
                 result.onComplete()
-            } catch (e: Exception) {
-                result.onError(e)
-            }
-        }
-
-    private fun disconnectVero(): Single<SetupStateDone> = Single.create { result ->
-        scanner?.let {
-
-            it.disconnect(WrapperScannerCallback({
-                result.onSuccess(SetupStateDone.DISCONNECT_VERO)
             }, { _ ->
-                result.onSuccess(SetupStateDone.DISCONNECT_VERO)
+                result.onComplete()
             }))
-        } ?: result.onSuccess(SetupStateDone.DISCONNECT_VERO)
+        }
     }
 
-    private fun initVero(): Single<SetupStateDone> = Single.create {
+    fun initVero() = Completable.create {
         val pairedScanners = ScannerUtils.getPairedScanners(bluetoothAdapter)
         when {
             pairedScanners.size == 0 -> it.onError(ScannerNotPairedException())
@@ -86,89 +66,92 @@ class ScannerManager(val component: AppComponent) {
                 preferencesManager.lastScannerUsed = convertAddressToSerial(macAddress)
 
                 Timber.d("Setup: Scanner initialized.")
-                it.onSuccess(SetupStateDone.INIT_VERO)
+                it.onComplete()
             }
         }
     }
 
-    private fun connectToVero(): Single<SetupStateDone> = Single.create { result ->
-
-        scanner?.let {
-            it.connect(WrapperScannerCallback({
+    fun connectToVero(): Completable = Completable.create { result ->
+        if (scanner == null) {
+            result.onError(Throwable("Unexpected error - Scanner null"))
+        } else {
+            scanner?.connect(WrapperScannerCallback({
                 Timber.d("Setup: Connected to Vero.")
-                preferencesManager.scannerId = it.scannerId ?: ""
+                preferencesManager.scannerId = scanner?.scannerId ?: ""
                 analyticsManager.logScannerProperties()
-
-                addBluetoothConnectivityEvent()
-
-                result.onSuccess(SetupStateDone.CONNECTING_TO_VERO)
+                result.onComplete()
             }, { scannerError ->
-                val issue = when (scannerError) {
-                    SCANNER_ERROR.INVALID_STATE // Already connected, considered as a success
-                    -> {
-                        Timber.d("Setup: Connected to Vero.")
-                        null
-                    }
-                    SCANNER_ERROR.BLUETOOTH_DISABLED -> BluetoothNotEnabledException()
-                    SCANNER_ERROR.BLUETOOTH_NOT_SUPPORTED -> BluetoothNotSupportedException()
-                    SCANNER_ERROR.SCANNER_UNBONDED -> ScannerNotPairedException()
-                    SCANNER_ERROR.BUSY, SCANNER_ERROR.IO_ERROR -> UnknownBluetoothIssueException()
+                scannerError?.let {
+                    val issue = when (scannerError) {
+                        SCANNER_ERROR.BLUETOOTH_DISABLED -> BluetoothNotEnabledException()
+                        SCANNER_ERROR.BLUETOOTH_NOT_SUPPORTED -> BluetoothNotSupportedException()
+                        SCANNER_ERROR.SCANNER_UNBONDED -> ScannerNotPairedException()
+                        SCANNER_ERROR.BUSY, SCANNER_ERROR.IO_ERROR -> UnknownBluetoothIssueException()
 
-                    else -> UnknownBluetoothIssueException()
-                }
-                issue?.let { issue ->
+                        else -> UnknownBluetoothIssueException()
+                    }
                     result.onError(issue)
-                } ?: result.onSuccess(SetupStateDone.CONNECTING_TO_VERO)
-                // If invalid state, we ignore the issue. To double check
-                // StopShip
+                } ?: result.onComplete()
             }))
-        } ?: result.onError(Throwable("Unexpected error - Scanner null"))
+        }
     }
 
-    private fun wakingUpVero(): Single<SetupStateDone> = Single.create { result ->
-        scanner?.let {
-            it.un20Wakeup(WrapperScannerCallback({
+    fun wakingUpVero(): Completable = Completable.create { result ->
+        if (scanner == null) {
+            result.onError(Throwable("Unexpected error - Scanner null"))
+        } else {
+            scanner?.un20Wakeup(WrapperScannerCallback({
                 Timber.d("Setup: UN20 ready.")
                 preferencesManager.hardwareVersion = scanner?.ucVersion ?: -1
-                sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(preferencesManager.hardwareVersionString)
 
-                result.onSuccess(SetupStateDone.WAKING_UP_VERO)
+                result.onComplete()
             }, { scannerError ->
-                val issue = when (scannerError) {
-                    SCANNER_ERROR.BUSY, SCANNER_ERROR.INVALID_STATE -> null
-                    SCANNER_ERROR.UN20_LOW_VOLTAGE -> {
-                        ScannerLowBatteryException()
-                    }
-                    else -> UnknownBluetoothIssueException()
-                }
 
-                issue?.let { issue ->
+                scannerError?.let {
+                    val issue = when (scannerError) {
+                        SCANNER_ERROR.UN20_LOW_VOLTAGE -> {
+                            ScannerLowBatteryException()
+                        }
+                        else -> UnknownBluetoothIssueException()
+                    }
                     result.onError(issue)
-                } ?: result.onSuccess(SetupStateDone.WAKING_UP_VERO)
+                } ?: result.onComplete()
             }
             ))
-        } ?: result.onError(Throwable("Unexpected error - Scanner null"))
+        }
     }
 
     // STEP 5
-    private fun resetUi(): Single<SetupStateDone> = Single.create { result ->
+    fun resetVeroUI(): Completable = Completable.create { result ->
 
-        scanner?.let {
-            it.resetUI(WrapperScannerCallback({
-                Timber.d("Setup: UI reset.")
-                result.onSuccess(SetupStateDone.RESET_UI)
-            }, { scannerError ->
-                val issue = when (scannerError) {
-                    SCANNER_ERROR.BUSY, SCANNER_ERROR.INVALID_STATE -> null
-                    else -> UnknownBluetoothIssueException()
+        if (scanner == null) {
+            result.onError(Throwable("Unexpected error - Scanner null"))
+        } else {
+            scanner?.let {
+                it.resetUI(WrapperScannerCallback({
+                    Timber.d("Setup: UI reset.")
+                    result.onComplete()
+                }, { scannerError ->
+                    scannerError?.let {
+                        result.onError(UnknownBluetoothIssueException(it.details()))
+                    } ?: result.onComplete()
                 }
-
-                issue?.let { issue ->
-                    result.onError(issue)
-                } ?: result.onSuccess(SetupStateDone.RESET_UI)
+                ))
             }
-            ))
-        } ?: result.onError(Throwable("Unexpected error - Scanner null"))
+        }
+    }
+
+    fun getAlertType(it: Throwable): ALERT_TYPE {
+        return when (it) {
+            is BluetoothNotEnabledException -> ALERT_TYPE.BLUETOOTH_NOT_ENABLED
+            is BluetoothNotSupportedException -> ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED
+            is MultipleScannersPairedException -> ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS
+            is ScannerLowBatteryException -> ALERT_TYPE.LOW_BATTERY
+            is ScannerNotPairedException -> ALERT_TYPE.NOT_PAIRED
+            is ScannerUnbondedException -> ALERT_TYPE.DISCONNECTED
+            is UnknownBluetoothIssueException -> ALERT_TYPE.DISCONNECTED
+            else -> ALERT_TYPE.UNEXPECTED_ERROR
+        }
     }
 
     fun disconnectScannerIfNeeded() {
@@ -176,14 +159,6 @@ class ScannerManager(val component: AppComponent) {
             override fun onSuccess() {}
             override fun onFailure(scanner_error: SCANNER_ERROR) {}
         })
-    }
-
-    private fun addBluetoothConnectivityEvent() {
-        sessionEventsManager.addEventForScannerConnectivityInBackground(
-            ScannerConnectionEvent.ScannerInfo(
-                preferencesManager.scannerId,
-                preferencesManager.macAddress,
-                preferencesManager.hardwareVersionString))
     }
 
     class WrapperScannerCallback(val success: () -> Unit, val failure: (scannerError: SCANNER_ERROR?) -> Unit) : ScannerCallback {
