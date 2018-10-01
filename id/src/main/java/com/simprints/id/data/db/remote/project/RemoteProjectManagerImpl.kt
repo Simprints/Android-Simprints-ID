@@ -12,6 +12,7 @@ import io.reactivex.Single
 import retrofit2.HttpException
 import java.io.IOException
 
+
 open class RemoteProjectManagerImpl(private val remoteDbManager: RemoteDbManager): RemoteProjectManager {
 
     override fun loadProjectFromRemote(projectId: String): Single<Project> =
@@ -34,7 +35,8 @@ open class RemoteProjectManagerImpl(private val remoteDbManager: RemoteDbManager
                 Single.just(buildProjectApi(it))
             }
 
-    private fun buildProjectApi(authToken: String): ProjectRemoteInterface = SimApiClient(ProjectRemoteInterface::class.java, ProjectRemoteInterface.baseUrl, authToken).api
+    private fun buildProjectApi(authToken: String): ProjectRemoteInterface =
+        SimApiClient(ProjectRemoteInterface::class.java, ProjectRemoteInterface.baseUrl, authToken).api
 
     private fun retryCriteria(attempts: Int, error: Throwable): Boolean =
         attempts < FirebaseManagerImpl.RETRY_ATTEMPTS_FOR_NETWORK_CALLS && errorIsWorthRetrying(error)
