@@ -9,6 +9,9 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.project.RemoteProjectManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
@@ -36,6 +39,8 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Inject lateinit var dataManager: DataManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var remotePeopleManagerock: RemotePeopleManager
+    @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -58,7 +63,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
         setUserLogInState(true, getRoboSharedPreferences())
 
-        mockLoadProject(localDbManagerMock, remoteDbManagerMock)
+        mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
     }
 
     @Test
@@ -68,7 +73,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         Assert.assertEquals(card?.description, "project desc")
 
         whenever(localDbManagerMock.loadProjectFromLocal(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
-        whenever(remoteDbManagerMock.loadProjectFromRemote(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
+        whenever(remoteProjectManagerMock.loadProjectFromRemote(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
 
         val testObserver = Single.merge(factory.createCards()).test()
         testObserver.awaitTerminalEvent()
@@ -141,7 +146,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
                                                                deleteEvent: () -> Unit,
                                                                cardTitle: String) {
         val event = createEvent()
-        mockNPeopleForSyncRequest(remoteDbManagerMock, 0)
+        mockNPeopleForSyncRequest(remotePeopleManagerock, 0)
 
         var card = getCardIfCreated(
             cardsFactory,
@@ -156,7 +161,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     }
 
     private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCard? {
-        mockNPeopleForSyncRequest(remoteDbManagerMock, 0)
+        mockNPeopleForSyncRequest(remotePeopleManagerock, 0)
         mockNLocalPeople(localDbManagerMock, 0)
         mockGetSyncInfoFor(localDbManagerMock)
 
@@ -172,8 +177,8 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         }
     }
 
-    private fun mockNPeopleForSyncRequest(remoteDbManager: RemoteDbManager, count: Int) {
-        whenever(remoteDbManager.getNumberOfPatientsForSyncParams(anyNotNull())).thenReturn(Single.just(count))
+    private fun mockNPeopleForSyncRequest(remotePeopleManager: RemotePeopleManager, count: Int) {
+        whenever(remotePeopleManager.getNumberOfPatientsForSyncParams(anyNotNull())).thenReturn(Single.just(count))
     }
 
     private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {

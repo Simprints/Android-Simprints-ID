@@ -11,6 +11,9 @@ import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.project.RemoteProjectManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -29,6 +32,9 @@ import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 open class AppModuleForAnyTests(app: Application,
                                 open var localDbManagerRule: DependencyRule = RealRule,
                                 open var remoteDbManagerRule: DependencyRule = RealRule,
+                                open var remotePeopleManagerRule: DependencyRule = RealRule,
+                                open var remoteProjectManagerRule: DependencyRule = RealRule,
+                                open var remoteSessionsManagerRule: DependencyRule = RealRule,
                                 open var dbManagerRule: DependencyRule = RealRule,
                                 open var secureDataManagerRule: DependencyRule = RealRule,
                                 open var dataManagerRule: DependencyRule = RealRule,
@@ -68,8 +74,10 @@ open class AppModuleForAnyTests(app: Application,
                                   loginInfoManager: LoginInfoManager,
                                   preferencesManager: PreferencesManager,
                                   sessionEventsManager: SessionEventsManager,
+                                  remotePeopleManager: RemotePeopleManager,
+                                  remoteProjectManager: RemoteProjectManager,
                                   timeHelper: TimeHelper): DbManager =
-        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper) }
+        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,
@@ -102,10 +110,10 @@ open class AppModuleForAnyTests(app: Application,
                                              sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                              preferencesManager: PreferencesManager,
                                              timeHelper: TimeHelper,
-                                             remoteDbManager: RemoteDbManager,
+                                             sessionEventsManager: RemoteSessionsManager,
                                              analyticsManager: AnalyticsManager): SessionEventsManager =
 
-        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, loginInfoManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, remoteDbManager, analyticsManager) }
+        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, loginInfoManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, sessionEventsManager, analyticsManager) }
 
     override fun provideSessionEventsLocalDbManager(ctx: Context,
                                             secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
@@ -116,4 +124,13 @@ open class AppModuleForAnyTests(app: Application,
 
     override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, analyticsManager: AnalyticsManager): LongConsentManager =
         longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, analyticsManager) }
+
+    override fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): RemotePeopleManager =
+        dataManagerRule.resolveDependency { super.provideRemotePeopleManager(remoteDbManager) }
+
+    override fun provideRemoteProjectManager(remoteDbManager: RemoteDbManager): RemoteProjectManager =
+        dataManagerRule.resolveDependency { super.provideRemoteProjectManager(remoteDbManager) }
+
+    override fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager =
+        dataManagerRule.resolveDependency { super.provideRemoteSessionsManager(remoteDbManager) }
 }

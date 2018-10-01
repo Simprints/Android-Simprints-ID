@@ -9,6 +9,7 @@ import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.domain.Project
@@ -24,13 +25,13 @@ import org.mockito.stubbing.Answer
 const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
 const val SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY = "SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY"
 
-fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteDbManagerMock: RemoteDbManager) {
+fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteProjectManagerMock: RemoteProjectManager) {
     val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }
     val projectSettings = JsonObject().apply { addProperty("key", "value") }
     whenever(localDbManagerMock.loadProjectFromLocal(anyNotNull())).thenReturn(Single.just(project))
-    whenever(remoteDbManagerMock.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(project))
+    whenever(remoteProjectManagerMock.loadProjectFromRemote(anyNotNull())).thenReturn(Single.just(project))
     whenever(localDbManagerMock.saveProjectIntoLocal(anyNotNull())).thenReturn(Completable.complete())
-    whenever(remoteDbManagerMock.loadProjectRemoteConfigSettingsJsonString(anyNotNull())).thenReturn(Single.just(projectSettings))
+    whenever(remoteProjectManagerMock.loadProjectRemoteConfigSettingsJsonString(anyNotNull())).thenReturn(Single.just(projectSettings))
 }
 
 fun initLogInStateMock(sharedPrefs: SharedPreferences,
