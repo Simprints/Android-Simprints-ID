@@ -71,7 +71,6 @@ interface AppComponent {
     fun inject(dashboardPresenter: DashboardPresenter)
     fun inject(alertPresenter: AlertPresenter)
     fun inject(launchPresenter: LaunchPresenter)
-    fun inject(positionTracker: PositionTracker)
     fun inject(scheduledPeopleSync: ScheduledPeopleSync)
     fun inject(scheduledSessionsSync: ScheduledSessionsSync)
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)

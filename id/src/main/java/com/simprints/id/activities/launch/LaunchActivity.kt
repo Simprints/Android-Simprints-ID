@@ -64,6 +64,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     }
 
     override fun handleSetupProgress(progress: Int, detailsId: Int) {
+        loadingInfoTextView.visibility = View.VISIBLE
         launchProgressBar.progress = progress
         loadingInfoTextView.setText(detailsId)
     }
@@ -135,7 +136,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         startActivityForResult(
             Intent(this@LaunchActivity, CollectFingerprintsActivity::class.java),
             COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE)
-        launchLayout.visibility = View.INVISIBLE
     }
 
     override fun goToRefusalActivity() {
