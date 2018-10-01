@@ -6,6 +6,8 @@ import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.project.RemoteProjectManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
@@ -40,6 +42,8 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
 
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
+    @Inject lateinit var remoteSessionsManagerMock: RemoteSessionsManager
     @Inject lateinit var loginInfoManagerMock: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var longConsentManager: LongConsentManager
@@ -64,9 +68,9 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
 
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
 
-        mockLoadProject(localDbManagerMock, remoteDbManagerMock)
+        mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
         mockLoginInfoManager(loginInfoManagerMock)
-        whenever(remoteDbManagerMock.getSessionsApiClient()).thenReturn(Single.create { it.onError(IllegalStateException()) })
+        whenever(remoteSessionsManagerMock.getSessionsApiClient()).thenReturn(Single.create { it.onError(IllegalStateException()) })
         whenever(longConsentManager.downloadAllLongConsents(anyNotNull())).thenReturn(Completable.complete())
 
         apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)

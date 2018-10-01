@@ -1,6 +1,7 @@
 package com.simprints.id.shared
 
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.network.NetworkConstants
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.SecureApiInterface
@@ -12,17 +13,22 @@ import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 import java.util.concurrent.TimeUnit
 
-fun replaceRemoteDbManagerApiClientsWithFailingClients(remoteDbManagerSpy: RemoteDbManager) {
-    createFailingApiClientForRemoteDbManager(remoteDbManagerSpy) { getPeopleApiClient() }
-    createFailingApiClientForRemoteDbManager(remoteDbManagerSpy) { getSessionsApiClient() }
-    createFailingApiClientForRemoteDbManager(remoteDbManagerSpy) { getSessionsApiClient() }
+fun replaceRemoteDbManagerApiClientsWithFailingClients(remotePeopleManagerSpy: RemotePeopleManager, remoteSessionsManagerSpy: RemoteSessionsManager) {
+    createFailingApiClientForRemotePeopleManager(remotePeopleManagerSpy) { getPeopleApiClient() }
+    createFailingApiClientForRemoteSessionsManager(remoteSessionsManagerSpy) { getSessionsApiClient() }
+    createFailingApiClientForRemoteSessionsManager(remoteSessionsManagerSpy) { getSessionsApiClient() }
 }
 
 fun replaceSecureApiClientWithFailingClientProvider() = createFailingApiClient<SecureApiInterface>()
 
-inline fun <reified T> createFailingApiClientForRemoteDbManager(remoteDbManagerSpy: RemoteDbManager, getClient: RemoteDbManager.() -> Single<T>) {
+inline fun <reified T> createFailingApiClientForRemotePeopleManager(remotePeopleManagerSpy: RemotePeopleManager, getClient: RemotePeopleManager.() -> Single<T>) {
     val poorNetworkClientMock: T = createFailingApiClient()
-    whenever(remoteDbManagerSpy.getClient()).thenReturn(Single.just(poorNetworkClientMock))
+    whenever(remotePeopleManagerSpy.getClient()).thenReturn(Single.just(poorNetworkClientMock))
+}
+
+inline fun <reified T> createFailingApiClientForRemoteSessionsManager(remoteSessionsManagerSpy: RemoteSessionsManager, getClient: RemoteSessionsManager.() -> Single<T>) {
+    val poorNetworkClientMock: T = createFailingApiClient()
+    whenever(remoteSessionsManagerSpy.getClient()).thenReturn(Single.just(poorNetworkClientMock))
 }
 
 inline fun <reified T> createFailingApiClient(): T {
