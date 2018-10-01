@@ -55,7 +55,8 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
                 Single.just(buildPeopleApi(it))
             }
 
-    private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api
+    private fun buildPeopleApi(authToken: String): PeopleRemoteInterface =
+        SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api
 
     private fun retryCriteria(attempts: Int, error: Throwable): Boolean =
         attempts < FirebaseManagerImpl.RETRY_ATTEMPTS_FOR_NETWORK_CALLS && errorIsWorthRetrying(error)

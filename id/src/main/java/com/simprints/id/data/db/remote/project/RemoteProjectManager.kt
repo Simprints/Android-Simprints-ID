@@ -5,6 +5,7 @@ import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
 import com.simprints.id.domain.Project
 import io.reactivex.Single
 
+
 interface RemoteProjectManager {
 
     fun loadProjectFromRemote(projectId: String): Single<Project>

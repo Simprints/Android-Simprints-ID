@@ -5,6 +5,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.network.SimApiClient
 import io.reactivex.Single
 
+
 open class RemoteSessionsManagerImpl(private val remoteDbManager: RemoteDbManager) : RemoteSessionsManager {
 
     override fun getSessionsApiClient(): Single<SessionsRemoteInterface> =
@@ -12,5 +13,6 @@ open class RemoteSessionsManagerImpl(private val remoteDbManager: RemoteDbManage
             Single.just(buildSessionsApi(it))
         }
 
-    private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(SessionsRemoteInterface::class.java, SessionsRemoteInterface.baseUrl, authToken).api
+    private fun buildSessionsApi(authToken: String): SessionsRemoteInterface =
+        SimApiClient(SessionsRemoteInterface::class.java, SessionsRemoteInterface.baseUrl, authToken).api
 }
