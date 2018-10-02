@@ -84,7 +84,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
 
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit, projectId: String) {
         updateSession(block, projectId).subscribeBy(onError = {
-            it.printStackTrace()
+            //it.printStackTrace()
         })
     }
 

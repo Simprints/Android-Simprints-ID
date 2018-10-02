@@ -12,10 +12,10 @@ object ScannerUtils {
     fun setupScannerForCollectingFingerprints(bluetoothAdapter: BluetoothComponentAdapter, scannerManager: ScannerManager) {
         scannerManager.scanner = Scanner("F0:AC:D7:C8:CB:22", bluetoothAdapter)
 
-        scannerManager.scanner.connect( object : ScannerCallback {
+        scannerManager.scanner?.connect( object : ScannerCallback {
 
             override fun onSuccess() {
-                scannerManager.scanner.un20Wakeup(object : ScannerCallback {
+                scannerManager.scanner?.un20Wakeup(object : ScannerCallback {
                     override fun onSuccess() {
                         Timber.d("Test", "Scanner success un20Wakeup")
                     }

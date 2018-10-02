@@ -138,6 +138,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
                         if (isPersonFromLocalDb) CandidateReadEvent.LocalResult.NOT_FOUND else CandidateReadEvent.LocalResult.FOUND,
                         if (isPersonFromLocalDb) CandidateReadEvent.RemoteResult.FOUND else CandidateReadEvent.RemoteResult.NOT_FOUND)
                 }.doOnError {
+                    it.printStackTrace()
                     // For any error, we show the missing guid screen.
                     saveNotFoundVerification(Person(guid), startCandidateSearchTime)
                 }.ignoreElement()
@@ -168,12 +169,13 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun manageVeroErrors(it: Throwable) {
+        it.printStackTrace()
         view.doLaunchAlert(scannerManager.getAlertType(it))
         analyticsManager.logThrowable(it)
     }
 
     private fun requestPermissionsForLocation(progress: Int): Completable {
-        view.handleSetupProgress(0, R.string.launch_checking_permissions)
+        view.handleSetupProgress(progress, R.string.launch_checking_permissions)
         val permissionsNeeded = arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
         val permissionsToRequest = if (permissionsAlreadyRequested) {

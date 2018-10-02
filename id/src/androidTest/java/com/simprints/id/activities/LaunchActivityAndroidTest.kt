@@ -1,0 +1,235 @@
+package com.simprints.id.activities
+
+import android.content.Intent
+import android.support.test.InstrumentationRegistry
+import android.support.test.espresso.Espresso
+import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.assertion.ViewAssertions
+import android.support.test.espresso.matcher.ViewMatchers
+import android.support.test.espresso.matcher.ViewMatchers.withId
+import android.support.test.espresso.matcher.ViewMatchers.withText
+import android.support.test.filters.LargeTest
+import android.support.test.rule.ActivityTestRule
+import android.support.test.rule.GrantPermissionRule
+import android.support.test.runner.AndroidJUnit4
+import android.support.v4.content.ContextCompat
+import android.util.Base64
+import com.nhaarman.mockito_kotlin.doReturn
+import com.simprints.id.Application
+import com.simprints.id.R
+import com.simprints.id.activities.launch.LaunchActivity
+import com.simprints.id.controllers.ScannerManager
+import com.simprints.id.controllers.ScannerManagerImpl
+import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.db.local.realm.PeopleRealmConfig
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.di.AppModuleForAndroidTests
+import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.exceptions.safe.setup.*
+import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.shared.DependencyRule
+import com.simprints.id.shared.PreferencesModuleForAnyTests
+import com.simprints.id.shared.mockSettingsPreferencesManager
+import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
+import com.simprints.id.testTemplates.FirstUseLocal
+import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.tools.RandomGenerator
+import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.libscanner.Scanner
+import com.simprints.mockscanner.MockBluetoothAdapter
+import com.simprints.mockscanner.MockScannerManager
+import io.reactivex.Completable
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import org.hamcrest.Matchers.*
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.util.regex.Pattern.matches
+import javax.inject.Inject
+
+
+@RunWith(AndroidJUnit4::class)
+@LargeTest
+class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
+
+    private val calloutCredentials = CalloutCredentials(
+        "bWOFHInKA2YaQwrxZ7uJ",
+        "the_one_and_only_module",
+        "the_lone_user",
+        "d95bacc0-7acb-4ff0-98b3-ae6ecbf7398f")
+
+    private val realmKey = Base64.decode("Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ==", Base64.NO_WRAP)
+    private val localDbKey = LocalDbKey(
+        calloutCredentials.projectId,
+        realmKey,
+        calloutCredentials.legacyApiKey)
+
+    override var peopleRealmConfiguration: RealmConfiguration? = null
+
+    @Rule
+    @JvmField
+    open var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+
+    @Rule
+    @JvmField
+    val launcActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
+
+    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
+        PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
+    }
+
+    override var module by lazyVar {
+        AppModuleForAndroidTests(app,
+            randomGeneratorRule = DependencyRule.MockRule,
+            bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter },
+            scannerManagerRule = DependencyRule.SpyRule)
+    }
+
+    private var mockBluetoothAdapter: MockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
+    @Inject lateinit var randomGeneratorMock: RandomGenerator
+    @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var scannerManagerSpy: ScannerManager
+
+    @Before
+    override fun setUp() {
+        app = InstrumentationRegistry.getTargetContext().applicationContext as Application
+        super<DaggerForAndroidTests>.setUp()
+        testAppComponent.inject(this)
+
+        setupRandomGeneratorToGenerateKey(realmKey, randomGeneratorMock)
+
+        app.initDependencies()
+
+        Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
+        peopleRealmConfiguration = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        super<FirstUseLocal>.setUp()
+
+        preferencesManager.calloutAction = CalloutAction.REGISTER
+    }
+
+    @Test
+    fun notScannerFromInitVeroStep_shouldShouldAnErrorAlert() {
+        mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
+        doReturn(Completable.error(ScannerNotPairedException())).`when`(scannerManagerSpy).initVero()
+        launcActivityRule.launchActivity(Intent())
+        Thread.sleep(1000)
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.NOT_PAIRED.alertTitleId)))
+
+    }
+
+    @Test
+    fun multiScannersPairedFromInitVeroStep_shouldShouldAnErrorAlert() {
+        mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
+        doReturn(Completable.error(MultipleScannersPairedException())).`when`(scannerManagerSpy).initVero()
+        launcActivityRule.launchActivity(Intent())
+        Thread.sleep(1000)
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS.alertTitleId)))
+    }
+
+    @Test
+    fun bluetoothOffFromConnectVeroStep_shouldShouldAnErrorAlert() {
+        mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
+        makeInitVeroStepSucceeding()
+
+        doReturn(Completable.error(BluetoothNotEnabledException())).`when`(scannerManagerSpy).connectToVero()
+        launcActivityRule.launchActivity(Intent())
+        Thread.sleep(1000)
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.BLUETOOTH_NOT_ENABLED.alertTitleId)))
+    }
+
+    @Test
+    fun bluetoothNotSupportedFromConnectVeroStep_shouldShouldAnErrorAlert() {
+        mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
+        makeInitVeroStepSucceeding()
+
+        doReturn(Completable.error(BluetoothNotEnabledException())).`when`(scannerManagerSpy).connectToVero()
+        launcActivityRule.launchActivity(Intent())
+        Thread.sleep(1000)
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED.alertTitleId)))
+    }
+
+    @Test
+    fun bluetoothNotPairedFromConnectVeroStep_shouldShouldAnErrorAlert() {
+        mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
+        makeInitVeroStepSucceeding()
+
+        doReturn(Completable.error(ScannerNotPairedException())).`when`(scannerManagerSpy).connectToVero()
+        launcActivityRule.launchActivity(Intent())
+        Thread.sleep(1000)
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.NOT_PAIRED.alertTitleId)))
+    }
+
+    @Test
+    fun unknownBluetoothIssueFromConnectVeroStep_shouldShouldAnErrorAlert() {
+        mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
+        makeInitVeroStepSucceeding()
+
+        doReturn(Completable.error(UnknownBluetoothIssueException())).`when`(scannerManagerSpy).connectToVero()
+        launcActivityRule.launchActivity(Intent())
+        Thread.sleep(1000)
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.DISCONNECTED.alertTitleId)))
+    }
+
+
+    @Test
+    fun unknownBluetoothIssueFromResetUIVeroStep_shouldShouldAnErrorAlert() {
+        mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
+        makeInitVeroStepSucceeding()
+        makeConnectToVeroStepSucceeding()
+
+        doReturn(Completable.error(UnknownBluetoothIssueException())).`when`(scannerManagerSpy).resetVeroUI()
+        launcActivityRule.launchActivity(Intent())
+        Thread.sleep(1000)
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.DISCONNECTED.alertTitleId)))
+    }
+
+    @Test
+    fun lowBatteryFromWakingUpVeroStep_shouldShouldAnErrorAlert() {
+        mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
+        makeInitVeroStepSucceeding()
+        makeConnectToVeroStepSucceeding()
+        makeResetVeroUISucceeding()
+
+        doReturn(Completable.error(ScannerLowBatteryException())).`when`(scannerManagerSpy).wakingUpVero()
+        launcActivityRule.launchActivity(Intent())
+        Thread.sleep(1000)
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.LOW_BATTERY.alertTitleId)))
+    }
+
+
+    @Test
+    fun unknownBluetoothIssueFromWakingUpVeroStep_shouldShouldAnErrorAlert() {
+        mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
+        makeInitVeroStepSucceeding()
+        makeConnectToVeroStepSucceeding()
+        makeResetVeroUISucceeding()
+
+        doReturn(Completable.error(UnknownBluetoothIssueException())).`when`(scannerManagerSpy).wakingUpVero()
+        launcActivityRule.launchActivity(Intent())
+        Thread.sleep(1000)
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.DISCONNECTED.alertTitleId)))
+    }
+
+    fun makeResetVeroUISucceeding() {
+        doReturn(Completable.complete()).`when`(scannerManagerSpy).resetVeroUI()
+    }
+
+    fun makeConnectToVeroStepSucceeding() {
+        doReturn(Completable.complete()).`when`(scannerManagerSpy).connectToVero()
+    }
+
+    fun makeInitVeroStepSucceeding() {
+        doReturn(Completable.complete()).`when`(scannerManagerSpy).initVero()
+        scannerManagerSpy.scanner = Scanner(MAC_ADDRESS, MockBluetoothAdapter(MockScannerManager()))
+    }
+
+    companion object {
+        private const val MAC_ADDRESS = "F0:AC:D7:C8:CB:22"
+        private const val REMOTE_CONSENT_GENERAL_OPTIONS = "{\"consent_enrol_only\":false,\"consent_enrol\":true,\"consent_id_verify\":true,\"consent_share_data_no\":true,\"consent_share_data_yes\":false,\"consent_collect_yes\":false,\"consent_privacy_rights\":true,\"consent_confirmation\":true}"
+    }
+}
