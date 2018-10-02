@@ -7,7 +7,7 @@ import android.os.Build
 import android.telephony.TelephonyManager
 import com.simprints.id.tools.utils.SimNetworkUtils.Connection
 
-class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
+open class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
 
     private val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val tm = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager

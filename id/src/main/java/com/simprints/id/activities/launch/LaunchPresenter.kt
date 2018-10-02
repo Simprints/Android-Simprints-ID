@@ -18,15 +18,13 @@ import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Resu
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.data.analytics.eventData.models.events.ScannerConnectionEvent
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
-import com.simprints.id.exceptions.safe.setup.*
 import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
@@ -45,8 +43,8 @@ import javax.inject.Inject
 class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
 
     @Inject lateinit var dataManager: DataManager
-    @Inject lateinit var localDbManager: LocalDbManager
-    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var dbManager: DbManager
+
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
 
@@ -124,28 +122,27 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         } else {
             val guid = preferencesManager.patientId
             val startCandidateSearchTime = timeHelper.now()
-            localDbManager.loadPersonFromLocal(guid).map { Pair(true, it) }
-                .onErrorResumeNext {
-                    remoteDbManager
-                        .downloadPerson(guid, loginInfoManager.getSignedInProjectIdOrEmpty())
-                        .map { Pair(false, rl_Person(it).libPerson) }
-                }.doOnSuccess {
-                    Timber.d("Setup: GUID found.")
-                    val isPersonFromLocalDb = it.first
-                    saveEventForCandidateReadInBackgroundNotFound(
-                        guid,
-                        startCandidateSearchTime,
-                        if (isPersonFromLocalDb) CandidateReadEvent.LocalResult.NOT_FOUND else CandidateReadEvent.LocalResult.FOUND,
-                        if (isPersonFromLocalDb) CandidateReadEvent.RemoteResult.FOUND else CandidateReadEvent.RemoteResult.NOT_FOUND)
-                }.doOnError {
-                    it.printStackTrace()
-                    // For any error, we show the missing guid screen.
-                    saveNotFoundVerification(Person(guid), startCandidateSearchTime)
-                }.ignoreElement()
+            dbManager.loadPerson(loginInfoManager.getSignedInProjectIdOrEmpty(), guid).doOnSuccess {
+                handleGuidFound(it, guid, startCandidateSearchTime)
+            }.doOnError {
+                it.printStackTrace()
+                // For any error, we show the missing guid screen.
+                saveNotFoundVerificationAndShowAlert(Person(guid), startCandidateSearchTime)
+            }.ignoreElement()
         }
     }
 
-    private fun saveNotFoundVerification(probe: Person, startCandidateSearchTime: Long) {
+    private fun handleGuidFound(result: PersonFetchResult, guid: String, startCandidateSearchTime: Long) {
+        Timber.d("Setup: GUID found.")
+        val isPersonFromLocalDb = !result.fetchedOnline
+        saveEventForCandidateReadInBackgroundNotFound(
+            guid,
+            startCandidateSearchTime,
+            if (isPersonFromLocalDb) CandidateReadEvent.LocalResult.NOT_FOUND else CandidateReadEvent.LocalResult.FOUND,
+            if (isPersonFromLocalDb) CandidateReadEvent.RemoteResult.FOUND else CandidateReadEvent.RemoteResult.NOT_FOUND)
+    }
+
+    private fun saveNotFoundVerificationAndShowAlert(probe: Person, startCandidateSearchTime: Long) {
         if (simNetworkUtils.isConnected()) {
             // We've synced with the online dbManager and they're not in the dbManager
             view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE)
