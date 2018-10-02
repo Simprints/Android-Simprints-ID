@@ -189,10 +189,12 @@ open class SessionEventsManagerImpl(private val ctx: Context,
 
     override fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo) {
         updateSessionInBackground({
-            it.events.add(ScannerConnectionEvent(
-                it.nowRelativeToStartTime(timeHelper),
-                scannerInfo
-            ))
+            if (it.events.filterIsInstance(ScannerConnectionEvent::class.java).isEmpty()) {
+                it.events.add(ScannerConnectionEvent(
+                    it.nowRelativeToStartTime(timeHelper),
+                    scannerInfo
+                ))
+            }
         })
     }
 

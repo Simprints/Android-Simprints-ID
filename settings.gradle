@@ -1,1 +1,1 @@
-include ':id', ':libcommon', ':libsimprints', ':libscanner'
+include ':id', ':libcommon', ':libsimprints'
