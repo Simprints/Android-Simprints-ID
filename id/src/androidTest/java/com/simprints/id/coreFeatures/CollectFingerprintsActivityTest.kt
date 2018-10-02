@@ -76,7 +76,7 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter })
     }
 
-    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
+    private var mockBluetoothAdapter: MockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
     @Inject lateinit var randomGeneratorMock: RandomGenerator
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var preferencesManager: PreferencesManager

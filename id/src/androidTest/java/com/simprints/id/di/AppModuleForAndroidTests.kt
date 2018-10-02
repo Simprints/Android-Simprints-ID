@@ -21,7 +21,8 @@ open class AppModuleForAndroidTests(app: Application,
                                     override var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
                                     override var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
                                     override var simNetworkUtilsRule: DependencyRule = RealRule,
-                                    override var secureApiInterfaceRule: DependencyRule = RealRule) : AppModuleForAnyTests(
+                                    override var secureApiInterfaceRule: DependencyRule = RealRule,
+                                    override var scannerManagerRule: DependencyRule = RealRule) : AppModuleForAnyTests(
     app,
     localDbManagerRule = localDbManagerRule,
     remoteDbManagerRule = remoteDbManagerRule,
@@ -38,5 +39,6 @@ open class AppModuleForAndroidTests(app: Application,
     scheduledPeopleSyncManagerRule = scheduledPeopleSyncManagerRule,
     scheduledSessionsSyncManagerRule = scheduledSessionsSyncManagerRule,
     simNetworkUtilsRule = simNetworkUtilsRule,
-    secureApiInterfaceRule = secureApiInterfaceRule
+    secureApiInterfaceRule = secureApiInterfaceRule,
+    scannerManagerRule = scannerManagerRule
 )
