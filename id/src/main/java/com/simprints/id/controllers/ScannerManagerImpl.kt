@@ -20,7 +20,7 @@ import io.reactivex.Completable
 import timber.log.Timber
 import javax.inject.Inject
 
-class ScannerManagerImpl(val preferencesManager: PreferencesManager,
+open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
                          val analyticsManager: AnalyticsManager,
                          val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
 
