@@ -5,7 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/Android-Simprints-ID.iml" filepath="$PROJECT_DIR$/Android-Simprints-ID.iml" />
       <module fileurl="file://$PROJECT_DIR$/id/id.iml" filepath="$PROJECT_DIR$/id/id.iml" />
       <module fileurl="file://$PROJECT_DIR$/libcommon/libcommon.iml" filepath="$PROJECT_DIR$/libcommon/libcommon.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libscanner/libscanner.iml" filepath="$PROJECT_DIR$/libscanner/libscanner.iml" />
       <module fileurl="file://$PROJECT_DIR$/libsimprints/libsimprints.iml" filepath="$PROJECT_DIR$/libsimprints/libsimprints.iml" />
     </modules>
   </component>

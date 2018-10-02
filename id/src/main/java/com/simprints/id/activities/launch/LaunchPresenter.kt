@@ -194,7 +194,8 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     @SuppressLint("MissingPermission")
     private fun collectLocationIfPermitted(permissions: List<Permission>) {
-        if (!permissionsAlreadyRequested && permissions.first { it.name == Manifest.permission.ACCESS_FINE_LOCATION }.granted) {
+        if (!permissionsAlreadyRequested &&
+            permissions.first { it.name == Manifest.permission.ACCESS_FINE_LOCATION }.granted) {
             val req = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
             view.getLocationProvider()
                 .getUpdatedLocation(req)
