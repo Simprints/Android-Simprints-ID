@@ -68,6 +68,8 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
         AppModuleForAndroidTests(app,
             randomGeneratorRule = MockRule,
             remoteDbManagerRule = SpyRule,
+            remotePeopleManagerRule = SpyRule,
+            remoteSessionsManagerRule =  SpyRule,
             secureApiInterfaceRule = ReplaceRule { replaceSecureApiClientWithFailingClientProvider() })
     }
 
@@ -77,7 +79,7 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
         setupRandomGeneratorToGenerateKey(realmKey, randomGeneratorMock)
-        replaceRemoteDbManagerApiClientsWithFailingClients(remoteDbManagerSpy)
+        replaceRemoteDbManagerApiClientsWithFailingClients(remotePeopleManagerSpy, remoteSessionsManagerSpy)
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
         peopleRealmConfiguration = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
