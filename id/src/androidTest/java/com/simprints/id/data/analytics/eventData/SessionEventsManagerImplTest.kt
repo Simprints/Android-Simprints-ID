@@ -21,6 +21,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
@@ -75,6 +76,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var timeHelper: TimeHelper
 
@@ -87,6 +89,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             app,
             localDbManagerRule = DependencyRule.SpyRule,
             remoteDbManagerRule = DependencyRule.SpyRule,
+            remoteSessionsManagerRule = DependencyRule.SpyRule,
             sessionEventsManagerRule = DependencyRule.SpyRule,
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter }
         )
@@ -163,7 +166,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             anyNotNull(),
             anyNotNull())).thenReturn(Single.just(Result.response(buildSuccessfulUploadSessionResponse())))
 
-        whenever(remoteDbManager.getSessionsApiClient()).thenReturn(Single.just(mockSessionsApi))
+        whenever(remoteSessionsManager.getSessionsApiClient()).thenReturn(Single.just(mockSessionsApi))
 
         sessionEventsManagerSpy.syncSessions(testProjectId).test().also {
             it.awaitTerminalEvent()
