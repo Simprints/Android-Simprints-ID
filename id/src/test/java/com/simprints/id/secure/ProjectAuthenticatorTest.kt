@@ -53,6 +53,7 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
             app,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
+            remoteProjectManagerRule = MockRule,
             loginInfoManagerRule = MockRule,
             scheduledPeopleSyncManagerRule = MockRule,
             longConsentManagerRule = MockRule

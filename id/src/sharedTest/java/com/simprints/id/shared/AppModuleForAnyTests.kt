@@ -126,11 +126,11 @@ open class AppModuleForAnyTests(app: Application,
         longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, analyticsManager) }
 
     override fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): RemotePeopleManager =
-        dataManagerRule.resolveDependency { super.provideRemotePeopleManager(remoteDbManager) }
+        remotePeopleManagerRule.resolveDependency { super.provideRemotePeopleManager(remoteDbManager) }
 
     override fun provideRemoteProjectManager(remoteDbManager: RemoteDbManager): RemoteProjectManager =
-        dataManagerRule.resolveDependency { super.provideRemoteProjectManager(remoteDbManager) }
+        remoteProjectManagerRule.resolveDependency { super.provideRemoteProjectManager(remoteDbManager) }
 
     override fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager =
-        dataManagerRule.resolveDependency { super.provideRemoteSessionsManager(remoteDbManager) }
+        remoteSessionsManagerRule.resolveDependency { super.provideRemoteSessionsManager(remoteDbManager) }
 }
