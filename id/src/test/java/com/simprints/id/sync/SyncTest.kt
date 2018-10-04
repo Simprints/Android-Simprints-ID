@@ -67,7 +67,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
     @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
-    @Inject lateinit var remotePeojectManagerSpy: RemoteProjectManager
+    @Inject lateinit var remoteProjectManagerSpy: RemoteProjectManager
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
@@ -77,6 +77,8 @@ class SyncTest : RxJavaTest, DaggerForTests() {
     override var module by lazyVar {
         AppModuleForTests(app,
             remoteDbManagerRule = SpyRule,
+            remotePeopleManagerRule = SpyRule,
+            remoteProjectManagerRule = SpyRule,
             localDbManagerRule = MockRule)
     }
 
@@ -107,7 +109,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 25, PeopleRemoteInterface::class.java))
         whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManagerSpy, remotePeojectManagerSpy, timeHelper), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManagerSpy, remoteProjectManagerSpy, timeHelper), JsonHelper.gson)
 
         val testObserver = sync.uploadNewPatients({ false }, syncParams, 10).test()
         testObserver.awaitTerminalEvent()
@@ -136,7 +138,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 25, PeopleRemoteInterface::class.java))
         whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManagerSpy, remotePeojectManagerSpy, timeHelper), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManagerSpy, remoteProjectManagerSpy, timeHelper), JsonHelper.gson)
 
         val count = AtomicInteger(0)
         val testObserver = sync.uploadNewPatients({ count.addAndGet(1) > 2 }, syncParams, 10).test()
@@ -295,7 +297,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         // Mock when trying to save the syncInfo
         whenever(localDbMock.updateSyncInfo(anyNotNull())).thenReturn(Completable.complete())
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManagerSpy, remotePeojectManagerSpy, timeHelper), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManagerSpy, remoteProjectManagerSpy, timeHelper), JsonHelper.gson)
 
         return sync.downloadNewPatients({ false }, syncParams).test()
     }

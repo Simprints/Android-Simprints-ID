@@ -39,7 +39,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Inject lateinit var dataManager: DataManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
-    @Inject lateinit var remotePeopleManagerock: RemotePeopleManager
+    @Inject lateinit var remotePeopleManagerMock: RemotePeopleManager
     @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var preferencesManager: PreferencesManager
@@ -49,6 +49,8 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     override var module by lazyVar {
         AppModuleForTests(app,
             remoteDbManagerRule = MockRule,
+            remotePeopleManagerRule = MockRule,
+            remoteProjectManagerRule = MockRule,
             localDbManagerRule = MockRule)
     }
 
@@ -146,7 +148,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
                                                                deleteEvent: () -> Unit,
                                                                cardTitle: String) {
         val event = createEvent()
-        mockNPeopleForSyncRequest(remotePeopleManagerock, 0)
+        mockNPeopleForSyncRequest(remotePeopleManagerMock, 0)
 
         var card = getCardIfCreated(
             cardsFactory,
@@ -161,7 +163,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     }
 
     private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCard? {
-        mockNPeopleForSyncRequest(remotePeopleManagerock, 0)
+        mockNPeopleForSyncRequest(remotePeopleManagerMock, 0)
         mockNLocalPeople(localDbManagerMock, 0)
         mockGetSyncInfoFor(localDbManagerMock)
 

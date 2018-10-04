@@ -59,6 +59,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
             app,
             localDbManagerRule = ReplaceRule { spy(LocalDbManager::class.java) },
             remoteDbManagerRule = SpyRule,
+            remotePeopleManagerRule = SpyRule,
             sessionEventsLocalDbManagerRule = MockRule
         )
     }
