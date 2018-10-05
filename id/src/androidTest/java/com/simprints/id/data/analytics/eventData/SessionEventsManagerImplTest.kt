@@ -149,6 +149,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         Assert.assertFalse(jsonObject.getJSONObject("device").has("id"))
         Assert.assertFalse(jsonObject.getJSONObject("databaseInfo").has("id"))
         Assert.assertFalse(jsonObject.getJSONObject("location").has("id"))
+        Assert.assertFalse(jsonObject.has("projectId"))
     }
 
     @Test

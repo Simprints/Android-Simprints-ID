@@ -4,7 +4,7 @@ import com.simprints.id.data.analytics.eventData.models.events.ArtificialTermina
 import com.simprints.id.data.analytics.eventData.models.events.Event
 import com.simprints.id.data.analytics.eventData.realm.RlSession
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.json.SkipSerialisationProperty
+import com.simprints.id.tools.json.SkipSerialisationField
 import java.util.*
 
 open class SessionEvents {
@@ -17,7 +17,7 @@ open class SessionEvents {
 
     val id: String
 
-    @SkipSerialisationProperty
+    @SkipSerialisationField
     var projectId: String
 
     var appVersionName: String
