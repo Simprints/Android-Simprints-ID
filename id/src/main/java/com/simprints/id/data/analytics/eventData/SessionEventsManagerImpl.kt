@@ -173,7 +173,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                 session.timeRelativeToStartTime(startTimeVerification),
                 session.nowRelativeToStartTime(timeHelper),
                 preferencesManager.patientId,
-                match?.let { MatchCandidate(it.guid, match.confidence) }))
+                match?.let { MatchEntry(it.guid, match.confidence) }))
         })
     }
 
@@ -183,7 +183,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                 session.timeRelativeToStartTime(startTimeIdentification),
                 session.nowRelativeToStartTime(timeHelper),
                 OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
-                matches.map { MatchCandidate(it.guid, it.confidence) }.toList().toTypedArray()))
+                matches.map { MatchEntry(it.guid, it.confidence) }.toList().toTypedArray()))
         })
     }
 
