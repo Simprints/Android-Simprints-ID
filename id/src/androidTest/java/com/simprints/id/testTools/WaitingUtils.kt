@@ -49,18 +49,3 @@ private fun changeUiTimeoutPolicyIfNeeded(timeout: Long) {
     if (currentTimeoutMillis <= timeout)
         setMasterPolicyTimeout(timeout * 2, TimeUnit.MILLISECONDS)
 }
-
-
-fun withProgressBarValue(expectedValue: Int): Matcher<View> {
-    return object : BoundedMatcher<View, ProgressBar>(ProgressBar::class.java) {
-
-        override fun describeTo(description: Description) {
-            description.appendText("Checking the matcher on received view: ")
-            description.appendText("with progressBarValue=$expectedValue")
-        }
-
-        override fun matchesSafely(progressBar: ProgressBar): Boolean {
-            return progressBar.progress == 0
-        }
-    }
-}
