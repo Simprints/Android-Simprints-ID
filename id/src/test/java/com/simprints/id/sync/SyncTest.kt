@@ -2,6 +2,7 @@ package com.simprints.id.sync
 
 import com.google.firebase.FirebaseApp
 import com.google.gson.stream.JsonReader
+import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
@@ -51,6 +52,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -105,9 +107,9 @@ class SyncTest : RxJavaTest, DaggerForTests() {
 
         whenever(localDbManager.loadPeopleFromLocalRx(toSync = true)).thenReturn(Flowable.fromIterable(patientsToUpload))
         whenever(localDbManager.getPeopleCountFromLocal(toSync = true)).thenReturn(Single.just(patientsToUpload.count()))
-
+        
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 25, PeopleRemoteInterface::class.java))
-        whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
+        doReturn(Single.just(poorNetworkClientMock)).`when`(remotePeopleManagerSpy).getPeopleApiClient()
 
         val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManagerSpy, remoteProjectManagerSpy, timeHelper), JsonHelper.gson)
 
@@ -136,7 +138,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         whenever(localDbManager.getPeopleCountFromLocal(toSync = true)).thenReturn(Single.just(peopleToUpload.count()))
 
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 25, PeopleRemoteInterface::class.java))
-        whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
+        doReturn(Single.just(poorNetworkClientMock)).`when`(remotePeopleManagerSpy).getPeopleApiClient()
 
         val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManagerSpy, remoteProjectManagerSpy, timeHelper), JsonHelper.gson)
 
