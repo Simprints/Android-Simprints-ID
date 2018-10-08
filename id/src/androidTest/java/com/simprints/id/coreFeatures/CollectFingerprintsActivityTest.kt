@@ -114,7 +114,7 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
 
-        waitForSplashScreenAppearsAndDisappears().also { Thread.sleep(2000) }
+        waitForSplashScreenAppearsAndDisappears()
 
         Assert.assertEquals(3, viewPager?.adapter?.count)
         Assert.assertEquals(1, viewPager?.currentItem)
@@ -138,7 +138,7 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
 
-        waitForSplashScreenAppearsAndDisappears().also { Thread.sleep(2000) }
+        waitForSplashScreenAppearsAndDisappears()
 
         Assert.assertEquals(4, viewPager?.adapter?.count)
         Assert.assertEquals(1, viewPager?.currentItem)
@@ -175,7 +175,7 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
 
         skipFinger()
 
-        waitForSplashScreenAppearsAndDisappears().also { Thread.sleep(2000) }
+        waitForSplashScreenAppearsAndDisappears()
 
         Assert.assertEquals(3, viewPager?.adapter?.count)
         Assert.assertEquals(1, viewPager?.currentItem)
@@ -192,7 +192,7 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
 
         skipFinger()
 
-        waitForSplashScreenAppearsAndDisappears().also { Thread.sleep(2000) }
+        waitForSplashScreenAppearsAndDisappears()
         Assert.assertEquals(4, viewPager?.adapter?.count)
         Assert.assertEquals(1, viewPager?.currentItem)
     }

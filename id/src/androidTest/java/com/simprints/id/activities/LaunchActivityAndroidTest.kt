@@ -2,29 +2,23 @@ package com.simprints.id.activities
 
 import android.content.Intent
 import android.support.test.InstrumentationRegistry
-import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.assertion.ViewAssertions
-import android.support.test.espresso.matcher.ViewMatchers
 import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.rule.GrantPermissionRule
 import android.support.test.runner.AndroidJUnit4
-import android.support.v4.content.ContextCompat
 import android.util.Base64
 import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.controllers.ScannerManager
-import com.simprints.id.controllers.ScannerManagerImpl
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
-import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
@@ -39,25 +33,23 @@ import com.simprints.id.shared.mockSettingsPreferencesManager
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.libcommon.Person
 import com.simprints.libscanner.Scanner
 import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_GUID
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockScannerManager
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import org.hamcrest.Matchers.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.regex.Pattern.matches
 import javax.inject.Inject
 
 
@@ -88,7 +80,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
 
     @Rule
     @JvmField
-    val launcActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
+    val launchActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
 
     override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
         PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
@@ -130,8 +122,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
     fun notScannerFromInitVeroStep_shouldAnErrorAlert() {
         mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
         doReturn(Completable.error(ScannerNotPairedException())).`when`(scannerManagerSpy).initVero()
-        launcActivityRule.launchActivity(Intent())
-        Thread.sleep(1000)
+        launchActivityRule.launchActivity(Intent())
+        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.NOT_PAIRED.alertTitleId)))
 
     }
@@ -140,8 +132,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
     fun multiScannersPairedFromInitVeroStep_shouldAnErrorAlert() {
         mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
         doReturn(Completable.error(MultipleScannersPairedException())).`when`(scannerManagerSpy).initVero()
-        launcActivityRule.launchActivity(Intent())
-        Thread.sleep(1000)
+        launchActivityRule.launchActivity(Intent())
+        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS.alertTitleId)))
     }
 
@@ -151,8 +143,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         makeInitVeroStepSucceeding()
 
         doReturn(Completable.error(BluetoothNotEnabledException())).`when`(scannerManagerSpy).connectToVero()
-        launcActivityRule.launchActivity(Intent())
-        Thread.sleep(1000)
+        launchActivityRule.launchActivity(Intent())
+        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.BLUETOOTH_NOT_ENABLED.alertTitleId)))
     }
 
@@ -162,8 +154,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         makeInitVeroStepSucceeding()
 
         doReturn(Completable.error(BluetoothNotEnabledException())).`when`(scannerManagerSpy).connectToVero()
-        launcActivityRule.launchActivity(Intent())
-        Thread.sleep(1000)
+        launchActivityRule.launchActivity(Intent())
+        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED.alertTitleId)))
     }
 
@@ -173,8 +165,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         makeInitVeroStepSucceeding()
 
         doReturn(Completable.error(ScannerNotPairedException())).`when`(scannerManagerSpy).connectToVero()
-        launcActivityRule.launchActivity(Intent())
-        Thread.sleep(1000)
+        launchActivityRule.launchActivity(Intent())
+        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.NOT_PAIRED.alertTitleId)))
     }
 
@@ -184,8 +176,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         makeInitVeroStepSucceeding()
 
         doReturn(Completable.error(UnknownBluetoothIssueException())).`when`(scannerManagerSpy).connectToVero()
-        launcActivityRule.launchActivity(Intent())
-        Thread.sleep(1000)
+        launchActivityRule.launchActivity(Intent())
+        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.DISCONNECTED.alertTitleId)))
     }
 
@@ -197,8 +189,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         makeConnectToVeroStepSucceeding()
 
         doReturn(Completable.error(UnknownBluetoothIssueException())).`when`(scannerManagerSpy).resetVeroUI()
-        launcActivityRule.launchActivity(Intent())
-        Thread.sleep(1000)
+        launchActivityRule.launchActivity(Intent())
+        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.DISCONNECTED.alertTitleId)))
     }
 
@@ -210,8 +202,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         makeResetVeroUISucceeding()
 
         doReturn(Completable.error(ScannerLowBatteryException())).`when`(scannerManagerSpy).wakingUpVero()
-        launcActivityRule.launchActivity(Intent())
-        Thread.sleep(1000)
+        launchActivityRule.launchActivity(Intent())
+        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.LOW_BATTERY.alertTitleId)))
     }
 
@@ -224,8 +216,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         makeResetVeroUISucceeding()
 
         doReturn(Completable.error(UnknownBluetoothIssueException())).`when`(scannerManagerSpy).wakingUpVero()
-        launcActivityRule.launchActivity(Intent())
-        Thread.sleep(1000)
+        launchActivityRule.launchActivity(Intent())
+        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.DISCONNECTED.alertTitleId)))
     }
 
@@ -238,9 +230,9 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         doReturn(Single.create<Person> { it.onError(IllegalStateException()) }).`when`(dbManagerSpy).loadPerson(anyNotNull(), anyNotNull())
         doReturn(false).`when`(simNetworkUtilsSpy).isConnected()
 
-        launcActivityRule.launchActivity(Intent())
+        launchActivityRule.launchActivity(Intent())
 
-        Thread.sleep(1000)
+        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE.alertTitleId)))
     }
 
@@ -253,8 +245,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         doReturn(Single.create<Person> { it.onError(IllegalStateException()) }).`when`(dbManagerSpy).loadPerson(anyNotNull(), anyNotNull())
         doReturn(true).`when`(simNetworkUtilsSpy).isConnected()
 
-        launcActivityRule.launchActivity(Intent().also { it.action = Constants.SIMPRINTS_VERIFY_INTENT })
-        Thread.sleep(1000)
+        launchActivityRule.launchActivity(Intent().also { it.action = Constants.SIMPRINTS_VERIFY_INTENT })
+        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.GUID_NOT_FOUND_ONLINE.alertTitleId)))
     }
 
