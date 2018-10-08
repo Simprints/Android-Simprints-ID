@@ -76,7 +76,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
 
     @Rule
     @JvmField
-    var permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     @Rule
     @JvmField
@@ -271,7 +271,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
 
     private fun makeInitVeroStepSucceeding() {
         doReturn(Completable.complete()).`when`(scannerManagerSpy).initVero()
-        scannerManagerSpy.scanner = Scanner(MAC_ADDRESS, MockBluetoothAdapter(MockScannerManager()))
+        scannerManagerSpy.scanner = Scanner(MAC_ADDRESS, mockBluetoothAdapter)
     }
 
     companion object {
