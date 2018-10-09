@@ -6,6 +6,7 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.analytics.eventData.models.events.ArtificialTerminationEvent
@@ -166,7 +167,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             anyNotNull(),
             anyNotNull())).thenReturn(Single.just(Result.response(buildSuccessfulUploadSessionResponse())))
 
-        whenever(remoteSessionsManager.getSessionsApiClient()).thenReturn(Single.just(mockSessionsApi))
+        doReturn(Single.just(mockSessionsApi)).`when`(remoteSessionsManager).getSessionsApiClient()
 
         sessionEventsManagerSpy.syncSessions(testProjectId).test().also {
             it.awaitTerminalEvent()
