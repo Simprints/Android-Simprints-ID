@@ -1,38 +1,33 @@
 package com.simprints.id.controllers
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
-import android.content.Context
-import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.setup.*
+import com.simprints.id.exceptions.unsafe.NullScannerError
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.Scanner
 import com.simprints.libscanner.ScannerCallback
 import com.simprints.libscanner.ScannerUtils
 import com.simprints.libscanner.ScannerUtils.convertAddressToSerial
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
-import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
 import io.reactivex.Completable
 import timber.log.Timber
-import javax.inject.Inject
 
 open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
-                         val analyticsManager: AnalyticsManager,
-                         val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
+                              val analyticsManager: AnalyticsManager,
+                              private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
 
     override var scanner: Scanner? = null
 
     @SuppressLint("CheckResult")
     override fun start(): Completable =
         disconnectVero()
-        .andThen(initVero())
-        .andThen(connectToVero())
-        .andThen(resetVeroUI())
-        .andThen(wakingUpVero())
+            .andThen(initVero())
+            .andThen(connectToVero())
+            .andThen(resetVeroUI())
+            .andThen(wakingUpVero())
 
     override fun disconnectVero(): Completable = Completable.create { result ->
         if (scanner == null) {
@@ -46,7 +41,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         }
     }
 
-    override fun initVero() = Completable.create {
+    override fun initVero(): Completable = Completable.create {
         val pairedScanners = ScannerUtils.getPairedScanners(bluetoothAdapter)
         when {
             pairedScanners.size == 0 -> it.onError(ScannerNotPairedException())
@@ -59,7 +54,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
                 preferencesManager.lastScannerUsed = convertAddressToSerial(macAddress)
 
-                Timber.d("Setup: Scanner initialized.")
+                Timber.d("ScannerManager: Scanner initialized.")
                 it.onComplete()
             }
         }
@@ -67,10 +62,10 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
     override fun connectToVero(): Completable = Completable.create { result ->
         if (scanner == null) {
-            result.onError(Throwable("Unexpected error - Scanner null"))
+            result.onError(NullScannerError())
         } else {
             scanner?.connect(WrapperScannerCallback({
-                Timber.d("Setup: Connected to Vero.")
+                Timber.d("ScannerManager: Connected to Vero.")
                 preferencesManager.scannerId = scanner?.scannerId ?: ""
                 analyticsManager.logScannerProperties()
                 result.onComplete()
@@ -91,10 +86,10 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
     override fun wakingUpVero(): Completable = Completable.create { result ->
         if (scanner == null) {
-            result.onError(Throwable("Unexpected error - Scanner null"))
+            result.onError(NullScannerError())
         } else {
             scanner?.un20Wakeup(WrapperScannerCallback({
-                Timber.d("Setup: UN20 ready.")
+                Timber.d("ScannerManager: UN20 ready.")
                 preferencesManager.hardwareVersion = scanner?.ucVersion ?: -1
 
                 result.onComplete()
@@ -114,28 +109,24 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         }
     }
 
-    // STEP 5
     override fun resetVeroUI(): Completable = Completable.create { result ->
 
         if (scanner == null) {
-            result.onError(Throwable("Unexpected error - Scanner null"))
+            result.onError(NullScannerError())
         } else {
-            scanner?.let {
-                it.resetUI(WrapperScannerCallback({
-                    Timber.d("Setup: UI reset.")
-                    result.onComplete()
-                }, { scannerError ->
-                    scannerError?.let {
-                        result.onError(UnknownBluetoothIssueException(it.details()))
-                    } ?: result.onComplete()
-                }
-                ))
-            }
+            scanner?.resetUI(WrapperScannerCallback({
+                Timber.d("ScannerManager: UI reset.")
+                result.onComplete()
+            }, { scannerError ->
+                scannerError?.let {
+                    result.onError(UnknownBluetoothIssueException(it.details()))
+                } ?: result.onComplete()
+            }))
         }
     }
 
-    override fun getAlertType(it: Throwable): ALERT_TYPE {
-        return when (it) {
+    override fun getAlertType(it: Throwable): ALERT_TYPE =
+        when (it) {
             is BluetoothNotEnabledException -> ALERT_TYPE.BLUETOOTH_NOT_ENABLED
             is BluetoothNotSupportedException -> ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED
             is MultipleScannersPairedException -> ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS
@@ -144,7 +135,6 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             is UnknownBluetoothIssueException -> ALERT_TYPE.DISCONNECTED
             else -> ALERT_TYPE.UNEXPECTED_ERROR
         }
-    }
 
     override fun disconnectScannerIfNeeded() {
         scanner?.disconnect(object : ScannerCallback {
@@ -153,7 +143,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         })
     }
 
-    class WrapperScannerCallback(val success: () -> Unit, val failure: (scannerError: SCANNER_ERROR?) -> Unit) : ScannerCallback {
+    private class WrapperScannerCallback(val success: () -> Unit, val failure: (scannerError: SCANNER_ERROR?) -> Unit) : ScannerCallback {
         override fun onSuccess() {
             success()
         }
