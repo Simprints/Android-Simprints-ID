@@ -89,6 +89,8 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
         syncSchedulerHelper.scheduleSyncsAndStartPeopleSyncIfNecessary()
         setTextToConsentTabs()
+
+        startSetup()
     }
 
     private fun startSetup() {
@@ -299,7 +301,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     override fun handleOnResume() {
         launchOutOfFocus = false
-        startSetup()
     }
 
     override fun handleOnPause() {
