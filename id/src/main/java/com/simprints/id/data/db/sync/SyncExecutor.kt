@@ -80,22 +80,26 @@ open class SyncExecutor(private val dbManager: DbManager,
             dbManager.calculateNPatientsToDownSync(it, syncParams)
         }.flatMapObservable { nPeopleToDownload ->
             Timber.d("Downloading batch $nPeopleToDownload people")
-            val downSyncParam = DownSyncParams(syncParams, dbManager.local)
-            syncApi.downSync(
-                downSyncParam.projectId,
-                downSyncParam.userId,
-                downSyncParam.moduleId,
-                downSyncParam.lastKnownPatientId,
-                downSyncParam.lastKnownPatientUpdatedAt)
-                .flatMapObservable {
-                    savePeopleFromStream(
-                        isInterrupted,
-                        syncParams,
-                        it.byteStream()).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
-                        .map {
-                            DownloadProgress(it, nPeopleToDownload)
-                        }
-                }
+            if (nPeopleToDownload != 0) {
+                val downSyncParam = DownSyncParams(syncParams, dbManager.local)
+                syncApi.downSync(
+                    downSyncParam.projectId,
+                    downSyncParam.userId,
+                    downSyncParam.moduleId,
+                    downSyncParam.lastKnownPatientId,
+                    downSyncParam.lastKnownPatientUpdatedAt)
+                    .flatMapObservable {
+                        savePeopleFromStream(
+                            isInterrupted,
+                            syncParams,
+                            it.byteStream()).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+                            .map {
+                                DownloadProgress(it, nPeopleToDownload)
+                            }
+                    }
+            } else {
+                Observable.just(Progress(0, 0))
+            }
         }
 
     protected open fun savePeopleFromStream(isInterrupted: () -> Boolean,
