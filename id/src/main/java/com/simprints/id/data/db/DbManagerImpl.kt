@@ -16,6 +16,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
+import com.simprints.id.exceptions.safe.setup.FetchingGuidForVerificationFailedException
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
@@ -35,7 +36,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
-class DbManagerImpl(override val local: LocalDbManager,
+open class DbManagerImpl(override val local: LocalDbManager,
                     override val remote: RemoteDbManager,
                     private val secureDataManager: SecureDataManager,
                     private val loginInfoManager: LoginInfoManager,
@@ -125,6 +126,15 @@ class DbManagerImpl(override val local: LocalDbManager,
                 onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
         })
     }
+
+    override fun loadPerson(projectId: String,
+                            guid: String): Single<PersonFetchResult> =
+        local.loadPersonFromLocal(guid).map { PersonFetchResult(it, false) }
+            .onErrorResumeNext {
+                remote.downloadPerson(guid, loginInfoManager.getSignedInProjectIdOrEmpty())
+                    .map { PersonFetchResult(rl_Person(it).libPerson, true) }
+            }
+
 
     override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
         val result = when (group) {

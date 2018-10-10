@@ -57,14 +57,19 @@ open class Application : MultiDexApplication() {
             Timber.plant(Timber.DebugTree())
         }
 
-        val crashlyticsKit = Crashlytics.Builder()
-            .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
-            .build()
-        Fabric.Builder(this).kits(crashlyticsKit).debuggable(BuildConfig.DEBUG).build()
+        initFabric()
 
         dbManager.initialiseDb()
 
         handleUndeliverableExceptionInRxJava()
+    }
+
+    private fun initFabric() {
+        val crashlyticsKit = Crashlytics.Builder()
+                .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
+                .build()
+
+        Fabric.with(this, crashlyticsKit)
     }
 
     private fun isReleaseWithLogfileVariant(): Boolean = BuildConfig.BUILD_TYPE == "releaseWithLogfile"

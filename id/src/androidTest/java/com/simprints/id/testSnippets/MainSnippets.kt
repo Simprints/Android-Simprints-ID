@@ -56,12 +56,12 @@ fun setupActivityAndContinue() {
 fun setupActivityAndDecline() {
     log("setupActivityAndDecline")
     setupActivity()
-    setupActivityDecine()
+    setupActivityDecline()
 }
 
 fun setupActivity() {
     log("setupActivity")
-    WaitingUtils.tryOnUiUntilTimeout(10000, 50) {
+    tryOnUiUntilTimeout(10000, 50) {
         ActivityUtils.grantPermissions()
         onView(withId(R.id.generalConsentTextView))
             .check(matches(isDisplayed()))
@@ -70,16 +70,16 @@ fun setupActivity() {
 
 private fun setupActivityContinue() {
     log("setupActivityContinue")
-    WaitingUtils.tryOnUiUntilTimeout(15000, 500) {
+    tryOnUiUntilTimeout(15000, 500) {
         onView(withId(R.id.consentAcceptButton))
             .check(matches(isDisplayed()))
             .perform(click())
     }
 }
 
-fun setupActivityDecine() {
+fun setupActivityDecline() {
     log("setupActivityContinue")
-    WaitingUtils.tryOnUiUntilTimeout(12000, 500) {
+    tryOnUiUntilTimeout(12000, 500) {
         onView(withId(R.id.consentDeclineButton))
             .check(matches(isDisplayed()))
             .perform(click())
@@ -88,7 +88,7 @@ fun setupActivityDecine() {
 
 fun collectFingerprintsPressScan() {
     log("collectFingerprintsPressScan")
-    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+    tryOnUiUntilTimeout(10000, 200) {
         onView(withId(R.id.scan_button))
             .check(matches(not(withText(R.string.cancel_button))))
             .perform(click())
@@ -98,7 +98,7 @@ fun collectFingerprintsPressScan() {
 
 fun skipFinger() {
     log("skipFinger")
-    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+    tryOnUiUntilTimeout(10000, 200) {
         onView(withId(R.id.missingFingerText))
             .check(matches(isDisplayed()))
             .perform(click())
@@ -107,19 +107,21 @@ fun skipFinger() {
 
 fun waitForSplashScreenAppearsAndDisappears() {
     log("checkSplashScreen")
-    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+    tryOnUiUntilTimeout(10000, 200) {
         onView(withId(R.id.splashGetReady))
             .check(matches(isDisplayed()))
     }
 
-    WaitingUtils.tryOnUiUntilTimeout(10000, 200) {
+    tryOnUiUntilTimeout(10000, 200) {
         onView(withId(R.id.splashGetReady))
             .check(doesNotExist())
     }
+
+    waitOnUi(2000)
 }
 
 fun checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
-    WaitingUtils.tryOnUiUntilTimeout(1000, 50) {
+    tryOnUiUntilTimeout(1000, 50) {
         onView(withText(getResourceString(R.string.confirm_fingers_dialog_title)))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
@@ -133,7 +135,7 @@ fun checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult: String = "�
 
 fun collectFingerprintsEnrolmentCheckFinished(enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("collectFingerprintsEnrolmentCheckFinished")
-    WaitingUtils.tryOnSystemUntilTimeout(5000, 500) {
+    tryOnSystemUntilTimeout(5000, 500) {
         assertTrue(enrolTestRule.activity.isDestroyed)
     }
 }
@@ -149,7 +151,7 @@ fun enrolmentReturnedResult(enrolTestRule: ActivityTestRule<CheckLoginFromIntent
 
 fun matchingActivityIdentificationCheckFinished(identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("matchingActivityIdentificationCheckFinished")
-    WaitingUtils.tryOnSystemUntilTimeout(20000, 500) {
+    tryOnSystemUntilTimeout(20000, 500) {
         assertTrue(identifyTestRule.activity.isDestroyed)
     }
 }
@@ -183,7 +185,7 @@ fun twoReturnedIdentificationsOneMatchOneNotMatch(identifyTestRule: ActivityTest
 
 fun matchingActivityVerificationCheckFinished(verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("matchingActivityVerificationCheckFinished")
-    WaitingUtils.tryOnSystemUntilTimeout(5000, 500) {
+    tryOnSystemUntilTimeout(5000, 500) {
         assertTrue(verifyTestRule.activity.isDestroyed)
     }
 }
