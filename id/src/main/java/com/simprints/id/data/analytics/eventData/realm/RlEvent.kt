@@ -10,7 +10,7 @@ import io.realm.annotations.PrimaryKey
 open class RlEvent : RealmObject {
 
     @PrimaryKey
-    lateinit var id: String
+    lateinit var eventId: String
 
     private var typeEventDescription: String? = null
     private var jsonEvent: String? = null
@@ -24,7 +24,7 @@ open class RlEvent : RealmObject {
     constructor() {}
     constructor(event: Event) : this() {
         saveType(event.type)
-        id = event.id
+        eventId = event.eventId
         jsonEvent = JsonHelper.toJson(event)
     }
 

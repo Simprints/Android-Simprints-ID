@@ -13,6 +13,6 @@ class CandidateReadEvent(val relativeStartTime: Long,
     }
 
     enum class RemoteResult {
-        FOUND, NOT_FOUND, OFFLINE
+        FOUND, NOT_FOUND
     }
 }

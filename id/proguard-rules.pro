@@ -50,6 +50,7 @@
 -keep class com.simprints.id.secure.models.** { *; }
 -keep class com.simprints.id.domain.consent.** { *; }
 -keep class com.simprints.id.domain.Project { *; }
+-keep class com.simprints.id.domain.ALERT_TYPE { *; }
 -keep class com.simprints.id.session.Session { *; }
 -keep class com.simprints.id.data.db.remote.models.** { *; }
 -keep class com.simprints.id.data.db.sync.models.** { *; }

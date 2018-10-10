@@ -4,10 +4,10 @@ import com.simprints.id.data.analytics.eventData.models.EventType
 
 class AuthenticationEvent(val relativeStartTime: Long,
                           val relativeEndTime: Long,
-                          val userInfo: LoginInfo,
+                          val userInfo: UserInfo,
                           val result: Result) : Event(EventType.AUTHENTICATION) {
 
-    class LoginInfo(val projectId: String, val userId: String)
+    class UserInfo(val projectId: String, val userId: String)
 
     enum class Result {
         AUTHENTICATED,

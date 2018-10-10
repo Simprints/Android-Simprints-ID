@@ -25,6 +25,8 @@ interface SessionEventsManager {
     fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit,
                                   projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty())
 
+    fun getSessionCount(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty()): Single<Int>
+
     /**
      * @throws NoSessionsFoundException
      * @throws SessionUploadFailureException
@@ -39,5 +41,5 @@ interface SessionEventsManager {
     fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
     fun addLocationToSession(latitude: Double, longitude: Double)
 
-    fun addEventForCandidateReadInBackground(guid: String, startCandidateSearchTime: Long, localResult: CandidateReadEvent.LocalResult, remoteResult: CandidateReadEvent.RemoteResult)
+    fun addEventForCandidateReadInBackground(guid: String, startCandidateSearchTime: Long, localResult: CandidateReadEvent.LocalResult, remoteResult: CandidateReadEvent.RemoteResult?)
 }
