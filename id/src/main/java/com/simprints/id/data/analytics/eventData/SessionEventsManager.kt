@@ -41,5 +41,5 @@ interface SessionEventsManager {
     fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
     fun addLocationToSession(latitude: Double, longitude: Double)
 
-    fun addEventForCandidateReadInBackground(guid: String, startCandidateSearchTime: Long, localResult: CandidateReadEvent.LocalResult, remoteResult: CandidateReadEvent.RemoteResult)
+    fun addEventForCandidateReadInBackground(guid: String, startCandidateSearchTime: Long, localResult: CandidateReadEvent.LocalResult, remoteResult: CandidateReadEvent.RemoteResult?)
 }

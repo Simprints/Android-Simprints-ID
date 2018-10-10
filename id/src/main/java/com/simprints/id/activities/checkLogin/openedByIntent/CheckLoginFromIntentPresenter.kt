@@ -3,7 +3,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEvent
-import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEvent.Info
+import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEvent.UserInfo
 import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEvent.Result.AUTHORIZED
 import com.simprints.id.data.analytics.eventData.models.events.CallbackEvent
 import com.simprints.id.data.analytics.eventData.models.events.CalloutEvent
@@ -176,7 +176,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             session.nowRelativeToStartTime(timeHelper),
             result,
             if (result == AUTHORIZED) {
-                Info(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
+                UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
             } else {
                 null
             }
