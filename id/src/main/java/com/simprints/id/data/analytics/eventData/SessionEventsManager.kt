@@ -25,6 +25,8 @@ interface SessionEventsManager {
     fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit,
                                   projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty())
 
+    fun getSessionCount(projectId: String = loginInfoManager.getSignedInProjectIdOrEmpty()): Single<Int>
+
     /**
      * @throws NoSessionsFoundException
      * @throws SessionUploadFailureException

@@ -76,9 +76,16 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
             SessionEvents(query.findFirst() ?: throw SessionNotFoundException())
         }
 
+    override fun getSessionCount(projectId: String?): Single<Int> =
+        getRealmInstance().map { realm ->
+            realm.where(RlSession::class.java).apply {
+                addQueryParamForProjectId(projectId, this)
+            }.count().toInt()
+        }
+
     override fun deleteSessions(projectId: String?, openSession: Boolean?): Completable =
-        getRealmInstance().flatMapCompletable { realm ->
-            realm.executeTransaction {
+        getRealmInstance().flatMapCompletable { thisRealm ->
+            thisRealm.executeTransaction { realm ->
 
                 val sessions = realm.where(RlSession::class.java).apply {
                     addQueryParamForProjectId(projectId, this)

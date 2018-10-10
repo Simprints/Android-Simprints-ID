@@ -145,10 +145,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         try {
             Singles.zip(
                 fetchAnalyticsId(),
-                fetchPeopleCountInLocalDatabase()) { gaId: String, dbCount: Int ->
-                return@zip Pair(gaId, dbCount)
-            }.flatMapCompletable { gaIdAndDbCount ->
-                populateSessionWithAnalyticsIdAndDbInfo(gaIdAndDbCount.first, gaIdAndDbCount.second)
+                fetchPeopleCountInLocalDatabase(),
+                fetchSessionCountInLocalDatabase()) { gaId: String, peopleDbCount: Int, sessionDbCount: Int->
+                return@zip Triple(gaId, peopleDbCount, sessionDbCount)
+            }.flatMapCompletable { gaIdAndDbCounts ->
+                populateSessionWithAnalyticsIdAndDbInfo(gaIdAndDbCounts.first, gaIdAndDbCounts.second, gaIdAndDbCounts.third)
             }.subscribeBy(onError = { it.printStackTrace() })
         } catch (e: Exception) {
             e.printStackTrace()
@@ -157,11 +158,12 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun fetchAnalyticsId(): Single<String> = analyticsManager.analyticsId.onErrorReturn { "" }
     private fun fetchPeopleCountInLocalDatabase(): Single<Int> = dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }
-    private fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, dbCount: Int): Completable =
+    private fun fetchSessionCountInLocalDatabase(): Single<Int> = sessionEventsManager.getSessionCount().onErrorReturn { -1 }
+    private fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, peopleDbCount: Int, sessionDbCount: Int): Completable =
         sessionEventsManager.updateSession({
             it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             it.analyticsId = gaId
-            it.databaseInfo = DatabaseInfo(dbCount)
+            it.databaseInfo = DatabaseInfo(peopleDbCount, sessionDbCount)
             it.events.apply {
                 add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), view.parseCallout()))
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))

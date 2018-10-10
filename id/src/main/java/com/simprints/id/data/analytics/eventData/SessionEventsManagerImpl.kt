@@ -105,6 +105,8 @@ open class SessionEventsManagerImpl(private val ctx: Context,
             this.activeSession = session
         }
 
+    override fun getSessionCount(projectId: String): Single<Int> = sessionEventsLocalDbManager.getSessionCount(projectId)
+
     /** @throws SessionNotFoundException */
     override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
         sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable {
