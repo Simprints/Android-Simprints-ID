@@ -2,10 +2,6 @@ package com.simprints.id.tools;
 
 public class InternalConstants {
 
-    public final static String COMMCARE_PACKAGE = "org.commcare.dalvik";
-
-    public final static String COMMCARE_PERMISSION = "org.commcare.dalvik.provider.cases.read";
-
     public final static int ALL_PERMISSIONS_REQUEST = 1;
     public final static int LOCATION_PERMISSION_REQUEST = 2;
     public final static int RESOLUTION_REQUEST = 22;

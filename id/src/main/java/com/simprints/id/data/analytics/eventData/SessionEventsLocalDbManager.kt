@@ -12,5 +12,6 @@ interface SessionEventsLocalDbManager {
     fun loadSessions(projectId: String? = null, openSession: Boolean? = null): Single<ArrayList<SessionEvents>>
     /** @throws SessionNotFoundException */
     fun loadSessionById(sessionId: String): Single<SessionEvents>
+    fun getSessionCount(projectId: String? = null): Single<Int>
     fun deleteSessions(projectId: String? = null, openSession: Boolean? = null): Completable
 }

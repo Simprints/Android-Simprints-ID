@@ -23,7 +23,8 @@ open class AppModuleForTests(app: Application,
                              override var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
                              override var simNetworkUtilsRule: DependencyRule = RealRule,
                              override var secureApiInterfaceRule: DependencyRule = RealRule,
-                             override var longConsentManagerRule: DependencyRule = RealRule)
+                             override var longConsentManagerRule: DependencyRule = RealRule,
+                             override var scannerManagerRule: DependencyRule = RealRule)
     : AppModuleForAnyTests(
     app,
     localDbManagerRule = localDbManagerRule,
@@ -40,7 +41,8 @@ open class AppModuleForTests(app: Application,
     scheduledSessionsSyncManagerRule = scheduledSessionsSyncManagerRule,
     simNetworkUtilsRule = simNetworkUtilsRule,
     secureApiInterfaceRule = secureApiInterfaceRule,
-    longConsentManagerRule = longConsentManagerRule) {
+    longConsentManagerRule = longConsentManagerRule,
+    scannerManagerRule = scannerManagerRule) {
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
 }
