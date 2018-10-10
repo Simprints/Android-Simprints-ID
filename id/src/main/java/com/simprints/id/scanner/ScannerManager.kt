@@ -8,8 +8,6 @@ interface ScannerManager {
 
     var scanner: Scanner?
 
-    fun withTimeout(method: ScannerManager.() -> Completable): Completable
-
     fun start(): Completable
     fun disconnectVero(): Completable
     fun initVero(): Completable
