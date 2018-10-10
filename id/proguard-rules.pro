@@ -58,6 +58,7 @@
 -keep class com.simprints.id.data.analytics.eventData.realm.** { *; }
 -keep class com.simprints.id.tools.utils.SimNetworkUtils$Connection { *; }
 -keep class com.simprints.id.session.callout.** { *; }
+-keep class com.simprints.id.tools.json.** { *; }
 -keepclassmembers enum * { *; }
 
 # For Realm
