@@ -56,7 +56,7 @@ fun setupActivityAndContinue() {
 fun setupActivityAndDecline() {
     log("setupActivityAndDecline")
     setupActivity()
-    setupActivityDecine()
+    setupActivityDecline()
 }
 
 fun setupActivity() {
@@ -77,7 +77,7 @@ private fun setupActivityContinue() {
     }
 }
 
-fun setupActivityDecine() {
+fun setupActivityDecline() {
     log("setupActivityContinue")
     tryOnUiUntilTimeout(12000, 500) {
         onView(withId(R.id.consentDeclineButton))
