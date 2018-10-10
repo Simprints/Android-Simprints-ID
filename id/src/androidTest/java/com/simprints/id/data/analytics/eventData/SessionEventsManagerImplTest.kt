@@ -8,9 +8,7 @@ import com.google.common.truth.Truth
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.analytics.eventData.models.events.ArtificialTerminationEvent
-import com.simprints.id.data.analytics.eventData.models.events.FingerprintCaptureEvent
-import com.simprints.id.data.analytics.eventData.models.events.PersonCreationEvent
+import com.simprints.id.data.analytics.eventData.models.events.*
 import com.simprints.id.data.analytics.eventData.models.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventData.models.session.Device
 import com.simprints.id.data.analytics.eventData.models.session.Location
@@ -30,6 +28,8 @@ import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.shared.PeopleGeneratorUtils
+import com.simprints.id.testTools.waitOnSystem
+import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
@@ -53,6 +53,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import retrofit2.Response
 import retrofit2.adapter.rxjava2.Result
+import java.util.*
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
@@ -136,6 +137,9 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         sessionEventsManagerSpy.updateSession({
             it.databaseInfo = DatabaseInfo(0)
             it.location = Location(0.0, 0.0)
+
+            it.events.add(GuidSelectionEvent(200, "some_guid"))
+            it.events.add(FingerprintCaptureEvent(100, 2000, FingerIdentifier.LEFT_INDEX_FINGER, 60, FingerprintCaptureEvent.Result.GOOD_SCAN, null))
         }).blockingGet()
 
         val session = sessionEventsManagerSpy.getCurrentSession().blockingGet()
@@ -149,6 +153,40 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         Assert.assertFalse(jsonObject.getJSONObject("device").has("id"))
         Assert.assertFalse(jsonObject.getJSONObject("databaseInfo").has("id"))
         Assert.assertFalse(jsonObject.getJSONObject("location").has("id"))
+        Assert.assertFalse(jsonObject.has("projectId"))
+
+        // In general, events should not have an id or an eventId property once serialised
+        val guidSelectionEventJson = jsonObject.getJSONArray("events").getJSONObject(0)
+        Assert.assertFalse(guidSelectionEventJson.has("eventId"))
+        Assert.assertFalse(guidSelectionEventJson.has("id"))
+
+        // FingerprintCaptureEvent is the only event that should have an id field
+        val fingerprintCaptureEvent = jsonObject.getJSONArray("events").getJSONObject(1)
+        Assert.assertFalse(fingerprintCaptureEvent.has("eventId"))
+        Assert.assertTrue(fingerprintCaptureEvent.has("id"))
+    }
+
+    @Test
+    fun sessionCount_shouldBeAccurate() {
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+
+        val numberOfPreviousSessions = 5
+
+        repeat(numberOfPreviousSessions) { createAndSaveFakeCloseSession(projectId = "bWOFHInKA2YaQwrxZ7uJ", id = UUID.randomUUID().toString()) }
+
+        launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        setupActivityAndContinue()
+        waitOnUi(100)
+
+        val session = sessionEventsManagerSpy.getCurrentSession().blockingGet()
+
+        val jsonString = JsonHelper.toJson(session)
+        val jsonObject = JSONObject(jsonString)
+
+        Assert.assertTrue(jsonObject.getJSONObject("databaseInfo").has("sessionCount"))
+        assertEquals(numberOfPreviousSessions + 1, jsonObject.getJSONObject("databaseInfo").getInt("sessionCount"))
     }
 
     @Test
