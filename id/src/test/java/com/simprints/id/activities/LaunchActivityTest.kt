@@ -11,7 +11,7 @@ import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
-import com.simprints.id.shared.whenever
+import com.simprints.id.shared.mockSettingsPreferencesManager
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.createRoboLaunchActivity
@@ -59,7 +59,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun enrollmentCallout_showsCorrectGeneralConsentTextAndNoParentalByDefault() {
-        mockSettingsPreferencesManager(parentalConsentExists = false)
+        mockSettingsPreferencesManagerForLaunchAct(parentalConsentExists = false)
 
         val calloutAction = CalloutAction.REGISTER
         preferencesManager.calloutAction = calloutAction
@@ -77,7 +77,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun identifyCallout_showsCorrectGeneralConsentTextAndNoParentalByDefault() {
-        mockSettingsPreferencesManager(parentalConsentExists = false)
+        mockSettingsPreferencesManagerForLaunchAct(parentalConsentExists = false)
 
         val calloutAction = CalloutAction.IDENTIFY
         preferencesManager.calloutAction = calloutAction
@@ -95,7 +95,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun enrollmentCallout_showsBothConsentsCorrectlyWhenParentalConsentExists() {
-        mockSettingsPreferencesManager(parentalConsentExists = true)
+        mockSettingsPreferencesManagerForLaunchAct(parentalConsentExists = true)
 
         val calloutAction = CalloutAction.REGISTER
         preferencesManager.calloutAction = calloutAction
@@ -114,7 +114,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun identifyCallout_showsBothConsentsCorrectlyWhenParentalConsentExists() {
-        mockSettingsPreferencesManager(parentalConsentExists = true)
+        mockSettingsPreferencesManagerForLaunchAct(parentalConsentExists = true)
 
         val calloutAction = CalloutAction.IDENTIFY
         preferencesManager.calloutAction = calloutAction
@@ -133,7 +133,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun malformedConsentJson_showsDefaultConsent() {
-        mockSettingsPreferencesManager(generalConsentOptions = MALFORMED_CONSENT_OPTIONS)
+        mockSettingsPreferencesManagerForLaunchAct(generalConsentOptions = MALFORMED_CONSENT_OPTIONS)
 
         val calloutAction = CalloutAction.IDENTIFY
         preferencesManager.calloutAction = calloutAction
@@ -148,7 +148,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun extraUnrecognisedConsentOptions_stillShowsCorrectValues() {
-        mockSettingsPreferencesManager(generalConsentOptions = EXTRA_UNRECOGNISED_CONSENT_OPTIONS)
+        mockSettingsPreferencesManagerForLaunchAct(generalConsentOptions = EXTRA_UNRECOGNISED_CONSENT_OPTIONS)
 
         val calloutAction = CalloutAction.IDENTIFY
         preferencesManager.calloutAction = calloutAction
@@ -163,7 +163,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun partiallyMissingConsentOptions_stillShowsCorrectValues() {
-        mockSettingsPreferencesManager(generalConsentOptions = PARTIALLY_MISSING_CONSENT_OPTIONS)
+        mockSettingsPreferencesManagerForLaunchAct(generalConsentOptions = PARTIALLY_MISSING_CONSENT_OPTIONS)
 
         val calloutAction = CalloutAction.IDENTIFY
         preferencesManager.calloutAction = calloutAction
@@ -176,17 +176,11 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
         Assert.assertEquals(targetConsentText, generalConsentText)
     }
 
-    private fun mockSettingsPreferencesManager(parentalConsentExists: Boolean = false,
-                                               generalConsentOptions: String = REMOTE_CONSENT_GENERAL_OPTIONS,
-                                               parentalConsentOptions: String = REMOTE_CONSENT_PARENTAL_OPTIONS) {
+    private fun mockSettingsPreferencesManagerForLaunchAct(parentalConsentExists: Boolean = false,
+                                                           generalConsentOptions: String = REMOTE_CONSENT_GENERAL_OPTIONS,
+                                                           parentalConsentOptions: String = REMOTE_CONSENT_PARENTAL_OPTIONS) {
 
-        whenever(settingsPreferencesManager.language).thenReturn(LANGUAGE)
-        whenever(settingsPreferencesManager.programName).thenReturn(PROGRAM_NAME)
-        whenever(settingsPreferencesManager.organizationName).thenReturn(ORGANIZATION_NAME)
-
-        whenever(settingsPreferencesManager.parentalConsentExists).thenReturn(parentalConsentExists)
-        whenever(settingsPreferencesManager.generalConsentOptionsJson).thenReturn(generalConsentOptions)
-        whenever(settingsPreferencesManager.parentalConsentOptionsJson).thenReturn(parentalConsentOptions)
+        mockSettingsPreferencesManager(settingsPreferencesManager, parentalConsentExists, generalConsentOptions, parentalConsentOptions, LANGUAGE, PROGRAM_NAME, ORGANIZATION_NAME)
     }
 
     companion object {

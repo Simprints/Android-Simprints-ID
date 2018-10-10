@@ -4,7 +4,7 @@ import android.support.test.filters.SmallTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
-import com.simprints.id.testTools.WaitingUtils
+import com.simprints.id.testTools.waitOnSystem
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
@@ -47,6 +47,6 @@ class ApplicationTest {
                 onNext = {}
             )
 
-        WaitingUtils.waitOnSystem(1000)
+        waitOnSystem(1000)
     }
 }
