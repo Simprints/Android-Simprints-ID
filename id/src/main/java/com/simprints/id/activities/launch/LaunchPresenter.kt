@@ -96,11 +96,11 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     private fun startSetup() {
         requestPermissionsForLocation(5)
             .andThen(checkIfVerifyAndGuidExists(15))
-            .andThen(veroTask(30, R.string.launch_bt_connect, scannerManager.disconnectVero()))
-            .andThen(veroTask(45, R.string.launch_bt_connect, scannerManager.initVero()))
-            .andThen(veroTask(60, R.string.launch_bt_connect, scannerManager.connectToVero()) { addBluetoothConnectivityEvent() })
-            .andThen(veroTask(75, R.string.launch_setup, scannerManager.resetVeroUI()))
-            .andThen(veroTask(90, R.string.launch_wake_un20, scannerManager.wakingUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() })
+            .andThen(veroTask(30, R.string.launch_bt_connect, scannerManager.withTimeout { disconnectVero() }))
+            .andThen(veroTask(45, R.string.launch_bt_connect, scannerManager.withTimeout { initVero() }))
+            .andThen(veroTask(60, R.string.launch_bt_connect, scannerManager.withTimeout { connectToVero() }) { addBluetoothConnectivityEvent() })
+            .andThen(veroTask(75, R.string.launch_setup, scannerManager.withTimeout { resetVeroUI() }))
+            .andThen(veroTask(90, R.string.launch_wake_un20, scannerManager.withTimeout { wakingUpVero() }) { updateBluetoothConnectivityEventWithVeroInfo() })
             .subscribeBy(onError = { it.printStackTrace() }, onComplete = { handleSetupFinished() })
     }
 
@@ -284,7 +284,9 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         scannerManager.disconnectScannerIfNeeded()
     }
 
-    override fun tryAgainFromErrorScreen() {}
+    override fun tryAgainFromErrorScreen() {
+        startSetup()
+    }
 
     override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
