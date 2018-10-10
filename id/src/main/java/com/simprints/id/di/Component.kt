@@ -29,7 +29,7 @@ import com.simprints.id.activities.matching.MatchingPresenter
 import com.simprints.id.activities.refusal.RefusalPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
-import com.simprints.id.controllers.ScannerManager
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSync

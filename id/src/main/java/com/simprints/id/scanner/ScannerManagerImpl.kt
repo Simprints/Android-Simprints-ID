@@ -1,4 +1,4 @@
-package com.simprints.id.controllers
+package com.simprints.id.scanner
 
 import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.AnalyticsManager

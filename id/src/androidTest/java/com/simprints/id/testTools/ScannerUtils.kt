@@ -1,6 +1,6 @@
 package com.simprints.id.testTools
 
-import com.simprints.id.controllers.ScannerManager
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.Scanner
 import com.simprints.libscanner.ScannerCallback

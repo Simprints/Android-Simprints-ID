@@ -28,7 +28,7 @@ import com.simprints.id.testTools.ActivityUtils.getCurrentActivity
 import com.simprints.id.testTools.ActivityUtils.launchCollectFingerprintsActivity
 import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.testTools.ScannerUtils.setupScannerForCollectingFingerprints
-import com.simprints.id.controllers.ScannerManager
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier

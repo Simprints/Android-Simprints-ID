@@ -8,7 +8,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.controllers.ScannerManager
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
