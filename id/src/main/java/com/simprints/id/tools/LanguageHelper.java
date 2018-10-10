@@ -23,7 +23,7 @@ public class LanguageHelper {
         Locale locale;
 
         /*
-         * Languages are usually two characters, except if they also contain a region.
+         * Languages are usually two  or three characters, except if they also contain a region.
          * If they contain a region they follow the format [language]-r[REGION] e.g. fa-rAF
          */
         if (languageString.contains("-r") && languageString.length() > 2) {
