@@ -151,6 +151,16 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         Assert.assertFalse(jsonObject.getJSONObject("databaseInfo").has("id"))
         Assert.assertFalse(jsonObject.getJSONObject("location").has("id"))
         Assert.assertFalse(jsonObject.has("projectId"))
+
+        // In general, events should not have an id or an eventId property once serialised
+        val guidSelectionEventJson = jsonObject.getJSONArray("events").getJSONObject(0)
+        Assert.assertFalse(guidSelectionEventJson.has("eventId"))
+        Assert.assertFalse(guidSelectionEventJson.has("id"))
+
+        // FingerprintCaptureEvent is the only event that should have an id field
+        val fingerprintCaptureEvent = jsonObject.getJSONArray("events").getJSONObject(1)
+        Assert.assertFalse(fingerprintCaptureEvent.has("eventId"))
+        Assert.assertTrue(fingerprintCaptureEvent.has("id"))
     }
 
     @Test
