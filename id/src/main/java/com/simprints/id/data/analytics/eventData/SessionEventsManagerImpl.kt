@@ -219,7 +219,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
     override fun addEventForCandidateReadInBackground(guid: String,
                                                       startCandidateSearchTime: Long,
                                                       localResult: CandidateReadEvent.LocalResult,
-                                                      remoteResult: CandidateReadEvent.RemoteResult) {
+                                                      remoteResult: CandidateReadEvent.RemoteResult?) {
         updateSessionInBackground({
             it.events.add(CandidateReadEvent(
                 it.timeRelativeToStartTime(startCandidateSearchTime),
