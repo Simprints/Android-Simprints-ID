@@ -8,9 +8,7 @@ import com.google.common.truth.Truth
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.analytics.eventData.models.events.ArtificialTerminationEvent
-import com.simprints.id.data.analytics.eventData.models.events.FingerprintCaptureEvent
-import com.simprints.id.data.analytics.eventData.models.events.PersonCreationEvent
+import com.simprints.id.data.analytics.eventData.models.events.*
 import com.simprints.id.data.analytics.eventData.models.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventData.models.session.Device
 import com.simprints.id.data.analytics.eventData.models.session.Location
@@ -136,6 +134,9 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         sessionEventsManagerSpy.updateSession({
             it.databaseInfo = DatabaseInfo(0)
             it.location = Location(0.0, 0.0)
+
+            it.events.add(GuidSelectionEvent(200, "some_guid"))
+            it.events.add(FingerprintCaptureEvent(100, 2000, FingerIdentifier.LEFT_INDEX_FINGER, 60, FingerprintCaptureEvent.Result.GOOD_SCAN, null))
         }).blockingGet()
 
         val session = sessionEventsManagerSpy.getCurrentSession().blockingGet()
