@@ -11,6 +11,8 @@ class FingerprintCaptureEvent(val relativeStartTime: Long,
                               val result: Result,
                               val fingerprint: Fingerprint?) : Event(EventType.FINGERPRINT_CAPTURE) {
 
+    val id: String = super.eventId
+
     class Fingerprint(val quality: Int, val template: String)
 
     enum class Result {
