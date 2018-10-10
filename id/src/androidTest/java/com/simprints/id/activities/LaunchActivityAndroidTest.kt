@@ -15,7 +15,7 @@ import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.launch.LaunchActivity
-import com.simprints.id.controllers.ScannerManager
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig

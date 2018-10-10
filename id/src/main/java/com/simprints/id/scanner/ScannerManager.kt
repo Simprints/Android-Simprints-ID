@@ -1,4 +1,4 @@
-package com.simprints.id.controllers
+package com.simprints.id.scanner
 
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.libscanner.Scanner

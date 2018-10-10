@@ -3,7 +3,7 @@ package com.simprints.id.shared
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
-import com.simprints.id.controllers.ScannerManager
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
