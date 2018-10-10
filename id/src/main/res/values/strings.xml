@@ -49,7 +49,6 @@
     <string name="consent_parental_id_verify">I\'d like to use your child\'s fingerprints to find their records for %1$s.&#160;</string>
     <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their fingerprint information and current location.&#160;</string>
     <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their fingerprint information and current location.&#160;</string>
-    <string name="consent_parental_collect_yes">Simprints will also use the data for research purposes.&#160;</string>
     <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.&#160;</string>
     <string name="consent_parental_confirmation">May I use your child\'s fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
     <!-- Loading Messages-->
