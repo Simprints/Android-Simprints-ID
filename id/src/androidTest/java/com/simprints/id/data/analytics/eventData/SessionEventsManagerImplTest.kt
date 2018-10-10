@@ -28,6 +28,8 @@ import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.shared.PeopleGeneratorUtils
+import com.simprints.id.testTools.waitOnSystem
+import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
@@ -51,6 +53,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import retrofit2.Response
 import retrofit2.adapter.rxjava2.Result
+import java.util.*
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
@@ -161,6 +164,29 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         val fingerprintCaptureEvent = jsonObject.getJSONArray("events").getJSONObject(1)
         Assert.assertFalse(fingerprintCaptureEvent.has("eventId"))
         Assert.assertTrue(fingerprintCaptureEvent.has("id"))
+    }
+
+    @Test
+    fun sessionCount_shouldBeAccurate() {
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+
+        val numberOfPreviousSessions = 5
+
+        repeat(numberOfPreviousSessions) { createAndSaveFakeCloseSession(projectId = "bWOFHInKA2YaQwrxZ7uJ", id = UUID.randomUUID().toString()) }
+
+        launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
+        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        pressSignIn()
+        setupActivityAndContinue()
+        waitOnUi(100)
+
+        val session = sessionEventsManagerSpy.getCurrentSession().blockingGet()
+
+        val jsonString = JsonHelper.toJson(session)
+        val jsonObject = JSONObject(jsonString)
+
+        Assert.assertTrue(jsonObject.getJSONObject("databaseInfo").has("sessionCount"))
+        assertEquals(numberOfPreviousSessions + 1, jsonObject.getJSONObject("databaseInfo").getInt("sessionCount"))
     }
 
     @Test
