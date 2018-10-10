@@ -1,6 +1,6 @@
 package com.simprints.id.testTools
 
-import com.simprints.id.tools.AppState
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.Scanner
 import com.simprints.libscanner.ScannerCallback
@@ -9,13 +9,13 @@ import timber.log.Timber
 
 object ScannerUtils {
 
-    fun setupScannerForCollectingFingerprints(bluetoothAdapter: BluetoothComponentAdapter, appState: AppState) {
-        appState.scanner = Scanner("F0:AC:D7:C8:CB:22", bluetoothAdapter)
+    fun setupScannerForCollectingFingerprints(bluetoothAdapter: BluetoothComponentAdapter, scannerManager: ScannerManager) {
+        scannerManager.scanner = Scanner("F0:AC:D7:C8:CB:22", bluetoothAdapter)
 
-        appState.scanner.connect( object : ScannerCallback {
+        scannerManager.scanner?.connect( object : ScannerCallback {
 
             override fun onSuccess() {
-                appState.scanner.un20Wakeup(object : ScannerCallback {
+                scannerManager.scanner?.un20Wakeup(object : ScannerCallback {
                     override fun onSuccess() {
                         Timber.d("Test", "Scanner success un20Wakeup")
                     }

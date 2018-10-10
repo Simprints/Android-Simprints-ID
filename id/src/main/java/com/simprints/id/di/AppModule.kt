@@ -4,7 +4,8 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
-import com.simprints.id.controllers.Setup
+import com.simprints.id.scanner.ScannerManager
+import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -129,31 +130,20 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    fun provideAppState(): AppState = AppState()
-
-    @Provides
-    @Singleton
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
     @Singleton
-    open fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter = AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
+    open fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
+        AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
 
     @Provides
     open fun provideSecureApiInterface(): SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api
 
     @Provides
     @Singleton
-    fun provideSetup(preferencesManager: PreferencesManager,
-                     dbManager: DbManager,
-                     loginInfoManager: LoginInfoManager,
-                     analyticsManager: AnalyticsManager,
-                     appState: AppState,
-                     simNetworkUtils: SimNetworkUtils,
-                     bluetoothComponentAdapter: BluetoothComponentAdapter,
-                     sessionEventsManager: SessionEventsManager,
-                     timeHelper: TimeHelper): Setup =
-        Setup(preferencesManager, dbManager, loginInfoManager, analyticsManager, appState, simNetworkUtils, bluetoothComponentAdapter, sessionEventsManager, timeHelper)
+    open fun provideScannerManager(preferencesManager: PreferencesManager, analyticsManager: AnalyticsManager, bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
+        ScannerManagerImpl(preferencesManager, analyticsManager, bluetoothComponentAdapter)
 
     @Provides
     @Singleton

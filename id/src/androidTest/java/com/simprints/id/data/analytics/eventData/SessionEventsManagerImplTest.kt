@@ -361,7 +361,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
         collectFingerprintsPressScan()
         skipFinger()
-        waitForSplashScreenAppearsAndDisappears().also { Thread.sleep(2000) }
+        waitForSplashScreenAppearsAndDisappears()
 
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
