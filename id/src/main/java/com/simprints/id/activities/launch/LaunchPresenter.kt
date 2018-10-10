@@ -152,14 +152,14 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         } else {
             // We're offline but might find the person if we sync
             view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE)
-            saveEventForCandidateReadInBackgroundNotFound(probe.guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.OFFLINE)
+            saveEventForCandidateReadInBackgroundNotFound(probe.guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, null)
         }
     }
 
     private fun saveEventForCandidateReadInBackgroundNotFound(guid: String,
                                                               startCandidateSearchTime: Long,
                                                               localResult: CandidateReadEvent.LocalResult,
-                                                              remoteResult: CandidateReadEvent.RemoteResult) {
+                                                              remoteResult: CandidateReadEvent.RemoteResult?) {
         sessionEventsManager.addEventForCandidateReadInBackground(
             guid,
             startCandidateSearchTime,
