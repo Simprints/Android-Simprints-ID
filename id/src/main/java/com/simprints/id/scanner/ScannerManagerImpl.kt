@@ -14,17 +14,12 @@ import com.simprints.libscanner.ScannerUtils.convertAddressToSerial
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import io.reactivex.Completable
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 
 open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
                               val analyticsManager: AnalyticsManager,
                               private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
 
     override var scanner: Scanner? = null
-
-    override fun withTimeout(method: ScannerManager.() -> Completable): Completable =
-        method.invoke(this).timeout(SCANNER_TIMEOUT, SCANNER_TIMEOUT_UNITS)
 
     @SuppressLint("CheckResult")
     override fun start(): Completable =
@@ -138,7 +133,6 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             is ScannerLowBatteryException -> ALERT_TYPE.LOW_BATTERY
             is ScannerNotPairedException -> ALERT_TYPE.NOT_PAIRED
             is UnknownBluetoothIssueException -> ALERT_TYPE.DISCONNECTED
-            is TimeoutException -> ALERT_TYPE.DISCONNECTED
             else -> ALERT_TYPE.UNEXPECTED_ERROR
         }
 
@@ -157,10 +151,5 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         override fun onFailure(error: SCANNER_ERROR?) {
             failure(error)
         }
-    }
-
-    companion object {
-        private const val SCANNER_TIMEOUT = 15L
-        private val SCANNER_TIMEOUT_UNITS = TimeUnit.SECONDS
     }
 }
