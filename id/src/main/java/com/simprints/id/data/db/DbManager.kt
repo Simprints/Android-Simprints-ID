@@ -36,6 +36,7 @@ interface DbManager {
     fun savePerson(fbPerson: fb_Person): Completable
 
     fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
+    fun loadPerson(projectId: String, guid: String): Single<PersonFetchResult>
 
     fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
 
