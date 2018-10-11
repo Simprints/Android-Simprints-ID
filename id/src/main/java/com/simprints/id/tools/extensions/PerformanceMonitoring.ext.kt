@@ -41,6 +41,14 @@ fun <T> Task<T>.trace(traceName: String): Task<T> {
     return this.addOnCompleteListener { trace.setSuccess(it.isSuccessful); trace.stop() }
 }
 
+inline fun <R> trace(traceName: String, block: () -> R) =
+    with(FirebasePerformance.getInstance().newTrace(traceName)) {
+        start()
+        val result = block()
+        stop()
+        result
+    }
+
 private fun Trace.setSuccess(success: Boolean) =
     if (success)
         this.incrementCounter(CALL_SUCCESS_NAME, SUCCESS)

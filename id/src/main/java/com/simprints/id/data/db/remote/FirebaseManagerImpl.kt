@@ -25,10 +25,7 @@ import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.id.tools.extensions.handleResponse
-import com.simprints.id.tools.extensions.handleResult
-import com.simprints.id.tools.extensions.toMap
-import com.simprints.id.tools.extensions.trace
+import com.simprints.id.tools.extensions.*
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -162,6 +159,7 @@ open class FirebaseManagerImpl(private val appContext: Context,
     }
 
     fun getFirebaseStorageInstance() = FirebaseStorage.getInstance(legacyFirebaseApp)
+
     override fun getFirebaseLegacyApp(): FirebaseApp = legacyFirebaseApp
 
     override fun getCurrentFirestoreToken(): Single<String> = Single.create {
@@ -180,6 +178,15 @@ open class FirebaseManagerImpl(private val appContext: Context,
             }
             .addOnFailureListener { e -> it.onError(e) }
     }
+
+    override suspend fun getCurrentFirestoreTokenSuspend(): String =
+        trace("getCurrentFirestoreToken") {
+            legacyFirebaseApp
+                .getToken(false)
+                .await()
+                .token
+                ?: throw RemoteDbNotSignedInError()
+        }
 
     // API
 
@@ -241,8 +248,17 @@ open class FirebaseManagerImpl(private val appContext: Context,
                 Single.just(buildPeopleApi(it))
             }
 
-    private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api
-    private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(SessionsRemoteInterface::class.java, SessionsRemoteInterface.baseUrl, authToken).api
+    private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(
+        PeopleRemoteInterface::class.java,
+        PeopleRemoteInterface.baseUrl,
+        authToken = authToken
+    ).api
+
+    private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(
+        SessionsRemoteInterface::class.java,
+        SessionsRemoteInterface.baseUrl,
+        authToken = authToken
+    ).api
 
     override fun getProjectApiClient(): Single<ProjectRemoteInterface> =
         getCurrentFirestoreToken()
@@ -250,7 +266,11 @@ open class FirebaseManagerImpl(private val appContext: Context,
                 Single.just(buildProjectApi(it))
             }
 
-    private fun buildProjectApi(authToken: String): ProjectRemoteInterface = SimApiClient(ProjectRemoteInterface::class.java, ProjectRemoteInterface.baseUrl, authToken).api
+    private fun buildProjectApi(authToken: String): ProjectRemoteInterface = SimApiClient(
+        ProjectRemoteInterface::class.java,
+        ProjectRemoteInterface.baseUrl,
+        authToken = authToken
+    ).api
 
     private fun retryCriteria(attempts: Int, error: Throwable): Boolean =
         attempts < RETRY_ATTEMPTS_FOR_NETWORK_CALLS && errorIsWorthRetrying(error)
