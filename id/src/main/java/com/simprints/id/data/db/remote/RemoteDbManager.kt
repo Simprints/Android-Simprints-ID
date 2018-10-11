@@ -48,7 +48,10 @@ interface RemoteDbManager {
     fun saveSessionInRemote(session: Session)
 
     fun getFirebaseLegacyApp(): FirebaseApp
+
     fun getCurrentFirestoreToken(): Single<String>
+
+    suspend fun getCurrentFirestoreTokenSuspend(): String
 
     // API
     /**
