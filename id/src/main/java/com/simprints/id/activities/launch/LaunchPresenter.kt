@@ -1,61 +1,67 @@
 package com.simprints.id.activities.launch
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
-import com.simprints.id.controllers.Setup
-import com.simprints.id.controllers.SetupCallback
+import com.simprints.id.R
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.events.CandidateReadEvent
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Result.*
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventData.models.events.ConsentEvent.Type.PARENTAL
-import com.simprints.id.data.db.sync.SyncManager
+import com.simprints.id.data.analytics.eventData.models.events.ScannerConnectionEvent
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
-import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
-import com.simprints.id.services.sync.SyncCategory
-import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.id.tools.AppState
-import com.simprints.id.tools.PositionTracker
+import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
+import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.libcommon.Person
 import com.simprints.libscanner.ButtonListener
-import com.simprints.libscanner.SCANNER_ERROR
-import com.simprints.libscanner.ScannerCallback
+import com.tbruyelle.rxpermissions2.Permission
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
 class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
 
     @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var dbManager: DbManager
+
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
+
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var analyticsManager: AnalyticsManager
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var syncManager: SyncManager
-    @Inject lateinit var scheduledPeopleSyncManager: ScheduledPeopleSyncManager
-    @Inject lateinit var scheduledSessionsSyncManager: ScheduledSessionsSyncManager
-    @Inject lateinit var appState: AppState
-    @Inject lateinit var setup: Setup
+    @Inject lateinit var scannerManager: ScannerManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var sessionEventsManager: SessionEventsManager
 
     private val activity = view as Activity
-    private lateinit var positionTracker: PositionTracker
 
-    // True iff the user confirmed consent
-    private var consentConfirmed = false
+    private var permissionsAlreadyRequested = false
+
+    private var syncSchedulerHelper: SyncSchedulerHelper
 
     // True iff the app is waiting for the user to confirm consent
-    private var waitingForConfirmation = false
+    private var waitingForConfirmation = true
 
     // True iff another activity launched by this activity is running
     private var launchOutOfFocus = false
@@ -70,80 +76,146 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     private var startConsentEventTime: Long = 0
 
     init {
-        (activity.application as Application).component.inject(this)
+        val component = (activity.application as Application).component
+        component.inject(this)
         startConsentEventTime = timeHelper.now()
+        syncSchedulerHelper = SyncSchedulerHelper(component)
     }
 
     override fun start() {
         view.setLanguage(preferencesManager.language)
         view.initTextsInButtons()
         view.initConsentTabs()
-        initPositionTracker()
-        initSetup()
-        initBackgroundSyncIfNecessary()
-        schedulePeopleSyncIfNecessary()
-        scheduleSessionsSyncIfNecessary()
+
+        syncSchedulerHelper.scheduleSyncsAndStartPeopleSyncIfNecessary()
         setTextToConsentTabs()
+
+        startSetup()
     }
 
-    private fun initPositionTracker() {
-        positionTracker = PositionTracker(activity, preferencesManager)
-        positionTracker.start()
+    private fun startSetup() {
+        requestPermissionsForLocation(5)
+            .andThen(checkIfVerifyAndGuidExists(15))
+            .andThen(veroTask(30, R.string.launch_bt_connect, scannerManager.disconnectVero()))
+            .andThen(veroTask(45, R.string.launch_bt_connect, scannerManager.initVero()))
+            .andThen(veroTask(60, R.string.launch_bt_connect, scannerManager.connectToVero()) { addBluetoothConnectivityEvent() })
+            .andThen(veroTask(75, R.string.launch_setup, scannerManager.resetVeroUI()))
+            .andThen(veroTask(90, R.string.launch_wake_un20, scannerManager.wakingUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() })
+            .subscribeBy(onError = { it.printStackTrace() }, onComplete = { handleSetupFinished() })
     }
 
-    private fun initSetup() {
-        setup.start(activity, setupCallback)
+    private fun updateBluetoothConnectivityEventWithVeroInfo() {
+        sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(preferencesManager.hardwareVersionString)
     }
 
-    private fun initBackgroundSyncIfNecessary() {
-        if (preferencesManager.syncOnCallout) {
-            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.AT_LAUNCH)
-        }
-    }
+    private fun veroTask(progress: Int, messageRes: Int, task: Completable, callback: (() -> Unit)? = null): Completable =
+        Completable.fromAction { view.handleSetupProgress(progress, messageRes) }
+            .andThen(task)
+            .andThen(Completable.fromAction { callback?.invoke() })
+            .doOnError { manageVeroErrors(it) }
 
-    private fun schedulePeopleSyncIfNecessary() {
-        if (preferencesManager.scheduledBackgroundSync) {
-            scheduledPeopleSyncManager.scheduleSyncIfNecessary()
+    private fun checkIfVerifyAndGuidExists(progress: Int): Completable =
+        Completable.fromAction { view.handleSetupProgress(progress, R.string.launch_checking_person_in_db) }
+            .andThen(tryToFetchGuid())
+
+    private fun tryToFetchGuid(): Completable {
+        return if (preferencesManager.calloutAction != CalloutAction.VERIFY) {
+            Completable.complete()
         } else {
-            scheduledPeopleSyncManager.deleteSyncIfNecessary()
+            val guid = preferencesManager.patientId
+            val startCandidateSearchTime = timeHelper.now()
+            dbManager.loadPerson(loginInfoManager.getSignedInProjectIdOrEmpty(), guid).doOnSuccess {
+                handleGuidFound(it, guid, startCandidateSearchTime)
+            }.doOnError {
+                it.printStackTrace()
+                // For any error, we show the missing guid screen.
+                saveNotFoundVerificationAndShowAlert(Person(guid), startCandidateSearchTime)
+            }.ignoreElement()
         }
     }
 
-    private fun scheduleSessionsSyncIfNecessary() {
-        scheduledSessionsSyncManager.scheduleSyncIfNecessary()
+    private fun handleGuidFound(result: PersonFetchResult, guid: String, startCandidateSearchTime: Long) {
+        Timber.d("Setup: GUID found.")
+        val isPersonFromLocalDb = !result.fetchedOnline
+        saveEventForCandidateReadInBackgroundNotFound(
+            guid,
+            startCandidateSearchTime,
+            if (isPersonFromLocalDb) CandidateReadEvent.LocalResult.NOT_FOUND else CandidateReadEvent.LocalResult.FOUND,
+            if (isPersonFromLocalDb) CandidateReadEvent.RemoteResult.FOUND else CandidateReadEvent.RemoteResult.NOT_FOUND)
     }
 
-    private val setupCallback = object : SetupCallback {
-        override fun onSuccess() {
-            handleSetupFinished()
+    private fun saveNotFoundVerificationAndShowAlert(probe: Person, startCandidateSearchTime: Long) {
+        if (simNetworkUtils.isConnected()) {
+            // We've synced with the online dbManager and they're not in the dbManager
+            view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE)
+            saveEventForCandidateReadInBackgroundNotFound(probe.guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND)
+        } else {
+            // We're offline but might find the person if we sync
+            view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE)
+            saveEventForCandidateReadInBackgroundNotFound(probe.guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, null)
         }
+    }
 
-        override fun onProgress(progress: Int, detailsId: Int) {
-            Timber.d( "onProgress")
-            view.handleSetupProgress(progress, detailsId)
+    private fun saveEventForCandidateReadInBackgroundNotFound(guid: String,
+                                                              startCandidateSearchTime: Long,
+                                                              localResult: CandidateReadEvent.LocalResult,
+                                                              remoteResult: CandidateReadEvent.RemoteResult?) {
+        sessionEventsManager.addEventForCandidateReadInBackground(
+            guid,
+            startCandidateSearchTime,
+            localResult,
+            remoteResult)
+    }
+
+    private fun manageVeroErrors(it: Throwable) {
+        it.printStackTrace()
+        view.doLaunchAlert(scannerManager.getAlertType(it))
+        analyticsManager.logThrowable(it)
+    }
+
+    private fun requestPermissionsForLocation(progress: Int): Completable {
+        view.handleSetupProgress(progress, R.string.launch_checking_permissions)
+        val permissionsNeeded = arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        val permissionsToRequest = if (permissionsAlreadyRequested) {
+            0
+        } else {
+            permissionsNeeded.size
         }
+        val requestForPermissions = view.requestPermissions(permissionsNeeded)
 
-        override fun onError(resultCode: Int) {
-            view.setResultAndFinish(resultCode, null)
-        }
+        return requestForPermissions
+            .take(permissionsToRequest.toLong())
+            .toList()
+            .flatMapCompletable { permissions ->
+                collectLocationIfPermitted(permissions)
+                permissionsAlreadyRequested = true
+                Completable.complete()
+            }
+    }
 
-        override fun onAlert(alertType: ALERT_TYPE) {
-            stopSetupAndLaunchAlert(alertType)
+    @SuppressLint("MissingPermission")
+    private fun collectLocationIfPermitted(permissions: List<Permission>) {
+        if (!permissionsAlreadyRequested &&
+            permissions.first { it.name == Manifest.permission.ACCESS_FINE_LOCATION }.granted) {
+            val req = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+            view.getLocationProvider()
+                .getUpdatedLocation(req)
+                .firstOrError()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribeBy(onSuccess = {
+                    preferencesManager.location = com.simprints.id.domain.Location.fromAndroidLocation(it)
+                    sessionEventsManager.addLocationToSession(it.latitude, it.longitude)
+                }, onError = { it.printStackTrace() })
         }
     }
 
     private fun handleSetupFinished() {
         preferencesManager.msSinceBootOnLoadEnd = timeHelper.now()
-        // If it is the first time the launch process finishes, wait for consent confirmation
-        // Else, go directly to the collectFingerprintsActivity
-        if (!consentConfirmed) {
-            view.handleSetupFinished()
-            waitingForConfirmation = true
-            appState.scanner.registerButtonListener(scannerButton)
-            view.doVibrateIfNecessary(preferencesManager.vibrateMode)
-        } else {
-            confirmConsentAndContinueToNextActivity()
-        }
+        view.handleSetupFinished()
+        scannerManager.scanner?.registerButtonListener(scannerButton)
+        view.doVibrateIfNecessary(preferencesManager.vibrateMode)
     }
 
     private fun setTextToConsentTabs() {
@@ -173,11 +245,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         return parentalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
     }
 
-    override fun handleOnRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        positionTracker.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        setup.onRequestPermissionsResult(activity, requestCode, permissions, grantResults)
-    }
-
     override fun handleOnBackPressed() {
         addConsentEvent(NO_RESPONSE)
         handleOnBackOrDeclinePressed()
@@ -186,6 +253,11 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     override fun handleDeclinePressed() {
         addConsentEvent(DECLINED)
         handleOnBackOrDeclinePressed()
+    }
+
+    private fun handleOnBackOrDeclinePressed() {
+        launchOutOfFocus = true
+        view.goToRefusalActivity()
     }
 
     private fun addConsentEvent(result: ConsentEvent.Result) {
@@ -208,44 +280,13 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         })
     }
 
-    private fun handleOnBackOrDeclinePressed() {
-        launchOutOfFocus = true
-        setup.stop()
-        view.goToRefusalActivity()
-    }
-
-    override fun updatePositionTracker(requestCode: Int, resultCode: Int, data: Intent?) {
-        positionTracker.onActivityResult(requestCode, resultCode, data)
-    }
-
-    fun stopSetupAndLaunchAlert(alertType: ALERT_TYPE) {
-        if (launchOutOfFocus)
-            return
-        launchOutOfFocus = true
-        setup.stop()
-        view.doLaunchAlert(alertType)
-    }
-
     override fun handleOnDestroy() {
-        positionTracker.finish()
-        disconnectScannerIfNeeded()
-    }
-
-    private fun disconnectScannerIfNeeded() {
-        if (appState.scanner != null) {
-            appState.scanner.disconnect(object : ScannerCallback {
-                override fun onSuccess() {}
-                override fun onFailure(scanner_error: SCANNER_ERROR) {}
-            })
-        }
+        scannerManager.disconnectScannerIfNeeded()
     }
 
     override fun tryAgainFromErrorScreen() {
-        launchOutOfFocus = false
-        initSetup()
+        startSetup()
     }
-
-    override fun isReadyToProceedToNextActivity(): Boolean = waitingForConfirmation
 
     override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
@@ -256,21 +297,23 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     override fun confirmConsentAndContinueToNextActivity() {
         addConsentEvent(ACCEPTED)
-
-        consentConfirmed = true
         waitingForConfirmation = false
         view.continueToNextActivity()
     }
 
     override fun handleOnResume() {
-        if (waitingForConfirmation) {
-            appState.scanner.registerButtonListener(scannerButton)
-        }
+        launchOutOfFocus = false
     }
 
     override fun handleOnPause() {
-        if (appState.scanner != null) {
-            appState.scanner.unregisterButtonListener(scannerButton)
-        }
+        launchOutOfFocus = true
+    }
+
+    private fun addBluetoothConnectivityEvent() {
+        sessionEventsManager.addEventForScannerConnectivityInBackground(
+            ScannerConnectionEvent.ScannerInfo(
+                preferencesManager.scannerId,
+                preferencesManager.macAddress,
+                preferencesManager.hardwareVersionString))
     }
 }

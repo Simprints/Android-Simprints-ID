@@ -6,7 +6,7 @@ import com.simprints.id.domain.Constants
 class OneToManyMatchEvent(val relativeStartTime: Long,
                           val relativeEndTime: Long,
                           val pool: MatchPool,
-                          val matchResult: Array<MatchCandidate>?) : Event(EventType.ONE_TO_MANY_MATCH) {
+                          val result: Array<MatchEntry>?) : Event(EventType.ONE_TO_MANY_MATCH) {
 
     class MatchPool(val type: MatchPoolType, val count: Int)
 

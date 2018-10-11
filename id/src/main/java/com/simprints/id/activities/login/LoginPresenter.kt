@@ -3,7 +3,7 @@ package com.simprints.id.activities.login
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.events.AuthenticationEvent
-import com.simprints.id.data.analytics.eventData.models.events.AuthenticationEvent.LoginInfo
+import com.simprints.id.data.analytics.eventData.models.events.AuthenticationEvent.UserInfo
 import com.simprints.id.data.analytics.eventData.models.events.AuthenticationEvent.Result.*
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -101,7 +101,7 @@ class LoginPresenter(val view: LoginContract.View,
             it.events.add(AuthenticationEvent(
                 it.timeRelativeToStartTime(startTimeLogin),
                 it.timeRelativeToStartTime(timeHelper.now()),
-                LoginInfo(suppliedProjectId, suppliedUserId),
+                UserInfo(suppliedProjectId, suppliedUserId),
                 result))
         })
     }

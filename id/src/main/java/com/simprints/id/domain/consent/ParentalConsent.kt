@@ -14,7 +14,7 @@ data class ParentalConsent(
     @SerializedName("consent_parent_id_verify") var consentParentIdVerify: Boolean = true,
     @SerializedName("consent_parent_share_data_no") var consentParentShareDataNo: Boolean = true,
     @SerializedName("consent_parent_share_data_yes") var consentParentShareDataYes: Boolean = false,
-    @SerializedName("consent_parent_collect_yes") var consentParentCollectYes: Boolean = false,
+    @SerializedName("consent_collect_yes") var consentCollectYes: Boolean = false,
     @SerializedName("consent_parent_privacy_rights") var consentParentPrivacyRights: Boolean = true,
     @SerializedName("consent_parent_confirmation") var consentParentConfirmation: Boolean = true
 ) {
@@ -31,7 +31,7 @@ data class ParentalConsent(
         }
         if (consentParentShareDataNo) append(context.getString(R.string.consent_parental_share_data_no))
         if (consentParentShareDataYes) append(context.getString(R.string.consent_parental_share_data_yes).format(organisationName))
-        if (consentParentCollectYes) append(context.getString(R.string.consent_parental_collect_yes))
+        if (consentCollectYes) append(context.getString(R.string.consent_collect_yes))
         if (consentParentPrivacyRights) append(context.getString(R.string.consent_parental_privacy_rights))
         if (consentParentConfirmation) append(context.getString(R.string.consent_parental_confirmation))
     }.toString()
