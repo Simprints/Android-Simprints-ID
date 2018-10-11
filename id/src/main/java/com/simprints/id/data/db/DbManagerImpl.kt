@@ -136,7 +136,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
                             guid: String): Single<PersonFetchResult> =
         local.loadPersonFromLocal(guid).map { PersonFetchResult(it, false) }
             .onErrorResumeNext {
-                remote.downloadPerson(guid, loginInfoManager.getSignedInProjectIdOrEmpty())
+                remotePeopleManager.downloadPerson(guid, loginInfoManager.getSignedInProjectIdOrEmpty())
                     .map { PersonFetchResult(rl_Person(it).libPerson, true) }
             }
 
