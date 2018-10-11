@@ -84,7 +84,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
 
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit, projectId: String) {
         updateSession(block, projectId).subscribeBy(onError = {
-            it.printStackTrace()
+            //it.printStackTrace()
         })
     }
 
@@ -104,6 +104,8 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         sessionEventsLocalDbManager.insertOrUpdateSessionEvents(session).doOnComplete {
             this.activeSession = session
         }
+
+    override fun getSessionCount(projectId: String): Single<Int> = sessionEventsLocalDbManager.getSessionCount(projectId)
 
     /** @throws SessionNotFoundException */
     override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
@@ -173,7 +175,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                 session.timeRelativeToStartTime(startTimeVerification),
                 session.nowRelativeToStartTime(timeHelper),
                 preferencesManager.patientId,
-                match?.let { MatchCandidate(it.guid, match.confidence) }))
+                match?.let { MatchEntry(it.guid, match.confidence) }))
         })
     }
 
@@ -183,16 +185,18 @@ open class SessionEventsManagerImpl(private val ctx: Context,
                 session.timeRelativeToStartTime(startTimeIdentification),
                 session.nowRelativeToStartTime(timeHelper),
                 OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
-                matches.map { MatchCandidate(it.guid, it.confidence) }.toList().toTypedArray()))
+                matches.map { MatchEntry(it.guid, it.confidence) }.toList().toTypedArray()))
         })
     }
 
     override fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo) {
         updateSessionInBackground({
-            it.events.add(ScannerConnectionEvent(
-                it.nowRelativeToStartTime(timeHelper),
-                scannerInfo
-            ))
+            if (it.events.filterIsInstance(ScannerConnectionEvent::class.java).isEmpty()) {
+                it.events.add(ScannerConnectionEvent(
+                    it.nowRelativeToStartTime(timeHelper),
+                    scannerInfo
+                ))
+            }
         })
     }
 
@@ -215,7 +219,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
     override fun addEventForCandidateReadInBackground(guid: String,
                                                       startCandidateSearchTime: Long,
                                                       localResult: CandidateReadEvent.LocalResult,
-                                                      remoteResult: CandidateReadEvent.RemoteResult) {
+                                                      remoteResult: CandidateReadEvent.RemoteResult?) {
         updateSessionInBackground({
             it.events.add(CandidateReadEvent(
                 it.timeRelativeToStartTime(startCandidateSearchTime),

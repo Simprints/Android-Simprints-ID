@@ -4,6 +4,9 @@ import android.content.Intent
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.ALERT_TYPE
+import com.tbruyelle.rxpermissions2.Permission
+import io.reactivex.Observable
+import pl.charmas.android.reactivelocation2.ReactiveLocationProvider
 
 interface LaunchContract {
 
@@ -24,15 +27,14 @@ interface LaunchContract {
         fun setTextToGeneralConsent(generalConsentText: String)
         fun addParentalConsentTabWithText(parentalConsentText: String)
         fun isCurrentTabParental(): Boolean
+        fun requestPermissions(permissions: ArrayList<String>): Observable<Permission>
+        fun getLocationProvider(): ReactiveLocationProvider
     }
 
     interface Presenter : BasePresenter {
 
-        fun isReadyToProceedToNextActivity(): Boolean
         fun tryAgainFromErrorScreen()
-        fun updatePositionTracker(requestCode: Int, resultCode: Int, data: Intent?)
 
-        fun handleOnRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray)
         fun handleOnDestroy()
         fun handleOnResume()
         fun handleOnPause()
