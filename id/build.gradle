@@ -22,7 +22,7 @@ kapt {
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 27
