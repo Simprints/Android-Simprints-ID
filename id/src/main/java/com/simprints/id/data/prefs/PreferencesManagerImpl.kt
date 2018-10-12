@@ -6,6 +6,7 @@ import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 
+
 class PreferencesManagerImpl(sessionState: SessionStatePreferencesManager,
                              settings: SettingsPreferencesManager,
                              lastEvents: RecentEventsPreferencesManager,
@@ -33,6 +34,14 @@ class PreferencesManagerImpl(sessionState: SessionStatePreferencesManager,
             is Int -> prefs.edit().putInt(key, value).apply()
             is Long -> prefs.edit().putLong(key, value).apply()
             is String -> prefs.edit().putString(key, value).apply()
+        }
+    }
+
+    override fun clearAllSharedPreferencesExceptRealmKeys() {
+        prefs.all.forEach {
+            if(!it.key.contains("realmKey")) {
+                prefs.edit().remove(it.key).apply()
+            }
         }
     }
 }
