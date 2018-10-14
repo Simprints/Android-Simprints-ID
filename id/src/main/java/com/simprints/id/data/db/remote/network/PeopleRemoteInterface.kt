@@ -26,7 +26,7 @@ interface PeopleRemoteInterface {
 
     @POST("projects/{projectId}/patients")
     fun uploadPeople(@Path("projectId") projectId: String,
-                     @Body patientsJson: HashMap<String, ArrayList<fb_Person>>): Single<Result<Unit>>
+                     @Body patientsJson: HashMap<String, List<fb_Person>>): Single<Result<Unit>>
 
     @GET("projects/{projectId}/patients/{patientId}")
     fun requestPerson(

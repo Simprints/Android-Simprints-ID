@@ -23,6 +23,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.toFlowable
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
@@ -58,9 +59,12 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     }
 
     override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable =
+        insertOrUpdatePeopleInLocal(listOf(person))
+
+    override fun insertOrUpdatePeopleInLocal(people: List<rl_Person>): Completable =
         getRealmInstance().flatMapCompletable {
             it.use {
-                it.executeTransaction { it.insertOrUpdate(person) }.let { Completable.complete() }
+                it.executeTransaction { it.insertOrUpdate(people) }.let { Completable.complete() }
             }
         }
 
@@ -131,6 +135,33 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 emitter.onError(t)
             }
         }, BackpressureStrategy.BUFFER)
+
+    override fun countPeopleFromLocalRx(patientId: String?,
+                                        userId: String?,
+                                        moduleId: String?,
+                                        toSync: Boolean?): Flowable<Int> {
+        val realmConfig = (realmConfig ?: throw RealmUninitialisedError("No valid realm Config"))
+        val realm = Realm.getInstance(realmConfig)
+        return buildQueryForPerson(realm, patientId, userId, moduleId, toSync)
+            .findAllAsync()
+            .asFlowable()
+            .map { realmResults -> realmResults.count() }
+            .doAfterTerminate(realm::close)
+    }
+//        Flowable.create<rl_Person>({ emitter ->
+//            try {
+//                getRealmInstance().blockingGet().use {
+//                    val query = buildQueryForPerson(it, patientId, userId, moduleId, toSync)
+//                    val people = query.findAllAsync().asFlowable()
+//                    for (person in people) {
+//                        emitter.onNext(it.copyFromRealm(person))
+//                    }
+//                    emitter.onComplete()
+//                }
+//            } catch (t: Throwable) {
+//                emitter.onError(t)
+//            }
+//        }, BackpressureStrategy.BUFFER)
 
     override fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo> =
         getRealmInstance().map {

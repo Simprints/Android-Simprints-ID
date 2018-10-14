@@ -37,9 +37,10 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 
-open class FirebaseManagerImpl(private val appContext: Context,
-                          private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
-    RemoteDbManager {
+open class FirebaseManagerImpl(
+    private val appContext: Context,
+    private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)
+) : RemoteDbManager {
 
     private var isInitialised = false
 
@@ -191,9 +192,9 @@ open class FirebaseManagerImpl(private val appContext: Context,
     // API
 
     override fun uploadPerson(fbPerson: fb_Person): Completable =
-        uploadPeople(fbPerson.projectId, arrayListOf(fbPerson))
+        uploadPeople(fbPerson.projectId, listOf(fbPerson))
 
-    override fun uploadPeople(projectId: String, patientsToUpload: ArrayList<fb_Person>): Completable =
+    override fun uploadPeople(projectId: String, patientsToUpload: List<fb_Person>): Completable =
         getPeopleApiClient().flatMapCompletable {
             it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload))
                 .retry(::retryCriteria)
@@ -251,13 +252,13 @@ open class FirebaseManagerImpl(private val appContext: Context,
     private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(
         PeopleRemoteInterface::class.java,
         PeopleRemoteInterface.baseUrl,
-        authToken = authToken
+        authToken
     ).api
 
     private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(
         SessionsRemoteInterface::class.java,
         SessionsRemoteInterface.baseUrl,
-        authToken = authToken
+        authToken
     ).api
 
     override fun getProjectApiClient(): Single<ProjectRemoteInterface> =
@@ -269,7 +270,7 @@ open class FirebaseManagerImpl(private val appContext: Context,
     private fun buildProjectApi(authToken: String): ProjectRemoteInterface = SimApiClient(
         ProjectRemoteInterface::class.java,
         ProjectRemoteInterface.baseUrl,
-        authToken = authToken
+        authToken
     ).api
 
     private fun retryCriteria(attempts: Int, error: Throwable): Boolean =
