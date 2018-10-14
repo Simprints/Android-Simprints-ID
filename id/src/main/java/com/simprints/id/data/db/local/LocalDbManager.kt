@@ -26,6 +26,7 @@ interface LocalDbManager {
 
     // Data transfer
     fun insertOrUpdatePersonInLocal(person: rl_Person): Completable
+    fun insertOrUpdatePeopleInLocal(people: List<rl_Person>): Completable
 
     fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
                                               gson: Gson,
@@ -50,6 +51,11 @@ interface LocalDbManager {
                               moduleId: String? = null,
                               toSync: Boolean? = null,
                               sortBy: Map<String, Sort>? = null): Flowable<rl_Person>
+
+    fun countPeopleFromLocalRx(patientId: String? = null,
+                               userId: String? = null,
+                               moduleId: String? = null,
+                               toSync: Boolean? = null): Flowable<Int>
 
     fun saveProjectIntoLocal(project: Project): Completable
 

@@ -16,9 +16,9 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
-import com.simprints.id.exceptions.safe.setup.FetchingGuidForVerificationFailedException
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.scheduledSync.peopleUpsync.PatientBatchUploader
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
 import com.simprints.id.tools.TimeHelper
@@ -84,15 +84,16 @@ open class DbManagerImpl(override val local: LocalDbManager,
             preferencesManager.moduleId))
 
     override fun savePerson(fbPerson: fb_Person): Completable = // TODO Investigate this interesting nested subscription
-        local.insertOrUpdatePersonInLocal(rl_Person(fbPerson))
+        local.insertOrUpdatePersonInLocal(rl_Person(fbPerson, toSync = true))
             .doOnComplete {
-                sessionEventsManager.updateSession({
-                    it.events.add(EnrollmentEvent(
-                        it.nowRelativeToStartTime(timeHelper),
-                        fbPerson.patientId
-                    ))
-                }).andThen(uploadPersonAndDownloadAgain(fbPerson))
-                    .updatePersonInLocal()
+                sessionEventsManager
+                    .updateSession({
+                        it.events.add(EnrollmentEvent(
+                            it.nowRelativeToStartTime(timeHelper),
+                            fbPerson.patientId
+                        ))
+                    })
+                    .andThen(scheduleUpsync(fbPerson.projectId, fbPerson.userId))
                     .subscribeOn(Schedulers.io())
                     .subscribeBy(onComplete = {}, onError = {
                         it.printStackTrace()
@@ -102,15 +103,19 @@ open class DbManagerImpl(override val local: LocalDbManager,
             .observeOn(AndroidSchedulers.mainThread())
             .trace("savePerson")
 
-    private fun uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
-        remote
-            .uploadPerson(fbPerson)
-            .andThen(remote.downloadPerson(fbPerson.patientId, fbPerson.projectId))
-            .trace("uploadPersonAndDownloadAgain")
+    fun scheduleUpsync(projectId: String, userId: String): Completable = Completable.create {
+        PatientBatchUploader.schedule(projectId, userId)
+    }
 
-    private fun Single<out fb_Person>.updatePersonInLocal(): Completable = flatMapCompletable {
-        local.insertOrUpdatePersonInLocal(rl_Person(it))
-    }.trace("updatePersonInLocal")
+//    private fun uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
+//        remote
+//            .uploadPerson(fbPerson)
+//            .andThen(remote.downloadPerson(fbPerson.patientId, fbPerson.projectId))
+//            .trace("uploadPersonAndDownloadAgain")
+
+//    private fun Single<out fb_Person>.updatePersonInLocal(): Completable = flatMapCompletable {
+//        local.insertOrUpdatePersonInLocal(rl_Person(it))
+//    }.trace("updatePersonInLocal")
 
     override fun loadPerson(destinationList: MutableList<Person>,
                             projectId: String,

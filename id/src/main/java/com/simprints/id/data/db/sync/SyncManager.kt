@@ -5,6 +5,7 @@ import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.exceptions.safe.TaskInProgressException
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.scheduledSync.peopleUpsync.PatientBatchUploader
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncService

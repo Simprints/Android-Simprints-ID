@@ -7,36 +7,32 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 
-class OkHttpClientBuilder {
+class DefaultOkHttpClientBuilder {
 
-    fun build(authToken: String? = null): OkHttpClient =
+    fun get(authToken: String? = null): OkHttpClient.Builder =
         OkHttpClient.Builder()
             .followRedirects(false)
             .followSslRedirects(false)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor(buildAuthenticationInterceptor(authToken))
+            .apply {
+                if (authToken != null && authToken.isNotBlank()) {
+                    addInterceptor(buildAuthenticationInterceptor(authToken))
+                }
+            }
             .apply {
                 if (BuildConfig.DEBUG) {
                     addInterceptor(buildLoggingInterceptor())
                 }
             }
             .addInterceptor(buildTemporaryRedirectionFollowingInterceptor())
-            .build()
 
-    private fun buildAuthenticationInterceptor(authToken: String?): Interceptor =
+    private fun buildAuthenticationInterceptor(authToken: String): Interceptor =
         Interceptor { chain ->
             val newRequest = chain.request().newBuilder()
-                .addAuthTokenIfRequestRequires(authToken)
+                .addHeader("Authorization", "Bearer $authToken")
                 .build()
             return@Interceptor chain.proceed(newRequest)
-        }
-
-    private fun Request.Builder.addAuthTokenIfRequestRequires(authToken: String?): Request.Builder =
-        apply {
-            if (!authToken.isNullOrBlank()) {
-                addHeader("Authorization", "Bearer $authToken")
-            }
         }
 
     private fun buildLoggingInterceptor(): Interceptor {

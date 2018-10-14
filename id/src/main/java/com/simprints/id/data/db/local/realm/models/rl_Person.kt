@@ -61,7 +61,7 @@ open class rl_Person : RealmObject {
 
     constructor() {}
 
-    constructor(person: fb_Person) {
+    constructor(person: fb_Person, toSync: Boolean = person.updatedAt == null || person.createdAt == null) {
         this.patientId = person.patientId
         this.userId = person.userId
         this.createdAt = person.createdAt
@@ -69,7 +69,7 @@ open class rl_Person : RealmObject {
         this.moduleId = person.moduleId
         this.projectId = person.projectId
         this.fingerprints = RealmList()
-        this.toSync = person.updatedAt == null || person.createdAt == null
+        this.toSync = toSync
 
         fingerprints.addAll(person.fingerprintsAsList
                                   .map { rl_Fingerprint(it) }
