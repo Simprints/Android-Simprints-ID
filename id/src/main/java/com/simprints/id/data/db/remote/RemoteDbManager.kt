@@ -7,6 +7,7 @@ import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
+import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
@@ -14,13 +15,13 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInExcepti
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.io.IOException
+import com.simprints.libcommon.Person as LibPerson
 
 interface RemoteDbManager {
 
@@ -38,10 +39,10 @@ interface RemoteDbManager {
     // Data transfer
     // Firebase
 
-    fun saveIdentificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
+    fun saveIdentificationInRemote(probe: LibPerson, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
     fun updateIdentificationInRemote(projectId: String, selectedGuid: String, deviceId: String, sessionId: String)
 
-    fun saveVerificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
+    fun saveVerificationInRemote(probe: LibPerson, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
 
     fun saveRefusalFormInRemote(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String)
 
@@ -50,8 +51,6 @@ interface RemoteDbManager {
     fun getFirebaseLegacyApp(): FirebaseApp
 
     fun getCurrentFirestoreToken(): Single<String>
-
-    suspend fun getCurrentFirestoreTokenSuspend(): String
 
     // API
     /**
@@ -63,8 +62,7 @@ interface RemoteDbManager {
     /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
     fun downloadPerson(patientId: String, projectId: String): Single<fb_Person>
 
-    fun uploadPerson(fbPerson: fb_Person): Completable
-    fun uploadPeople(projectId: String, patientsToUpload: List<fb_Person>): Completable
+    fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable
 
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
 

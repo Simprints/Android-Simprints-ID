@@ -2,10 +2,9 @@ package com.simprints.id.di
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
+import androidx.work.WorkManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
-import com.simprints.id.scanner.ScannerManager
-import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -22,9 +21,6 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.RemotePeopleManagerImpl
-import com.simprints.id.data.db.remote.people.PeopleApi
-import com.simprints.id.data.db.remote.people.PeopleClient
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
@@ -36,16 +32,20 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.network.DefaultOkHttpClientBuilder
-import com.simprints.id.network.NetworkConstants
 import com.simprints.id.network.SimApiClient
+import com.simprints.id.scanner.ScannerManager
+import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.progress.notifications.NotificationFactory
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncService
-import com.simprints.id.tools.*
+import com.simprints.id.tools.RandomGenerator
+import com.simprints.id.tools.RandomGeneratorImpl
+import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -77,29 +77,12 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideRemotePeopleManager(peopleClient: PeopleClient) =
-        RemotePeopleManagerImpl(peopleClient)
-
-    @Provides
-    @Singleton
-    open fun providePeopleClient(peopleApi: PeopleApi, remoteDbManager: RemoteDbManager) =
-        PeopleClient(
-            peopleApi = peopleApi,
-            getAuthToken = { remoteDbManager.getCurrentFirestoreTokenSuspend() }
-        )
-
-    @Provides
-    @Singleton
-    open fun providePeopleApi(): PeopleApi =
-        PeopleApi.Factory.build(
-            baseUrl = NetworkConstants.baseUrl,
-            okHttpClient = DefaultOkHttpClientBuilder().get().build()
-        )
-
-
-        @Provides
-    @Singleton
     open fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager = LoginInfoManagerImpl(improvedSharedPreferences)
+
+    @Provides
+    @Singleton
+    open fun providePeopleUpSyncMaster() =
+        PeopleUpSyncMaster(WorkManager.getInstance())
 
     @Provides
     @Singleton
@@ -109,8 +92,9 @@ open class AppModule(val app: Application) {
                               loginInfoManager: LoginInfoManager,
                               preferencesManager: PreferencesManager,
                               sessionEventsManager: SessionEventsManager,
-                              timeHelper: TimeHelper): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper)
+                              timeHelper: TimeHelper,
+                              peopleUpSyncMaster: PeopleUpSyncMaster): DbManager =
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper, peopleUpSyncMaster)
 
     @Provides
     @Singleton

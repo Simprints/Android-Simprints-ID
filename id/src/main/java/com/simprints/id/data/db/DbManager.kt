@@ -26,7 +26,7 @@ interface DbManager {
     // Lifecycle
     fun initialiseDb()
 
-    fun signIn(projectId: String, tokens: Tokens): Completable
+    fun signIn(projectId: String, userId: String, tokens: Tokens): Completable
     fun signOut()
 
     fun isDbInitialised(): Boolean

@@ -3,13 +3,15 @@ package com.simprints.id.data.db.remote.models
 import com.google.firebase.firestore.ServerTimestamp
 import com.google.gson.annotations.SerializedName
 import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.domain.Fingerprint
+import com.simprints.id.domain.Person
 import com.simprints.id.tools.json.PostGsonProcessable
 import com.simprints.id.tools.json.SkipSerialisationProperty
-import com.simprints.libcommon.Person
 import com.simprints.libsimprints.FingerIdentifier
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import com.simprints.libcommon.Person as LibPerson
 
 data class fb_Person(@SerializedName("id") var patientId: String,
                      var projectId: String,
@@ -19,7 +21,7 @@ data class fb_Person(@SerializedName("id") var patientId: String,
                      @ServerTimestamp var updatedAt: Date?,
                      var fingerprints: HashMap<FingerIdentifier, ArrayList<fb_Fingerprint>>) : PostGsonProcessable {
 
-    constructor (person: Person,
+    constructor (person: LibPerson,
                  projectId: String,
                  userId: String,
                  moduleId: String) : this(
@@ -57,3 +59,31 @@ data class fb_Person(@SerializedName("id") var patientId: String,
         fingerprints.mapValues { entry -> entry.value.forEach { it.fingerId = entry.key } }
     }
 }
+
+fun Person.toFirebasePerson(): fb_Person =
+    fb_Person(
+        patientId = patientId,
+        projectId = projectId,
+        userId = userId,
+        moduleId = moduleId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        fingerprints = HashMap(fingerprints
+            .map(Fingerprint::toFirebaseFingerprint)
+            .groupBy { it.fingerId }
+            .mapValues { ArrayList(it.value) })
+    )
+
+fun fb_Person.toDomainPerson(): Person =
+    Person(
+        patientId = patientId,
+        projectId = projectId,
+        userId = userId,
+        moduleId = moduleId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        fingerprints = fingerprints.flatMap { (_, fingerFingerprints) ->
+            fingerFingerprints.map(fb_Fingerprint::toDomainFingerprint)
+        },
+        toSync = false
+    )

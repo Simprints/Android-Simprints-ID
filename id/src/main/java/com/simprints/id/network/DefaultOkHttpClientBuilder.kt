@@ -3,7 +3,6 @@ package com.simprints.id.network
 import com.simprints.id.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.TimeUnit
 
@@ -13,8 +12,8 @@ class DefaultOkHttpClientBuilder {
         OkHttpClient.Builder()
             .followRedirects(false)
             .followSslRedirects(false)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
             .apply {
                 if (authToken != null && authToken.isNotBlank()) {
                     addInterceptor(buildAuthenticationInterceptor(authToken))
