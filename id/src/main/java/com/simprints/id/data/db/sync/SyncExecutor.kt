@@ -23,7 +23,6 @@ open class SyncExecutor(private val dbManager: DbManager,
     companion object {
         private const val DOWN_BATCH_SIZE_FOR_DOWNLOADING = 10000
         const val DOWN_BATCH_SIZE_FOR_UPDATING_UI = 100
-        const val UP_BATCH_SIZE = 80
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 
@@ -67,7 +66,6 @@ open class SyncExecutor(private val dbManager: DbManager,
                                             syncParams: SyncTaskParameters,
                                             input: InputStream): Observable<Int> =
         Observable.create<Int> { result ->
-
             val reader = JsonReader(InputStreamReader(input) as Reader?)
             try {
                 reader.beginArray()
@@ -79,7 +77,7 @@ open class SyncExecutor(private val dbManager: DbManager,
                         val shouldDownloadingBatchStop = isInterrupted() ||
                                                                   hasCurrentBatchDownloadedFinished(totalDownloaded, DOWN_BATCH_SIZE_FOR_DOWNLOADING)
                         shouldDownloadingBatchStop
-                    }.subscribe()
+                    }.blockingAwait()
                 }
 
                 val possibleError = if (isInterrupted()) InterruptedSyncException() else null
@@ -105,6 +103,7 @@ open class SyncExecutor(private val dbManager: DbManager,
                                error: Throwable? = null) {
 
         Timber.d("Download finished")
+        error?.let { Timber.e(error)}
 
         reader.endArray()
         reader.close()

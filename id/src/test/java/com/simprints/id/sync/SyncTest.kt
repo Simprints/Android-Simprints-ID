@@ -20,24 +20,22 @@ import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
-import com.simprints.id.services.progress.UploadProgress
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.SpyRule
+import com.simprints.id.shared.PeopleGeneratorUtils
+import com.simprints.id.shared.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.mockServer.assertPathUrlParam
 import com.simprints.id.testUtils.mockServer.assertQueryUrlParam
-import com.simprints.id.shared.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper
-import com.simprints.id.shared.PeopleGeneratorUtils
-import com.simprints.id.shared.PeopleGeneratorUtils.getRandomPeople
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import okhttp3.mockwebserver.MockResponse
@@ -51,7 +49,6 @@ import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
-import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
@@ -68,6 +65,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
 
     override var module by lazyVar {
         AppModuleForTests(app,
@@ -87,61 +85,6 @@ class SyncTest : RxJavaTest, DaggerForTests() {
 
         mockServer.start()
         apiClient = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl)
-    }
-
-    @Test
-    fun uploadPeopleInBatches_shouldWorkWithPoorConnection() {
-        val localDbManager = Mockito.mock(LocalDbManager::class.java)
-        val patientsToUpload = getRandomPeople(35)
-        val projectIdTest = "projectIDTest"
-        val syncParams = SyncTaskParameters.GlobalSyncTaskParameters(projectIdTest)
-
-        whenever(localDbManager.loadPeopleFromLocalRx(toSync = true)).thenReturn(Flowable.fromIterable(patientsToUpload))
-        whenever(localDbManager.getPeopleCountFromLocal(toSync = true)).thenReturn(Single.just(patientsToUpload.count()))
-
-        val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 25, PeopleRemoteInterface::class.java))
-        whenever(remoteDbManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
-
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper), JsonHelper.gson)
-
-        val testObserver = sync.uploadNewPatients({ false }, syncParams, 10).test()
-        testObserver.awaitTerminalEvent()
-
-        testObserver
-            .assertNoErrors()
-            .assertComplete()
-            .assertValueSequence(arrayListOf(
-                UploadProgress(10, patientsToUpload.size),
-                UploadProgress(20, patientsToUpload.size),
-                UploadProgress(30, patientsToUpload.size),
-                UploadProgress(35, patientsToUpload.size)))
-    }
-
-    @Test
-    fun uploadPeopleGetInterrupted_shouldStopUploading() {
-        val localDbManager = Mockito.mock(LocalDbManager::class.java)
-        val projectIdTest = "projectIDTest"
-        val syncParams = SyncTaskParameters.GlobalSyncTaskParameters(projectIdTest)
-
-        val peopleToUpload = getRandomPeople(35, projectId = projectIdTest)
-
-        whenever(localDbManager.loadPeopleFromLocalRx(toSync = true)).thenReturn(Flowable.fromIterable(peopleToUpload))
-        whenever(localDbManager.getPeopleCountFromLocal(toSync = true)).thenReturn(Single.just(peopleToUpload.count()))
-
-        val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 25, PeopleRemoteInterface::class.java))
-        whenever(remoteDbManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
-
-        val sync = SyncExecutorMock(DbManagerImpl(localDbManager, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper), JsonHelper.gson)
-
-        val count = AtomicInteger(0)
-        val testObserver = sync.uploadNewPatients({ count.addAndGet(1) > 2 }, syncParams, 10).test()
-
-        testObserver.awaitTerminalEvent()
-
-        testObserver
-            .assertNoErrors()
-            .assertComplete()
-            .assertValueCount(1)
     }
 
     @Test
@@ -290,7 +233,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         // Mock when trying to save the syncInfo
         whenever(localDbMock.updateSyncInfo(anyNotNull())).thenReturn(Completable.complete())
 
-        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper), JsonHelper.gson)
+        val sync = SyncExecutorMock(DbManagerImpl(localDbMock, remoteDbManagerSpy, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper, peopleUpSyncMaster), JsonHelper.gson)
 
         return sync.downloadNewPatients({ false }, syncParams).test()
     }
