@@ -9,6 +9,8 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
+import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderTask
 import com.simprints.id.shared.assertThrows
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -16,7 +18,7 @@ import io.reactivex.Single
 import org.junit.Test
 import java.util.*
 
-class PeopleUpSyncTaskTest {
+class PeopleUpSyncUploaderTaskTest {
 
     private val loginInfoManager: LoginInfoManager = mock()
     private val localDbManager: LocalDbManager = mock()
@@ -26,7 +28,7 @@ class PeopleUpSyncTaskTest {
     private val userIdToSync = "userIdToSync"
     private val batchSize = 2
 
-    private val task = PeopleUpSyncTask(
+    private val task = PeopleUpSyncUploaderTask(
         loginInfoManager, localDbManager, remoteDbManager,
         projectIdToSync, userIdToSync, batchSize
     )
@@ -64,13 +66,13 @@ class PeopleUpSyncTaskTest {
     }
 
     @Test
-    fun httpException_shouldRethrow() {
+    fun simprintsInternalServerException_shouldWrapInTransientSyncFailureException() {
         mockSignedInUser(projectIdToSync, userIdToSync)
         mockSuccessfulLocalPeopleQueries(listOf(notYetSyncedPerson1))
         whenever(remoteDbManager.uploadPeople(projectIdToSync, listOf(notYetSyncedPerson1)))
             .thenThrow(SimprintsInternalServerException())
 
-        assertThrows<SimprintsInternalServerException> {
+        assertThrows<TransientSyncFailureException> {
             task.execute()
         }
     }

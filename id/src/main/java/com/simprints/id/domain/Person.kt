@@ -11,7 +11,7 @@ data class Person (
     val moduleId: String,
     val createdAt: Date?,
     val updatedAt: Date?,
-    val toSync: Boolean,
+    val toSync: Boolean, // TODO: stop leaking data layer concerns into domain layer
     val fingerprints: List<Fingerprint>
 )
 

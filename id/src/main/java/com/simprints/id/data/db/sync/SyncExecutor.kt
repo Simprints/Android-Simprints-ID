@@ -5,7 +5,7 @@ import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.network.DownSyncParams
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.exceptions.safe.InterruptedSyncException
+import com.simprints.id.exceptions.safe.sync.InterruptedSyncException
 import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
@@ -75,7 +75,7 @@ open class SyncExecutor(private val dbManager: DbManager,
                         val shouldDownloadingBatchStop = isInterrupted() ||
                                                                   hasCurrentBatchDownloadedFinished(totalDownloaded, DOWN_BATCH_SIZE_FOR_DOWNLOADING)
                         shouldDownloadingBatchStop
-                    }.blockingAwait()
+                    }.subscribe()
                 }
 
                 val possibleError = if (isInterrupted()) InterruptedSyncException() else null

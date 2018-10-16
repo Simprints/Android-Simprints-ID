@@ -38,6 +38,8 @@ import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.progress.notifications.NotificationFactory
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
+import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncService
@@ -81,7 +83,10 @@ open class AppModule(val app: Application) {
     @Provides
     @Singleton
     open fun providePeopleUpSyncMaster() =
-        PeopleUpSyncMaster()
+        PeopleUpSyncMaster(
+            PeopleUpSyncUploaderMaster(),
+            PeopleUpSyncPeriodicFlusherMaster()
+        )
 
     @Provides
     @Singleton
