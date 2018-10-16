@@ -33,6 +33,7 @@ import com.simprints.libcommon.Utils
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Registration
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.min
@@ -286,6 +287,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun handleUnexpectedError(error: SimprintsError) {
         analyticsManager.logError(error)
+        Timber.e(error)
         view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }
 

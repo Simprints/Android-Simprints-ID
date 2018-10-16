@@ -49,10 +49,8 @@ open class SyncExecutor(private val dbManager: DbManager,
                     downSyncParam.lastKnownPatientId,
                     downSyncParam.lastKnownPatientUpdatedAt)
                     .flatMapObservable {
-                        savePeopleFromStream(
-                            isInterrupted,
-                            syncParams,
-                            it.byteStream()).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+                        savePeopleFromStream(isInterrupted, syncParams, it.byteStream())
+                            .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
                             .map {
                                 DownloadProgress(it, nPeopleToDownload)
                             }

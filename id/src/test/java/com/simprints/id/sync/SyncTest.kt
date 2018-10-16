@@ -212,7 +212,8 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         nPatientsForProjectIdFromServer: Int,
         localDbMock: LocalDbManager,
         patientsAlreadyInLocalDb: Int,
-        syncParams: SyncTaskParameters): TestObserver<Progress> {
+        syncParams: SyncTaskParameters
+    ): TestObserver<Progress> {
 
         //Build fake response for GET patients
         val patientsToDownload = ArrayList(peopleToDownload)

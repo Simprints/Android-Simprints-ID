@@ -5,6 +5,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Person
 import io.reactivex.Flowable
+import timber.log.Timber
 
 class PeopleUpSyncTask(
     private val loginInfoManager: LoginInfoManager,
@@ -34,6 +35,7 @@ class PeopleUpSyncTask(
         val peopleToSyncCount = localDbManager
             .getPeopleCountFromLocal(userId = userId, toSync = true)
             .blockingGet()
+        Timber.d("$peopleToSyncCount people to up-sync")
         return peopleToSyncCount > 0
     }
 
@@ -43,7 +45,9 @@ class PeopleUpSyncTask(
 
     private fun upSyncBatch(people: List<Person>) {
         uploadPeople(people)
+        Timber.d("Uploaded a batch of ${people.size} people")
         markPeopleAsSynced(people)
+        Timber.d("Marked a batch of ${people.size} people as synced")
     }
 
     private fun uploadPeople(people: List<Person>) =
