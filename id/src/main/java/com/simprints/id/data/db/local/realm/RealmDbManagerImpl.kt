@@ -26,6 +26,7 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import io.realm.Sort
+import timber.log.Timber
 import com.simprints.libcommon.Person as LibPerson
 
 //TODO: investigate potential concurrency issues using .use
@@ -82,9 +83,9 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                     }
                 }
             }
+            updateSyncInfo(syncParams)
         }
             .ignoreElement()
-            .andThen { updateSyncInfo(syncParams) }
 
     override fun getPeopleCountFromLocal(patientId: String?,
                                          userId: String?,
@@ -116,6 +117,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 .map(rl_Person::toDomainPerson)
         }
 
+    // TODO: improve this terrible usage of RxJava
     override fun loadPeopleFromLocalRx(patientId: String?,
                                        userId: String?,
                                        moduleId: String?,
@@ -131,8 +133,9 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                             emitter.onNext(realmPerson.toDomainPerson())
                         }
                     emitter.onComplete()
-                }
+                }.blockingGet()
             } catch (t: Throwable) {
+                Timber.e(t)
                 emitter.onError(t)
             }
         }, BackpressureStrategy.BUFFER)
@@ -220,7 +223,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
             }
 
     private fun Realm.buildQueryForPerson(syncParams: SyncTaskParameters): RealmQuery<rl_Person> =
-        this.buildQueryForPerson(
+        buildQueryForPerson(
             userId = syncParams.userId,
             moduleId = syncParams.moduleId
         )

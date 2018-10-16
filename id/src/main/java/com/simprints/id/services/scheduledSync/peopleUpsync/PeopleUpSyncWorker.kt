@@ -33,7 +33,7 @@ class PeopleUpSyncWorker: Worker() {
     }
 
     override fun doWork(): Result {
-        Timber.d("PeopleUpSyncWorker - doWork")
+        Timber.d("Reporting for duty!")
         injectDependencies()
 
         val task = PeopleUpSyncTask(

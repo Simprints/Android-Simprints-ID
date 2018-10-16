@@ -134,6 +134,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
 
     private fun scheduleUpsync(projectId: String, userId: String): Completable = Completable.create {
         peopleUpSyncMaster.schedule(projectId, userId)
+        it.onComplete()
     }
 
     override fun loadPerson(destinationList: MutableList<LibPerson>,
