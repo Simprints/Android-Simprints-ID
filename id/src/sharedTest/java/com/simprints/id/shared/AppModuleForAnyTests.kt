@@ -46,7 +46,8 @@ open class AppModuleForAnyTests(app: Application,
                                 open var simNetworkUtilsRule: DependencyRule = RealRule,
                                 open var secureApiInterfaceRule: DependencyRule = RealRule,
                                 open var longConsentManagerRule: DependencyRule = RealRule,
-                                open var scannerManagerRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var scannerManagerRule: DependencyRule = RealRule,
+                                open var peopleUpSyncMasterRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -126,4 +127,7 @@ open class AppModuleForAnyTests(app: Application,
                                        bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
 
         scannerManagerRule.resolveDependency { super.provideScannerManager(preferencesManager, analyticsManager, bluetoothComponentAdapter) }
+
+    override fun providePeopleUpSyncMaster(): PeopleUpSyncMaster =
+        peopleUpSyncMasterRule.resolveDependency { super.providePeopleUpSyncMaster() }
 }

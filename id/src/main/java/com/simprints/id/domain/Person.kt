@@ -1,6 +1,8 @@
 package com.simprints.id.domain
 
 import java.util.*
+import com.simprints.libcommon.Fingerprint as LibFingerprint
+import com.simprints.libcommon.Person as LibPerson
 
 data class Person (
     val patientId: String,
@@ -12,3 +14,10 @@ data class Person (
     val toSync: Boolean,
     val fingerprints: List<Fingerprint>
 )
+
+// TODO: move this adapter out of domain code. The domain layer should not be aware of outer layers
+fun Person.toLibPerson(): LibPerson =
+    LibPerson(
+        patientId,
+        fingerprints.mapNotNull(Fingerprint::toLibFingerprintOrNull)
+    )

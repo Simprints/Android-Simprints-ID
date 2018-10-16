@@ -70,7 +70,9 @@ class SyncTest : RxJavaTest, DaggerForTests() {
     override var module by lazyVar {
         AppModuleForTests(app,
             remoteDbManagerRule = SpyRule,
-            localDbManagerRule = MockRule)
+            localDbManagerRule = MockRule,
+            peopleUpSyncMasterRule = MockRule
+        )
     }
 
     @Before

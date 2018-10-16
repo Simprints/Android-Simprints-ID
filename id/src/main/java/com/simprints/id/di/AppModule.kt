@@ -2,7 +2,6 @@ package com.simprints.id.di
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
-import androidx.work.WorkManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
@@ -82,7 +81,7 @@ open class AppModule(val app: Application) {
     @Provides
     @Singleton
     open fun providePeopleUpSyncMaster() =
-        PeopleUpSyncMaster(WorkManager.getInstance())
+        PeopleUpSyncMaster()
 
     @Provides
     @Singleton

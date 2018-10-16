@@ -41,14 +41,13 @@ interface LocalDbManager {
                                 moduleId: String? = null,
                                 toSync: Boolean? = null): Single<Int>
 
-    fun loadPersonFromLocal(personId: String): Single<LibPerson>
+    fun loadPersonFromLocal(personId: String): Single<Person>
 
-    // TODO: stop leaking Realm model into domain layer
     fun loadPeopleFromLocal(patientId: String? = null,
                             userId: String? = null,
                             moduleId: String? = null,
                             toSync: Boolean? = null,
-                            sortBy: Map<String, Sort>? = null): Single<ArrayList<rl_Person>>
+                            sortBy: Map<String, Sort>? = null): Single<List<Person>>
 
     fun loadPeopleFromLocalRx(patientId: String? = null,
                               userId: String? = null,

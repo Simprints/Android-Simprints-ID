@@ -10,13 +10,13 @@ import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
-import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import com.simprints.libcommon.Person as LibPerson
 
 interface DbManager {
 
@@ -32,13 +32,13 @@ interface DbManager {
     fun isDbInitialised(): Boolean
 
     // Data transfer
-    fun savePerson(person: Person): Completable
+    fun savePerson(person: LibPerson): Completable
     fun savePerson(fbPerson: fb_Person): Completable
 
-    fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
+    fun loadPerson(destinationList: MutableList<LibPerson>, projectId: String, guid: String, callback: DataCallback)
     fun loadPerson(projectId: String, guid: String): Single<PersonFetchResult>
 
-    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
+    fun loadPeople(destinationList: MutableList<LibPerson>, group: Constants.GROUP, callback: DataCallback?)
 
     fun loadProject(projectId: String): Single<Project>
 
@@ -58,7 +58,7 @@ interface DbManager {
 
     fun recoverLocalDb(group: Constants.GROUP): Completable
 
-    fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
+    fun saveVerification(probe: LibPerson, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
 
-    fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
+    fun saveIdentification(probe: LibPerson, matchSize: Int, matches: List<Identification>)
 }
