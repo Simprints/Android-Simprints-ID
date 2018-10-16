@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleUpsync
+package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
 import androidx.work.Worker
 import com.simprints.id.Application
@@ -6,10 +6,11 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import timber.log.Timber
 import javax.inject.Inject
 
-class PeopleUpSyncWorker: Worker() {
+class PeopleUpSyncUploaderWorker: Worker() {
 
     @Inject
     lateinit var loginInfoManager: LoginInfoManager
@@ -36,7 +37,7 @@ class PeopleUpSyncWorker: Worker() {
         Timber.d("Reporting for duty!")
         injectDependencies()
 
-        val task = PeopleUpSyncTask(
+        val task = PeopleUpSyncUploaderTask(
             loginInfoManager, localDbManager, remoteDbManager,
             projectId, userId, PATIENT_UPLOAD_BATCH_SIZE
         )
@@ -44,6 +45,9 @@ class PeopleUpSyncWorker: Worker() {
         return try {
             task.execute()
             Result.SUCCESS
+        } catch(exception: TransientSyncFailureException) {
+            Timber.e(exception)
+            Result.RETRY
         } catch (throwable: Throwable) {
             Timber.e(throwable)
             analyticsManager.logThrowable(throwable)

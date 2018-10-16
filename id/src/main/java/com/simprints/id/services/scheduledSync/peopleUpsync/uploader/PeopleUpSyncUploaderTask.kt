@@ -1,13 +1,16 @@
-package com.simprints.id.services.scheduledSync.peopleUpsync
+package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Person
+import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import io.reactivex.Flowable
 import timber.log.Timber
+import java.io.IOException
 
-class PeopleUpSyncTask(
+class PeopleUpSyncUploaderTask(
     private val loginInfoManager: LoginInfoManager,
     private val localDbManager: LocalDbManager,
     private val remoteDbManager: RemoteDbManager,
@@ -16,6 +19,10 @@ class PeopleUpSyncTask(
     private val batchSize: Int
 ) {
 
+    /**
+     * @throws TransientSyncFailureException if a temporary network / backend error caused
+     * the sync to fail.
+     */
     fun execute() {
         checkUserIsSignedIn()
 
@@ -51,9 +58,15 @@ class PeopleUpSyncTask(
     }
 
     private fun uploadPeople(people: List<Person>) =
-        remoteDbManager
-            .uploadPeople(projectId, people)
-            .blockingAwait()
+        try {
+            remoteDbManager
+                .uploadPeople(projectId, people)
+                .blockingAwait()
+        } catch (exception: IOException) {
+            throw TransientSyncFailureException(cause = exception)
+        } catch (exception: SimprintsInternalServerException) {
+            throw TransientSyncFailureException(cause = exception)
+        }
 
     private fun markPeopleAsSynced(people: List<Person>) {
         val updatedPeople = people.map { it.copy(toSync = false) }

@@ -33,7 +33,8 @@ import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSync
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncWorker
+import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
+import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSync
 import com.simprints.id.services.sync.SyncService
 import dagger.Component
@@ -73,7 +74,8 @@ interface AppComponent {
     fun inject(alertPresenter: AlertPresenter)
     fun inject(launchPresenter: LaunchPresenter)
     fun inject(scheduledPeopleSync: ScheduledPeopleSync)
-    fun inject(peopleUpSyncWorker: PeopleUpSyncWorker)
+    fun inject(peopleUpSyncUploaderWorker: PeopleUpSyncUploaderWorker)
+    fun inject(peopleUpSyncPeriodicFlusherWorker: PeopleUpSyncPeriodicFlusherWorker)
     fun inject(scheduledSessionsSync: ScheduledSessionsSync)
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(longConsentPresenter: LongConsentPresenter)
