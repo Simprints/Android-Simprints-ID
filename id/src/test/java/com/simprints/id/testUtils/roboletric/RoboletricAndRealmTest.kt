@@ -76,7 +76,7 @@ fun setupLocalAndRemoteManagersForApiTesting(mockServer: MockWebServer? = null,
 
     PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
     whenever(localDbManagerSpy.insertOrUpdatePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
-    whenever(localDbManagerSpy.loadPersonFromLocal(any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
+    whenever(localDbManagerSpy.loadPersonFromLocal(any())).thenReturn(Single.error(IllegalStateException()))
     whenever(localDbManagerSpy.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
 
     setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)

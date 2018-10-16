@@ -4,8 +4,9 @@ import androidx.work.*
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncWorker.Companion.PROJECT_ID_KEY
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncWorker.Companion.USER_ID_KEY
 
-class PeopleUpSyncMaster(private val workManager: WorkManager) {
-
+class PeopleUpSyncMaster(
+    private val getWorkManager: () -> WorkManager = WorkManager::getInstance
+) {
 
     fun schedule(projectId: String, userId: String) {
         val constraints = Constraints.Builder()
@@ -22,7 +23,7 @@ class PeopleUpSyncMaster(private val workManager: WorkManager) {
             .setInputData(data)
             .build()
 
-        workManager
+        getWorkManager()
             .beginUniqueWork(
                 uniqueWorkNameFor(projectId, userId),
                 ExistingWorkPolicy.KEEP,
@@ -32,7 +33,7 @@ class PeopleUpSyncMaster(private val workManager: WorkManager) {
     }
 
     fun pause(projectId: String, userId: String) {
-        workManager
+        getWorkManager()
             .cancelUniqueWork(uniqueWorkNameFor(projectId, userId))
     }
 

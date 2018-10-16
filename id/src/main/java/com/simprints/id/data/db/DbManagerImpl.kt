@@ -10,12 +10,15 @@ import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.Constants
+import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
+import com.simprints.id.domain.toLibPerson
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -24,7 +27,6 @@ import com.simprints.id.session.Session
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
 import com.simprints.id.tools.json.JsonHelper
-import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
@@ -35,6 +37,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.*
+import com.simprints.libcommon.Person as LibPerson
 
 open class DbManagerImpl(override val local: LocalDbManager,
                          override val remote: RemoteDbManager,
@@ -102,7 +105,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
         remote.isRemoteDbInitialized()
 
     // Data transfer
-    override fun savePerson(person: Person): Completable =
+    override fun savePerson(person: LibPerson): Completable =
         savePerson(fb_Person(
             person,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
@@ -133,20 +136,26 @@ open class DbManagerImpl(override val local: LocalDbManager,
         peopleUpSyncMaster.schedule(projectId, userId)
     }
 
-    override fun loadPerson(destinationList: MutableList<Person>,
+    override fun loadPerson(destinationList: MutableList<LibPerson>,
                             projectId: String,
                             guid: String,
                             callback: DataCallback) {
 
         local.loadPersonFromLocal(guid).subscribeBy(
             onSuccess = { person ->
-                destinationList.add(person)
+                destinationList.add(person.toLibPerson())
                 callback.onSuccess(false)
             },
-            onError = { e ->
+            onError = {
                 remote.downloadPerson(guid, projectId).subscribeBy(
-                    onSuccess = { destinationList.add(rl_Person(it).libPerson); callback.onSuccess(true) },
-                    onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
+                    onSuccess = {  fbPerson ->
+                        destinationList.add(fbPerson.toDomainPerson().toLibPerson())
+                        callback.onSuccess(true)
+                    },
+                    onError = {
+                        callback.onFailure(DATA_ERROR.NOT_FOUND)
+                    }
+                )
             })
     }
 
@@ -154,18 +163,23 @@ open class DbManagerImpl(override val local: LocalDbManager,
                             guid: String): Single<PersonFetchResult> =
         local.loadPersonFromLocal(guid).map { PersonFetchResult(it, false) }
             .onErrorResumeNext {
-                remote.downloadPerson(guid, loginInfoManager.getSignedInProjectIdOrEmpty())
-                    .map { PersonFetchResult(rl_Person(it).libPerson, true) }
+                remote
+                    .downloadPerson(guid, loginInfoManager.getSignedInProjectIdOrEmpty())
+                    .map { fbPerson ->
+                        PersonFetchResult(fbPerson.toDomainPerson(), true)
+                    }
             }
 
 
-    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
-        val result = when (group) {
-            Constants.GROUP.GLOBAL -> local.loadPeopleFromLocal().blockingGet().map { it.libPerson }
-            Constants.GROUP.USER -> local.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty()).blockingGet().map { it.libPerson }
-            Constants.GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = preferencesManager.moduleId).blockingGet().map { it.libPerson }
+    override fun loadPeople(destinationList: MutableList<LibPerson>, group: Constants.GROUP, callback: DataCallback?) {
+        val people = when (group) {
+            Constants.GROUP.GLOBAL -> local.loadPeopleFromLocal()
+            Constants.GROUP.USER -> local.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
+            Constants.GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = preferencesManager.moduleId)
         }
-        destinationList.addAll(result)
+            .blockingGet()
+            .map(Person::toLibPerson)
+        destinationList.addAll(people)
         callback?.onSuccess(false)
     }
 
@@ -202,7 +216,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
                 local.getPeopleCountFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty(), moduleId = preferencesManager.moduleId)
         }
 
-    override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
+    override fun saveIdentification(probe: LibPerson, matchSize: Int, matches: List<Identification>) {
         preferencesManager.lastIdentificationDate = Date()
         remote.saveIdentificationInRemote(
             probe,
@@ -223,7 +237,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
             sessionId)
     }
 
-    override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
+    override fun saveVerification(probe: LibPerson, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
         preferencesManager.lastVerificationDate = Date()
         remote.saveVerificationInRemote(
             probe,
