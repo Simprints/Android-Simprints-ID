@@ -20,7 +20,8 @@ class PeopleUpSyncPeriodicFlusherMaster(
     }
 
     private fun buildWorkRequest(projectId: String, userId: String) =
-        PeriodicWorkRequestBuilder<PeopleUpSyncPeriodicFlusherWorker>(1, TimeUnit.HOURS)
+        PeriodicWorkRequestBuilder<PeopleUpSyncPeriodicFlusherWorker>(
+            PEOPLE_UP_SYNC_FLUSHER_REPEAT_INTERVAL, PEOPLE_UP_SYNC_FLUSHER_REPEAT_UNIT)
             .setInputData(buildWorkData(projectId, userId))
             .build()
 
@@ -38,4 +39,8 @@ class PeopleUpSyncPeriodicFlusherMaster(
             .cancelUniqueWork(uniqueWorkNameFor(projectId, userId))
     }
 
+    companion object {
+        private const val PEOPLE_UP_SYNC_FLUSHER_REPEAT_INTERVAL = 1L
+        private val PEOPLE_UP_SYNC_FLUSHER_REPEAT_UNIT = TimeUnit.HOURS
+    }
 }

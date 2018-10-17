@@ -22,7 +22,10 @@ class PeopleUpSyncUploaderMaster(
             .setConstraints(buildConstraints())
             .setInputData(buildWorkData(projectId, userId))
             // Retry in case of a transient sync failure
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                PEOPLE_UP_SYNC_UPLOAD_BACKOFF_DELAY,
+                PEOPLE_UP_SYNC_UPLOAD_BACKOFF_UNIT)
             .build()
 
     private fun buildConstraints() =
@@ -43,4 +46,8 @@ class PeopleUpSyncUploaderMaster(
     private fun uniqueWorkNameFor(projectId: String, userId: String) =
         "$projectId-$userId"
 
+    companion object {
+        private const val PEOPLE_UP_SYNC_UPLOAD_BACKOFF_DELAY = 30L
+        private val PEOPLE_UP_SYNC_UPLOAD_BACKOFF_UNIT = TimeUnit.SECONDS
+    }
 }
