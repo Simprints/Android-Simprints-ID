@@ -10,19 +10,12 @@ import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import timber.log.Timber
 import javax.inject.Inject
 
-class PeopleUpSyncUploaderWorker: Worker() {
+class PeopleUpSyncUploaderWorker : Worker() {
 
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-
-    @Inject
-    lateinit var localDbManager: LocalDbManager
-
-    @Inject
-    lateinit var remoteDbManager: RemoteDbManager
-
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
 
     val projectId by lazy {
         inputData.getString(PROJECT_ID_KEY) ?: throw IllegalArgumentException("Project Id required")
@@ -30,11 +23,10 @@ class PeopleUpSyncUploaderWorker: Worker() {
 
     val userId by lazy {
         inputData.getString(USER_ID_KEY) ?: throw IllegalArgumentException("User Id required")
-
     }
 
     override fun doWork(): Result {
-        Timber.d("Reporting for duty!")
+        Timber.d("PeopleUpSyncUploaderWorker doWork()")
         injectDependencies()
 
         val task = PeopleUpSyncUploaderTask(
@@ -45,7 +37,7 @@ class PeopleUpSyncUploaderWorker: Worker() {
         return try {
             task.execute()
             Result.SUCCESS
-        } catch(exception: TransientSyncFailureException) {
+        } catch (exception: TransientSyncFailureException) {
             Timber.e(exception)
             Result.RETRY
         } catch (throwable: Throwable) {
@@ -63,11 +55,8 @@ class PeopleUpSyncUploaderWorker: Worker() {
     }
 
     companion object {
-
         const val PATIENT_UPLOAD_BATCH_SIZE = 80
         const val PROJECT_ID_KEY = "projectId"
         const val USER_ID_KEY = "userId"
-
     }
-
 }

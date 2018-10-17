@@ -6,10 +6,9 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import timber.log.Timber
 import javax.inject.Inject
 
-class PeopleUpSyncPeriodicFlusherWorker: Worker() {
+class PeopleUpSyncPeriodicFlusherWorker : Worker() {
 
-    @Inject
-    lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
+    @Inject lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
 
     val projectId by lazy {
         inputData.getString(PROJECT_ID_KEY) ?: throw IllegalArgumentException("Project Id required")
@@ -17,11 +16,10 @@ class PeopleUpSyncPeriodicFlusherWorker: Worker() {
 
     val userId by lazy {
         inputData.getString(USER_ID_KEY) ?: throw IllegalArgumentException("User Id required")
-
     }
 
     override fun doWork(): Result {
-        Timber.d("Reporting for duty!")
+        Timber.d("PeopleUpSyncPeriodicFlusherWorker doWork")
         injectDependencies()
         peopleUpSyncMaster.schedule(projectId, userId)
         return Result.SUCCESS
@@ -37,7 +35,5 @@ class PeopleUpSyncPeriodicFlusherWorker: Worker() {
     companion object {
         const val PROJECT_ID_KEY = "projectId"
         const val USER_ID_KEY = "userId"
-
     }
-
 }
