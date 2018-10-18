@@ -1,34 +1,25 @@
 package com.simprints.id.data.db.local.realm.models
 
-import com.google.gson.annotations.JsonAdapter
-import com.simprints.id.data.db.remote.models.fb_Fingerprint
-import com.simprints.id.tools.json.FingerIdentifierAsIntJsonConverter
-import com.simprints.id.tools.json.TemplateAsByteArrayJsonConverter
-import com.simprints.libcommon.Fingerprint
+import com.simprints.id.domain.Fingerprint
 import io.realm.RealmObject
+import com.simprints.libcommon.Fingerprint as LibFingerprint
 
-open class rl_Fingerprint : RealmObject {
-
-    @JsonAdapter(FingerIdentifierAsIntJsonConverter::class)
-    var fingerId: Int = 0
-
-    @JsonAdapter(TemplateAsByteArrayJsonConverter::class)
-    var template: ByteArray? = null
-
+open class rl_Fingerprint (
+    var fingerId: Int = 0,
+    var template: ByteArray? = null,
     var qualityScore: Int = 0
+): RealmObject()
 
-    constructor()
+fun rl_Fingerprint.toDomainFingerprint(): Fingerprint =
+    Fingerprint(
+        fingerId = fingerId,
+        qualityScore = qualityScore,
+        template = template
+    )
 
-    constructor(print: fb_Fingerprint) {
-        val catchPrint: Fingerprint
-        try {
-            catchPrint = Fingerprint(print.fingerId, print.template)
-        } catch (ignored: IllegalArgumentException) {
-            return
-        }
-
-        this.fingerId = catchPrint.fingerId.ordinal
-        this.qualityScore = catchPrint.qualityScore
-        this.template = catchPrint.templateBytes
-    }
-}
+fun Fingerprint.toRealmFingerprint(): rl_Fingerprint =
+    rl_Fingerprint(
+        fingerId = fingerId,
+        qualityScore = qualityScore,
+        template = template
+    )

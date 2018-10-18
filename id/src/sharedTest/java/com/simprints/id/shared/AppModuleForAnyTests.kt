@@ -3,7 +3,6 @@ package com.simprints.id.shared
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
-import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
@@ -18,8 +17,10 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
 import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.tools.RandomGenerator
@@ -45,7 +46,8 @@ open class AppModuleForAnyTests(app: Application,
                                 open var simNetworkUtilsRule: DependencyRule = RealRule,
                                 open var secureApiInterfaceRule: DependencyRule = RealRule,
                                 open var longConsentManagerRule: DependencyRule = RealRule,
-                                open var scannerManagerRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var scannerManagerRule: DependencyRule = RealRule,
+                                open var peopleUpSyncMasterRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -70,8 +72,9 @@ open class AppModuleForAnyTests(app: Application,
                                   loginInfoManager: LoginInfoManager,
                                   preferencesManager: PreferencesManager,
                                   sessionEventsManager: SessionEventsManager,
-                                  timeHelper: TimeHelper): DbManager =
-        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper) }
+                                  timeHelper: TimeHelper,
+                                  peopleUpSyncMaster: PeopleUpSyncMaster): DbManager =
+        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper, peopleUpSyncMaster) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,
@@ -124,4 +127,7 @@ open class AppModuleForAnyTests(app: Application,
                                        bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
 
         scannerManagerRule.resolveDependency { super.provideScannerManager(preferencesManager, analyticsManager, bluetoothComponentAdapter) }
+
+    override fun providePeopleUpSyncMaster(): PeopleUpSyncMaster =
+        peopleUpSyncMasterRule.resolveDependency { super.providePeopleUpSyncMaster() }
 }

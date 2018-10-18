@@ -8,7 +8,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
@@ -26,6 +25,7 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
@@ -124,8 +124,8 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         } else {
             val guid = preferencesManager.patientId
             val startCandidateSearchTime = timeHelper.now()
-            dbManager.loadPerson(loginInfoManager.getSignedInProjectIdOrEmpty(), guid).doOnSuccess {
-                handleGuidFound(it, guid, startCandidateSearchTime)
+            dbManager.loadPerson(loginInfoManager.getSignedInProjectIdOrEmpty(), guid).doOnSuccess { personFetchResult ->
+                handleGuidFound(personFetchResult, guid, startCandidateSearchTime)
             }.doOnError {
                 it.printStackTrace()
                 // For any error, we show the missing guid screen.
