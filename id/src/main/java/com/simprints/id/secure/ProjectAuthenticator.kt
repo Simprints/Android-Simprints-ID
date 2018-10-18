@@ -9,7 +9,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
@@ -51,9 +50,7 @@ open class ProjectAuthenticator(component: AppComponent,
     fun authenticate(nonceScope: NonceScope, projectSecret: String): Completable =
         prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
-            .signIn(nonceScope.projectId)
-            .fetchProjectInfo(nonceScope.projectId)
-            .storeCredentials(nonceScope.userId)
+            .signIn(nonceScope.projectId, nonceScope.userId)
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
             .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
             .fetchProjectLongConsentTexts()
@@ -90,20 +87,9 @@ open class ProjectAuthenticator(component: AppComponent,
             authManager.requestAuthToken(authRequest)
         }
 
-    private fun Single<out Tokens>.signIn(projectId: String): Completable =
+    private fun Single<out Tokens>.signIn(projectId: String, userId: String): Completable =
         flatMapCompletable { tokens ->
-            dbManager.signIn(projectId, tokens)
-        }
-
-    private fun Completable.fetchProjectInfo(projectId: String): Single<Project> =
-        andThen(
-            dbManager.refreshProjectInfoWithServer(projectId)
-        )
-
-    private fun Single<out Project>.storeCredentials(userId: String): Completable =
-        flatMapCompletable {
-            loginInfoManager.storeCredentials(it.id, it.legacyId, userId)
-            Completable.complete()
+            dbManager.signIn(projectId, userId, tokens)
         }
 
     private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<JsonElement> =

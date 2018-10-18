@@ -164,7 +164,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun logout() {
-        loginInfoManager.cleanCredentials()
         dbManager.signOut()
     }
 
