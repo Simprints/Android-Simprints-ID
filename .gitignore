@@ -31,6 +31,7 @@ Thumbs.db
 .idea/misc.xml
 .idea/tasks.xml
 .idea/gradle.xml
+.idea/encodings.xml
 .idea/dictionaries
 .idea/libraries
 .idea/jenkinsSettings.xml

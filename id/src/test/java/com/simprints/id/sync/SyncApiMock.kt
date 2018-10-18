@@ -15,7 +15,7 @@ import retrofit2.mock.Calls
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class SimApiMock(private val delegate: BehaviorDelegate<PeopleRemoteInterface>) : PeopleRemoteInterface {
 
-    override fun uploadPeople(projectId: String, patientsJson: HashMap<String, ArrayList<fb_Person>>): Single<Result<Unit>> {
+    override fun uploadPeople(projectId: String, patientsJson: HashMap<String, List<fb_Person>>): Single<Result<Unit>> {
         return delegate.returning(buildSuccessResponseWith("")).uploadPeople(projectId, patientsJson)
     }
 

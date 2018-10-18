@@ -4,8 +4,6 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
-import com.simprints.id.scanner.ScannerManager
-import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -34,13 +32,21 @@ import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.network.SimApiClient
+import com.simprints.id.scanner.ScannerManager
+import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.progress.notifications.NotificationFactory
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
+import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncService
-import com.simprints.id.tools.*
+import com.simprints.id.tools.RandomGenerator
+import com.simprints.id.tools.RandomGeneratorImpl
+import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -76,14 +82,23 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
+    open fun providePeopleUpSyncMaster() =
+        PeopleUpSyncMaster(
+            PeopleUpSyncUploaderMaster(),
+            PeopleUpSyncPeriodicFlusherMaster()
+        )
+
+    @Provides
+    @Singleton
     open fun provideDbManager(localDbManager: LocalDbManager,
                               remoteDbManager: RemoteDbManager,
                               secureDataManager: SecureDataManager,
                               loginInfoManager: LoginInfoManager,
                               preferencesManager: PreferencesManager,
                               sessionEventsManager: SessionEventsManager,
-                              timeHelper: TimeHelper): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper)
+                              timeHelper: TimeHelper,
+                              peopleUpSyncMaster: PeopleUpSyncMaster): DbManager =
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper, peopleUpSyncMaster)
 
     @Provides
     @Singleton
