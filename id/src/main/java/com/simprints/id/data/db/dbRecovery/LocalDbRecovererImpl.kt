@@ -3,15 +3,19 @@ package com.simprints.id.data.db.dbRecovery
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import com.google.gson.annotations.SerializedName
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
-import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.domain.Constants
+import com.simprints.id.domain.Fingerprint
+import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.LocalDbRecoveryFailedException
 import com.simprints.id.tools.json.JsonHelper
+import com.simprints.id.tools.json.SkipSerialisationField
+import com.simprints.libcommon.Utils.byteArrayToBase64
+import com.simprints.libsimprints.FingerIdentifier
 import io.reactivex.Completable
 import io.reactivex.CompletableEmitter
 import io.reactivex.Flowable
@@ -22,6 +26,7 @@ import timber.log.Timber
 import java.io.IOException
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
+import java.util.*
 
 class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
                            private val firebaseManagerImpl: FirebaseManagerImpl,
@@ -31,6 +36,46 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
                            private val moduleId: String,
                            private val group: Constants.GROUP) :
     LocalDbRecoverer {
+
+    private class JsonPerson(
+        @SerializedName("id")
+        val patientId: String,
+        val projectId: String,
+        val userId: String,
+        val moduleId: String,
+        val createdAt: Date?,
+        val updatedAt: Date?,
+        val toSync: Boolean = false,
+        val fingerprints: Map<FingerIdentifier, ArrayList<JsonFingerprint>>
+    )
+
+    private fun Person.toJsonPerson(): JsonPerson =
+        JsonPerson(
+            patientId = patientId,
+            projectId = projectId,
+            userId = userId,
+            moduleId = moduleId,
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            toSync = toSync,
+            fingerprints = fingerprints
+                .map { it.toJsonFingerprint() }
+                .groupBy { it.fingerId }
+                .mapValues { ArrayList(it.value) }
+        )
+
+    private class JsonFingerprint(
+        @SkipSerialisationField val fingerId: FingerIdentifier,
+        val template: String,
+        val quality: Int
+    )
+
+    private fun Fingerprint.toJsonFingerprint(): JsonFingerprint =
+        JsonFingerprint(
+            fingerId = FingerIdentifier.values()[fingerId],
+            template = byteArrayToBase64(template!!), // TODO: get rid of double bang
+            quality = qualityScore
+        )
 
     private val realmDbInputStream = PipedInputStream()
     private val realmDbOutputStream = PipedOutputStream()
@@ -77,7 +122,7 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
     }
 
     private var peopleCount = 0
-    private fun writePersonToStream(person: rl_Person) {
+    private fun writePersonToStream(person: Person) {
         val commaString = if (peopleCount == 0) "" else ","
         val personString = convertPersonToJsonString(person)
         val fullString = "$commaString$personString"
@@ -90,15 +135,15 @@ class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
         realmDbOutputStream.close()
     }
 
-    private fun getListOfPeopleToRecover(): Flowable<rl_Person> =
+    private fun getListOfPeopleToRecover(): Flowable<Person> =
         when (group) {
             Constants.GROUP.GLOBAL -> localDbManager.loadPeopleFromLocalRx()
             Constants.GROUP.USER -> localDbManager.loadPeopleFromLocalRx(userId = userId)
             Constants.GROUP.MODULE -> localDbManager.loadPeopleFromLocalRx(moduleId = moduleId)
         }
 
-    private fun convertPersonToJsonString(person: rl_Person): String =
-        JsonHelper.gson.toJson(fb_Person(person))
+    private fun convertPersonToJsonString(person: Person): String =
+        JsonHelper.gson.toJson(person.toJsonPerson())
 
     private fun PipedOutputStream.write(string: String) =
         write(string.toByteArray())

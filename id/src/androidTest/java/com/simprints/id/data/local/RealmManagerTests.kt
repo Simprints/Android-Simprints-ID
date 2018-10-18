@@ -7,13 +7,14 @@ import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl.Companion.SYNC_ID_FIELD
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
+import com.simprints.id.data.db.local.realm.models.toDomainPerson
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Constants.GROUP.*
 import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.shared.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.testTools.extensions.awaitAndAssertSuccess
 import com.simprints.id.tools.json.JsonHelper
-import com.simprints.id.shared.PeopleGeneratorUtils.getRandomPeople
 import io.reactivex.Completable
 import io.realm.Realm
 import org.junit.After
@@ -134,7 +135,7 @@ class RealmManagerTests : RealmTestsBase() {
         saveFakePerson(realm, fakePerson)
 
         val people = realmManager.loadPeopleFromLocal().blockingGet()
-        assertTrue(people.first().deepEquals(fakePerson))
+        assertEquals(listOf(fakePerson.toDomainPerson()), people)
     }
 
     @Test
@@ -143,8 +144,7 @@ class RealmManagerTests : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20))
 
         val people = realmManager.loadPeopleFromLocal(userId = fakePerson.userId).blockingGet()
-        assertTrue(people.first().deepEquals(fakePerson))
-        assertEquals(people.size, 1)
+        assertEquals(listOf(fakePerson.toDomainPerson()), people)
     }
 
     @Test
@@ -153,8 +153,7 @@ class RealmManagerTests : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20))
 
         val people = realmManager.loadPeopleFromLocal(moduleId = fakePerson.moduleId).blockingGet()
-        assertTrue(people.first().deepEquals(fakePerson))
-        assertEquals(people.size, 1)
+        assertEquals(listOf(fakePerson.toDomainPerson()), people)
     }
 
     @Test
