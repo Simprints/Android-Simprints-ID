@@ -15,6 +15,7 @@ import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
 import com.simprints.id.data.db.remote.tools.Routes
 import com.simprints.id.data.db.remote.tools.Utils
+import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
@@ -29,7 +30,6 @@ import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
 import com.simprints.id.tools.extensions.toMap
 import com.simprints.id.tools.extensions.trace
-import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
@@ -39,10 +39,12 @@ import org.jetbrains.anko.doAsync
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
+import com.simprints.libcommon.Person as LibPerson
 
-open class FirebaseManagerImpl(private val appContext: Context,
-                          private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)) :
-    RemoteDbManager {
+open class FirebaseManagerImpl(
+    private val appContext: Context,
+    private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)
+) : RemoteDbManager {
 
     private var isInitialised = false
 
@@ -141,7 +143,7 @@ open class FirebaseManagerImpl(private val appContext: Context,
 
     // Data transfer
     // Firebase
-    override fun saveIdentificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
+    override fun saveIdentificationInRemote(probe: LibPerson, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String) {
         Routes.idEventRef(legacyFirebaseApp, projectId).push().setValue(fb_IdEvent(probe, projectId, userId, moduleId, matchSize, matches, sessionId).toMap())
     }
 
@@ -149,7 +151,7 @@ open class FirebaseManagerImpl(private val appContext: Context,
         Routes.idUpdateRef(projectId).push().setValue(fb_IdEventUpdate(projectId, selectedGuid, deviceId, sessionId))
     }
 
-    override fun saveVerificationInRemote(probe: Person, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
+    override fun saveVerificationInRemote(probe: LibPerson, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
         Routes.vfEventRef(legacyFirebaseApp, projectId).push().setValue(fb_VfEvent(probe, projectId, userId, moduleId, patientId, match, sessionId, guidExistsResult).toMap())
     }
 
@@ -162,6 +164,7 @@ open class FirebaseManagerImpl(private val appContext: Context,
     }
 
     fun getFirebaseStorageInstance() = FirebaseStorage.getInstance(legacyFirebaseApp)
+
     override fun getFirebaseLegacyApp(): FirebaseApp = legacyFirebaseApp
 
     override fun getCurrentFirestoreToken(): Single<String> = Single.create {
@@ -183,16 +186,14 @@ open class FirebaseManagerImpl(private val appContext: Context,
 
     // API
 
-    override fun uploadPerson(fbPerson: fb_Person): Completable =
-        uploadPeople(fbPerson.projectId, arrayListOf(fbPerson))
-
-    override fun uploadPeople(projectId: String, patientsToUpload: ArrayList<fb_Person>): Completable =
+    override fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable =
         getPeopleApiClient().flatMapCompletable {
-            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload))
+            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::toFirebasePerson)))
                 .retry(::retryCriteria)
                 .handleResult(::defaultResponseErrorHandling)
         }
 
+    // TODO: stop leaking fb_Person model in the domain layer
     /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
         getPeopleApiClient().flatMap {
@@ -241,8 +242,17 @@ open class FirebaseManagerImpl(private val appContext: Context,
                 Single.just(buildPeopleApi(it))
             }
 
-    private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl, authToken).api
-    private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(SessionsRemoteInterface::class.java, SessionsRemoteInterface.baseUrl, authToken).api
+    private fun buildPeopleApi(authToken: String): PeopleRemoteInterface = SimApiClient(
+        PeopleRemoteInterface::class.java,
+        PeopleRemoteInterface.baseUrl,
+        authToken
+    ).api
+
+    private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(
+        SessionsRemoteInterface::class.java,
+        SessionsRemoteInterface.baseUrl,
+        authToken
+    ).api
 
     override fun getProjectApiClient(): Single<ProjectRemoteInterface> =
         getCurrentFirestoreToken()
@@ -250,14 +260,22 @@ open class FirebaseManagerImpl(private val appContext: Context,
                 Single.just(buildProjectApi(it))
             }
 
-    private fun buildProjectApi(authToken: String): ProjectRemoteInterface = SimApiClient(ProjectRemoteInterface::class.java, ProjectRemoteInterface.baseUrl, authToken).api
+    private fun buildProjectApi(authToken: String): ProjectRemoteInterface = SimApiClient(
+        ProjectRemoteInterface::class.java,
+        ProjectRemoteInterface.baseUrl,
+        authToken
+    ).api
 
     private fun retryCriteria(attempts: Int, error: Throwable): Boolean =
         attempts < RETRY_ATTEMPTS_FOR_NETWORK_CALLS && errorIsWorthRetrying(error)
 
     private fun errorIsWorthRetrying(error: Throwable): Boolean =
-        error is IOException ||
-            error is HttpException && error.code() != 404 && error.code() !in 500..599
+        error is IOException || error.isHttp5xx()
+
+    private fun Throwable.isHttp5xx(): Boolean =
+        this is HttpException && code() in 500..599
+
+
 
     private fun defaultResponseErrorHandling(e: HttpException): Nothing =
         when (e.code()) {

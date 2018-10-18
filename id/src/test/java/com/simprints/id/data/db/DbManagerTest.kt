@@ -11,6 +11,7 @@ import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.id.shared.createMockBehaviorService
@@ -50,6 +51,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var localDbManagerSpy: LocalDbManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
     @Inject lateinit var sessionEventsLocalDbManagerSpy: SessionEventsLocalDbManager
+    @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
     @Inject lateinit var dbManager: DbManager
 
     override var module by lazyVar {
@@ -57,7 +59,8 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
             app,
             localDbManagerRule = ReplaceRule { spy(LocalDbManager::class.java) },
             remoteDbManagerRule = SpyRule,
-            sessionEventsLocalDbManagerRule = MockRule
+            sessionEventsLocalDbManagerRule = MockRule,
+            peopleUpSyncMasterRule = MockRule
         )
     }
 
@@ -75,7 +78,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     }
 
     @Test
-    fun savingPerson_shouldSaveThenUpdatePersonLocally() {
+    fun savingPerson_shouldSaveThenScheduleUpSync() {
         val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().apply {
             updatedAt = null
             createdAt = null
@@ -98,17 +101,14 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
         Thread.sleep(1000)
 
         val argument = argumentCaptor<rl_Person>()
-        verify(localDbManagerSpy, times(2)).insertOrUpdatePersonInLocal(argument.capture())
+        verify(localDbManagerSpy, times(1)).insertOrUpdatePersonInLocal(argument.capture())
 
         // First time we save the person in the local dbManager, it doesn't have times and it needs to be sync
         Assert.assertNull(argument.firstValue.createdAt)
         Assert.assertNull(argument.firstValue.updatedAt)
         Assert.assertTrue(argument.firstValue.toSync)
 
-        // Second time, it's after we download the person from our server, with timestamp.
-        Assert.assertNotNull(argument.secondValue.createdAt)
-        Assert.assertNotNull(argument.secondValue.updatedAt)
-        Assert.assertFalse(argument.secondValue.toSync)
+        verify(peopleUpSyncMasterMock).schedule(fakePerson.projectId, fakePerson.userId)
     }
 
     @Test
