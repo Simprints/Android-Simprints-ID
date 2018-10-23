@@ -99,6 +99,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
         peopleUpSyncMaster.pause(loginInfoManager.signedInProjectId, loginInfoManager.signedInUserId)
         loginInfoManager.cleanCredentials()
         remote.signOutOfRemoteDb()
+        preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
     }
 
     override fun isDbInitialised(): Boolean =
