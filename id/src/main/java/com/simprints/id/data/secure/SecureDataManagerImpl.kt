@@ -15,8 +15,10 @@ class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
 
     companion object {
         private const val PROJECT_ID_ENC_DATA = "ProjectIdEncData"
-        const val SHARED_PREFS_KEY_FOR_REALM_KEY = "${PROJECT_ID_ENC_DATA}_realmKey_"
-        const val SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY = "${PROJECT_ID_ENC_DATA}_legacyRealmKey_"
+        const val SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER = "realmKey"
+        const val SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY_IDENTIFIER = "legacyRealmKey"
+        const val SHARED_PREFS_KEY_FOR_REALM_KEY = "${PROJECT_ID_ENC_DATA}_${SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER}_"
+        const val SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY = "${PROJECT_ID_ENC_DATA}_${SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY_IDENTIFIER}_"
     }
 
     override fun setLocalDatabaseKey(projectId: String, legacyApiKey: String?) {
