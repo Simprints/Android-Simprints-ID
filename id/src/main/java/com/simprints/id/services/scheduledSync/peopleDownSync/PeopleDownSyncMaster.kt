@@ -3,7 +3,7 @@ package com.simprints.id.services.scheduledSync.peopleDownSync
 import androidx.work.*
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 
-class PeopleDownSyncDownloaderMaster(
+class PeopleDownSyncMaster(
     private val getWorkManager: () -> WorkManager = WorkManager::getInstance
 ) {
     fun schedule(projectId: String, userId: String) {
