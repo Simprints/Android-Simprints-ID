@@ -36,6 +36,9 @@ import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.progress.notifications.NotificationFactory
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
+import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
+import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
@@ -87,6 +90,18 @@ open class AppModule(val app: Application) {
             PeopleUpSyncUploaderMaster(),
             PeopleUpSyncPeriodicFlusherMaster()
         )
+
+    @Provides
+    @Singleton
+    open fun providePeopleDownSyncMaster() = PeopleDownSyncMaster()
+
+    @Provides
+    @Singleton
+    open fun provideOneTimeDownSyncCountMaster() = OneTimeDownSyncCountMaster()
+
+    @Provides
+    @Singleton
+    open fun providePeriodicDownSyncCountMaster() = PeriodicDownSyncCountMaster()
 
     @Provides
     @Singleton
