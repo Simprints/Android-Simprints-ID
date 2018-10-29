@@ -1,8 +1,8 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.OneTimeDownsyncCount
+package com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount
 
 import androidx.work.*
 
-class OneTimeDownsyncCountMaster(
+class OneTimeDownSyncCountMaster(
     private val getWorkManager: () -> WorkManager = WorkManager::getInstance
 ) {
     fun schedule(projectId: String, userId: String) {
@@ -15,7 +15,7 @@ class OneTimeDownsyncCountMaster(
     }
 
     private fun buildWorkRequest(projectId: String, userId: String) =
-        OneTimeWorkRequestBuilder<OneTimeDownsyncCountWorker>()
+        OneTimeWorkRequestBuilder<OneTimeDownSyncCountWorker>()
             .setConstraints(buildConstraints())
             .build()
 

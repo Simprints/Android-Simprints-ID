@@ -1,8 +1,8 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.PeriodicDownSyncCount
+package com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount
 
 import androidx.work.Worker
 
-class PeriodicDownSyncCountWorker: Worker() {
+class OneTimeDownSyncCountWorker: Worker() {
 
     override fun doWork(): Result {
         //TODO: refer design spec
