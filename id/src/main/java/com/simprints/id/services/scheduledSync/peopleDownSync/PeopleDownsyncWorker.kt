@@ -4,12 +4,12 @@ import androidx.work.Worker
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import timber.log.Timber
 
-class PeopleDownsyncDownloaderWorker: Worker() {
+class PeopleDownsyncWorker: Worker() {
 
 
     override fun doWork(): Result {
 
-        val task = PeopleDownsyncDownloaderTask()
+        val task = PeopleDownsyncTask()
 
         return try {
             task.execute()
