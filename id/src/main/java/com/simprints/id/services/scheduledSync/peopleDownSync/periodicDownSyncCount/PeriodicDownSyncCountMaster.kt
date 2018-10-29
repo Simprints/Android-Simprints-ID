@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.PeriodicDownSyncCount
+package com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount
 
 import androidx.work.*
 import androidx.work.ktx.PeriodicWorkRequestBuilder
