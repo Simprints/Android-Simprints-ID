@@ -256,6 +256,11 @@ dependencies {
     implementation "com.google.firebase:firebase-database:16.0.1"
     implementation "com.google.firebase:firebase-firestore:17.0.3"
 
+    //Room
+    def room_version = "2.1.0-alpha02"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
     // Firebase
     implementation "com.google.firebase:firebase-core:16.0.1"
     implementation "com.google.firebase:firebase-auth:16.0.2"
@@ -351,6 +356,8 @@ dependencies {
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
     implementation 'pl.charmas.android:android-reactive-location2:2.1@aar'
 
+    //Room
+    testImplementation "androidx.room:room-testing:$room_version"
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {
