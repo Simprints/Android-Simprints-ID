@@ -21,6 +21,8 @@ import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.sync.SyncManager
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
+import com.simprints.id.data.db.sync.viewModel.SyncStatusViewModel
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -223,4 +225,12 @@ open class AppModule(val app: Application) {
     @Provides
     open fun provideScheduledSessionsSyncManager(): ScheduledSessionsSyncManager =
         ScheduledSessionsSyncManager()
+
+    @Provides
+    @Singleton
+    open fun provideSyncStatusDatabase(): SyncStatusDatabase = SyncStatusDatabase.getDatabase(provideContext())
+
+    @Provides
+    @Singleton
+    open fun provideSyncStatusViewModel(): SyncStatusViewModel = SyncStatusViewModel(provideSyncStatusDatabase())
 }
