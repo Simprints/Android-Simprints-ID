@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData
 import androidx.room.*
 import com.simprints.id.data.db.sync.room.SyncStatus.Companion.SYNC_STATUS_CONST_ID
 
-
 @Dao
 interface SyncStatusDao {
 
