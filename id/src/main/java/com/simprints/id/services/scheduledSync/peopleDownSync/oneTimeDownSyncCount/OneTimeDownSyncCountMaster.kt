@@ -28,6 +28,6 @@ class OneTimeDownSyncCountMaster(
         "$projectId-$userId-$ONE_TIME_DOWN_SYNC_WORK_NAME_SUFFIX"
 
     companion object {
-        const val ONE_TIME_DOWN_SYNC_WORK_NAME_SUFFIX = "down-sync"
+        const val ONE_TIME_DOWN_SYNC_WORK_NAME_SUFFIX = "down-sync-count-one-time"
     }
 }
