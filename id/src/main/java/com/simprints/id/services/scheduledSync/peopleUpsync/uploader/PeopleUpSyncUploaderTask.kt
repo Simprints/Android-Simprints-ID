@@ -1,5 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
+import com.google.firebase.FirebaseNetworkException
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -66,6 +67,12 @@ class PeopleUpSyncUploaderTask(
             throw TransientSyncFailureException(cause = exception)
         } catch (exception: SimprintsInternalServerException) {
             throw TransientSyncFailureException(cause = exception)
+        } catch (exception: RuntimeException) {
+            throw if (exception.cause is FirebaseNetworkException) {
+                TransientSyncFailureException(cause = exception)
+            } else {
+                exception
+            }
         }
 
     private fun markPeopleAsSynced(people: List<Person>) {
