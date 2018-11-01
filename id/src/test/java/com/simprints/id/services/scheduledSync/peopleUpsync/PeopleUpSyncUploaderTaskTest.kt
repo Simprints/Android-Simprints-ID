@@ -30,7 +30,7 @@ class PeopleUpSyncUploaderTaskTest {
 
     private val task = PeopleUpSyncUploaderTask(
         loginInfoManager, localDbManager, remoteDbManager,
-        projectIdToSync, userIdToSync, batchSize
+        projectIdToSync, /*userIdToSync, */batchSize // TODO: uncomment userId when multitenancy is properly implemented
     )
 
     private val differentProjectId = "differentProjectId"

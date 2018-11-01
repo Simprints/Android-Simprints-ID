@@ -98,7 +98,7 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
             .assertNoErrors()
             .assertComplete()
 
-        verify(peopleUpSyncMasterMock).resume(projectId, userId)
+        verify(peopleUpSyncMasterMock).resume(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
     }
 
     @Test
