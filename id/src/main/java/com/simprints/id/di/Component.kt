@@ -32,6 +32,8 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
+import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSync
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
@@ -81,4 +83,6 @@ interface AppComponent {
     fun inject(longConsentPresenter: LongConsentPresenter)
     fun inject(scannerManager: ScannerManager)
     fun inject(syncSchedulerHelper: SyncSchedulerHelper)
+    fun inject(periodicDownSyncCountWorker: PeriodicDownSyncCountWorker)
+    fun inject(oneTimeDownSyncCountWorker: OneTimeDownSyncCountWorker)
 }
