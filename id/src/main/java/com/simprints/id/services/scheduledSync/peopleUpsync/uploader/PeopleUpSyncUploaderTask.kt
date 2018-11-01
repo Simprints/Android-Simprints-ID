@@ -70,7 +70,7 @@ class PeopleUpSyncUploaderTask(
         } catch (exception: SimprintsInternalServerException) {
             throw TransientSyncFailureException(cause = exception)
         } catch (exception: RuntimeException) {
-            throw if (exception.cause is FirebaseNetworkException) {
+            throw if (exception.cause is FirebaseNetworkException || exception.cause is IOException) {
                 TransientSyncFailureException(cause = exception)
             } else {
                 exception
