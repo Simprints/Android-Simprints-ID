@@ -11,12 +11,14 @@ import io.reactivex.Flowable
 import timber.log.Timber
 import java.io.IOException
 
+// TODO: uncomment userId when multitenancy is properly implemented
+
 class PeopleUpSyncUploaderTask(
     private val loginInfoManager: LoginInfoManager,
     private val localDbManager: LocalDbManager,
     private val remoteDbManager: RemoteDbManager,
     private val projectId: String,
-    private val userId: String,
+    /*private val userId: String,*/
     private val batchSize: Int
 ) {
 
@@ -34,21 +36,21 @@ class PeopleUpSyncUploaderTask(
     }
 
     private fun checkUserIsSignedIn() {
-        if (projectId != loginInfoManager.signedInProjectId || userId != loginInfoManager.signedInUserId) {
+        if (projectId != loginInfoManager.signedInProjectId /*|| userId != loginInfoManager.signedInUserId*/) {
             throw IllegalStateException("Only people enrolled by the currently signed in user can be up-synced")
         }
     }
 
     private fun thereArePeopleToSync(): Boolean {
         val peopleToSyncCount = localDbManager
-            .getPeopleCountFromLocal(userId = userId, toSync = true)
+            .getPeopleCountFromLocal(/*userId = userId, */toSync = true)
             .blockingGet()
         Timber.d("$peopleToSyncCount people to up-sync")
         return peopleToSyncCount > 0
     }
 
     private fun getPeopleToSyncInBatches(): Flowable<List<Person>> =
-        localDbManager.loadPeopleFromLocalRx(userId = userId, toSync = true)
+        localDbManager.loadPeopleFromLocalRx(/*userId = userId, */toSync = true)
             .buffer(batchSize)
 
     private fun upSyncBatch(people: List<Person>) {
