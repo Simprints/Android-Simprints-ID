@@ -89,14 +89,16 @@ open class DbManagerImpl(override val local: LocalDbManager,
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun resumePeopleUpSync(projectId: String, userId: String): Completable =
         Completable.create {
-            peopleUpSyncMaster.resume(projectId, userId)
+            peopleUpSyncMaster.resume(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
+
             it.onComplete()
         }
 
     override fun signOut() {
-        peopleUpSyncMaster.pause(loginInfoManager.signedInProjectId, loginInfoManager.signedInUserId)
+        peopleUpSyncMaster.pause(loginInfoManager.signedInProjectId/*, loginInfoManager.signedInUserId*/) // TODO: uncomment userId when multitenancy is properly implemented
         loginInfoManager.cleanCredentials()
         remote.signOutOfRemoteDb()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
@@ -133,8 +135,9 @@ open class DbManagerImpl(override val local: LocalDbManager,
             .observeOn(AndroidSchedulers.mainThread())
             .trace("savePerson")
 
+    @Suppress("UNUSED_PARAMETER")
     private fun scheduleUpsync(projectId: String, userId: String): Completable = Completable.create {
-        peopleUpSyncMaster.schedule(projectId, userId)
+        peopleUpSyncMaster.schedule(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
         it.onComplete()
     }
 

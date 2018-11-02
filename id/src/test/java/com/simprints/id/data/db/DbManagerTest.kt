@@ -108,7 +108,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
         Assert.assertNull(argument.firstValue.updatedAt)
         Assert.assertTrue(argument.firstValue.toSync)
 
-        verify(peopleUpSyncMasterMock).schedule(fakePerson.projectId, fakePerson.userId)
+        verify(peopleUpSyncMasterMock).schedule(fakePerson.projectId/*, fakePerson.userId*/) // TODO: uncomment userId when multitenancy is properly implemented
     }
 
     @Test
