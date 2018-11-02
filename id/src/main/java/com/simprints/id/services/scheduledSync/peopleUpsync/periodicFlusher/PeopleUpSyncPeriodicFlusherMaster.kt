@@ -6,37 +6,40 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import java.util.concurrent.TimeUnit
 
+// TODO: uncomment userId when multitenancy is properly implemented
+
 class PeopleUpSyncPeriodicFlusherMaster(
     private val getWorkManager: () -> WorkManager = WorkManager::getInstance
 ) {
 
-    fun enablePeriodicFlusherFor(projectId: String, userId: String) {
+    fun enablePeriodicFlusherFor(projectId: String/*, userId: String*/) {
         getWorkManager()
             .enqueueUniquePeriodicWork(
-                uniqueWorkNameFor(projectId, userId),
+                uniqueWorkNameFor(projectId/*, userId*/),
                 ExistingPeriodicWorkPolicy.KEEP,
-                buildWorkRequest(projectId, userId)
+                buildWorkRequest(projectId/*, userId*/)
             )
     }
 
-    private fun buildWorkRequest(projectId: String, userId: String) =
+    private fun buildWorkRequest(projectId: String/*, userId: String*/) =
         PeriodicWorkRequestBuilder<PeopleUpSyncPeriodicFlusherWorker>(
             PEOPLE_UP_SYNC_FLUSHER_REPEAT_INTERVAL, PEOPLE_UP_SYNC_FLUSHER_REPEAT_UNIT)
-            .setInputData(buildWorkData(projectId, userId))
+            .setInputData(buildWorkData(projectId/*, userId*/))
             .build()
 
-    private fun buildWorkData(projectId: String, userId: String) =
+    private fun buildWorkData(projectId: String/*, userId: String*/) =
         workDataOf(
-            PeopleUpSyncPeriodicFlusherWorker.PROJECT_ID_KEY to projectId,
-            PeopleUpSyncPeriodicFlusherWorker.USER_ID_KEY to userId
+            PeopleUpSyncPeriodicFlusherWorker.PROJECT_ID_KEY to projectId/*,
+            PeopleUpSyncPeriodicFlusherWorker.USER_ID_KEY to userId*/
         )
 
-    private fun uniqueWorkNameFor(projectId: String, userId: String) =
-        "PeriodicFlusher-$projectId-$userId"
+    private fun uniqueWorkNameFor(projectId: String/*, userId: String*/) =
+        "PeriodicFlusher-$projectId"
+    /*"PeriodicFlusher-$projectId-$userId"*/
 
-    fun disablePeriodicFlusherFor(projectId: String, userId: String) {
+    fun disablePeriodicFlusherFor(projectId: String/*, userId: String*/) {
         getWorkManager()
-            .cancelUniqueWork(uniqueWorkNameFor(projectId, userId))
+            .cancelUniqueWork(uniqueWorkNameFor(projectId/*, userId*/))
     }
 
     companion object {
