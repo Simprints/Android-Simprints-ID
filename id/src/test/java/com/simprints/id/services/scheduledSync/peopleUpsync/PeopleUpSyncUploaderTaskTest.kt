@@ -56,6 +56,7 @@ class PeopleUpSyncUploaderTaskTest {
         }
     }
 
+    /* // TODO: uncomment userId when multitenancy is properly implemented
     @Test
     fun userNotSignedIn2_shouldThrowIllegalStateException() {
         mockSignedInUser(projectIdToSync, differentUserId)
@@ -64,6 +65,7 @@ class PeopleUpSyncUploaderTaskTest {
             task.execute()
         }
     }
+    */
 
     @Test
     fun simprintsInternalServerException_shouldWrapInTransientSyncFailureException() {
@@ -148,12 +150,12 @@ class PeopleUpSyncUploaderTaskTest {
 
     private fun mockSuccessfulLocalPeopleQueries(vararg queryResults: List<Person>) {
         queryResults
-            .fold(whenever(localDbManager.getPeopleCountFromLocal(userId = userIdToSync, toSync = true))) { ongoingStub, queryResult ->
+            .fold(whenever(localDbManager.getPeopleCountFromLocal(/*userId = userIdToSync, */toSync = true))) { ongoingStub, queryResult ->
                 ongoingStub.thenReturn(Single.just(queryResult.size))
             }
             .thenReturn(Single.just(0))
         queryResults
-            .fold(whenever(localDbManager.loadPeopleFromLocalRx(userId = userIdToSync, toSync = true))) { ongoingStub, queryResult ->
+            .fold(whenever(localDbManager.loadPeopleFromLocalRx(/*userId = userIdToSync, */toSync = true))) { ongoingStub, queryResult ->
                 ongoingStub.thenReturn(Flowable.fromIterable(queryResult))
             }
     }
@@ -172,8 +174,8 @@ class PeopleUpSyncUploaderTaskTest {
     }
 
     private fun verifyLocalPeopleQueries(vararg queryResults: List<Person>) {
-        verify(localDbManager, times(queryResults.size + 1)).getPeopleCountFromLocal(userId = userIdToSync, toSync = true)
-        verify(localDbManager, times(queryResults.size)).loadPeopleFromLocalRx(userId = userIdToSync, toSync = true)
+        verify(localDbManager, times(queryResults.size + 1)).getPeopleCountFromLocal(/*userId = userIdToSync, */toSync = true)
+        verify(localDbManager, times(queryResults.size)).loadPeopleFromLocalRx(/*userId = userIdToSync, */toSync = true)
     }
 
     private fun verifyPeopleUploads(vararg batches: List<Person>) {
