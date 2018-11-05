@@ -12,6 +12,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.services.sync.SyncTaskParameters
@@ -33,6 +34,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
+    @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
 
     private var started: AtomicBoolean = AtomicBoolean(false)
 
@@ -60,6 +62,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
         } else {
             SyncService.catchUpWithSyncServiceIfStillRunning(syncManager, preferencesManager, loginInfoManager)
         }
+        peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
+
     }
 
     private fun hasSyncGroupChangedSinceLastRun(): Boolean {

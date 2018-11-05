@@ -1,7 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync
 
 import androidx.work.*
-import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
+
 
 class PeopleDownSyncMaster(
     private val getWorkManager: () -> WorkManager = WorkManager::getInstance
@@ -16,7 +16,7 @@ class PeopleDownSyncMaster(
     }
 
     private fun buildWorkRequest(projectId: String, userId: String) =
-        OneTimeWorkRequestBuilder<PeopleUpSyncUploaderWorker>()
+        OneTimeWorkRequestBuilder<PeopleDownSyncWorker>()
             .setConstraints(buildConstraints())
             .build()
 
