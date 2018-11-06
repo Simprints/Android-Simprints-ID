@@ -2,10 +2,11 @@ package com.simprints.id.activities.dashboard
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DefaultItemAnimator
+import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
@@ -19,7 +20,6 @@ import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
-import org.jetbrains.anko.support.v4.onRefresh
 import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
@@ -62,7 +62,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     private fun initRecyclerCardViews(viewPresenter: DashboardContract.Presenter) {
         cardsViewAdapter = DashboardCardAdapter(viewPresenter.cardsModelsList)
-        dashboardCardsView.also {
+        (dashboardCardsView as RecyclerView).also {
             it.setHasFixedSize(false)
             it.itemAnimator = DefaultItemAnimator()
             it.layoutManager = WrapContentLinearLayoutManager(this)
@@ -71,7 +71,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     private fun initSwipeRefreshLayout(viewPresenter: DashboardContract.Presenter) {
-        swipeRefreshLayout.onRefresh {
+        swipeRefreshLayout.setOnRefreshListener {
             viewPresenter.userDidWantToRefreshCardsIfPossible()
         }
     }

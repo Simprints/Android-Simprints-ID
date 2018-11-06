@@ -2,12 +2,12 @@ package com.simprints.id.activities.about
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.WindowManager
+import androidx.appcompat.widget.Toolbar
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.collectFingerprints.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.LanguageHelper
@@ -37,7 +37,7 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
         setContentView(R.layout.activity_about)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        setSupportActionBar(toolbar_about)
+        setSupportActionBar(toolbar_about as Toolbar?)
         supportActionBar?.let {
             it.show()
             it.setDisplayHomeAsUpEnabled(true)

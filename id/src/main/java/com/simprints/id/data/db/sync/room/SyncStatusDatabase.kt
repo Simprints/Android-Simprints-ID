@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.sync.room
 
+
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room

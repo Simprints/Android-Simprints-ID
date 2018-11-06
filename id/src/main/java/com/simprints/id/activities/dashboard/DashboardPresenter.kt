@@ -7,12 +7,14 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
+import com.simprints.id.data.db.sync.room.SyncStatus
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.progress.Progress
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
+import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.services.sync.SyncTaskParameters
@@ -34,7 +36,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
-    @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
+    @Inject lateinit var oneTimeDownSyncCountMaster: OneTimeDownSyncCountMaster
 
     private var started: AtomicBoolean = AtomicBoolean(false)
 
@@ -62,8 +64,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         } else {
             SyncService.catchUpWithSyncServiceIfStillRunning(syncManager, preferencesManager, loginInfoManager)
         }
-        peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
-
+        oneTimeDownSyncCountMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
     }
 
     private fun hasSyncGroupChangedSinceLastRun(): Boolean {

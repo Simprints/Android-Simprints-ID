@@ -4,14 +4,14 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.core.content.ContextCompat
+import androidx.viewpager.widget.ViewPager
 import com.simprints.id.R
 import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE

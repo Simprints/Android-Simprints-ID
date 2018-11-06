@@ -1,7 +1,7 @@
 package com.simprints.id.activities.requestLogin
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager

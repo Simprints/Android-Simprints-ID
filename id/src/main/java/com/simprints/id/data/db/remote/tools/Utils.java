@@ -2,8 +2,7 @@ package com.simprints.id.data.db.remote.tools;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseException;
@@ -19,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import androidx.annotation.Nullable;
 import timber.log.Timber;
 
 
