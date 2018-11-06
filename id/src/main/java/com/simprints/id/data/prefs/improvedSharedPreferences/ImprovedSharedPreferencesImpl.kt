@@ -7,12 +7,15 @@ import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
 
 
 class ImprovedSharedPreferencesImpl(private val prefs: SharedPreferences)
-    : ImprovedSharedPreferences,
-        SharedPreferences by prefs {
+    : ImprovedSharedPreferences {
 
     @SuppressLint("CommitPrefEdits")
     override fun edit(): ImprovedSharedPreferences.Editor =
             ImprovedSharedPreferencesEditorImpl(prefs.edit())
+
+    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    override fun getString(key: String, defaultValue: String): String =
+        prefs.getString(key, defaultValue)
 
     override fun <T: Any> getPrimitive(key: String, defaultValue: T): T =
             try {
@@ -29,23 +32,23 @@ class ImprovedSharedPreferencesImpl(private val prefs: SharedPreferences)
             when (defaultValue) {
                 is Byte ->  getByte(key, defaultValue) as T
                 is Short -> getShort(key, defaultValue) as T
-                is Int -> getInt(key, defaultValue) as T
-                is Long -> getLong(key, defaultValue) as T
-                is Float -> getFloat(key, defaultValue) as T
+                is Int -> prefs.getInt(key, defaultValue) as T
+                is Long -> prefs.getLong(key, defaultValue) as T
+                is Float -> prefs.getFloat(key, defaultValue) as T
                 is Double -> getDouble(key, defaultValue) as T
-                is String -> getString(key, defaultValue) as T
-                is Boolean -> getBoolean(key, defaultValue) as T
+                is String -> prefs.getString(key, defaultValue) as T
+                is Boolean -> prefs.getBoolean(key, defaultValue) as T
                 else -> throw NonPrimitiveTypeError.forTypeOf(defaultValue)
             }
 
     private fun getByte(key: String, defaultValue: Byte): Byte =
-            getInt(key, defaultValue.toInt()).toByte()
+        prefs.getInt(key, defaultValue.toInt()).toByte()
 
     private fun getShort(key: String, defaultValue: Short): Short =
-            getInt(key, defaultValue.toInt()).toShort()
+        prefs.getInt(key, defaultValue.toInt()).toShort()
 
     private fun getDouble(key: String, defaultValue: Double): Double =
-            Double.fromBits(getLong(key, defaultValue.toRawBits()))
+            Double.fromBits(prefs.getLong(key, defaultValue.toRawBits()))
 
 }
 

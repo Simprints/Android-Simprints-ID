@@ -2,13 +2,12 @@ package com.simprints.id.activities.settings
 
 import android.os.Bundle
 import android.preference.PreferenceActivity
-import android.support.v7.app.ActionBar
-import android.support.v7.app.AppCompatDelegate
-import android.support.v7.widget.Toolbar
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import android.support.annotation.LayoutRes
+import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.Toolbar
 
 /**
  * A [android.preference.PreferenceActivity] which implements and proxies the necessary calls

@@ -2,7 +2,7 @@ package com.simprints.libcommon;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+
 
 import com.simprints.libsimprints.FingerIdentifier;
 
@@ -11,6 +11,8 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
+
+import androidx.annotation.NonNull;
 
 @SuppressWarnings("unused")
 public class Fingerprint implements Parcelable {

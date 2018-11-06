@@ -2,7 +2,7 @@ package com.simprints.libcommon;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+
 
 import com.simprints.libsimprints.FingerIdentifier;
 
@@ -14,6 +14,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
+
+import androidx.annotation.NonNull;
 
 @SuppressWarnings("unused")
 public class Person implements Parcelable {

@@ -4,11 +4,15 @@ import androidx.work.Worker
 import com.simprints.id.Application
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.sync.room.SyncStatus
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncCountTask
+import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -18,6 +22,7 @@ class OneTimeDownSyncCountWorker: Worker() {
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     override fun doWork(): Result {
 
@@ -28,6 +33,7 @@ class OneTimeDownSyncCountWorker: Worker() {
 
         task.execute()
             .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
             .subscribeBy(
             onSuccess = {
                 //TODO: Update in room

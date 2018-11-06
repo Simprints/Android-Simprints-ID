@@ -5,8 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-
+import androidx.annotation.NonNull;
 import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.data.analytics.eventData.SessionEventsManager;
 import com.simprints.id.data.analytics.eventData.models.session.SessionEvents;
