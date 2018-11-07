@@ -4,8 +4,8 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.support.v4.content.res.ResourcesCompat
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
 import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
