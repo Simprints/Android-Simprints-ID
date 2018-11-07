@@ -2,6 +2,7 @@ package com.simprints.id.activities.dashboard
 
 import com.google.firebase.FirebaseApp
 import com.simprints.id.R
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.data.DataManager
@@ -31,7 +32,7 @@ import java.util.*
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Inject lateinit var dataManager: DataManager

@@ -2,7 +2,7 @@ package com.simprints.id.testTools
 
 import android.app.Instrumentation
 import android.os.Bundle
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import timber.log.Timber
 
 fun log(message: String) {
