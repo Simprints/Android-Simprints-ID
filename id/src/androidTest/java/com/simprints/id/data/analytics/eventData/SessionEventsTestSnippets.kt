@@ -7,9 +7,13 @@ import com.simprints.id.data.analytics.eventData.models.session.Device
 import com.simprints.id.data.analytics.eventData.models.session.Location
 import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.data.analytics.eventData.realm.RlEvent
+import com.simprints.id.data.analytics.eventData.realm.RlSession
+import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
+import junit.framework.Assert
 import junit.framework.Assert.assertNotSame
 import org.junit.Assert.*
+import java.util.*
 
 fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
 
@@ -109,4 +113,75 @@ fun verifySessionIsOpen(sessionEvents: SessionEvents) {
     assertNotNull(sessionEvents.id)
     assertNotSame(sessionEvents.startTime, 0L)
     assertEquals(sessionEvents.relativeEndTime, 0L)
+}
+
+fun createAndSaveCloseFakeSession(timeHelper: TimeHelper,
+                                  realmSessionEventsManager: SessionEventsLocalDbManager,
+                                  projectId: String,
+                                  id: String = UUID.randomUUID().toString() + "close"): String =
+    createFakeSession(timeHelper, projectId, id).apply {
+        startTime = timeHelper.now() - 1000
+        relativeEndTime = nowRelativeToStartTime(timeHelper) - 10
+    }.also { saveSessionInDb(it, realmSessionEventsManager) }.id
+
+fun createAndSaveOpenFakeSession(timeHelper: TimeHelper,
+                                 realmSessionEventsManager: SessionEventsLocalDbManager,
+                                 projectId: String,
+                                 id: String = UUID.randomUUID().toString() + "open") =
+    createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000)).also { saveSessionInDb(it, realmSessionEventsManager) }.id
+
+fun createAndSaveExpiredOpenFakeSession(timeHelper: TimeHelper,
+                                        realmSessionEventsManager: SessionEventsLocalDbManager,
+                                        projectId: String,
+                                        id: String = UUID.randomUUID().toString() + "open_expired_session") =
+    createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(SessionEvents.GRACE_PERIOD + 1000)).also { saveSessionInDb(it, realmSessionEventsManager) }.id
+
+fun saveSessionInDb(session: SessionEvents, realmSessionEventsManager: SessionEventsLocalDbManager) {
+    realmSessionEventsManager.insertOrUpdateSessionEvents(session).blockingAwait()
+}
+
+fun createFakeSession(timeHelper: TimeHelper? = null,
+                      projectId: String,
+                      id: String = UUID.randomUUID().toString(),
+                      startTime: Long = timeHelper?.now() ?: 0,
+                      fakeRelativeEndTime: Long = 0): SessionEvents =
+    SessionEvents(
+        id = id,
+        projectId = projectId,
+        appVersionName = "some_version",
+        libVersionName = "some_version",
+        language = "en",
+        device = Device(),
+        startTime = startTime).apply {
+        relativeEndTime = fakeRelativeEndTime
+    }
+
+fun verifyNumberOfSessionsInDb(count: Int, realmForDataEvent: Realm) {
+    with(realmForDataEvent) {
+        Assert.assertEquals(count, where(RlSession::class.java).findAll().size)
+    }
+}
+
+fun verifyNumberOfDatabaseInfosInDb(count: Int, realmForDataEvent: Realm) {
+    with(realmForDataEvent) {
+        Assert.assertEquals(count, where(DatabaseInfo::class.java).findAll().size)
+    }
+}
+
+fun verifyNumberOfEventsInDb(count: Int, realmForDataEvent: Realm) {
+    with(realmForDataEvent) {
+        Assert.assertEquals(count, where(RlEvent::class.java).findAll().size)
+    }
+}
+
+fun verifyNumberOfDeviceInfosInDb(count: Int, realmForDataEvent: Realm) {
+    with(realmForDataEvent) {
+        Assert.assertEquals(count, where(Device::class.java).findAll().size)
+    }
+}
+
+fun verifyNumberOfLocationsInDb(count: Int, realmForDataEvent: Realm) {
+    with(realmForDataEvent) {
+        Assert.assertEquals(count, where(Location::class.java).findAll().size)
+    }
 }

@@ -3,6 +3,7 @@ package com.simprints.id.di
 import com.simprints.id.activities.LaunchActivityAndroidTest
 import com.simprints.id.coreFeatures.CollectFingerprintsActivityTest
 import com.simprints.id.coreFeatures.HappyWorkflowAllMainFeatures
+import com.simprints.id.data.analytics.eventData.RealmSessionEventsDbManagerImplTest
 import com.simprints.id.data.analytics.eventData.SessionEventsManagerImplTest
 import com.simprints.id.data.secure.SecureDataManagerTest
 import com.simprints.id.secure.AuthTestsHappyWifi
@@ -23,4 +24,5 @@ interface AppComponentForAndroidTests : AppComponent {
     fun inject(collectFingerprintsActivityTest: CollectFingerprintsActivityTest)
     fun inject(guidSelectionServiceTest: GuidSelectionServiceTest)
     fun inject(launchActivityAndroidTest: LaunchActivityAndroidTest)
+    fun inject(localSessionEventsManagerImplTest: RealmSessionEventsDbManagerImplTest)
 }

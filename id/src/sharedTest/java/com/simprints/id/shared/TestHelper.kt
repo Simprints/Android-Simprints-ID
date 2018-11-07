@@ -1,5 +1,6 @@
 package com.simprints.id.shared
 
+import io.reactivex.observers.TestObserver
 import junit.framework.AssertionFailedError
 import org.junit.Assert.assertEquals
 import org.mockito.Mockito
@@ -55,4 +56,9 @@ inline fun <reified T : Throwable> assertThrows(throwable: T, executable: () -> 
     val thrown = assertThrows<T>(executable)
     assertEquals(throwable, thrown)
     return thrown
+}
+
+fun <T> TestObserver<T>.waitForCompletionAndAssertNoErrors() {
+    this.awaitTerminalEvent()
+    this.assertComplete()
 }
