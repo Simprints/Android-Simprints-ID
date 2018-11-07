@@ -10,6 +10,8 @@ import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import timber.log.Timber
 import javax.inject.Inject
 
+// TODO: uncomment userId when multitenancy is properly implemented
+
 class PeopleUpSyncUploaderWorker : Worker() {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -21,9 +23,9 @@ class PeopleUpSyncUploaderWorker : Worker() {
         inputData.getString(PROJECT_ID_KEY) ?: throw IllegalArgumentException("Project Id required")
     }
 
-    val userId by lazy {
+    /*val userId by lazy {
         inputData.getString(USER_ID_KEY) ?: throw IllegalArgumentException("User Id required")
-    }
+    }*/
 
     override fun doWork(): Result {
         Timber.d("PeopleUpSyncUploaderWorker doWork()")
@@ -31,7 +33,7 @@ class PeopleUpSyncUploaderWorker : Worker() {
 
         val task = PeopleUpSyncUploaderTask(
             loginInfoManager, localDbManager, remoteDbManager,
-            projectId, userId, PATIENT_UPLOAD_BATCH_SIZE
+            projectId, /*userId, */PATIENT_UPLOAD_BATCH_SIZE
         )
 
         return try {
