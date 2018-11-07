@@ -27,7 +27,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
     @Inject lateinit var preferencesManager: PreferencesManager

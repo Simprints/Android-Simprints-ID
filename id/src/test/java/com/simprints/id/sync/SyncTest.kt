@@ -2,6 +2,7 @@ package com.simprints.id.sync
 
 import com.google.firebase.FirebaseApp
 import com.google.gson.stream.JsonReader
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
@@ -52,7 +53,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SyncTest : RxJavaTest, DaggerForTests() {
 
     private var mockServer = MockWebServer()

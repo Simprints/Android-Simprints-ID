@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.Nonce
@@ -19,7 +20,7 @@ import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class NonceManagerTest : RxJavaTest {
 
     private val validNonceJsonResponse = "{\"value\":\"nonce_from_server\"}"

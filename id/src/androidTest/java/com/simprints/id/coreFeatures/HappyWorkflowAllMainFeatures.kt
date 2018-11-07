@@ -1,9 +1,9 @@
 package com.simprints.id.coreFeatures
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.filters.LargeTest
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.InstrumentationRegistry
+import androidx.test.filters.LargeTest
+import androidx.test.rule.ActivityTestRule
+import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.db.local.models.LocalDbKey

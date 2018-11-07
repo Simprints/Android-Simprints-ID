@@ -2,8 +2,8 @@ package com.simprints.id
 
 import android.app.Instrumentation
 import android.content.Context
-import android.support.annotation.NonNull
 import android.support.test.runner.AndroidJUnitRunner
+import androidx.annotation.NonNull
 
 // Not used - useful if a custom Application is required
 class UiTestsRunner : AndroidJUnitRunner() {
