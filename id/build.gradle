@@ -27,8 +27,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         multiDexEnabled true
-        versionCode 122
-        versionName "2018.4.1"
+        versionCode 124
+        versionName "2018.4.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunner "com.simprints.id.UiTestsRunner" //To use custom TestApplication
 

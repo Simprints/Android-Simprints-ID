@@ -15,7 +15,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     class PeopleModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 2
+        const val REALM_SCHEMA_VERSION: Long = 3
 
         const val PERSON_TABLE: String = "rl_Person"
         const val USER_TABLE: String = "rl_User"
@@ -56,6 +56,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
             when (i.toInt()) {
                 0 -> migrateTo1(realm.schema)
                 1 -> migrateTo2(realm.schema)
+                2 -> migrateTo3(realm.schema)
             }
         }
     }
@@ -126,6 +127,12 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
             .addStringAndMakeRequired(PROJECT_DESCRIPTION)
             .addStringAndMakeRequired(PROJECT_CREATOR)
             .addStringAndMakeRequired(PROJECT_UPDATED_AT)
+    }
+
+    private fun migrateTo3(schema: RealmSchema) {
+        schema.get(PERSON_TABLE)?.transform {
+            it.set(SYNC_FIELD, true)
+        }
     }
 
     private fun RealmObjectSchema.addStringAndMakeRequired(name: String): RealmObjectSchema =
