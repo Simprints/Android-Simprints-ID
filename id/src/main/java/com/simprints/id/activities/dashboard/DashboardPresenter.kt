@@ -64,7 +64,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
         } else {
             SyncService.catchUpWithSyncServiceIfStillRunning(syncManager, preferencesManager, loginInfoManager)
         }
-        oneTimeDownSyncCountMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
     }
 
     private fun hasSyncGroupChangedSinceLastRun(): Boolean {
@@ -81,7 +80,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     private fun initCards() {
         cardsModelsList.clear()
         syncManager.removeObservers()
-
+        oneTimeDownSyncCountMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
         Single.merge(
             cardsFactory.createCards()
                 .map {

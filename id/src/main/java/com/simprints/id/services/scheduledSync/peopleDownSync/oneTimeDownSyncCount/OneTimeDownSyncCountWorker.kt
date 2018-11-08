@@ -11,6 +11,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncCoun
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
+import java.lang.Exception
 import javax.inject.Inject
 
 class OneTimeDownSyncCountWorker: Worker() {
@@ -25,28 +26,21 @@ class OneTimeDownSyncCountWorker: Worker() {
     override fun doWork(): Result {
 
         injectDependencies()
-        executeDownSyncCountTask()
-        return Result.SUCCESS
+        return try {
+            val numberOfPeopleToDownSync = executeDownSyncCountTask()
+            syncStatusDatabase.syncStatusModel.updatePeopleToDownSyncCount(numberOfPeopleToDownSync)
+
+            if (numberOfPeopleToDownSync > 0) {
+               //peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
+            }
+            Result.SUCCESS
+        } catch (e: Exception) {
+            Result.FAILURE
+        }
     }
 
-    private fun executeDownSyncCountTask() {
-
-        PeopleDownSyncCountTask(remoteDbManager, dbManager,
-            preferencesManager, loginInfoManager).execute()
-            .subscribeBy(
-                onSuccess = {
-                    Timber.d("Writing number of people to downsync in room")
-                    syncStatusDatabase.syncStatusModel.updatePeopleToDownSyncCount(it)
-                    if(it > 0) {
-//                        peopleDownSyncMaster.schedule(preferencesManager.projectId,
-//                            preferencesManager.userId)
-                    }
-                },
-                onError = {
-
-                }
-            )
-    }
+    private fun executeDownSyncCountTask() = PeopleDownSyncCountTask(remoteDbManager, dbManager,
+            preferencesManager, loginInfoManager).execute().blockingGet()
 
     private fun injectDependencies() {
         val context = applicationContext
