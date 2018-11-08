@@ -4,11 +4,15 @@ import androidx.work.Worker
 import com.simprints.id.Application
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncCountTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 class PeriodicDownSyncCountWorker: Worker() {
@@ -17,6 +21,7 @@ class PeriodicDownSyncCountWorker: Worker() {
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
 
     override fun doWork(): Result {
 
@@ -26,16 +31,16 @@ class PeriodicDownSyncCountWorker: Worker() {
             preferencesManager, loginInfoManager)
 
         task.execute()
-            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-            onSuccess = {
-                //TODO: Update in room
-                //TODO: Enqueue PeopleDownSyncWorker conditional upon design spec
-            },
-            onError = {
+                onSuccess = {
+                    if (it > 0) {
+                        peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
+                    }
+                },
+                onError = {
 
-            }
-        )
+                }
+            )
         return Result.SUCCESS
     }
 

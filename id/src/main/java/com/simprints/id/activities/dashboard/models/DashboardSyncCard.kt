@@ -1,10 +1,14 @@
 package com.simprints.id.activities.dashboard.models
 
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
+import com.simprints.id.data.db.sync.room.SyncStatus
+import com.simprints.id.data.db.sync.viewModel.SyncStatusViewModel
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -29,6 +33,7 @@ class DashboardSyncCard(component: AppComponent,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var syncStatusViewModel: SyncStatusViewModel
 
     var syncParams by lazyVar {
         SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
@@ -108,24 +113,13 @@ class DashboardSyncCard(component: AppComponent,
     }
 
     private fun updateRemotePeopleCount() {
-        remoteDbManager.getNumberOfPatientsForSyncParams(syncParams)
-            .flatMap {
-                dbManager.calculateNPatientsToDownSync(it, syncParams)
+        syncStatusViewModel.syncStatus.observeForever { syncStatus ->
+            syncStatus?.also {
+                peopleToDownload = syncStatus.peopleToDownSync
+                syncNeeded = syncStatus.peopleToDownSync > 0 || peopleToUpload > 0
+                cardView?.updateCard(this)
             }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    peopleToDownload = it
-                    syncNeeded = it > 0 || peopleToUpload > 0
-                    cardView?.updateCard(this)
-                },
-                onError = {
-                    it.printStackTrace()
-                    peopleToDownload = null
-                    syncNeeded = true
-                    cardView?.updateCard(this)
-                }
-            )
+        }
     }
 
     fun syncStarted() {

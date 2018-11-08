@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "SyncStatus")
 data class SyncStatus(
     @PrimaryKey val id: String = SYNC_STATUS_CONST_ID,
-    var peopleToUpSync: Int = 0,
+    val peopleToUpSync: Int = 0,
     var lastUpSyncTime: String? = null,
-    var peopleToDownSync: Int = 0,
+    val peopleToDownSync: Int = 0,
     var lastDownSyncTime: String? = null
     ) {
     companion object {

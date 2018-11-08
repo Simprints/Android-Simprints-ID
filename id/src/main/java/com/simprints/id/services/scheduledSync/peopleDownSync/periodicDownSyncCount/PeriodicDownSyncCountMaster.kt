@@ -1,7 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount
 
 import androidx.work.*
-import androidx.work.ktx.PeriodicWorkRequestBuilder
 import java.util.concurrent.TimeUnit
 
 class PeriodicDownSyncCountMaster(
