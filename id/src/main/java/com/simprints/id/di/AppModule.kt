@@ -21,6 +21,7 @@ import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.sync.SyncManager
+import com.simprints.id.data.db.sync.room.SyncStatus
 import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.db.sync.viewModel.SyncStatusViewModel
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -60,6 +61,7 @@ import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Module
 import dagger.Provides
+import org.jetbrains.anko.doAsync
 import javax.inject.Singleton
 
 @Module
@@ -228,9 +230,16 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideSyncStatusDatabase(): SyncStatusDatabase = SyncStatusDatabase.getDatabase(provideContext())
+    open fun provideAndInitializeSyncStatusDatabase(): SyncStatusDatabase {
+        val syncStatusDb = SyncStatusDatabase.getDatabase(provideContext())
+        doAsync {
+            syncStatusDb.syncStatusModel.insertDefaultSyncStatus(SyncStatus())
+        }
+        return syncStatusDb
+    }
 
     @Provides
     @Singleton
-    open fun provideSyncStatusViewModel(): SyncStatusViewModel = SyncStatusViewModel(provideSyncStatusDatabase())
+    open fun provideSyncStatusViewModel(): SyncStatusViewModel =
+        SyncStatusViewModel(provideAndInitializeSyncStatusDatabase())
 }
