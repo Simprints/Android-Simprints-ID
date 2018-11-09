@@ -8,7 +8,7 @@ interface RemoteTestingManager {
         fun create() = RemoteTestingManagerImpl()
     }
 
-    fun createTestProject(projectId: String, userId: String = "the_lone_user"): TestProject
+    fun createTestProject(): TestProject
     fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters): TestProject
     fun deleteTestProject(projectId: String)
 
