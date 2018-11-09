@@ -7,7 +7,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 /**
- * Makes all the calls to the cloud blocking
+ * This class wraps [RemoteTestingApi] and makes all the calls to the cloud blocking.
  */
 class RemoteTestingManagerImpl : RemoteTestingManager {
 
@@ -16,8 +16,8 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
         RemoteTestingApi.baseUrl)
         .api
 
-    override fun createTestProject(projectId: String, userId: String): TestProject =
-        createTestProject(TestProjectCreationParameters(projectId, userId))
+    override fun createTestProject(): TestProject =
+        createTestProject(TestProjectCreationParameters())
 
     override fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters): TestProject =
         remoteTestingApi.createProject(testProjectCreationParameters)
@@ -29,7 +29,7 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
     }
 
     override fun getFirebaseToken(projectId: String, userId: String): TestFirebaseToken =
-        getFirebaseToken(TestFirebaseTokenParameters(projectId, userId))
+        getFirebaseToken(TestFirebaseTokenParameters(projectId = projectId, userId = userId))
 
     override fun getFirebaseToken(testFirebaseTokenParameters: TestFirebaseTokenParameters): TestFirebaseToken =
         remoteTestingApi.getFirebaseToken(testFirebaseTokenParameters)
