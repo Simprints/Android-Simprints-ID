@@ -36,29 +36,29 @@ open class SyncExecutor(private val dbManager: DbManager,
     }
 
     protected open fun downloadNewPatients(isInterrupted: () -> Boolean, syncParams: SyncTaskParameters): Observable<Progress> =
-        dbManager.remote.getNumberOfPatientsForSyncParams(syncParams).flatMap {
-            dbManager.calculateNPatientsToDownSync(it, syncParams)
-        }.flatMapObservable { nPeopleToDownload ->
-            Timber.d("Downloading batch $nPeopleToDownload people")
-            if (nPeopleToDownload != 0) {
-                val downSyncParam = DownSyncParams(syncParams, dbManager.local)
-                syncApi.downSync(
-                    downSyncParam.projectId,
-                    downSyncParam.userId,
-                    downSyncParam.moduleId,
-                    downSyncParam.lastKnownPatientId,
-                    downSyncParam.lastKnownPatientUpdatedAt)
-                    .flatMapObservable {
-                        savePeopleFromStream(isInterrupted, syncParams, it.byteStream())
-                            .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
-                            .map {
-                                DownloadProgress(it, nPeopleToDownload)
-                            }
-                    }
-            } else {
+//        dbManager.remote.getNumberOfPatientsForSyncParams(syncParams).flatMap {
+//            dbManager.calculateNPatientsToDownSync(it, syncParams)
+//        }.flatMapObservable { nPeopleToDownload ->
+//            Timber.d("Downloading batch $nPeopleToDownload people")
+//            if (nPeopleToDownload != 0) {
+//                val downSyncParam = DownSyncParams(syncParams, dbManager.local)
+//                syncApi.downSync(
+//                    downSyncParam.projectId,
+//                    downSyncParam.userId,
+//                    downSyncParam.moduleId,
+//                    downSyncParam.lastKnownPatientId,
+//                    downSyncParam.lastKnownPatientUpdatedAt)
+//                    .flatMapObservable {
+//                        savePeopleFromStream(isInterrupted, syncParams, it.byteStream())
+//                            .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+//                            .map {
+//                                DownloadProgress(it, nPeopleToDownload)
+//                            }
+//                    }
+//            } else {
                 Observable.just(Progress(0, 0))
-            }
-        }
+//            }
+//        }
 
     protected open fun savePeopleFromStream(isInterrupted: () -> Boolean,
                                             syncParams: SyncTaskParameters,

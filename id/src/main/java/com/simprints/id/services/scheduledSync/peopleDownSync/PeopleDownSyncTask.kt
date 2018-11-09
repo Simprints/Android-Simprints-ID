@@ -6,6 +6,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.DownSyncParams
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.SyncTaskParameters
@@ -25,7 +26,8 @@ class PeopleDownSyncTask (
     val dbManager: DbManager,
     val preferencesManager: PreferencesManager,
     val loginInfoManager: LoginInfoManager,
-    val localDbManager: LocalDbManager
+    val localDbManager: LocalDbManager,
+    private val syncStatusDatabase: SyncStatusDatabase
 ) {
 
     private val syncApi: PeopleRemoteInterface by lazy {
@@ -49,6 +51,7 @@ class PeopleDownSyncTask (
                 onSuccess = {
                      savePeopleFromStream(syncParams, it.byteStream())
                          .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+                         .subscribe()
                  },
                 onError = {
 
@@ -63,10 +66,11 @@ class PeopleDownSyncTask (
             try {
                 reader.beginArray()
                 var totalDownloaded = 0
+                val peopleToDownSync = syncStatusDatabase.syncStatusModel.getPeopleToDownSync()
                 while (reader.hasNext()) {
                     dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
                         totalDownloaded++
-                        emitResultProgressIfRequired(result, totalDownloaded, DOWN_BATCH_SIZE_FOR_UPDATING_UI)
+                        syncStatusDatabase.syncStatusModel.updatePeopleToDownSyncCount(peopleToDownSync - totalDownloaded)
                         val shouldDownloadingBatchStop =
                             hasCurrentBatchDownloadedFinished(totalDownloaded, DOWN_BATCH_SIZE_FOR_DOWNLOADING)
                         shouldDownloadingBatchStop
@@ -80,14 +84,6 @@ class PeopleDownSyncTask (
 
     private fun hasCurrentBatchDownloadedFinished(totalDownloaded: Int, maxPatientsForBatch: Int) =
         totalDownloaded % maxPatientsForBatch == 0
-
-    private fun emitResultProgressIfRequired(it: ObservableEmitter<Int>,
-                                             totalDownloaded: Int,
-                                             emitProgressEvery: Int) {
-        if (totalDownloaded % emitProgressEvery == 0) {
-            it.onNext(totalDownloaded)
-        }
-    }
 
     private fun finishDownload(reader: JsonReader,
                                emitter: Emitter<Int>,
@@ -107,7 +103,6 @@ class PeopleDownSyncTask (
 
     companion object {
         const val DOWN_BATCH_SIZE_FOR_DOWNLOADING = 10000
-        const val DOWN_BATCH_SIZE_FOR_UPDATING_UI = 100
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 }

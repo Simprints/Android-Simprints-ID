@@ -237,9 +237,4 @@ open class AppModule(val app: Application) {
         }
         return syncStatusDb
     }
-
-    @Provides
-    @Singleton
-    open fun provideSyncStatusViewModel(): SyncStatusViewModel =
-        SyncStatusViewModel(provideAndInitializeSyncStatusDatabase())
 }

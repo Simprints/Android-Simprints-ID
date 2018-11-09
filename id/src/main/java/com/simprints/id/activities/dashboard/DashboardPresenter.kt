@@ -7,13 +7,12 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
-import com.simprints.id.data.db.sync.room.SyncStatus
-import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.progress.Progress
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
 import com.simprints.id.services.sync.SyncCategory
 import com.simprints.id.services.sync.SyncService
@@ -37,6 +36,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
     @Inject lateinit var oneTimeDownSyncCountMaster: OneTimeDownSyncCountMaster
+    @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
 
     private var started: AtomicBoolean = AtomicBoolean(false)
 
@@ -150,8 +150,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     private fun isUserAllowedToRefresh(): Boolean = syncCardModel?.syncState != SyncManagerState.IN_PROGRESS
 
     override fun userDidWantToSync() {
-        setSyncingStartedInLocalDbCardView()
-        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.USER_INITIATED)
+        peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
     }
 
     private fun setSyncingStartedInLocalDbCardView() {

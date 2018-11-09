@@ -7,15 +7,22 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.db.sync.models.SyncManagerState
+import com.simprints.id.data.db.sync.room.SyncStatus
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
+import com.simprints.id.data.db.sync.viewModel.SyncStatusViewModel
 import com.simprints.id.services.progress.DownloadProgress
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.UploadProgress
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textResource
+import javax.inject.Inject
 
 @SuppressLint("SetTextI18n")
 class DashboardSyncCardView(private val rootView: View) : DashboardCardView(rootView) {
@@ -30,12 +37,17 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     private val syncProgressBar: ProgressBar = rootView.findViewById(R.id.dashboardCardSyncProgressBar)
     private val syncAction: TextView = rootView.findViewById(R.id.dashboardCardSyncAction)
 
+    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+
     fun updateCard(cardModel: DashboardCard) {
         bind(cardModel)
     }
 
     override fun bind(cardModel: DashboardCard) {
         super.bind(cardModel)
+
+        val component = (rootView.context.applicationContext as Application).component
+        component.inject(this)
 
         if (cardModel is DashboardSyncCard) {
             cardModel.cardView = this
@@ -150,10 +162,17 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     }
 
     private fun setDownloadCounter(cardModel: DashboardSyncCard) {
-        syncDownloadCount.text = ""
-        cardModel.peopleToDownload?.let {
-            syncDownloadCount.text = "${Math.max(it, 0)}"
+
+        val observer = Observer<SyncStatus> {
+            cardModel.peopleToDownload = it.peopleToDownSync
+            syncDownloadCount.text = "${Math.max(it.peopleToDownSync, 0)}"
+            if (it.peopleToDownSync > 0) {
+                cardModel.syncNeeded = true
+            }
+
         }
+        val syncStatusViewModel = SyncStatusViewModel(syncStatusDatabase)
+        syncStatusViewModel.syncStatus.observe(rootView.context as DashboardActivity, observer)
     }
 
     private fun showLastSyncTimeText(dataModel: DashboardSyncCard) {

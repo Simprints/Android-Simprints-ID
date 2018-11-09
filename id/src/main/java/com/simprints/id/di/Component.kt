@@ -18,6 +18,7 @@ import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
 import com.simprints.id.activities.dashboard.DashboardPresenter
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
+import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.activities.launch.LaunchPresenter
 import com.simprints.id.activities.launch.SyncSchedulerHelper
 import com.simprints.id.activities.login.LoginActivity
@@ -87,4 +88,5 @@ interface AppComponent {
     fun inject(periodicDownSyncCountWorker: PeriodicDownSyncCountWorker)
     fun inject(oneTimeDownSyncCountWorker: OneTimeDownSyncCountWorker)
     fun inject(peopleDownSyncWorker: PeopleDownSyncWorker)
+    fun inject(dashboardSyncCardView: DashboardSyncCardView)
 }
