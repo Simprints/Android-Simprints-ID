@@ -8,9 +8,6 @@ import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncCountTask
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
-import io.reactivex.rxkotlin.subscribeBy
-import timber.log.Timber
 import java.lang.Exception
 import javax.inject.Inject
 
@@ -21,7 +18,6 @@ class OneTimeDownSyncCountWorker: Worker() {
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
-    @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
 
     override fun doWork(): Result {
 
@@ -29,10 +25,6 @@ class OneTimeDownSyncCountWorker: Worker() {
         return try {
             val numberOfPeopleToDownSync = executeDownSyncCountTask()
             syncStatusDatabase.syncStatusModel.updatePeopleToDownSyncCount(numberOfPeopleToDownSync)
-
-            if (numberOfPeopleToDownSync > 0) {
-               //peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
-            }
             Result.SUCCESS
         } catch (e: Exception) {
             Result.FAILURE

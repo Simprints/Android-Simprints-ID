@@ -5,6 +5,7 @@ import com.simprints.id.Application
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
@@ -18,11 +19,13 @@ class PeopleDownSyncWorker: Worker() {
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     override fun doWork(): Result {
 
         injectDependencies()
-        val task = PeopleDownSyncTask(remoteDbManager, dbManager, preferencesManager, loginInfoManager, localDbManager)
+        val task = PeopleDownSyncTask(remoteDbManager, dbManager, preferencesManager,
+            loginInfoManager, localDbManager, syncStatusDatabase)
 
         return try {
             task.execute()

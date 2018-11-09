@@ -32,8 +32,8 @@ class SyncService : ProgressService<SyncTaskParameters>() {
                 // When "sync" is called, syncManager connect to the Service and syncManager either starts
                 // the sync or catch with the Sync state.
                 SyncService.syncCategory?.let {
-                    syncManager.sync(SyncTaskParameters.build(
-                        preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), it)
+//                    syncManager.sync(SyncTaskParameters.build(
+//                        preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), it)
                 }
             }
         }

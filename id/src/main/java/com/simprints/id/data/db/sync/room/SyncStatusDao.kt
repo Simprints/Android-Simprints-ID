@@ -24,4 +24,10 @@ interface SyncStatusDao {
 
     @Query("update SyncStatus set lastDownSyncTime = :lastDownSyncTime where id= '$SYNC_STATUS_CONST_ID'")
     fun updateLastDownSyncTime(lastDownSyncTime: String)
+
+    @Query("select peopleToDownSync from SyncStatus where id = '$SYNC_STATUS_CONST_ID'")
+    fun getPeopleToDownSync(): Int
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun updateSyncStatus(syncStatus: SyncStatus)
 }
