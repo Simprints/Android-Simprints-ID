@@ -1,6 +1,5 @@
 package com.simprints.id.testTools.remote
 
-import com.simprints.id.network.SimApiClient
 import com.simprints.id.testTools.models.*
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -11,7 +10,7 @@ import io.reactivex.schedulers.Schedulers
  */
 class RemoteTestingManagerImpl : RemoteTestingManager {
 
-    private val remoteTestingApi = SimApiClient(
+    private val remoteTestingApi = TestingApiClient(
         RemoteTestingApi::class.java,
         RemoteTestingApi.baseUrl)
         .api
