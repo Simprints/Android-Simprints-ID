@@ -6,7 +6,7 @@ import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.http.*
 
-interface RemoteTestingInterface {
+interface RemoteTestingApi {
 
     companion object {
         var baseUrl = "https://androidapitest-v1-dot-simprints-dev.appspot.com/"
