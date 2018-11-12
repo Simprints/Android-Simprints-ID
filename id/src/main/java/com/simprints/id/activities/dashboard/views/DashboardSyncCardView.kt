@@ -17,9 +17,6 @@ import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.data.db.sync.room.SyncStatus
 import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.db.sync.viewModel.SyncStatusViewModel
-import com.simprints.id.services.progress.DownloadProgress
-import com.simprints.id.services.progress.Progress
-import com.simprints.id.services.progress.UploadProgress
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textResource
 import javax.inject.Inject
@@ -122,35 +119,11 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
             setImageResource(R.drawable.ic_syncing)
         }
 
-        val progressEmitted = dataModel.progress
-        updateCountersDuringSync(progressEmitted)
-        updateProgressBar(progressEmitted)
-
         description.text = ""
 
         syncDescription.textResource = R.string.syncing
 
         disableSyncButton()
-    }
-
-    private fun updateProgressBar(progressEmitted: Progress?) {
-        syncProgressBar.apply {
-            visibility = View.VISIBLE
-            isIndeterminate = false
-            max = progressEmitted?.maxValue ?: 0
-            progress = progressEmitted?.currentValue ?: 0
-        }
-    }
-
-    private fun updateCountersDuringSync(progress: Progress?) {
-        when (progress) {
-            null -> {
-                syncDownloadCount.text = ""
-                syncUploadCount.text = ""
-            }
-            is DownloadProgress -> syncDownloadCount.text = "${Math.max(progress.maxValue - progress.currentValue, 0)}"
-            is UploadProgress -> syncUploadCount.text = "${Math.max(progress.maxValue - progress.currentValue, 0)}"
-        }
     }
 
     private fun setUploadCounter(cardModel: DashboardSyncCard) {

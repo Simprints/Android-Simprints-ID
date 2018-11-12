@@ -36,7 +36,6 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
-import com.simprints.id.services.progress.notifications.NotificationFactory
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountMaster
@@ -177,14 +176,6 @@ open class AppModule(val app: Application) {
     @Provides
     @Singleton
     fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
-
-    @Provides
-    @Singleton
-    fun provideNotificationFactory(app: Application): NotificationFactory {
-        val factory = NotificationFactory(app)
-        factory.initSyncNotificationChannel()
-        return factory
-    }
 
     @Provides
     fun provideAndroidResourcesHelper(ctx: Context): AndroidResourcesHelper =

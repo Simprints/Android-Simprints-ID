@@ -13,8 +13,7 @@ class PeopleDownSyncCountTask(
     private val remoteDbManager: RemoteDbManager,
     private val dbManager: DbManager,
     private val preferencesManager: PreferencesManager,
-    private val loginInfoManager: LoginInfoManager
-) {
+    private val loginInfoManager: LoginInfoManager) {
 
     var syncParams by lazyVar {
         SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
