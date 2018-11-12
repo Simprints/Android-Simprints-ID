@@ -20,19 +20,19 @@ interface FirstUseLocal {
         val sessionRealmConfiguration = SessionRealmConfig.get(sessionLocalDbKey.projectId, sessionLocalDbKey.value)
     }
 
-    var peopleRealmConfiguration: RealmConfiguration?
+    var peopleRealmConfiguration: RealmConfiguration
 
     fun setUp() {
         log("FirstUseTest.setUp(): cleaning internal data")
         StorageUtils.clearApplicationData(InstrumentationRegistry.getTargetContext())
-        StorageUtils.clearRealmDatabase(peopleRealmConfiguration!!)
+        StorageUtils.clearRealmDatabase(peopleRealmConfiguration)
         StorageUtils.clearRealmDatabase(sessionRealmConfiguration)
     }
 
     fun tearDown() {
         log("FirstUseTest.tearDown(): cleaning internal data")
         StorageUtils.clearApplicationData(InstrumentationRegistry.getTargetContext())
-        StorageUtils.clearRealmDatabase(peopleRealmConfiguration!!)
+        StorageUtils.clearRealmDatabase(peopleRealmConfiguration)
         StorageUtils.clearRealmDatabase(sessionRealmConfiguration)
     }
 }

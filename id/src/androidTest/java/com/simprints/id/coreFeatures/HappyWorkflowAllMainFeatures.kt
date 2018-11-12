@@ -16,6 +16,7 @@ import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUse
 import com.simprints.id.testTemplates.FirstUseLocal.Companion.realmKey
+import com.simprints.id.testTools.ActivityUtils
 import com.simprints.id.testTools.adapters.toCalloutCredentials
 import com.simprints.id.testTools.log
 import com.simprints.id.testTools.models.TestProject
@@ -36,56 +37,27 @@ import javax.inject.Inject
 @LargeTest
 class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUse {
 
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-
+    override lateinit var peopleRealmConfiguration: RealmConfiguration
     override lateinit var testProject: TestProject
 
-    @Rule
-    @JvmField
-    val enrolTestRule1 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val enrolTestRule2 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val identifyTestRule1 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val identifyTestRule2 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val verifyTestRule1 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val verifyTestRule2 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val verifyTestRule3 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val verifyTestRule4 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+    @Rule @JvmField val enrolTestRule1 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val enrolTestRule2 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val identifyTestRule1 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val identifyTestRule2 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val verifyTestRule1 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val verifyTestRule2 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val verifyTestRule3 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val verifyTestRule4 = ActivityUtils.checkLoginFromIntentActivityTestRule()
 
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var randomGeneratorMock: RandomGenerator
-
-    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
-        PreferencesModuleForAnyTests(remoteConfigRule = DependencyRule.SpyRule)
-    }
+    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
 
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
             randomGeneratorRule = MockRule,
             bluetoothComponentAdapterRule = ReplaceRule { mockBluetoothAdapter })
     }
-
-    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
 
     @Before
     override fun setUp() {

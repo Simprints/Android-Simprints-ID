@@ -20,6 +20,9 @@ import java.util.*
 
 object ActivityUtils {
 
+    fun checkLoginFromIntentActivityTestRule() =
+        ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+
     private val permissions = ArrayList(Arrays.asList(
         Manifest.permission.ACCESS_NETWORK_STATE,
         Manifest.permission.BLUETOOTH,

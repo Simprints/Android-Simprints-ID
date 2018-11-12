@@ -13,7 +13,7 @@ interface FirstUse : FirstUseLocal {
 
     var testProject: TestProject
 
-    override var peopleRealmConfiguration: RealmConfiguration?
+    override var peopleRealmConfiguration: RealmConfiguration
 
     override fun setUp() {
 

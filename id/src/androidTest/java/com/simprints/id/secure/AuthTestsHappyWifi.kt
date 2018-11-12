@@ -55,7 +55,7 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     private val invalidSecret = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
 
-    override var peopleRealmConfiguration: RealmConfiguration? = null
+    override lateinit var peopleRealmConfiguration: RealmConfiguration
 
     @Rule
     @JvmField

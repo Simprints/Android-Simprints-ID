@@ -45,7 +45,7 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     private val projectSecret = "Z8nRspDoiQg1QpnDdKE6U7fQKa0GjpQOwnJ4OcSFWulAcIk4+LP9wrtDn8fRmqacLvkmtmOLl+Kxo1emXLsZ0Q=="
 
-    override var peopleRealmConfiguration: RealmConfiguration? = null
+    override lateinit var peopleRealmConfiguration: RealmConfiguration
 
     @Rule
     @JvmField
