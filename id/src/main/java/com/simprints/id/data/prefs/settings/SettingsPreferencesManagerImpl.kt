@@ -110,7 +110,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(ParentalConsent())
 
         const val PEOPLE_DOWN_SYNC_STATE_KEY = "PeopleDownSyncState"
-        val PEOPLE_DOWN_SYNC_STATE_DEFAULT = PeopleDownSyncState.ACTIVE
+        val PEOPLE_DOWN_SYNC_STATE_DEFAULT = PeopleDownSyncState.BACKGROUND
     }
 
     // Should the UI automatically slide forward?

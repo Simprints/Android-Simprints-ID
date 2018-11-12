@@ -9,7 +9,6 @@ import androidx.core.app.NotificationCompat
 import com.simprints.id.R
 import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.progress.UploadProgress
-import com.simprints.id.services.sync.SyncCategory
 import org.jetbrains.anko.notificationManager
 
 class NotificationFactory(private val context: Context) {
@@ -56,13 +55,12 @@ class NotificationFactory(private val context: Context) {
         notificationManager.createNotificationChannel(channel)
     }
 
-    fun syncProgressNotification(syncCategory: SyncCategory?) =
+    fun syncProgressNotification() =
         ProgressNotificationBuilder(notificationManager,
             NotificationCompat.Builder(context, channelId),
             syncTag,
             syncTitle,
-            syncProgressIcon,
-            syncCategory
+            syncProgressIcon
         ) { progress ->
             formatProgressContent(progress)
         }
@@ -85,21 +83,19 @@ class NotificationFactory(private val context: Context) {
     private fun isProgressZero(progress: Progress): Boolean =
         progress.currentValue == 0 && progress.maxValue == 0
 
-    fun syncCompleteNotification(syncCategory: SyncCategory?): NotificationBuilder =
+    fun syncCompleteNotification(): NotificationBuilder =
         CompleteNotificationBuilder(notificationManager,
             NotificationCompat.Builder(context, channelId),
             syncTag,
             syncTitle,
-            syncCompleteIcon,
-            syncCategory
+            syncCompleteIcon
         ) { syncCompleteContent }
 
-    fun syncErrorNotification(syncCategory: SyncCategory?): NotificationBuilder =
+    fun syncErrorNotification(): NotificationBuilder =
         ErrorNotificationBuilder(notificationManager,
             NotificationCompat.Builder(context, channelId),
             syncTag,
             syncTitle,
-            syncErrorIcon,
-            syncCategory
+            syncErrorIcon
         ) { syncErrorContent }
 }
