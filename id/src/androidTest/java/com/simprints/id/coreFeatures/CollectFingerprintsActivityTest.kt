@@ -60,7 +60,7 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
         realmKey,
         calloutCredentials.legacyApiKey)
 
-    override var peopleRealmConfiguration: RealmConfiguration? = null
+    override lateinit var peopleRealmConfiguration: RealmConfiguration
 
     @Rule
     @JvmField
