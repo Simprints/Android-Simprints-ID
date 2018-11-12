@@ -38,7 +38,7 @@ object StorageUtils {
         return deletedAll
     }
 
-    fun deletaAllFiles(ctx: Context) {
+    fun deleteAllFiles(ctx: Context) {
         val files = ctx.filesDir.listFiles()
         files?.let {
             for (file in it) {

@@ -11,7 +11,6 @@ import org.hamcrest.Description
 import org.hamcrest.Matcher
 import java.util.concurrent.TimeUnit
 
-
 fun tryOnUiUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Any?): Any? {
     changeUiTimeoutPolicyIfNeeded(timeout)
     return tryUntilTimeout(timeout, pollingInterval, snippet, ::waitOnUi)
