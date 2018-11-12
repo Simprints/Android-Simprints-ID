@@ -14,12 +14,13 @@ import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper.Companion.gson
 import io.reactivex.Emitter
 import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
+import java.text.DateFormat
+import java.util.*
 
 class PeopleDownSyncTask (
     val remoteDbManager: RemoteDbManager,
@@ -37,6 +38,10 @@ class PeopleDownSyncTask (
     var syncParams by lazyVar {
         SyncTaskParameters.build(preferencesManager.syncGroup,
             preferencesManager.moduleId, loginInfoManager)
+    }
+
+    private val dateFormat: DateFormat by lazy {
+        DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
     fun execute() {
@@ -71,6 +76,7 @@ class PeopleDownSyncTask (
                     dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
                         totalDownloaded++
                         syncStatusDatabase.syncStatusModel.updatePeopleToDownSyncCount(peopleToDownSync - totalDownloaded)
+                        syncStatusDatabase.syncStatusModel.updateLastDownSyncTime(dateFormat.format(Date()))
                         val shouldDownloadingBatchStop =
                             hasCurrentBatchDownloadedFinished(totalDownloaded, DOWN_BATCH_SIZE_FOR_DOWNLOADING)
                         shouldDownloadingBatchStop

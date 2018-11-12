@@ -4,16 +4,11 @@ import androidx.work.Worker
 import com.simprints.id.Application
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncCountTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import timber.log.Timber
 import java.lang.Exception
-import java.util.*
 import javax.inject.Inject
 
 class PeriodicDownSyncCountWorker: Worker() {
@@ -29,12 +24,12 @@ class PeriodicDownSyncCountWorker: Worker() {
         injectDependencies()
 
         return try {
-
             val numberOfPeopleToDownSync = executeDownSyncCountTask()
 
             if (numberOfPeopleToDownSync > 0) {
                 peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
             }
+
             Result.SUCCESS
         } catch (e: Exception) {
             Result.FAILURE

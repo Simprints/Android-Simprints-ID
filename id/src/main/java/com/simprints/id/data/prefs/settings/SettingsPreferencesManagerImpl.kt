@@ -3,6 +3,7 @@ package com.simprints.id.data.prefs.settings
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
@@ -12,6 +13,7 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.preferences.NoSuchPreferenceError
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncState
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
@@ -21,6 +23,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           private val remoteConfigWrapper: RemoteConfigWrapper,
                                           private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                           groupSerializer: Serializer<Constants.GROUP>,
+                                          downSyncStateSerializer: Serializer<PeopleDownSyncState>,
                                           languagesStringArraySerializer: Serializer<Array<String>>)
     : SettingsPreferencesManager {
 
@@ -105,6 +108,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
         val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(ParentalConsent())
+
+        const val PEOPLE_DOWN_SYNC_STATE_KEY = "PeopleDownSyncState"
+        val PEOPLE_DOWN_SYNC_STATE_DEFAULT = PeopleDownSyncState.ACTIVE
     }
 
     // Should the UI automatically slide forward?
@@ -192,6 +198,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // The options of the parental consent as a JSON string of booleans
     override var parentalConsentOptionsJson: String
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT)
+
+    override var peopleDownSyncState: PeopleDownSyncState
+        by ComplexPreference(prefs, PEOPLE_DOWN_SYNC_STATE_KEY, PEOPLE_DOWN_SYNC_STATE_DEFAULT, downSyncStateSerializer)
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()

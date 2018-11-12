@@ -52,7 +52,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         if (cardModel is DashboardSyncCard) {
             cardModel.cardView = this
             setUploadCounter(cardModel)
-            setDownloadCounter(cardModel)
+            setDownloadCounterAndLastSyncTime(cardModel)
             updateState(cardModel)
         }
     }
@@ -74,8 +74,6 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
 
         if (dataModel.syncNeeded) {
             showSyncNeededText()
-        } else {
-            showLastSyncTimeText(dataModel)
         }
 
         enableSyncButton(dataModel)
@@ -101,8 +99,6 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         }
 
         syncProgressBar.visibility = View.INVISIBLE
-
-        showLastSyncTimeText(dataModel)
 
         enableSyncButton(dataModel)
     }
@@ -161,25 +157,19 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         syncUploadCount.text = "${Math.max(cardModel.peopleToUpload, 0)}"
     }
 
-    private fun setDownloadCounter(cardModel: DashboardSyncCard) {
+    private fun setDownloadCounterAndLastSyncTime(cardModel: DashboardSyncCard) {
 
         val observer = Observer<SyncStatus> {
             cardModel.peopleToDownload = it.peopleToDownSync
             syncDownloadCount.text = "${Math.max(it.peopleToDownSync, 0)}"
             if (it.peopleToDownSync > 0) {
                 cardModel.syncNeeded = true
+                syncDescription.text = String.format(rootView.context.getString(R.string.dashboard_card_sync_last_sync),
+                    it.lastDownSyncTime)
             }
-
         }
         val syncStatusViewModel = SyncStatusViewModel(syncStatusDatabase)
         syncStatusViewModel.syncStatus.observe(rootView.context as DashboardActivity, observer)
-    }
-
-    private fun showLastSyncTimeText(dataModel: DashboardSyncCard) {
-        syncDescription.text = ""
-        dataModel.lastSyncTime?.let {
-            syncDescription.text = String.format(rootView.context.getString(R.string.dashboard_card_sync_last_sync), it)
-        }
     }
 
     private fun showSyncNeededText() {
