@@ -28,13 +28,17 @@ class PeopleDownSyncWorker: Worker() {
             loginInfoManager, localDbManager, syncStatusDatabase)
 
         return try {
+            Timber.d("DownSync task...starting")
             task.execute()
+            Timber.d("DownSync task successful")
             Result.SUCCESS
         } catch (exception: TransientSyncFailureException) {
             Timber.e(exception)
+            Timber.d("DownSync task failure: Retry")
             Result.RETRY
         } catch (throwable: Throwable) {
             Timber.e(throwable)
+            Timber.d("DownSync task failure: Failure")
             Result.FAILURE
         }
     }

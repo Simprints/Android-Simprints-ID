@@ -9,12 +9,12 @@ class OneTimeDownSyncCountMaster(
         getWorkManager().beginUniqueWork(
             getUniqueOneTimeDownSyncCountWorkName(projectId, userId),
             ExistingWorkPolicy.REPLACE,
-            buildWorkRequest(projectId, userId)
+            buildWorkRequest()
         )
             .enqueue()
     }
 
-    private fun buildWorkRequest(projectId: String, userId: String) =
+    private fun buildWorkRequest() =
         OneTimeWorkRequestBuilder<OneTimeDownSyncCountWorker>()
             .setConstraints(buildConstraints())
             .build()

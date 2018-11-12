@@ -10,12 +10,12 @@ class PeopleDownSyncMaster(
         getWorkManager().beginUniqueWork(
             getUniqueDownSyncWorkName(projectId, userId),
             ExistingWorkPolicy.KEEP,
-            buildWorkRequest(projectId, userId)
+            buildWorkRequest()
         )
             .enqueue()
     }
 
-    private fun buildWorkRequest(projectId: String, userId: String) =
+    private fun buildWorkRequest() =
         OneTimeWorkRequestBuilder<PeopleDownSyncWorker>()
             .setConstraints(buildConstraints())
             .build()

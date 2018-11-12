@@ -11,11 +11,11 @@ class PeriodicDownSyncCountMaster(
         getWorkManager().enqueueUniquePeriodicWork(
             getUniquePeriodicDownSyncCountWorkName(projectId, userId),
             ExistingPeriodicWorkPolicy.KEEP,
-            buildWorkRequest(projectId, userId)
+            buildWorkRequest()
         )
     }
 
-    private fun buildWorkRequest(projectId: String, userId: String) =
+    private fun buildWorkRequest() =
         PeriodicWorkRequestBuilder<PeriodicDownSyncCountWorker>(DOWN_SYNC_REPEAT_INTERVAL, DOWN_SYNC_REPEAT_UNIT)
             .setConstraints(buildConstraints())
             .build()
