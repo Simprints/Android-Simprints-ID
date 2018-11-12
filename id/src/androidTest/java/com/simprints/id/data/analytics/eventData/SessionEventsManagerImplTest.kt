@@ -24,11 +24,10 @@ import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.shared.*
 import com.simprints.id.testSnippets.*
-import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.models.TestCalloutCredentials
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.shared.PeopleGeneratorUtils
-import com.simprints.id.testTools.waitOnSystem
 import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
@@ -61,7 +60,7 @@ import javax.inject.Inject
 class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
     private val testProjectId = "test_project"
-    private val calloutCredentials = CalloutCredentials(
+    private val calloutCredentials = TestCalloutCredentials(
         "bWOFHInKA2YaQwrxZ7uJ",
         "the_one_and_only_module",
         "the_lone_user",

@@ -15,7 +15,7 @@ import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.testSnippets.launchActivityEnrol
-import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.models.TestCalloutCredentials
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.SimHelper
 import org.junit.Assert
@@ -35,7 +35,7 @@ class GuidSelectionServiceTest : DaggerForAndroidTests() {
 
     val scanTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
-    val calloutCredentials: CalloutCredentials = CalloutCredentials(
+    val testCalloutCredentials: TestCalloutCredentials = TestCalloutCredentials(
         "00000002-0000-0000-0000-000000000000",
         "the_one_and_only_module",
         "the_lone_user")
@@ -54,21 +54,21 @@ class GuidSelectionServiceTest : DaggerForAndroidTests() {
         super.setUp()
         testAppComponent.inject(this)
 
-        setupLoginInfoToBeSignedIn(loginInfoManagerSpy, calloutCredentials.projectId, calloutCredentials.userId)
+        setupLoginInfoToBeSignedIn(loginInfoManagerSpy, testCalloutCredentials.projectId, testCalloutCredentials.userId)
 
         app.initDependencies()
     }
 
     @Test
     fun testWithStartedService() {
-        launchActivityEnrol(calloutCredentials, scanTestRule)
+        launchActivityEnrol(testCalloutCredentials, scanTestRule)
         var session = sessionEventsManagerSpy.createSession().blockingGet()
 
         sessionEventsManagerSpy.updateSession({
             session.projectId = loginInfoManagerSpy.getSignedInProjectIdOrEmpty()
         }).blockingGet()
 
-        val simHelper = SimHelper(calloutCredentials.projectId, calloutCredentials.userId)
+        val simHelper = SimHelper(testCalloutCredentials.projectId, testCalloutCredentials.userId)
         simHelper.confirmIdentity(app, session.id, "some_guid_confirmed")
 
         Awaitility.await().atMost(30, TimeUnit.SECONDS).pollDelay(Duration.TWO_SECONDS).until<Any> {

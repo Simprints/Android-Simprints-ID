@@ -8,6 +8,7 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.testTools.StorageUtils
 import com.simprints.id.testTools.log
 import io.realm.RealmConfiguration
+import org.junit.After
 import org.junit.Before
 
 interface FirstUseLocal {
@@ -21,10 +22,15 @@ interface FirstUseLocal {
 
     var peopleRealmConfiguration: RealmConfiguration?
 
-    @Before
     fun setUp() {
-        // Clear any internal data
         log("FirstUseTest.setUp(): cleaning internal data")
+        StorageUtils.clearApplicationData(InstrumentationRegistry.getTargetContext())
+        StorageUtils.clearRealmDatabase(peopleRealmConfiguration!!)
+        StorageUtils.clearRealmDatabase(sessionRealmConfiguration)
+    }
+
+    fun tearDown() {
+        log("FirstUseTest.tearDown(): cleaning internal data")
         StorageUtils.clearApplicationData(InstrumentationRegistry.getTargetContext())
         StorageUtils.clearRealmDatabase(peopleRealmConfiguration!!)
         StorageUtils.clearRealmDatabase(sessionRealmConfiguration)
