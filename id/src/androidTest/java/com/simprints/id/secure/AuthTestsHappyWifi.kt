@@ -16,7 +16,7 @@ import com.simprints.id.shared.DependencyRule.ReplaceRule
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.FirstUseLocal.Companion.realmKey
-import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.models.TestCalloutCredentials
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.mockscanner.MockBluetoothAdapter
@@ -33,7 +33,7 @@ import javax.inject.Inject
 @LargeTest
 class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
 
-    private val calloutCredentials = CalloutCredentials(
+    private val calloutCredentials = TestCalloutCredentials(
         "bWOFHInKA2YaQwrxZ7uJ",
         "the_one_and_only_module",
         "the_lone_user",
@@ -44,7 +44,7 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
         realmKey,
         calloutCredentials.legacyApiKey)
 
-    private val invalidCredentials = CalloutCredentials(
+    private val invalidCredentials = TestCalloutCredentials(
         "beefdeadbeefdeadbeef",
         "the_one_and_only_module",
         "the_lone_user",
@@ -210,6 +210,10 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
         ensureConfigError()
         signOut()
+    }
+
+    override fun tearDown() {
+        super.tearDown()
     }
 
     private fun signOut() {

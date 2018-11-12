@@ -17,7 +17,7 @@ import com.simprints.id.shared.replaceSecureApiClientWithFailingClientProvider
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTemplates.FirstUseLocal.Companion.realmKey
-import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.models.TestCalloutCredentials
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import io.realm.Realm
@@ -32,7 +32,7 @@ import javax.inject.Inject
 @LargeTest
 class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
 
-    private val calloutCredentials = CalloutCredentials(
+    private val calloutCredentials = TestCalloutCredentials(
         "bWOFHInKA2YaQwrxZ7uJ",
         "the_one_and_only_module",
         "the_lone_user",

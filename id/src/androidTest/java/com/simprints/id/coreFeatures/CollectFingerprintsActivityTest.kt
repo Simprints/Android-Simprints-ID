@@ -26,7 +26,7 @@ import com.simprints.id.testSnippets.waitForSplashScreenAppearsAndDisappears
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTools.ActivityUtils.getCurrentActivity
 import com.simprints.id.testTools.ActivityUtils.launchCollectFingerprintsActivity
-import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.models.TestCalloutCredentials
 import com.simprints.id.testTools.ScannerUtils.setupScannerForCollectingFingerprints
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.tools.RandomGenerator
@@ -48,7 +48,7 @@ import javax.inject.Inject
 @LargeTest
 class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
 
-    private val calloutCredentials = CalloutCredentials(
+    private val calloutCredentials = TestCalloutCredentials(
         "bWOFHInKA2YaQwrxZ7uJ",
         "the_one_and_only_module",
         "the_lone_user",

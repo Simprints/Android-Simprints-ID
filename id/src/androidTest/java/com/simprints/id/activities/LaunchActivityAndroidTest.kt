@@ -32,7 +32,7 @@ import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.mockSettingsPreferencesManager
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.models.TestCalloutCredentials
 import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
@@ -60,7 +60,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
     @Inject lateinit var dbManagerSpy: DbManager
     @Inject lateinit var simNetworkUtilsSpy: SimNetworkUtils
 
-    private val calloutCredentials = CalloutCredentials(
+    private val calloutCredentials = TestCalloutCredentials(
         "bWOFHInKA2YaQwrxZ7uJ",
         "the_one_and_only_module",
         "the_lone_user",

@@ -1,5 +1,6 @@
 package com.simprints.id.testTools.remote
 
+import com.simprints.id.testTools.exceptions.TestingRemoteApiError
 import com.simprints.id.testTools.models.*
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -20,11 +21,11 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
 
     override fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters): TestProject =
         remoteTestingApi.createProject(testProjectCreationParameters)
-            .blockingGetOnDifferentThread()
+            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to create project", it) }
 
     override fun deleteTestProject(projectId: String) {
         remoteTestingApi.deleteProject(projectId)
-            .blockingGetOnDifferentThread()
+            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to delete project", it) }
     }
 
     override fun getFirebaseToken(projectId: String, userId: String): TestFirebaseToken =
@@ -32,19 +33,23 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
 
     override fun getFirebaseToken(testFirebaseTokenParameters: TestFirebaseTokenParameters): TestFirebaseToken =
         remoteTestingApi.getFirebaseToken(testFirebaseTokenParameters)
-            .blockingGetOnDifferentThread()
+            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to get firebase token", it) }
 
     override fun getSessionSignatures(projectId: String): List<TestSessionSignature> =
         remoteTestingApi.getSessionSignatures(projectId)
             .toList()
-            .blockingGetOnDifferentThread()
+            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to get session signatures", it) }
 
     override fun getSessionCount(projectId: String): TestSessionCount =
         remoteTestingApi.getSessionCount(projectId)
-            .blockingGetOnDifferentThread()
+            .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to get session count") }
 
-    private inline fun <reified T> Single<T>.blockingGetOnDifferentThread() =
-        this.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .blockingGet()
+    private inline fun <reified T> Single<T>.blockingGetOnDifferentThread(wrapError: (Throwable) -> Throwable): T =
+        try {
+            this.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .blockingGet()
+        } catch (e: Throwable) {
+            throw wrapError(e)
+        }
 }
