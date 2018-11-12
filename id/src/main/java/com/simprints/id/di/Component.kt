@@ -36,11 +36,9 @@ import com.simprints.id.services.GuidSelectionService
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountWorker
-import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSync
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSync
-import com.simprints.id.services.sync.SyncService
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
@@ -63,7 +61,6 @@ interface AppComponent {
     fun inject(checkLoginPresenter: CheckLoginPresenter)
     fun inject(checkLoginFromIntentPresenter: CheckLoginFromIntentPresenter)
     fun inject(checkLoginFromMainLauncherPresenter: CheckLoginFromMainLauncherPresenter)
-    fun inject(syncService: SyncService)
     fun inject(matchingPresenter: MatchingPresenter)
     fun inject(aboutPresenter: AboutPresenter)
     fun inject(dashboardCardsFactory: DashboardCardsFactory)
@@ -77,7 +74,6 @@ interface AppComponent {
     fun inject(dashboardPresenter: DashboardPresenter)
     fun inject(alertPresenter: AlertPresenter)
     fun inject(launchPresenter: LaunchPresenter)
-    fun inject(scheduledPeopleSync: ScheduledPeopleSync)
     fun inject(peopleUpSyncUploaderWorker: PeopleUpSyncUploaderWorker)
     fun inject(peopleUpSyncPeriodicFlusherWorker: PeopleUpSyncPeriodicFlusherWorker)
     fun inject(scheduledSessionsSync: ScheduledSessionsSync)

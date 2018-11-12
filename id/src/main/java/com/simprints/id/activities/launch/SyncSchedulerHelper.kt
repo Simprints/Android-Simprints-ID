@@ -1,22 +1,18 @@
 package com.simprints.id.activities.launch
 
-import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
-import com.simprints.id.services.sync.SyncCategory
-import com.simprints.id.services.sync.SyncTaskParameters
 import javax.inject.Inject
 
 class SyncSchedulerHelper(appComponent: AppComponent) {
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var syncManager: SyncManager
-    @Inject lateinit var scheduledPeopleSyncManager: ScheduledPeopleSyncManager
     @Inject lateinit var scheduledSessionsSyncManager: ScheduledSessionsSyncManager
+    @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
 
     init {
         appComponent.inject(this)
@@ -24,7 +20,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
 
     fun scheduleSyncsAndStartPeopleSyncIfNecessary() {
         if (preferencesManager.syncOnCallout) {
-            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.AT_LAUNCH)
+            peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
         }
 
         schedulePeopleSyncIfNecessary()
@@ -33,9 +29,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
 
     private fun schedulePeopleSyncIfNecessary() {
         if (preferencesManager.scheduledBackgroundSync) {
-            scheduledPeopleSyncManager.scheduleSyncIfNecessary()
-        } else {
-            scheduledPeopleSyncManager.deleteSyncIfNecessary()
+            //TODO: Schedule periodic downsync worker
         }
     }
 

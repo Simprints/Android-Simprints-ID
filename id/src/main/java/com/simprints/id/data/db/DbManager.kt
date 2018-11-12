@@ -54,8 +54,6 @@ interface DbManager {
 
     fun saveSession(session: Session)
 
-    fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress>
-
     fun recoverLocalDb(group: Constants.GROUP): Completable
 
     fun saveVerification(probe: LibPerson, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)

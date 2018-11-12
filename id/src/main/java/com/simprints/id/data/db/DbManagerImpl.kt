@@ -11,7 +11,6 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toDomainPerson
-import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
@@ -267,12 +266,6 @@ open class DbManagerImpl(override val local: LocalDbManager,
     override fun saveSession(session: Session) {
         remote.saveSessionInRemote(session)
     }
-
-    override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
-        SyncExecutor(
-            this,
-            JsonHelper.gson
-        ).sync(interrupted, parameters).trace("sync")
 
     override fun recoverLocalDb(group: Constants.GROUP): Completable {
         val firebaseManager = remote as FirebaseManagerImpl
