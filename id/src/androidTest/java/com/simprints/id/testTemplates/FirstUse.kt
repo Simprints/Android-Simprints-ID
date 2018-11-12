@@ -3,7 +3,7 @@ package com.simprints.id.testTemplates
 import android.support.test.InstrumentationRegistry
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
-import com.simprints.id.testTemplates.FirstUseLocal.Companion.realmKey
+import com.simprints.id.testTemplates.FirstUseLocal.Companion.sessionsRealmKey
 import com.simprints.id.testTools.models.TestProject
 import com.simprints.id.testTools.remote.RemoteTestingManager
 import io.realm.Realm
@@ -21,7 +21,7 @@ interface FirstUse : FirstUseLocal {
 
         val localDbKey = LocalDbKey(
             testProject.id,
-            realmKey,
+            sessionsRealmKey,
             testProject.legacyId)
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)

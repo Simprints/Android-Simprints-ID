@@ -2,13 +2,14 @@ package com.simprints.id.data.analytics.eventData
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.SmallTest
-import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.Application
-import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.analytics.eventData.models.events.*
+import com.simprints.id.data.analytics.eventData.models.events.ArtificialTerminationEvent
+import com.simprints.id.data.analytics.eventData.models.events.FingerprintCaptureEvent
+import com.simprints.id.data.analytics.eventData.models.events.GuidSelectionEvent
+import com.simprints.id.data.analytics.eventData.models.events.PersonCreationEvent
 import com.simprints.id.data.analytics.eventData.models.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventData.models.session.Device
 import com.simprints.id.data.analytics.eventData.models.session.Location
@@ -24,11 +25,9 @@ import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.shared.*
 import com.simprints.id.testSnippets.*
-import com.simprints.id.testTools.models.TestCalloutCredentials
+import com.simprints.id.testTools.*
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.shared.PeopleGeneratorUtils
-import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
@@ -59,17 +58,7 @@ import javax.inject.Inject
 @SmallTest
 class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
-    private val testProjectId = "test_project"
-    private val calloutCredentials = TestCalloutCredentials(
-        "bWOFHInKA2YaQwrxZ7uJ",
-        "the_one_and_only_module",
-        "the_lone_user",
-        "d95bacc0-7acb-4ff0-98b3-ae6ecbf7398f")
-    private val projectSecret = "Z8nRspDoiQg1QpnDdKE6U7fQKa0GjpQOwnJ4OcSFWulAcIk4+LP9wrtDn8fRmqacLvkmtmOLl+Kxo1emXLsZ0Q=="
-
-    @Rule
-    @JvmField
-    val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+    @Rule @JvmField val simprintsActionTestRule = ActivityUtils.checkLoginFromIntentActivityTestRule()
 
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
     @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
@@ -77,6 +66,10 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var timeHelper: TimeHelper
+    
+    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
+    private val realmForDataEvent
+        get() = (realmSessionEventsManager as RealmSessionEventsDbManagerImpl).getRealmInstance().blockingGet()
 
     override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
         PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
@@ -91,10 +84,6 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter }
         )
     }
-
-    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
-    private val realmForDataEvent
-        get() = (realmSessionEventsManager as RealmSessionEventsDbManagerImpl).getRealmInstance().blockingGet()
 
     @Before
     override fun setUp() {
@@ -171,10 +160,10 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
         val numberOfPreviousSessions = 5
 
-        repeat(numberOfPreviousSessions) { createAndSaveFakeCloseSession(projectId = "bWOFHInKA2YaQwrxZ7uJ", id = UUID.randomUUID().toString()) }
+        repeat(numberOfPreviousSessions) { createAndSaveFakeCloseSession(projectId = DEFAULT_PROJECT_ID, id = UUID.randomUUID().toString()) }
 
-        launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         setupActivityAndContinue()
         waitOnUi(100)
@@ -202,7 +191,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
         whenever(remoteDbManager.getSessionsApiClient()).thenReturn(Single.just(mockSessionsApi))
 
-        sessionEventsManagerSpy.syncSessions(testProjectId).test().also {
+        sessionEventsManagerSpy.syncSessions(DEFAULT_PROJECT_ID).test().also {
             it.awaitTerminalEvent()
             it.assertComplete()
             val sessions = realmSessionEventsManager.loadSessions().blockingGet()
@@ -228,23 +217,23 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
     @Test
     fun createSession_shouldStopPreviousSessions() {
-        val oldSession = createFakeSession(projectId = testProjectId, id = "oldSession")
+        val oldSession = createFakeSession(projectId = DEFAULT_PROJECT_ID, id = "oldSession")
         assertEquals(oldSession.relativeEndTime, 0)
         realmSessionEventsManager.insertOrUpdateSessionEvents(oldSession).blockingAwait()
 
         sessionEventsManagerSpy.createSession().blockingGet()
-        sessionEventsManagerSpy.updateSession({ it.projectId = testProjectId }).blockingGet()
+        sessionEventsManagerSpy.updateSession({ it.projectId = DEFAULT_PROJECT_ID }).blockingGet()
 
-        val sessions = realmSessionEventsManager.loadSessions(testProjectId).blockingGet()
+        val sessions = realmSessionEventsManager.loadSessions(DEFAULT_PROJECT_ID).blockingGet()
 
         sessions[0].also {
             assertTrue(it.isOpen())
         }
 
-        sessions[1].also {
-            assertEquals(it.id, oldSession.id)
-            assertTrue(it.isClosed())
-            val finalEvent = it.events.find { it is ArtificialTerminationEvent } as ArtificialTerminationEvent?
+        sessions[1].also { sessionEvents ->
+            assertEquals(sessionEvents.id, oldSession.id)
+            assertTrue(sessionEvents.isClosed())
+            val finalEvent = sessionEvents.events.find { it is ArtificialTerminationEvent } as ArtificialTerminationEvent?
             assertEquals(finalEvent?.reason, ArtificialTerminationEvent.Reason.NEW_SESSION)
         }
     }
@@ -253,13 +242,13 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     fun userRefusesConsent_sessionShouldNotHaveTheLocation() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
 
-        launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         setupActivityAndDecline()
         Thread.sleep(100)
 
-        sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).subscribeBy(
+        sessionEventsManagerSpy.getCurrentSession(DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId).subscribeBy(
             onSuccess = {
                 assertNull(it.location)
             }, onError = { it.printStackTrace() })
@@ -269,13 +258,13 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     fun userAcceptsConsent_sessionShouldHaveTheLocation() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
 
-        launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         setupActivityAndContinue()
         Thread.sleep(100)
 
-        sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).subscribeBy(
+        sessionEventsManagerSpy.getCurrentSession(DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId).subscribeBy(
             onSuccess = {
                 assertNotNull(it.location)
             }, onError = { it.printStackTrace() })
@@ -298,15 +287,15 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
 
         // Launch and sign in
-        launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
 
         // Once signed in proceed to enrol person1
         fullHappyWorkflow()
         collectFingerprintsEnrolmentCheckFinished(simprintsActionTestRule)
 
-        sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).test().also {
+        sessionEventsManagerSpy.getCurrentSession(DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId).test().also {
             it.awaitTerminalEvent()
             it.assertNoErrors()
 
@@ -319,16 +308,16 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
 
         // Launch and sign in
-        launchActivityEnrol(calloutCredentials, simprintsActionTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret + "wrong")
+        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET + "wrong")
         pressSignIn()
 
         Thread.sleep(6000)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         setupActivityAndContinue()
 
-        sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).test().also {
+        sessionEventsManagerSpy.getCurrentSession(DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId).test().also {
             it.awaitTerminalEvent()
             it.assertNoErrors()
 
@@ -343,14 +332,14 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
         mockLocalToAddFakePersonAfterLogin(guid)
 
-        launchActivityVerify(calloutCredentials, simprintsActionTestRule, guid)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchActivityVerify(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule, guid)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
 
         fullHappyWorkflow()
         matchingActivityVerificationCheckFinished(simprintsActionTestRule)
 
-        sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).test().also {
+        sessionEventsManagerSpy.getCurrentSession(DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId).test().also {
             it.awaitTerminalEvent()
             it.assertNoErrors()
 
@@ -365,15 +354,15 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
 
         mockLocalToAddFakePersonAfterLogin(guid)
 
-        launchActivityIdentify(calloutCredentials, simprintsActionTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchActivityIdentify(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
 
         fullHappyWorkflow()
 
         matchingActivityIdentificationCheckFinished(simprintsActionTestRule)
 
-        sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).test().also {
+        sessionEventsManagerSpy.getCurrentSession(DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId).test().also {
             it.awaitTerminalEvent()
             it.assertNoErrors()
 
@@ -389,8 +378,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_GOOD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_INDEX_GOOD_SCAN)))
 
-        launchActivityIdentify(calloutCredentials, simprintsActionTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchActivityIdentify(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
 
         setupActivityAndContinue()
@@ -409,10 +398,10 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         val personCreatedArg = argumentCaptor<Person>()
         Mockito.verify(sessionEventsManagerSpy, Mockito.times(1)).addPersonCreationEventInBackground(personCreatedArg.capture())
 
-        sessionEventsManagerSpy.getCurrentSession(calloutCredentials.projectId).test().also {
-            it.awaitTerminalEvent()
-            it.assertNoErrors()
-            val session = it.values().first()
+        sessionEventsManagerSpy.getCurrentSession(DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId).test().also { testObserver ->
+            testObserver.awaitTerminalEvent()
+            testObserver.assertNoErrors()
+            val session = testObserver.values().first()
 
             val personCreatedForMatchingActivity = personCreatedArg.firstValue
             val personCreationEvent = session.events.filterIsInstance(PersonCreationEvent::class.java)[0]
@@ -442,7 +431,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         }.`when`(localDbManager).signInToLocal(anyNotNull())
     }
 
-    private fun createAndSaveFakeCloseSession(projectId: String = testProjectId, id: String = "close_session"): String =
+    private fun createAndSaveFakeCloseSession(projectId: String = DEFAULT_PROJECT_ID, id: String = "close_session"): String =
         timeHelper.let { it ->
             createFakeSession(it, projectId, id).apply {
                 startTime = it.now() - 1000
@@ -450,18 +439,18 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             }.also { saveSessionInDb(it) }.id
         }
 
-    private fun createAndSaveFakeOpenSession(projectId: String = testProjectId, id: String = "open_session") =
-        timeHelper.let {
-            createFakeSession(it, projectId, id).apply {
-                startTime = it.now() - 1000
+    private fun createAndSaveFakeOpenSession(projectId: String = DEFAULT_PROJECT_ID, id: String = "open_session") =
+        timeHelper.let { timeHelper ->
+            createFakeSession(timeHelper, projectId, id).apply {
+                startTime = timeHelper.now() - 1000
                 relativeEndTime = 0
             }.also { saveSessionInDb(it) }.id
         }
 
-    private fun createAndSaveFakeExpiredOpenSession(projectId: String = testProjectId, id: String = "open_expired_session") =
-        timeHelper.let {
-            createFakeSession(it, projectId, id).apply {
-                startTime = it.now() - SessionEvents.GRACE_PERIOD - 1000
+    private fun createAndSaveFakeExpiredOpenSession(projectId: String = DEFAULT_PROJECT_ID, id: String = "open_expired_session") =
+        timeHelper.let { timeHelper ->
+            createFakeSession(timeHelper, projectId, id).apply {
+                startTime = timeHelper.now() - SessionEvents.GRACE_PERIOD - 1000
                 relativeEndTime = 0
             }.also { saveSessionInDb(it) }.id
         }
@@ -470,7 +459,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         realmSessionEventsManager.insertOrUpdateSessionEvents(session).blockingAwait()
     }
 
-    private fun createFakeSession(timeHelper: TimeHelper? = null, projectId: String = testProjectId, id: String = "some_id"): SessionEvents =
+    private fun createFakeSession(timeHelper: TimeHelper? = null, projectId: String = DEFAULT_PROJECT_ID, id: String = "some_id"): SessionEvents =
         SessionEvents(
             id = id,
             projectId = projectId,
