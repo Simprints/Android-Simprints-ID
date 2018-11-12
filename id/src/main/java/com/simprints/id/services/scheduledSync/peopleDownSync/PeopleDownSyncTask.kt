@@ -54,7 +54,7 @@ class PeopleDownSyncTask (
                          .subscribe()
                  },
                 onError = {
-
+                    throw it
                 }
             )
     }
@@ -79,6 +79,7 @@ class PeopleDownSyncTask (
                 finishDownload(reader, result)
             } catch (e: Exception) {
                 finishDownload(reader, result, e)
+                throw e
             }
         }
 
@@ -102,7 +103,7 @@ class PeopleDownSyncTask (
     }
 
     companion object {
-        const val DOWN_BATCH_SIZE_FOR_DOWNLOADING = 10000
+        const val DOWN_BATCH_SIZE_FOR_DOWNLOADING = 200
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 }
