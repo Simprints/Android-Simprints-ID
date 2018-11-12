@@ -8,10 +8,8 @@ import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.delegates.lazyVar
-import io.reactivex.observers.DisposableObserver
 import io.reactivex.rxkotlin.subscribeBy
 import java.text.DateFormat
 import javax.inject.Inject
@@ -38,14 +36,13 @@ class DashboardSyncCard(component: AppComponent,
     var peopleToDownload: Int? = null
     var syncNeeded: Boolean = false
     var lastSyncTime: String? = null
-    var progress: Progress? = null
     var cardView: DashboardSyncCardView? = null
 
     var syncState: SyncManagerState = SyncManagerState.NOT_STARTED
         set(value) {
             field = value
             if (field != SyncManagerState.IN_PROGRESS) {
-                this.progress = null
+
             }
 
             when (field) {

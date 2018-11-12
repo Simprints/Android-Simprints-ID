@@ -28,8 +28,7 @@ class PeopleDownSyncTask (
     val preferencesManager: PreferencesManager,
     val loginInfoManager: LoginInfoManager,
     val localDbManager: LocalDbManager,
-    private val syncStatusDatabase: SyncStatusDatabase
-) {
+    private val syncStatusDatabase: SyncStatusDatabase) {
 
     private val syncApi: PeopleRemoteInterface by lazy {
         dbManager.remote.getPeopleApiClient().blockingGet()
