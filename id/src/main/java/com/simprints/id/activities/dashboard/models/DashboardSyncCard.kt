@@ -57,22 +57,6 @@ class DashboardSyncCard(component: AppComponent,
             }
         }
 
-    val syncObserver = object : DisposableObserver<Progress>() {
-
-        override fun onNext(progressSync: Progress) {
-            progress = progressSync
-            syncState = SyncManagerState.IN_PROGRESS
-        }
-
-        override fun onComplete() {
-            syncState = SyncManagerState.SUCCEED
-        }
-
-        override fun onError(throwable: Throwable) {
-            syncState = SyncManagerState.FAILED
-        }
-    }
-
     init {
         component.inject(this)
         updateSyncInfo()
