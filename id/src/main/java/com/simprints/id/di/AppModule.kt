@@ -20,10 +20,8 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.db.sync.room.SyncStatus
 import com.simprints.id.data.db.sync.room.SyncStatusDatabase
-import com.simprints.id.data.db.sync.viewModel.SyncStatusViewModel
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -42,13 +40,10 @@ import com.simprints.id.services.progress.notifications.NotificationFactory
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountMaster
-import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
-import com.simprints.id.services.sync.SyncClient
-import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.TimeHelper
@@ -196,14 +191,6 @@ open class AppModule(val app: Application) {
         AndroidResourcesHelperImpl(ctx)
 
     @Provides
-    fun provideSyncClient(app: Application): SyncClient =
-        SyncService.getClient(app)
-
-    @Provides
-    fun provideSyncManager(analyticsManager: AnalyticsManager, syncClient: SyncClient): SyncManager =
-        SyncManager(analyticsManager, syncClient)
-
-    @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(ctx: Context,
                                                 secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
@@ -219,10 +206,6 @@ open class AppModule(val app: Application) {
                                          remoteDbManager: RemoteDbManager,
                                          analyticsManager: AnalyticsManager): SessionEventsManager =
         SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, remoteDbManager, analyticsManager)
-
-    @Provides
-    open fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
-        ScheduledPeopleSyncManager(preferencesManager)
 
     @Provides
     open fun provideScheduledSessionsSyncManager(): ScheduledSessionsSyncManager =

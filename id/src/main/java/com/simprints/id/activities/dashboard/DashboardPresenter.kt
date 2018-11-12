@@ -5,25 +5,17 @@ import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
-import com.simprints.id.services.sync.SyncCategory
-import com.simprints.id.services.sync.SyncService
-import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.observers.DisposableObserver
 import io.reactivex.rxkotlin.subscribeBy
 import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class DashboardPresenter(private val view: DashboardContract.View,
@@ -33,18 +25,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
     @Inject lateinit var oneTimeDownSyncCountMaster: OneTimeDownSyncCountMaster
     @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
 
-    private var started: AtomicBoolean = AtomicBoolean(false)
-
     private val cardsFactory = DashboardCardsFactory(component)
-
-    private var actualSyncParams: SyncTaskParameters by lazyVar {
-        SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
-    }
 
     override val cardsModelsList: ArrayList<DashboardCard> = arrayListOf()
 
@@ -59,27 +44,15 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override fun start() {
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
-        if (!started.getAndSet(true) || hasSyncGroupChangedSinceLastRun()) {
-            initCards()
-        } else {
-            SyncService.catchUpWithSyncServiceIfStillRunning(syncManager, preferencesManager, loginInfoManager)
-        }
-    }
-
-    private fun hasSyncGroupChangedSinceLastRun(): Boolean {
-        val syncParams = SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
-        return (actualSyncParams != syncParams).also {
-            actualSyncParams = syncParams
-        }
+        initCards()
     }
 
     override fun pause() {
-        syncManager.stopListeners()
+
     }
 
     private fun initCards() {
         cardsModelsList.clear()
-        syncManager.removeObservers()
         oneTimeDownSyncCountMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
         Single.merge(
             cardsFactory.createCards()
@@ -100,7 +73,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun handleCardsCreated() {
-        SyncService.catchUpWithSyncServiceIfStillRunning(syncManager, preferencesManager, loginInfoManager)
         view.stopRequestIfRequired()
     }
 
@@ -110,25 +82,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun initSyncCardModel(it: DashboardSyncCard) {
         it.onSyncActionClicked = { userDidWantToSync() }
-        syncManager.addObserver(it.syncObserver)
-        syncManager.addObserver(object : DisposableObserver<Progress>() {
-            override fun onNext(t: Progress) {}
-            override fun onError(e: Throwable) {
-                e.printStackTrace()
-                createAndAddLocalDbCard()
-            }
-
-            override fun onComplete() {
-                createAndAddLocalDbCard()
-            }
-        })
-    }
-
-    fun createAndAddLocalDbCard() {
-        cardsFactory.createLocalDbInfoCard()
-            .subscribeBy(
-                onSuccess = { addCard(it) },
-                onError = { it.printStackTrace() })
     }
 
     private fun addCard(dashboardCard: DashboardCard) {
@@ -151,13 +104,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override fun userDidWantToSync() {
         peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
-    }
-
-    private fun setSyncingStartedInLocalDbCardView() {
-        syncCardModel?.let {
-            it.syncStarted()
-            view.notifyCardViewChanged(cardsModelsList.indexOf(it))
-        }
     }
 
     private fun removeCardIfExist(projectType: DashboardCardType) {
