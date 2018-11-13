@@ -35,14 +35,14 @@ android {
     }
 
     //Add those properties in ~/.gradle/gradle.properties
-    signingConfigs {
-        release {
-            storeFile file(SIMPRINTSID_RELEASE_STORE_FILE)
-            storePassword SIMPRINTSID_RELEASE_STORE_PASSWORD
-            keyAlias SIMPRINTSID_RELEASE_KEY_ALIAS
-            keyPassword SIMPRINTSID_RELEASE_KEY_PASSWORD
-        }
-    }
+//    signingConfigs {
+//        release {
+//            storeFile file(SIMPRINTSID_RELEASE_STORE_FILE)
+//            storePassword SIMPRINTSID_RELEASE_STORE_PASSWORD
+//            keyAlias SIMPRINTSID_RELEASE_KEY_ALIAS
+//            keyPassword SIMPRINTSID_RELEASE_KEY_PASSWORD
+//        }
+//    }
 
     bundle {
         language {
