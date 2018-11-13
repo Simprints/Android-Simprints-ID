@@ -4,6 +4,7 @@ import androidx.work.Worker
 import com.simprints.id.Application
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncCountTask
@@ -18,6 +19,7 @@ class PeriodicDownSyncCountWorker: Worker() {
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
+    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     override fun doWork(): Result {
 
@@ -25,6 +27,7 @@ class PeriodicDownSyncCountWorker: Worker() {
 
         return try {
             val numberOfPeopleToDownSync = executeDownSyncCountTask()
+            syncStatusDatabase.syncStatusModel.updatePeopleToDownSyncCount(numberOfPeopleToDownSync)
 
             if (numberOfPeopleToDownSync > 0) {
                 peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)

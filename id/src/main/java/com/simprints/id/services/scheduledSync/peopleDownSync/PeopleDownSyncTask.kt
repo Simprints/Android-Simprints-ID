@@ -75,9 +75,12 @@ class PeopleDownSyncTask (
                     dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
                         totalDownloaded++
                         syncStatusDatabase.syncStatusModel.updatePeopleToDownSyncCount(peopleToDownSync - totalDownloaded)
-                        syncStatusDatabase.syncStatusModel.updateLastDownSyncTime(dateFormat.format(Date()))
                         val shouldDownloadingBatchStop =
                             hasCurrentBatchDownloadedFinished(totalDownloaded, DOWN_BATCH_SIZE_FOR_DOWNLOADING)
+
+                        if (shouldDownloadingBatchStop) {
+                            updateDownSyncTimestampOnBatchDownload()
+                        }
                         shouldDownloadingBatchStop
                     }.subscribe()
                 }
@@ -90,6 +93,10 @@ class PeopleDownSyncTask (
 
     private fun hasCurrentBatchDownloadedFinished(totalDownloaded: Int, maxPatientsForBatch: Int) =
         totalDownloaded % maxPatientsForBatch == 0
+
+    private fun updateDownSyncTimestampOnBatchDownload() {
+        syncStatusDatabase.syncStatusModel.updateLastDownSyncTime(dateFormat.format(Date()))
+    }
 
     private fun finishDownload(reader: JsonReader,
                                emitter: Emitter<Int>,
