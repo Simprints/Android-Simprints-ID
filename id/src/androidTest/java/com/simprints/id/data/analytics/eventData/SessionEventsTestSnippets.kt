@@ -1,13 +1,11 @@
 package com.simprints.id.data.analytics.eventData
 
 import com.google.common.truth.Truth
-import com.simprints.id.data.analytics.eventData.models.events.*
-import com.simprints.id.data.analytics.eventData.models.session.DatabaseInfo
-import com.simprints.id.data.analytics.eventData.models.session.Device
-import com.simprints.id.data.analytics.eventData.models.session.Location
-import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
-import com.simprints.id.data.analytics.eventData.realm.RlEvent
-import com.simprints.id.data.analytics.eventData.realm.RlSession
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.models.domain.events.*
+import com.simprints.id.data.analytics.eventData.models.domain.session.Device
+import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventData.models.local.*
 import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
 import junit.framework.Assert
@@ -52,6 +50,7 @@ fun verifyEventsAfterEnrolment(events: List<Event>, realmForDataEvent: Realm) {
         EnrollmentEvent::class.java,
         CallbackEvent::class.java
     )
+
     Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(expectedEvents)
     checkDbHasOnlyTheExpectedInfo(realmForDataEvent, expectedEvents.size)
 }
@@ -101,9 +100,9 @@ fun checkDbHasOnlyTheExpectedInfo(realmForDataEvent: Realm, nEvents: Int) {
     with(realmForDataEvent) {
         realmForDataEvent.executeTransaction {
             assertEquals(nEvents, where(RlEvent::class.java).findAll().size)
-            assertEquals(1, where(DatabaseInfo::class.java).findAll().size)
-            assertEquals(1, where(Device::class.java).findAll().size)
-            Truth.assertThat(where(Location::class.java).findAll().size).isIn(arrayListOf(0, 1))
+            assertEquals(1, where(RlDatabaseInfo::class.java).findAll().size)
+            assertEquals(1, where(RlDevice::class.java).findAll().size)
+            Truth.assertThat(where(RlLocation::class.java).findAll().size).isIn(arrayListOf(0, 1))
         }
     }
 }
@@ -164,7 +163,7 @@ fun verifyNumberOfSessionsInDb(count: Int, realmForDataEvent: Realm) {
 
 fun verifyNumberOfDatabaseInfosInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(DatabaseInfo::class.java).findAll().size)
+        Assert.assertEquals(count, where(RlDatabaseInfo::class.java).findAll().size)
     }
 }
 
@@ -176,12 +175,12 @@ fun verifyNumberOfEventsInDb(count: Int, realmForDataEvent: Realm) {
 
 fun verifyNumberOfDeviceInfosInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(Device::class.java).findAll().size)
+        Assert.assertEquals(count, where(RlDevice::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfLocationsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(Location::class.java).findAll().size)
+        Assert.assertEquals(count, where(RlLocation::class.java).findAll().size)
     }
 }

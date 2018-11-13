@@ -8,14 +8,14 @@ class ScheduledSessionsSyncManager {
     fun scheduleSyncIfNecessary() = createAndEnqueueRequest()
 
     private fun createAndEnqueueRequest(): PeriodicWorkRequest =
-        PeriodicWorkRequestBuilder<ScheduledSessionsSync>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
+        PeriodicWorkRequestBuilder<ScheduledSessionsSyncWorker>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
             .setConstraints(getConstraints())
             .addTag(WORKER_TAG)
             .build().also {
                 WorkManager.getInstance().enqueueUniquePeriodicWork(WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, it)
             }
 //            .also {
-//                WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<ScheduledSessionsSync>().build())
+//                WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<ScheduledSessionsSyncWorker>().build())
 //            }
 
     private fun getConstraints() = Constraints.Builder()

@@ -8,8 +8,8 @@ import com.jayway.awaitility.Awaitility
 import com.jayway.awaitility.Duration
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.events.GuidSelectionEvent
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.domain.events.GuidSelectionEvent
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests

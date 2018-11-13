@@ -7,10 +7,12 @@ import android.support.test.runner.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.analytics.eventData.models.events.RefusalEvent
-import com.simprints.id.data.analytics.eventData.models.session.DatabaseInfo
-import com.simprints.id.data.analytics.eventData.models.session.Location
-import com.simprints.id.data.analytics.eventData.realm.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.models.domain.events.RefusalEvent
+import com.simprints.id.data.analytics.eventData.models.domain.session.DatabaseInfo
+import com.simprints.id.data.analytics.eventData.models.domain.session.Location
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
@@ -94,11 +96,11 @@ class RealmSessionEventsDbManagerImplTest : DaggerForAndroidTests() {
         createAndSaveCloseSession(testProjectId3)
         createAndSaveCloseSession(testProjectId3)
 
-        sessionEventsManagerSpy.updateSession({
+        sessionEventsManagerSpy.updateSession {
             it.databaseInfo = DatabaseInfo(0)
             it.location = Location(0.0, 0.0)
             it.events.add(RefusalEvent(200, 200, RefusalEvent.Answer.OTHER, "fake_event"))
-        }).blockingGet()
+        }.blockingGet()
 
         verifyNumberOfSessionsInDb(5, realmForDataEvent)
 
