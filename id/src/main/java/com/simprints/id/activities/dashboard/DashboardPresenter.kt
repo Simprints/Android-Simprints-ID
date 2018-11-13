@@ -4,7 +4,7 @@ import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.db.sync.models.SyncManagerState

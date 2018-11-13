@@ -2,8 +2,8 @@ package com.simprints.id.testTemplates
 
 import android.support.test.InstrumentationRegistry
 import android.util.Base64
-import com.simprints.id.data.analytics.eventData.realm.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.analytics.eventData.realm.SessionRealmConfig
+import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionRealmConfig
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.testTools.StorageUtils
 import com.simprints.id.testTools.log

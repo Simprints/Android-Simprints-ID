@@ -8,10 +8,10 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
-import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.SessionEventsManagerImpl
-import com.simprints.id.data.analytics.eventData.realm.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManagerImpl
+import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
 import com.simprints.id.data.db.DbManager
@@ -193,13 +193,11 @@ open class AppModule(val app: Application) {
     @Provides
     @Singleton
     open fun provideSessionEventsManager(ctx: Context,
-                                         loginInfoManager: LoginInfoManager,
                                          sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                          preferencesManager: PreferencesManager,
                                          timeHelper: TimeHelper,
-                                         remoteDbManager: RemoteDbManager,
                                          analyticsManager: AnalyticsManager): SessionEventsManager =
-        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, remoteDbManager, analyticsManager)
+        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, preferencesManager, timeHelper, analyticsManager)
 
     @Provides
     open fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =

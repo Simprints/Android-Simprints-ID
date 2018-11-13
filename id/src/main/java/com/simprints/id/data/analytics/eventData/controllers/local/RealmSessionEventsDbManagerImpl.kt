@@ -1,0 +1,139 @@
+package com.simprints.id.data.analytics.eventData.controllers.local
+
+import android.content.Context
+import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventData.models.local.RlSession
+import com.simprints.id.data.analytics.eventData.models.local.toDomainSession
+import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.exceptions.safe.session.SessionNotFoundException
+import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
+import io.reactivex.Completable
+import io.reactivex.Single
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import io.realm.RealmQuery
+import io.realm.Sort
+
+class RealmSessionEventsDbManagerImpl(private val appContext: Context,
+                                      private val secureDataManager: SecureDataManager) : SessionEventsLocalDbManager {
+
+    companion object {
+        const val PROJECT_ID = "projectId"
+        const val END_TIME = "relativeEndTime"
+        const val START_TIME = "startTime"
+        const val SESSION_ID = "id"
+
+        const val SESSIONS_REALM_DB_FILE_NAME = "event_data"
+    }
+
+    private var realmConfig: RealmConfiguration? = null
+    private var localDbKey: LocalDbKey? = null
+
+    fun getRealmInstance(): Single<Realm> =
+        initDbIfRequired().andThen(getRealmConfig().flatMap {
+            Single.just(Realm.getInstance(it))
+        })
+
+    private fun initDbIfRequired(): Completable {
+        try {
+            if (this.localDbKey == null) {
+                Realm.init(appContext)
+                val localKey = generateDbKeyIfRequired().also { this.localDbKey = it }
+                createAndSaveRealmConfig(localKey)
+            }
+        } catch (e: Exception) {
+            return Completable.error(e)
+        }
+
+        return Completable.complete()
+    }
+
+    override fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents): Completable =
+        getRealmInstance().flatMapCompletable { realm ->
+            realm.executeTransaction {
+                it.insertOrUpdate(RlSession(sessionEvents))
+            }
+            Completable.complete()
+        }
+
+    override fun loadSessions(projectId: String?, openSession: Boolean?): Single<ArrayList<SessionEvents>> =
+        getRealmInstance().map { realm ->
+            val query = realm.where(RlSession::class.java).apply {
+                addQueryParamForProjectId(projectId, this)
+                addQueryParamForOpenSession(openSession, this)
+
+                this.sort(RealmSessionEventsDbManagerImpl.START_TIME, Sort.DESCENDING)
+            }
+            ArrayList(realm.copyFromRealm(query.findAll()).map { it.toDomainSession() })
+        }
+
+    /** @throws SessionNotFoundException */
+    override fun loadSessionById(sessionId: String): Single<SessionEvents> =
+        getRealmInstance().map { realm ->
+            val query = realm.where(RlSession::class.java).apply {
+                equalTo(RealmSessionEventsDbManagerImpl.SESSION_ID, sessionId)
+            }
+            query.findFirst()?.toDomainSession() ?: throw SessionNotFoundException()
+        }
+
+    override fun getSessionCount(projectId: String?): Single<Int> =
+        getRealmInstance().map { realm ->
+            realm.where(RlSession::class.java).apply {
+                addQueryParamForProjectId(projectId, this)
+            }.count().toInt()
+        }
+
+    override fun deleteSessions(projectId: String?, openSession: Boolean?): Completable =
+        getRealmInstance().flatMapCompletable { thisRealm ->
+            thisRealm.executeTransaction { realm ->
+
+                val sessions = realm.where(RlSession::class.java).apply {
+                    addQueryParamForProjectId(projectId, this)
+                    addQueryParamForOpenSession(openSession, this)
+                }.findAll()
+
+                sessions.forEach {
+                    it.databaseInfo?.deleteFromRealm()
+                    it.device?.deleteFromRealm()
+                    it.location?.deleteFromRealm()
+                    it.realmEvents.deleteAllFromRealm()
+                }
+                sessions.deleteAllFromRealm()
+            }
+            Completable.complete()
+        }
+
+    private fun generateDbKeyIfRequired(): LocalDbKey {
+        try {
+            secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
+        } catch (e: Exception) {
+            secureDataManager.setLocalDatabaseKey(SESSIONS_REALM_DB_FILE_NAME, null)
+        }
+        return secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
+    }
+
+    private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
+        Single.just(SessionRealmConfig.get(localDbKey.projectId, localDbKey.value)
+            .also { realmConfig = it })
+
+    private fun getRealmConfig(): Single<RealmConfiguration> = realmConfig?.let {
+        Single.just(it)
+    } ?: throw RealmUninitialisedError("No valid realm Config")
+
+    private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<RlSession>) {
+        projectId?.let {
+            query.equalTo(RealmSessionEventsDbManagerImpl.PROJECT_ID, projectId)
+        }
+    }
+
+    private fun addQueryParamForOpenSession(openSession: Boolean?, query: RealmQuery<RlSession>) {
+        openSession?.let {
+            if (it) {
+                query.equalTo(RealmSessionEventsDbManagerImpl.END_TIME, 0L)
+            } else {
+                query.greaterThan(RealmSessionEventsDbManagerImpl.END_TIME, 0L)
+            }
+        }
+    }
+}
