@@ -3,6 +3,7 @@ package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 import com.google.firebase.FirebaseNetworkException
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
@@ -10,6 +11,8 @@ import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import io.reactivex.Flowable
 import timber.log.Timber
 import java.io.IOException
+import java.text.DateFormat
+import java.util.*
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
@@ -19,13 +22,19 @@ class PeopleUpSyncUploaderTask(
     private val remoteDbManager: RemoteDbManager,
     private val projectId: String,
     /*private val userId: String,*/
-    private val batchSize: Int
+    private val batchSize: Int,
+    private val syncStatusDatabase: SyncStatusDatabase
 ) {
 
     /**
      * @throws TransientSyncFailureException if a temporary network / backend error caused
      * the sync to fail.
      */
+
+    private val dateFormat: DateFormat by lazy {
+        DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
+    }
+
     fun execute() {
         checkUserIsSignedIn()
 
@@ -58,6 +67,7 @@ class PeopleUpSyncUploaderTask(
         Timber.d("Uploaded a batch of ${people.size} people")
         markPeopleAsSynced(people)
         Timber.d("Marked a batch of ${people.size} people as synced")
+        updateLastUpSyncTime()
     }
 
     private fun uploadPeople(people: List<Person>) =
@@ -82,6 +92,10 @@ class PeopleUpSyncUploaderTask(
         localDbManager
             .insertOrUpdatePeopleInLocal(updatedPeople)
             .blockingAwait()
+    }
+
+    private fun updateLastUpSyncTime() {
+        syncStatusDatabase.syncStatusModel.updateLastUpSyncTime(dateFormat.format(Date()))
     }
 
 }

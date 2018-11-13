@@ -10,6 +10,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import timber.log.Timber
+import java.text.DateFormat
+import java.util.*
 import javax.inject.Inject
 
 class PeopleDownSyncWorker: Worker() {

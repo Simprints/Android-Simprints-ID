@@ -19,6 +19,8 @@ import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.db.sync.viewModel.SyncStatusViewModel
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textResource
+import java.text.DateFormat
+import java.util.*
 import javax.inject.Inject
 
 @SuppressLint("SetTextI18n")
@@ -35,6 +37,10 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     private val syncAction: TextView = rootView.findViewById(R.id.dashboardCardSyncAction)
 
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+
+    private val dateFormat: DateFormat by lazy {
+        DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
+    }
 
     fun updateCard(cardModel: DashboardCard) {
         bind(cardModel)
@@ -137,13 +143,37 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
             syncDownloadCount.text = "${Math.max(it.peopleToDownSync, 0)}"
             if (it.peopleToDownSync > 0) {
                 cardModel.syncNeeded = true
-                syncDescription.text = String.format(rootView.context.getString(R.string.dashboard_card_sync_last_sync),
-                    it.lastDownSyncTime)
             }
+            calculateLastSyncTimeAndUpdateText(it)
         }
         val syncStatusViewModel = SyncStatusViewModel(syncStatusDatabase)
         syncStatusViewModel.syncStatus.observe(rootView.context as DashboardActivity, observer)
     }
+
+    private fun calculateLastSyncTimeAndUpdateText(syncStatus: SyncStatus) {
+        val lastSyncTime = calculateLatestSyncTime(syncStatus.lastDownSyncTime, syncStatus.lastUpSyncTime)
+        syncDescription.text = String.format(rootView.context.getString(R.string.dashboard_card_sync_last_sync),
+            lastSyncTime)
+    }
+
+    private fun calculateLatestSyncTime(lastDownSyncTime: String?, lastUpSyncTime: String?): String {
+        val lastDownSyncDate = lastDownSyncTime?.let { dateFormat.parse(it) }
+        val lastUpSyncDate =  lastUpSyncTime?.let { dateFormat.parse(it) }
+
+        if (lastDownSyncDate != null && lastUpSyncDate != null) {
+            return if (lastDownSyncDate.after(lastUpSyncDate)) {
+                lastDownSyncDate.toString()
+            } else {
+                lastUpSyncDate.toString()
+            }
+        }
+
+        lastDownSyncDate?.let { return it.toString() }
+        lastUpSyncDate?.let { return it.toString() }
+
+        return ""
+    }
+
 
     private fun showSyncNeededText() {
         syncDescription.textResource = R.string.dashboard_card_sync_needed
