@@ -32,8 +32,6 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     private val syncDescription: TextView = rootView.findViewById(R.id.dashboardCardSyncDescription)
     private val syncUploadCount: TextView = rootView.findViewById(R.id.dashboardCardSyncUploadText)
     private val syncDownloadCount: TextView = rootView.findViewById(R.id.dashboardCardSyncDownloadText)
-
-    private val syncProgressBar: ProgressBar = rootView.findViewById(R.id.dashboardCardSyncProgressBar)
     private val syncAction: TextView = rootView.findViewById(R.id.dashboardCardSyncAction)
 
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
@@ -73,8 +71,6 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     private fun setUIForSyncNotStarted(dataModel: DashboardSyncCard) {
         syncStateIcon.visibility = View.INVISIBLE
 
-        syncProgressBar.visibility = View.INVISIBLE
-
         if (dataModel.syncNeeded) {
             showSyncNeededText()
         }
@@ -88,8 +84,6 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
             setImageResource(R.drawable.ic_syncing)
         }
 
-        syncProgressBar.visibility = View.INVISIBLE
-
         syncDescription.textResource = R.string.syncing_calculating
 
         disableSyncButton()
@@ -101,8 +95,6 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
             setImageResource(R.drawable.ic_sync_success)
         }
 
-        syncProgressBar.visibility = View.INVISIBLE
-
         enableSyncButton(dataModel)
     }
 
@@ -111,8 +103,6 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
             visibility = View.VISIBLE
             setImageResource(R.drawable.ic_sync_failed)
         }
-
-        syncProgressBar.visibility = View.INVISIBLE
 
         syncDescription.textResource = R.string.dashboard_card_sync_failed
 

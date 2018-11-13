@@ -82,7 +82,9 @@ class PeopleDownSyncTask (
                             updateDownSyncTimestampOnBatchDownload()
                         }
                         shouldDownloadingBatchStop
-                    }.subscribe()
+                    }.subscribeBy(onError = {
+                        throw it
+                    })
                 }
                 finishDownload(reader, result)
             } catch (e: Exception) {
