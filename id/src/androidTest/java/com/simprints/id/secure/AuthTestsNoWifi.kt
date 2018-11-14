@@ -16,7 +16,7 @@ import com.simprints.id.shared.replaceRemoteDbManagerApiClientsWithFailingClient
 import com.simprints.id.shared.replaceSecureApiClientWithFailingClientProvider
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTemplates.FirstUseLocal.Companion.sessionsRealmKey
+import com.simprints.id.testTools.DEFAULT_REALM_KEY
 import com.simprints.id.testTools.models.TestCalloutCredentials
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
@@ -40,7 +40,7 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     private val localDbKey = LocalDbKey(
         calloutCredentials.projectId,
-        sessionsRealmKey,
+        DEFAULT_REALM_KEY,
         calloutCredentials.legacyApiKey)
 
     private val projectSecret = "Z8nRspDoiQg1QpnDdKE6U7fQKa0GjpQOwnJ4OcSFWulAcIk4+LP9wrtDn8fRmqacLvkmtmOLl+Kxo1emXLsZ0Q=="
@@ -67,7 +67,7 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
         app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
-        setupRandomGeneratorToGenerateKey(sessionsRealmKey, randomGeneratorMock)
+        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
         replaceRemoteDbManagerApiClientsWithFailingClients(remoteDbManagerSpy)
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)

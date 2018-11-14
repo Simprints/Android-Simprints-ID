@@ -26,8 +26,8 @@ import com.simprints.id.testTools.ActivityUtils.getCurrentActivity
 import com.simprints.id.testTools.ActivityUtils.launchCollectFingerprintsActivity
 import com.simprints.id.testTools.ScannerUtils.setupScannerForCollectingFingerprints
 import com.simprints.id.scanner.ScannerManager
-import com.simprints.id.testTemplates.FirstUseLocal.Companion.sessionsRealmKey
 import com.simprints.id.testTools.DEFAULT_LOCAL_DB_KEY
+import com.simprints.id.testTools.DEFAULT_REALM_KEY
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
@@ -73,7 +73,7 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
 
-        setupRandomGeneratorToGenerateKey(sessionsRealmKey, randomGeneratorMock)
+        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
         app.initDependencies()
 

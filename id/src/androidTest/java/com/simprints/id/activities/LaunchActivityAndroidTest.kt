@@ -30,8 +30,8 @@ import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.mockSettingsPreferencesManager
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTemplates.FirstUseLocal.Companion.sessionsRealmKey
 import com.simprints.id.testTools.DEFAULT_LOCAL_DB_KEY
+import com.simprints.id.testTools.DEFAULT_REALM_KEY
 import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
@@ -89,7 +89,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
 
-        setupRandomGeneratorToGenerateKey(sessionsRealmKey, randomGeneratorMock)
+        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
         app.initDependencies()
 
