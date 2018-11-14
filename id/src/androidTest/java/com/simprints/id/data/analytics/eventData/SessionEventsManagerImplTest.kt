@@ -17,6 +17,7 @@ import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.data.analytics.eventData.realm.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventData.realm.RlEvent
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
@@ -25,7 +26,9 @@ import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.shared.*
 import com.simprints.id.testSnippets.*
+import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTools.*
+import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper
@@ -38,6 +41,7 @@ import com.simprints.mockscanner.MockScannerManager
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.realm.Realm
+import io.realm.RealmConfiguration
 import junit.framework.Assert
 import junit.framework.Assert.*
 import okhttp3.Protocol
@@ -56,10 +60,13 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class SessionEventsManagerImplTest : DaggerForAndroidTests() {
+class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
 
+    override lateinit var peopleRealmConfiguration: RealmConfiguration
+    
     @Rule @JvmField val simprintsActionTestRule = ActivityUtils.checkLoginFromIntentActivityTestRule()
 
+    @Inject lateinit var randomGeneratorMock: RandomGenerator
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
     @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
@@ -81,6 +88,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
             localDbManagerRule = DependencyRule.SpyRule,
             remoteDbManagerRule = DependencyRule.SpyRule,
             sessionEventsManagerRule = DependencyRule.SpyRule,
+            randomGeneratorRule = DependencyRule.MockRule,
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter }
         )
     }
@@ -88,16 +96,16 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     @Before
     override fun setUp() {
         app = InstrumentationRegistry.getTargetContext().applicationContext as Application
-        super.setUp()
-
+        super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
 
-        Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
+        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
+
         app.initDependencies()
 
-        realmForDataEvent.executeTransaction {
-            it.deleteAll()
-        }
+        Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
+        peopleRealmConfiguration = PeopleRealmConfig.get(DEFAULT_LOCAL_DB_KEY.projectId, DEFAULT_LOCAL_DB_KEY.value, DEFAULT_LOCAL_DB_KEY.projectId)
+        super<FirstUseLocal>.setUp()
 
         signOut()
 
@@ -107,7 +115,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     }
 
     @After
-    fun tearDown() {
+    override fun tearDown() {
+        super.tearDown()
     }
 
     @Test
@@ -312,7 +321,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET + "wrong")
         pressSignIn()
 
-        Thread.sleep(6000)
+        waitOnUi(8000)
         enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         setupActivityAndContinue()

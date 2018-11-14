@@ -14,9 +14,9 @@ import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.ReplaceRule
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTemplates.FirstUseLocal.Companion.sessionsRealmKey
 import com.simprints.id.testTools.DEFAULT_LOCAL_DB_KEY
 import com.simprints.id.testTools.DEFAULT_PROJECT_SECRET
+import com.simprints.id.testTools.DEFAULT_REALM_KEY
 import com.simprints.id.testTools.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.testTools.models.TestCalloutCredentials
 import com.simprints.id.tools.RandomGenerator
@@ -25,6 +25,7 @@ import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockScannerManager
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -66,7 +67,7 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
         app = InstrumentationRegistry.getTargetContext().applicationContext as Application
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
-        setupRandomGeneratorToGenerateKey(sessionsRealmKey, randomGeneratorMock)
+        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
         app.initDependencies()
 
@@ -201,6 +202,7 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
         signOut()
     }
 
+    @After
     override fun tearDown() {
         super.tearDown()
     }
