@@ -16,9 +16,6 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
         RemoteTestingApi.baseUrl)
         .api
 
-    override fun createTestProject(): TestProject =
-        createTestProject(TestProjectCreationParameters())
-
     override fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters): TestProject =
         remoteTestingApi.createProject(testProjectCreationParameters)
             .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to create project", it) }

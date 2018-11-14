@@ -9,8 +9,7 @@ interface RemoteTestingManager {
         fun create() = RemoteTestingManagerImpl()
     }
 
-    fun createTestProject(): TestProject
-    fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters): TestProject
+    fun createTestProject(testProjectCreationParameters: TestProjectCreationParameters = TestProjectCreationParameters()): TestProject
     fun deleteTestProject(projectId: String)
 
     fun getFirebaseToken(projectId: String, userId: String = DEFAULT_USER_ID): TestFirebaseToken
