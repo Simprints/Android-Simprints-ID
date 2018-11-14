@@ -14,10 +14,7 @@ import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.ReplaceRule
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTools.DEFAULT_LOCAL_DB_KEY
-import com.simprints.id.testTools.DEFAULT_PROJECT_SECRET
-import com.simprints.id.testTools.DEFAULT_REALM_KEY
-import com.simprints.id.testTools.DEFAULT_TEST_CALLOUT_CREDENTIALS
+import com.simprints.id.testTools.*
 import com.simprints.id.testTools.models.TestCalloutCredentials
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
@@ -38,8 +35,8 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     private val invalidCredentials = TestCalloutCredentials(
         "beefdeadbeefdeadbeef",
-        "the_one_and_only_module",
-        "the_lone_user",
+        DEFAULT_MODULE_ID,
+        DEFAULT_USER_ID,
         "deadbeef-dead-beef-dead-deaddeadbeef"
     )
 
