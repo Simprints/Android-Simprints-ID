@@ -9,9 +9,6 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.Constants
-import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.NumberFormatter
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import io.reactivex.Single
 import java.text.DateFormat
@@ -37,7 +34,6 @@ class DashboardCardsFactory(private val component: AppComponent) {
     fun createCards() = arrayListOf(
         createProjectInfoCard(),
         createCurrentUserInfoCard(),
-        createLocalDbInfoCard(),
         createSyncInfoCard(),
         createLastScannerInfoCard(),
         createLastEnrolInfoCard(),
@@ -69,24 +65,6 @@ class DashboardCardsFactory(private val component: AppComponent) {
         } else {
             null
         }
-
-    fun createLocalDbInfoCard(position: Int = 2): Single<DashboardCard> =
-        dbManager.getPeopleCount(preferencesManager.syncGroup).map { numberOfPeople ->
-            DashboardCard(
-                DashboardCardType.LOCAL_DB,
-                position,
-                R.drawable.local_db,
-                getLocalDbInfoTitle(),
-                NumberFormatter(LanguageHelper.localeFor(preferencesManager.language))
-                    .getFormattedIntegerString(numberOfPeople))
-        }.doOnError { it.printStackTrace() }
-
-    private fun getLocalDbInfoTitle(): String =
-        androidResourcesHelper.getString(
-            if (preferencesManager.syncGroup == Constants.GROUP.USER)
-                R.string.dashboard_card_localdb_sync_user_title
-            else
-                R.string.dashboard_card_localdb_sync_project_title)
 
     private fun createSyncInfoCard(position: Int = 3): Single<DashboardSyncCard>? =
         Single.just(
