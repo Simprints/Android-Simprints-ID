@@ -21,7 +21,8 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           private val remoteConfigWrapper: RemoteConfigWrapper,
                                           private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                           groupSerializer: Serializer<Constants.GROUP>,
-                                          languagesStringArraySerializer: Serializer<Array<String>>)
+                                          languagesStringArraySerializer: Serializer<Array<String>>,
+                                          moduleIdOptionsStringListSerializer: Serializer<List<String>>)
     : SettingsPreferencesManager {
 
     companion object {
@@ -52,6 +53,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         const val TIMEOUT_KEY = "TimeoutInt"
         const val TIMEOUT_DEFAULT = 3
+
+        const val MODULE_ID_OPTIONS_KEY = "ModuleIdOptions"
+        val MODULE_ID_OPTIONS_DEFAULT = listOf<String>()
 
         const val SYNC_GROUP_KEY = "SyncGroup"
         val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
@@ -142,6 +146,10 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Timeout seconds
     override var timeoutS: Int
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, TIMEOUT_KEY, TIMEOUT_DEFAULT)
+
+    // What modules will be available to sync by for this project. Serialize as pipe (|) separated list. Empty list indicates that module sync should not be possible.
+    override var moduleIdOptions: List<String>
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODULE_ID_OPTIONS_KEY, MODULE_ID_OPTIONS_DEFAULT, moduleIdOptionsStringListSerializer)
 
     // Sync group. Default is user
     override var syncGroup: Constants.GROUP
