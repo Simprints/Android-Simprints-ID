@@ -17,6 +17,7 @@ interface SettingsPreferencesManager {
     var projectLanguages: Array<String>
     var matcherType: Int
     var timeoutS: Int
+    var moduleIdOptions: List<String>
     var syncGroup: Constants.GROUP
     var matchGroup: Constants.GROUP
     var vibrateMode: Boolean
