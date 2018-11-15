@@ -33,7 +33,8 @@ class DashboardSyncCard(component: AppComponent,
 
     var onSyncActionClicked: (cardModel: DashboardSyncCard) -> Unit = {}
     var peopleToUpload: Int = 0
-    var peopleToDownload: Int? = null
+    var peopleToDownload: Int = 0
+    var peopleInDb: Int = 0
     var syncNeeded: Boolean = false
     var lastSyncTime: String? = null
     var cardView: DashboardSyncCardView? = null
@@ -60,8 +61,18 @@ class DashboardSyncCard(component: AppComponent,
     }
 
     private fun updateSyncInfo() {
-        updateLocalPeopleCount()
+        updateTotalLocalPeopleCount()
+        updateLocalPeopleToUpSyncCount()
         updateLastSyncedTime()
+    }
+
+    private fun updateTotalLocalPeopleCount() {
+        dbManager.getPeopleCount(preferencesManager.syncGroup).subscribeBy(
+            onSuccess = {
+                peopleInDb = it
+                cardView?.updateCard(this)
+            },
+            onError = { it.printStackTrace() })
     }
 
     private fun updateLastSyncedTime() {
@@ -75,7 +86,7 @@ class DashboardSyncCard(component: AppComponent,
                     onError = { it.printStackTrace() })
     }
 
-    private fun updateLocalPeopleCount() {
+    private fun updateLocalPeopleToUpSyncCount() {
         localDbManager
                 .getPeopleCountFromLocal(toSync = true)
             .subscribeBy(

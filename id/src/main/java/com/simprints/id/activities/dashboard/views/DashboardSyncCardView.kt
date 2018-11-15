@@ -2,11 +2,8 @@ package com.simprints.id.activities.dashboard.views
 
 import android.annotation.SuppressLint
 import android.view.View
-import android.widget.ImageView
-import android.widget.ProgressBar
+import android.widget.Button
 import android.widget.TextView
-import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -17,7 +14,6 @@ import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.data.db.sync.room.SyncStatus
 import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.db.sync.viewModel.SyncStatusViewModel
-import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textResource
 import java.text.DateFormat
 import java.util.*
@@ -26,13 +22,11 @@ import javax.inject.Inject
 @SuppressLint("SetTextI18n")
 class DashboardSyncCardView(private val rootView: View) : DashboardCardView(rootView) {
 
-    private val syncCard: CardView = rootView.findViewById(R.id.dashboardCardSync)
-
-    private val syncStateIcon: ImageView = rootView.findViewById(R.id.dashboardCardSyncState)
     private val syncDescription: TextView = rootView.findViewById(R.id.dashboardCardSyncDescription)
     private val syncUploadCount: TextView = rootView.findViewById(R.id.dashboardCardSyncUploadText)
     private val syncDownloadCount: TextView = rootView.findViewById(R.id.dashboardCardSyncDownloadText)
-    private val syncAction: TextView = rootView.findViewById(R.id.dashboardCardSyncAction)
+    private val syncButton: Button = rootView.findViewById(R.id.dashboardSyncCardSyncButton)
+    private val totalPeopleInLocal: TextView = rootView.findViewById(R.id.totalPeopleInLocal)
 
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
@@ -52,9 +46,11 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
 
         if (cardModel is DashboardSyncCard) {
             cardModel.cardView = this
+            setTotalPeopleInDbCounter(cardModel)
             setUploadCounter(cardModel)
             setDownloadCounterAndLastSyncTime(cardModel)
             updateState(cardModel)
+            setListenerForSyncButton(cardModel)
         }
     }
 
@@ -69,57 +65,36 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     }
 
     private fun setUIForSyncNotStarted(dataModel: DashboardSyncCard) {
-        syncStateIcon.visibility = View.INVISIBLE
 
         if (dataModel.syncNeeded) {
             showSyncNeededText()
         }
-
-        enableSyncButton(dataModel)
     }
 
     private fun setUIForSyncStarted() {
-        syncStateIcon.apply {
-            visibility = View.VISIBLE
-            setImageResource(R.drawable.ic_syncing)
-        }
 
         syncDescription.textResource = R.string.syncing_calculating
-
-        disableSyncButton()
     }
 
     private fun setUIForSyncSucceeded(dataModel: DashboardSyncCard) {
-        syncStateIcon.apply {
-            visibility = View.VISIBLE
-            setImageResource(R.drawable.ic_sync_success)
-        }
 
-        enableSyncButton(dataModel)
     }
 
     private fun setUIForSyncFailed(dataModel: DashboardSyncCard) {
-        syncStateIcon.apply {
-            visibility = View.VISIBLE
-            setImageResource(R.drawable.ic_sync_failed)
-        }
+
 
         syncDescription.textResource = R.string.dashboard_card_sync_failed
-
-        enableSyncButton(dataModel)
     }
 
     private fun setUIForSyncInProgress(dataModel: DashboardSyncCard) {
-        syncStateIcon.apply {
-            visibility = View.VISIBLE
-            setImageResource(R.drawable.ic_syncing)
-        }
 
-        description.text = ""
+        description?.text  = ""
 
         syncDescription.textResource = R.string.syncing
+    }
 
-        disableSyncButton()
+    private fun setTotalPeopleInDbCounter(cardModel: DashboardSyncCard) {
+        totalPeopleInLocal.text = "${Math.max(cardModel.peopleInDb, 0)}"
     }
 
     private fun setUploadCounter(cardModel: DashboardSyncCard) {
@@ -164,26 +139,13 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         return ""
     }
 
-
     private fun showSyncNeededText() {
         syncDescription.textResource = R.string.dashboard_card_sync_needed
     }
 
-    private fun enableSyncButton(dataModel: DashboardSyncCard) {
-        syncAction.apply {
-            textColor = ContextCompat.getColor(rootView.context, R.color.colorAccent)
-        }
-        syncCard.apply {
-            setOnClickListener { dataModel.onSyncActionClicked(dataModel) }
-        }
-    }
-
-    private fun disableSyncButton() {
-        syncAction.apply {
-            textColor = ContextCompat.getColor(rootView.context, R.color.simprints_grey)
-        }
-        syncCard.apply {
-            setOnClickListener { }
+    private fun setListenerForSyncButton(cardModel: DashboardSyncCard) {
+        if (cardModel.peopleToDownload > 0 || cardModel.peopleToUpload > 0) {
+            syncButton.setOnClickListener { cardModel.onSyncActionClicked(cardModel) }
         }
     }
 }
