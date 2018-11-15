@@ -106,7 +106,7 @@ class PeopleDownSyncTask (
 
         Timber.d("Download finished")
         error?.let { Timber.e(error)}
-
+        updateDownSyncTimestampOnBatchDownload()
         reader.endArray()
         reader.close()
         if (error != null) {
