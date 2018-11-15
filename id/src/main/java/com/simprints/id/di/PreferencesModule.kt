@@ -91,7 +91,8 @@ open class PreferencesModule {
                                                remoteConfigWrapper: RemoteConfigWrapper,
                                                @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                                @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>,
-                                               @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer, languagesStringArraySerializer)
+                                               @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
+                                               @Named("ModuleIdOptionsStringListSerializer") moduleIdOptionsStringListSerializer: Serializer<List<String>>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer, languagesStringArraySerializer, moduleIdOptionsStringListSerializer)
 
     @Provides
     @Singleton
