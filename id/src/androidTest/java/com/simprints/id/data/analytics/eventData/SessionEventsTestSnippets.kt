@@ -3,14 +3,18 @@ package com.simprints.id.data.analytics.eventData
 import com.google.common.truth.Truth
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.*
-import com.simprints.id.data.analytics.eventData.models.domain.session.Device
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.data.analytics.eventData.models.local.*
+import com.simprints.id.shared.sessionEvents.createFakeClosedSession
+import com.simprints.id.shared.sessionEvents.createFakeSession
 import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
 import junit.framework.Assert
 import junit.framework.Assert.assertNotSame
+import okhttp3.Protocol
+import okhttp3.Request
 import org.junit.Assert.*
+import retrofit2.Response
 import java.util.*
 
 fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
@@ -28,9 +32,9 @@ fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
     events.filterIsInstance(AuthenticationEvent::class.java).let {
         assertEquals(it.first().result, AuthenticationEvent.Result.BAD_CREDENTIALS)
         assertEquals(it[1].result, AuthenticationEvent.Result.AUTHENTICATED)
-        it.forEach {
-            assertTrue(it.userInfo.userId.isNotEmpty())
-            assertTrue(it.userInfo.projectId.isNotEmpty())
+        it.forEach { authEvent ->
+            assertTrue(authEvent.userInfo.userId.isNotEmpty())
+            assertTrue(authEvent.userInfo.projectId.isNotEmpty())
         }
     }
 }
@@ -49,9 +53,9 @@ fun verifyEventsAfterEnrolment(events: List<Event>, realmForDataEvent: Realm) {
         PersonCreationEvent::class.java,
         EnrollmentEvent::class.java,
         CallbackEvent::class.java
-    )
+    ).map { it.canonicalName }
 
-    Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(expectedEvents)
+    Truth.assertThat(events.map { it.javaClass.canonicalName }).containsExactlyElementsIn(expectedEvents)
     checkDbHasOnlyTheExpectedInfo(realmForDataEvent, expectedEvents.size)
 }
 
@@ -70,9 +74,9 @@ fun verifyEventsAfterVerification(events: List<Event>, realmForDataEvent: Realm)
         PersonCreationEvent::class.java,
         OneToOneMatchEvent::class.java,
         CallbackEvent::class.java
-    )
+    ).map { it.canonicalName }
 
-    Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(expectedEvents)
+    Truth.assertThat(events.map { it.javaClass.canonicalName }).containsExactlyElementsIn(expectedEvents)
     checkDbHasOnlyTheExpectedInfo(realmForDataEvent, expectedEvents.size)
 }
 
@@ -90,9 +94,9 @@ fun verifyEventsAfterIdentification(events: List<Event>, realmForDataEvent: Real
         PersonCreationEvent::class.java,
         OneToManyMatchEvent::class.java,
         CallbackEvent::class.java
-    )
+    ).map { it.canonicalName }
 
-    Truth.assertThat(events.map { it.javaClass }).containsExactlyElementsIn(expectedEvents)
+    Truth.assertThat(events.map { it.javaClass.canonicalName }).containsExactlyElementsIn(expectedEvents)
     checkDbHasOnlyTheExpectedInfo(realmForDataEvent, expectedEvents.size)
 }
 
@@ -118,10 +122,7 @@ fun createAndSaveCloseFakeSession(timeHelper: TimeHelper,
                                   realmSessionEventsManager: SessionEventsLocalDbManager,
                                   projectId: String,
                                   id: String = UUID.randomUUID().toString() + "close"): String =
-    createFakeSession(timeHelper, projectId, id).apply {
-        startTime = timeHelper.now() - 1000
-        relativeEndTime = nowRelativeToStartTime(timeHelper) - 10
-    }.also { saveSessionInDb(it, realmSessionEventsManager) }.id
+    createFakeClosedSession(timeHelper, projectId, id).also { saveSessionInDb(it, realmSessionEventsManager) }.id
 
 fun createAndSaveOpenFakeSession(timeHelper: TimeHelper,
                                  realmSessionEventsManager: SessionEventsLocalDbManager,
@@ -138,22 +139,6 @@ fun createAndSaveExpiredOpenFakeSession(timeHelper: TimeHelper,
 fun saveSessionInDb(session: SessionEvents, realmSessionEventsManager: SessionEventsLocalDbManager) {
     realmSessionEventsManager.insertOrUpdateSessionEvents(session).blockingAwait()
 }
-
-fun createFakeSession(timeHelper: TimeHelper? = null,
-                      projectId: String,
-                      id: String = UUID.randomUUID().toString(),
-                      startTime: Long = timeHelper?.now() ?: 0,
-                      fakeRelativeEndTime: Long = 0): SessionEvents =
-    SessionEvents(
-        id = id,
-        projectId = projectId,
-        appVersionName = "some_version",
-        libVersionName = "some_version",
-        language = "en",
-        device = Device(),
-        startTime = startTime).apply {
-        relativeEndTime = fakeRelativeEndTime
-    }
 
 fun verifyNumberOfSessionsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
@@ -184,3 +169,11 @@ fun verifyNumberOfLocationsInDb(count: Int, realmForDataEvent: Realm) {
         Assert.assertEquals(count, where(RlLocation::class.java).findAll().size)
     }
 }
+
+fun buildSuccessfulUploadSessionResponse() =
+    Response.success<Void?>(null, okhttp3.Response.Builder() //
+        .code(201)
+        .message("OK")
+        .protocol(Protocol.HTTP_1_1)
+        .request(Request.Builder().url("http://localhost/").build())
+        .build())

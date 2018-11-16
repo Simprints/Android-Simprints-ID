@@ -14,6 +14,7 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import io.realm.Sort
+import timber.log.Timber
 
 class RealmSessionEventsDbManagerImpl(private val appContext: Context,
                                       private val secureDataManager: SecureDataManager) : SessionEventsLocalDbManager {
@@ -94,6 +95,7 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
                 }.findAll()
 
                 sessions.forEach {
+                    Timber.d("Deleting session: ${it.id}")
                     it.databaseInfo?.deleteFromRealm()
                     it.device?.deleteFromRealm()
                     it.location?.deleteFromRealm()

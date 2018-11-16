@@ -22,10 +22,8 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.StringsUtils
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -92,9 +90,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     override fun handleNotSignedInUser() {
-        sessionEventsManager.updateSessionInBackground({
+        sessionEventsManager.updateSessionInBackground {
             addAuthorizationEvent(it, AuthorizationEvent.Result.NOT_AUTHORIZED)
-        })
+        }
 
         if (!loginAlreadyTried.get()) {
             loginAlreadyTried.set(true)
@@ -163,7 +161,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private fun fetchPeopleCountInLocalDatabase(): Single<Int> = dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }
     private fun fetchSessionCountInLocalDatabase(): Single<Int> = sessionEventsManager.getSessionCount().onErrorReturn { -1 }
     private fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, peopleDbCount: Int, sessionDbCount: Int): Completable =
-        sessionEventsManager.updateSession({
+        sessionEventsManager.updateSession {
             it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             it.analyticsId = gaId
             it.databaseInfo = DatabaseInfo(peopleDbCount, sessionDbCount)
@@ -172,7 +170,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
                 addAuthorizationEvent(it, AUTHORIZED)
             }
-        })
+        }
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.events.add(AuthorizationEvent(
@@ -187,13 +185,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     override fun handleActivityResult(requestCode: Int, resultCode: Int, returnCallout: Callout) {
-        sessionEventsManager.updateSession({
+        sessionEventsManager.updateSession {
             it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), returnCallout))
             it.closeIfRequired(timeHelper)
-        }).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onComplete = {}, onError = {
-                it.printStackTrace()
-            })
+        }.blockingAwait()
     }
 }

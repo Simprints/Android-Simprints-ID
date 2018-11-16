@@ -30,7 +30,7 @@ android {
         versionCode 124
         versionName "2018.4.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        //testInstrumentationRunner "com.simprints.id.UiTestsRunner" //To use custom TestApplication
+        //testInstrumentationRunner "com.sitruthmprints.id.UiTestsRunner" //To use custom TestApplication
 
     }
 

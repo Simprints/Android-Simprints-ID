@@ -47,6 +47,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
 
     override fun createSession(): Single<SessionEvents> =
         createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN).let {
+            Timber.d("Created session: ${it.id}")
             closeLastSessionsIfPending()
                 .andThen(insertOrUpdateSessionEvents(it))
                 .toSingle { it }
