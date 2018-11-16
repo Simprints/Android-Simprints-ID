@@ -41,6 +41,7 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
 import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
+import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManagerImpl
 import com.simprints.id.services.sync.SyncClient
 import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.RandomGenerator
@@ -204,6 +205,7 @@ open class AppModule(val app: Application) {
         ScheduledPeopleSyncManager(preferencesManager)
 
     @Provides
+    @Singleton
     open fun provideScheduledSessionsSyncManager(): ScheduledSessionsSyncManager =
-        ScheduledSessionsSyncManager()
+        ScheduledSessionsSyncManagerImpl()
 }
