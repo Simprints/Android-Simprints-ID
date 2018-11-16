@@ -37,7 +37,7 @@ class OneTimeDownSyncCountWorker: Worker() {
             }
 
             Result.SUCCESS
-        } catch (e: Exception) {
+        } catch (throwable: Throwable) {
             Result.FAILURE
         }
     }
