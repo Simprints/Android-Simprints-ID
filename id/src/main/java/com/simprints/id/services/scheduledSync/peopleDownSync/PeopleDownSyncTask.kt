@@ -1,5 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync
 
+import android.annotation.SuppressLint
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -43,24 +44,20 @@ class PeopleDownSyncTask (
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
+    @SuppressLint("CheckResult")
     fun execute() {
         val downSyncParam = DownSyncParams(syncParams, localDbManager)
-        syncApi.downSync(
+        val responseBody = syncApi.downSync(
             downSyncParam.projectId,
             downSyncParam.userId,
             downSyncParam.moduleId,
             downSyncParam.lastKnownPatientId,
             downSyncParam.lastKnownPatientUpdatedAt)
-            .subscribeBy (
-                onSuccess = {
-                     savePeopleFromStream(syncParams, it.byteStream())
-                         .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
-                         .subscribe()
-                 },
-                onError = {
-                    throw it
-                }
-            )
+            .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+            .blockingGet()
+
+        savePeopleFromStream(syncParams, responseBody.byteStream())
+            .blockingLast()
     }
 
     private fun savePeopleFromStream(syncParams: SyncTaskParameters,
