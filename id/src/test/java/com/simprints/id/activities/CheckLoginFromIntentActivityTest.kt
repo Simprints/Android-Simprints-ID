@@ -70,6 +70,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
             analyticsManagerRule = SpyRule,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
+            scheduledSessionsSyncManagerRule = MockRule,
             sessionEventsLocalDbManagerRule = MockRule)
     }
 
