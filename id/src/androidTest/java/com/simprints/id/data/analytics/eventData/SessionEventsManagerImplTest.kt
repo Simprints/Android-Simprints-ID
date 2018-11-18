@@ -11,9 +11,13 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
 import com.simprints.id.data.analytics.eventData.models.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.analytics.eventData.models.domain.events.PersonCreationEvent
+import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventData.models.local.RlSession
+import com.simprints.id.data.analytics.eventData.models.local.toDomainSession
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -28,15 +32,14 @@ import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
-import io.reactivex.rxkotlin.subscribeBy
 import io.realm.Realm
+import io.realm.Sort
 import junit.framework.Assert.*
 import org.json.JSONObject
 import org.junit.Before
@@ -89,6 +92,15 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
     private val realmForDataEvent
         get() = (realmSessionEventsManager as RealmSessionEventsDbManagerImpl).getRealmInstance().blockingGet()
 
+    private val mostRecentSessionInDb: SessionEvents
+        get() {
+            realmForDataEvent.refresh()
+            return realmForDataEvent
+                .where(RlSession::class.java)
+                .findAll()
+                .sort("startTime", Sort.DESCENDING).first()!!.toDomainSession()
+        }
+
     @Before
     override fun setUp() {
         app = InstrumentationRegistry.getTargetContext().applicationContext as Application
@@ -131,13 +143,12 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         setupActivityAndContinue()
         waitOnUi(100)
 
-        simprintsActionTestRule.activity.runOnUiThread {
-            with(sessionEventsManagerSpy.getCurrentSession().blockingGet()) {
-                val jsonString = JsonHelper.toJson(this)
-                val jsonObject = JSONObject(jsonString)
-                assertTrue(jsonObject.getJSONObject("databaseInfo").has("sessionCount"))
-                assertEquals(numberOfPreviousSessions + 1, jsonObject.getJSONObject("databaseInfo").getInt("sessionCount"))
-            }
+        realmForDataEvent.refresh()
+        with(mostRecentSessionInDb) {
+            val jsonString = SessionEventsApiAdapterFactory().gson.toJson(this)
+            val jsonObject = JSONObject(jsonString)
+            assertTrue(jsonObject.getJSONObject("databaseInfo").has("sessionCount"))
+            assertEquals(numberOfPreviousSessions + 1, jsonObject.getJSONObject("databaseInfo").getInt("sessionCount"))
         }
     }
 
@@ -158,8 +169,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         newSessionFromDb.also {
             assertEquals(it.id, oldSession.id)
             assertTrue(it.isClosed())
-            val finalEvent = it.events.find { it is ArtificialTerminationEvent } as ArtificialTerminationEvent?
-            assertEquals(finalEvent?.reason, ArtificialTerminationEvent.Reason.NEW_SESSION)
+            val finalEvent = it.events.filterIsInstance(ArtificialTerminationEvent::class.java).first()
+            assertEquals(finalEvent.reason, ArtificialTerminationEvent.Reason.NEW_SESSION)
         }
     }
 
@@ -173,12 +184,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         setupActivityAndDecline()
         Thread.sleep(100)
 
-        simprintsActionTestRule.activity.runOnUiThread {
-            sessionEventsManagerSpy.getCurrentSession().subscribeBy(
-                onSuccess = {
-                    assertNull(it.location)
-                }, onError = { it.printStackTrace() })
-        }
+        assertNull(mostRecentSessionInDb.location)
     }
 
     @Test
@@ -191,17 +197,12 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         setupActivityAndContinue()
         Thread.sleep(100)
 
-        simprintsActionTestRule.activity.runOnUiThread {
-            sessionEventsManagerSpy.getCurrentSession().subscribeBy(
-                onSuccess = {
-                    assertNotNull(it.location)
-                }, onError = { it.printStackTrace() })
-        }
+        assertNotNull(mostRecentSessionInDb.location)
     }
 
     @Test
     fun anErrorWithEvents_shouldBeSwallowed() {
-        realmSessionEventsManager.deleteSessions().blockingAwait()
+        realmSessionEventsManager.deleteSessions()
 
         // There is not activeSession open or pending in the db. So it should fail, but it swallows the error
         sessionEventsManagerSpy.updateSession {
@@ -221,12 +222,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         fullHappyWorkflow()
         collectFingerprintsEnrolmentCheckFinished(simprintsActionTestRule)
 
-        simprintsActionTestRule.activity.runOnUiThread {
-            with(sessionEventsManagerSpy.getCurrentSession().test()) {
-                waitForCompletionAndAssertNoErrors()
-                verifyEventsAfterEnrolment(values().first().events, realmForDataEvent)
-            }
-        }
+        realmForDataEvent.refresh()
+        verifyEventsAfterEnrolment(mostRecentSessionInDb.events, realmForDataEvent)
     }
 
     @Test
@@ -242,12 +239,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         pressSignIn()
         setupActivityAndContinue()
 
-        simprintsActionTestRule.activity.runOnUiThread {
-           with(sessionEventsManagerSpy.getCurrentSession().test()) {
-                waitForCompletionAndAssertNoErrors()
-                verifyEventsForFailedSignedIdFollowedBySucceedSignIn(values().first().events)
-            }
-        }
+        verifyEventsForFailedSignedIdFollowedBySucceedSignIn(mostRecentSessionInDb.events)
     }
 
     @Test
@@ -263,12 +255,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         fullHappyWorkflow()
         matchingActivityVerificationCheckFinished(simprintsActionTestRule)
 
-        simprintsActionTestRule.activity.runOnUiThread {
-            with(sessionEventsManagerSpy.getCurrentSession().test()) {
-                waitForCompletionAndAssertNoErrors()
-                verifyEventsAfterVerification(values().first().events, realmForDataEvent)
-            }
-        }
+        verifyEventsAfterVerification(mostRecentSessionInDb.events, realmForDataEvent)
     }
 
     @Test
@@ -283,12 +270,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         fullHappyWorkflow()
         matchingActivityIdentificationCheckFinished(simprintsActionTestRule)
 
-        simprintsActionTestRule.activity.runOnUiThread {
-            with(sessionEventsManagerSpy.getCurrentSession().test()) {
-                waitForCompletionAndAssertNoErrors()
-                verifyEventsAfterIdentification(values().first().events, realmForDataEvent)
-            }
-        }
+        verifyEventsAfterIdentification(mostRecentSessionInDb.events, realmForDataEvent)
     }
 
     @Test
@@ -308,35 +290,30 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests() {
         waitForSplashScreenAppearsAndDisappears()
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
-
         checkIfDialogIsDisplayedWithResultAndClickConfirm("× LEFT THUMB\n✓ LEFT INDEX FINGER\n✓ RIGHT THUMB\n")
         matchingActivityIdentificationCheckFinished(simprintsActionTestRule)
+
         val personCreatedArg = argumentCaptor<Person>()
         Mockito.verify(sessionEventsManagerSpy, Mockito.times(1)).addPersonCreationEventInBackground(personCreatedArg.capture())
-        simprintsActionTestRule.activity.runOnUiThread {
-            with(sessionEventsManagerSpy.getCurrentSession().test()) {
-                waitForCompletionAndAssertNoErrors()
-                val session = values().first()
 
-                val personCreatedForMatchingActivity = personCreatedArg.firstValue
-                val personCreationEvent = session.events.filterIsInstance(PersonCreationEvent::class.java)[0]
-                val usefulTemplatesFromEvents = session.events
-                    .filterIsInstance(FingerprintCaptureEvent::class.java)
-                    .filter { it.id in personCreationEvent.fingerprintCaptureIds }
-                    .map { it.fingerprint?.template }
+        val eventsInMostRecentSession = mostRecentSessionInDb.events
+        val personCreatedForMatchingActivity = personCreatedArg.firstValue
+        val personCreationEvent = eventsInMostRecentSession.filterIsInstance(PersonCreationEvent::class.java)[0]
+        val usefulTemplatesFromEvents = eventsInMostRecentSession
+            .filterIsInstance(FingerprintCaptureEvent::class.java)
+            .filter { it.id in personCreationEvent.fingerprintCaptureIds }
+            .map { it.fingerprint?.template }
 
-                Truth.assertThat(usefulTemplatesFromEvents)
-                    .containsExactlyElementsIn(personCreatedForMatchingActivity.fingerprints.map {
-                        Utils.byteArrayToBase64(it.templateBytes)
-                    })
+        Truth.assertThat(usefulTemplatesFromEvents)
+            .containsExactlyElementsIn(personCreatedForMatchingActivity.fingerprints.map {
+                Utils.byteArrayToBase64(it.templateBytes)
+            })
 
-                val skippedEvent = session.events
-                    .filterIsInstance(FingerprintCaptureEvent::class.java)
-                    .findLast { it.result == FingerprintCaptureEvent.Result.SKIPPED }
+        val skippedFingerCaptureEvent = eventsInMostRecentSession
+            .filterIsInstance(FingerprintCaptureEvent::class.java)
+            .findLast { it.result == FingerprintCaptureEvent.Result.SKIPPED }
 
-                assertNotNull(skippedEvent)
-            }
-        }
+        assertNotNull(skippedFingerCaptureEvent)
     }
 
     private fun mockLocalToAddFakePersonAfterLogin(guid: String) {

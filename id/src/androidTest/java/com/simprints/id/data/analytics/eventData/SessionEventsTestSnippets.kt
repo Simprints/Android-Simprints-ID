@@ -169,11 +169,3 @@ fun verifyNumberOfLocationsInDb(count: Int, realmForDataEvent: Realm) {
         Assert.assertEquals(count, where(RlLocation::class.java).findAll().size)
     }
 }
-
-fun buildSuccessfulUploadSessionResponse() =
-    Response.success<Void?>(null, okhttp3.Response.Builder() //
-        .code(201)
-        .message("OK")
-        .protocol(Protocol.HTTP_1_1)
-        .request(Request.Builder().url("http://localhost/").build())
-        .build())

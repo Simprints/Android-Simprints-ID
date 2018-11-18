@@ -12,6 +12,8 @@ import io.reactivex.Single
 
 interface SessionEventsManager: SessionEventsLocalDbManager {
 
+    fun signOut()
+
     fun createSession(): Single<SessionEvents>
     fun getCurrentSession(): Single<SessionEvents>
 

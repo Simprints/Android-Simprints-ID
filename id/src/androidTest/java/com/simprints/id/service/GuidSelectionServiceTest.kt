@@ -4,8 +4,6 @@ import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import com.jayway.awaitility.Awaitility
-import com.jayway.awaitility.Duration
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
@@ -24,11 +22,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 import com.simprints.id.testSnippets.*
+import org.awaitility.Awaitility
+import org.awaitility.Duration
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class GuidSelectionServiceTest : DaggerForAndroidTests() {
+class GuidSelectionServiceTest: DaggerForAndroidTests() {
 
     @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
     @Inject lateinit var loginInfoManagerSpy: LoginInfoManager
@@ -64,21 +64,23 @@ class GuidSelectionServiceTest : DaggerForAndroidTests() {
         launchActivityEnrol(calloutCredentials, scanTestRule)
         var session = sessionEventsManagerSpy.createSession().blockingGet()
 
-        sessionEventsManagerSpy.updateSession({
-            session.projectId = loginInfoManagerSpy.getSignedInProjectIdOrEmpty()
-        }).blockingGet()
+        sessionEventsManagerSpy.updateSession {
+            it.projectId = loginInfoManagerSpy.getSignedInProjectIdOrEmpty()
+        }.blockingGet()
 
         val simHelper = SimHelper(calloutCredentials.projectId, calloutCredentials.userId)
         simHelper.confirmIdentity(app, session.id, "some_guid_confirmed")
 
-        Awaitility.await().atMost(30, TimeUnit.SECONDS).pollDelay(Duration.TWO_SECONDS).until<Any> {
+        Awaitility.await().atMost(30, TimeUnit.SECONDS).pollDelay(Duration.TWO_SECONDS).until {
             val potentialSessionWithGUIDEvent = sessionEventsManagerSpy.getCurrentSession().blockingGet()
             potentialSessionWithGUIDEvent.events.findLast { it is GuidSelectionEvent } != null
         }
 
-        session = sessionEventsManagerSpy.getCurrentSession().blockingGet()
-        val potentialGuidSelectionEvent = session.events.findLast { it is GuidSelectionEvent } as GuidSelectionEvent?
-        Assert.assertNotNull(potentialGuidSelectionEvent)
-        Assert.assertEquals(potentialGuidSelectionEvent?.selectedId, "some_guid_confirmed")
+        scanTestRule.activity.runOnUiThread {
+            session = sessionEventsManagerSpy.loadSessionById(session.id).blockingGet()
+            val potentialGuidSelectionEvent = session.events.filterIsInstance(GuidSelectionEvent::class.java).first()
+            Assert.assertNotNull(potentialGuidSelectionEvent)
+            Assert.assertEquals(potentialGuidSelectionEvent.selectedId, "some_guid_confirmed")
+        }
     }
 }

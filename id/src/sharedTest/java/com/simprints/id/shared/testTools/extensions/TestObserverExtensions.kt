@@ -1,4 +1,4 @@
-package com.simprints.id.testTools.extensions
+package com.simprints.id.shared.testTools.extensions
 
 import io.reactivex.observers.TestObserver
 

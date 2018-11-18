@@ -16,8 +16,8 @@ import io.realm.RealmQuery
 import io.realm.Sort
 import timber.log.Timber
 
-class RealmSessionEventsDbManagerImpl(private val appContext: Context,
-                                      private val secureDataManager: SecureDataManager) : SessionEventsLocalDbManager {
+open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
+                                           private val secureDataManager: SecureDataManager) : SessionEventsLocalDbManager {
 
     companion object {
         const val PROJECT_ID = "projectId"
@@ -51,60 +51,70 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     }
 
     override fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents): Completable =
-        getRealmInstance().flatMapCompletable { realm ->
-            realm.executeTransaction {
-                it.insertOrUpdate(RlSession(sessionEvents))
+        getRealmInstance().flatMapCompletable {
+            it.use { realm ->
+                realm.executeTransaction { realmInTrans ->
+                    realmInTrans.insertOrUpdate(RlSession(sessionEvents))
+                }
+                Completable.complete()
             }
-            Completable.complete()
         }
 
     override fun loadSessions(projectId: String?, openSession: Boolean?): Single<ArrayList<SessionEvents>> =
-        getRealmInstance().map { realm ->
-            val query = realm.where(RlSession::class.java).apply {
+        useRealmInstance {
+            val query = it.where(RlSession::class.java).apply {
                 addQueryParamForProjectId(projectId, this)
                 addQueryParamForOpenSession(openSession, this)
 
                 this.sort(RealmSessionEventsDbManagerImpl.START_TIME, Sort.DESCENDING)
             }
-            ArrayList(realm.copyFromRealm(query.findAll()).map { it.toDomainSession() })
+            ArrayList(it.copyFromRealm(query.findAll()).map { session -> session.toDomainSession() })
         }
+
 
     /** @throws SessionNotFoundException */
     override fun loadSessionById(sessionId: String): Single<SessionEvents> =
-        getRealmInstance().map { realm ->
-            val query = realm.where(RlSession::class.java).apply {
+        useRealmInstance {
+            val query = it.where(RlSession::class.java).apply {
                 equalTo(RealmSessionEventsDbManagerImpl.SESSION_ID, sessionId)
             }
             query.findFirst()?.toDomainSession() ?: throw SessionNotFoundException()
         }
 
+
     override fun getSessionCount(projectId: String?): Single<Int> =
-        getRealmInstance().map { realm ->
-            realm.where(RlSession::class.java).apply {
+        useRealmInstance {
+            it.where(RlSession::class.java).apply {
                 addQueryParamForProjectId(projectId, this)
             }.count().toInt()
         }
 
-    override fun deleteSessions(projectId: String?, openSession: Boolean?): Completable =
-        getRealmInstance().flatMapCompletable { thisRealm ->
-            thisRealm.executeTransaction { realm ->
+    override fun deleteSessions(projectId: String?, sessionId: String?, openSession: Boolean?): Completable =
+        getRealmInstance().flatMapCompletable { realm ->
+            realm.use {
+                it.executeTransaction { realmInTrans ->
+                    val sessions = realmInTrans.where(RlSession::class.java).apply {
+                        addQueryParamForProjectId(projectId, this)
+                        addQueryParamForOpenSession(openSession, this)
+                        addQueryParamForSessionId(sessionId, this)
+                    }.findAll()
 
-                val sessions = realm.where(RlSession::class.java).apply {
-                    addQueryParamForProjectId(projectId, this)
-                    addQueryParamForOpenSession(openSession, this)
-                }.findAll()
-
-                sessions.forEach {
-                    Timber.d("Deleting session: ${it.id}")
-                    it.databaseInfo?.deleteFromRealm()
-                    it.device?.deleteFromRealm()
-                    it.location?.deleteFromRealm()
-                    it.realmEvents.deleteAllFromRealm()
+                    sessions.forEach { session ->
+                        Timber.d("Deleting session: ${session.id}")
+                        deleteSessionInfo(session)
+                    }
+                    sessions.deleteAllFromRealm()
                 }
-                sessions.deleteAllFromRealm()
+                Completable.complete()
             }
-            Completable.complete()
         }
+
+    private fun deleteSessionInfo(session: RlSession) {
+        session.databaseInfo?.deleteFromRealm()
+        session.device?.deleteFromRealm()
+        session.location?.deleteFromRealm()
+        session.realmEvents.deleteAllFromRealm()
+    }
 
     private fun generateDbKeyIfRequired(): LocalDbKey {
         try {
@@ -129,6 +139,12 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         }
     }
 
+    private fun addQueryParamForSessionId(sessionId: String?, query: RealmQuery<RlSession>) {
+        sessionId?.let {
+            query.equalTo(RealmSessionEventsDbManagerImpl.SESSION_ID, sessionId)
+        }
+    }
+
     private fun addQueryParamForOpenSession(openSession: Boolean?, query: RealmQuery<RlSession>) {
         openSession?.let {
             if (it) {
@@ -138,4 +154,10 @@ class RealmSessionEventsDbManagerImpl(private val appContext: Context,
             }
         }
     }
+
+    private fun <R> useRealmInstance(block: (Realm) -> R): Single<R> =
+        getRealmInstance()
+            .map { realm ->
+                realm.use(block)
+            }
 }

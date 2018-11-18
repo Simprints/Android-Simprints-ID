@@ -2,6 +2,7 @@ package com.simprints.id.data.analytics.eventData.controllers.domain
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.*
@@ -11,6 +12,7 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEv
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.session.AttemptedToModifyASessionAlreadyClosed
 import com.simprints.id.exceptions.safe.session.SessionNotFoundException
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.libcommon.Person
@@ -23,7 +25,8 @@ import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 
 // Class to manage the current activeSession
-open class SessionEventsManagerImpl(private val ctx: Context,
+open class SessionEventsManagerImpl(private val deviceId: String,
+                                    private val sessionEventsSyncManager: SessionEventsSyncManager,
                                     private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                     private val preferencesManager: PreferencesManager,
                                     private val timeHelper: TimeHelper,
@@ -35,19 +38,15 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
     }
 
-    private var activeSessionId: String? = null
-
     //as default, the manager tries to load the last open activeSession
     override fun getCurrentSession(): Single<SessionEvents> =
-        activeSessionId?.let {
-            sessionEventsLocalDbManager.loadSessionById(it)
-        } ?: sessionEventsLocalDbManager.loadSessions(openSession = true).map { it[0] }.doOnSuccess {
-            activeSessionId = it.id
-        }
+        sessionEventsLocalDbManager.loadSessions(openSession = true).map { it[0] }
 
     override fun createSession(): Single<SessionEvents> =
         createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN).let {
             Timber.d("Created session: ${it.id}")
+            sessionEventsSyncManager.scheduleSyncIfNecessary()
+
             closeLastSessionsIfPending()
                 .andThen(insertOrUpdateSessionEvents(it))
                 .toSingle { it }
@@ -62,7 +61,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
             Device(
                 Build.VERSION.SDK_INT.toString(),
                Build.MANUFACTURER + "_" + Build.MODEL,
-                ctx.deviceId),
+                deviceId),
             timeHelper.now())
 
     override fun updateSession(block: (sessionEvents: SessionEvents) -> Unit): Completable =
@@ -84,6 +83,7 @@ open class SessionEventsManagerImpl(private val ctx: Context,
 
     private fun closeLastSessionsIfPending(): Completable =
         sessionEventsLocalDbManager.loadSessions(openSession = true).flatMapCompletable { openSessions ->
+
             openSessions.forEach {
                 it.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.NEW_SESSION)
                 it.closeIfRequired(timeHelper)
@@ -171,6 +171,11 @@ open class SessionEventsManagerImpl(private val ctx: Context,
         this.updateSessionInBackground { sessionEvents ->
             sessionEvents.location = Location(latitude, longitude)
         }
+    }
+
+    override fun signOut() {
+        deleteSessions().blockingAwait()
+        sessionEventsSyncManager.cancelSyncWorkers()
     }
 
     // It extracts CaptureEvents Ids with the templates used to create the "Person" object for
