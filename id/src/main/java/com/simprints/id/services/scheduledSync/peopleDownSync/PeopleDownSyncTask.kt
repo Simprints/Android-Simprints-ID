@@ -7,7 +7,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.DownSyncParams
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.data.db.sync.room.SyncStatusDatabase
+import com.simprints.id.data.db.sync.room.SyncStatusDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.SyncTaskParameters
@@ -29,7 +29,7 @@ class PeopleDownSyncTask (
     val preferencesManager: PreferencesManager,
     val loginInfoManager: LoginInfoManager,
     val localDbManager: LocalDbManager,
-    private val syncStatusDatabase: SyncStatusDatabase) {
+    private val syncStatusDatabaseModel: SyncStatusDao) {
 
     private val syncApi: PeopleRemoteInterface by lazy {
         dbManager.remote.getPeopleApiClient().blockingGet()
@@ -67,11 +67,11 @@ class PeopleDownSyncTask (
             try {
                 reader.beginArray()
                 var totalDownloaded = 0
-                val peopleToDownSync = syncStatusDatabase.syncStatusModel.getPeopleToDownSync()
+                val peopleToDownSync = syncStatusDatabaseModel.getPeopleToDownSync()
                 while (reader.hasNext()) {
                     dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
                         totalDownloaded++
-                        syncStatusDatabase.syncStatusModel.updatePeopleToDownSyncCount(peopleToDownSync - totalDownloaded)
+                        syncStatusDatabaseModel.updatePeopleToDownSyncCount(peopleToDownSync - totalDownloaded)
                         val shouldDownloadingBatchStop =
                             hasCurrentBatchDownloadedFinished(totalDownloaded, DOWN_BATCH_SIZE_FOR_DOWNLOADING)
 
@@ -94,7 +94,7 @@ class PeopleDownSyncTask (
         totalDownloaded % maxPatientsForBatch == 0
 
     private fun updateDownSyncTimestampOnBatchDownload() {
-        syncStatusDatabase.syncStatusModel.updateLastDownSyncTime(dateFormat.format(Date()))
+        syncStatusDatabaseModel.updateLastDownSyncTime(dateFormat.format(Date()))
     }
 
     private fun finishDownload(reader: JsonReader,

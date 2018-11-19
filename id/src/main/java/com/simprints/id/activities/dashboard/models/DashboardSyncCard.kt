@@ -4,7 +4,6 @@ import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -38,22 +37,6 @@ class DashboardSyncCard(component: AppComponent,
     var syncNeeded: Boolean = false
     var lastSyncTime: String? = null
     var cardView: DashboardSyncCardView? = null
-
-    var syncState: SyncManagerState = SyncManagerState.NOT_STARTED
-        set(value) {
-            field = value
-            if (field != SyncManagerState.IN_PROGRESS) {
-
-            }
-
-            when (field) {
-                SyncManagerState.NOT_STARTED -> cardView?.updateState(this)
-                SyncManagerState.IN_PROGRESS -> cardView?.updateState(this)
-                SyncManagerState.SUCCEED -> updateSyncInfo()
-                SyncManagerState.FAILED -> updateSyncInfo()
-                SyncManagerState.STARTED -> updateSyncInfo()
-            }
-        }
 
     init {
         component.inject(this)
@@ -95,9 +78,5 @@ class DashboardSyncCard(component: AppComponent,
                     cardView?.updateCard(this)
                 },
                 onError = { it.printStackTrace() })
-    }
-
-    fun syncStarted() {
-        syncState = SyncManagerState.STARTED
     }
 }

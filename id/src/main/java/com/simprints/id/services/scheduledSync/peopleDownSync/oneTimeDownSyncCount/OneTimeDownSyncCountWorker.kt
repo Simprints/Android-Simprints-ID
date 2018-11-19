@@ -10,9 +10,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncCountTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncState
-import java.lang.Exception
-import java.text.DateFormat
-import java.util.*
 import javax.inject.Inject
 
 class OneTimeDownSyncCountWorker: Worker() {
