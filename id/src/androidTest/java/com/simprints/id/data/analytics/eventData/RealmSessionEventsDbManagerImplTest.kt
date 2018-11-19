@@ -20,11 +20,15 @@ import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.whenever
+import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
+import com.simprints.id.testTemplates.FirstUseLocal
+import com.simprints.id.testTools.DEFAULT_REALM_KEY
+import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
-import io.realm.Realm
+import io.realm.RealmConfiguration
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +37,10 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class RealmSessionEventsDbManagerImplTest : DaggerForAndroidTests() {
+class RealmSessionEventsDbManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
+
+    override lateinit var peopleRealmConfiguration: RealmConfiguration
+    override lateinit var sessionsRealmConfiguration: RealmConfiguration
 
     private val testProjectId1 = "test_project1"
     private val testProjectId2 = "test_project2"
@@ -48,6 +55,7 @@ class RealmSessionEventsDbManagerImplTest : DaggerForAndroidTests() {
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var randomGeneratorMock: RandomGenerator
 
     override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
         PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
@@ -56,6 +64,7 @@ class RealmSessionEventsDbManagerImplTest : DaggerForAndroidTests() {
     override var module by lazyVar {
         AppModuleForAndroidTests(
             app,
+            randomGeneratorRule = DependencyRule.MockRule,
             localDbManagerRule = DependencyRule.SpyRule,
             remoteDbManagerRule = DependencyRule.SpyRule,
             sessionEventsManagerRule = DependencyRule.SpyRule,
@@ -70,16 +79,15 @@ class RealmSessionEventsDbManagerImplTest : DaggerForAndroidTests() {
     @Before
     override fun setUp() {
         app = InstrumentationRegistry.getTargetContext().applicationContext as Application
-        super.setUp()
+        super<DaggerForAndroidTests>.setUp()
 
         testAppComponent.inject(this)
 
-        Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
+        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
+        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
+        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
         app.initDependencies()
-
-        realmForDataEvent.executeTransaction {
-            it.deleteAll()
-        }
+        super<FirstUseLocal>.setUp()
 
         signOut()
 

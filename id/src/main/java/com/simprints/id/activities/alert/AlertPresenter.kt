@@ -35,9 +35,9 @@ class AlertPresenter(val view: AlertContract.View,
         view.setAlertHintImageWithDrawableId(alertType.alertHintDrawableId)
         view.setAlertMessageWithStringRes(alertType.alertMessageId)
 
-        sessionManager.updateSessionInBackground({
+        sessionManager.updateSessionInBackground {
             it.events.add(AlertScreenEvent(it.nowRelativeToStartTime(timeHelper), alertType))
-        })
+        }
     }
 
     override fun handleLeftButtonClick() {

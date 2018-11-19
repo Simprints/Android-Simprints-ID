@@ -8,34 +8,34 @@ import android.support.test.rule.ActivityTestRule
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.testTools.ActivityUtils
-import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTools.models.TestCalloutCredentials
 import com.simprints.id.testTools.log
 import com.simprints.id.testTools.tryOnUiUntilTimeout
 import com.simprints.libsimprints.Constants
 
-fun launchAppFromIntentEnrol(calloutCredentials: CalloutCredentials,
+fun launchAppFromIntentEnrol(testCalloutCredentials: TestCalloutCredentials,
                              enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("launchAppFromIntentEnrol")
-    ActivityUtils.launchActivityAndRunOnUiThread(calloutCredentials,
+    ActivityUtils.launchActivityAndRunOnUiThread(testCalloutCredentials,
         Constants.SIMPRINTS_REGISTER_INTENT, enrolTestRule)
 }
 
-fun launchAppFromIntentEnrolAndDoLogin(calloutCredentials: CalloutCredentials,
+fun launchAppFromIntentEnrolAndDoLogin(testCalloutCredentials: TestCalloutCredentials,
                                        loginTestRule: ActivityTestRule<CheckLoginFromIntentActivity>,
                                        projectSecret: String) {
-    launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
-    enterCredentialsDirectly(calloutCredentials, projectSecret)
+    launchAppFromIntentEnrol(testCalloutCredentials, loginTestRule)
+    enterCredentialsDirectly(testCalloutCredentials, projectSecret)
     pressSignIn()
     ensureSignInSuccess()
 }
 
-fun enterCredentialsDirectly(calloutCredentials: CalloutCredentials, projectSecret: String) {
+fun enterCredentialsDirectly(testCalloutCredentials: TestCalloutCredentials, projectSecret: String) {
     log("enterCredentialsDirectly")
     tryOnUiUntilTimeout(10000, 50) {
         onView(withId(R.id.loginEditTextProjectId))
             .check(matches(isDisplayed()))
             .perform(clearText())
-            .perform(typeText(calloutCredentials.projectId))
+            .perform(typeText(testCalloutCredentials.projectId))
             .perform(closeSoftKeyboard())
         onView(withId(R.id.loginEditTextProjectSecret))
             .check(matches(isDisplayed()))
