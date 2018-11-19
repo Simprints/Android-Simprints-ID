@@ -1,6 +1,5 @@
 package com.simprints.id.shared.sessionEvents
 
-import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.session.Device
@@ -34,7 +33,6 @@ fun createFakeOpenSession(timeHelper: TimeHelper,
                           id: String = UUID.randomUUID().toString()) =
     createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000))
 
-
 fun createFakeClosedSession(timeHelper: TimeHelper,
                             projectId: String = "some_project",
                             id: String = UUID.randomUUID().toString()) =
@@ -47,7 +45,7 @@ fun mockSessionEventsManager(sessionsEventsManager: SessionEventsLocalDbManager,
 
     mockSessionEventsMgrLoadSessionsToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
     mockSessionEventsMgrInsertOrUpdateSessionsToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
-    mockSessionEventsMgrToDeleteSessionByIdToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
+    mockSessionEventsMgrToDeleteSessionsToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
     mockSessionEventsMgrLoadSessionByIdToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
 }
 
@@ -60,15 +58,16 @@ fun mockSessionEventsMgrLoadSessionByIdToUseFakeDb(sessionsEventsManager: Sessio
     }
 }
 
-fun mockSessionEventsMgrToDeleteSessionByIdToUseFakeDb(sessionsEventsManager: SessionEventsLocalDbManager,
-                                                       sessionsInFakeDb: MutableList<SessionEvents>) {
+fun mockSessionEventsMgrToDeleteSessionsToUseFakeDb(sessionsEventsManager: SessionEventsLocalDbManager,
+                                                    sessionsInFakeDb: MutableList<SessionEvents>) {
 
-    whenever(sessionsEventsManager.deleteSessions(anyOrNull(), anyOrNull(), anyOrNull())).thenAnswer { args ->
+    whenever(sessionsEventsManager.deleteSessions(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenAnswer { args ->
         val sessionToDelete = findSessions(
             sessionsInFakeDb,
             args.arguments[0] as String?,
             args.arguments[1] as String?,
-            args.arguments[2] as Boolean?)
+            args.arguments[2] as Boolean?,
+            args.arguments[3] as Long?)
 
         sessionsInFakeDb.removeAll(sessionToDelete)
         Completable.complete()
@@ -83,7 +82,8 @@ fun mockSessionEventsMgrLoadSessionsToUseFakeDb(sessionsEventsManager: SessionEv
             sessionsInFakeDb,
             args.arguments[0] as String?,
             null,
-            args.arguments[1] as Boolean?)
+            args.arguments[1] as Boolean?,
+            null)
         Single.just(sessions)
     }
 }
@@ -91,12 +91,14 @@ fun mockSessionEventsMgrLoadSessionsToUseFakeDb(sessionsEventsManager: SessionEv
 private fun findSessions(sessionsInFakeDb: MutableList<SessionEvents>,
                          projectId: String?,
                          sessionId: String?,
-                         openSession: Boolean?): List<SessionEvents> {
+                         openSession: Boolean?,
+                         startedBefore: Long?): List<SessionEvents> {
 
     return sessionsInFakeDb.filter {
         projectId?.let { projectIdToSelect -> it.projectId == projectIdToSelect } ?: true &&
-            sessionId?.let { sessionIdToSelect -> it.id == sessionIdToSelect } ?: true &&
-            openSession?.let { openSession -> it.isOpen() == openSession } ?: true
+        sessionId?.let { sessionIdToSelect -> it.id == sessionIdToSelect } ?: true &&
+        openSession?.let { openSession -> it.isOpen() == openSession } ?: true &&
+        startedBefore?.let { startedBefore -> it.startTime < startedBefore } ?: true
     }
 }
 

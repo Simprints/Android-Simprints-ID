@@ -33,6 +33,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowLog
+import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
@@ -50,6 +52,8 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
 
     @Before
     override fun setUp() {
+        ShadowLog.stream = System.out
+
         mockServer.start()
         SessionsRemoteInterface.baseUrl = this.mockServer.url("/").toString()
         sessionsRemoteInterface = SimApiClient(
@@ -104,7 +108,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
     }
 
     @Test
-    fun uploadTask_shouldDeleteOnlyItsSessions() {
+    fun uploadABatch_shouldDeleteOnlyItsSessions() {
         sessionsInFakeDb.addAll(createClosedSessions(2))
         enqueueResponses(mockSuccessfulResponseForSessionsUpload())
 
@@ -117,8 +121,11 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
     }
 
     @Test
-    fun uploadFailsForServerError_shouldStillDeleteSessions() {
+    fun uploadFailsForServerError_shouldDeleteOldSessions() {
         sessionsInFakeDb.addAll(createClosedSessions(BATCH_SIZE))
+        sessionsInFakeDb.forEach { it.startTime = timeHelper.nowMinus(8, TimeUnit.DAYS) }
+        sessionsInFakeDb.addAll(createClosedSessions(1))
+
         enqueueResponses(mockFailureResponseForSessionsUpload())
 
         val testObserver = executeUpload()
@@ -127,9 +134,11 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
         Truth.assertThat(testObserver.errorCount()).isEqualTo(1)
         Truth.assertThat(testObserver.errors().first()).isInstanceOf(SessionUploadFailureException::class.java)
         Truth.assertThat(mockServer.requestCount).isEqualTo(1)
-        verifyBodyRequestHasSessions(BATCH_SIZE, mockServer.takeRequest())
-        verify(sessionsEventsManagerMock, times(BATCH_SIZE)).deleteSessions(anyOrNull(), anyOrNull(), anyOrNull())
-        Truth.assertThat(sessionsInFakeDb.size).isEqualTo(0)
+
+        verifyBodyRequestHasSessions(BATCH_SIZE + 1, mockServer.takeRequest())
+
+        verify(sessionsEventsManagerMock, times(BATCH_SIZE + 1)).deleteSessions(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+        Truth.assertThat(sessionsInFakeDb.size).isEqualTo(1)
     }
 
     @Test
