@@ -11,14 +11,15 @@ import com.simprints.id.tools.TimeHelper
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
+import timber.log.Timber
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class SessionEventsUploaderTask(private val projectId: String,
                                 private val sessionsIds: Array<String>,
                                 private val sessionEventsManager: SessionEventsManager,
                                 private val timeHelper: TimeHelper,
                                 private val sessionApiClient: SessionsRemoteInterface) {
-
 
     /**
      * @throws NoSessionsFoundException
@@ -35,12 +36,15 @@ class SessionEventsUploaderTask(private val projectId: String,
 
     private fun Single<Array<String>>.loadSessionsFromDb(): Single<Array<SessionEvents>> =
         this.map {
+            Timber.d("SessionEventsUploaderTask loadSessionsFromDb()")
             it.map { session -> sessionEventsManager.loadSessionById(session).blockingGet() }.toTypedArray()
         }
 
     @SuppressLint("CheckResult")
     private fun Single<Array<SessionEvents>>.closeOpenSessionsAndUpdateUploadTime(): Single<Array<SessionEvents>> =
         this.flatMap { sessions ->
+            Timber.d("SessionEventsUploaderTask closeOpenSessionsAndUpdateUploadTime()")
+
             sessions.forEach {
                 forceSessionToCloseIfOpenAndNotInProgress(it, timeHelper)
                 it.relativeUploadTime = it.nowRelativeToStartTime(timeHelper)
@@ -52,6 +56,8 @@ class SessionEventsUploaderTask(private val projectId: String,
     @SuppressLint("CheckResult")
     private fun Single<Array<SessionEvents>>.filterClosedSessions(): Single<Array<SessionEvents>> =
         this.flatMap { sessions ->
+            Timber.d("SessionEventsUploaderTask filterClosedSessions()")
+
             Single.just(sessions.filter { it.isClosed() }.toTypedArray())
         }
 
@@ -61,11 +67,13 @@ class SessionEventsUploaderTask(private val projectId: String,
             if (sessions.isEmpty())
                 throw NoSessionsFoundException()
 
+            sessions.forEach { Timber.d("SessionEventsUploaderTask uploadClosedSessionsOrThrowIfNoSessions: ${it.id}") }
             sessionApiClient.uploadSessions(projectId, hashMapOf("sessions" to sessions))
         }
 
-
     private fun forceSessionToCloseIfOpenAndNotInProgress(session: SessionEvents, timeHelper: TimeHelper) {
+        Timber.d("SessionEventsUploaderTask forceSessionToCloseIfOpenAndNotInProgress()")
+
         if (session.isOpen() && !session.isPossiblyInProgress(timeHelper)) {
             session.addArtificialTerminationIfRequired(timeHelper, ArtificialTerminationEvent.Reason.TIMED_OUT)
             session.closeIfRequired(timeHelper)
@@ -74,6 +82,8 @@ class SessionEventsUploaderTask(private val projectId: String,
 
     private fun Single<out Result<Void?>>.checkUploadSucceed(): Completable =
         flatMapCompletable { result ->
+            Timber.d("SessionEventsUploaderTask checkUploadSucceed()")
+
             when {
                 result.response()?.code() == 201 -> Completable.complete()
                 result.response() == null -> throw IOException(result.error())
@@ -87,13 +97,26 @@ class SessionEventsUploaderTask(private val projectId: String,
         }
     }
 
+    //To avoid db building up in case of errors, we delete session older 1 month.
+    //So we have 1 month to fix any integration issues that comes up on the cloud.
+    private fun deleteSessionsAfterAServerError() {
+        sessionsIds.forEach {
+            sessionEventsManager.deleteSessions(
+                sessionId = it,
+                openSession = false,
+                startedBefore = timeHelper.nowMinus(31, TimeUnit.DAYS)
+            ).blockingGet()
+        }
+    }
+
     private fun Completable.deleteSessionsFromDb(): Completable =
         this.doOnError {
-            if(it is SessionUploadFailureException) {
-                deleteSessions()
+            Timber.d("SessionEventsUploaderTask deleteSessionsFromDb()")
+
+            if (it is SessionUploadFailureException) {
+                deleteSessionsAfterAServerError()
             }
         }.doOnComplete {
             deleteSessions()
         }
 }
-

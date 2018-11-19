@@ -5,7 +5,6 @@ import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import io.reactivex.Completable
 import io.reactivex.Single
 
-
 interface SessionEventsLocalDbManager {
 
     fun insertOrUpdateSessionEvents(sessionEvents: SessionEvents): Completable
@@ -14,5 +13,8 @@ interface SessionEventsLocalDbManager {
     fun loadSessionById(sessionId: String): Single<SessionEvents>
 
     fun getSessionCount(projectId: String? = null): Single<Int>
-    fun deleteSessions(projectId: String? = null, sessionId: String? = null, openSession: Boolean? = null): Completable
+    fun deleteSessions(projectId: String? = null,
+                       sessionId: String? = null,
+                       openSession: Boolean? = null,
+                       startedBefore: Long? = null): Completable
 }

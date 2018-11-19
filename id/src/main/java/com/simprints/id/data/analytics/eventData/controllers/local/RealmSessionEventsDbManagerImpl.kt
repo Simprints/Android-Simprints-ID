@@ -32,13 +32,15 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     private var localDbKey: LocalDbKey? = null
 
     fun getRealmInstance(): Single<Realm> =
-        initDbIfRequired().andThen(getRealmConfig().flatMap {
-            Single.just(Realm.getInstance(it))
-        })
+        initDbIfRequired().toSingle {
+            realmConfig?.let {
+                Realm.getInstance(it)
+            } ?: throw RealmUninitialisedError("No valid realm Config")
+        }
 
     private fun initDbIfRequired(): Completable {
         try {
-            if (this.localDbKey == null) {
+            if (this.localDbKey == null || realmConfig == null) {
                 Realm.init(appContext)
                 val localKey = generateDbKeyIfRequired().also { this.localDbKey = it }
                 createAndSaveRealmConfig(localKey)
@@ -71,7 +73,6 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
             ArrayList(it.copyFromRealm(query.findAll()).map { session -> session.toDomainSession() })
         }
 
-
     /** @throws SessionNotFoundException */
     override fun loadSessionById(sessionId: String): Single<SessionEvents> =
         useRealmInstance {
@@ -81,7 +82,6 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
             query.findFirst()?.toDomainSession() ?: throw SessionNotFoundException()
         }
 
-
     override fun getSessionCount(projectId: String?): Single<Int> =
         useRealmInstance {
             it.where(RlSession::class.java).apply {
@@ -89,7 +89,10 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
             }.count().toInt()
         }
 
-    override fun deleteSessions(projectId: String?, sessionId: String?, openSession: Boolean?): Completable =
+    override fun deleteSessions(projectId: String?,
+                                sessionId: String?,
+                                openSession: Boolean?,
+                                startedBefore: Long?): Completable =
         getRealmInstance().flatMapCompletable { realm ->
             realm.use {
                 it.executeTransaction { realmInTrans ->
@@ -97,6 +100,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
                         addQueryParamForProjectId(projectId, this)
                         addQueryParamForOpenSession(openSession, this)
                         addQueryParamForSessionId(sessionId, this)
+                        addQueryParamForStartTime(startedBefore, this)
                     }.findAll()
 
                     sessions.forEach { session ->
@@ -129,10 +133,6 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         Single.just(SessionRealmConfig.get(localDbKey.projectId, localDbKey.value)
             .also { realmConfig = it })
 
-    private fun getRealmConfig(): Single<RealmConfiguration> = realmConfig?.let {
-        Single.just(it)
-    } ?: throw RealmUninitialisedError("No valid realm Config")
-
     private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<RlSession>) {
         projectId?.let {
             query.equalTo(RealmSessionEventsDbManagerImpl.PROJECT_ID, projectId)
@@ -142,6 +142,12 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     private fun addQueryParamForSessionId(sessionId: String?, query: RealmQuery<RlSession>) {
         sessionId?.let {
             query.equalTo(RealmSessionEventsDbManagerImpl.SESSION_ID, sessionId)
+        }
+    }
+
+    private fun addQueryParamForStartTime(startedBefore: Long?, query: RealmQuery<RlSession>) {
+        startedBefore?.let {
+            query.greaterThan(RealmSessionEventsDbManagerImpl.START_TIME, startedBefore).not()
         }
     }
 

@@ -31,7 +31,6 @@ class SessionEventsUploaderWorker : Worker() {
         inputData.getString(SessionEventsSyncMasterTask.PROJECT_ID_KEY) ?: throw IllegalArgumentException("Project Id required")
     }
 
-
     override fun doWork(): Result {
         Timber.d("SessionEventsUploaderWorker doWork()")
         injectDependencies()
@@ -45,8 +44,12 @@ class SessionEventsUploaderWorker : Worker() {
                 sessionsApiClient)
 
             task.execute().blockingAwait()
+            Timber.d("SessionEventsUploaderWorker done()")
+
             Result.SUCCESS
         } catch (throwable: Throwable) {
+            Timber.d("SessionEventsUploaderWorker error()")
+
             Timber.e(throwable)
             analyticsManager.logThrowable(throwable)
             Result.FAILURE

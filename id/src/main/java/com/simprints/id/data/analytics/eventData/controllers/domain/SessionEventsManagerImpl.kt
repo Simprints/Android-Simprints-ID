@@ -1,8 +1,6 @@
 package com.simprints.id.data.analytics.eventData.controllers.domain
 
-import android.content.Context
 import android.os.Build
-import android.util.Log
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.*
@@ -11,6 +9,7 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.Location
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.session.AttemptedToModifyASessionAlreadyClosed
+import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
@@ -30,7 +29,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
                                     private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                     private val preferencesManager: PreferencesManager,
                                     private val timeHelper: TimeHelper,
-                                    private val analyticsManager: AnalyticsManager):
+                                    private val analyticsManager: AnalyticsManager) :
     SessionEventsManager,
     SessionEventsLocalDbManager by sessionEventsLocalDbManager {
 
@@ -40,7 +39,11 @@ open class SessionEventsManagerImpl(private val deviceId: String,
 
     //as default, the manager tries to load the last open activeSession
     override fun getCurrentSession(): Single<SessionEvents> =
-        sessionEventsLocalDbManager.loadSessions(openSession = true).map { it[0] }
+        sessionEventsLocalDbManager.loadSessions(openSession = true).map {
+            if (it.isEmpty())
+                throw NoSessionsFoundException()
+            it[0]
+        }
 
     override fun createSession(): Single<SessionEvents> =
         createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN).let {
@@ -93,7 +96,6 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         }.doOnError {
             analyticsManager.logThrowable(it)
         }.onErrorComplete()
-
 
     /** @throws SessionNotFoundException */
     override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
