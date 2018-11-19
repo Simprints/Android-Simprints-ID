@@ -34,14 +34,10 @@ class PeopleDownSyncWorker: Worker() {
             task.execute()
             Timber.d("DownSync task successful")
             Result.SUCCESS
-        } catch (exception: TransientSyncFailureException) {
-            Timber.e(exception)
-            Timber.d("DownSync task failure: Retry")
-            Result.RETRY
         } catch (throwable: Throwable) {
             Timber.e(throwable)
-            Timber.d("DownSync task failure: Failure")
-            Result.FAILURE
+            Timber.d("DownSync task failure: Retry")
+            Result.RETRY
         }
     }
 

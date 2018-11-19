@@ -3,7 +3,7 @@ package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 import com.google.firebase.FirebaseNetworkException
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.sync.room.SyncStatusDatabase
+import com.simprints.id.data.db.sync.room.SyncStatusDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
@@ -23,7 +23,7 @@ class PeopleUpSyncUploaderTask(
     private val projectId: String,
     /*private val userId: String,*/
     private val batchSize: Int,
-    private val syncStatusDatabase: SyncStatusDatabase
+    private val syncStatusModel: SyncStatusDao
 ) {
 
     /**
@@ -95,7 +95,7 @@ class PeopleUpSyncUploaderTask(
     }
 
     private fun updateLastUpSyncTime() {
-        syncStatusDatabase.syncStatusModel.updateLastUpSyncTime(dateFormat.format(Date()))
+        syncStatusModel.updateLastUpSyncTime(dateFormat.format(Date()))
     }
 
 }
