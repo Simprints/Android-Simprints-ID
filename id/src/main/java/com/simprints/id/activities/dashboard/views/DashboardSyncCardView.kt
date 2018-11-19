@@ -10,11 +10,9 @@ import com.simprints.id.R
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
-import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.data.db.sync.room.SyncStatus
 import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.db.sync.viewModel.SyncStatusViewModel
-import org.jetbrains.anko.textResource
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
@@ -49,48 +47,8 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
             setTotalPeopleInDbCounter(cardModel)
             setUploadCounter(cardModel)
             setDownloadCounterAndLastSyncTime(cardModel)
-            updateState(cardModel)
             setListenerForSyncButton(cardModel)
         }
-    }
-
-    fun updateState(cardModel: DashboardSyncCard) {
-        when (cardModel.syncState) {
-            SyncManagerState.NOT_STARTED -> setUIForSyncNotStarted(cardModel)
-            SyncManagerState.STARTED -> setUIForSyncStarted()
-            SyncManagerState.IN_PROGRESS -> setUIForSyncInProgress(cardModel)
-            SyncManagerState.SUCCEED -> setUIForSyncSucceeded(cardModel)
-            SyncManagerState.FAILED -> setUIForSyncFailed(cardModel)
-        }
-    }
-
-    private fun setUIForSyncNotStarted(dataModel: DashboardSyncCard) {
-
-        if (dataModel.syncNeeded) {
-            showSyncNeededText()
-        }
-    }
-
-    private fun setUIForSyncStarted() {
-
-        syncDescription.textResource = R.string.syncing_calculating
-    }
-
-    private fun setUIForSyncSucceeded(dataModel: DashboardSyncCard) {
-
-    }
-
-    private fun setUIForSyncFailed(dataModel: DashboardSyncCard) {
-
-
-        syncDescription.textResource = R.string.dashboard_card_sync_failed
-    }
-
-    private fun setUIForSyncInProgress(dataModel: DashboardSyncCard) {
-
-        description?.text  = ""
-
-        syncDescription.textResource = R.string.syncing
     }
 
     private fun setTotalPeopleInDbCounter(cardModel: DashboardSyncCard) {
@@ -137,10 +95,6 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         lastUpSyncDate?.let { return it.toString() }
 
         return ""
-    }
-
-    private fun showSyncNeededText() {
-        syncDescription.textResource = R.string.dashboard_card_sync_needed
     }
 
     private fun setListenerForSyncButton(cardModel: DashboardSyncCard) {

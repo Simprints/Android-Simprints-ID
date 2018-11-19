@@ -5,7 +5,6 @@ import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.sync.models.SyncManagerState
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
@@ -93,14 +92,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun userDidWantToRefreshCardsIfPossible() {
-        if (isUserAllowedToRefresh()) {
-            initCards()
-        } else {
-            view.stopRequestIfRequired()
-        }
+        initCards()
     }
-
-    private fun isUserAllowedToRefresh(): Boolean = syncCardModel?.syncState != SyncManagerState.IN_PROGRESS
 
     override fun userDidWantToSync() {
         peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)

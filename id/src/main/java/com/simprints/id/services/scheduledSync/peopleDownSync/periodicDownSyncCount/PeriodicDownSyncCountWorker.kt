@@ -9,7 +9,6 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncCountTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
-import java.lang.Exception
 import javax.inject.Inject
 
 class PeriodicDownSyncCountWorker: Worker() {

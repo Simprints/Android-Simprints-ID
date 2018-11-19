@@ -27,7 +27,7 @@ class PeopleDownSyncWorker: Worker() {
 
         injectDependencies()
         val task = PeopleDownSyncTask(remoteDbManager, dbManager, preferencesManager,
-            loginInfoManager, localDbManager, syncStatusDatabase)
+            loginInfoManager, localDbManager, syncStatusDatabase.syncStatusModel)
 
         return try {
             Timber.d("DownSync task...starting")
@@ -36,8 +36,8 @@ class PeopleDownSyncWorker: Worker() {
             Result.SUCCESS
         } catch (throwable: Throwable) {
             Timber.e(throwable)
-            Timber.d("DownSync task failure: Retry")
-            Result.RETRY
+            Timber.d("DownSync task failure")
+            Result.FAILURE
         }
     }
 
