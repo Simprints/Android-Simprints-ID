@@ -11,10 +11,7 @@ import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
 import junit.framework.Assert
 import junit.framework.Assert.assertNotSame
-import okhttp3.Protocol
-import okhttp3.Request
 import org.junit.Assert.*
-import retrofit2.Response
 import java.util.*
 
 fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
@@ -29,12 +26,12 @@ fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
         assertFalse(it[1].userInfo?.projectId.isNullOrEmpty())
     }
 
-    events.filterIsInstance(AuthenticationEvent::class.java).let {
-        assertEquals(it.first().result, AuthenticationEvent.Result.BAD_CREDENTIALS)
-        assertEquals(it[1].result, AuthenticationEvent.Result.AUTHENTICATED)
-        it.forEach { authEvent ->
-            assertTrue(authEvent.userInfo.userId.isNotEmpty())
-            assertTrue(authEvent.userInfo.projectId.isNotEmpty())
+    events.filterIsInstance(AuthenticationEvent::class.java).let { list ->
+        assertEquals(list.first().result, AuthenticationEvent.Result.BAD_CREDENTIALS)
+        assertEquals(list[1].result, AuthenticationEvent.Result.AUTHENTICATED)
+        list.forEach {
+            assertTrue(it.userInfo.userId.isNotEmpty())
+            assertTrue(it.userInfo.projectId.isNotEmpty())
         }
     }
 }

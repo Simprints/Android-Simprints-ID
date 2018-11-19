@@ -14,6 +14,7 @@ import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderTask.Companion.DAYS_TO_KEEP_SESSIONS_IN_CASE_OF_ERROR
 import com.simprints.id.shared.mock
 import com.simprints.id.shared.sessionEvents.createFakeClosedSession
 import com.simprints.id.shared.sessionEvents.createFakeSession
@@ -39,8 +40,6 @@ import java.util.concurrent.TimeUnit
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class)
 class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
-
-    private val projectId = "projectId"
 
     private val mockServer = MockWebServer()
 
@@ -69,7 +68,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
     @Test
     fun openSessions_shouldNotBeUploaded() {
         sessionsInFakeDb.addAll(createClosedSessions(2))
-        val openSession = createFakeSession(timeHelper, projectId, "id", timeHelper.nowMinus(1000))
+        val openSession = createFakeSession(timeHelper, "bWOFHInKA2YaQwrxZ7uJ", "id", timeHelper.nowMinus(1000))
         sessionsInFakeDb.add(openSession)
 
         enqueueResponses(mockSuccessfulResponseForSessionsUpload())
@@ -84,7 +83,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun expiredOpenSessions_shouldBeClosedAndUploaded() {
-        val openSession = createFakeSession(timeHelper, projectId, "id", timeHelper.nowMinus(SessionEvents.GRACE_PERIOD + 1000))
+        val openSession = createFakeSession(timeHelper, "bWOFHInKA2YaQwrxZ7uJ", "id", timeHelper.nowMinus(SessionEvents.GRACE_PERIOD + 1000))
         sessionsInFakeDb.add(openSession)
         enqueueResponses(mockSuccessfulResponseForSessionsUpload())
 
@@ -123,7 +122,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
     @Test
     fun uploadFailsForServerError_shouldDeleteOldSessions() {
         sessionsInFakeDb.addAll(createClosedSessions(BATCH_SIZE))
-        sessionsInFakeDb.forEach { it.startTime = timeHelper.nowMinus(8, TimeUnit.DAYS) }
+        sessionsInFakeDb.forEach { it.startTime = timeHelper.nowMinus(DAYS_TO_KEEP_SESSIONS_IN_CASE_OF_ERROR + 1, TimeUnit.DAYS) }
         sessionsInFakeDb.addAll(createClosedSessions(1))
 
         enqueueResponses(mockFailureResponseForSessionsUpload())
@@ -152,7 +151,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
 
     private fun executeUpload(): TestObserver<Void> {
         val syncTask = SessionEventsUploaderTask(
-            projectId,
+            "bWOFHInKA2YaQwrxZ7uJ",
             sessionsInFakeDb.map { it.id }.toTypedArray(),
             sessionsEventsManagerMock,
             timeHelper,
@@ -184,6 +183,6 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
 
     private fun createClosedSessions(nSessions: Int) =
         mutableListOf<SessionEvents>().apply {
-            repeat(nSessions) { this.add(createFakeClosedSession(timeHelper, projectId)) }
+            repeat(nSessions) { this.add(createFakeClosedSession(timeHelper, "bWOFHInKA2YaQwrxZ7uJ")) }
         }
 }

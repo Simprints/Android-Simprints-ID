@@ -21,6 +21,10 @@ class SessionEventsUploaderTask(private val projectId: String,
                                 private val timeHelper: TimeHelper,
                                 private val sessionApiClient: SessionsRemoteInterface) {
 
+    companion object {
+        const val DAYS_TO_KEEP_SESSIONS_IN_CASE_OF_ERROR = 31L
+    }
+
     /**
      * @throws NoSessionsFoundException
      * @throws SessionUploadFailureException
@@ -104,7 +108,7 @@ class SessionEventsUploaderTask(private val projectId: String,
             sessionEventsManager.deleteSessions(
                 sessionId = it,
                 openSession = false,
-                startedBefore = timeHelper.nowMinus(31, TimeUnit.DAYS)
+                startedBefore = timeHelper.nowMinus(DAYS_TO_KEEP_SESSIONS_IN_CASE_OF_ERROR, TimeUnit.DAYS)
             ).blockingGet()
         }
     }
