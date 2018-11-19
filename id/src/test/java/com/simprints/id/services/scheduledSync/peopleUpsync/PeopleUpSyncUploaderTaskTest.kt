@@ -1,11 +1,10 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync
 
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.times
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockito_kotlin.*
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.sync.room.SyncStatusDao
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
@@ -16,6 +15,8 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import org.junit.Test
+import org.mockito.Mockito
+import java.text.DateFormat
 import java.util.*
 
 class PeopleUpSyncUploaderTaskTest {
@@ -23,6 +24,7 @@ class PeopleUpSyncUploaderTaskTest {
     private val loginInfoManager: LoginInfoManager = mock()
     private val localDbManager: LocalDbManager = mock()
     private val remoteDbManager: RemoteDbManager = mock()
+    private val syncStatusModel: SyncStatusDao = mock()
 
     private val projectIdToSync = "projectIdToSync"
     private val userIdToSync = "userIdToSync"
@@ -30,7 +32,7 @@ class PeopleUpSyncUploaderTaskTest {
 
     private val task = PeopleUpSyncUploaderTask(
         loginInfoManager, localDbManager, remoteDbManager,
-        projectIdToSync, /*userIdToSync, */batchSize // TODO: uncomment userId when multitenancy is properly implemented
+        projectIdToSync, /*userIdToSync, */batchSize, syncStatusModel // TODO: uncomment userId when multitenancy is properly implemented
     )
 
     private val differentProjectId = "differentProjectId"
@@ -46,6 +48,10 @@ class PeopleUpSyncUploaderTaskTest {
     private val syncedPerson1 = notYetSyncedPerson1.copy(toSync = false)
     private val syncedPerson2 = notYetSyncedPerson2.copy(toSync = false)
     private val syncedPerson3 = notYetSyncedPerson3.copy(toSync = false)
+
+    private val dateFormat: DateFormat by lazy {
+        DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
+    }
 
     @Test
     fun userNotSignedIn1_shouldThrowIllegalStateException() {
@@ -135,6 +141,7 @@ class PeopleUpSyncUploaderTaskTest {
         mockSuccessfulLocalPeopleQueries(*localQueryResults)
         mockSuccessfulPeopleUploads(*expectedUploadBatches)
         mockSuccessfulLocalPeopleUpdates(*expectedLocalUpdates)
+        mockSyncStatusModel()
 
         task.execute()
 
@@ -171,6 +178,10 @@ class PeopleUpSyncUploaderTaskTest {
         updates.forEach { update ->
             whenever(localDbManager.insertOrUpdatePeopleInLocal(update)).thenReturn(Completable.complete())
         }
+    }
+
+    private fun mockSyncStatusModel() {
+        whenever(syncStatusModel.updateLastUpSyncTime(dateFormat.format(Date()))).then { }
     }
 
     private fun verifyLocalPeopleQueries(vararg queryResults: List<Person>) {

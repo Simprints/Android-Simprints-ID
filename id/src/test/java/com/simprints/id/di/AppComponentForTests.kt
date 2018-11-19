@@ -7,7 +7,6 @@ import com.simprints.id.data.db.DbManagerTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.secure.ProjectAuthenticatorTest
 import com.simprints.id.secure.ProjectSecretManagerTest
-import com.simprints.id.sync.SyncTest
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
@@ -20,7 +19,6 @@ interface AppComponentForTests : AppComponent {
     fun inject(checkLoginFromMainLauncherActivityTest: CheckLoginFromMainLauncherActivityTest)
     fun inject(loginActivityTest: LoginActivityTest)
     fun inject(dashboardCardsFactoryTest: DashboardCardsFactoryTest)
-    fun inject(syncTest: SyncTest)
     fun inject(projectSecretManagerTest: ProjectSecretManagerTest)
     fun inject(dbManagerTest: DbManagerTest)
     fun inject(projectAuthenticatorTest: ProjectAuthenticatorTest)
