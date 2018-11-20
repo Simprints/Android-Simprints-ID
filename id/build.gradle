@@ -34,15 +34,6 @@ android {
 
     }
 
-    signingConfigs {
-        release {
-            storeFile "${System.properties['user.home']}${File.separator}simprintsID-release-keystore.jks" as File
-            storePassword BITRISEIO_ANDROID_KEYSTORE_PASSWORD
-            keyAlias BITRISEIO_ANDROID_KEYSTORE_ALIAS
-            keyPassword BITRISEIO_ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD
-        }
-    }
-
     bundle {
         language {
             enableSplit = false
@@ -62,7 +53,6 @@ android {
             minifyEnabled true
             ext.enableCrashlytics = true
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
             manifestPlaceholders = [firebase_performance_logcat_enabled: false, firebase_analytics_collection_enabled: true]
         }
         releaseWithLogfile {
@@ -97,7 +87,7 @@ android {
     }
 
     testBuildType "debug"
-    
+
     sourceSets {
         String sharedTestDir = 'src/sharedTest/java'
         test {
