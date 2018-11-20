@@ -211,7 +211,7 @@ android {
 // ./gradlew publishApkRelease to publish on internal channel
 play {
     track = 'internal'
-    jsonFile = file(SIMPRINTSID_PUBLISH_KEY_FILE)
+    jsonFile = "${System.properties['user.home']}${File.separator}google-play-service-upload-key.json" as File
 }
 
 dependencies {
