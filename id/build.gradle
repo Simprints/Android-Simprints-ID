@@ -96,18 +96,8 @@ android {
         }
     }
 
-    applicationVariants.all { variant ->
-        if (variant.buildType.name == "$variant_for_android_tests") {
-            buildConfigField("String", "SCANNER", "\"${SIMPRINTSID_TEST_SCANNER}\"")
-            buildConfigField("String", "WIFI_NETWORK", "\"${SIMPRINTSID_TEST_WIFI}\"")
-            buildConfigField("String", "WIFI_PASSWORD", "\"${SIMPRINTSID_TEST_WIFI_PASSWORD}\"")
-        }
-    }
-
     testBuildType "debug"
-    productFlavors {
-    }
-
+    
     sourceSets {
         String sharedTestDir = 'src/sharedTest/java'
         test {
