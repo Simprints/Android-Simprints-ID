@@ -24,8 +24,8 @@ open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
         .build()
 
     companion object {
-        private const val SYNC_REPEAT_INTERVAL = 20L
-        private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
+        private const val SYNC_REPEAT_INTERVAL = 6L
+        private val SYNC_REPEAT_UNIT = TimeUnit.HOURS
         private const val MASTER_WORKER_TAG = "SYNC_SESSIONS_WORKER"
     }
 
