@@ -1,7 +1,6 @@
 package com.simprints.id.tools.serializers
 
 import com.google.common.truth.Truth
-import junit.framework.Assert
 import org.junit.Test
 
 class ModuleIdOptionsStringSetSerializerTest {
@@ -11,7 +10,7 @@ class ModuleIdOptionsStringSetSerializerTest {
         val moduleIdOptionsSet = setOf("module1", "module2", "module3", "module4", "module5")
         val expectedString = "module1|module2|module3|module4|module5"
         val serializedModuleIdOptions = ModuleIdOptionsStringSetSerializer().serialize(moduleIdOptionsSet)
-        Assert.assertEquals(expectedString, serializedModuleIdOptions)
+        Truth.assertThat(serializedModuleIdOptions).isEqualTo(expectedString)
     }
 
     @Test
@@ -19,7 +18,7 @@ class ModuleIdOptionsStringSetSerializerTest {
         val moduleIdOptionsSet = setOf<String>()
         val expectedString = ""
         val serializedModuleIdOptions = ModuleIdOptionsStringSetSerializer().serialize(moduleIdOptionsSet)
-        Assert.assertEquals(expectedString, serializedModuleIdOptions)
+        Truth.assertThat(serializedModuleIdOptions).isEqualTo(expectedString)
     }
 
     @Test
@@ -27,7 +26,7 @@ class ModuleIdOptionsStringSetSerializerTest {
         val moduleIdOptionsSet = setOf("module1", "module2", "module3", "module4", "module4", "module5", "module5")
         val expectedString = "module1|module2|module3|module4|module5"
         val serializedModuleIdOptions = ModuleIdOptionsStringSetSerializer().serialize(moduleIdOptionsSet)
-        Assert.assertEquals(expectedString, serializedModuleIdOptions)
+        Truth.assertThat(serializedModuleIdOptions).isEqualTo(expectedString)
     }
 
     @Test
