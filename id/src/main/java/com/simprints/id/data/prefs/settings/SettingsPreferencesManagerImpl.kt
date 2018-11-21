@@ -3,6 +3,7 @@ package com.simprints.id.data.prefs.settings
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
@@ -22,7 +23,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                           groupSerializer: Serializer<Constants.GROUP>,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
-                                          moduleIdOptionsStringListSerializer: Serializer<List<String>>)
+                                          moduleIdOptionsStringSetSerializer: Serializer<Set<String>>)
     : SettingsPreferencesManager {
 
     companion object {
@@ -55,7 +56,10 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val TIMEOUT_DEFAULT = 3
 
         const val MODULE_ID_OPTIONS_KEY = "ModuleIdOptions"
-        val MODULE_ID_OPTIONS_DEFAULT = listOf<String>()
+        val MODULE_ID_OPTIONS_DEFAULT = setOf<String>()
+
+        const val SELECTED_MODULES_KEY = "SelectedModules"
+        val SELECTED_MODULES_DEFAULT = setOf<String>()
 
         const val SYNC_GROUP_KEY = "SyncGroup"
         val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
@@ -148,8 +152,12 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, TIMEOUT_KEY, TIMEOUT_DEFAULT)
 
     // What modules will be available to sync by for this project. Serialize as pipe (|) separated list. Empty list indicates that module sync should not be possible.
-    override var moduleIdOptions: List<String>
-        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODULE_ID_OPTIONS_KEY, MODULE_ID_OPTIONS_DEFAULT, moduleIdOptionsStringListSerializer)
+    override var moduleIdOptions: Set<String>
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODULE_ID_OPTIONS_KEY, MODULE_ID_OPTIONS_DEFAULT, moduleIdOptionsStringSetSerializer)
+
+    // What modules were selected by the user
+    override var selectedModules: Set<String>
+        by ComplexPreference(prefs, SELECTED_MODULES_KEY, SELECTED_MODULES_DEFAULT, moduleIdOptionsStringSetSerializer)
 
     // Sync group. Default is user
     override var syncGroup: Constants.GROUP
