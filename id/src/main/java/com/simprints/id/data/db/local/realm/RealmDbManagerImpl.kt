@@ -145,6 +145,9 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
         useRealmInstance { realm ->
             realm
                 .where(rl_SyncInfo::class.java).equalTo(SYNC_ID_FIELD, typeSync.ordinal)
+                .apply {
+                    specificModule?.let { this.equalTo(MODULE_ID_FIELD, it) }
+                }
                 .findFirst()
                 ?.let { realm.copyFromRealm(it) }
                 ?: throw NoStoredLastSyncedInfoException()

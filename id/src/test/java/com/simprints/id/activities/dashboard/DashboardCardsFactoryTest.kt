@@ -1,6 +1,7 @@
 package com.simprints.id.activities.dashboard
 
 import com.google.firebase.FirebaseApp
+import com.nhaarman.mockito_kotlin.anyOrNull
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
@@ -181,6 +182,6 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     }
 
     private fun mockGetSyncInfoFor(localDbManager: LocalDbManager) {
-        whenever(localDbManager.getSyncInfoFor(anyNotNull())).thenReturn(Single.just(rl_SyncInfo().apply { lastSyncTime = Date() }))
+        whenever(localDbManager.getSyncInfoFor(anyNotNull(), anyOrNull())).thenReturn(Single.just(rl_SyncInfo().apply { lastSyncTime = Date() }))
     }
 }

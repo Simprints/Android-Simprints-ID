@@ -28,7 +28,7 @@ class SyncTaskParametersTest {
         Assert.assertNotNull(moduleSync.projectId)
         Assert.assertNotNull(moduleSync.moduleIds)
         Assert.assertEquals(moduleSync.toGroup(), Constants.GROUP.MODULE)
-        Assert.assertEquals(moduleSync.toMap(), hashMapOf("projectId" to "projectId", "moduleId" to "moduleId"))
+        Assert.assertEquals(moduleSync.toMap(), hashMapOf("projectId" to "projectId", "moduleIds" to "moduleId"))
 
         Assert.assertNotNull(projectSync.projectId)
         Assert.assertEquals(projectSync.toGroup(), Constants.GROUP.GLOBAL)

@@ -87,7 +87,7 @@ class DashboardSyncCard(component: AppComponent,
 
     private fun updateLastSyncedTime() {
         localDbManager
-                .getSyncInfoFor(syncParams.toGroup())
+                .getSyncInfoFor(syncParams.toGroup(), null)
                 .subscribeBy(
                     onSuccess = {
                         lastSyncTime = dateFormat.format(it.lastSyncTime).toString()

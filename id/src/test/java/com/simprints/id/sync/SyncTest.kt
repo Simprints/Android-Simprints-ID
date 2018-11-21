@@ -2,6 +2,7 @@ package com.simprints.id.sync
 
 import com.google.firebase.FirebaseApp
 import com.google.gson.stream.JsonReader
+import com.nhaarman.mockito_kotlin.anyOrNull
 import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
@@ -135,7 +136,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         //Params
         val projectIdTest = "projectIdTest"
         val moduleIdTest = "moduleIdTest"
-        val syncParams = SyncTaskParameters.ModuleIdSyncTaskParameters(projectIdTest, moduleIdTest)
+        val syncParams = SyncTaskParameters.ModuleIdSyncTaskParameters(projectIdTest, setOf(moduleIdTest))
         val nPeopleToDownload = 22000
         val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
 
@@ -231,7 +232,7 @@ class SyncTest : RxJavaTest, DaggerForTests() {
         whenever(localDbMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(patientsAlreadyInLocalDb))
 
         //Mock app RealmSyncInfo for syncParams
-        whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup(), rl_Person(peopleToDownload.last()))) })
+        whenever(localDbMock.getSyncInfoFor(anyNotNull(), anyOrNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup(), rl_Person(peopleToDownload.last()), null)) })
 
         // Mock when trying to save the syncInfo
         whenever(localDbMock.updateSyncInfo(anyNotNull())).thenReturn(Completable.complete())
