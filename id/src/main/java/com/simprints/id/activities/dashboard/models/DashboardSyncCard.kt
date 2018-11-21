@@ -31,7 +31,7 @@ class DashboardSyncCard(component: AppComponent,
     @Inject lateinit var localDbManager: LocalDbManager
 
     var syncParams by lazyVar {
-        SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
+        SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.selectedModules, loginInfoManager)
     }
 
     var onSyncActionClicked: (cardModel: DashboardSyncCard) -> Unit = {}

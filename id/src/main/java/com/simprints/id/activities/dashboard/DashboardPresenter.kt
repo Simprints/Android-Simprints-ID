@@ -39,7 +39,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     private val cardsFactory = DashboardCardsFactory(component)
 
     private var actualSyncParams: SyncTaskParameters by lazyVar {
-        SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
+        SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.selectedModules, loginInfoManager)
     }
 
     override val cardsModelsList: ArrayList<DashboardCard> = arrayListOf()
@@ -63,7 +63,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun hasSyncGroupChangedSinceLastRun(): Boolean {
-        val syncParams = SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager)
+        val syncParams = SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.selectedModules, loginInfoManager)
         return (actualSyncParams != syncParams).also {
             actualSyncParams = syncParams
         }
@@ -147,7 +147,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override fun userDidWantToSync() {
         setSyncingStartedInLocalDbCardView()
-        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.USER_INITIATED)
+        syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.selectedModules, loginInfoManager), SyncCategory.USER_INITIATED)
     }
 
     private fun setSyncingStartedInLocalDbCardView() {

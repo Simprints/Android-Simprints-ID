@@ -22,7 +22,7 @@ class ScheduledPeopleSync : Worker() {
 
             Timber.e("ScheduledPeopleSync - doWork")
 
-            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.SCHEDULED_BACKGROUND)
+            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.selectedModules, loginInfoManager), SyncCategory.SCHEDULED_BACKGROUND)
 
             return Result.SUCCESS
         }

@@ -24,7 +24,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
 
     fun scheduleSyncsAndStartPeopleSyncIfNecessary() {
         if (preferencesManager.syncOnCallout) {
-            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), SyncCategory.AT_LAUNCH)
+            syncManager.sync(SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.selectedModules, loginInfoManager), SyncCategory.AT_LAUNCH)
         }
 
         schedulePeopleSyncIfNecessary()
