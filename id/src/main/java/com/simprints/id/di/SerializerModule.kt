@@ -43,7 +43,7 @@ class SerializerModule {
                                                                 gson: Gson): Serializer<Map<FingerIdentifier, Boolean>> = MapSerializer(fingerIdentifierSerializer, booleanSerializer, gson)
 
     @Provides @Singleton @Named("LanguagesStringArraySerializer") fun provideLanguagesStringArraySerializer(): Serializer<Array<String>> = LanguagesStringArraySerializer()
-    @Provides @Singleton @Named("ModuleIdOptionsStringListSerializer") fun provideModuleIdOptionsStringListSerializer(): Serializer<List<String>> = ModuleIdOptionsStringListSerializer()
+    @Provides @Singleton @Named("ModuleIdOptionsStringSetSerializer") fun provideModuleIdOptionsStringSetSerializer(): Serializer<Set<String>> = ModuleIdOptionsStringSetSerializer()
 
     //Action
     @Provides @Singleton @Named("ActionReader") fun provideActionReader(): Reader<CalloutAction> = ActionReader()
