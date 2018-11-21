@@ -43,6 +43,9 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun getPreferenceForLanguage(): Preference =
         findPreference(getKeyForLanguagePreference())
 
+    override fun getPreferenceForSelectModules(): Preference =
+        findPreference(getKeyForSelectModulesPreference())
+
     override fun getPreferenceForDefaultFingers(): Preference =
         findPreference(getKeyForDefaultFingersPreference())
 
@@ -61,6 +64,9 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun getKeyForLanguagePreference(): String =
         getString(R.string.select_language_preference)
 
+    override fun getKeyForSelectModulesPreference(): String =
+        getString(R.string.select_modules_preference)
+
     override fun getKeyForDefaultFingersPreference(): String =
         getString(R.string.select_fingers_preference)
 
@@ -75,6 +81,18 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
 
     override fun getKeyForScannerVersionPreference(): String =
         getString(R.string.scanner_version_preference)
+
+    override fun setSelectModulePreferenceEnabled(enabled: Boolean) {
+        getPreferenceForSelectModules().isEnabled = enabled
+    }
+
+    override fun showToastForNoModulesSelected() {
+        Toast.makeText(activity, getString(R.string.settings_no_modules_toast), Toast.LENGTH_LONG).show()
+    }
+
+    override fun showToastForTooManyModulesSelected(maxModules: Int) {
+        Toast.makeText(activity, getString(R.string.settings_too_many_modules_toast, maxModules), Toast.LENGTH_LONG).show()
+    }
 
     override fun showToastForInvalidSelectionOfFingers() {
         Toast.makeText(activity, getString(R.string.settings_invalid_selection), Toast.LENGTH_LONG).show()
