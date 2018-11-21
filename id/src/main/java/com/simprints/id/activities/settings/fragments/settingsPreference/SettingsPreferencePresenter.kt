@@ -28,8 +28,15 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     }
 
     private fun configureSelectModulePreference() {
+        clearSelectModulePreferenceOfOldValues()
         configureVisibilityOfSelectModulePreference()
         configureSelectModuleEntriesFromModuleIdOptions()
+    }
+
+    private fun clearSelectModulePreferenceOfOldValues() {
+        preferencesManager.selectedModules = preferencesManager.selectedModules.filter {
+            preferencesManager.moduleIdOptions.contains(it)
+        }.toSet()
     }
 
     private fun configureVisibilityOfSelectModulePreference() {
