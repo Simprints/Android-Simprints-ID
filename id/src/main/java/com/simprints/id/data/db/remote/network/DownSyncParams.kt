@@ -14,12 +14,13 @@ import com.simprints.id.services.sync.SyncTaskParameters
  *
  * Based on syncParams and last updated user
  */
-class DownSyncParams(syncParams: SyncTaskParameters,
+class DownSyncParams(private val syncParams: SyncTaskParameters,
+                     specificModule: String? = null,
                      localDbManager: LocalDbManager) {
 
     val projectId: String = syncParams.projectId
     val userId: String? = syncParams.userId
-    val moduleId: String? = syncParams.moduleId
+    val moduleId: String? = specificModule
 
     var lastKnownPatientId: String? = null
     var lastKnownPatientUpdatedAt: Long? = null
@@ -27,7 +28,7 @@ class DownSyncParams(syncParams: SyncTaskParameters,
     init {
         try {
             localDbManager
-                .getSyncInfoFor(syncParams.toGroup())
+                .getSyncInfoFor(syncParams.toGroup(), moduleId)
                 .blockingGet().let {
                     lastKnownPatientUpdatedAt = it.lastKnownPatientUpdatedAt.time
                     if (it.lastKnownPatientId.isNotEmpty())
@@ -36,4 +37,6 @@ class DownSyncParams(syncParams: SyncTaskParameters,
         } catch (e: NoStoredLastSyncedInfoException) {
         }
     }
+
+    fun toGroup() = syncParams.toGroup()
 }

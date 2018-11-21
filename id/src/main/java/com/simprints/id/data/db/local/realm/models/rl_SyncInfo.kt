@@ -10,6 +10,8 @@ open class rl_SyncInfo : RealmObject {
     @field:PrimaryKey
     var syncGroupId: Int = 0
 
+    var moduleId: String? = null
+
     lateinit var lastKnownPatientUpdatedAt: Date
     lateinit var lastKnownPatientId: String
     lateinit var lastSyncTime: Date
@@ -20,10 +22,11 @@ open class rl_SyncInfo : RealmObject {
 
     constructor()
 
-    constructor(syncGroup: Constants.GROUP, lastPerson: rl_Person) {
+    constructor(syncGroup: Constants.GROUP, lastPerson: rl_Person, moduleId: String?) {
         syncGroupId = syncGroup.ordinal
         lastKnownPatientUpdatedAt = lastPerson.updatedAt ?: Date(0)
         lastKnownPatientId = lastPerson.patientId
         lastSyncTime = Date()
+        this.moduleId = moduleId
     }
 }

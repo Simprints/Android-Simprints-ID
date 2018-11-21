@@ -10,6 +10,7 @@ import com.simprints.id.data.db.local.realm.models.*
 import com.simprints.id.data.db.local.realm.models.adapters.toProject
 import com.simprints.id.data.db.local.realm.models.adapters.toRealmProject
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.network.DownSyncParams
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
@@ -71,19 +72,19 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
 
     override fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
                                                        gson: Gson,
-                                                       syncParams: SyncTaskParameters,
+                                                       downSyncParams: DownSyncParams,
                                                        shouldStop: (personSaved: fb_Person) -> Boolean): Completable =
         useRealmInstance { realm ->
             realm.executeTransaction {
                 while (readerOfPeopleArray.hasNext()) {
                     val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPeopleArray, it)
-                    it.insertOrUpdate(rl_SyncInfo(syncParams.toGroup(), rl_Person(lastPersonSaved)))
+                    it.insertOrUpdate(rl_SyncInfo(downSyncParams.toGroup(), rl_Person(lastPersonSaved), downSyncParams.moduleId))
                     if (shouldStop(lastPersonSaved)) {
                         break
                     }
                 }
             }
-            updateSyncInfo(syncParams)
+            updateSyncInfo(downSyncParams)
         }
             .ignoreElement()
 
@@ -140,7 +141,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
             }
         }, BackpressureStrategy.BUFFER)
 
-    override fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo> =
+    override fun getSyncInfoFor(typeSync: Constants.GROUP, specificModule: String?): Single<rl_SyncInfo> =
         useRealmInstance { realm ->
             realm
                 .where(rl_SyncInfo::class.java).equalTo(SYNC_ID_FIELD, typeSync.ordinal)
@@ -161,10 +162,16 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     override fun deletePeopleFromLocal(syncParams: SyncTaskParameters): Completable =
         useRealmInstance { realm ->
             realm.executeTransaction {
-                it.buildQueryForPerson(syncParams)
+            syncParams.moduleIds?.let { moduleIds -> // Delete everyone for each moduleId
+                moduleIds.forEach { moduleId ->
+                    it.buildQueryForPerson(DownSyncParams(syncParams, moduleId, this))
+                        .findAll()
+                        .deleteAllFromRealm()
+                }
+            } ?: it.buildQueryForPerson(DownSyncParams(syncParams, null, this))
                     .findAll()
                     .deleteAllFromRealm()
-                }
+            }
         }
             .ignoreElement()
 
@@ -222,22 +229,22 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 sortBy?.let { this.sort(sortBy.keys.toTypedArray(), sortBy.values.toTypedArray()) }
             }
 
-    private fun Realm.buildQueryForPerson(syncParams: SyncTaskParameters): RealmQuery<rl_Person> =
+    private fun Realm.buildQueryForPerson(downSyncParams: DownSyncParams): RealmQuery<rl_Person> =
         buildQueryForPerson(
-            userId = syncParams.userId,
-            moduleId = syncParams.moduleId
+            userId = downSyncParams.userId,
+            moduleId = downSyncParams.moduleId
         )
 
-    override fun updateSyncInfo(syncParams: SyncTaskParameters): Completable =
+    override fun updateSyncInfo(downSyncParams: DownSyncParams): Completable =
         useRealmInstance { realm ->
-            realm.buildQueryForPerson(syncParams)
+            realm.buildQueryForPerson(downSyncParams)
                 .equalTo(TO_SYNC_FIELD, false)
                 .sort(UPDATE_TIME_FIELD, Sort.DESCENDING)
                 .findAll()
                 .first()
                 ?.let { person ->
                     realm.executeTransaction {
-                        it.insertOrUpdate(rl_SyncInfo(syncParams.toGroup(), person))
+                        it.insertOrUpdate(rl_SyncInfo(downSyncParams.toGroup(), person, downSyncParams.moduleId))
                     }
                 }
         }

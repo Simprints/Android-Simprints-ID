@@ -313,7 +313,7 @@ class RealmManagerTests : RealmTestsBase() {
             )
             Constants.GROUP.MODULE -> SyncTaskParameters.ModuleIdSyncTaskParameters(
                 projectId = downloadPeople.first().projectId,
-                moduleId = downloadPeople.first().moduleId
+                moduleIds = downloadPeople.first().moduleId
             )
         }
 
