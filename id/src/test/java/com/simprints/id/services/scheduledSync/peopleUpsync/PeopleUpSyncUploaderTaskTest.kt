@@ -15,7 +15,6 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import org.junit.Test
-import org.mockito.Mockito
 import java.text.DateFormat
 import java.util.*
 

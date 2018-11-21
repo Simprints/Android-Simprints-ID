@@ -7,6 +7,8 @@ import com.simprints.id.data.db.DbManagerTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.secure.ProjectAuthenticatorTest
 import com.simprints.id.secure.ProjectSecretManagerTest
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncCountTaskTest
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncTaskTest
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
@@ -25,4 +27,6 @@ interface AppComponentForTests : AppComponent {
     fun inject(alertActivityTest: AlertActivityTest)
     fun inject(launchActivityTest: LaunchActivityTest)
     fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
+    fun inject(peopleDownSyncTaskTest: PeopleDownSyncTaskTest)
+    fun inject(peopleDownSyncCountTaskTest: PeopleDownSyncCountTaskTest)
 }
