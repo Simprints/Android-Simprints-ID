@@ -58,9 +58,9 @@ open class RealmTestsBase {
     protected fun saveFakeSyncInfo(realm: Realm,
                                    userId: String = "",
                                    moduleId: String = ""): rl_SyncInfo = when {
-        userId.isNotEmpty() -> rl_SyncInfo(USER, PeopleGeneratorUtils.getRandomPerson(toSync = false))
-        moduleId.isNotEmpty() -> rl_SyncInfo(MODULE, PeopleGeneratorUtils.getRandomPerson(toSync = false))
-        else -> rl_SyncInfo(GLOBAL, PeopleGeneratorUtils.getRandomPerson(toSync = false))
+        userId.isNotEmpty() -> rl_SyncInfo(USER, PeopleGeneratorUtils.getRandomPerson(toSync = false), null)
+        moduleId.isNotEmpty() -> rl_SyncInfo(MODULE, PeopleGeneratorUtils.getRandomPerson(toSync = false), moduleId)
+        else -> rl_SyncInfo(GLOBAL, PeopleGeneratorUtils.getRandomPerson(toSync = false), null)
     }.also { info -> realm.executeTransaction { it.insertOrUpdate(info) } }
 
     protected fun rl_SyncInfo.deepEquals(other: rl_SyncInfo): Boolean =

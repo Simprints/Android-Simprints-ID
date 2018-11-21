@@ -9,6 +9,7 @@ import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.local.realm.models.toDomainPerson
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.network.DownSyncParams
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Constants.GROUP.*
 import com.simprints.id.services.sync.SyncTaskParameters
@@ -269,7 +270,7 @@ class RealmManagerTests : RealmTestsBase() {
     @Test
     fun getSyncInfoForGlobal_ShouldSucceed() {
         val fakeSync = saveFakeSyncInfo(realm)
-        val loadSyncInfo = realmManager.getSyncInfoFor(GLOBAL).blockingGet()
+        val loadSyncInfo = realmManager.getSyncInfoFor(GLOBAL, null).blockingGet()
 
         assertTrue(loadSyncInfo!!.deepEquals(fakeSync))
     }
@@ -277,7 +278,7 @@ class RealmManagerTests : RealmTestsBase() {
     @Test
     fun getSyncInfoForUser_ShouldSucceed() {
         val fakeSync = saveFakeSyncInfo(realm, userId = FAKE_DB_FIELD)
-        val loadSyncInfo = realmManager.getSyncInfoFor(USER).blockingGet()
+        val loadSyncInfo = realmManager.getSyncInfoFor(USER, null).blockingGet()
 
         assertTrue(loadSyncInfo!!.deepEquals(fakeSync))
     }
@@ -285,7 +286,7 @@ class RealmManagerTests : RealmTestsBase() {
     @Test
     fun getSyncInfoForModule_ShouldSucceed() {
         val fakeSync = saveFakeSyncInfo(realm, moduleId = FAKE_DB_FIELD)
-        val loadSyncInfo = realmManager.getSyncInfoFor(MODULE).blockingGet()
+        val loadSyncInfo = realmManager.getSyncInfoFor(MODULE, FAKE_DB_FIELD).blockingGet()
 
         assertTrue(loadSyncInfo!!.deepEquals(fakeSync))
     }
@@ -313,10 +314,12 @@ class RealmManagerTests : RealmTestsBase() {
             )
             Constants.GROUP.MODULE -> SyncTaskParameters.ModuleIdSyncTaskParameters(
                 projectId = downloadPeople.first().projectId,
-                moduleIds = downloadPeople.first().moduleId
+                moduleIds = setOf(downloadPeople.first().moduleId)
             )
         }
 
-        return realmManager.savePeopleFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams, { false })
+        val downSyncParams = DownSyncParams(taskParams, taskParams.moduleIds?.firstOrNull(), realmManager)
+
+        return realmManager.savePeopleFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, downSyncParams, { false })
     }
 }
