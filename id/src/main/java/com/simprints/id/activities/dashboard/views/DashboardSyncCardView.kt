@@ -44,22 +44,14 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
 
         if (cardModel is DashboardSyncCard) {
             cardModel.cardView = this
+            observeAndUpdatePeopleToDownloadAndLastSyncTime(cardModel)
             setTotalPeopleInDbCounter(cardModel)
             setUploadCounter(cardModel)
-            setDownloadCounterAndLastSyncTime(cardModel)
             setListenerForSyncButton(cardModel)
         }
     }
 
-    private fun setTotalPeopleInDbCounter(cardModel: DashboardSyncCard) {
-        totalPeopleInLocal.text = "${Math.max(cardModel.peopleInDb, 0)}"
-    }
-
-    private fun setUploadCounter(cardModel: DashboardSyncCard) {
-        syncUploadCount.text = "${Math.max(cardModel.peopleToUpload, 0)}"
-    }
-
-    private fun setDownloadCounterAndLastSyncTime(cardModel: DashboardSyncCard) {
+    private fun observeAndUpdatePeopleToDownloadAndLastSyncTime(cardModel: DashboardSyncCard) {
 
         val observer = Observer<SyncStatus> {
             cardModel.peopleToDownload = it.peopleToDownSync
@@ -69,8 +61,17 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
             }
             calculateLastSyncTimeAndUpdateText(it)
         }
+
         val syncStatusViewModel = SyncStatusViewModel(syncStatusDatabase)
         syncStatusViewModel.syncStatus.observe(rootView.context as DashboardActivity, observer)
+    }
+
+    private fun setTotalPeopleInDbCounter(cardModel: DashboardSyncCard) {
+        totalPeopleInLocal.text = "${Math.max(cardModel.peopleInDb, 0)}"
+    }
+
+    private fun setUploadCounter(cardModel: DashboardSyncCard) {
+        syncUploadCount.text = "${Math.max(cardModel.peopleToUpload, 0)}"
     }
 
     private fun calculateLastSyncTimeAndUpdateText(syncStatus: SyncStatus) {

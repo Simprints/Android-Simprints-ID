@@ -1,6 +1,5 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync
 
-import android.annotation.SuppressLint
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -13,8 +12,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper.Companion.gson
-import io.reactivex.Emitter
-import io.reactivex.Observable
+import io.reactivex.Completable
+import io.reactivex.CompletableEmitter
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.io.InputStream
@@ -23,7 +22,7 @@ import java.io.Reader
 import java.text.DateFormat
 import java.util.*
 
-class PeopleDownSyncTask (
+class PeopleDownSyncTask(
     val remoteDbManager: RemoteDbManager,
     val dbManager: DbManager,
     val preferencesManager: PreferencesManager,
@@ -44,7 +43,6 @@ class PeopleDownSyncTask (
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
-    @SuppressLint("CheckResult")
     fun execute() {
         val downSyncParam = DownSyncParams(syncParams, localDbManager)
         val responseBody = syncApi.downSync(
@@ -56,39 +54,42 @@ class PeopleDownSyncTask (
             .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
             .blockingGet()
 
-        savePeopleFromStream(syncParams, responseBody.byteStream())
-            .blockingLast()
+        setupReaderAndStartSavingPeopleFromStream(responseBody.byteStream())
+            .blockingAwait()
     }
 
-    private fun savePeopleFromStream(syncParams: SyncTaskParameters,
-                                          input: InputStream): Observable<Int> =
-        Observable.create<Int> { result ->
+    private fun setupReaderAndStartSavingPeopleFromStream(input: InputStream): Completable =
+        Completable.create { result ->
             val reader = JsonReader(InputStreamReader(input) as Reader?)
             try {
                 reader.beginArray()
-                var totalDownloaded = 0
-                val peopleToDownSync = syncStatusDatabaseModel.getPeopleToDownSync()
-                while (reader.hasNext()) {
-                    dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
-                        totalDownloaded++
-                        syncStatusDatabaseModel.updatePeopleToDownSyncCount(peopleToDownSync - totalDownloaded)
-                        val shouldDownloadingBatchStop =
-                            hasCurrentBatchDownloadedFinished(totalDownloaded, DOWN_BATCH_SIZE_FOR_DOWNLOADING)
-
-                        if (shouldDownloadingBatchStop) {
-                            updateDownSyncTimestampOnBatchDownload()
-                        }
-                        shouldDownloadingBatchStop
-                    }.subscribeBy(onError = {
-                        throw it
-                    })
-                }
+                savePeopleFromStreamAndUpdateDownSyncStatus(reader)
                 finishDownload(reader, result)
             } catch (e: Exception) {
                 finishDownload(reader, result, e)
                 throw e
             }
         }
+
+    private fun savePeopleFromStreamAndUpdateDownSyncStatus(reader: JsonReader) {
+        var totalDownloaded = 0
+        val peopleToDownSync = syncStatusDatabaseModel.getPeopleToDownSync()
+        while (reader.hasNext()) {
+            dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
+                totalDownloaded++
+                syncStatusDatabaseModel.updatePeopleToDownSyncCount(peopleToDownSync - totalDownloaded)
+                val shouldDownloadingBatchStop =
+                    hasCurrentBatchDownloadedFinished(totalDownloaded, DOWN_BATCH_SIZE_FOR_DOWNLOADING)
+
+                if (shouldDownloadingBatchStop) {
+                    updateDownSyncTimestampOnBatchDownload()
+                }
+                shouldDownloadingBatchStop
+            }.subscribeBy(onError = {
+                throw it
+            })
+        }
+    }
 
     private fun hasCurrentBatchDownloadedFinished(totalDownloaded: Int, maxPatientsForBatch: Int) =
         totalDownloaded % maxPatientsForBatch == 0
@@ -98,11 +99,11 @@ class PeopleDownSyncTask (
     }
 
     private fun finishDownload(reader: JsonReader,
-                               emitter: Emitter<Int>,
+                               emitter: CompletableEmitter,
                                error: Throwable? = null) {
 
         Timber.d("Download finished")
-        error?.let { Timber.e(error)}
+        error?.let { Timber.e(error) }
         updateDownSyncTimestampOnBatchDownload()
         reader.endArray()
         reader.close()
