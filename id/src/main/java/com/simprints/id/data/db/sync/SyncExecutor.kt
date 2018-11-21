@@ -51,10 +51,14 @@ open class SyncExecutor(private val dbManager: DbManager,
         }
 
     private fun makeDownSyncApiCallsForMultipleDownSyncParams(downSyncParams: List<DownSyncParams>, interrupted: () -> Boolean, nPeopleToDownload: Int): Observable<DownloadProgress> {
-        return Observable.
+        val observables = downSyncParams.map { makeDownSyncApiCall(it, interrupted, nPeopleToDownload) }
+
+        return concatMapWithPreviousLastValue(observables, DownloadProgress(0, 0)) { item, lastValue ->
+            DownloadProgress(item.currentValue + lastValue.currentValue, nPeopleToDownload)
+        }
     }
 
-    private fun makeDownSyncApiCall(downSyncParam: DownSyncParams, isInterrupted: () -> Boolean, nPeopleToDownload: Int, peopleDownloadedSoFar: Int = 0): Observable<DownloadProgress> =
+    private fun makeDownSyncApiCall(downSyncParam: DownSyncParams, isInterrupted: () -> Boolean, nPeopleToDownload: Int): Observable<DownloadProgress> =
         syncApi.downSync(
             downSyncParam.projectId,
             downSyncParam.userId,
@@ -62,7 +66,7 @@ open class SyncExecutor(private val dbManager: DbManager,
             downSyncParam.lastKnownPatientId,
             downSyncParam.lastKnownPatientUpdatedAt)
             .flatMapObservable { response ->
-                savePeopleFromStream(isInterrupted, downSyncParam, response.byteStream(), peopleDownloadedSoFar)
+                savePeopleFromStream(isInterrupted, downSyncParam, response.byteStream())
                     .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
                     .map {
                         DownloadProgress(it, nPeopleToDownload)
@@ -71,13 +75,12 @@ open class SyncExecutor(private val dbManager: DbManager,
 
     protected open fun savePeopleFromStream(isInterrupted: () -> Boolean,
                                             downSyncParams: DownSyncParams,
-                                            input: InputStream,
-                                            startingTotalDownloaded: Int = 0): Observable<Int> =
+                                            input: InputStream): Observable<Int> =
         Observable.create<Int> { result ->
             val reader = JsonReader(InputStreamReader(input) as Reader?)
             try {
                 reader.beginArray()
-                var totalDownloaded = startingTotalDownloaded
+                var totalDownloaded = 0
                 while (reader.hasNext() && !isInterrupted()) {
                     dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, downSyncParams) {
                         totalDownloaded++
@@ -121,4 +124,19 @@ open class SyncExecutor(private val dbManager: DbManager,
             emitter.onComplete()
         }
     }
+
+    private fun <T> concatMapWithPreviousLastValue(observables: Iterable<Observable<T>>, initialValue: T, mapWithPreviousLastValue: (item: T, lastValue: T) -> T) =
+        Observable.create<T> { emitter ->
+            var lastValue = initialValue
+
+            observables.forEach { observable ->
+                lastValue = observable
+                    .map { mapWithPreviousLastValue(it, lastValue) }
+                    .doOnNext { emitter.onNext(it) }
+                    .last(initialValue)
+                    .blockingGet()
+            }
+
+            emitter.onComplete()
+        }
 }
