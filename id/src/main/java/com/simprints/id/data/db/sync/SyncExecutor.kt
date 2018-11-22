@@ -41,27 +41,40 @@ open class SyncExecutor(private val dbManager: DbManager,
         }.flatMapObservable { nPeopleToDownload ->
             Timber.d("Downloading batch $nPeopleToDownload people")
             if (nPeopleToDownload != 0) {
-                val downSyncParam = DownSyncParams(syncParams, dbManager.local)
-                syncApi.downSync(
-                    downSyncParam.projectId,
-                    downSyncParam.userId,
-                    downSyncParam.moduleId,
-                    downSyncParam.lastKnownPatientId,
-                    downSyncParam.lastKnownPatientUpdatedAt)
-                    .flatMapObservable {
-                        savePeopleFromStream(isInterrupted, syncParams, it.byteStream())
-                            .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
-                            .map {
-                                DownloadProgress(it, nPeopleToDownload)
-                            }
-                    }
+                syncParams.moduleIds?.let { moduleIds ->
+                    val downSyncParams = moduleIds.map { DownSyncParams(syncParams, it, dbManager.local) }
+                    makeDownSyncApiCallsForMultipleDownSyncParams(downSyncParams, isInterrupted, nPeopleToDownload)
+                } ?: makeDownSyncApiCall(DownSyncParams(syncParams, null, dbManager.local), isInterrupted, nPeopleToDownload)
             } else {
                 Observable.just(Progress(0, 0))
             }
         }
 
+    private fun makeDownSyncApiCallsForMultipleDownSyncParams(downSyncParams: List<DownSyncParams>, interrupted: () -> Boolean, nPeopleToDownload: Int): Observable<DownloadProgress> {
+        val observables = downSyncParams.map { makeDownSyncApiCall(it, interrupted, nPeopleToDownload) }
+
+        return concatMapWithPreviousLastValue(observables, DownloadProgress(0, 0)) { item, lastValue ->
+            DownloadProgress(item.currentValue + lastValue.currentValue, nPeopleToDownload)
+        }
+    }
+
+    private fun makeDownSyncApiCall(downSyncParam: DownSyncParams, isInterrupted: () -> Boolean, nPeopleToDownload: Int): Observable<DownloadProgress> =
+        syncApi.downSync(
+            downSyncParam.projectId,
+            downSyncParam.userId,
+            downSyncParam.moduleId,
+            downSyncParam.lastKnownPatientId,
+            downSyncParam.lastKnownPatientUpdatedAt)
+            .flatMapObservable { response ->
+                savePeopleFromStream(isInterrupted, downSyncParam, response.byteStream())
+                    .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+                    .map {
+                        DownloadProgress(it, nPeopleToDownload)
+                    }
+            }
+
     protected open fun savePeopleFromStream(isInterrupted: () -> Boolean,
-                                            syncParams: SyncTaskParameters,
+                                            downSyncParams: DownSyncParams,
                                             input: InputStream): Observable<Int> =
         Observable.create<Int> { result ->
             val reader = JsonReader(InputStreamReader(input) as Reader?)
@@ -69,11 +82,11 @@ open class SyncExecutor(private val dbManager: DbManager,
                 reader.beginArray()
                 var totalDownloaded = 0
                 while (reader.hasNext() && !isInterrupted()) {
-                    dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
+                    dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, downSyncParams) {
                         totalDownloaded++
                         emitResultProgressIfRequired(result, totalDownloaded, DOWN_BATCH_SIZE_FOR_UPDATING_UI)
                         val shouldDownloadingBatchStop = isInterrupted() ||
-                                                                  hasCurrentBatchDownloadedFinished(totalDownloaded, DOWN_BATCH_SIZE_FOR_DOWNLOADING)
+                            hasCurrentBatchDownloadedFinished(totalDownloaded, DOWN_BATCH_SIZE_FOR_DOWNLOADING)
                         shouldDownloadingBatchStop
                     }.subscribe()
                 }
@@ -101,7 +114,7 @@ open class SyncExecutor(private val dbManager: DbManager,
                                error: Throwable? = null) {
 
         Timber.d("Download finished")
-        error?.let { Timber.e(error)}
+        error?.let { Timber.e(error) }
 
         reader.endArray()
         reader.close()
@@ -111,4 +124,19 @@ open class SyncExecutor(private val dbManager: DbManager,
             emitter.onComplete()
         }
     }
+
+    private fun <T> concatMapWithPreviousLastValue(observables: Iterable<Observable<T>>, initialValue: T, mapWithPreviousLastValue: (item: T, lastValue: T) -> T) =
+        Observable.create<T> { emitter ->
+            var lastValue = initialValue
+
+            observables.forEach { observable ->
+                lastValue = observable
+                    .map { mapWithPreviousLastValue(it, lastValue) }
+                    .doOnNext { emitter.onNext(it) }
+                    .last(initialValue)
+                    .blockingGet()
+            }
+
+            emitter.onComplete()
+        }
 }

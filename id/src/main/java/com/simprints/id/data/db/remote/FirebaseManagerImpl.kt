@@ -35,6 +35,7 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync
 import retrofit2.HttpException
 import timber.log.Timber
@@ -209,8 +210,24 @@ open class FirebaseManagerImpl(
         }
 
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
-        getPeopleApiClient().flatMap {
-            it.requestPeopleCount(syncParams.projectId, syncParams.userId, syncParams.moduleId)
+        getPeopleApiClient().flatMap { api ->
+            syncParams.moduleIds?.let { moduleIds ->
+                sumCountsForEachModule(moduleIds, syncParams)
+            } ?: api.requestPeopleCount(syncParams.projectId, syncParams.userId, null)
+                .retry(::retryCriteria)
+                .handleResponse(::defaultResponseErrorHandling)
+                .map { it.count }
+        }
+
+    private fun sumCountsForEachModule(moduleIds: Set<String>, syncParams: SyncTaskParameters): Single<Int> =
+        Single.merge(moduleIds.map {
+            getNumberOfPatientsInModule(syncParams.projectId, it)
+                .subscribeOn(Schedulers.io())
+        }).toList().map { it.sum() }
+
+    override fun getNumberOfPatientsInModule(projectId: String, moduleId: String): Single<Int> =
+        getPeopleApiClient().flatMap { api ->
+            api.requestPeopleCount(projectId = projectId, userId = null, moduleId = moduleId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .map { it.count }

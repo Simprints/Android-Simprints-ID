@@ -65,6 +65,7 @@ interface RemoteDbManager {
     fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable
 
     fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
+    fun getNumberOfPatientsInModule(projectId: String, moduleId: String): Single<Int>
 
     fun loadProjectFromRemote(projectId: String): Single<Project>
     fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JsonElement>

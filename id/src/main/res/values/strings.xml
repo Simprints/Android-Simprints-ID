@@ -362,6 +362,7 @@
     <string name="dashboard_card_project_title">Project</string>
 
     <string name="dashboard_card_localdb_sync_user_title">People enrolled by user</string>
+    <string name="dashboard_card_localdb_sync_module_title">People enrolled in selected modules</string>
     <string name="dashboard_card_localdb_sync_project_title">People enrolled in project</string>
 
     <string name="dashboard_card_sync_title">Sync info</string>

@@ -7,6 +7,7 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.network.DownSyncParams
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
@@ -33,7 +34,7 @@ interface LocalDbManager {
 
     fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
                                               gson: Gson,
-                                              syncParams: SyncTaskParameters,
+                                              downSyncParams: DownSyncParams,
                                               shouldStop: (personSaved: fb_Person) -> Boolean): Completable
 
     fun getPeopleCountFromLocal(patientId: String? = null,
@@ -61,9 +62,9 @@ interface LocalDbManager {
     fun loadProjectFromLocal(projectId: String): Single<Project>
 
     //Sync
-    fun updateSyncInfo(syncParams: SyncTaskParameters): Completable
+    fun updateSyncInfo(downSyncParams: DownSyncParams): Completable
     /** @throws NoStoredLastSyncedInfoException */
-    fun getSyncInfoFor(typeSync: Constants.GROUP): Single<rl_SyncInfo>
+    fun getSyncInfoFor(typeSync: Constants.GROUP, specificModule: String?): Single<rl_SyncInfo>
 
     fun deletePeopleFromLocal(syncParams: SyncTaskParameters): Completable
     fun deleteSyncInfoFromLocal(syncParams: SyncTaskParameters): Completable
