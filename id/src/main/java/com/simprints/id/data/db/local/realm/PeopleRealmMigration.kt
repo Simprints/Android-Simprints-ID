@@ -140,7 +140,6 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     private fun migrateTo4(schema: RealmSchema) {
         schema.get(SYNC_INFO_TABLE)
             ?.addField(SYNC_INFO_MODULE_ID, String::class.java)
-            ?.setNullable(SYNC_INFO_MODULE_ID, true)
     }
 
     private fun RealmObjectSchema.addStringAndMakeRequired(name: String): RealmObjectSchema =
