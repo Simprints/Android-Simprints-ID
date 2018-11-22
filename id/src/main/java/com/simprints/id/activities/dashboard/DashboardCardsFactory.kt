@@ -82,11 +82,11 @@ class DashboardCardsFactory(private val component: AppComponent) {
         }.doOnError { it.printStackTrace() }
 
     private fun getLocalDbInfoTitle(): String =
-        androidResourcesHelper.getString(
-            if (preferencesManager.syncGroup == Constants.GROUP.USER)
-                R.string.dashboard_card_localdb_sync_user_title
-            else
-                R.string.dashboard_card_localdb_sync_project_title)
+        androidResourcesHelper.getString(when (preferencesManager.syncGroup) {
+            Constants.GROUP.GLOBAL -> R.string.dashboard_card_localdb_sync_project_title
+            Constants.GROUP.USER -> R.string.dashboard_card_localdb_sync_user_title
+            Constants.GROUP.MODULE -> R.string.dashboard_card_localdb_sync_module_title
+        })
 
     private fun createSyncInfoCard(position: Int = 3): Single<DashboardSyncCard>? =
         Single.just(
