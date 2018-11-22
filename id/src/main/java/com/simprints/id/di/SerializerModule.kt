@@ -54,7 +54,7 @@ class SerializerModule {
     //ModuleId
     @Provides @Singleton @Named("InvalidModuleIdError") fun provideInvalidModuleIdError(): Error = InvalidCalloutError(ALERT_TYPE.INVALID_MODULE_ID)
     @Provides @Singleton @Named("MissingModuleIdError") fun provideMissingModuleIdError(): Error = InvalidCalloutError(ALERT_TYPE.MISSING_MODULE_ID)
-    @Provides @Singleton @Named("ModuleIdValidator") fun provideModuleIdValidator(): Validator<String> = NoOpValidator<String>()
+    @Provides @Singleton @Named("ModuleIdValidator") fun provideModuleIdValidator(@Named("InvalidModuleIdError") invalidModuleIdError: Error): Validator<String> = ModuleIdValidator(invalidModuleIdError)
     @Provides @Singleton @Named("ModuleIdExtractor")fun provideModuleIdExtractor(@Named("ModuleIdReader") moduleIdReader: Reader<String>, @Named("ModuleIdValidator") moduleIdValidator: Validator<String>): Extractor<String> = ParameterExtractor(moduleIdReader, moduleIdValidator)
     @Provides @Singleton @Named("ModuleIdReader") fun provideModuleIdReader(@Named("MissingModuleIdError") missingModuleIdError: Error, @Named("InvalidModuleIdError") invalidModuleIdError: Error): Reader<String> =
         MandatoryParameterReader(SIMPRINTS_MODULE_ID, String::class, missingModuleIdError, invalidModuleIdError)
