@@ -122,6 +122,18 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
     }
 
     @Test
+    fun invalidModuleIdInParams_shouldAlertActComeUp() {
+
+        val intent = createACallingAppIntentWithProjectId(moduleId = "invalid module ID with pipes |")
+
+        val controller = createRoboCheckLoginFromIntentViewActivity(intent).start()
+        val activity = controller.get() as CheckLoginFromIntentActivity
+        controller.visible()
+
+        assertActivityStarted(AlertActivity::class.java, activity)
+    }
+
+    @Test
     fun invalidParams_shouldAlertActComeUp() {
 
         val controller = createRoboCheckLoginFromIntentViewActivity().start()
