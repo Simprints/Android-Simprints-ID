@@ -205,7 +205,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
 
     override fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int> =
         syncParams.moduleIds?.let { moduleIds ->
-            sumCountsForEachModule(moduleIds, syncParams).map {
+            sumCountsForEachModule(moduleIds).map {
                 Math.max(nPatientsOnServerForSyncParam - it, 0)
             }
         } ?: local.getPeopleCountFromLocal(
@@ -215,9 +215,9 @@ open class DbManagerImpl(override val local: LocalDbManager,
             Math.max(nPatientsOnServerForSyncParam - it, 0)
         }
 
-    private fun sumCountsForEachModule(moduleIds: Set<String>, syncParams: SyncTaskParameters): Single<Int> =
+    private fun sumCountsForEachModule(moduleIds: Set<String>): Single<Int> =
         Single.merge(moduleIds.map {
-            local.getPeopleCountFromLocal(syncParams.projectId, it)
+            local.getPeopleCountFromLocal(moduleId =  it, toSync = false)
         }).toList().map { it.sum() }
 
     override fun getPeopleCount(group: Constants.GROUP): Single<Int> =
@@ -227,7 +227,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
             Constants.GROUP.USER ->
                 local.getPeopleCountFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
             Constants.GROUP.MODULE ->
-                local.getPeopleCountFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty(), moduleId = preferencesManager.moduleId)
+                sumCountsForEachModule(preferencesManager.selectedModules)
         }
 
     override fun saveIdentification(probe: LibPerson, matchSize: Int, matches: List<Identification>) {
