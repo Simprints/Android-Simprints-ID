@@ -15,7 +15,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     class PeopleModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 3
+        const val REALM_SCHEMA_VERSION: Long = 4
 
         const val PERSON_TABLE: String = "rl_Person"
         const val USER_TABLE: String = "rl_User"
@@ -29,6 +29,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         const val SYNC_FIELD: String = "toSync"
         const val ANDROID_ID_FIELD: String = "androidId"
         const val SYNC_INFO_ID: String = "syncGroupId"
+        const val SYNC_INFO_MODULE_ID: String = "moduleId"
         const val SYNC_INFO_LAST_UPDATE: String = "lastKnownPatientUpdatedAt"
         const val SYNC_INFO_LAST_PATIENT_ID: String = "lastKnownPatientId"
         const val SYNC_INFO_SYNC_TIME: String = "lastSyncTime"
@@ -57,6 +58,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
                 0 -> migrateTo1(realm.schema)
                 1 -> migrateTo2(realm.schema)
                 2 -> migrateTo3(realm.schema)
+                3 -> migrateTo4(realm.schema)
             }
         }
     }
@@ -133,6 +135,12 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         schema.get(PERSON_TABLE)?.transform {
             it.set(SYNC_FIELD, true)
         }
+    }
+
+    private fun migrateTo4(schema: RealmSchema) {
+        schema.get(SYNC_INFO_TABLE)
+            ?.addField(SYNC_INFO_MODULE_ID, String::class.java)
+            ?.setNullable(SYNC_INFO_MODULE_ID, true)
     }
 
     private fun RealmObjectSchema.addStringAndMakeRequired(name: String): RealmObjectSchema =

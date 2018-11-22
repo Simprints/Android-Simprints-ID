@@ -33,7 +33,7 @@ class SyncService : ProgressService<SyncTaskParameters>() {
                 // the sync or catch with the Sync state.
                 SyncService.syncCategory?.let {
                     syncManager.sync(SyncTaskParameters.build(
-                        preferencesManager.syncGroup, preferencesManager.moduleId, loginInfoManager), it)
+                        preferencesManager.syncGroup, preferencesManager.selectedModules, loginInfoManager), it)
                 }
             }
         }
