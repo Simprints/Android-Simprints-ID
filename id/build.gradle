@@ -100,11 +100,15 @@ android {
 }
 
 //For Android tests, uninstall any previous apk
-afterEvaluate {
-    if (tasks.findByPath(assembleTaskForEndToEndTest()) != null) {
-        tasks.findByPath(assembleTaskForEndToEndTest()).dependsOn uninstallAll
-    }
-}
+//afterEvaluate {
+//    if (tasks.findByPath(assembleTaskForEndToEndTest()) != null) {
+//        tasks.findByPath(assembleTaskForEndToEndTest()).dependsOn uninstallAll
+//    }
+//}
+//
+//def assembleTaskForEndToEndTest() {
+//    return "assemble${variant_for_android_tests.capitalize()}AndroidTest"
+//}
 
 def getDevProjectId() {
     if (project.hasProperty("development_gcp_project")) {
@@ -112,47 +116,6 @@ def getDevProjectId() {
     } else {
         return "simprints-dev"
     }
-}
-
-def connectedTaskForEndToEndTest() {
-    return "connected${variant_for_android_tests.capitalize()}AndroidTest"
-}
-
-def assembleTaskForEndToEndTest() {
-    return "assemble${variant_for_android_tests.capitalize()}AndroidTest"
-}
-
-project.afterEvaluate {
-    if (gradle.startParameter.taskNames.findAll {
-        it.contains(connectedTaskForEndToEndTest())
-    }.size() > 0) {
-        project.(connectedTaskForEndToEndTest()).doFirst {
-            def originalProvider = deviceProvider
-            deviceProvider = [
-                    getName       : { originalProvider.getName() },
-                    init          : { originalProvider.init() },
-                    terminate     : { originalProvider.terminate() },
-                    getDevices    : { filterDevices(originalProvider.getDevices()) },
-                    getTimeoutInMs: { originalProvider.getTimeoutInMs() },
-                    isConfigured  : { originalProvider.isConfigured() },
-                    getMaxThreads : { originalProvider.getMaxThreads() }
-            ] as DeviceProvider
-        }
-    }
-}
-
-// Required to run instrumented tests (gradlew connectedAndroidTest) on a single device.
-// By default Android runs on all device at the same time
-def filterDevices(connectedDevices) {
-    def DEVICES_PROPERTY = "devices"
-    def devices = connectedDevices
-    if (project.hasProperty(DEVICES_PROPERTY)) {
-        def devicesSerials = project.getProperties().get(DEVICES_PROPERTY).split(/,/)
-        devices = connectedDevices.findAll { devicesSerials.contains(it.serialNumber) }
-        println "[testy] ${!devices.empty ? "Execute on: ${devices.collect { it.serialNumber }}" : "Devices not found"}"
-    }
-
-    devices
 }
 
 buildscript {
