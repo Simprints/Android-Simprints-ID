@@ -2,9 +2,7 @@ package com.simprints.id.services.scheduledSync.peopleDownSync
 
 import com.google.firebase.FirebaseApp
 import com.google.gson.stream.JsonReader
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.doAnswer
-import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.*
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -17,11 +15,9 @@ import com.simprints.id.data.db.sync.room.SyncStatusDao
 import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
+import com.simprints.id.domain.Constants
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.sync.SyncTaskParameters
-import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.id.shared.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.shared.anyNotNull
@@ -30,7 +26,6 @@ import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.mockServer.assertPathUrlParam
 import com.simprints.id.testUtils.mockServer.assertQueryUrlParam
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -47,44 +42,34 @@ import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
-import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class PeopleDownSyncTaskTest: RxJavaTest, DaggerForTests() {
+class PeopleDownSyncTaskTest: RxJavaTest {
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
     private lateinit var syncStatusDatabaseModel: SyncStatusDao
 
-    @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
-    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var preferencesManager: PreferencesManager
 
-    override var module by lazyVar {
-        AppModuleForTests(app,
-            remoteDbManagerRule = DependencyRule.SpyRule,
-            localDbManagerRule = DependencyRule.MockRule,
-            peopleUpSyncMasterRule = DependencyRule.MockRule,
-            syncStatusDatabaseRule = DependencyRule.MockRule
-        )
-    }
+    val dbManager: DbManager = mock()
+    private val remoteDbManagerSpy: RemoteDbManager = spy()
+    private val syncStatusDatabase: SyncStatusDatabase = mock()
+    private val loginInfoManager: LoginInfoManager = mock()
+    val preferencesManager: PreferencesManager = mock()
+    private val peopleRemoteInterface = Mockito.mock(PeopleRemoteInterface::class.java)
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
-        super.setUp()
-        testAppComponent.inject(this)
         dbManager.initialiseDb()
 
         whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just(""))
 
         mockServer.start()
         apiClient = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl)
-        syncStatusDatabaseModel = Mockito.mock(syncStatusDatabase.syncStatusModel::class.java)
+        whenever(syncStatusDatabase.syncStatusModel).thenReturn(Mockito.mock(SyncStatusDao::class.java))
+        syncStatusDatabaseModel = syncStatusDatabase.syncStatusModel
     }
 
     @Test
@@ -225,6 +210,11 @@ class PeopleDownSyncTaskTest: RxJavaTest, DaggerForTests() {
         whenever(syncStatusDatabaseModel.updateLastDownSyncTime(any())).doAnswer {  }
         whenever(syncStatusDatabaseModel.getPeopleToDownSync()).doReturn(25000)
         whenever(syncStatusDatabaseModel.updatePeopleToDownSyncCount(any())).doAnswer {  }
+        whenever(preferencesManager.syncGroup).thenReturn(Constants.GROUP.GLOBAL)
+        whenever(preferencesManager.moduleId).thenReturn("")
+        whenever(loginInfoManager.getSignedInUserIdOrEmpty()).thenReturn("")
+        whenever(loginInfoManager.getSignedInProjectIdOrEmpty()).thenReturn("")
+        whenever(dbManager.remote.getPeopleApiClient()).thenReturn(Single.just(peopleRemoteInterface))
 
         val sync = PeopleDownSyncTask(remoteDbManagerSpy, dbManager, preferencesManager, loginInfoManager, localDbMock, syncStatusDatabaseModel)
 
