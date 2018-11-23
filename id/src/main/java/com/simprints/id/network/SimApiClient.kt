@@ -14,7 +14,7 @@ open class SimApiClient<T>(val service: Class<T>,
         retrofit.create(service)
     }
 
-    val retrofit: Retrofit by lazy {
+    open val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create(JsonHelper.gson))
