@@ -2,6 +2,7 @@ package com.simprints.id.testTools
 
 import android.content.Context
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.testTools.exceptions.TestingSuiteError
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File
@@ -64,6 +65,8 @@ object StorageUtils {
             } finally {
                 realm.close()
             }
+        } else {
+            throw TestingSuiteError("Realm config uninitialised for testing")
         }
     }
 }

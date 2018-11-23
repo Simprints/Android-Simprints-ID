@@ -23,8 +23,8 @@ interface RemoteTestingApi {
                       @Query("key") key: String = apiKey): Single<Result<Void?>>
 
     @POST("tokens")
-    fun getFirebaseToken(@Body testFirebaseTokenParameters: TestFirebaseTokenParameters,
-                         @Query("key") key: String = apiKey): Single<TestFirebaseToken>
+    fun generateFirebaseToken(@Body testFirebaseTokenParameters: TestFirebaseTokenParameters,
+                              @Query("key") key: String = apiKey): Single<TestFirebaseToken>
 
     @GET("projects/{projectId}/sessions")
     fun getSessionSignatures(@Path("projectId") projectId: String,

@@ -15,7 +15,7 @@ import com.simprints.id.shared.DependencyRule
 import com.simprints.id.testSnippets.launchActivityEnrol
 import com.simprints.id.testSnippets.setupLoginInfoToBeSignedIn
 import com.simprints.id.testTools.ActivityUtils
-import com.simprints.id.testTools.DEFAULT_TEST_CALLOUT_CREDENTIALS
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.SimHelper
 import org.junit.Assert
