@@ -317,6 +317,6 @@ class RealmManagerTests : RealmTestsBase() {
             )
         }
 
-        return realmManager.savePeopleFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams, { false })
+        return realmManager.savePeopleFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams) { false }
     }
 }
