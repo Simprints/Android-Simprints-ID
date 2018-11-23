@@ -2,7 +2,7 @@ package com.simprints.id.shared
 
 import android.util.Base64
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.testTools.models.TestCalloutCredentials
+import com.simprints.id.shared.models.TestCalloutCredentials
 
 
 object DefaultTestConstants {

@@ -14,7 +14,7 @@ import android.view.WindowManager
 import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
-import com.simprints.id.testTools.models.TestCalloutCredentials
+import com.simprints.id.shared.models.TestCalloutCredentials
 import com.simprints.libsimprints.Constants
 import java.util.*
 

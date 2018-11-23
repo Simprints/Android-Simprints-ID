@@ -1,4 +1,4 @@
-package com.simprints.id.testTools.models
+package com.simprints.id.shared.models
 
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_LEGACY_API_KEY
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_MODULE_ID

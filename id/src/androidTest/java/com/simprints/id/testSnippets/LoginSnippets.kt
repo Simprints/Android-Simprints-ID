@@ -8,7 +8,7 @@ import android.support.test.rule.ActivityTestRule
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.testTools.ActivityUtils
-import com.simprints.id.testTools.models.TestCalloutCredentials
+import com.simprints.id.shared.models.TestCalloutCredentials
 import com.simprints.id.testTools.log
 import com.simprints.id.testTools.tryOnUiUntilTimeout
 import com.simprints.libsimprints.Constants
