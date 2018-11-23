@@ -20,7 +20,7 @@ import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.testTools.models.TestCalloutCredentials
+import com.simprints.id.shared.models.TestCalloutCredentials
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.mockscanner.MockBluetoothAdapter

@@ -11,7 +11,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.testTools.*
 import com.simprints.id.testTools.StringUtils.getResourceString
-import com.simprints.id.testTools.models.TestCalloutCredentials
+import com.simprints.id.shared.models.TestCalloutCredentials
 import com.simprints.libsimprints.*
 import org.hamcrest.Matchers.*
 import org.junit.Assert.*
