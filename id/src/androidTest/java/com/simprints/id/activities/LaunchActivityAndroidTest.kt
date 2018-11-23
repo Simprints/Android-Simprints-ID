@@ -30,8 +30,8 @@ import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.mockSettingsPreferencesManager
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTools.DEFAULT_LOCAL_DB_KEY
-import com.simprints.id.testTools.DEFAULT_REALM_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_LOCAL_DB_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
@@ -59,7 +59,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
     @Inject lateinit var dbManagerSpy: DbManager
     @Inject lateinit var simNetworkUtilsSpy: SimNetworkUtils
 
-    override lateinit var peopleRealmConfiguration: RealmConfiguration
+    override var peopleRealmConfiguration: RealmConfiguration? = null
 
     @Rule @JvmField var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
     @Rule @JvmField val launchActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)

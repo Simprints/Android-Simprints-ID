@@ -25,11 +25,11 @@ class RemoteTestingManagerImpl : RemoteTestingManager {
             .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to delete project", it) }
     }
 
-    override fun getFirebaseToken(projectId: String, userId: String): TestFirebaseToken =
-        getFirebaseToken(TestFirebaseTokenParameters(projectId = projectId, userId = userId))
+    override fun generateFirebaseToken(projectId: String, userId: String): TestFirebaseToken =
+        generateFirebaseToken(TestFirebaseTokenParameters(projectId = projectId, userId = userId))
 
-    override fun getFirebaseToken(testFirebaseTokenParameters: TestFirebaseTokenParameters): TestFirebaseToken =
-        remoteTestingApi.getFirebaseToken(testFirebaseTokenParameters)
+    override fun generateFirebaseToken(testFirebaseTokenParameters: TestFirebaseTokenParameters): TestFirebaseToken =
+        remoteTestingApi.generateFirebaseToken(testFirebaseTokenParameters)
             .blockingGetOnDifferentThread { TestingRemoteApiError("Failed to get firebase token", it) }
 
     override fun getSessionSignatures(projectId: String): List<TestSessionSignature> =

@@ -15,7 +15,10 @@ import com.simprints.id.shared.replaceRemoteDbManagerApiClientsWithFailingClient
 import com.simprints.id.shared.replaceSecureApiClientWithFailingClientProvider
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTools.*
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_LOCAL_DB_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_SECRET
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import io.realm.Realm
@@ -30,7 +33,7 @@ import javax.inject.Inject
 @LargeTest
 class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
 
-    override lateinit var peopleRealmConfiguration: RealmConfiguration
+    override var peopleRealmConfiguration: RealmConfiguration? = null
 
     @Rule
     @JvmField
