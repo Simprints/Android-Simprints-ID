@@ -16,15 +16,15 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.sessionEvents.createFakeClosedSession
 import com.simprints.id.shared.waitForCompletionAndAssertNoErrors
 import com.simprints.id.shared.whenever
 import com.simprints.id.testSnippets.*
-import com.simprints.id.testTemplates.FirstUse
-import com.simprints.id.testTools.DEFAULT_PROJECT_ID
-import com.simprints.id.testTools.DEFAULT_REALM_KEY
+import com.simprints.id.testTemplates.FirstUseLocalAndRemote
 import com.simprints.id.testTools.adapters.toCalloutCredentials
 import com.simprints.id.testTools.models.TestProject
 import com.simprints.id.testTools.remote.RemoteTestingManager
@@ -48,10 +48,10 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUse {
+class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseLocalAndRemote {
 
-    override lateinit var peopleRealmConfiguration: RealmConfiguration
-    override lateinit var sessionsRealmConfiguration: RealmConfiguration
+    override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     override lateinit var testProject: TestProject
 
@@ -94,7 +94,7 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUse 
             FingerIdentifier.LEFT_THUMB to true,
             FingerIdentifier.LEFT_INDEX_FINGER to true))
 
-        super<FirstUse>.setUp()
+        super<FirstUseLocalAndRemote>.setUp()
         signOut()
     }
 

@@ -13,8 +13,13 @@ import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.ReplaceRule
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTools.*
-import com.simprints.id.testTools.models.TestCalloutCredentials
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_LOCAL_DB_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_SECRET
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.shared.models.TestCalloutCredentials
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.mockscanner.MockBluetoothAdapter
@@ -41,8 +46,8 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     private val invalidSecret = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
 
-    override lateinit var peopleRealmConfiguration: RealmConfiguration
-    override lateinit var sessionsRealmConfiguration: RealmConfiguration
+    override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule
     @JvmField

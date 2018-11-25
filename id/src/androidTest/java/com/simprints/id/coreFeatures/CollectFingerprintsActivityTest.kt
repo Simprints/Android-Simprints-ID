@@ -25,7 +25,8 @@ import com.simprints.id.testTools.ActivityUtils.getCurrentActivity
 import com.simprints.id.testTools.ActivityUtils.launchCollectFingerprintsActivity
 import com.simprints.id.testTools.ScannerUtils.setupScannerForCollectingFingerprints
 import com.simprints.id.scanner.ScannerManager
-import com.simprints.id.testTools.DEFAULT_REALM_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
+
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
@@ -45,8 +46,8 @@ import javax.inject.Inject
 @LargeTest
 class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
 
-    override lateinit var peopleRealmConfiguration: RealmConfiguration
-    override lateinit var sessionsRealmConfiguration: RealmConfiguration
+    override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule @JvmField val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
 

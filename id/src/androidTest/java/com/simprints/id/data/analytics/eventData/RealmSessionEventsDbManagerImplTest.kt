@@ -17,12 +17,12 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.whenever
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTools.DEFAULT_REALM_KEY
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
@@ -39,8 +39,8 @@ import javax.inject.Inject
 @SmallTest
 class RealmSessionEventsDbManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
 
-    override lateinit var peopleRealmConfiguration: RealmConfiguration
-    override lateinit var sessionsRealmConfiguration: RealmConfiguration
+    override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     private val testProjectId1 = "test_project1"
     private val testProjectId2 = "test_project2"
