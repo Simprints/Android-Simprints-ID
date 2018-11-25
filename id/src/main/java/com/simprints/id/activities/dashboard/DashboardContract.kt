@@ -19,7 +19,6 @@ interface DashboardContract {
     interface Presenter : BasePresenter {
         val cardsModelsList: ArrayList<DashboardCard>
 
-        fun pause()
         fun userDidWantToRefreshCardsIfPossible()
         fun userDidWantToSync()
         fun userDidWantToLogout()

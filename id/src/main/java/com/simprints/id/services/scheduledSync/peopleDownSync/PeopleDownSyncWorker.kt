@@ -8,10 +8,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import timber.log.Timber
-import java.text.DateFormat
-import java.util.*
 import javax.inject.Inject
 
 class PeopleDownSyncWorker: Worker() {
@@ -37,7 +34,7 @@ class PeopleDownSyncWorker: Worker() {
         } catch (throwable: Throwable) {
             Timber.e(throwable)
             Timber.d("DownSync task failure")
-            Result.FAILURE
+            Result.RETRY
         }
     }
 
