@@ -29,9 +29,6 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.json.JsonHelper
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.observers.TestObserver
-import io.reactivex.schedulers.Schedulers
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
@@ -43,12 +40,14 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
+@Suppress("UNCHECKED_CAST")
 @RunWith(RobolectricTestRunner::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class PeopleDownSyncTaskTest: RxJavaTest {
+class PeopleDownSyncTaskTest : RxJavaTest {
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
+    private lateinit var remotePeopleApi: PeopleRemoteInterface
     private lateinit var syncStatusDatabaseModel: SyncStatusDao
 
 
@@ -57,7 +56,6 @@ class PeopleDownSyncTaskTest: RxJavaTest {
     private val syncStatusDatabase: SyncStatusDatabase = mock()
     private val loginInfoManager: LoginInfoManager = mock()
     val preferencesManager: PreferencesManager = mock()
-    private val peopleRemoteInterface = Mockito.mock(PeopleRemoteInterface::class.java)
 
     @Before
     fun setUp() {
@@ -67,14 +65,11 @@ class PeopleDownSyncTaskTest: RxJavaTest {
         whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just(""))
 
         mockServer.start()
-        apiClient = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl)
-        whenever(syncStatusDatabase.syncStatusModel).thenReturn(Mockito.mock(SyncStatusDao::class.java))
-        syncStatusDatabaseModel = syncStatusDatabase.syncStatusModel
+        setupApi()
     }
 
     @Test
     fun downloadPatientsForGlobalSync_shouldSuccess() {
-        PeopleRemoteInterface.baseUrl = this.mockServer.url("/").toString()
         val localDbMock = Mockito.mock(LocalDbManager::class.java)
 
         //Params
@@ -83,32 +78,17 @@ class PeopleDownSyncTaskTest: RxJavaTest {
         val nPeopleToDownload = 22000
         val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
 
-        val testObserver = makeFakeDownloadRequest(
-            peopleToDownload,
-            25000,
-            localDbMock,
-            3000,
-            syncParams
-        )
-        testObserver.awaitTerminalEvent()
-
-        testObserver
-            .assertNoErrors()
-            .assertComplete()
-
-        val peopleCountRequestUrl = mockServer.takeRequest().requestUrl
-        assertPathUrlParam(peopleCountRequestUrl, projectIdTest)
+        makeFakeDownloadRequest(peopleToDownload, localDbMock, 3000, syncParams)
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
         assertPathUrlParam(peopleRequestUrl, projectIdTest)
         val lastDownloadedPatient = peopleToDownload.last()
-        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", lastDownloadedPatient.updatedAt!!.time, { it?.toLong() })
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", lastDownloadedPatient.updatedAt!!.time) { it?.toLong() }
         assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", lastDownloadedPatient.patientId)
     }
 
     @Test
     fun downloadPatientsForModuleSync_shouldSuccess() {
-        PeopleRemoteInterface.baseUrl = this.mockServer.url("/").toString()
         val localDbMock = Mockito.mock(LocalDbManager::class.java)
 
         //Params
@@ -118,33 +98,17 @@ class PeopleDownSyncTaskTest: RxJavaTest {
         val nPeopleToDownload = 22000
         val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
 
-        val testObserver = makeFakeDownloadRequest(
-            peopleToDownload,
-            25000,
-            localDbMock,
-            3000,
-            syncParams
-        )
-        testObserver.awaitTerminalEvent()
-
-        testObserver
-            .assertNoErrors()
-            .assertComplete()
-
-        val peopleCountRequestUrl = mockServer.takeRequest().requestUrl
-        assertPathUrlParam(peopleCountRequestUrl, projectIdTest)
-        assertQueryUrlParam(peopleCountRequestUrl, "moduleId", moduleIdTest)
+        makeFakeDownloadRequest(peopleToDownload, localDbMock, 3000, syncParams)
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
         assertPathUrlParam(peopleRequestUrl, projectIdTest)
         assertQueryUrlParam(peopleRequestUrl, "moduleId", moduleIdTest)
-        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", peopleToDownload.last().updatedAt!!.time) { it?.toLong() }
         assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", peopleToDownload.last().patientId)
     }
 
     @Test
     fun downloadPatientsForUserSync_shouldSuccess() {
-        PeopleRemoteInterface.baseUrl = this.mockServer.url("/").toString()
         val localDbMock = Mockito.mock(LocalDbManager::class.java)
 
         //Params
@@ -154,43 +118,30 @@ class PeopleDownSyncTaskTest: RxJavaTest {
         val nPeopleToDownload = 22000
         val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
 
-        val testObserver = makeFakeDownloadRequest(
-            peopleToDownload,
-            25000,
-            localDbMock,
-            3000,
-            syncParams
-        )
-        testObserver.awaitTerminalEvent()
-
-        testObserver
-            .assertNoErrors()
-            .assertComplete()
-
-        val peopleCountRequestUrl = mockServer.takeRequest().requestUrl
-        assertPathUrlParam(peopleCountRequestUrl, projectIdTest)
-        assertQueryUrlParam(peopleCountRequestUrl, "userId", userIdTest)
+        makeFakeDownloadRequest(peopleToDownload, localDbMock, 3000, syncParams)
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
         assertPathUrlParam(peopleRequestUrl, projectIdTest)
         assertQueryUrlParam(peopleRequestUrl, "userId", userIdTest)
-        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", peopleToDownload.last().updatedAt!!.time, { it?.toLong() })
+        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", peopleToDownload.last().updatedAt!!.time) { it?.toLong() }
         assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", peopleToDownload.last().patientId)
+    }
+
+    private fun setupApi() {
+        PeopleRemoteInterface.baseUrl = this.mockServer.url("/").toString()
+        apiClient = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl)
+        remotePeopleApi = apiClient.api
     }
 
     private fun makeFakeDownloadRequest(
         peopleToDownload: List<fb_Person>,
-        nPatientsForProjectIdFromServer: Int,
         localDbMock: LocalDbManager,
         patientsAlreadyInLocalDb: Int,
         syncParams: SyncTaskParameters
-    ): TestObserver<Void> {
+    ) {
 
         //Build fake response for GET patients
         val patientsToDownload = ArrayList(peopleToDownload)
-
-        //Mock GET patients-count
-        mockServer.enqueue(mockResponseForPatientsCount(nPatientsForProjectIdFromServer))
 
         //Mock GET patients
         mockServer.enqueue(mockResponseForDownloadPatients(patientsToDownload))
@@ -207,18 +158,22 @@ class PeopleDownSyncTaskTest: RxJavaTest {
         // Mock when trying to save the syncInfo
         whenever(localDbMock.updateSyncInfo(anyNotNull())).thenReturn(Completable.complete())
 
-        whenever(syncStatusDatabaseModel.updateLastDownSyncTime(any())).doAnswer {  }
-        whenever(syncStatusDatabaseModel.getPeopleToDownSync()).doReturn(25000)
-        whenever(syncStatusDatabaseModel.updatePeopleToDownSyncCount(any())).doAnswer {  }
         whenever(preferencesManager.syncGroup).thenReturn(Constants.GROUP.GLOBAL)
         whenever(preferencesManager.moduleId).thenReturn("")
         whenever(loginInfoManager.getSignedInUserIdOrEmpty()).thenReturn("")
         whenever(loginInfoManager.getSignedInProjectIdOrEmpty()).thenReturn("")
-        whenever(dbManager.remote.getPeopleApiClient()).thenReturn(Single.just(peopleRemoteInterface))
+        whenever(dbManager.remote).thenReturn(remoteDbManagerSpy)
+        whenever(dbManager.remote.getPeopleApiClient()).thenReturn(Single.just(remotePeopleApi))
+
+        whenever(syncStatusDatabase.syncStatusModel).thenReturn(mock())
+        syncStatusDatabaseModel = syncStatusDatabase.syncStatusModel
+        whenever(syncStatusDatabaseModel.getPeopleToDownSync()).doReturn(25000)
+        doNothing().whenever(syncStatusDatabaseModel).updateLastDownSyncTime(any())
+        doNothing().whenever(syncStatusDatabaseModel).updatePeopleToDownSyncCount(any())
 
         val sync = PeopleDownSyncTask(remoteDbManagerSpy, dbManager, preferencesManager, loginInfoManager, localDbMock, syncStatusDatabaseModel)
-
-        return Completable.create {  sync.execute() }.observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).test()
+        sync.syncParams = syncParams
+        sync.execute()
     }
 
     private fun mockLocalDbToSavePatientsFromStream(localDbMock: LocalDbManager) {
@@ -234,12 +189,6 @@ class PeopleDownSyncTaskTest: RxJavaTest {
         }
     }
 
-    private fun mockResponseForPatientsCount(count: Int): MockResponse? {
-        return MockResponse().let {
-            it.setResponseCode(200)
-            it.setBody("{\"count\": $count}")
-        }
-    }
     private fun mockResponseForDownloadPatients(patients: ArrayList<fb_Person>): MockResponse? {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
         return MockResponse().let {

@@ -34,7 +34,7 @@ class PeriodicDownSyncCountWorker: Worker() {
 
             Result.SUCCESS
         } catch (throwable: Throwable) {
-            Result.FAILURE
+            Result.RETRY
         }
     }
 
