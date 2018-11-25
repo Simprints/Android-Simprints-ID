@@ -10,6 +10,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncState
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -32,11 +33,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override val cardsModelsList: ArrayList<DashboardCard> = arrayListOf()
 
-    private var syncCardModel: DashboardSyncCard? = null
-        get() {
-            return cardsModelsList.first { it is DashboardSyncCard } as DashboardSyncCard?
-        }
-
     init {
         component.inject(this)
     }
@@ -44,10 +40,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
     override fun start() {
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
         initCards()
-    }
-
-    override fun pause() {
-
     }
 
     private fun initCards() {
@@ -96,7 +88,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun userDidWantToSync() {
-        peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
+        if (preferencesManager.peopleDownSyncState != PeopleDownSyncState.OFF) {
+            peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
+        }
     }
 
     private fun removeCardIfExist(projectType: DashboardCardType) {
