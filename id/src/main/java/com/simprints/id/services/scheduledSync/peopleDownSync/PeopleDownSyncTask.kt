@@ -75,7 +75,7 @@ class PeopleDownSyncTask(
         var totalDownloaded = 0
         val peopleToDownSync = syncStatusDatabaseModel.getPeopleToDownSync()
         while (reader.hasNext()) {
-            dbManager.local.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
+            localDbManager.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
                 totalDownloaded++
                 syncStatusDatabaseModel.updatePeopleToDownSyncCount(peopleToDownSync - totalDownloaded)
                 val shouldDownloadingBatchStop =
