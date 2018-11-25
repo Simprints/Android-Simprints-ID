@@ -5,7 +5,7 @@ import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionE
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionRealmConfig
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
-import com.simprints.id.testTools.DEFAULT_REALM_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.testTools.models.TestProject
 import com.simprints.id.testTools.remote.RemoteTestingManager
 import io.realm.Realm
@@ -19,10 +19,10 @@ import io.realm.RealmConfiguration
  *
  * ```
  * @RunWith(AndroidJUnit4::class)
- * class AndroidTestClass : DaggerForAndroidTests(), FirstUse {
+ * class AndroidTestClass : DaggerForAndroidTests(), FirstUseLocalAndRemote {
  *
  *     override lateinit var testProject: TestProject
- *     override lateinit var peopleRealmConfiguration
+ *     override var peopleRealmConfiguration: RealmConfiguration? = null
  *
  *     @Inject lateinit var randomGeneratorMock: RandomGenerator
  *     @Inject lateinit var remoteDbManager: RemoteDbManager
@@ -42,7 +42,7 @@ import io.realm.RealmConfiguration
  *
  *         app.initDependencies()
  *
- *         super<FirstUse>.setUp()
+ *         super<FirstUseLocalAndRemote>.setUp()
  *
  *         signOut()
  *     }
@@ -58,12 +58,12 @@ import io.realm.RealmConfiguration
  * }
  * ```
  */
-interface FirstUse : FirstUseLocal {
+interface FirstUseLocalAndRemote : FirstUseLocal {
 
     var testProject: TestProject
 
-    override var peopleRealmConfiguration: RealmConfiguration
-    override var sessionsRealmConfiguration: RealmConfiguration
+    override var peopleRealmConfiguration: RealmConfiguration?
+    override var sessionsRealmConfiguration: RealmConfiguration?
 
     override fun setUp() {
 

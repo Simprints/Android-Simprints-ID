@@ -5,8 +5,8 @@ import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionE
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionRealmConfig
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
-import com.simprints.id.testTools.DEFAULT_LOCAL_DB_KEY
-import com.simprints.id.testTools.DEFAULT_REALM_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_LOCAL_DB_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.testTools.StorageUtils
 import com.simprints.id.testTools.log
 import io.realm.RealmConfiguration
@@ -22,7 +22,7 @@ import io.realm.RealmConfiguration
  * @RunWith(AndroidJUnit4::class)
  * class AndroidTestClass : DaggerForAndroidTests(), FirstUseLocal {
  *
- *     override lateinit var peopleRealmConfiguration
+ *     override var peopleRealmConfiguration: RealmConfiguration? = null
  *
  *     @Inject lateinit var randomGeneratorMock: RandomGenerator
  *     @Inject lateinit var remoteDbManager: RemoteDbManager
@@ -44,7 +44,7 @@ import io.realm.RealmConfiguration
  *
  *         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
  *         peopleRealmConfiguration = PeopleRealmConfig.get(DEFAULT_LOCAL_DB_KEY.projectId, DEFAULT_LOCAL_DB_KEY.value, DEFAULT_LOCAL_DB_KEY.projectId)
- *         super<FirstUse>.setUp()
+ *         super<FirstUseLocal>.setUp()
  *
  *         signOut()
  *     }
@@ -68,11 +68,12 @@ interface FirstUseLocal {
         val defaultPeopleRealmConfiguration = PeopleRealmConfig.get(DEFAULT_LOCAL_DB_KEY.projectId, DEFAULT_LOCAL_DB_KEY.value, DEFAULT_LOCAL_DB_KEY.projectId)
     }
 
-    var peopleRealmConfiguration: RealmConfiguration
-    var sessionsRealmConfiguration: RealmConfiguration
+    var peopleRealmConfiguration: RealmConfiguration?
+    var sessionsRealmConfiguration: RealmConfiguration?
 
     fun setUp() {
         log("FirstUseTest.setUp(): cleaning internal data")
+
         StorageUtils.clearApplicationData(InstrumentationRegistry.getTargetContext())
         StorageUtils.clearRealmDatabase(peopleRealmConfiguration)
         StorageUtils.clearRealmDatabase(sessionsRealmConfiguration)

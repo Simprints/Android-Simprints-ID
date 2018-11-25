@@ -1,8 +1,8 @@
 package com.simprints.id.testTools.adapters
 
-import com.simprints.id.testTools.DEFAULT_MODULE_ID
-import com.simprints.id.testTools.DEFAULT_USER_ID
-import com.simprints.id.testTools.models.TestCalloutCredentials
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.shared.models.TestCalloutCredentials
 import com.simprints.id.testTools.models.TestProject
 
 fun TestProject.toCalloutCredentials(moduleId: String = DEFAULT_MODULE_ID,
