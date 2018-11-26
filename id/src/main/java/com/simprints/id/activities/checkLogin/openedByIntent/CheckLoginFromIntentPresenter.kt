@@ -147,7 +147,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             Singles.zip(
                 fetchAnalyticsId(),
                 fetchPeopleCountInLocalDatabase(),
-                fetchSessionCountInLocalDatabase()) { gaId: String, peopleDbCount: Int, sessionDbCount: Int->
+                fetchSessionCountInLocalDatabase()) { gaId: String, peopleDbCount: Int, sessionDbCount: Int ->
                 return@zip Triple(gaId, peopleDbCount, sessionDbCount)
             }.flatMapCompletable { gaIdAndDbCounts ->
                 populateSessionWithAnalyticsIdAndDbInfo(gaIdAndDbCounts.first, gaIdAndDbCounts.second, gaIdAndDbCounts.third)
@@ -185,9 +185,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     override fun handleActivityResult(requestCode: Int, resultCode: Int, returnCallout: Callout) {
-        sessionEventsManager.updateSession {
+        sessionEventsManager.updateSessionInBackground {
             it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), returnCallout))
             it.closeIfRequired(timeHelper)
-        }.blockingAwait()
+        }
     }
 }
