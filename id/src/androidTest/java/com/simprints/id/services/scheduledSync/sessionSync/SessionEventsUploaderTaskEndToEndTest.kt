@@ -8,7 +8,6 @@ import com.google.common.truth.Truth
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -16,7 +15,6 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
@@ -36,7 +34,6 @@ import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
 import io.reactivex.observers.TestObserver
-import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.After
 import org.junit.Before
@@ -44,7 +41,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
-
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -126,7 +122,7 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseL
 
     private fun executeUpload(): TestObserver<Void> {
         val syncTask = SessionEventsUploaderTask(
-            DEFAULT_PROJECT_ID,
+            testProject.id,
             realmSessionEventsManager.loadSessions().blockingGet().map { it.id }.toTypedArray(),
             sessionEventsManager,
             timeHelper,
