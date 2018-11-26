@@ -379,7 +379,7 @@
     <string name="dashboard_card_enrolment_info">Enrolment Info</string>
     <string name="dashboard_card_sync_now">Sync Now</string>
     <string name="dashboard_card_available_on_phone">Available on Phone</string>
-    <string name="dashboard_card_to_upload">To upload</string>
+    <string name="dashboard_card_to_upload">To Upload</string>
     <string name="dashboard_card_to_download">To Download</string>
 
     <string name="menu_privacy_notice">Privacy Notice</string>

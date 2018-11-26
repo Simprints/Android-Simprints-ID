@@ -5,9 +5,9 @@ import androidx.work.*
 class OneTimeDownSyncCountMaster(
     private val getWorkManager: () -> WorkManager = WorkManager::getInstance
 ) {
-    fun schedule(projectId: String, userId: String) {
+    fun schedule(projectId: String) {
         getWorkManager().beginUniqueWork(
-            getUniqueOneTimeDownSyncCountWorkName(projectId, userId),
+            getUniqueOneTimeDownSyncCountWorkName(projectId),
             ExistingWorkPolicy.REPLACE,
             buildWorkRequest()
         )
@@ -24,8 +24,8 @@ class OneTimeDownSyncCountMaster(
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-    private fun getUniqueOneTimeDownSyncCountWorkName(projectId: String, userId: String) =
-        "$projectId-$userId-$ONE_TIME_DOWN_SYNC_WORK_NAME_SUFFIX"
+    private fun getUniqueOneTimeDownSyncCountWorkName(projectId: String) =
+        "$projectId-$ONE_TIME_DOWN_SYNC_WORK_NAME_SUFFIX"
 
     companion object {
         const val ONE_TIME_DOWN_SYNC_WORK_NAME_SUFFIX = "down-sync-count-one-time"

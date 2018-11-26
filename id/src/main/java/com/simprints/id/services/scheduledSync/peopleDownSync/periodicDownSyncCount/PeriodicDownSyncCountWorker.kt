@@ -29,7 +29,7 @@ class PeriodicDownSyncCountWorker: Worker() {
             syncStatusDatabase.syncStatusModel.updatePeopleToDownSyncCount(numberOfPeopleToDownSync)
 
             if (numberOfPeopleToDownSync > 0) {
-                peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
+                peopleDownSyncMaster.schedule(preferencesManager.projectId)
             }
 
             Result.SUCCESS
