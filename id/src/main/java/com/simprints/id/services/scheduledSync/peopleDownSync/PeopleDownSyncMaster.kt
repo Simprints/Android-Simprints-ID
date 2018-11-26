@@ -6,9 +6,9 @@ import androidx.work.*
 class PeopleDownSyncMaster(
     private val getWorkManager: () -> WorkManager = WorkManager::getInstance
 ) {
-    fun schedule(projectId: String, userId: String) {
+    fun schedule(projectId: String) {
         getWorkManager().beginUniqueWork(
-            getUniqueDownSyncWorkName(projectId, userId),
+            getUniqueDownSyncWorkName(projectId),
             ExistingWorkPolicy.KEEP,
             buildWorkRequest()
         )
@@ -25,8 +25,8 @@ class PeopleDownSyncMaster(
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-    private fun getUniqueDownSyncWorkName(projectId: String, userId: String) =
-        "$projectId-$userId-$DOWN_SYNC_WORK_NAME_SUFFIX"
+    private fun getUniqueDownSyncWorkName(projectId: String) =
+        "$projectId-$DOWN_SYNC_WORK_NAME_SUFFIX"
 
     companion object {
         const val DOWN_SYNC_WORK_NAME_SUFFIX = "down-sync"

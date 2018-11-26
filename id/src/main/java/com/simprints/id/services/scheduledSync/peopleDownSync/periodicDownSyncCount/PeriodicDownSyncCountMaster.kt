@@ -7,9 +7,9 @@ class PeriodicDownSyncCountMaster(
     private val getWorkManager: () -> WorkManager = WorkManager::getInstance
 ) {
 
-    fun schedule(projectId: String, userId: String) {
+    fun schedule(projectId: String) {
         getWorkManager().enqueueUniquePeriodicWork(
-            getUniquePeriodicDownSyncCountWorkName(projectId, userId),
+            getUniquePeriodicDownSyncCountWorkName(projectId),
             ExistingPeriodicWorkPolicy.KEEP,
             buildWorkRequest()
         )
@@ -25,8 +25,8 @@ class PeriodicDownSyncCountMaster(
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-    private fun getUniquePeriodicDownSyncCountWorkName(projectId: String, userId: String) =
-        "$projectId-$userId-$PERIODIC_DOWN_SYNC_COUNT_SUFFIX"
+    private fun getUniquePeriodicDownSyncCountWorkName(projectId: String) =
+        "$projectId-$PERIODIC_DOWN_SYNC_COUNT_SUFFIX"
 
     companion object {
         private const val DOWN_SYNC_REPEAT_INTERVAL = 6L

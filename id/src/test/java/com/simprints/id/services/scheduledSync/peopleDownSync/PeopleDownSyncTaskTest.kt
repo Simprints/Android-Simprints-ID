@@ -51,11 +51,11 @@ class PeopleDownSyncTaskTest : RxJavaTest {
     private lateinit var syncStatusDatabaseModel: SyncStatusDao
 
 
-    val dbManager: DbManager = mock()
+    private val dbManager: DbManager = mock()
     private val remoteDbManagerSpy: RemoteDbManager = spy()
     private val syncStatusDatabase: SyncStatusDatabase = mock()
     private val loginInfoManager: LoginInfoManager = mock()
-    val preferencesManager: PreferencesManager = mock()
+    private val preferencesManager: PreferencesManager = mock()
 
     @Before
     fun setUp() {
@@ -72,7 +72,6 @@ class PeopleDownSyncTaskTest : RxJavaTest {
     fun downloadPatientsForGlobalSync_shouldSuccess() {
         val localDbMock = Mockito.mock(LocalDbManager::class.java)
 
-        //Params
         val projectIdTest = "projectIDTest"
         val syncParams = SyncTaskParameters.GlobalSyncTaskParameters(projectIdTest)
         val nPeopleToDownload = 22000
@@ -91,7 +90,6 @@ class PeopleDownSyncTaskTest : RxJavaTest {
     fun downloadPatientsForModuleSync_shouldSuccess() {
         val localDbMock = Mockito.mock(LocalDbManager::class.java)
 
-        //Params
         val projectIdTest = "projectIdTest"
         val moduleIdTest = "moduleIdTest"
         val syncParams = SyncTaskParameters.ModuleIdSyncTaskParameters(projectIdTest, moduleIdTest)
@@ -111,7 +109,6 @@ class PeopleDownSyncTaskTest : RxJavaTest {
     fun downloadPatientsForUserSync_shouldSuccess() {
         val localDbMock = Mockito.mock(LocalDbManager::class.java)
 
-        //Params
         val projectIdTest = "projectIdTest"
         val userIdTest = "userIdTest"
         val syncParams = SyncTaskParameters.UserSyncTaskParameters(projectIdTest, userIdTest)
@@ -137,31 +134,24 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         peopleToDownload: List<fb_Person>,
         localDbMock: LocalDbManager,
         patientsAlreadyInLocalDb: Int,
-        syncParams: SyncTaskParameters
-    ) {
+        syncParams: SyncTaskParameters) {
 
-        //Build fake response for GET patients
         val patientsToDownload = ArrayList(peopleToDownload)
 
-        //Mock GET patients
         mockServer.enqueue(mockResponseForDownloadPatients(patientsToDownload))
 
-        //Mock saving patient in Realm
         mockLocalDbToSavePatientsFromStream(localDbMock)
 
-        //Mock app has already patients in localDb
         whenever(localDbMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(patientsAlreadyInLocalDb))
-
-        //Mock app RealmSyncInfo for syncParams
         whenever(localDbMock.getSyncInfoFor(anyNotNull())).thenReturn(Single.create { it.onSuccess(rl_SyncInfo(syncParams.toGroup(), rl_Person(peopleToDownload.last()))) })
-
-        // Mock when trying to save the syncInfo
         whenever(localDbMock.updateSyncInfo(anyNotNull())).thenReturn(Completable.complete())
 
         whenever(preferencesManager.syncGroup).thenReturn(Constants.GROUP.GLOBAL)
         whenever(preferencesManager.moduleId).thenReturn("")
+
         whenever(loginInfoManager.getSignedInUserIdOrEmpty()).thenReturn("")
         whenever(loginInfoManager.getSignedInProjectIdOrEmpty()).thenReturn("")
+
         whenever(dbManager.remote).thenReturn(remoteDbManagerSpy)
         whenever(dbManager.remote.getPeopleApiClient()).thenReturn(Single.just(remotePeopleApi))
 
@@ -171,7 +161,8 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         doNothing().whenever(syncStatusDatabaseModel).updateLastDownSyncTime(any())
         doNothing().whenever(syncStatusDatabaseModel).updatePeopleToDownSyncCount(any())
 
-        val sync = PeopleDownSyncTask(remoteDbManagerSpy, dbManager, preferencesManager, loginInfoManager, localDbMock, syncStatusDatabaseModel)
+        val sync = PeopleDownSyncTask(remoteDbManagerSpy, dbManager, preferencesManager,
+            loginInfoManager, localDbMock, syncStatusDatabaseModel)
         sync.syncParams = syncParams
         sync.execute()
     }

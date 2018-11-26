@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.work.State
+import androidx.work.WorkStatus
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.DashboardActivity
@@ -13,6 +16,7 @@ import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.db.sync.room.SyncStatus
 import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.db.sync.viewModel.SyncStatusViewModel
+import com.simprints.id.data.prefs.PreferencesManager
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
@@ -27,6 +31,8 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     private val totalPeopleInLocal: TextView = rootView.findViewById(R.id.totalPeopleInLocal)
 
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+    @Inject lateinit var preferencesManager: PreferencesManager
+    private lateinit var syncStatusViewModel: SyncStatusViewModel
 
     private val dateFormat: DateFormat by lazy {
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
@@ -41,10 +47,12 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
 
         val component = (rootView.context.applicationContext as Application).component
         component.inject(this)
+        syncStatusViewModel = SyncStatusViewModel(syncStatusDatabase, preferencesManager.projectId)
 
         if (cardModel is DashboardSyncCard) {
             cardModel.cardView = this
             observeAndUpdatePeopleToDownloadAndLastSyncTime(cardModel)
+            observeDownSyncStatusAndUpdateButton(cardModel)
             setTotalPeopleInDbCounter(cardModel)
             setUploadCounter(cardModel)
             setListenerForSyncButton(cardModel)
@@ -62,8 +70,21 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
             calculateLastSyncTimeAndUpdateText(it)
         }
 
-        val syncStatusViewModel = SyncStatusViewModel(syncStatusDatabase)
         syncStatusViewModel.syncStatus.observe(rootView.context as DashboardActivity, observer)
+    }
+
+    private fun observeDownSyncStatusAndUpdateButton(cardModel: DashboardSyncCard) {
+
+        val downSyncObserver = Observer<MutableList<WorkStatus>> {
+            if(it.size > 0) {
+                if (it.last().state == State.RUNNING) {
+                    disableSyncButton()
+                } else {
+                    enableSyncButtonAndUpdateSyncInfo(cardModel)
+                }
+            }
+        }
+        syncStatusViewModel.downSyncWorkStatus.observe(rootView.context as DashboardActivity, downSyncObserver)
     }
 
     private fun setTotalPeopleInDbCounter(cardModel: DashboardSyncCard) {
@@ -99,8 +120,19 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     }
 
     private fun setListenerForSyncButton(cardModel: DashboardSyncCard) {
-        if (cardModel.peopleToDownload > 0 || cardModel.peopleToUpload > 0) {
-            syncButton.setOnClickListener { cardModel.onSyncActionClicked(cardModel) }
-        }
+        syncButton.setOnClickListener { cardModel.onSyncActionClicked(cardModel) }
+    }
+
+    private fun disableSyncButton() {
+        syncButton.isClickable = false
+        syncButton.background = ContextCompat.getDrawable(rootView.context, R.drawable.button_rounded_corners_disabled)
+        syncButton.text = rootView.context.resources.getString(R.string.syncing)
+    }
+
+    private fun enableSyncButtonAndUpdateSyncInfo(cardModel: DashboardSyncCard) {
+        syncButton.isClickable = true
+        syncButton.text = rootView.context.resources.getString(R.string.dashboard_card_sync_now)
+        syncButton.background = ContextCompat.getDrawable(rootView.context, R.drawable.button_rounded_corners)
+        cardModel.updateSyncInfo()
     }
 }

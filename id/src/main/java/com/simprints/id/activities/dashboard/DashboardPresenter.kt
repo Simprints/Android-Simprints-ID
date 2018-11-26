@@ -44,7 +44,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun initCards() {
         cardsModelsList.clear()
-        oneTimeDownSyncCountMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
+        oneTimeDownSyncCountMaster.schedule(preferencesManager.projectId)
         Single.merge(
             cardsFactory.createCards()
                 .map {
@@ -72,7 +72,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun initSyncCardModel(it: DashboardSyncCard) {
-        it.onSyncActionClicked = { userDidWantToSync() }
+        it.onSyncActionClicked = {
+            if (it.peopleToUpload > 0 || it.peopleToDownload > 0 ) {
+                userDidWantToSync()
+            }
+        }
     }
 
     private fun addCard(dashboardCard: DashboardCard) {
@@ -89,7 +93,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override fun userDidWantToSync() {
         if (preferencesManager.peopleDownSyncState != PeopleDownSyncState.OFF) {
-            peopleDownSyncMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
+            peopleDownSyncMaster.schedule(preferencesManager.projectId)
         }
     }
 

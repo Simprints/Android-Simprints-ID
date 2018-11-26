@@ -44,7 +44,7 @@ class OneTimeDownSyncCountWorker: Worker() {
 
     private fun scheduleDownSyncWorkIfDownSyncIsActive(projectId: String, userId: String) {
         if (preferencesManager.peopleDownSyncState == PeopleDownSyncState.ACTIVE) {
-            peopleDownSyncMaster.schedule(projectId, userId)
+            peopleDownSyncMaster.schedule(projectId)
         }
     }
 

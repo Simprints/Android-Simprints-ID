@@ -24,7 +24,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
 
     fun scheduleSyncsAndStartPeopleSyncIfNecessary() {
         if (preferencesManager.peopleDownSyncState == PeopleDownSyncState.ACTIVE) {
-            oneTimeDownSyncCountMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
+            oneTimeDownSyncCountMaster.schedule(preferencesManager.projectId)
         }
 
         schedulePeopleSyncIfNecessary()
@@ -34,7 +34,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
     private fun schedulePeopleSyncIfNecessary() {
         if (preferencesManager.peopleDownSyncState == PeopleDownSyncState.ACTIVE ||
             preferencesManager.peopleDownSyncState == PeopleDownSyncState.BACKGROUND) {
-            periodicDownSyncCountMaster.schedule(preferencesManager.projectId, preferencesManager.userId)
+            periodicDownSyncCountMaster.schedule(preferencesManager.projectId)
         }
     }
 

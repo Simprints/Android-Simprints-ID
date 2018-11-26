@@ -200,7 +200,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT)
 
     override var peopleDownSyncState: PeopleDownSyncState
-        by ComplexPreference(prefs, PEOPLE_DOWN_SYNC_STATE_KEY, PEOPLE_DOWN_SYNC_STATE_DEFAULT, downSyncStateSerializer)
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_STATE_KEY, PEOPLE_DOWN_SYNC_STATE_DEFAULT, downSyncStateSerializer)
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()
