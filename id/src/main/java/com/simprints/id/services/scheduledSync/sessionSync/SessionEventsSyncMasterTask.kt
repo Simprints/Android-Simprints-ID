@@ -32,8 +32,7 @@ class SessionEventsSyncMasterTask(
         }
 
     private fun Single<ArrayList<SessionEvents>>.createBatches(): Observable<ArrayList<SessionEvents>> =
-        this.toObservable()
-            .flatMap { Observable.fromIterable(it) }
+        this.flattenAsObservable { it }
             .buffer(BATCH_SIZE)
             .map { ArrayList(it) }
 
