@@ -90,8 +90,8 @@ class SessionEventsUploaderTask(private val projectId: String,
 
             when {
                 result.response()?.code() == 201 -> Completable.complete()
-                result.response() == null -> throw IOException(result.error())
-                else -> throw SessionUploadFailureException()
+                result.response() == null -> Completable.error(IOException(result.error()))
+                else -> Completable.error(SessionUploadFailureException())
             }
         }
 
