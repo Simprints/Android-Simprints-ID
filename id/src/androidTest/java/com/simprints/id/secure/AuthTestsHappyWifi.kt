@@ -6,8 +6,6 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
@@ -15,14 +13,20 @@ import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.ReplaceRule
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTemplates.FirstUseLocal.Companion.realmKey
-import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_LOCAL_DB_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_SECRET
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.shared.models.TestCalloutCredentials
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockScannerManager
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,29 +37,17 @@ import javax.inject.Inject
 @LargeTest
 class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
 
-    private val calloutCredentials = CalloutCredentials(
-        "bWOFHInKA2YaQwrxZ7uJ",
-        "the_one_and_only_module",
-        "the_lone_user",
-        "d95bacc0-7acb-4ff0-98b3-ae6ecbf7398f")
-
-    private val localDbKey = LocalDbKey(
-        calloutCredentials.projectId,
-        realmKey,
-        calloutCredentials.legacyApiKey)
-
-    private val invalidCredentials = CalloutCredentials(
+    private val invalidCredentials = TestCalloutCredentials(
         "beefdeadbeefdeadbeef",
-        "the_one_and_only_module",
-        "the_lone_user",
+        DEFAULT_MODULE_ID,
+        DEFAULT_USER_ID,
         "deadbeef-dead-beef-dead-deaddeadbeef"
     )
-
-    private val projectSecret = "Z8nRspDoiQg1QpnDdKE6U7fQKa0GjpQOwnJ4OcSFWulAcIk4+LP9wrtDn8fRmqacLvkmtmOLl+Kxo1emXLsZ0Q=="
 
     private val invalidSecret = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule
     @JvmField
@@ -77,12 +69,13 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
         app = InstrumentationRegistry.getTargetContext().applicationContext as Application
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
-        setupRandomGeneratorToGenerateKey(realmKey, randomGeneratorMock)
+        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
         app.initDependencies()
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        peopleRealmConfiguration = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
+        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()
 
         signOut()
@@ -90,8 +83,8 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     @Test
     fun validLegacyCredentials_shouldSucceed() {
-        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS.toLegacy(), loginTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInSuccess()
         signOut()
@@ -99,8 +92,8 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     @Test
     fun validCredentials_shouldSucceed() {
-        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInSuccess()
         signOut()
@@ -109,15 +102,15 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
     @Test
     fun invalidIntentLegacyProjectIdAndInvalidSubmittedProjectId_shouldFail() {
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
-        enterCredentialsDirectly(invalidCredentials, projectSecret)
+        enterCredentialsDirectly(invalidCredentials, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInFailure()
     }
 
     @Test
     fun validIntentLegacyProjectIdAndInvalidSubmittedProjectId_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
-        enterCredentialsDirectly(invalidCredentials, projectSecret)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS.toLegacy(), loginTestRule)
+        enterCredentialsDirectly(invalidCredentials, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInFailure()
     }
@@ -125,31 +118,31 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
     @Test
     fun invalidIntentProjectIdAndInvalidSubmittedProjectId_shouldFail() {
         launchAppFromIntentEnrol(invalidCredentials, loginTestRule)
-        enterCredentialsDirectly(invalidCredentials, projectSecret)
+        enterCredentialsDirectly(invalidCredentials, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInFailure()
     }
 
     @Test
     fun validIntentProjectIdAndInvalidSubmittedProjectId_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
-        enterCredentialsDirectly(invalidCredentials, projectSecret)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule)
+        enterCredentialsDirectly(invalidCredentials, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInFailure()
     }
 
     @Test
     fun validProjectIdAndInvalidSecret_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
-        enterCredentialsDirectly(calloutCredentials, invalidSecret)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, invalidSecret)
         pressSignIn()
         ensureSignInFailure()
     }
 
     @Test
     fun validLegacyProjectIdAndInvalidSecret_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
-        enterCredentialsDirectly(calloutCredentials, invalidSecret)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS.toLegacy(), loginTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, invalidSecret)
         pressSignIn()
         ensureSignInFailure()
     }
@@ -165,35 +158,35 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
     @Test
     fun invalidLegacyCredentials_shouldFail() {
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
-        enterCredentialsDirectly(invalidCredentials, projectSecret)
+        enterCredentialsDirectly(invalidCredentials, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInFailure()
     }
 
     @Test
     fun validCredentials_shouldPersistAcrossAppRestart() {
-        launchAppFromIntentEnrolAndDoLogin(calloutCredentials, loginTestRule, projectSecret)
+        launchAppFromIntentEnrolAndDoLogin(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule, DEFAULT_PROJECT_SECRET)
 
-        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule)
         ensureSignInSuccess()
         signOut()
     }
 
     @Test
     fun validLegacyCredentials_shouldPersistAcrossAppRestart() {
-        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS.toLegacy(), loginTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInSuccess()
 
-        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS.toLegacy(), loginTestRule)
         ensureSignInSuccess()
         signOut()
     }
 
     @Test
     fun validCredentialsThenRestartingWithInvalidCredentials_shouldFail() {
-        launchAppFromIntentEnrolAndDoLogin(calloutCredentials, loginTestRule, projectSecret)
+        launchAppFromIntentEnrolAndDoLogin(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule, DEFAULT_PROJECT_SECRET)
 
         launchAppFromIntentEnrol(invalidCredentials, loginTestRule)
         ensureConfigError()
@@ -202,14 +195,19 @@ class AuthTestsHappyWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     @Test
     fun validLegacyCredentialsThenRestartingWithInvalidCredentials_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS.toLegacy(), loginTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInSuccess()
 
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
         ensureConfigError()
         signOut()
+    }
+
+    @After
+    override fun tearDown() {
+        super.tearDown()
     }
 
     private fun signOut() {

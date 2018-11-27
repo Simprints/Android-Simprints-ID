@@ -1,21 +1,20 @@
 package com.simprints.id.coreFeatures
 
-import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
-import android.util.Base64
 import androidx.test.InstrumentationRegistry
 import androidx.test.filters.LargeTest
+import androidx.test.rule.ActivityTestRule
+import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.activities.collectFingerprints.ViewPagerCustom
-import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.whenever
@@ -26,9 +25,7 @@ import com.simprints.id.testSnippets.waitForSplashScreenAppearsAndDisappears
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTools.ActivityUtils.getCurrentActivity
 import com.simprints.id.testTools.ActivityUtils.launchCollectFingerprintsActivity
-import com.simprints.id.testTools.CalloutCredentials
 import com.simprints.id.testTools.ScannerUtils.setupScannerForCollectingFingerprints
-import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
@@ -48,23 +45,10 @@ import javax.inject.Inject
 @LargeTest
 class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
 
-    private val calloutCredentials = CalloutCredentials(
-        "bWOFHInKA2YaQwrxZ7uJ",
-        "the_one_and_only_module",
-        "the_lone_user",
-        "d95bacc0-7acb-4ff0-98b3-ae6ecbf7398f")
-
-    private val realmKey = Base64.decode("Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ==", Base64.NO_WRAP)
-    private val localDbKey = LocalDbKey(
-        calloutCredentials.projectId,
-        realmKey,
-        calloutCredentials.legacyApiKey)
-
     override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
-    @Rule
-    @JvmField
-    val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
+    @Rule @JvmField val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
 
     override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
         PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
@@ -88,12 +72,13 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
 
-        setupRandomGeneratorToGenerateKey(realmKey, randomGeneratorMock)
+        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
         app.initDependencies()
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        peopleRealmConfiguration = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
+        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()
 
         preferencesManager.calloutAction = CalloutAction.REGISTER

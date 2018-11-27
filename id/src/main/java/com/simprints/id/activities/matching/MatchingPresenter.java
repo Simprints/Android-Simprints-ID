@@ -7,8 +7,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
 import com.simprints.id.data.analytics.AnalyticsManager;
-import com.simprints.id.data.analytics.eventData.SessionEventsManager;
-import com.simprints.id.data.analytics.eventData.models.session.SessionEvents;
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager;
+import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.DbManager;
@@ -75,10 +75,10 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         this.matchingView = matchingView;
         this.probe = probe;
         sessionEventsManager
-            .getCurrentSession(loginInfoManager.getSignedInProjectIdOrEmpty())
+            .getCurrentSession()
             .subscribe(new BiConsumer<SessionEvents, Throwable>() {
             @Override
-            public void accept(SessionEvents sessionEvents, Throwable throwable) throws Exception {
+            public void accept(SessionEvents sessionEvents, Throwable throwable) {
                 if (sessionEvents != null && throwable == null) {
                     sessionId = sessionEvents.getId();
                 }

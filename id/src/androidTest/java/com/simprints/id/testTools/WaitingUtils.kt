@@ -6,7 +6,6 @@ import androidx.test.espresso.IdlingPolicies.setMasterPolicyTimeout
 import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
 import java.util.concurrent.TimeUnit
 
-
 fun tryOnUiUntilTimeout(timeout: Long, pollingInterval: Long, snippet: () -> Any?): Any? {
     changeUiTimeoutPolicyIfNeeded(timeout)
     return tryUntilTimeout(timeout, pollingInterval, snippet, ::waitOnUi)

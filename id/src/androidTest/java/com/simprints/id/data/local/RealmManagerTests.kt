@@ -13,7 +13,7 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Constants.GROUP.*
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.shared.PeopleGeneratorUtils.getRandomPeople
-import com.simprints.id.testTools.extensions.awaitAndAssertSuccess
+import com.simprints.id.shared.testTools.extensions.awaitAndAssertSuccess
 import com.simprints.id.tools.json.JsonHelper
 import io.reactivex.Completable
 import io.realm.Realm
@@ -317,6 +317,6 @@ class RealmManagerTests : RealmTestsBase() {
             )
         }
 
-        return realmManager.savePeopleFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams, { false })
+        return realmManager.savePeopleFromStreamAndUpdateSyncInfo(reader, JsonHelper.gson, taskParams) { false }
     }
 }
