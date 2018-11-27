@@ -3,8 +3,8 @@ package com.simprints.id.activities.refusal
 import android.app.Activity
 import com.simprints.id.R
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.events.RefusalEvent
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.domain.events.RefusalEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
 import com.simprints.id.di.AppComponent

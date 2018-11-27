@@ -15,7 +15,6 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
@@ -24,14 +23,14 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.setup.*
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.mockSettingsPreferencesManager
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_LOCAL_DB_KEY
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
+
 import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
@@ -51,7 +50,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 
-
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
@@ -60,6 +58,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
     @Inject lateinit var simNetworkUtilsSpy: SimNetworkUtils
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule @JvmField var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
     @Rule @JvmField val launchActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
@@ -94,7 +93,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         app.initDependencies()
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        peopleRealmConfiguration = PeopleRealmConfig.get(DEFAULT_LOCAL_DB_KEY.projectId, DEFAULT_LOCAL_DB_KEY.value, DEFAULT_LOCAL_DB_KEY.projectId)
+        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
+        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()
 
         preferencesManager.calloutAction = CalloutAction.REGISTER
@@ -107,7 +107,6 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.NOT_PAIRED.alertTitleId)))
-
     }
 
     @Test
@@ -163,7 +162,6 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.DISCONNECTED.alertTitleId)))
     }
 
-
     @Test
     fun unknownBluetoothIssueFromResetUIVeroStep_shouldAnErrorAlert() {
         mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
@@ -188,7 +186,6 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.LOW_BATTERY.alertTitleId)))
     }
-
 
     @Test
     fun unknownBluetoothIssueFromWakingUpVeroStep_shouldAnErrorAlert() {

@@ -5,8 +5,8 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -21,7 +21,7 @@ import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
@@ -99,18 +99,17 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
         scheduledPeopleSyncManagerRule.resolveDependency { super.provideScheduledPeopleSyncManager(preferencesManager) }
 
-    override fun provideScheduledSessionsSyncManager(): ScheduledSessionsSyncManager =
+    override fun provideScheduledSessionsSyncManager(): SessionEventsSyncManager =
         scheduledSessionsSyncManagerRule.resolveDependency { super.provideScheduledSessionsSyncManager() }
 
     override fun provideSessionEventsManager(ctx: Context,
-                                             loginInfoManager: LoginInfoManager,
+                                             sessionEventsSyncManager: SessionEventsSyncManager,
                                              sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                              preferencesManager: PreferencesManager,
                                              timeHelper: TimeHelper,
-                                             remoteDbManager: RemoteDbManager,
                                              analyticsManager: AnalyticsManager): SessionEventsManager =
 
-        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, loginInfoManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, remoteDbManager, analyticsManager) }
+        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, analyticsManager) }
 
     override fun provideSessionEventsLocalDbManager(ctx: Context,
                                             secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
