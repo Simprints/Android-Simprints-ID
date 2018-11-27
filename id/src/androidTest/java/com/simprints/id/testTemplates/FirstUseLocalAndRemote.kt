@@ -1,6 +1,8 @@
 package com.simprints.id.testTemplates
 
 import android.support.test.InstrumentationRegistry
+import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionRealmConfig
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
@@ -61,6 +63,7 @@ interface FirstUseLocalAndRemote : FirstUseLocal {
     var testProject: TestProject
 
     override var peopleRealmConfiguration: RealmConfiguration?
+    override var sessionsRealmConfiguration: RealmConfiguration?
 
     override fun setUp() {
 
@@ -73,6 +76,7 @@ interface FirstUseLocalAndRemote : FirstUseLocal {
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
         peopleRealmConfiguration = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        sessionsRealmConfiguration = SessionRealmConfig.get(RealmSessionEventsDbManagerImpl.SESSIONS_REALM_DB_FILE_NAME, localDbKey.value)
 
         super.setUp()
     }

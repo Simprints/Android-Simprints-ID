@@ -30,7 +30,7 @@ android {
         versionCode 124
         versionName "2018.4.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        //testInstrumentationRunner "com.simprints.id.UiTestsRunner" //To use custom TestApplication
+        //testInstrumentationRunner "com.sitruthmprints.id.UiTestsRunner" //To use custom TestApplication
 
     }
 
@@ -345,7 +345,6 @@ dependencies {
     androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.4'
     testImplementation 'com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4'
     androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4'
-    androidTestImplementation 'com.jayway.awaitility:awaitility:1.6.3'
 
     //Permissions & Locations
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
