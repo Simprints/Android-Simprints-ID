@@ -2,7 +2,6 @@ package com.simprints.id.services.scheduledSync.peopleDownSync
 
 import androidx.work.*
 
-
 class PeopleDownSyncMaster(
     private val getWorkManager: () -> WorkManager = WorkManager::getInstance
 ) {

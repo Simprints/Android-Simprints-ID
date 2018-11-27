@@ -24,6 +24,10 @@ class OneTimeDownSyncCountMaster(
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
+    fun cancelWorker(projectId: String) {
+        getWorkManager().cancelUniqueWork(getUniqueOneTimeDownSyncCountWorkName(projectId))
+    }
+
     private fun getUniqueOneTimeDownSyncCountWorkName(projectId: String) =
         "$projectId-$ONE_TIME_DOWN_SYNC_WORK_NAME_SUFFIX"
 

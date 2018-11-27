@@ -25,6 +25,10 @@ class PeriodicDownSyncCountMaster(
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
+    fun cancelWorker(projectId: String) {
+        getWorkManager().cancelUniqueWork("$projectId-$PERIODIC_DOWN_SYNC_COUNT_SUFFIX")
+    }
+
     private fun getUniquePeriodicDownSyncCountWorkName(projectId: String) =
         "$projectId-$PERIODIC_DOWN_SYNC_COUNT_SUFFIX"
 

@@ -3,7 +3,6 @@ package com.simprints.id.activities.launch
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncState
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountMaster
@@ -24,7 +23,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
 
     fun scheduleSyncsAndStartPeopleSyncIfNecessary() {
         if (preferencesManager.peopleDownSyncState == PeopleDownSyncState.ACTIVE) {
-            oneTimeDownSyncCountMaster.schedule(preferencesManager.projectId)
+            oneTimeDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
         }
 
         schedulePeopleSyncIfNecessary()
@@ -34,7 +33,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
     private fun schedulePeopleSyncIfNecessary() {
         if (preferencesManager.peopleDownSyncState == PeopleDownSyncState.ACTIVE ||
             preferencesManager.peopleDownSyncState == PeopleDownSyncState.BACKGROUND) {
-            periodicDownSyncCountMaster.schedule(preferencesManager.projectId)
+            periodicDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
         }
     }
 
