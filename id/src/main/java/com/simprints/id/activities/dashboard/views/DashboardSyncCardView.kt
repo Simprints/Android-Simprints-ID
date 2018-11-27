@@ -75,7 +75,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     private fun observeDownSyncStatusAndUpdateButton(cardModel: DashboardSyncCard) {
 
         val downSyncObserver = Observer<MutableList<WorkStatus>> {
-            if(it.size > 0) {
+            if (it.size > 0) {
                 if (it.last().state == State.RUNNING) {
                     disableSyncButtonIfEnabled()
                 } else {
@@ -102,7 +102,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
 
     private fun calculateLatestSyncTimeIfPossible(lastDownSyncTime: Long?, lastUpSyncTime: Long?): String {
         val lastDownSyncDate = lastDownSyncTime?.let { Date(it) }
-        val lastUpSyncDate =  lastUpSyncTime?.let { Date(it) }
+        val lastUpSyncDate = lastUpSyncTime?.let { Date(it) }
 
         if (lastDownSyncDate != null && lastUpSyncDate != null) {
             return if (lastDownSyncDate.after(lastUpSyncDate)) {
@@ -131,7 +131,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     }
 
     private fun enableSyncButtonIfDisabledAndUpdateSyncInfo(cardModel: DashboardSyncCard) {
-        if(!syncButton.isClickable) {
+        if (!syncButton.isClickable) {
             syncButton.isClickable = true
             syncButton.background = ContextCompat.getDrawable(rootView.context, R.drawable.button_rounded_corners)
             syncButton.text = rootView.context.resources.getString(R.string.dashboard_card_sync_now)
