@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.simprints.id.activities.CheckLoginFromIntentActivityTest
-import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface

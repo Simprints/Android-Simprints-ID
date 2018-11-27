@@ -51,8 +51,7 @@ object ActivityUtils {
         intent.action = action
         if (testCalloutCredentials.projectId.isNotEmpty())
             intent.putExtra(Constants.SIMPRINTS_PROJECT_ID, testCalloutCredentials.projectId)
-        else
-            intent.putExtra(Constants.SIMPRINTS_API_KEY, testCalloutCredentials.legacyApiKey)
+        else intent.putExtra(Constants.SIMPRINTS_API_KEY, testCalloutCredentials.legacyApiKey)
         intent.putExtra(Constants.SIMPRINTS_USER_ID, testCalloutCredentials.userId)
         intent.putExtra(Constants.SIMPRINTS_MODULE_ID, testCalloutCredentials.moduleId)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -94,5 +93,4 @@ object ActivityUtils {
             return activity[0]
         }
     }
-
 }
