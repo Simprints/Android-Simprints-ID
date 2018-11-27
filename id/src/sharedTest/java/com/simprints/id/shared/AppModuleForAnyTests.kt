@@ -97,9 +97,6 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideSecureApiInterface(): SecureApiInterface =
         secureApiInterfaceRule.resolveDependency { super.provideSecureApiInterface() }
 
-    override fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
-        scheduledPeopleSyncManagerRule.resolveDependency { super.provideScheduledPeopleSyncManager(preferencesManager) }
-
     override fun provideScheduledSessionsSyncManager(): SessionEventsSyncManager =
         scheduledSessionsSyncManagerRule.resolveDependency { super.provideScheduledSessionsSyncManager() }
 
