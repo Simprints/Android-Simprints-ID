@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import androidx.test.InstrumentationRegistry
-import android.support.test.filters.LargeTest
+import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
@@ -9,17 +9,16 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
-import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.id.shared.DependencyRule.ReplaceRule
-import com.simprints.id.testSnippets.*
-import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_LOCAL_DB_KEY
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.shared.DependencyRule.MockRule
+import com.simprints.id.shared.DependencyRule.ReplaceRule
 import com.simprints.id.shared.models.TestCalloutCredentials
+import com.simprints.id.testSnippets.*
+import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.mockscanner.MockBluetoothAdapter

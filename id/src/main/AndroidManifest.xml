@@ -141,9 +141,6 @@
                 <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
             </intent-filter>
         </service>
-        <service
-            android:name=".services.sync.SyncService"
-            android:exported="false" />
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
