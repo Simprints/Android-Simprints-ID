@@ -64,7 +64,7 @@ class GuidSelectionServiceTest : DaggerForAndroidTests() {
         val simHelper = SimHelper(DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId, DEFAULT_TEST_CALLOUT_CREDENTIALS.userId)
         simHelper.confirmIdentity(app, session.id, "some_guid_confirmed")
 
-        tryOnSystemUntilTimeout(30, 2) {
+        tryOnSystemUntilTimeout(10000, 500) {
             val potentialSessionWithGUIDEvent = sessionEventsManagerSpy.getCurrentSession().blockingGet()
             if (potentialSessionWithGUIDEvent.events.findLast { it is GuidSelectionEvent } == null) {
                 throw Exception("GuidSelectionEvent not generated yet. Still waiting for it.")
