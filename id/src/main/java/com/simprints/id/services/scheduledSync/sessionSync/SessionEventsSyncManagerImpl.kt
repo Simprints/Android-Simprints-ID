@@ -7,16 +7,14 @@ open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
 
     override fun scheduleSyncIfNecessary() = createAndEnqueueRequest()
 
-    private fun createAndEnqueueRequest(): PeriodicWorkRequest =
+    private fun createAndEnqueueRequest() {
         PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
             .setConstraints(getConstraints())
             .addTag(MASTER_WORKER_TAG)
             .build().also {
                 WorkManager.getInstance().enqueueUniquePeriodicWork(MASTER_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, it)
             }
-//            .also {
-//                WorkManager.getInstance().enqueue(OneTimeWorkRequestBuilder<SessionEventsMasterWorker>().build())
-//            }
+    }
 
     private fun getConstraints() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)

@@ -25,18 +25,17 @@ class SessionEventsSyncMasterTask(
             .createBatches()
             .registerOneTimeUploader()
 
-    private fun Single<ArrayList<SessionEvents>>.cancelPreviousUploadTasks(): Single<ArrayList<SessionEvents>> =
+    private fun Single<ArrayList<SessionEvents>>.cancelPreviousUploadTasks(): Single<List<SessionEvents>> =
         this.map {
             getWorkManager().cancelAllWorkByTag(SESSIONS_TO_UPLOAD_TAG)
             it
         }
 
-    private fun Single<ArrayList<SessionEvents>>.createBatches(): Observable<ArrayList<SessionEvents>> =
+    private fun Single<List<SessionEvents>>.createBatches(): Observable<List<SessionEvents>> =
         this.flattenAsObservable { it }
             .buffer(BATCH_SIZE)
-            .map { ArrayList(it) }
 
-    private fun Observable<ArrayList<SessionEvents>>.registerOneTimeUploader(): Completable =
+    private fun Observable<List<SessionEvents>>.registerOneTimeUploader(): Completable =
         this.flatMapCompletable { sessions ->
             Completable.fromAction {
                 getWorkManager().enqueue(buildWorkRequest(sessions.map { it.id }.toTypedArray()))
