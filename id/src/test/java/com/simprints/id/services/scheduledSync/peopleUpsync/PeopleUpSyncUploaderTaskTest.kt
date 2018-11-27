@@ -4,7 +4,6 @@ import com.nhaarman.mockito_kotlin.*
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.sync.room.SyncStatusDao
-import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
@@ -15,6 +14,7 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyLong
 import java.text.DateFormat
 import java.util.*
 
@@ -180,7 +180,7 @@ class PeopleUpSyncUploaderTaskTest {
     }
 
     private fun mockSyncStatusModel() {
-        whenever(syncStatusModel.updateLastUpSyncTime(dateFormat.format(Date()))).then { }
+        whenever(syncStatusModel.updateLastUpSyncTime(anyLong())).then { }
     }
 
     private fun verifyLocalPeopleQueries(vararg queryResults: List<Person>) {

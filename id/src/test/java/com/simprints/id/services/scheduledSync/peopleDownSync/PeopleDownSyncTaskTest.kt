@@ -35,6 +35,8 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
@@ -158,8 +160,8 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         whenever(syncStatusDatabase.syncStatusModel).thenReturn(mock())
         syncStatusDatabaseModel = syncStatusDatabase.syncStatusModel
         whenever(syncStatusDatabaseModel.getPeopleToDownSync()).doReturn(25000)
-        doNothing().whenever(syncStatusDatabaseModel).updateLastDownSyncTime(any())
-        doNothing().whenever(syncStatusDatabaseModel).updatePeopleToDownSyncCount(any())
+        doNothing().whenever(syncStatusDatabaseModel).updateLastDownSyncTime(anyLong())
+        doNothing().whenever(syncStatusDatabaseModel).updatePeopleToDownSyncCount(anyInt())
 
         val sync = PeopleDownSyncTask(remoteDbManagerSpy, dbManager, preferencesManager,
             loginInfoManager, localDbMock, syncStatusDatabaseModel)
