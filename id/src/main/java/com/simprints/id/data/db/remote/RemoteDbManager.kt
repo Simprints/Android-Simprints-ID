@@ -2,7 +2,7 @@ package com.simprints.id.data.db.remote
 
 import com.google.firebase.FirebaseApp
 import com.google.gson.JsonElement
-import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
+import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface

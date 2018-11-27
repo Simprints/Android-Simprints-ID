@@ -14,10 +14,14 @@ import android.view.WindowManager
 import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
+import com.simprints.id.shared.models.TestCalloutCredentials
 import com.simprints.libsimprints.Constants
 import java.util.*
 
 object ActivityUtils {
+
+    fun checkLoginFromIntentActivityTestRule() =
+        ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
     private val permissions = ArrayList(Arrays.asList(
         Manifest.permission.ACCESS_NETWORK_STATE,
@@ -29,11 +33,11 @@ object ActivityUtils {
         Manifest.permission.VIBRATE
     ))
 
-    fun launchActivityAndRunOnUiThread(calloutCredentials: CalloutCredentials,
+    fun launchActivityAndRunOnUiThread(testCalloutCredentials: TestCalloutCredentials,
                                        action: String,
                                        activityTestRule: ActivityTestRule<*>,
                                        verifyGuidExtra: String? = null) {
-        val intent = createIntent(calloutCredentials, action)
+        val intent = createIntent(testCalloutCredentials, action)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         if (verifyGuidExtra != null) intent.putExtra(Constants.SIMPRINTS_VERIFY_GUID, verifyGuidExtra)
         activityTestRule.launchActivity(intent)
@@ -41,16 +45,15 @@ object ActivityUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) grantPermissions()
     }
 
-    private fun createIntent(calloutCredentials: CalloutCredentials, action: String): Intent {
+    private fun createIntent(testCalloutCredentials: TestCalloutCredentials, action: String): Intent {
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
         val intent = Intent(targetContext, CheckLoginFromIntentActivity::class.java)
         intent.action = action
-        if (calloutCredentials.projectId.isNotEmpty())
-            intent.putExtra(Constants.SIMPRINTS_PROJECT_ID, calloutCredentials.projectId)
-        else
-            intent.putExtra(Constants.SIMPRINTS_API_KEY, calloutCredentials.legacyApiKey)
-        intent.putExtra(Constants.SIMPRINTS_USER_ID, calloutCredentials.userId)
-        intent.putExtra(Constants.SIMPRINTS_MODULE_ID, calloutCredentials.moduleId)
+        if (testCalloutCredentials.projectId.isNotEmpty())
+            intent.putExtra(Constants.SIMPRINTS_PROJECT_ID, testCalloutCredentials.projectId)
+        else intent.putExtra(Constants.SIMPRINTS_API_KEY, testCalloutCredentials.legacyApiKey)
+        intent.putExtra(Constants.SIMPRINTS_USER_ID, testCalloutCredentials.userId)
+        intent.putExtra(Constants.SIMPRINTS_MODULE_ID, testCalloutCredentials.moduleId)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         return intent
     }
@@ -90,5 +93,4 @@ object ActivityUtils {
             return activity[0]
         }
     }
-
 }

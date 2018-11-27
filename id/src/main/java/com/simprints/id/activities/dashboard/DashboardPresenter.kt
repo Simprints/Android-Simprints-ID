@@ -4,6 +4,8 @@ import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.sync.SyncManager
 import com.simprints.id.data.db.sync.models.SyncManagerState
@@ -33,6 +35,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
+    @Inject lateinit var sessionEventManager: SessionEventsManager
 
     private var started: AtomicBoolean = AtomicBoolean(false)
 
@@ -165,6 +168,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override fun logout() {
         dbManager.signOut()
+        sessionEventManager.signOut()
     }
 
     override fun userDidWantToLogout() {
