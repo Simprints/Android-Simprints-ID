@@ -29,8 +29,7 @@ class OneTimeDownSyncCountWorker: Worker() {
             syncStatusDatabase.syncStatusModel.updatePeopleToDownSyncCount(numberOfPeopleToDownSync)
 
             if (numberOfPeopleToDownSync > 0) {
-                scheduleDownSyncWorkIfDownSyncIsActive(preferencesManager.projectId,
-                    preferencesManager.userId)
+                scheduleDownSyncWorkIfDownSyncIsActive(preferencesManager.projectId)
             }
 
             Result.SUCCESS
@@ -42,7 +41,7 @@ class OneTimeDownSyncCountWorker: Worker() {
     private fun executeDownSyncCountTask() = PeopleDownSyncCountTask(remoteDbManager, dbManager,
             preferencesManager, loginInfoManager).execute().blockingGet()
 
-    private fun scheduleDownSyncWorkIfDownSyncIsActive(projectId: String, userId: String) {
+    private fun scheduleDownSyncWorkIfDownSyncIsActive(projectId: String) {
         if (preferencesManager.peopleDownSyncState == PeopleDownSyncState.ACTIVE) {
             peopleDownSyncMaster.schedule(projectId)
         }
