@@ -123,7 +123,7 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseL
     private fun executeUpload(): TestObserver<Void> {
         val syncTask = SessionEventsUploaderTask(
             testProject.id,
-            realmSessionEventsManager.loadSessions().blockingGet().map { it.id }.toTypedArray(),
+            realmSessionEventsManager.loadSessions().blockingGet().map { it.id },
             sessionEventsManager,
             timeHelper,
             remoteDbManager.getSessionsApiClient().blockingGet())

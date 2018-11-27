@@ -22,8 +22,8 @@ class SessionEventsUploaderWorker : Worker() {
         remoteDbManager.getSessionsApiClient().blockingGet()
     }
 
-    private val sessionsIdsToUpload by lazy {
-        inputData.getStringArray(SessionEventsSyncMasterTask.SESSIONS_IDS_KEY)
+    private val sessionIdsToUpload by lazy {
+        inputData.getStringArray(SessionEventsSyncMasterTask.SESSIONS_IDS_KEY)?.toList()
             ?: throw IllegalArgumentException("Sessions ids required")
     }
 
@@ -38,7 +38,7 @@ class SessionEventsUploaderWorker : Worker() {
         return try {
             val task = SessionEventsUploaderTask(
                 signedProjectId,
-                sessionsIdsToUpload,
+                sessionIdsToUpload,
                 sessionEventsManager,
                 timeHelper,
                 sessionsApiClient)

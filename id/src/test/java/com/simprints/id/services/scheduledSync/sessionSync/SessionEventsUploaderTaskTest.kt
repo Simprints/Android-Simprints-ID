@@ -152,7 +152,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
     private fun executeUpload(): TestObserver<Void> {
         val syncTask = SessionEventsUploaderTask(
             "bWOFHInKA2YaQwrxZ7uJ",
-            sessionsInFakeDb.map { it.id }.toTypedArray(),
+            sessionsInFakeDb.map { it.id },
             sessionsEventsManagerMock,
             timeHelper,
             sessionsRemoteInterface)

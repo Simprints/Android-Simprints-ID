@@ -16,7 +16,7 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class SessionEventsUploaderTask(private val projectId: String,
-                                private val sessionsIds: Array<String>,
+                                private val sessionsIds: List<String>,
                                 private val sessionEventsManager: SessionEventsManager,
                                 private val timeHelper: TimeHelper,
                                 private val sessionApiClient: SessionsRemoteInterface) {
@@ -38,14 +38,14 @@ class SessionEventsUploaderTask(private val projectId: String,
             .checkUploadSucceed()
             .deleteSessionsFromDb()
 
-    private fun Single<Array<String>>.loadSessionsFromDb(): Single<Array<SessionEvents>> =
+    private fun Single<List<String>>.loadSessionsFromDb(): Single<List<SessionEvents>> =
         this.map {
             Timber.d("SessionEventsUploaderTask loadSessionsFromDb()")
-            it.map { session -> sessionEventsManager.loadSessionById(session).blockingGet() }.toTypedArray()
+            it.map { session -> sessionEventsManager.loadSessionById(session).blockingGet() }
         }
 
     @SuppressLint("CheckResult")
-    private fun Single<Array<SessionEvents>>.closeOpenSessionsAndUpdateUploadTime(): Single<Array<SessionEvents>> =
+    private fun Single<List<SessionEvents>>.closeOpenSessionsAndUpdateUploadTime(): Single<List<SessionEvents>> =
         this.flatMap { sessions ->
             Timber.d("SessionEventsUploaderTask closeOpenSessionsAndUpdateUploadTime()")
 
@@ -58,21 +58,21 @@ class SessionEventsUploaderTask(private val projectId: String,
         }
 
     @SuppressLint("CheckResult")
-    private fun Single<Array<SessionEvents>>.filterClosedSessions(): Single<Array<SessionEvents>> =
+    private fun Single<List<SessionEvents>>.filterClosedSessions(): Single<List<SessionEvents>> =
         this.flatMap { sessions ->
             Timber.d("SessionEventsUploaderTask filterClosedSessions()")
 
-            Single.just(sessions.filter { it.isClosed() }.toTypedArray())
+            Single.just(sessions.filter { it.isClosed() })
         }
 
     @SuppressLint("CheckResult")
-    private fun Single<Array<SessionEvents>>.uploadClosedSessionsOrThrowIfNoSessions(): Single<Result<Void?>> =
+    private fun Single<List<SessionEvents>>.uploadClosedSessionsOrThrowIfNoSessions(): Single<Result<Void?>> =
         this.flatMap { sessions ->
             if (sessions.isEmpty())
                 throw NoSessionsFoundException()
 
             sessions.forEach { Timber.d("SessionEventsUploaderTask uploadClosedSessionsOrThrowIfNoSessions: ${it.id}") }
-            sessionApiClient.uploadSessions(projectId, hashMapOf("sessions" to sessions))
+            sessionApiClient.uploadSessions(projectId, hashMapOf("sessions" to sessions.toTypedArray()))
         }
 
     private fun forceSessionToCloseIfOpenAndNotInProgress(session: SessionEvents, timeHelper: TimeHelper) {
