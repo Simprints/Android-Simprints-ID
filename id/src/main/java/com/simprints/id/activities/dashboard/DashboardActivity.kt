@@ -18,6 +18,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.launchAlert
+import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
 import javax.inject.Inject
@@ -135,5 +136,13 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun launchAlertView(error: ALERT_TYPE) {
         this.launchAlert(error)
+    }
+
+    override fun showToastForUserOffline() {
+        showToast(R.string.login_no_network)
+    }
+
+    override fun showToastForRecordsUpToDate() {
+        showToast(R.string.records_up_to_date)
     }
 }

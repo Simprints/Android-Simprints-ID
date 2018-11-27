@@ -8,7 +8,6 @@ import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
 
-
 class PeopleDownSyncCountTask(
     private val remoteDbManager: RemoteDbManager,
     private val dbManager: DbManager,

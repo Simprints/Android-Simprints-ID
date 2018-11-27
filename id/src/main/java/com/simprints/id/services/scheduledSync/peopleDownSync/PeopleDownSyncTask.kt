@@ -19,8 +19,6 @@ import timber.log.Timber
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.Reader
-import java.text.DateFormat
-import java.util.*
 
 class PeopleDownSyncTask(
     val remoteDbManager: RemoteDbManager,
@@ -37,10 +35,6 @@ class PeopleDownSyncTask(
     var syncParams by lazyVar {
         SyncTaskParameters.build(preferencesManager.syncGroup,
             preferencesManager.moduleId, loginInfoManager)
-    }
-
-    private val dateFormat: DateFormat by lazy {
-        DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
     fun execute() {
@@ -95,7 +89,7 @@ class PeopleDownSyncTask(
         totalDownloaded % maxPatientsForBatch == 0
 
     private fun updateDownSyncTimestampOnBatchDownload() {
-        syncStatusDatabaseModel.updateLastDownSyncTime(dateFormat.format(Date()))
+        syncStatusDatabaseModel.updateLastDownSyncTime(System.currentTimeMillis())
     }
 
     private fun finishDownload(reader: JsonReader,

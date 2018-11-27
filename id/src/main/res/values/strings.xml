@@ -360,6 +360,7 @@
     <string name="account_menu">Account</string>
     <string name="nav_logout">Logout</string>
     <string name="dashboard_card_project_title">Project</string>
+    <string name="records_up_to_date">All records are updated</string>
 
     <string name="dashboard_card_localdb_sync_user_title">People enrolled by user</string>
     <string name="dashboard_card_localdb_sync_project_title">People enrolled in project</string>

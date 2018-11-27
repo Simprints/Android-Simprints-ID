@@ -11,8 +11,6 @@ import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import io.reactivex.Flowable
 import timber.log.Timber
 import java.io.IOException
-import java.text.DateFormat
-import java.util.*
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
@@ -30,10 +28,6 @@ class PeopleUpSyncUploaderTask(
      * @throws TransientSyncFailureException if a temporary network / backend error caused
      * the sync to fail.
      */
-
-    private val dateFormat: DateFormat by lazy {
-        DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
-    }
 
     fun execute() {
         checkUserIsSignedIn()
@@ -95,7 +89,7 @@ class PeopleUpSyncUploaderTask(
     }
 
     private fun updateLastUpSyncTime() {
-        syncStatusModel.updateLastUpSyncTime(dateFormat.format(Date()))
+        syncStatusModel.updateLastUpSyncTime(System.currentTimeMillis())
     }
 
 }

@@ -20,10 +20,10 @@ interface SyncStatusDao {
     fun updatePeopleToDownSyncCount(peopleToDownSync: Int)
 
     @Query("update SyncStatus set lastUpSyncTime = :lastUpSyncTime where id = '$SYNC_STATUS_CONST_ID'")
-    fun updateLastUpSyncTime(lastUpSyncTime: String)
+    fun updateLastUpSyncTime(lastUpSyncTime: Long)
 
     @Query("update SyncStatus set lastDownSyncTime = :lastDownSyncTime where id= '$SYNC_STATUS_CONST_ID'")
-    fun updateLastDownSyncTime(lastDownSyncTime: String)
+    fun updateLastDownSyncTime(lastDownSyncTime: Long)
 
     @Query("select peopleToDownSync from SyncStatus where id = '$SYNC_STATUS_CONST_ID'")
     fun getPeopleToDownSync(): Int

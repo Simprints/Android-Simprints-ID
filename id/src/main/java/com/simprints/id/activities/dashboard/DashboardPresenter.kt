@@ -12,9 +12,12 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncState
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
+import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountMaster
+import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import java.lang.IllegalStateException
 import java.util.*
 import javax.inject.Inject
 
@@ -27,7 +30,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
     @Inject lateinit var oneTimeDownSyncCountMaster: OneTimeDownSyncCountMaster
+    @Inject lateinit var periodicDownSyncCountMaster: PeriodicDownSyncCountMaster
     @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
 
     private val cardsFactory = DashboardCardsFactory(component)
 
@@ -44,7 +49,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun initCards() {
         cardsModelsList.clear()
-        oneTimeDownSyncCountMaster.schedule(preferencesManager.projectId)
+        oneTimeDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty() )
         Single.merge(
             cardsFactory.createCards()
                 .map {
@@ -73,8 +78,10 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun initSyncCardModel(it: DashboardSyncCard) {
         it.onSyncActionClicked = {
-            if (it.peopleToUpload > 0 || it.peopleToDownload > 0 ) {
-                userDidWantToSync()
+            when {
+                userIsOffline() -> view.showToastForUserOffline()
+                weDoNotHaveRecordsToSync(it) -> view.showToastForRecordsUpToDate()
+                weHaveRecordsToSync(it) -> userDidWantToSync()
             }
         }
     }
@@ -105,9 +112,27 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override fun logout() {
         dbManager.signOut()
+        cancelAllDownSyncWorkers()
     }
 
     override fun userDidWantToLogout() {
         view.showConfirmationDialogForLogout()
+    }
+
+    private fun userIsOffline() = try {
+        !simNetworkUtils.isConnected()
+    } catch (e: IllegalStateException) {
+        true
+    }
+
+    private fun weHaveRecordsToSync(dashboardSyncCard: DashboardSyncCard) =
+        dashboardSyncCard.peopleToUpload > 0 || dashboardSyncCard.peopleToDownload > 0
+
+    private fun weDoNotHaveRecordsToSync(dashboardSyncCard: DashboardSyncCard) =
+        dashboardSyncCard.peopleToUpload == 0 && dashboardSyncCard.peopleToDownload == 0
+
+    private fun cancelAllDownSyncWorkers() {
+        oneTimeDownSyncCountMaster.cancelWorker(loginInfoManager.getSignedInProjectIdOrEmpty())
+        periodicDownSyncCountMaster.cancelWorker(loginInfoManager.getSignedInProjectIdOrEmpty())
     }
 }
