@@ -9,21 +9,19 @@ import com.simprints.id.data.analytics.eventData.models.domain.events.GuidSelect
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.testSnippets.launchActivityEnrol
 import com.simprints.id.testSnippets.setupLoginInfoToBeSignedIn
 import com.simprints.id.testTools.ActivityUtils
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
+import com.simprints.id.testTools.tryOnSystemUntilTimeout
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.SimHelper
-import org.awaitility.Awaitility
-import org.awaitility.Duration
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
@@ -66,9 +64,11 @@ class GuidSelectionServiceTest : DaggerForAndroidTests() {
         val simHelper = SimHelper(DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId, DEFAULT_TEST_CALLOUT_CREDENTIALS.userId)
         simHelper.confirmIdentity(app, session.id, "some_guid_confirmed")
 
-        Awaitility.await().atMost(30, TimeUnit.SECONDS).pollDelay(Duration.TWO_SECONDS).until {
+        tryOnSystemUntilTimeout(30, 2) {
             val potentialSessionWithGUIDEvent = sessionEventsManagerSpy.getCurrentSession().blockingGet()
-            potentialSessionWithGUIDEvent.events.findLast { it is GuidSelectionEvent } != null
+            if (potentialSessionWithGUIDEvent.events.findLast { it is GuidSelectionEvent } == null) {
+                throw Exception("GuidSelectionEvent not generated yet. Still waiting for it.")
+            }
         }
 
         scanTestRule.activity.runOnUiThread {
