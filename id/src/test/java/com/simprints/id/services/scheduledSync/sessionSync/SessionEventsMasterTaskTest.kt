@@ -5,6 +5,7 @@ import androidx.work.WorkRequest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.di.DaggerForTests
@@ -29,7 +30,7 @@ import org.robolectric.annotation.Config
 
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsMasterTaskTest: RxJavaTest, DaggerForTests() {
 
     private val projectId = "projectId"
