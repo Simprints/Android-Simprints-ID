@@ -3,8 +3,6 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.activities.checkLogin.CheckLoginContract
-import com.simprints.id.data.analytics.eventData.models.events.ConnectivitySnapshotEvent
-import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
 import com.simprints.id.session.callout.Callout
 
 interface CheckLoginFromIntentContract {

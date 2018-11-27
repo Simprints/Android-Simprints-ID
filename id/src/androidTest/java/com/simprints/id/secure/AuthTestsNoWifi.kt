@@ -6,7 +6,6 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
@@ -34,6 +33,7 @@ import javax.inject.Inject
 class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule
     @JvmField
@@ -59,8 +59,8 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
         replaceRemoteDbManagerApiClientsWithFailingClients(remoteDbManagerSpy)
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        peopleRealmConfiguration = PeopleRealmConfig.get(DEFAULT_LOCAL_DB_KEY.projectId, DEFAULT_LOCAL_DB_KEY.value, DEFAULT_LOCAL_DB_KEY.projectId)
-
+        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
+        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()
     }
 

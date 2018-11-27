@@ -34,6 +34,8 @@ import javax.inject.Inject
 class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocalAndRemote {
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
+
     override lateinit var testProject: TestProject
 
     @Rule @JvmField val enrolTestRule1 = ActivityUtils.checkLoginFromIntentActivityTestRule()
