@@ -2,31 +2,27 @@ package com.simprints.id.coreFeatures
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
-import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
-import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.ReplaceRule
-import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.testSnippets.*
-import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTemplates.FirstUseLocal.Companion.realmKey
-import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testTemplates.FirstUseLocalAndRemote
+import com.simprints.id.testTools.ActivityUtils
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.testTools.adapters.toCalloutCredentials
 import com.simprints.id.testTools.log
+import com.simprints.id.testTools.models.TestProject
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
-import io.realm.Realm
 import io.realm.RealmConfiguration
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -35,69 +31,31 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal {
-
-    private val calloutCredentials = CalloutCredentials(
-        "bWOFHInKA2YaQwrxZ7uJ",
-        "the_one_and_only_module",
-        "the_lone_user",
-        "d95bacc0-7acb-4ff0-98b3-ae6ecbf7398f")
-
-    private val localDbKey = LocalDbKey(
-        calloutCredentials.projectId,
-        realmKey,
-        calloutCredentials.legacyApiKey)
-
-    private val projectSecret = "Z8nRspDoiQg1QpnDdKE6U7fQKa0GjpQOwnJ4OcSFWulAcIk4+LP9wrtDn8fRmqacLvkmtmOLl+Kxo1emXLsZ0Q=="
+class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocalAndRemote {
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
-    @Rule
-    @JvmField
-    val enrolTestRule1 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+    override lateinit var testProject: TestProject
 
-    @Rule
-    @JvmField
-    val enrolTestRule2 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val identifyTestRule1 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val identifyTestRule2 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val verifyTestRule1 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val verifyTestRule2 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val verifyTestRule3 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    @Rule
-    @JvmField
-    val verifyTestRule4 = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+    @Rule @JvmField val enrolTestRule1 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val enrolTestRule2 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val identifyTestRule1 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val identifyTestRule2 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val verifyTestRule1 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val verifyTestRule2 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val verifyTestRule3 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @Rule @JvmField val verifyTestRule4 = ActivityUtils.checkLoginFromIntentActivityTestRule()
 
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var randomGeneratorMock: RandomGenerator
-
-    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
-        PreferencesModuleForAnyTests(remoteConfigRule = DependencyRule.SpyRule)
-    }
+    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
 
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
             randomGeneratorRule = MockRule,
             bluetoothComponentAdapterRule = ReplaceRule { mockBluetoothAdapter })
     }
-
-    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
 
     @Before
     override fun setUp() {
@@ -106,13 +64,11 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal {
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
 
-        setupRandomGeneratorToGenerateKey(realmKey, randomGeneratorMock)
+        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
         app.initDependencies()
 
-        Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        peopleRealmConfiguration = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
-        super<FirstUseLocal>.setUp()
+        super<FirstUseLocalAndRemote>.setUp()
 
         signOut()
     }
@@ -126,9 +82,11 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal {
             *MockFinger.person1TwoFingersAgainGoodScan,
             *MockFinger.person1TwoFingersAgainGoodScan)))
 
+        val testCredentials = testProject.toCalloutCredentials()
+
         // Launch and sign in
-        launchActivityEnrol(calloutCredentials, enrolTestRule1)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchActivityEnrol(testCredentials, enrolTestRule1)
+        enterCredentialsDirectly(testCredentials, testProject.secret)
         pressSignIn()
         // Once signed in proceed to enrol workflow
         fullHappyWorkflow()
@@ -136,13 +94,13 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal {
         val guid = enrolmentReturnedResult(enrolTestRule1)
 
         // Launch app and do an identification workflow
-        launchActivityIdentify(calloutCredentials, identifyTestRule1)
+        launchActivityIdentify(testCredentials, identifyTestRule1)
         fullHappyWorkflow()
         matchingActivityIdentificationCheckFinished(identifyTestRule1)
-//        guidIsTheOnlyReturnedIdentification(identifyTestRule, guid) // FIXME
+        guidIsTheOnlyReturnedIdentification(identifyTestRule1, guid)
 
         // Launch app and do a verification workflow
-        launchActivityVerify(calloutCredentials, verifyTestRule1, guid)
+        launchActivityVerify(testCredentials, verifyTestRule1, guid)
         fullHappyWorkflow()
         matchingActivityVerificationCheckFinished(verifyTestRule1)
         verificationSuccessful(verifyTestRule1, guid)
@@ -162,9 +120,11 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal {
             *MockFinger.person1TwoFingersAgainGoodScan,
             *MockFinger.person2TwoFingersAgainGoodScan)))
 
+        val testCredentials = testProject.toCalloutCredentials()
+
         // Launch and sign in
-        launchActivityEnrol(calloutCredentials, enrolTestRule1)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchActivityEnrol(testCredentials, enrolTestRule1)
+        enterCredentialsDirectly(testCredentials, testProject.secret)
         pressSignIn()
         // Once signed in proceed to enrol person1
         fullHappyWorkflow()
@@ -172,46 +132,51 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocal {
         val person1 = enrolmentReturnedResult(enrolTestRule1)
 
         // Launch app and enrol person2
-        launchActivityEnrol(calloutCredentials, enrolTestRule2)
+        launchActivityEnrol(testCredentials, enrolTestRule2)
         fullHappyWorkflow()
         collectFingerprintsEnrolmentCheckFinished(enrolTestRule2)
         val person2 = enrolmentReturnedResult(enrolTestRule2)
 
         // Launch app and do an identification with person 1
-        launchActivityIdentify(calloutCredentials, identifyTestRule1)
+        launchActivityIdentify(testCredentials, identifyTestRule1)
         fullHappyWorkflow()
         matchingActivityIdentificationCheckFinished(identifyTestRule1)
-//        twoReturnedIdentificationsOneMatchOneNotMatch(identifyTestRule1, person1, person2) // FIXME
+        twoReturnedIdentificationsOneMatchOneNotMatch(identifyTestRule1, person1, person2)
 
         // Launch app and do an identification with person 2
-        launchActivityIdentify(calloutCredentials, identifyTestRule2)
+        launchActivityIdentify(testCredentials, identifyTestRule2)
         fullHappyWorkflow()
         matchingActivityIdentificationCheckFinished(identifyTestRule2)
-//        twoReturnedIdentificationsOneMatchOneNotMatch(identifyTestRule2, person2, person1) // FIXME
+        twoReturnedIdentificationsOneMatchOneNotMatch(identifyTestRule2, person2, person1)
 
         // Launch app and do a verification with person 1, should match
-        launchActivityVerify(calloutCredentials, verifyTestRule1, person1)
+        launchActivityVerify(testCredentials, verifyTestRule1, person1)
         fullHappyWorkflow()
         matchingActivityVerificationCheckFinished(verifyTestRule1)
         verificationSuccessful(verifyTestRule1, person1)
 
         // Launch app and do a verification with person 2, should match
-        launchActivityVerify(calloutCredentials, verifyTestRule2, person2)
+        launchActivityVerify(testCredentials, verifyTestRule2, person2)
         fullHappyWorkflow()
         matchingActivityVerificationCheckFinished(verifyTestRule2)
         verificationSuccessful(verifyTestRule2, person2)
 
         // Launch app and do a verification with person 1 pretending to be person 2, should not match
-        launchActivityVerify(calloutCredentials, verifyTestRule3, person2)
+        launchActivityVerify(testCredentials, verifyTestRule3, person2)
         fullHappyWorkflow()
         matchingActivityVerificationCheckFinished(verifyTestRule3)
         verificationNotAMatch(verifyTestRule3, person2)
 
         // Launch app and do a verification with person 2 pretending to be person 1, should not match
-        launchActivityVerify(calloutCredentials, verifyTestRule4, person1)
+        launchActivityVerify(testCredentials, verifyTestRule4, person1)
         fullHappyWorkflow()
         matchingActivityVerificationCheckFinished(verifyTestRule4)
         verificationNotAMatch(verifyTestRule4, person1)
+    }
+
+    @After
+    override fun tearDown() {
+        super.tearDown()
     }
 
     private fun signOut() {

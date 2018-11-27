@@ -6,8 +6,6 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
@@ -16,8 +14,10 @@ import com.simprints.id.shared.replaceRemoteDbManagerApiClientsWithFailingClient
 import com.simprints.id.shared.replaceSecureApiClientWithFailingClientProvider
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTemplates.FirstUseLocal.Companion.realmKey
-import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_LOCAL_DB_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_SECRET
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import io.realm.Realm
@@ -32,20 +32,8 @@ import javax.inject.Inject
 @LargeTest
 class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
 
-    private val calloutCredentials = CalloutCredentials(
-        "bWOFHInKA2YaQwrxZ7uJ",
-        "the_one_and_only_module",
-        "the_lone_user",
-        "d95bacc0-7acb-4ff0-98b3-ae6ecbf7398f")
-
-    private val localDbKey = LocalDbKey(
-        calloutCredentials.projectId,
-        realmKey,
-        calloutCredentials.legacyApiKey)
-
-    private val projectSecret = "Z8nRspDoiQg1QpnDdKE6U7fQKa0GjpQOwnJ4OcSFWulAcIk4+LP9wrtDn8fRmqacLvkmtmOLl+Kxo1emXLsZ0Q=="
-
     override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule
     @JvmField
@@ -67,27 +55,27 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
         app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
-        setupRandomGeneratorToGenerateKey(realmKey, randomGeneratorMock)
+        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
         replaceRemoteDbManagerApiClientsWithFailingClients(remoteDbManagerSpy)
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        peopleRealmConfiguration = PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
-
+        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
+        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()
     }
 
     @Test
     fun validCredentialsWithoutWifi_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials, loginTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInFailure()
     }
 
     @Test
     fun validLegacyCredentialsWithoutWifi_shouldFail() {
-        launchAppFromIntentEnrol(calloutCredentials.toLegacy(), loginTestRule)
-        enterCredentialsDirectly(calloutCredentials, projectSecret)
+        launchAppFromIntentEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS.toLegacy(), loginTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInFailure()
     }

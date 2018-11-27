@@ -4,7 +4,7 @@ import android.app.IntentService
 import android.content.Intent
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager

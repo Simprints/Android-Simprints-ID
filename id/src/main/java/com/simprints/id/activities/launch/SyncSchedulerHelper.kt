@@ -4,18 +4,18 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncState
-import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountMaster
-import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSyncManager
+import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import javax.inject.Inject
 
 class SyncSchedulerHelper(appComponent: AppComponent) {
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var scheduledSessionsSyncManager: ScheduledSessionsSyncManager
     @Inject lateinit var oneTimeDownSyncCountMaster: OneTimeDownSyncCountMaster
     @Inject lateinit var periodicDownSyncCountMaster: PeriodicDownSyncCountMaster
+    @Inject lateinit var scheduledSessionsSyncManager: SessionEventsSyncManager
 
     init {
         appComponent.inject(this)

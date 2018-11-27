@@ -14,7 +14,7 @@ import java.io.IOException
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
-class PeopleUpSyncUploaderTask(
+class PeopleUpSyncUploaderTask (
     private val loginInfoManager: LoginInfoManager,
     private val localDbManager: LocalDbManager,
     private val remoteDbManager: RemoteDbManager,

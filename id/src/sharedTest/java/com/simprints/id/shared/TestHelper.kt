@@ -1,9 +1,12 @@
 package com.simprints.id.shared
 
+import io.reactivex.observers.TestObserver
 import junit.framework.AssertionFailedError
 import org.junit.Assert.assertEquals
 import org.mockito.Mockito
 import org.mockito.stubbing.OngoingStubbing
+import java.security.SecureRandom
+
 
 inline fun <reified T> mock(): T =
         Mockito.mock(T::class.java)
@@ -55,4 +58,16 @@ inline fun <reified T : Throwable> assertThrows(throwable: T, executable: () -> 
     val thrown = assertThrows<T>(executable)
     assertEquals(throwable, thrown)
     return thrown
+}
+
+fun <T> TestObserver<T>.waitForCompletionAndAssertNoErrors() {
+    this.awaitTerminalEvent()
+    this.assertNoErrors()
+}
+
+fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }
+
+fun <T : Enum<*>> randomEnum(clazz: Class<T>): T {
+    val x = SecureRandom().nextInt(clazz.enumConstants.size)
+    return clazz.enumConstants[x]
 }

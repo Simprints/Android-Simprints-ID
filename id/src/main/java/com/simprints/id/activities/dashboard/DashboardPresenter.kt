@@ -4,6 +4,7 @@ import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCard
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -17,7 +18,6 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
-import java.lang.IllegalStateException
 import java.util.*
 import javax.inject.Inject
 
@@ -33,6 +33,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var periodicDownSyncCountMaster: PeriodicDownSyncCountMaster
     @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
+    @Inject lateinit var sessionEventManager: SessionEventsManager
 
     private val cardsFactory = DashboardCardsFactory(component)
 
@@ -113,6 +114,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     override fun logout() {
         dbManager.signOut()
         cancelAllDownSyncWorkers()
+        sessionEventManager.signOut()
     }
 
     override fun userDidWantToLogout() {
