@@ -1,6 +1,6 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonObject
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.times
@@ -77,8 +77,8 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
         testObserver.waitForCompletionAndAssertNoErrors()
 
         verifyBodyRequestHasSessions(2, mockServer.takeRequest())
-        Truth.assertThat(sessionsInFakeDb.size).isEqualTo(1)
-        Truth.assertThat(sessionsInFakeDb.first().isOpen()).isTrue()
+        assertThat(sessionsInFakeDb.size).isEqualTo(1)
+        assertThat(sessionsInFakeDb.first().isOpen()).isTrue()
     }
 
     @Test
@@ -91,7 +91,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
         testObserver.waitForCompletionAndAssertNoErrors()
 
         verifyBodyRequestHasSessions(1, mockServer.takeRequest())
-        Truth.assertThat(sessionsInFakeDb.size).isEqualTo(0)
+        assertThat(sessionsInFakeDb.size).isEqualTo(0)
     }
 
     @Test
@@ -103,7 +103,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
         testObserver.waitForCompletionAndAssertNoErrors()
 
         verifyBodyRequestHasSessions(2, mockServer.takeRequest())
-        Truth.assertThat(sessionsInFakeDb.size).isEqualTo(0)
+        assertThat(sessionsInFakeDb.size).isEqualTo(0)
     }
 
     @Test
@@ -116,7 +116,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
         testObserver.waitForCompletionAndAssertNoErrors()
 
         verifyBodyRequestHasSessions(2, mockServer.takeRequest())
-        Truth.assertThat(sessionsInFakeDb.size).isEqualTo(1)
+        assertThat(sessionsInFakeDb.size).isEqualTo(1)
     }
 
     @Test
@@ -130,14 +130,14 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
         val testObserver = executeUpload()
         testObserver.awaitTerminalEvent()
 
-        Truth.assertThat(testObserver.errorCount()).isEqualTo(1)
-        Truth.assertThat(testObserver.errors().first()).isInstanceOf(SessionUploadFailureException::class.java)
-        Truth.assertThat(mockServer.requestCount).isEqualTo(1)
+        assertThat(testObserver.errorCount()).isEqualTo(1)
+        assertThat(testObserver.errors().first()).isInstanceOf(SessionUploadFailureException::class.java)
+        assertThat(mockServer.requestCount).isEqualTo(1)
 
         verifyBodyRequestHasSessions(BATCH_SIZE + 1, mockServer.takeRequest())
 
         verify(sessionsEventsManagerMock, times(BATCH_SIZE + 1)).deleteSessions(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
-        Truth.assertThat(sessionsInFakeDb.size).isEqualTo(1)
+        assertThat(sessionsInFakeDb.size).isEqualTo(1)
     }
 
     @Test
@@ -145,8 +145,8 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
         val testObserver = executeUpload()
         testObserver.awaitTerminalEvent()
 
-        Truth.assertThat(testObserver.errorCount()).isEqualTo(1)
-        Truth.assertThat(testObserver.errors().first()).isInstanceOf(NoSessionsFoundException::class.java)
+        assertThat(testObserver.errorCount()).isEqualTo(1)
+        assertThat(testObserver.errors().first()).isInstanceOf(NoSessionsFoundException::class.java)
     }
 
     private fun executeUpload(): TestObserver<Void> {
@@ -164,15 +164,15 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
         setResponseCode(201)
     }
 
-    private fun mockFailureResponseForSessionsUpload() = MockResponse().apply {
-        setResponseCode(500)
+    private fun mockFailureResponseForSessionsUpload(code: Int = 404) = MockResponse().apply {
+        setResponseCode(code)
         setBody(Exception().toString())
     }
 
     private fun verifyBodyRequestHasSessions(nSessions: Int, request: RecordedRequest) {
         val firstBodyRequest = request.body.readUtf8()
         val firstBodyJson = JsonHelper.gson.fromJson(firstBodyRequest, JsonObject::class.java)
-        Truth.assertThat(firstBodyJson.get("sessions").asJsonArray.size()).isEqualTo(nSessions)
+        assertThat(firstBodyJson.get("sessions").asJsonArray.size()).isEqualTo(nSessions)
     }
 
     private fun enqueueResponses(vararg responses: MockResponse) {
