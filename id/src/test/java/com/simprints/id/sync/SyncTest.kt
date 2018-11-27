@@ -2,8 +2,8 @@ package com.simprints.id.sync
 
 import com.google.firebase.FirebaseApp
 import com.google.gson.stream.JsonReader
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.nhaarman.mockito_kotlin.anyOrNull
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager

@@ -7,7 +7,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.JsonElement
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
+import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
+import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
@@ -268,7 +269,8 @@ open class FirebaseManagerImpl(
     private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(
         SessionsRemoteInterface::class.java,
         SessionsRemoteInterface.baseUrl,
-        authToken
+        authToken,
+        jsonAdapter = SessionEventsApiAdapterFactory().gson
     ).api
 
     override fun getProjectApiClient(): Single<ProjectRemoteInterface> =
