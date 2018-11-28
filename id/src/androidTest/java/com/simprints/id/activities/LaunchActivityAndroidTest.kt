@@ -181,7 +181,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         makeConnectToVeroStepSucceeding()
         makeResetVeroUISucceeding()
 
-        doReturn(Completable.error(ScannerLowBatteryException())).`when`(scannerManagerSpy).wakingUpVero()
+        doReturn(Completable.error(ScannerLowBatteryException())).`when`(scannerManagerSpy).wakeUpVero()
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.LOW_BATTERY.alertTitleId)))
@@ -194,7 +194,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         makeConnectToVeroStepSucceeding()
         makeResetVeroUISucceeding()
 
-        doReturn(Completable.error(UnknownBluetoothIssueException())).`when`(scannerManagerSpy).wakingUpVero()
+        doReturn(Completable.error(UnknownBluetoothIssueException())).`when`(scannerManagerSpy).wakeUpVero()
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(ALERT_TYPE.DISCONNECTED.alertTitleId)))
@@ -245,7 +245,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
     }
 
     private fun makeWakingUpVeroStepSucceeding() {
-        doReturn(Completable.complete()).`when`(scannerManagerSpy).wakingUpVero()
+        doReturn(Completable.complete()).`when`(scannerManagerSpy).wakeUpVero()
     }
 
     private fun makeInitVeroStepSucceeding() {
