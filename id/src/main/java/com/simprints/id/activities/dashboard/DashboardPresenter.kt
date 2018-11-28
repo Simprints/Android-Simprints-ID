@@ -81,8 +81,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
         it.onSyncActionClicked = {
             when {
                 userIsOffline() -> view.showToastForUserOffline()
-                weDoNotHaveRecordsToSync(it) -> view.showToastForRecordsUpToDate()
-                weHaveRecordsToSync(it) -> userDidWantToSync()
+                !areThereRecordsToSync(it) -> view.showToastForRecordsUpToDate()
+                areThereRecordsToSync(it) -> userDidWantToSync()
             }
         }
     }
@@ -127,11 +127,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
         true
     }
 
-    private fun weHaveRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
+    private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
         dashboardSyncCardViewModel.peopleToUpload > 0 || dashboardSyncCardViewModel.peopleToDownload > 0
-
-    private fun weDoNotHaveRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
-        dashboardSyncCardViewModel.peopleToUpload == 0 && dashboardSyncCardViewModel.peopleToDownload == 0
 
     private fun cancelAllDownSyncWorkers() {
         oneTimeDownSyncCountMaster.cancelWorker(loginInfoManager.getSignedInProjectIdOrEmpty())
