@@ -10,15 +10,13 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.rxkotlin.subscribeBy
-import java.text.DateFormat
 import javax.inject.Inject
 
 class DashboardSyncCard(component: AppComponent,
                         type: DashboardCardType,
                         position: Int,
                         imageRes: Int,
-                        title: String,
-                        private val dateFormat: DateFormat) : DashboardCard(type, position, imageRes, title, "") {
+                        title: String) : DashboardCard(type, position, imageRes, title, "") {
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -48,7 +46,7 @@ class DashboardSyncCard(component: AppComponent,
     }
 
     private fun updateTotalLocalPeopleCount() {
-        dbManager.getPeopleCount(preferencesManager.syncGroup).subscribeBy(
+        dbManager.getPeopleCountFromLocalForSyncGroup(preferencesManager.syncGroup).subscribeBy(
             onSuccess = {
                 peopleInDb = it
                 cardView?.updateCard(this)
@@ -58,7 +56,7 @@ class DashboardSyncCard(component: AppComponent,
 
     private fun updateLocalPeopleToUpSyncCount() {
         localDbManager
-                .getPeopleCountFromLocal(toSync = true)
+            .getPeopleCountFromLocal(toSync = true)
             .subscribeBy(
                 onSuccess = {
                     peopleToUpload = it

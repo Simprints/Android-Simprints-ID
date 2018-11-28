@@ -207,7 +207,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
             Math.max(nPatientsOnServerForSyncParam - it, 0)
         }
 
-    override fun getPeopleCount(group: Constants.GROUP): Single<Int> =
+    override fun getPeopleCountFromLocalForSyncGroup(group: Constants.GROUP): Single<Int> =
         when (group) {
             Constants.GROUP.GLOBAL ->
                 local.getPeopleCountFromLocal()
