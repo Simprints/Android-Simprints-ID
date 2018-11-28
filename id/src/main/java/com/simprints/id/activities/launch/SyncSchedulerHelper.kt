@@ -3,7 +3,7 @@ package com.simprints.id.activities.launch
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncState
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
 import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
@@ -22,7 +22,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
     }
 
     fun scheduleSyncsAndStartPeopleSyncIfNecessary() {
-        if (preferencesManager.peopleDownSyncState == PeopleDownSyncState.ACTIVE) {
+        if (preferencesManager.peopleDownSyncOption == PeopleDownSyncOption.ACTIVE) {
             oneTimeDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
         }
 
@@ -31,8 +31,8 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
     }
 
     private fun schedulePeopleSyncIfNecessary() {
-        if (preferencesManager.peopleDownSyncState == PeopleDownSyncState.ACTIVE ||
-            preferencesManager.peopleDownSyncState == PeopleDownSyncState.BACKGROUND) {
+        if (preferencesManager.peopleDownSyncOption == PeopleDownSyncOption.ACTIVE ||
+            preferencesManager.peopleDownSyncOption == PeopleDownSyncOption.BACKGROUND) {
             periodicDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
         }
     }

@@ -9,7 +9,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncCountTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncState
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
 import javax.inject.Inject
 
 class OneTimeDownSyncCountWorker: Worker() {
@@ -42,7 +42,7 @@ class OneTimeDownSyncCountWorker: Worker() {
             preferencesManager, loginInfoManager).execute().blockingGet()
 
     private fun scheduleDownSyncWorkIfDownSyncIsActive(projectId: String) {
-        if (preferencesManager.peopleDownSyncState == PeopleDownSyncState.ACTIVE) {
+        if (preferencesManager.peopleDownSyncOption == PeopleDownSyncOption.ACTIVE) {
             peopleDownSyncMaster.schedule(projectId)
         }
     }
