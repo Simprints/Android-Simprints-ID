@@ -49,7 +49,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
 
     fun schedulePeopleDownSync() {
         if (preferencesManager.peopleDownSyncOption != PeopleDownSyncOption.OFF) {
-            peopleDownSyncMaster.schedule(preferencesManager.projectId)
+            peopleDownSyncMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
         }
     }
 
