@@ -42,7 +42,7 @@ interface DbManager {
 
     fun refreshProjectInfoWithServer(projectId: String): Single<Project>
 
-    fun getPeopleCount(group: Constants.GROUP): Single<Int>
+    fun getPeopleCountFromLocalForSyncGroup(group: Constants.GROUP): Single<Int>
 
     fun updateIdentification(projectId: String, selectedGuid: String, sessionId: String)
 

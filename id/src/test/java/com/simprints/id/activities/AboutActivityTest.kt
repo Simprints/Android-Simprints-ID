@@ -46,7 +46,7 @@ class AboutActivityTest : RxJavaTest, DaggerForTests() {
         testAppComponent.inject(this)
         dbManagerMock.initialiseDb()
 
-        whenever(dbManagerMock.getPeopleCount(anyNotNull())).thenReturn(Single.just(0))
+        whenever(dbManagerMock.getPeopleCountFromLocalForSyncGroup(anyNotNull())).thenReturn(Single.just(0))
     }
 
     @Test

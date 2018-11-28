@@ -73,8 +73,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
                 DashboardCardType.SYNC_DB,
                 position,
                 R.drawable.dashboard_sync,
-                androidResourcesHelper.getString(R.string.dashboard_card_sync_title),
-                dateFormat))
+                androidResourcesHelper.getString(R.string.dashboard_card_sync_title)))
 
     private fun createLastScannerInfoCard(position: Int = 4): Single<DashboardCard>? {
         return if (preferencesManager.lastScannerUsed.isNotEmpty()) {
