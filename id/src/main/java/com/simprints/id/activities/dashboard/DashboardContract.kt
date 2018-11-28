@@ -1,5 +1,6 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.lifecycle.LifecycleOwner
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.activities.dashboard.models.DashboardCard
@@ -16,6 +17,7 @@ interface DashboardContract {
         fun showConfirmationDialogForLogout()
         fun showToastForUserOffline()
         fun showToastForRecordsUpToDate()
+        fun getLifeCycleOwner(): LifecycleOwner
     }
 
     interface Presenter : BasePresenter {

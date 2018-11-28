@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.Application
@@ -25,10 +26,8 @@ import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
-    @Inject
-    lateinit var preferences: PreferencesManager
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var preferences: PreferencesManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -145,4 +144,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override fun showToastForRecordsUpToDate() {
         showToast(R.string.records_up_to_date)
     }
+
+    override fun getLifeCycleOwner(): LifecycleOwner = this
 }

@@ -2,7 +2,7 @@ package com.simprints.id.activities.dashboard
 
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
-import com.simprints.id.activities.dashboard.models.DashboardSyncCard
+import com.simprints.id.activities.dashboard.models.DashboardSyncCardViewModel
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
@@ -35,7 +35,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var sessionEventManager: SessionEventsManager
 
-    private val cardsFactory = DashboardCardsFactory(component)
+    private val cardsFactory = DashboardCardsFactory(view.getLifeCycleOwner(), component)
 
     override val cardsModelsList: ArrayList<DashboardCard> = arrayListOf()
 
@@ -54,11 +54,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
         Single.merge(
             cardsFactory.createCards()
                 .map {
-                    it.doOnSuccess {
-                        if (it is DashboardSyncCard) {
-                            initSyncCardModel(it)
+                    it.doOnSuccess { dashboardCard ->
+                        if (dashboardCard is DashboardSyncCardViewModel) {
+                            initSyncCardModel(dashboardCard)
                         }
-                        addCard(it)
+                        addCard(dashboardCard)
                     }
                 }
         )
@@ -77,7 +77,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         view.stopRequestIfRequired()
     }
 
-    private fun initSyncCardModel(it: DashboardSyncCard) {
+    private fun initSyncCardModel(it: DashboardSyncCardViewModel) {
         it.onSyncActionClicked = {
             when {
                 userIsOffline() -> view.showToastForUserOffline()
@@ -127,11 +127,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
         true
     }
 
-    private fun weHaveRecordsToSync(dashboardSyncCard: DashboardSyncCard) =
-        dashboardSyncCard.peopleToUpload > 0 || dashboardSyncCard.peopleToDownload > 0
+    private fun weHaveRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
+        dashboardSyncCardViewModel.peopleToUpload > 0 || dashboardSyncCardViewModel.peopleToDownload > 0
 
-    private fun weDoNotHaveRecordsToSync(dashboardSyncCard: DashboardSyncCard) =
-        dashboardSyncCard.peopleToUpload == 0 && dashboardSyncCard.peopleToDownload == 0
+    private fun weDoNotHaveRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
+        dashboardSyncCardViewModel.peopleToUpload == 0 && dashboardSyncCardViewModel.peopleToDownload == 0
 
     private fun cancelAllDownSyncWorkers() {
         oneTimeDownSyncCountMaster.cancelWorker(loginInfoManager.getSignedInProjectIdOrEmpty())

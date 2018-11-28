@@ -1,9 +1,10 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.lifecycle.LifecycleOwner
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
-import com.simprints.id.activities.dashboard.models.DashboardSyncCard
+import com.simprints.id.activities.dashboard.models.DashboardSyncCardViewModel
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -15,7 +16,8 @@ import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
 
-class DashboardCardsFactory(private val component: AppComponent) {
+class DashboardCardsFactory(private val lifeCycleOwner: LifecycleOwner,
+                            private val component: AppComponent) {
 
     val dateFormat: DateFormat by lazy {
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
@@ -66,9 +68,10 @@ class DashboardCardsFactory(private val component: AppComponent) {
             null
         }
 
-    private fun createSyncInfoCard(position: Int = 3): Single<DashboardSyncCard>? =
+    private fun createSyncInfoCard(position: Int = 3): Single<DashboardSyncCardViewModel>? =
         Single.just(
-            DashboardSyncCard(
+            DashboardSyncCardViewModel(
+                lifeCycleOwner,
                 component,
                 DashboardCardType.SYNC_DB,
                 position,

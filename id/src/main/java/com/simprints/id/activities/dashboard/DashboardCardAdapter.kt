@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
-import com.simprints.id.activities.dashboard.models.DashboardSyncCard
+import com.simprints.id.activities.dashboard.models.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.views.DashboardCardView
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 
@@ -18,7 +18,7 @@ class DashboardCardAdapter(private val cardModels: ArrayList<DashboardCard>) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (cardModels[position] is DashboardSyncCard) {
+        return if (cardModels[position] is DashboardSyncCardViewModel) {
             CardViewType.SYNC.ordinal
         } else {
             CardViewType.GENERAL.ordinal
