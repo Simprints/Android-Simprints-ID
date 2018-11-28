@@ -1,6 +1,9 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.work.WorkManager
 import com.google.firebase.FirebaseApp
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.spy
 import com.simprints.id.R
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.models.DashboardCard
@@ -9,11 +12,13 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.sync.room.SyncStatusDao
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
-import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.*
@@ -39,12 +44,19 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+
+    private lateinit var syncStatusDatabaseModel: SyncStatusDao
 
     override var module by lazyVar {
         AppModuleForTests(app,
             remoteDbManagerRule = MockRule,
-            localDbManagerRule = MockRule)
+            localDbManagerRule = MockRule,
+            syncStatusDatabaseRule = MockRule)
     }
+
+    val activity = spy<DashboardActivity>()
+    private val workManager: WorkManager = mock()
 
     @Before
     override fun setUp() {
@@ -54,6 +66,12 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         testAppComponent.inject(this)
         dbManager.initialiseDb()
 
+        whenever(syncStatusDatabase.syncStatusModel).thenReturn(mock())
+        syncStatusDatabaseModel = syncStatusDatabase.syncStatusModel
+
+        whenever(syncStatusDatabaseModel.getSyncStatus()).thenReturn(mock())
+        whenever(syncStatusDatabaseModel.insertDefaultSyncStatus(anyNotNull())).then {  }
+
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
         setUserLogInState(true, getRoboSharedPreferences())
 
@@ -62,7 +80,8 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheProjectCard_onlyWhenItHasAValidProject() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(activity, testAppComponent)
+
         val card = getCardIfCreated(factory, "project name")
         Assert.assertEquals(card?.description, "project desc")
 
@@ -80,7 +99,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastEnrolCard_onlyWhenAnEnrolEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(activity, testAppComponent)
         val lastEnrolDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -92,7 +111,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastIdentificationCard_onlyWhenAnIdentificationEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(activity, testAppComponent)
         val lastIdentificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -103,7 +122,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastVerificationCard_onlyWhenAnVerificationEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(activity, testAppComponent)
         val lastVerificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -115,7 +134,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     @Test
     @Config(sdk = [25]) // Bug with Robolectric and SharedPreferences.commit() on API >= 26. apply() works fine
     fun shouldCreateTheCurrentUserCard_onlyIfValidUserSignedIn() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(activity, testAppComponent)
         val signedInUser = "someone"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -126,7 +145,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastScannerCard_onlyWhenALastScannerEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(activity, testAppComponent)
         val lastScanner = "SPXXXX"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
