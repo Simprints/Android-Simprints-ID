@@ -11,7 +11,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncState
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountMaster
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -100,7 +100,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun userDidWantToSync() {
-        if (preferencesManager.peopleDownSyncState != PeopleDownSyncState.OFF) {
+        if (preferencesManager.peopleDownSyncOption != PeopleDownSyncOption.OFF) {
             peopleDownSyncMaster.schedule(preferencesManager.projectId)
         }
     }

@@ -23,7 +23,7 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncState
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
@@ -92,13 +92,13 @@ open class PreferencesModule {
                                                remoteConfigWrapper: RemoteConfigWrapper,
                                                @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                                @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>,
-                                               @Named("PeopleDownSyncStateSerializer") peopleDownSyncStateSerializer: Serializer<PeopleDownSyncState>,
+                                               @Named("PeopleDownSyncStateSerializer") peopleDownSyncOptionSerializer: Serializer<PeopleDownSyncOption>,
                                                @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>): SettingsPreferencesManager =
         SettingsPreferencesManagerImpl(prefs,
             remoteConfigWrapper,
             fingerIdToBooleanSerializer,
             groupSerializer,
-            peopleDownSyncStateSerializer,
+            peopleDownSyncOptionSerializer,
             languagesStringArraySerializer)
 
     @Provides

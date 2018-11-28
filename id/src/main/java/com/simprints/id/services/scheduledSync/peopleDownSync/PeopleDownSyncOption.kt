@@ -1,6 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync
 
-enum class PeopleDownSyncState {
+enum class PeopleDownSyncOption {
     OFF,
     BACKGROUND,
     ACTIVE
