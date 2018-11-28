@@ -2,6 +2,7 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncC
 
 import androidx.work.Worker
 import com.simprints.id.Application
+import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.sync.room.SyncStatusDatabase
@@ -19,6 +20,7 @@ class PeriodicDownSyncCountWorker: Worker() {
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+    @Inject lateinit var analyticsManager: AnalyticsManager
 
     override fun doWork(): Result {
 
@@ -34,6 +36,7 @@ class PeriodicDownSyncCountWorker: Worker() {
 
             Result.SUCCESS
         } catch (throwable: Throwable) {
+            analyticsManager.logThrowable(throwable)
             Result.RETRY
         }
     }
