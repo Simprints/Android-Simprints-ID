@@ -20,7 +20,7 @@ import com.simprints.id.activities.dashboard.DashboardPresenter
 import com.simprints.id.activities.dashboard.models.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.activities.launch.LaunchPresenter
-import com.simprints.id.activities.launch.SyncSchedulerHelper
+import com.simprints.id.activities.SyncSchedulerHelper
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentActivity

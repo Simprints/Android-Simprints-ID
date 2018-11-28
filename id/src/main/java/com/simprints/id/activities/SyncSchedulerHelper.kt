@@ -1,8 +1,9 @@
-package com.simprints.id.activities.launch
+package com.simprints.id.activities
 
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
 import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
@@ -16,6 +17,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
     @Inject lateinit var oneTimeDownSyncCountMaster: OneTimeDownSyncCountMaster
     @Inject lateinit var periodicDownSyncCountMaster: PeriodicDownSyncCountMaster
     @Inject lateinit var scheduledSessionsSyncManager: SessionEventsSyncManager
+    @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
 
     init {
         appComponent.inject(this)
@@ -39,5 +41,20 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
 
     private fun scheduleSessionsSyncIfNecessary() {
         scheduledSessionsSyncManager.scheduleSyncIfNecessary()
+    }
+
+    fun scheduleOneTimeDownSyncCount() {
+        oneTimeDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty() )
+    }
+
+    fun schedulePeopleDownSync() {
+        if (preferencesManager.peopleDownSyncOption != PeopleDownSyncOption.OFF) {
+            peopleDownSyncMaster.schedule(preferencesManager.projectId)
+        }
+    }
+
+    fun cancelDownSyncWorkers() {
+        oneTimeDownSyncCountMaster.cancelWorker(loginInfoManager.getSignedInProjectIdOrEmpty())
+        periodicDownSyncCountMaster.cancelWorker(loginInfoManager.getSignedInProjectIdOrEmpty())
     }
 }
