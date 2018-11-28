@@ -2,6 +2,7 @@ package com.simprints.id.services.scheduledSync.peopleDownSync
 
 import androidx.work.Worker
 import com.simprints.id.Application
+import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -19,6 +20,7 @@ class PeopleDownSyncWorker: Worker() {
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+    @Inject lateinit var analyticsManager: AnalyticsManager
 
     override fun doWork(): Result {
 
@@ -32,6 +34,7 @@ class PeopleDownSyncWorker: Worker() {
             Timber.d("DownSync task successful")
             Result.SUCCESS
         } catch (throwable: Throwable) {
+            analyticsManager.logThrowable(throwable)
             Timber.e(throwable)
             Timber.d("DownSync task failure")
             Result.RETRY
