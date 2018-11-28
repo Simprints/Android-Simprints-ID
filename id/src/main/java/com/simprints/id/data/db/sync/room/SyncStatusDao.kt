@@ -13,9 +13,6 @@ interface SyncStatusDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertDefaultSyncStatus(syncStatus: SyncStatus)
 
-    @Query("update SyncStatus set peopleToUpSync = :peopleToUpSync where id = '$SYNC_STATUS_CONST_ID'")
-    fun updatePeopleToUpSyncCount(peopleToUpSync: Int)
-
     @Query("update SyncStatus set peopleToDownSync = :peopleToDownSync where id = '$SYNC_STATUS_CONST_ID'")
     fun updatePeopleToDownSyncCount(peopleToDownSync: Int)
 
@@ -27,7 +24,4 @@ interface SyncStatusDao {
 
     @Query("select peopleToDownSync from SyncStatus where id = '$SYNC_STATUS_CONST_ID'")
     fun getPeopleToDownSync(): Int
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun updateSyncStatus(syncStatus: SyncStatus)
 }
