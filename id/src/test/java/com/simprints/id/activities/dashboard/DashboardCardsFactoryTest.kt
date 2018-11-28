@@ -1,5 +1,6 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.mock
@@ -56,7 +57,6 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     }
 
     val activity = spy<DashboardActivity>()
-    private val workManager: WorkManager = mock()
 
     @Before
     override fun setUp() {
@@ -65,6 +65,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         super.setUp()
         testAppComponent.inject(this)
         dbManager.initialiseDb()
+        WorkManager.initialize(app, Configuration.Builder().build())
 
         whenever(syncStatusDatabase.syncStatusModel).thenReturn(mock())
         syncStatusDatabaseModel = syncStatusDatabase.syncStatusModel
