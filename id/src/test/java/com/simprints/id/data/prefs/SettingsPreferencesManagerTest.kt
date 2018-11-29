@@ -4,6 +4,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
 import com.nhaarman.mockito_kotlin.times
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.di.DaggerForTests
@@ -25,7 +26,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SettingsPreferencesManagerTest : DaggerForTests() {
 
     @Inject lateinit var remoteConfigSpy: FirebaseRemoteConfig

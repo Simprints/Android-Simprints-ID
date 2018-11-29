@@ -1,10 +1,10 @@
 package com.simprints.id.testSnippets
 
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.*
-import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.matcher.ViewMatchers.*
-import android.support.test.rule.ActivityTestRule
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.*
+import androidx.test.rule.ActivityTestRule
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.*
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.testTools.ActivityUtils

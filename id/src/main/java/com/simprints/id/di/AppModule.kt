@@ -20,7 +20,8 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.sync.SyncManager
+import com.simprints.id.data.db.sync.room.SyncStatus
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -35,15 +36,14 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
-import com.simprints.id.services.progress.notifications.NotificationFactory
-import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
+import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.OneTimeDownSyncCountMaster
+import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.PeriodicDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImpl
-import com.simprints.id.services.sync.SyncClient
-import com.simprints.id.services.sync.SyncService
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.TimeHelper
@@ -57,6 +57,7 @@ import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Module
 import dagger.Provides
+import org.jetbrains.anko.doAsync
 import javax.inject.Singleton
 
 @Module
@@ -89,6 +90,18 @@ open class AppModule(val app: Application) {
             PeopleUpSyncUploaderMaster(),
             PeopleUpSyncPeriodicFlusherMaster()
         )
+
+    @Provides
+    @Singleton
+    open fun providePeopleDownSyncMaster() = PeopleDownSyncMaster()
+
+    @Provides
+    @Singleton
+    open fun provideOneTimeDownSyncCountMaster() = OneTimeDownSyncCountMaster()
+
+    @Provides
+    @Singleton
+    open fun providePeriodicDownSyncCountMaster() = PeriodicDownSyncCountMaster()
 
     @Provides
     @Singleton
@@ -167,24 +180,8 @@ open class AppModule(val app: Application) {
     fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
 
     @Provides
-    @Singleton
-    fun provideNotificationFactory(app: Application): NotificationFactory {
-        val factory = NotificationFactory(app)
-        factory.initSyncNotificationChannel()
-        return factory
-    }
-
-    @Provides
     fun provideAndroidResourcesHelper(ctx: Context): AndroidResourcesHelper =
         AndroidResourcesHelperImpl(ctx)
-
-    @Provides
-    fun provideSyncClient(app: Application): SyncClient =
-        SyncService.getClient(app)
-
-    @Provides
-    fun provideSyncManager(analyticsManager: AnalyticsManager, syncClient: SyncClient): SyncManager =
-        SyncManager(analyticsManager, syncClient)
 
     @Provides
     @Singleton
@@ -203,8 +200,14 @@ open class AppModule(val app: Application) {
         SessionEventsManagerImpl(ctx.deviceId, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, analyticsManager)
 
     @Provides
-    open fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
-        ScheduledPeopleSyncManager(preferencesManager)
+    @Singleton
+    open fun provideAndInitializeSyncStatusDatabase(): SyncStatusDatabase {
+        val syncStatusDb = SyncStatusDatabase.getDatabase(provideContext())
+        doAsync {
+            syncStatusDb.syncStatusModel.insertDefaultSyncStatus(SyncStatus())
+        }
+        return syncStatusDb
+    }
 
     @Provides
     @Singleton

@@ -1,5 +1,6 @@
 package com.simprints.id.tools
 
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Assert
 import org.junit.Test
@@ -9,7 +10,7 @@ import org.robolectric.annotation.Config
 import java.util.*
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class NumberFormatterTest {
 
     private val hindiLocale = Locale("hi")

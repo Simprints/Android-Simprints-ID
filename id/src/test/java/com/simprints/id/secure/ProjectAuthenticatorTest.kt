@@ -3,6 +3,7 @@ package com.simprints.id.secure
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.verify
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -35,7 +36,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
 
     private lateinit var apiClient: SimApiClient<SecureApiInterface>

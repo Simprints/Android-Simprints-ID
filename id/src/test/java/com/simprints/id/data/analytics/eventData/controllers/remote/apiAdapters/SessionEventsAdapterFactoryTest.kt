@@ -1,6 +1,7 @@
 package com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters
 
 import android.net.NetworkInfo
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.models.domain.events.*
 import com.simprints.id.data.analytics.eventData.models.domain.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.analytics.eventData.models.domain.events.OneToManyMatchEvent.MatchPoolType
@@ -23,7 +24,7 @@ import org.robolectric.annotation.Config
 import java.util.*
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsAdapterFactoryTest {
 
     private val gsonWithAdapters = SessionEventsApiAdapterFactory().gson

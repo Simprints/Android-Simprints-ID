@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.local.models
 
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.testUtils.roboletric.TestApplication
@@ -15,7 +16,7 @@ import org.robolectric.annotation.Config
 import java.util.*
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class rl_PersonTest {
 
     @Test

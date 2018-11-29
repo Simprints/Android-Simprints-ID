@@ -4,10 +4,11 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.support.v4.content.res.ResourcesCompat
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
 import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.IntentKeys
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
@@ -30,7 +31,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class AlertActivityTest : DaggerForTests() {
 
     @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager

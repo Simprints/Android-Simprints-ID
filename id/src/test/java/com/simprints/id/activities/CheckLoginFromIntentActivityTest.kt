@@ -43,7 +43,7 @@ import javax.inject.Inject
 @RunWith(RobolectricTestRunner::class)
 @Config(
     application = TestApplication::class,
-    sdk = [Build.VERSION_CODES.N_MR1])
+    sdk = [Build.VERSION_CODES.N_MR1], shadows = [ShadowAndroidXMultiDex::class])
 class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
     companion object {
