@@ -4,9 +4,10 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
 import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
+import com.simprints.id.services.scheduledSync.peopleDownSync.shouldDownSyncScheduleInBackground
+import com.simprints.id.services.scheduledSync.peopleDownSync.shouldDownSyncScheduleInForeground
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import javax.inject.Inject
 
@@ -24,7 +25,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
     }
 
     fun scheduleSyncsAndStartPeopleSyncIfNecessary() {
-        if (preferencesManager.peopleDownSyncOption == PeopleDownSyncOption.ACTIVE) {
+        if (preferencesManager.peopleDownSyncOption.shouldDownSyncScheduleInForeground()) {
             oneTimeDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
         }
 
@@ -33,8 +34,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
     }
 
     private fun schedulePeopleSyncIfNecessary() {
-        if (preferencesManager.peopleDownSyncOption == PeopleDownSyncOption.ACTIVE ||
-            preferencesManager.peopleDownSyncOption == PeopleDownSyncOption.BACKGROUND) {
+        if (preferencesManager.peopleDownSyncOption.shouldDownSyncScheduleInBackground()) {
             periodicDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
         }
     }
@@ -48,7 +48,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
     }
 
     fun schedulePeopleDownSync() {
-        if (preferencesManager.peopleDownSyncOption != PeopleDownSyncOption.OFF) {
+        if (preferencesManager.peopleDownSyncOption.shouldDownSyncScheduleInBackground()) {
             peopleDownSyncMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
         }
     }
