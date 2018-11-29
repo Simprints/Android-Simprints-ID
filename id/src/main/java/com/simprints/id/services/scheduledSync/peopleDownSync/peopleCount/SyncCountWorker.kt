@@ -22,7 +22,7 @@ sealed class SyncCountWorker: Worker() {
     @Inject lateinit var peopleDownSyncMaster: PeopleDownSyncMaster
     @Inject lateinit var analyticsManager: AnalyticsManager
 
-    abstract val resultForErrors:Result
+    abstract val resultForErrors: Result
 
     override fun doWork(): Result {
 
@@ -54,7 +54,7 @@ sealed class SyncCountWorker: Worker() {
         }
     }
 
-    class PeriodicWorker: SyncCountWorker() {
+    class PeriodicWorker : SyncCountWorker() {
 
         override val resultForErrors: Result = Result.RETRY
         override fun scheduleDownSyncWorkIfRequired(projectId: String) {
@@ -62,7 +62,7 @@ sealed class SyncCountWorker: Worker() {
         }
     }
 
-    class OneTimeWorker: SyncCountWorker() {
+    class OneTimeWorker : SyncCountWorker() {
 
         override val resultForErrors: Result = Result.FAILURE
         override fun scheduleDownSyncWorkIfRequired(projectId: String) {

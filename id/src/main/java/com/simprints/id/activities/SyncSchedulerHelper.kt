@@ -35,12 +35,19 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
         }
     }
 
+    /* Called by LaunchPresenter and DashboardPresenter.
+    The worker is scheduled iff sync is set to ACTIVE. The worker will get the peopleToDownSync
+    and schedule PeopleDownSyncWorker if required. */
     fun startPeopleDownSyncIfAllowedFromForeground() {
         if (preferencesManager.peopleDownSyncOption.shouldDownSyncScheduleInForeground()) {
             oneTimeDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
         }
     }
 
+    /*This is called from the DashboardPresenter.
+    The OneTimeDownSyncCountWorker will be scheduled here to get the number of people to DownSync,
+    and if DownSyncOption is set to ACTIVE and peopleToDownload > 0,
+    the PeopleDownSync worker is scheduled.*/
     fun startDownSyncCount() {
         oneTimeDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty() )
     }
