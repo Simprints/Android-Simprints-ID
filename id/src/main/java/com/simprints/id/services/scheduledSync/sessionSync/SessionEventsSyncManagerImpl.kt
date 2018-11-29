@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit
 
 open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
 
-    override fun scheduleSyncIfNecessary() = createAndEnqueueRequest()
+    override fun scheduleSessionsSync() = createAndEnqueueRequest()
 
     private fun createAndEnqueueRequest() {
         PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)

@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount
+package com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount
 
 import androidx.work.*
 import java.util.concurrent.TimeUnit
@@ -8,6 +8,7 @@ class PeriodicDownSyncCountMaster(
 ) {
 
     fun schedule(projectId: String) {
+
         getWorkManager().enqueueUniquePeriodicWork(
             getUniquePeriodicDownSyncCountWorkName(projectId),
             ExistingPeriodicWorkPolicy.KEEP,
@@ -16,7 +17,7 @@ class PeriodicDownSyncCountMaster(
     }
 
     private fun buildWorkRequest() =
-        PeriodicWorkRequestBuilder<PeriodicDownSyncCountWorker>(DOWN_SYNC_REPEAT_INTERVAL, DOWN_SYNC_REPEAT_UNIT)
+        PeriodicWorkRequestBuilder<SyncCountWorker.PeriodicWorker>(DOWN_SYNC_REPEAT_INTERVAL, DOWN_SYNC_REPEAT_UNIT)
             .setConstraints(buildConstraints())
             .build()
 

@@ -98,7 +98,7 @@ class SessionEventsManagerImplTest {
         assertThat(oldOpenSession?.isClosed()).isTrue()
         assertThat(oldOpenSession?.events?.filterIsInstance(ArtificialTerminationEvent::class.java)).hasSize(1)
 
-        verify(sessionEventsSyncManagerMock, times(1)).scheduleSyncIfNecessary()
+        verify(sessionEventsSyncManagerMock, times(1)).scheduleSessionsSync()
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount
+package com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount
 
 import androidx.work.*
 
@@ -10,12 +10,11 @@ class OneTimeDownSyncCountMaster(
             getUniqueOneTimeDownSyncCountWorkName(projectId),
             ExistingWorkPolicy.REPLACE,
             buildWorkRequest()
-        )
-            .enqueue()
+        ).enqueue()
     }
 
     private fun buildWorkRequest() =
-        OneTimeWorkRequestBuilder<OneTimeDownSyncCountWorker>()
+        OneTimeWorkRequestBuilder<SyncCountWorker.OneTimeWorker>()
             .setConstraints(buildConstraints())
             .build()
 

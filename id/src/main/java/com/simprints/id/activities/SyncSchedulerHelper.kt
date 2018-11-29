@@ -4,9 +4,9 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
-import com.simprints.id.services.scheduledSync.peopleDownSync.periodicDownSyncCount.PeriodicDownSyncCountMaster
-import com.simprints.id.services.scheduledSync.peopleDownSync.oneTimeDownSyncCount.OneTimeDownSyncCountMaster
-import com.simprints.id.services.scheduledSync.peopleDownSync.shouldDownSyncScheduleInBackground
+import com.simprints.id.services.scheduledSync.peopleDownSync.isPeopleDownSyncOff
+import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.OneTimeDownSyncCountMaster
+import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.PeriodicDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.shouldDownSyncScheduleInForeground
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import javax.inject.Inject
@@ -24,37 +24,39 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
         appComponent.inject(this)
     }
 
-    fun scheduleSyncsAndStartPeopleSyncIfNecessary() {
+    fun scheduleBackgroundSyncs() {
+        schedulePeopleDownSyncCountIfNotOff()
+        scheduleSessionsSync()
+    }
+
+    fun schedulePeopleDownSyncIfNotOff() {
+        if (!preferencesManager.peopleDownSyncOption.isPeopleDownSyncOff()) {
+            peopleDownSyncMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
+        }
+    }
+
+    fun startPeopleDownSyncIfAllowedFromForeground() {
         if (preferencesManager.peopleDownSyncOption.shouldDownSyncScheduleInForeground()) {
             oneTimeDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
         }
-
-        schedulePeopleSyncIfNecessary()
-        scheduleSessionsSyncIfNecessary()
     }
 
-    private fun schedulePeopleSyncIfNecessary() {
-        if (preferencesManager.peopleDownSyncOption.shouldDownSyncScheduleInBackground()) {
-            periodicDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
-        }
-    }
-
-    private fun scheduleSessionsSyncIfNecessary() {
-        scheduledSessionsSyncManager.scheduleSyncIfNecessary()
-    }
-
-    fun scheduleOneTimeDownSyncCount() {
+    fun startDownSyncCount() {
         oneTimeDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty() )
-    }
-
-    fun schedulePeopleDownSync() {
-        if (preferencesManager.peopleDownSyncOption.shouldDownSyncScheduleInBackground()) {
-            peopleDownSyncMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
-        }
     }
 
     fun cancelDownSyncWorkers() {
         oneTimeDownSyncCountMaster.cancelWorker(loginInfoManager.getSignedInProjectIdOrEmpty())
         periodicDownSyncCountMaster.cancelWorker(loginInfoManager.getSignedInProjectIdOrEmpty())
+    }
+
+    private fun schedulePeopleDownSyncCountIfNotOff() {
+        if (!preferencesManager.peopleDownSyncOption.isPeopleDownSyncOff()) {
+            periodicDownSyncCountMaster.schedule(loginInfoManager.getSignedInProjectIdOrEmpty())
+        }
+    }
+
+    private fun scheduleSessionsSync() {
+        scheduledSessionsSyncManager.scheduleSessionsSync()
     }
 }

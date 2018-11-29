@@ -88,7 +88,9 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         view.initTextsInButtons()
         view.initConsentTabs()
 
-        syncSchedulerHelper.scheduleSyncsAndStartPeopleSyncIfNecessary()
+        syncSchedulerHelper.scheduleBackgroundSyncs()
+        syncSchedulerHelper.startPeopleDownSyncIfAllowedFromForeground()
+
         setTextToConsentTabs()
 
         startSetup()
