@@ -40,7 +40,7 @@ import org.robolectric.shadows.ShadowToast
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class LoginActivityTest : RxJavaTest, DaggerForTests() {
 
     companion object {

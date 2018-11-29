@@ -2,10 +2,12 @@ package com.simprints.id.activities.dashboard
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DefaultItemAnimator
+import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
+import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
@@ -17,17 +19,15 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.launchAlert
+import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
-import org.jetbrains.anko.support.v4.onRefresh
 import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
-    @Inject
-    lateinit var preferences: PreferencesManager
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var preferences: PreferencesManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -62,7 +62,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     private fun initRecyclerCardViews(viewPresenter: DashboardContract.Presenter) {
         cardsViewAdapter = DashboardCardAdapter(viewPresenter.cardsModelsList)
-        dashboardCardsView.also {
+        (dashboardCardsView as RecyclerView).also {
             it.setHasFixedSize(false)
             it.itemAnimator = DefaultItemAnimator()
             it.layoutManager = WrapContentLinearLayoutManager(this)
@@ -71,7 +71,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     private fun initSwipeRefreshLayout(viewPresenter: DashboardContract.Presenter) {
-        swipeRefreshLayout.onRefresh {
+        swipeRefreshLayout.setOnRefreshListener {
             viewPresenter.userDidWantToRefreshCardsIfPossible()
         }
     }
@@ -136,4 +136,14 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override fun launchAlertView(error: ALERT_TYPE) {
         this.launchAlert(error)
     }
+
+    override fun showToastForUserOffline() {
+        showToast(R.string.login_no_network)
+    }
+
+    override fun showToastForRecordsUpToDate() {
+        showToast(R.string.records_up_to_date)
+    }
+
+    override fun getLifeCycleOwner(): LifecycleOwner = this
 }

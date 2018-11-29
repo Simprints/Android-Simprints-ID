@@ -6,7 +6,7 @@ import android.content.SharedPreferences
  * Extension of the SharedPreferences interface of the Android framework.
  * Adds generic read and write capabilities, and provides a more test friendly boundary.
  */
-interface ImprovedSharedPreferences : SharedPreferences {
+interface ImprovedSharedPreferences {
 
     /**
      * Retrieve a value of primitive type ([Byte], [Short], [Int], [Long], [Float], [Double],
@@ -28,14 +28,16 @@ interface ImprovedSharedPreferences : SharedPreferences {
      * Note that you must call [Editor.commit] or [Editor.apply] to have any
      * changes you perform in the Editor actually show up in the preferencesManager.
      */
-    override fun edit(): ImprovedSharedPreferences.Editor
+    fun edit(): ImprovedSharedPreferences.Editor
+
+    fun getString(key: String, defaultValue: String): String
 
     /**
      * Interface used for modifying values in preferencesManager. All changes you make in an editor are
      * batched, and will not actually show up in the preferencesManager until you call [Editor.commit] or
      * [Editor.apply]
      */
-    interface Editor : SharedPreferences.Editor {
+    interface Editor {
 
         /**
          * Set a value of primitive type ([Byte], [Short], [Int], [Long], [Float], [Double],
@@ -48,5 +50,9 @@ interface ImprovedSharedPreferences : SharedPreferences {
          * Throw a [NonPrimitiveTypeException] if T is not a primitive type.
          */
         fun <T : Any> putPrimitive(key: String, value: T): ImprovedSharedPreferences.Editor
+
+        fun commit()
+
+        fun apply()
     }
 }

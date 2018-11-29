@@ -5,6 +5,7 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameter
 import com.simprints.id.session.sessionParameters.SessionParameters
@@ -35,6 +36,7 @@ class SerializerModule {
     @Provides @Singleton @Named("FingerIdentifierSerializer") fun provideFingerIdentifierSerializer(): Serializer<FingerIdentifier> = EnumSerializer(FingerIdentifier::class.java)
     @Provides @Singleton @Named("CalloutActionSerializer") fun provideCalloutActionSerializer(): Serializer<CalloutAction> = EnumSerializer(CalloutAction::class.java)
     @Provides @Singleton @Named("GroupSerializer") fun provideGroupSerializer(): Serializer<Constants.GROUP> = EnumSerializer(Constants.GROUP::class.java)
+    @Provides @Singleton @Named("PeopleDownSyncStateSerializer") fun providePeopleDownSyncStateSerializer(): Serializer<PeopleDownSyncOption> =EnumSerializer(PeopleDownSyncOption::class.java)
     @Provides @Singleton fun provideGson(): Gson = Gson()
     @Provides @Singleton @Named("LocationSerializer") fun provideLocationSerializer(): Serializer<Location> = LocationSerializer()
 

@@ -47,7 +47,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     override fun createSession(): Single<SessionEvents> =
         createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN).let {
             Timber.d("Created session: ${it.id}")
-            sessionEventsSyncManager.scheduleSyncIfNecessary()
+            sessionEventsSyncManager.scheduleSessionsSync()
 
             closeLastSessionsIfPending()
                 .andThen(insertOrUpdateSessionEvents(it))

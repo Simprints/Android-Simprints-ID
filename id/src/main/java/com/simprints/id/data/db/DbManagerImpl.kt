@@ -11,7 +11,6 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toDomainPerson
-import com.simprints.id.data.db.sync.SyncExecutor
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
@@ -20,18 +19,15 @@ import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.toLibPerson
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.progress.Progress
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
-import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -220,7 +216,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
             local.getPeopleCountFromLocal(moduleId =  it, toSync = false)
         }).toList().map { it.sum() }
 
-    override fun getPeopleCount(group: Constants.GROUP): Single<Int> =
+    override fun getPeopleCountFromLocalForSyncGroup(group: Constants.GROUP): Single<Int> =
         when (group) {
             Constants.GROUP.GLOBAL ->
                 local.getPeopleCountFromLocal()
@@ -276,12 +272,6 @@ open class DbManagerImpl(override val local: LocalDbManager,
     override fun saveSession(session: Session) {
         remote.saveSessionInRemote(session)
     }
-
-    override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
-        SyncExecutor(
-            this,
-            JsonHelper.gson
-        ).sync(interrupted, parameters).trace("sync")
 
     override fun recoverLocalDb(group: Constants.GROUP): Completable {
         val firebaseManager = remote as FirebaseManagerImpl

@@ -1,15 +1,13 @@
 package com.simprints.id.testUtils.roboletric
 
-
-import android.support.v4.app.FragmentManager
-import android.support.v4.view.PagerAdapter
-import android.support.v4.view.ViewPager
+import androidx.fragment.app.FragmentManager
+import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.spy
 import org.mockito.internal.util.reflection.Fields
 import org.robolectric.annotation.Implementation
-import org.robolectric.annotation.Implements
 import org.robolectric.annotation.RealObject
 import org.robolectric.shadow.api.Shadow.directlyOn
 import org.robolectric.shadows.ShadowViewGroup

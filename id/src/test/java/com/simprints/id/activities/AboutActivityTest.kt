@@ -25,7 +25,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class AboutActivityTest : RxJavaTest, DaggerForTests() {
 
     @Inject
@@ -46,7 +46,7 @@ class AboutActivityTest : RxJavaTest, DaggerForTests() {
         testAppComponent.inject(this)
         dbManagerMock.initialiseDb()
 
-        whenever(dbManagerMock.getPeopleCount(anyNotNull())).thenReturn(Single.just(0))
+        whenever(dbManagerMock.getPeopleCountFromLocalForSyncGroup(anyNotNull())).thenReturn(Single.just(0))
     }
 
     @Test

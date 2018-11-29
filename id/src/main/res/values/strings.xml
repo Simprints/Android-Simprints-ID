@@ -360,6 +360,7 @@
     <string name="account_menu">Account</string>
     <string name="nav_logout">Logout</string>
     <string name="dashboard_card_project_title">Project</string>
+    <string name="records_up_to_date">All records are updated</string>
 
     <string name="dashboard_card_localdb_sync_user_title">People enrolled by user</string>
     <string name="dashboard_card_localdb_sync_module_title">People enrolled in selected modules</string>
@@ -377,6 +378,12 @@
     <string name="dashboard_card_verification_title">Last Verification</string>
     <string name="dashboard_card_identification_title">Last Identification</string>
     <string name="dashboard_card_currentuser_title">Current user</string>
+    <string name="dashboard_card_enrolment_info">Enrolment Info</string>
+    <string name="dashboard_card_sync_now">Sync Now</string>
+    <string name="dashboard_card_available_on_phone">Available on Phone</string>
+    <string name="dashboard_card_to_upload">To Upload</string>
+    <string name="dashboard_card_to_download">To Download</string>
+
     <string name="menu_privacy_notice">Privacy Notice</string>
     <string name="privacy_notice_title">Privacy Notice</string>
 

@@ -2,10 +2,8 @@ package com.simprints.id.services.sync
 
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Constants
-import com.simprints.id.services.progress.service.ProgressTaskParameters
-import com.simprints.id.tools.serializers.ModuleIdOptionsStringSetSerializer
 
-sealed class SyncTaskParameters(open val projectId: String, open val moduleIds: Set<String>?, open val userId: String?) : ProgressTaskParameters {
+sealed class SyncTaskParameters(open val projectId: String, open val moduleIds: Set<String>?, open val userId: String?) {
 
     companion object {
         const val PROJECT_ID_FIELD = "projectId"
