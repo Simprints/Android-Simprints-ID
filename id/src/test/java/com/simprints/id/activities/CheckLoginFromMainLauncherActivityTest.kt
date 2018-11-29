@@ -24,7 +24,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class CheckLoginFromMainLauncherActivityTest : DaggerForTests() {
 
     private lateinit var editor: SharedPreferences.Editor

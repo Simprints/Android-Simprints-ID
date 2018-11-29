@@ -1,5 +1,6 @@
 package com.simprints.id.secure.cryptography
 
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Assert
 import org.junit.Test
@@ -8,7 +9,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class HasherTest {
 
     @Test

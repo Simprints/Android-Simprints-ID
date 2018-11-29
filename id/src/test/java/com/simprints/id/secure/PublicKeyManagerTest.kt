@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
@@ -22,7 +23,7 @@ import retrofit2.mock.NetworkBehavior
 import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class PublicKeyManagerTest : RxJavaTest {
 
     private val validPublicKeyJsonResponse = "{\"value\":\"public_key_from_server\"}"

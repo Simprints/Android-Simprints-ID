@@ -1,8 +1,8 @@
 package com.simprints.id.coreFeatures
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.filters.LargeTest
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.InstrumentationRegistry
+import androidx.test.filters.LargeTest
+import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests

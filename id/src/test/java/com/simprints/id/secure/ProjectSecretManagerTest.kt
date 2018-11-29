@@ -1,6 +1,7 @@
 package com.simprints.id.secure
 
 import com.google.firebase.FirebaseApp
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
@@ -20,7 +21,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ProjectSecretManagerTest : RxJavaTest, DaggerForTests() {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
