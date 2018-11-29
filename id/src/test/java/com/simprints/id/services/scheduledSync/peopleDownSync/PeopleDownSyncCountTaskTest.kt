@@ -8,6 +8,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Constants
+import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.PeopleDownSyncCountTask
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.mock
 import com.simprints.id.shared.whenever

@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync
+package com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount
 
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager

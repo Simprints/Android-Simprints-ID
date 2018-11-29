@@ -1,9 +1,9 @@
 package com.simprints.id.activities.dashboard
 
+import com.simprints.id.activities.SyncSchedulerHelper
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCardViewModel
-import com.simprints.id.activities.SyncSchedulerHelper
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
@@ -46,7 +46,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun initCards() {
         cardsModelsList.clear()
-        syncSchedulerHelper.scheduleOneTimeDownSyncCount()
+        syncSchedulerHelper.startDownSyncCount()
         Single.merge(
             cardsFactory.createCards()
                 .map {
@@ -96,7 +96,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun userDidWantToSync() {
-        syncSchedulerHelper.schedulePeopleDownSync()
+        syncSchedulerHelper.schedulePeopleDownSyncIfNotOff()
     }
 
     private fun removeCardIfExist(projectType: DashboardCardType) {
