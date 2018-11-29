@@ -36,15 +36,15 @@ class AboutPresenter(private val view: AboutContract.View,
     }
 
     private fun initCounts() {
-        dbManager.getPeopleCount(Constants.GROUP.GLOBAL).subscribe({ count ->
+        dbManager.getPeopleCountFromLocalForSyncGroup(Constants.GROUP.GLOBAL).subscribe({ count ->
             view.setProjectCount(count.toString())
         }, { analyticsManager.logSafeException(SimprintsException(it)) })
 
-        dbManager.getPeopleCount(Constants.GROUP.MODULE).subscribe({ count ->
+        dbManager.getPeopleCountFromLocalForSyncGroup(Constants.GROUP.MODULE).subscribe({ count ->
             view.setModuleCount(count.toString())
         }, { analyticsManager.logSafeException(SimprintsException(it)) })
 
-        dbManager.getPeopleCount(Constants.GROUP.USER).subscribe({ count ->
+        dbManager.getPeopleCountFromLocalForSyncGroup(Constants.GROUP.USER).subscribe({ count ->
             view.setUserCount(count.toString())
         }, { analyticsManager.logSafeException(SimprintsException(it)) })
     }

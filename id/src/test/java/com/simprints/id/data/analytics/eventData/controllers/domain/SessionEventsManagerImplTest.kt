@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.spy
 import com.nhaarman.mockito_kotlin.verify
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.ArtificialTerminationEvent
@@ -32,7 +33,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 
 @RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsManagerImplTest {
 
     private val sessionEventsSyncManagerMock: SessionEventsSyncManager = mock()
@@ -97,7 +98,7 @@ class SessionEventsManagerImplTest {
         assertThat(oldOpenSession?.isClosed()).isTrue()
         assertThat(oldOpenSession?.events?.filterIsInstance(ArtificialTerminationEvent::class.java)).hasSize(1)
 
-        verify(sessionEventsSyncManagerMock, times(1)).scheduleSyncIfNecessary()
+        verify(sessionEventsSyncManagerMock, times(1)).scheduleSessionsSync()
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.lifecycle.LifecycleOwner
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.activities.dashboard.models.DashboardCard
@@ -14,12 +15,14 @@ interface DashboardContract {
         fun notifyCardViewChanged(position: Int)
         fun getStringWithParams(stringRes: Int, currentValue: Int = 0, maxValue: Int = 0): String
         fun showConfirmationDialogForLogout()
+        fun showToastForUserOffline()
+        fun showToastForRecordsUpToDate()
+        fun getLifeCycleOwner(): LifecycleOwner
     }
 
     interface Presenter : BasePresenter {
         val cardsModelsList: ArrayList<DashboardCard>
 
-        fun pause()
         fun userDidWantToRefreshCardsIfPossible()
         fun userDidWantToSync()
         fun userDidWantToLogout()

@@ -1,24 +1,23 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.lifecycle.LifecycleOwner
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
-import com.simprints.id.activities.dashboard.models.DashboardSyncCard
+import com.simprints.id.activities.dashboard.models.DashboardSyncCardViewModel
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.Constants
-import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.NumberFormatter
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import io.reactivex.Single
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
 
-class DashboardCardsFactory(private val component: AppComponent) {
+class DashboardCardsFactory(private val lifeCycleOwner: LifecycleOwner,
+                            private val component: AppComponent) {
 
     val dateFormat: DateFormat by lazy {
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
@@ -37,7 +36,6 @@ class DashboardCardsFactory(private val component: AppComponent) {
     fun createCards() = arrayListOf(
         createProjectInfoCard(),
         createCurrentUserInfoCard(),
-        createLocalDbInfoCard(),
         createSyncInfoCard(),
         createLastScannerInfoCard(),
         createLastEnrolInfoCard(),
@@ -70,33 +68,15 @@ class DashboardCardsFactory(private val component: AppComponent) {
             null
         }
 
-    fun createLocalDbInfoCard(position: Int = 2): Single<DashboardCard> =
-        dbManager.getPeopleCount(preferencesManager.syncGroup).map { numberOfPeople ->
-            DashboardCard(
-                DashboardCardType.LOCAL_DB,
-                position,
-                R.drawable.local_db,
-                getLocalDbInfoTitle(),
-                NumberFormatter(LanguageHelper.localeFor(preferencesManager.language))
-                    .getFormattedIntegerString(numberOfPeople))
-        }.doOnError { it.printStackTrace() }
-
-    private fun getLocalDbInfoTitle(): String =
-        androidResourcesHelper.getString(when (preferencesManager.syncGroup) {
-            Constants.GROUP.GLOBAL -> R.string.dashboard_card_localdb_sync_project_title
-            Constants.GROUP.USER -> R.string.dashboard_card_localdb_sync_user_title
-            Constants.GROUP.MODULE -> R.string.dashboard_card_localdb_sync_module_title
-        })
-
-    private fun createSyncInfoCard(position: Int = 3): Single<DashboardSyncCard>? =
+    private fun createSyncInfoCard(position: Int = 3): Single<DashboardSyncCardViewModel>? =
         Single.just(
-            DashboardSyncCard(
+            DashboardSyncCardViewModel(
+                lifeCycleOwner,
                 component,
                 DashboardCardType.SYNC_DB,
                 position,
                 R.drawable.dashboard_sync,
-                androidResourcesHelper.getString(R.string.dashboard_card_sync_title),
-                dateFormat))
+                androidResourcesHelper.getString(R.string.dashboard_card_sync_title)))
 
     private fun createLastScannerInfoCard(position: Int = 4): Single<DashboardCard>? {
         return if (preferencesManager.lastScannerUsed.isNotEmpty()) {

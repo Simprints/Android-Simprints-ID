@@ -11,6 +11,7 @@ import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -19,7 +20,6 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.SecureApiInterface
-import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSyncManager
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.shared.DependencyRule.RealRule
@@ -47,7 +47,8 @@ open class AppModuleForAnyTests(app: Application,
                                 open var secureApiInterfaceRule: DependencyRule = RealRule,
                                 open var longConsentManagerRule: DependencyRule = RealRule,
                                 open var scannerManagerRule: DependencyRule = RealRule,
-                                open var peopleUpSyncMasterRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var peopleUpSyncMasterRule: DependencyRule = RealRule,
+                                open var syncStatusDatabaseRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -96,9 +97,6 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideSecureApiInterface(): SecureApiInterface =
         secureApiInterfaceRule.resolveDependency { super.provideSecureApiInterface() }
 
-    override fun provideScheduledPeopleSyncManager(preferencesManager: PreferencesManager): ScheduledPeopleSyncManager =
-        scheduledPeopleSyncManagerRule.resolveDependency { super.provideScheduledPeopleSyncManager(preferencesManager) }
-
     override fun provideScheduledSessionsSyncManager(): SessionEventsSyncManager =
         scheduledSessionsSyncManagerRule.resolveDependency { super.provideScheduledSessionsSyncManager() }
 
@@ -129,4 +127,7 @@ open class AppModuleForAnyTests(app: Application,
 
     override fun providePeopleUpSyncMaster(): PeopleUpSyncMaster =
         peopleUpSyncMasterRule.resolveDependency { super.providePeopleUpSyncMaster() }
+
+    override fun provideAndInitializeSyncStatusDatabase(): SyncStatusDatabase =
+        syncStatusDatabaseRule.resolveDependency { super.provideAndInitializeSyncStatusDatabase() }
 }

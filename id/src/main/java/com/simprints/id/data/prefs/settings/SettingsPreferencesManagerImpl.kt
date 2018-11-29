@@ -13,6 +13,7 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.preferences.NoSuchPreferenceError
+import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
@@ -23,7 +24,8 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                           groupSerializer: Serializer<Constants.GROUP>,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
-                                          moduleIdOptionsStringSetSerializer: Serializer<Set<String>>)
+                                          moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
+                                          downSyncOptionSerializer: Serializer<PeopleDownSyncOption>)
     : SettingsPreferencesManager {
 
     companion object {
@@ -113,6 +115,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
         val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(ParentalConsent())
+
+        const val PEOPLE_DOWN_SYNC_STATE_KEY = "PeopleDownSyncOption"
+        val PEOPLE_DOWN_SYNC_STATE_DEFAULT = PeopleDownSyncOption.BACKGROUND
     }
 
     // Should the UI automatically slide forward?
@@ -208,6 +213,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // The options of the parental consent as a JSON string of booleans
     override var parentalConsentOptionsJson: String
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT)
+
+    override var peopleDownSyncOption: PeopleDownSyncOption
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_STATE_KEY, PEOPLE_DOWN_SYNC_STATE_DEFAULT, downSyncOptionSerializer)
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()
