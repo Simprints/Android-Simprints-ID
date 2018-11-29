@@ -12,6 +12,7 @@ import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Emitter
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -51,11 +52,11 @@ open class SyncExecutor(private val dbManager: DbManager,
         }
 
     private fun makeDownSyncApiCallsForMultipleDownSyncParams(downSyncParams: List<DownSyncParams>, interrupted: () -> Boolean, nPeopleToDownload: Int): Observable<DownloadProgress> {
-        val observables = downSyncParams.map { makeDownSyncApiCall(it, interrupted, nPeopleToDownload) }
+        val observables = downSyncParams.map { makeDownSyncApiCall(it, interrupted, nPeopleToDownload).subscribeOn(Schedulers.io()) }
 
-        return concatMapWithPreviousLastValue(observables, DownloadProgress(0, 0)) { item, lastValue ->
-            DownloadProgress(item.currentValue + lastValue.currentValue, nPeopleToDownload)
-        }
+        var count = 0
+
+        return Observable.mergeDelayError(observables).doOnNext { count += DOWN_BATCH_SIZE_FOR_UPDATING_UI }.map { DownloadProgress(count, nPeopleToDownload) }
     }
 
     private fun makeDownSyncApiCall(downSyncParam: DownSyncParams, isInterrupted: () -> Boolean, nPeopleToDownload: Int): Observable<DownloadProgress> =
