@@ -31,7 +31,7 @@ class OneTimeDownSyncCountWorker: Worker() {
             syncStatusDatabase.syncStatusModel.updatePeopleToDownSyncCount(numberOfPeopleToDownSync)
 
             if (numberOfPeopleToDownSync > 0) {
-                scheduleDownSyncWorkIfDownSyncIsActive(preferencesManager.projectId)
+                scheduleDownSyncWorkIfDownSyncIsActive(loginInfoManager.getSignedInProjectIdOrEmpty())
             }
 
             Result.SUCCESS
