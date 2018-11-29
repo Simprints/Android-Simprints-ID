@@ -5,3 +5,6 @@ enum class PeopleDownSyncOption {
     BACKGROUND,
     ACTIVE
 }
+
+fun PeopleDownSyncOption.shouldDownSyncScheduleInBackground() = this != PeopleDownSyncOption.OFF
+fun PeopleDownSyncOption.shouldDownSyncScheduleInForeground() = this == PeopleDownSyncOption.ACTIVE
