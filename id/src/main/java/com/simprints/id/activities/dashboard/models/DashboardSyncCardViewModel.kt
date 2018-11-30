@@ -120,7 +120,8 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
             }
             peopleToDownload = peopleToDownSync
             latestDownSyncTime = latestDownSyncTimeForModules.max()
-            calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
+
+            lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
         }
         newSyncStatusViewModel.downSyncStatus.observe(lifecycleOwner, downSyncStatusObserver)
     }
@@ -129,7 +130,7 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
         val upSyncObserver = Observer<UpSyncStatus> {
             latestUpSyncTime = it.lastUpSyncTime
-            calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
+            lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
         }
         newSyncStatusViewModel.upSyncStatus.observe(lifecycleOwner, upSyncObserver)
     }
