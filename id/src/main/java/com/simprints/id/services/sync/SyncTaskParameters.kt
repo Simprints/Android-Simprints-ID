@@ -44,6 +44,6 @@ sealed class SyncTaskParameters(open val projectId: String, open val moduleIds: 
         workDataOf(
             PROJECT_ID_FIELD to projectId,
             USER_ID_FIELD to userId,
-            MODULES_ID_FIELD to moduleIds
+            MODULES_ID_FIELD to moduleIds?.toTypedArray()
         )
 }
