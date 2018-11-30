@@ -210,6 +210,14 @@ open class FirebaseManagerImpl(
                 }
         }
 
+    override fun getNumberOfPatients(projectId: String, userId: String?, moduleId: String?): Single<Int> =
+        getPeopleApiClient().flatMap { api ->
+            api.requestPeopleCount(projectId = projectId, userId = userId, moduleId = moduleId)
+                .retry(::retryCriteria)
+                .handleResponse(::defaultResponseErrorHandling)
+                .map { it.count }
+        }
+
     override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
         getPeopleApiClient().flatMap { api ->
             syncParams.moduleIds?.let { moduleIds ->

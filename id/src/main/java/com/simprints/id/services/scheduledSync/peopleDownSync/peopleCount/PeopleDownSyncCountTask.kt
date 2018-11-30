@@ -21,6 +21,6 @@ class PeopleDownSyncCountTask(
     fun execute(): Single<Int> =
         remoteDbManager.getNumberOfPatientsForSyncParams(syncParams)
             .flatMap {
-                dbManager.calculateNPatientsToDownSync(it, syncParams)
+                dbManager.calculateNPatientsToDownSyncForSyncParams(it, syncParams)
             }
 }

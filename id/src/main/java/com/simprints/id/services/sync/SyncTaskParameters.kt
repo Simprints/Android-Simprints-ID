@@ -1,5 +1,6 @@
 package com.simprints.id.services.sync
 
+import androidx.work.workDataOf
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Constants
 
@@ -8,7 +9,8 @@ sealed class SyncTaskParameters(open val projectId: String, open val moduleIds: 
     companion object {
         const val PROJECT_ID_FIELD = "projectId"
         const val USER_ID_FIELD = "userId"
-        const val MODULE_ID_FIELD = "moduleIds"
+        const val MODULES_ID_FIELD = "moduleIds" //StopShip: MODULE_IDS?
+        const val MODULE_ID_FIELD = "moduleId"
 
         @JvmStatic fun build(group: Constants.GROUP,
                              moduleIds: Set<String>,
@@ -36,4 +38,12 @@ sealed class SyncTaskParameters(open val projectId: String, open val moduleIds: 
             is GlobalSyncTaskParameters -> Constants.GROUP.GLOBAL
         }
     }
+
+    //StopShip is it the right place for that?
+    fun toData() =
+        workDataOf(
+            PROJECT_ID_FIELD to projectId,
+            USER_ID_FIELD to userId,
+            MODULES_ID_FIELD to moduleIds
+        )
 }

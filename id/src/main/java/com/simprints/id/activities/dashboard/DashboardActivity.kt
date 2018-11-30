@@ -2,9 +2,9 @@ package com.simprints.id.activities.dashboard
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +17,9 @@ import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.Constants
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.controllers.MasterSync
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.showToast
@@ -53,6 +56,10 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         setMenuItemClickListener()
 
         initCards()
+
+        MasterSync().enqueueOneTimeSyncWorker( //StopShip
+            SyncTaskParameters.build(Constants.GROUP.MODULE, setOf("module1, module2, module3"), loginInfoManager)
+        )
     }
 
     private fun initCards() {

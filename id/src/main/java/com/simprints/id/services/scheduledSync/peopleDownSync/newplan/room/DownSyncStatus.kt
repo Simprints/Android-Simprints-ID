@@ -12,15 +12,15 @@ import java.util.*
  *  3) ModuleId: String?
  *  4) LastPatientId: String?
  *  5) LastPatientUpdatedAt: Long?
- *  6) TotalToDownload: Int = 0
- *  7) LastSyncTime: Long?
+ *  6) TotalToDownload
+ *  7) LastSyncTime
  */
 
 @Entity(tableName = "DownSyncStatus")
 data class DownSyncStatus(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val projectId: String,
-    val userId:String? = null,
+    val userId: String? = null,
     val moduleId: String? = null,
     val lastPatientId: String? = null,
     val lastPatientUpdatedAt: Long? = null,

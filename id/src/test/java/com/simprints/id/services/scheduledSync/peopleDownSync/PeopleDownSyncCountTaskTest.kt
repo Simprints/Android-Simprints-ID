@@ -67,7 +67,7 @@ class PeopleDownSyncCountTaskTest: RxJavaTest {
         whenever(preferencesManagerMock.moduleId).thenReturn("0")
         whenever(loginInfoManagerMock.getSignedInUserIdOrEmpty()).thenReturn("")
         whenever(loginInfoManagerMock.getSignedInProjectIdOrEmpty()).thenReturn("")
-        whenever(dbManagerMock.calculateNPatientsToDownSync(anyInt(), anyNotNull())).thenReturn(Single.just(20000))
+        whenever(dbManagerMock.calculateNPatientsToDownSyncForSyncParams(anyInt(), anyNotNull())).thenReturn(Single.just(20000))
 
         val peopleToDownSyncTask = PeopleDownSyncCountTask(remoteDbManagerMock, dbManagerMock, preferencesManagerMock, loginInfoManagerMock)
         return peopleToDownSyncTask.execute().test()
