@@ -13,7 +13,7 @@ abstract class NewSyncStatusDatabase : RoomDatabase() {
     abstract val upSyncStatusModel: UpSyncDao
 
     companion object {
-        private const val SYNC_STATUS_DB_NAME = "sync_status_db"
+        private const val SYNC_STATUS_DB_NAME = "new_sync_status_db" // STOPSHIP : remove new from here and delete old
 
         fun getDatabase(context: Context): NewSyncStatusDatabase = Room
             .databaseBuilder(context.applicationContext, NewSyncStatusDatabase::class.java, SYNC_STATUS_DB_NAME)

@@ -2,7 +2,6 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.u
 
 import android.util.Log
 import androidx.work.Worker
-import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.di.AppComponent

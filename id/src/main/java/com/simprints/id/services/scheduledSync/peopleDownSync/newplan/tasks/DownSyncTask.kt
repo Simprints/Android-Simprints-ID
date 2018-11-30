@@ -106,14 +106,16 @@ class DownSyncTask(component: AppComponent,
         reader?.close()
     }
 
-    private fun getLastKnownPatientId(): String? = downSyncDao.getDownSyncStatusForId(getDownSyncId()).lastPatientId
-    private fun getLastKnownPatientUpdatedAt(): Long? = downSyncDao.getDownSyncStatusForId(getDownSyncId()).lastPatientUpdatedAt
+    private fun getLastKnownPatientId(): String? = downSyncDao.getDownSyncStatusForId(getDownSyncId())?.lastPatientId
+    private fun getLastKnownPatientUpdatedAt(): Long? = downSyncDao.getDownSyncStatusForId(getDownSyncId())?.lastPatientUpdatedAt
     private fun updateDownSyncTimestampOnBatchDownload() {
         downSyncDao.updateLastSyncTime(getDownSyncId(), timeHelper.now())
     }
     private fun decrementAndSavePeopleToDownSyncCount(decrement: Int) {
-        val currentCount = downSyncDao.getDownSyncStatusForId(getDownSyncId()).totalToDownload
-        downSyncDao.updatePeopleToDownSync(getDownSyncId(), currentCount - decrement)
+        val currentCount = downSyncDao.getDownSyncStatusForId(getDownSyncId())?.totalToDownload
+        if (currentCount != null) {
+            downSyncDao.updatePeopleToDownSync(getDownSyncId(), currentCount - decrement)
+        }
     }
     private fun updateLastKnownPatientUpdatedAt(updatedAt: Date?) {
         downSyncDao.updateLastPatientUpdatedAt(getDownSyncId(), updatedAt?.time ?: 0L)

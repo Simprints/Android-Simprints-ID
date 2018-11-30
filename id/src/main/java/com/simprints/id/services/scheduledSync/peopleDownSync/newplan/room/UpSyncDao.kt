@@ -14,7 +14,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.UpSyn
 interface UpSyncDao {
 
     @Query("select * from UpSyncStatus where upSyncStatusId = '$UP_SYNC_STATUS_CONST_ID'")
-    fun getUpSyncStatus(): LiveData<UpSyncStatus>
+    fun getUpSyncStatus(): LiveData<UpSyncStatus?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertLastUpSyncTime(upSyncStatus: UpSyncStatus)

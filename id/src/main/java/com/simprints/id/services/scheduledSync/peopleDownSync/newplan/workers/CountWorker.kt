@@ -10,6 +10,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.tasks.Coun
 import com.simprints.id.services.sync.SyncTaskParameters
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -43,6 +44,7 @@ class CountWorker : Worker() {
     }
 
     override fun doWork(): Result {
+        Timber.d("Doing work in CountWorker")
         val component = getComponentAndInject()
         val syncScope = SyncScope(projectId, userId, moduleIds?.toSet())
         val subSyncScopes = syncScope.toSubSyncScopes()
