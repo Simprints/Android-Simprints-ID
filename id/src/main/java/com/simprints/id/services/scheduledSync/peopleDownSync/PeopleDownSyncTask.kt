@@ -6,6 +6,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.DownSyncParams
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.network.toDownSyncParams
 import com.simprints.id.data.db.sync.room.SyncStatusDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -42,19 +43,22 @@ class PeopleDownSyncTask(
     }
 
     fun execute() {
-        // FIXME : Create multiple DownSyncParams from SyncParams
-        val downSyncParam = DownSyncParams(syncParams, "some_module", localDbManager)
-        val responseBody = syncApi.downSync(
-            downSyncParam.projectId,
-            downSyncParam.userId,
-            downSyncParam.moduleId,
-            downSyncParam.lastKnownPatientId,
-            downSyncParam.lastKnownPatientUpdatedAt)
-            .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
-            .blockingGet()
+        val downSyncParams = syncParams.toDownSyncParams(localDbManager)
 
-        setupReaderAndStartSavingPeopleFromStream(responseBody.byteStream())
-            .blockingAwait()
+        // TODO : Parallelise instead of sequential
+        downSyncParams.forEach { downSyncParam ->
+            val responseBody = syncApi.downSync(
+                downSyncParam.projectId,
+                downSyncParam.userId,
+                downSyncParam.moduleId,
+                downSyncParam.lastKnownPatientId,
+                downSyncParam.lastKnownPatientUpdatedAt)
+                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+                .blockingGet()
+
+            setupReaderAndStartSavingPeopleFromStream(responseBody.byteStream())
+                .blockingAwait()
+        }
     }
 
     private fun setupReaderAndStartSavingPeopleFromStream(input: InputStream): Completable =
