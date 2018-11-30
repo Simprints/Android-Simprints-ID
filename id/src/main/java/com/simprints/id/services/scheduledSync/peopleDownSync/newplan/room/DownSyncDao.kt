@@ -16,6 +16,9 @@ interface DownSyncDao {
     @Query("select * from DownSyncStatus")
     fun getDownSyncStatus(): LiveData<List<DownSyncStatus>>
 
+    @Query("select * from DownSyncStatus where id = :downSyncStatusId")
+    fun getDownSyncStatusForId(downSyncStatusId: String)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertDownSyncStatus(downSyncStatus: DownSyncStatus)
 
@@ -29,5 +32,6 @@ interface DownSyncDao {
     fun updateLastPatientId(downSyncStatusId: String, lastPatientId: String)
 
     @Query("update DownSyncStatus set lastPatientUpdatedAt = :lastPatientUpdatedAt where id = :downSyncStatusId")
-    fun updatelastPatientUpdatedAt(downSyncStatusId: String, lastPatientUpdatedAt: Long)
+    fun updateLastPatientUpdatedAt(downSyncStatusId: String, lastPatientUpdatedAt: Long)
 }
+fun DownSyncDao.getStatusId(projectId: String, userId: String?, moduleId: String?) = "${projectId}_${userId ?: ""}_${moduleId ?: ""}"

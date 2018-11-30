@@ -1,8 +1,8 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import java.util.*
 
 /**
  * Aashay - DownSyncStatus: room entity
@@ -17,8 +17,8 @@ import java.util.*
  */
 
 @Entity(tableName = "DownSyncStatus")
-data class DownSyncStatus(
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+class DownSyncStatus(
+    @PrimaryKey val id: String,
     val projectId: String,
     val userId: String? = null,
     val moduleId: String? = null,
@@ -26,4 +26,21 @@ data class DownSyncStatus(
     val lastPatientUpdatedAt: Long? = null,
     val totalToDownload: Int = 0,
     val lastSyncTime: Long? = null
-)
+) {
+    @Ignore
+    constructor(projectId: String,
+                userId: String? = null,
+                moduleId: String? = null,
+                lastPatientId: String? = null,
+                lastPatientUpdatedAt: Long? = null,
+                totalToDownload: Int = 0,
+                lastSyncTime: Long?):
+        this(id = "${projectId}_${userId ?: ""}_${moduleId ?: ""}",
+            projectId = projectId,
+            userId = userId,
+            moduleId = moduleId,
+            lastPatientId = lastPatientId,
+            lastPatientUpdatedAt = lastPatientUpdatedAt,
+            totalToDownload = totalToDownload,
+            lastSyncTime = lastSyncTime)
+}

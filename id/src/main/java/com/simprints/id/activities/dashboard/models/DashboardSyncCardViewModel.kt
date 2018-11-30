@@ -53,14 +53,14 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
     private val syncStatusViewModel: SyncStatusViewModel
     private val newSyncStatusViewModel: NewSyncStatusViewModel
 
-    var latestDownSyncTime: Long? = null
-    var latestUpSyncTime: Long? = null
+    private var latestDownSyncTime: Long? = null
+    private var latestUpSyncTime: Long? = null
+    private var syncState: State? = null
 
     var onSyncActionClicked: (cardModel: DashboardSyncCardViewModel) -> Unit = {}
     var peopleToUpload = 0
     var peopleToDownload = 0
     var peopleInDb = 0
-    var syncState: State? = null
     var isSyncRunning = false
         get() = syncState == State.RUNNING
 
@@ -123,7 +123,7 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
             lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
         }
-        newSyncStatusViewModel.downSyncStatus.observe(lifecycleOwner, downSyncStatusObserver)
+       // newSyncStatusViewModel.downSyncStatus.observe(lifecycleOwner, downSyncStatusObserver)
     }
 
     private fun observeAndUpdateLatestUpSyncTime() {
@@ -171,6 +171,7 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
     private fun updateCardView() = cardView?.bind(this)
 
+
     class SyncStatusViewModel(
         syncStatusDbModel: SyncStatusDao,
         projectId: String,
@@ -190,5 +191,7 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
         val downSyncStatus = downSyncDbModel.getDownSyncStatus()
 
         val upSyncStatus = upSyncDbModel.getUpSyncStatus()
+
+        //TODO: Get status for DownSyncWorker
     }
 }
