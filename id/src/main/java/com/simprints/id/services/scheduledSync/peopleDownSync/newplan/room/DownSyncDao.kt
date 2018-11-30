@@ -17,7 +17,7 @@ interface DownSyncDao {
     fun getDownSyncStatus(): LiveData<List<DownSyncStatus>>
 
     @Query("select * from DownSyncStatus where id = :downSyncStatusId")
-    fun getDownSyncStatusForId(downSyncStatusId: String)
+    fun getDownSyncStatusForId(downSyncStatusId: String): DownSyncStatus
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertDownSyncStatus(downSyncStatus: DownSyncStatus)

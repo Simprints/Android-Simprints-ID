@@ -12,7 +12,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import timber.log.Timber
 import javax.inject.Inject
 
-class PeopleDownSyncWorker: Worker() {
+class PeopleDownSyncWorker : Worker() {
 
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var dbManager: DbManager

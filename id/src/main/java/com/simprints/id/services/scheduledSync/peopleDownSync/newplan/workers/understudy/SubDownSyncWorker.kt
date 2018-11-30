@@ -1,9 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.understudy
 
-import android.content.Context
 import android.util.Log
 import androidx.work.Worker
-import androidx.work.WorkerParameters
 import com.simprints.id.tools.json.JsonHelper
 import java.util.*
 
@@ -11,7 +9,7 @@ import java.util.*
  * Tris - Worker to execute sync for (p, u, m) using DownCountTask.
  * Invocated by DownSyncWorker
  */
-class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class SubDownSyncWorker : Worker() {
 
     companion object {
         const val SUBDOWNSYNC_WORKER_TAG = "SUBDOWNSYNC_WORKER_TAG"

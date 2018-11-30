@@ -39,7 +39,7 @@ class CountTask(component: AppComponent,
 
     private fun Single<out Int>.insertNewCountForDownSyncStatus(projectId: String, userId: String?, moduleId: String?) =
         flatMapCompletable {
-            newSyncStatusDatabase.downSyncStatusModel.updatePeopleToDownSync(downSyncStatusId, it)
+            newSyncStatusDatabase.downSyncStatusModel.updatePeopleToDownSync("", it) //StopShip: fix DownSyncStatus
             Completable.complete()
         }
 }

@@ -1,8 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers
 
-import android.content.Context
 import androidx.work.Worker
-import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.di.AppComponent
@@ -23,7 +21,7 @@ import javax.inject.Inject
  * OR
  * b) zip SubCountWorkers to fetch counter for each (p, u, m)
  */
-class CountWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class CountWorker : Worker() {
 
     val projectId by lazy {
         inputData.getString(SyncTaskParameters.PROJECT_ID_FIELD)
