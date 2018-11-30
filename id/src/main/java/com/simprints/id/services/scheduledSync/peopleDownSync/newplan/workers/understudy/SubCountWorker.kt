@@ -1,10 +1,8 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.understudy
 
-import android.content.Context
 import android.util.Log
 import androidx.work.Data
 import androidx.work.Worker
-import androidx.work.WorkerParameters
 import com.simprints.id.tools.json.JsonHelper
 import java.util.*
 
@@ -12,7 +10,7 @@ import java.util.*
  * Tris - Worker to fetch counter for (p, u, m) using CountTask.
  * Invocated by CountWorker
  */
-class SubCountWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class SubCountWorker : Worker() {
 
     companion object {
         const val SUBCOUNT_WORKER_TAG = "SUBCOUNT_WORKER_TAG"

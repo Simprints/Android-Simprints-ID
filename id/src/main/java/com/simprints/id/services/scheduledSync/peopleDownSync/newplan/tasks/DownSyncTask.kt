@@ -100,13 +100,16 @@ class DownSyncTask(component: AppComponent,
         reader?.close()
     }
 
-    private fun getLastKnownPatientId(): String
-    private fun getLastKnownPatientUpdatedAt(): Long
-    private fun getPeopleToDownSync(): Int
+    private fun getLastKnownPatientId(): String = "" //StopShip
+    private fun getLastKnownPatientUpdatedAt(): Long = 0
+    private fun getPeopleToDownSync(): Int = 0
     private fun updateDownSyncTimestampOnBatchDownload() {
-        syncStatusDatabaseModel.updateLastDownSyncTime(System.currentTimeMillis())
+        //syncStatusDatabaseModel.updateLastDownSyncTime(System.currentTimeMillis())
     }
-    private fun decrementAndSavePeopleToDownSyncCount(decrement: Int)
+    private fun decrementAndSavePeopleToDownSyncCount(decrement: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     private fun updateLastKnownPatientUpdatedAt(updatedAt: Date?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

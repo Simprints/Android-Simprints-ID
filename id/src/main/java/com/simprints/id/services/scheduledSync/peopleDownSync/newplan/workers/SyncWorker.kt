@@ -1,6 +1,5 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers
 
-import android.content.Context
 import android.util.Log
 import androidx.work.*
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.understudy.SubCountWorker
@@ -16,7 +15,7 @@ import java.util.concurrent.TimeUnit
  * Fabio - Sync Worker: Worker to chain CountWorker and DownSyncWorker
  * passing SyncParams as Input of the CountWorker.
  */
-class SyncWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class SyncWorker : Worker() {
 
     private val workerManager = WorkManager.getInstance()
     val projectId by lazy {
