@@ -38,7 +38,7 @@ class SyncTaskParametersTest {
 
     private fun SyncTaskParameters.toMap(): Map<String, String> {
         val map = mutableMapOf(SyncTaskParameters.PROJECT_ID_FIELD to projectId)
-        moduleIds?.let { map[SyncTaskParameters.MODULE_ID_FIELD] = ModuleIdOptionsStringSetSerializer().serialize(it) }
+        moduleIds?.let { map[SyncTaskParameters.MODULES_ID_FIELD] = ModuleIdOptionsStringSetSerializer().serialize(it) }
         userId?.let { map[SyncTaskParameters.USER_ID_FIELD] = it }
         return map
     }

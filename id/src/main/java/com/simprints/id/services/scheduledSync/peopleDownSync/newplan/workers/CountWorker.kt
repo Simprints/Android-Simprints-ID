@@ -11,4 +11,13 @@ import androidx.work.Worker
  * OR
  * b) zip SubCountWorkers to fetch counter for each (p, u, m)
  */
-class CountWorker : Worker()
+class CountWorker : Worker() {
+
+    companion object {
+        const val COUNT_WORKER_TAG = "COUNT_WORKER_TAG"
+    }
+
+    override fun doWork(): Result {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+}
