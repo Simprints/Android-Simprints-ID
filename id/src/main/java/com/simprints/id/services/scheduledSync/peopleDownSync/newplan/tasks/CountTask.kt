@@ -14,7 +14,6 @@ import javax.inject.Inject
  * b) InsertOrUpdate DownSyncStatus(p,u,m).totalToDownload = X in Room
  */
 class CountTask(component: AppComponent,
-                private val downSyncStatusId: String,
                 private val projectId: String,
                 private val userId: String?,
                 private val moduleId: String?) {
@@ -31,14 +30,14 @@ class CountTask(component: AppComponent,
         remoteDbManager
             .getNumberOfPatients(projectId, userId, moduleId)
             .calculateNPatientsToDownSync(projectId, userId, moduleId)
-            .insertNewCountForDownSyncStatus(downSyncStatusId)
+            .insertNewCountForDownSyncStatus(projectId, userId, moduleId)
 
     private fun Single<out Int>.calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?) =
         flatMap {
             dbManager.calculateNPatientsToDownSync(it, projectId, userId, moduleId)
         }
 
-    private fun Single<out Int>.insertNewCountForDownSyncStatus(downSyncStatusId: String) =
+    private fun Single<out Int>.insertNewCountForDownSyncStatus(projectId: String, userId: String?, moduleId: String?) =
         flatMapCompletable {
             newSyncStatusDatabase.downSyncStatusModel.updatePeopleToDownSync(downSyncStatusId, it)
             Completable.complete()

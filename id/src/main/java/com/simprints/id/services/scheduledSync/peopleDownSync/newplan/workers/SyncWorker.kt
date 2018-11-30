@@ -1,5 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers
 
+import android.content.Context
 import android.util.Log
 import androidx.work.*
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.understudy.SubCountWorker
@@ -8,13 +9,14 @@ import com.simprints.id.services.sync.SyncTaskParameters.Companion.MODULES_ID_FI
 import com.simprints.id.services.sync.SyncTaskParameters.Companion.MODULE_ID_FIELD
 import com.simprints.id.services.sync.SyncTaskParameters.Companion.PROJECT_ID_FIELD
 import com.simprints.id.services.sync.SyncTaskParameters.Companion.USER_ID_FIELD
+import com.simprints.id.tools.json.JsonHelper
 import java.util.concurrent.TimeUnit
 
 /**
  * Fabio - Sync Worker: Worker to chain CountWorker and DownSyncWorker
  * passing SyncParams as Input of the CountWorker.
  */
-class SyncWorker : Worker() {
+class SyncWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
     private val workerManager = WorkManager.getInstance()
     val projectId by lazy {
@@ -37,16 +39,24 @@ class SyncWorker : Worker() {
     }
 
     override fun doWork(): Result {
-        Log.d("WM", "Running SyncWorker with $inputData")
+        Log.d("WM", "Running SyncWorker with ${JsonHelper.toJson(inputData)}")
         val listOfCountWorkers = getCountWorkers().map { workerManager.beginWith(it) }
         val listOfDownSyncers = getDownSyncWorkers()
-        val syncChain = WorkContinuation.combine(listOfCountWorkers).then(listOfDownSyncers)
 
+        val countersChain = if (listOfCountWorkers.size == 1) {
+            listOfCountWorkers[0]
+        } else {
+            WorkContinuation.combine(*listOfCountWorkers.toTypedArray())
+        }
+
+        val syncChain = countersChain.then(listOfDownSyncers)
         syncChain.enqueue()
 
+        Log.d("WM", "All queuing done!")
         return Result.SUCCESS
     }
 
+    //it convert (p, u, listOf(m)) -> listOf(OneTimeWorker<SubDownSyncWorker>(p, u, m))
     private fun getDownSyncWorkers(): List<OneTimeWorkRequest> =
         mutableListOf<OneTimeWorkRequest>().apply {
             moduleIds?.let {
@@ -56,6 +66,7 @@ class SyncWorker : Worker() {
             } ?: add(buildDownSyncWorker(projectId, userId, null))
         }
 
+    //it convert (p, u, listOf(m)) -> listOf(OneTimeWorker<CountSyncWorker>(p, u, m))
     private fun getCountWorkers(): List<OneTimeWorkRequest> =
         mutableListOf<OneTimeWorkRequest>().apply {
             moduleIds?.let {
