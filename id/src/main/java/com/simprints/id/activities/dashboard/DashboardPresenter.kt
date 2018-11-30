@@ -11,10 +11,15 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.Constants
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.controllers.MasterSync
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
+import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import org.jetbrains.anko.doAsync
 import java.util.*
 import javax.inject.Inject
 
@@ -29,6 +34,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var sessionEventManager: SessionEventsManager
 
+    @Inject lateinit var newSyncStatusDatabase: NewSyncStatusDatabase
+
     private val cardsFactory = DashboardCardsFactory(view.getLifeCycleOwner(), component)
     private val syncSchedulerHelper: SyncSchedulerHelper
 
@@ -37,6 +44,12 @@ class DashboardPresenter(private val view: DashboardContract.View,
     init {
         component.inject(this)
         syncSchedulerHelper = SyncSchedulerHelper(component)
+
+        // STOPSHIP : please god remove this
+        dbManager.local.deletePeopleFromLocal(SyncTaskParameters.build(Constants.GROUP.GLOBAL, emptySet(), loginInfoManager)).blockingAwait()
+        doAsync {
+            newSyncStatusDatabase.downSyncStatusModel.lolDelete()
+        }
     }
 
     override fun start() {
@@ -96,7 +109,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun userDidWantToSync() {
-        syncSchedulerHelper.schedulePeopleDownSyncIfNotOff()
+//        syncSchedulerHelper.schedulePeopleDownSyncIfNotOff()
+
+        MasterSync().enqueueOneTimeSyncWorker( //StopShip
+            SyncTaskParameters.build(Constants.GROUP.GLOBAL, emptySet(), loginInfoManager)
+        )
     }
 
     private fun removeCardIfExist(projectType: DashboardCardType) {
@@ -121,8 +138,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
         true
     }
 
-    private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
-        dashboardSyncCardViewModel.peopleToUpload > 0 || dashboardSyncCardViewModel.peopleToDownload > 0
+    private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) = true // STOPSHIP
+//        dashboardSyncCardViewModel.peopleToUpload > 0 || dashboardSyncCardViewModel.peopleToDownload > 0
 
     private fun cancelAllDownSyncWorkers() {
         syncSchedulerHelper.cancelDownSyncWorkers()
