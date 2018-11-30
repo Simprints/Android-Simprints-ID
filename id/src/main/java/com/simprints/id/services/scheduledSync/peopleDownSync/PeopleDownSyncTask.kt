@@ -32,6 +32,10 @@ class PeopleDownSyncTask(
         dbManager.remote.getPeopleApiClient().blockingGet()
     }
 
+    val downSyncParams by lazyVar {
+        DownSyncParams(syncParams, "some_module", localDbManager)
+    }
+
     var syncParams by lazyVar {
         SyncTaskParameters.build(preferencesManager.syncGroup,
             preferencesManager.selectedModules, loginInfoManager)
@@ -39,7 +43,7 @@ class PeopleDownSyncTask(
 
     fun execute() {
         // FIXME : Create multiple DownSyncParams from SyncParams
-        val downSyncParam = DownSyncParams(syncParams, localDbManager)
+        val downSyncParam = DownSyncParams(syncParams, "some_module", localDbManager)
         val responseBody = syncApi.downSync(
             downSyncParam.projectId,
             downSyncParam.userId,
@@ -70,7 +74,7 @@ class PeopleDownSyncTask(
         var totalDownloaded = 0
         val peopleToDownSync = syncStatusDatabaseModel.getPeopleToDownSync()
         while (reader.hasNext()) {
-            localDbManager.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, syncParams) {
+            localDbManager.savePeopleFromStreamAndUpdateSyncInfo(reader, gson, downSyncParams) {
                 totalDownloaded++
                 syncStatusDatabaseModel.updatePeopleToDownSyncCount(peopleToDownSync - totalDownloaded)
                 val shouldDownloadingBatchStop =
