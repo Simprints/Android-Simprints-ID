@@ -7,7 +7,10 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.di.AppComponent
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.DownSyncDao
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.getStatusId
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -35,12 +38,15 @@ class DownSyncTask(component: AppComponent,
 
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var newSyncStatusDatabase: NewSyncStatusDatabase
+    private var downSyncDao: DownSyncDao
 
     private var reader: JsonReader? = null
 
     init {
         component.inject(this)
+        downSyncDao = newSyncStatusDatabase.downSyncStatusModel
     }
 
     fun execute(): Completable =
@@ -100,22 +106,22 @@ class DownSyncTask(component: AppComponent,
         reader?.close()
     }
 
-    private fun getLastKnownPatientId(): String = "" //StopShip
-    private fun getLastKnownPatientUpdatedAt(): Long = 0
-    private fun getPeopleToDownSync(): Int = 0
+    private fun getLastKnownPatientId(): String? = downSyncDao.getDownSyncStatusForId(getDownSyncId()).lastPatientId
+    private fun getLastKnownPatientUpdatedAt(): Long? = downSyncDao.getDownSyncStatusForId(getDownSyncId()).lastPatientUpdatedAt
     private fun updateDownSyncTimestampOnBatchDownload() {
-        //syncStatusDatabaseModel.updateLastDownSyncTime(System.currentTimeMillis())
+        downSyncDao.updateLastSyncTime(getDownSyncId(), timeHelper.now())
     }
     private fun decrementAndSavePeopleToDownSyncCount(decrement: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val currentCount = downSyncDao.getDownSyncStatusForId(getDownSyncId()).totalToDownload
+        downSyncDao.updatePeopleToDownSync(getDownSyncId(), currentCount - decrement)
     }
-
     private fun updateLastKnownPatientUpdatedAt(updatedAt: Date?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        downSyncDao.updateLastPatientUpdatedAt(getDownSyncId(), updatedAt?.time ?: 0L)
     }
     private fun updateLastKnownPatientId(patientId: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        downSyncDao.updateLastPatientId(getDownSyncId(), patientId)
     }
+    private fun getDownSyncId() = downSyncDao.getStatusId(projectId, userId, moduleId)
 
     companion object {
         const val BATCH_SIZE_FOR_DOWNLOADING = 200
