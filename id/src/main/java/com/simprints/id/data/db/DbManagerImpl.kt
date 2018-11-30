@@ -199,7 +199,14 @@ open class DbManagerImpl(override val local: LocalDbManager,
                 .andThen(Single.just(it))
         }.trace("refreshProjectInfoWithServer")
 
-    override fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int> =
+    override fun calculateNPatientsToDownSync(nPatientsOnServer: Int,
+                                              projectId: String, userId: String?, moduleId: String?): Single<Int> =
+        local.getPeopleCountFromLocal(userId = userId, moduleId = moduleId, toSync = false) // STOPSHIP: Do we need the toSync flag = false here?
+            .map {
+                Math.max(nPatientsOnServer - it, 0)
+            }
+
+    override fun calculateNPatientsToDownSyncForSyncParams(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int> =
         syncParams.moduleIds?.let { moduleIds ->
             sumCountsForEachModule(moduleIds).map {
                 Math.max(nPatientsOnServerForSyncParam - it, 0)
