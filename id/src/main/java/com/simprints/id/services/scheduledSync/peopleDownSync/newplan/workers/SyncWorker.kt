@@ -38,6 +38,20 @@ class SyncWorker : Worker() {
     }
 
     override fun doWork(): Result {
+        workerManager
+            .beginWith(OneTimeWorkRequestBuilder<CountWorker>()
+                .addTag(CountWorker.COUNT_WORKER_TAG)
+                .setInputData(inputData)
+                .build())
+            .then(OneTimeWorkRequestBuilder<DownSyncWorker>()
+                .addTag(DownSyncWorker.DOWNSYNC_WORKER_TAG)
+                .setInputData(inputData)
+                .build())
+            .enqueue()
+        return Result.SUCCESS
+    }
+
+    fun experimental_doWork(): Result {
         Log.d("WM", "Running SyncWorker with ${JsonHelper.toJson(inputData)}")
         val listOfCountWorkers = getCountWorkers().map { workerManager.beginWith(it) }
         val listOfDownSyncers = getDownSyncWorkers()

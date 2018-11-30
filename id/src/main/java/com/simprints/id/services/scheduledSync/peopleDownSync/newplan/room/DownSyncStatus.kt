@@ -18,14 +18,14 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "DownSyncStatus")
 class DownSyncStatus(
-    @PrimaryKey val id: String,
-    val projectId: String,
-    val userId: String? = null,
-    val moduleId: String? = null,
-    val lastPatientId: String? = null,
-    val lastPatientUpdatedAt: Long? = null,
-    val totalToDownload: Int = 0,
-    val lastSyncTime: Long? = null
+    @PrimaryKey var id: String,
+    var projectId: String,
+    var userId: String? = null,
+    var moduleId: String? = null,
+    var lastPatientId: String? = null,
+    var lastPatientUpdatedAt: Long? = null,
+    var totalToDownload: Int = 0,
+    var lastSyncTime: Long? = null
 ) {
     @Ignore
     constructor(projectId: String,
@@ -34,7 +34,7 @@ class DownSyncStatus(
                 lastPatientId: String? = null,
                 lastPatientUpdatedAt: Long? = null,
                 totalToDownload: Int = 0,
-                lastSyncTime: Long?):
+                lastSyncTime: Long? = null):
         this(id = "${projectId}_${userId ?: ""}_${moduleId ?: ""}",
             projectId = projectId,
             userId = userId,

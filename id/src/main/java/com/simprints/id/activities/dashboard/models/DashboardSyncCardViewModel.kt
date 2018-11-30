@@ -118,8 +118,8 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
     private fun observeAndUpdateLatestUpSyncTime() {
 
-        val upSyncObserver = Observer<UpSyncStatus> {
-            latestUpSyncTime = it.lastUpSyncTime
+        val upSyncObserver = Observer<UpSyncStatus?> {
+            latestUpSyncTime = it?.lastUpSyncTime
             lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
         }
         newSyncStatusViewModel.upSyncStatus.observe(lifecycleOwner, upSyncObserver)

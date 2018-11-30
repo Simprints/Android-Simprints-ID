@@ -58,7 +58,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         initCards()
 
         MasterSync().enqueueOneTimeSyncWorker( //StopShip
-            SyncTaskParameters.build(Constants.GROUP.MODULE, setOf("module1", "module2", "module3"), loginInfoManager)
+            SyncTaskParameters.build(Constants.GROUP.MODULE, preferences.selectedModules, loginInfoManager)
         )
     }
 

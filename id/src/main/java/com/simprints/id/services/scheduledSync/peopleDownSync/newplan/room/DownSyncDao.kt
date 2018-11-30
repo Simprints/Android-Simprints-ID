@@ -17,10 +17,10 @@ interface DownSyncDao {
     fun getDownSyncStatus(): LiveData<List<DownSyncStatus>>
 
     @Query("select * from DownSyncStatus where id = :downSyncStatusId")
-    fun getDownSyncStatusForId(downSyncStatusId: String): DownSyncStatus
+    fun getDownSyncStatusForId(downSyncStatusId: String): DownSyncStatus?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertDownSyncStatus(downSyncStatus: DownSyncStatus)
+    fun insertOrReplaceDownSyncStatus(downSyncStatus: DownSyncStatus)
 
     @Query("update DownSyncStatus set totalToDownload = :totalToDownload where id = :downSyncStatusId")
     fun updatePeopleToDownSync(downSyncStatusId: String, totalToDownload: Int)
