@@ -3,6 +3,7 @@ package com.simprints.id.activities.dashboard.models
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.work.State
+import androidx.work.WorkManager
 import androidx.work.WorkStatus
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.data.db.DbManager
@@ -11,7 +12,9 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.*
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.DownSyncWorker
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.rxkotlin.subscribeBy
@@ -62,9 +65,12 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
     init {
         component.inject(this)
 
+        val syncScope = SyncScope(syncParams.projectId, syncParams.userId, syncParams.moduleIds)
+
         newSyncStatusViewModel = NewSyncStatusViewModel(
             newSyncStatusDatabase.downSyncStatusModel,
-            newSyncStatusDatabase.upSyncStatusModel)
+            newSyncStatusDatabase.upSyncStatusModel,
+            syncScope)
 
         observeAndUpdatePeopleToDownloadAndLatestDownSyncTimes()
         observeAndUpdateLatestUpSyncTime()
@@ -112,6 +118,7 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
             latestDownSyncTime = latestDownSyncTimeForModules.max()
 
             lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
+            updateCardView()
         }
        newSyncStatusViewModel.downSyncStatus.observe(lifecycleOwner, downSyncStatusObserver)
     }
@@ -121,6 +128,7 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
         val upSyncObserver = Observer<UpSyncStatus?> {
             latestUpSyncTime = it?.lastUpSyncTime
             lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
+            updateCardView()
         }
         newSyncStatusViewModel.upSyncStatus.observe(lifecycleOwner, upSyncObserver)
     }
@@ -146,30 +154,34 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
     private fun observeDownSyncStatusAndUpdateButton() {
 
-        val downSyncObserver = Observer<MutableList<WorkStatus>> {
-            if (it.size > 0) {
-                val currentSyncState = it.last().state
-                if(syncState != currentSyncState) {
-                    syncState = currentSyncState
+        val downSyncObserver = Observer<List<WorkStatus>> { it ->
+            val possibleSyncState = it.find { it.state == State.RUNNING }
+
+            if (possibleSyncState != null) {
+//                val currentSyncState = it.last().state
+//                if(syncState != currentSyncState) {
+//                    syncState = currentSyncState
                     updateSyncInfo()
                     updateCardView()
-                }
+//                }
             }
         }
 
         //TODO: Observe DownSyncWorker/s here
+        newSyncStatusViewModel.downSyncWorkerStatus.observe(lifecycleOwner, downSyncObserver)
     }
 
     private fun updateCardView() = cardView?.bind(this)
 
     class NewSyncStatusViewModel(
         downSyncDbModel: DownSyncDao,
-        upSyncDbModel: UpSyncDao) {
+        upSyncDbModel: UpSyncDao,
+        syncScope: SyncScope) {
 
         val downSyncStatus = downSyncDbModel.getDownSyncStatus()
 
         val upSyncStatus = upSyncDbModel.getUpSyncStatus()
 
-        //TODO: Get status for DownSyncWorker
+        val downSyncWorkerStatus = WorkManager.getInstance().getStatusesByTag("${DownSyncWorker.DOWNSYNC_WORKER_TAG}_$syncScope")
     }
 }

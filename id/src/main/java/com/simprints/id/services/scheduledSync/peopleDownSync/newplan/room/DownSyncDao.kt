@@ -33,5 +33,9 @@ interface DownSyncDao {
 
     @Query("update DownSyncStatus set lastPatientUpdatedAt = :lastPatientUpdatedAt where id = :downSyncStatusId")
     fun updateLastPatientUpdatedAt(downSyncStatusId: String, lastPatientUpdatedAt: Long)
+
+    // STOPSHIP
+    @Query("delete from DownSyncStatus")
+    fun lolDelete()
 }
 fun DownSyncDao.getStatusId(projectId: String, userId: String?, moduleId: String?) = "${projectId}_${userId ?: ""}_${moduleId ?: ""}"

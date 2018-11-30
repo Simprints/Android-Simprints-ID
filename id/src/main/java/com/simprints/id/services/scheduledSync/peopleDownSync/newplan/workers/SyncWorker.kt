@@ -2,6 +2,7 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers
 
 import android.util.Log
 import androidx.work.*
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.understudy.SubCountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.understudy.SubDownSyncWorker
 import com.simprints.id.services.sync.SyncTaskParameters.Companion.MODULES_ID_FIELD
@@ -44,7 +45,7 @@ class SyncWorker : Worker() {
                 .setInputData(inputData)
                 .build())
             .then(OneTimeWorkRequestBuilder<DownSyncWorker>()
-                .addTag(DownSyncWorker.DOWNSYNC_WORKER_TAG)
+                .addTag("${DownSyncWorker.DOWNSYNC_WORKER_TAG}_${SyncScope(projectId, userId, moduleIds?.toSet())}")
                 .setInputData(inputData)
                 .build())
             .enqueue()

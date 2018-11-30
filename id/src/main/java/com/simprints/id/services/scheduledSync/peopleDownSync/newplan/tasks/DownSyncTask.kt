@@ -91,6 +91,7 @@ class DownSyncTask(component: AppComponent,
         flatMapCompletable { batchOfPeople ->
             Completable.create { emitter ->
                 localDbManager.insertOrUpdatePeopleInLocal(batchOfPeople.map { it.toDomainPerson() }).blockingAwait()
+                Timber.d("Saved batch")
                 decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
                 updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
                 updateLastKnownPatientId(batchOfPeople.last().patientId)
@@ -126,7 +127,7 @@ class DownSyncTask(component: AppComponent,
     private fun getDownSyncId() = downSyncDao.getStatusId(projectId, userId, moduleId)
 
     companion object {
-        const val BATCH_SIZE_FOR_DOWNLOADING = 200
+        const val BATCH_SIZE_FOR_DOWNLOADING = 200 // STOPSHIP
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 }

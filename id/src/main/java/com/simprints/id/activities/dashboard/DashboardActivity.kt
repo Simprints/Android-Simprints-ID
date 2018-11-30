@@ -56,10 +56,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         setMenuItemClickListener()
 
         initCards()
-
-        MasterSync().enqueueOneTimeSyncWorker( //StopShip
-            SyncTaskParameters.build(Constants.GROUP.MODULE, preferences.selectedModules, loginInfoManager)
-        )
     }
 
     private fun initCards() {
