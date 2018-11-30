@@ -40,3 +40,10 @@ class DownSyncParams(private val syncParams: SyncTaskParameters,
 
     fun toGroup() = syncParams.toGroup()
 }
+
+fun SyncTaskParameters.toDownSyncParams(localDbManager: LocalDbManager): List<DownSyncParams> =
+    this.moduleIds?.let { moduleIds ->
+        moduleIds.map { moduleId ->
+            DownSyncParams(this, moduleId, localDbManager)
+        }
+    } ?: listOf(DownSyncParams(this, null, localDbManager))

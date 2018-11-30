@@ -15,7 +15,7 @@ class PeopleDownSyncCountTask(
     private val loginInfoManager: LoginInfoManager) {
 
     var syncParams by lazyVar {
-        SyncTaskParameters.build(preferencesManager.syncGroup, setOf(preferencesManager.moduleId), loginInfoManager)
+        SyncTaskParameters.build(preferencesManager.syncGroup, preferencesManager.selectedModules, loginInfoManager)
     }
 
     fun execute(): Single<Int> =
