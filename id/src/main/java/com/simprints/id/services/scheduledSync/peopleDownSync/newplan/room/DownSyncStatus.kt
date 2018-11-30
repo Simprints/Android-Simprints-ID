@@ -1,5 +1,9 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import java.util.*
+
 /**
  * Aashay - DownSyncStatus: room entity
  *  1) Id
@@ -11,3 +15,15 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room
  *  6) TotalToDownload: Int = 0
  *  7) LastSyncTime: Long?
  */
+
+@Entity(tableName = "DownSyncStatus")
+data class DownSyncStatus(
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    val projectId: String,
+    val userId:String? = null,
+    val moduleId: String? = null,
+    val lastPatientId: String? = null,
+    val lastPatientUpdatedAt: Long? = null,
+    val totalToDownload: Int = 0,
+    val lastSyncTime: Long? = null
+)
