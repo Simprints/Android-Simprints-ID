@@ -3,6 +3,7 @@ package com.simprints.id.data.db.remote.network
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfoException
 import com.simprints.id.services.sync.SyncTaskParameters
+import java.io.Serializable
 
 /**
  * An hashmap with (all optionals):
@@ -16,7 +17,7 @@ import com.simprints.id.services.sync.SyncTaskParameters
  */
 class DownSyncParams(private val syncParams: SyncTaskParameters,
                      specificModule: String? = null,
-                     localDbManager: LocalDbManager) {
+                     localDbManager: LocalDbManager) : Serializable {
 
     val projectId: String = syncParams.projectId
     val userId: String? = syncParams.userId

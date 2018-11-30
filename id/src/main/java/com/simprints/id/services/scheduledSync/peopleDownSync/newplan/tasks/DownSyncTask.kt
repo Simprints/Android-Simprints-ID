@@ -12,5 +12,5 @@ import io.reactivex.Completable
  *      DownSyncStatus(p,u,m).LastSyncTime = X
  */
 class DownSyncTask(val projectId: String, val userId: String?, val moduleId: String?) {
-    fun execute(): Completable
+    fun execute(): Completable = Completable.complete()
 }
