@@ -4,6 +4,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.getStatusId
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
@@ -29,17 +30,19 @@ class CountTask(component: AppComponent,
     fun execute(): Completable =
         remoteDbManager
             .getNumberOfPatients(projectId, userId, moduleId)
-            .calculateNPatientsToDownSync(projectId, userId, moduleId)
-            .insertNewCountForDownSyncStatus(projectId, userId, moduleId)
+            .calculateNPatientsToDownSync()
+            .insertNewCountForDownSyncStatus()
 
-    private fun Single<out Int>.calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?) =
+    private fun Single<out Int>.calculateNPatientsToDownSync() =
         flatMap {
             dbManager.calculateNPatientsToDownSync(it, projectId, userId, moduleId)
         }
 
-    private fun Single<out Int>.insertNewCountForDownSyncStatus(projectId: String, userId: String?, moduleId: String?) =
+    private fun Single<out Int>.insertNewCountForDownSyncStatus() =
         flatMapCompletable {
-            newSyncStatusDatabase.downSyncStatusModel.updatePeopleToDownSync("", it) //StopShip: fix DownSyncStatus
+            newSyncStatusDatabase.downSyncStatusModel.updatePeopleToDownSync(getDownSyncId(), it)
             Completable.complete()
         }
+
+    private fun getDownSyncId() = newSyncStatusDatabase.downSyncStatusModel.getStatusId(projectId, userId, moduleId)
 }
