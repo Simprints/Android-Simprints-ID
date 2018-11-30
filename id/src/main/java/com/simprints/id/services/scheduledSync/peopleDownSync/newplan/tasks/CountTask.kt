@@ -3,7 +3,7 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.tasks
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.DownSyncDao
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
 import io.reactivex.Completable
 import io.reactivex.Single
 import javax.inject.Inject
@@ -21,7 +21,7 @@ class CountTask(component: AppComponent,
 
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var downSyncDao: DownSyncDao // STOPSHIP : inject or constructor?
+    @Inject lateinit var newSyncStatusDatabase: NewSyncStatusDatabase
 
     init {
         component.inject(this)
@@ -40,7 +40,7 @@ class CountTask(component: AppComponent,
 
     private fun Single<out Int>.insertNewCountForDownSyncStatus(downSyncStatusId: String) =
         flatMapCompletable {
-            downSyncDao.updatePeopleToDownSync(downSyncStatusId, it)
+            newSyncStatusDatabase.downSyncStatusModel.updatePeopleToDownSync(downSyncStatusId, it)
             Completable.complete()
         }
 }
