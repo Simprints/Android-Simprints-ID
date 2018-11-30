@@ -48,7 +48,8 @@ interface DbManager {
 
     fun saveRefusalForm(refusalForm: RefusalForm)
 
-    fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int>
+    fun calculateNPatientsToDownSync(nPatientsOnServer: Int, projectId: String, userId: String?, moduleId: String?): Single<Int>
+    fun calculateNPatientsToDownSyncForSyncParams(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int>
 
     fun saveSession(session: Session)
 
