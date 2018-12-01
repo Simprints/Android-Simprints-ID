@@ -20,7 +20,6 @@ import com.simprints.id.domain.Project
 import com.simprints.id.domain.toLibPerson
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
@@ -199,23 +198,11 @@ open class DbManagerImpl(override val local: LocalDbManager,
                 .andThen(Single.just(it))
         }.trace("refreshProjectInfoWithServer")
 
-    override fun calculateNPatientsToDownSync(nPatientsOnServer: Int,
-                                              projectId: String, userId: String?, moduleId: String?): Single<Int> =
-        local.getPeopleCountFromLocal(userId = userId, moduleId = moduleId, toSync = false) // STOPSHIP: Do we need the toSync flag = false here?
-            .map {
+    override fun calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?): Single<Int> =
+        remote.getNumberOfPatients(projectId, userId, moduleId).flatMap { nPatientsOnServer ->
+            local.getPeopleCountFromLocal(userId = userId, moduleId = moduleId, toSync = false).map {
                 Math.max(nPatientsOnServer - it, 0)
             }
-
-    override fun calculateNPatientsToDownSyncForSyncParams(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int> =
-        syncParams.moduleIds?.let { moduleIds ->
-            sumCountsForEachModule(moduleIds).map {
-                Math.max(nPatientsOnServerForSyncParam - it, 0)
-            }
-        } ?: local.getPeopleCountFromLocal(
-            userId = syncParams.userId,
-            moduleId = null,
-            toSync = false).map {
-            Math.max(nPatientsOnServerForSyncParam - it, 0)
         }
 
     private fun sumCountsForEachModule(moduleIds: Set<String>): Single<Int> =

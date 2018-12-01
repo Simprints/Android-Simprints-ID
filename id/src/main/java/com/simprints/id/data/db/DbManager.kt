@@ -7,7 +7,6 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.session.Session
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -48,8 +47,7 @@ interface DbManager {
 
     fun saveRefusalForm(refusalForm: RefusalForm)
 
-    fun calculateNPatientsToDownSync(nPatientsOnServer: Int, projectId: String, userId: String?, moduleId: String?): Single<Int>
-    fun calculateNPatientsToDownSyncForSyncParams(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int>
+    fun calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?): Single<Int>
 
     fun saveSession(session: Session)
 

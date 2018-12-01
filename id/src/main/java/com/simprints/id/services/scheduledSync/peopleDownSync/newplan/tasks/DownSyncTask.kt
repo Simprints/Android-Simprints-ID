@@ -7,6 +7,7 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.di.AppComponent
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.DownSyncDao
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.getStatusId
@@ -31,10 +32,11 @@ import javax.inject.Inject
  *      DownSyncStatus(p,u,m).LastPatientUpdatedAt = X
  *      DownSyncStatus(p,u,m).LastSyncTime = X
  */
-class DownSyncTask(component: AppComponent,
-                   private val projectId: String,
-                   private val userId: String?,
-                   private val moduleId: String?) {
+class DownSyncTask(component: AppComponent, subSyncScope: SubSyncScope) {
+
+    val projectId = subSyncScope.projectId
+    val userId = subSyncScope.userId
+    val moduleId = subSyncScope.moduleId
 
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var remoteDbManager: RemoteDbManager

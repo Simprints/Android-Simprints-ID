@@ -6,5 +6,6 @@ enum class PeopleDownSyncOption {
     ACTIVE
 }
 
-fun PeopleDownSyncOption.isPeopleDownSyncOff() = this == PeopleDownSyncOption.OFF
-fun PeopleDownSyncOption.shouldDownSyncScheduleInForeground() = this == PeopleDownSyncOption.ACTIVE
+fun PeopleDownSyncOption.isDownSyncOff() = this == PeopleDownSyncOption.OFF
+fun PeopleDownSyncOption.isDownSyncActiveOnLaunch() = this == PeopleDownSyncOption.ACTIVE
+fun PeopleDownSyncOption.isDownSyncActiveOnUserAction() = this == PeopleDownSyncOption.BACKGROUND
