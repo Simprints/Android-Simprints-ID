@@ -1,6 +1,5 @@
 package com.simprints.id.services.sync
 
-import androidx.work.workDataOf
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Constants
 
@@ -38,12 +37,4 @@ sealed class SyncTaskParameters(open val projectId: String, open val moduleIds: 
             is GlobalSyncTaskParameters -> Constants.GROUP.GLOBAL
         }
     }
-
-    //StopShip is it the right place for that?
-    fun toData() =
-        workDataOf(
-            PROJECT_ID_FIELD to projectId,
-            USER_ID_FIELD to userId,
-            MODULES_ID_FIELD to moduleIds?.toTypedArray()
-        )
 }

@@ -12,7 +12,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Constants
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.controllers.MasterSync
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -44,12 +43,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
     init {
         component.inject(this)
         syncSchedulerHelper = SyncSchedulerHelper(component)
-
-        // STOPSHIP : please god remove this
-        dbManager.local.deletePeopleFromLocal(SyncTaskParameters.build(Constants.GROUP.GLOBAL, emptySet(), loginInfoManager)).blockingAwait()
-        doAsync {
-            newSyncStatusDatabase.downSyncStatusModel.lolDelete()
-        }
     }
 
     override fun start() {
@@ -59,7 +52,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun initCards() {
         cardsModelsList.clear()
-        syncSchedulerHelper.startDownSyncCount()
         Single.merge(
             cardsFactory.createCards()
                 .map {
@@ -109,11 +101,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun userDidWantToSync() {
-//        syncSchedulerHelper.schedulePeopleDownSyncIfNotOff()
-
-        MasterSync().enqueueOneTimeSyncWorker( //StopShip
-            SyncTaskParameters.build(Constants.GROUP.GLOBAL, emptySet(), loginInfoManager)
-        )
+        syncSchedulerHelper.startDownSyncOnUserActionIfPossible()
     }
 
     private fun removeCardIfExist(projectType: DashboardCardType) {
@@ -123,9 +111,15 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun logout() {
-        dbManager.signOut()
-        cancelAllDownSyncWorkers()
-        sessionEventManager.signOut()
+        // STOPSHIP : please god remove this
+        dbManager.local.deletePeopleFromLocal(SyncTaskParameters.build(Constants.GROUP.GLOBAL, preferencesManager.selectedModules, loginInfoManager)).blockingAwait()
+        doAsync {
+            newSyncStatusDatabase.downSyncStatusModel.lolDelete()
+        }
+
+//        dbManager.signOut()
+//        cancelAllDownSyncWorkers()
+//        sessionEventManager.signOut()
     }
 
     override fun userDidWantToLogout() {
@@ -138,8 +132,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
         true
     }
 
-    private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) = true // STOPSHIP
-//        dashboardSyncCardViewModel.peopleToUpload > 0 || dashboardSyncCardViewModel.peopleToDownload > 0
+    private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
+        dashboardSyncCardViewModel.peopleToUpload > 0 || dashboardSyncCardViewModel.peopleToDownload > 0
 
     private fun cancelAllDownSyncWorkers() {
         syncSchedulerHelper.cancelDownSyncWorkers()

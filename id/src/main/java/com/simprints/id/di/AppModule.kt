@@ -37,6 +37,8 @@ import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScopesBuilderImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.OneTimeDownSyncCountMaster
 import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.PeriodicDownSyncCountMaster
@@ -219,4 +221,9 @@ open class AppModule(val app: Application) {
     @Singleton
     open fun provideNewSyncStatusDatabase(): NewSyncStatusDatabase =
         NewSyncStatusDatabase.getDatabase(provideContext())
+
+    @Provides
+    @Singleton
+    open fun provideSyncScopesBuilder(loginInfoManager: LoginInfoManager, preferencesManager: PreferencesManager): SyncScopesBuilder =
+        SyncScopesBuilderImpl(loginInfoManager, preferencesManager)
 }

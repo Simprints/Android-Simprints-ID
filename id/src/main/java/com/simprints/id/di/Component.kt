@@ -36,10 +36,9 @@ import com.simprints.id.services.GuidSelectionService
 import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.tasks.CountTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.tasks.DownSyncTask
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.CountWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.DownSyncWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.understudy.SubCountWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.understudy.SubDownSyncWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SubCountWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SubDownSyncWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SyncWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.SyncCountWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
@@ -93,8 +92,7 @@ interface AppComponent {
     fun inject(syncCountWorker: SyncCountWorker)
     fun inject(countTask: CountTask)
     fun inject(downSyncTask: DownSyncTask)
-    fun inject(countWorker: CountWorker)
-    fun inject(downSyncWorker: DownSyncWorker)
     fun inject(subCountWorker: SubCountWorker)
     fun inject(subDownSyncWorker: SubDownSyncWorker)
+    fun inject(syncWorker: SyncWorker)
 }

@@ -1,13 +1,16 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.controllers
 
 import androidx.work.*
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.CountWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.CountWorker.Companion.COUNT_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SubCountWorker.Companion.SUBCOUNT_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SubDownSyncWorker.Companion.SUBDOWNSYNC_WORKER_TAG
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SyncWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SyncWorker.Companion.SYNC_WORKER_REPEAT_INTERVAL
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SyncWorker.Companion.SYNC_WORKER_REPEAT_UNIT
+import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SyncWorker.Companion.SYNC_WORKER_SYNC_SCOPE_INPUT
 import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SyncWorker.Companion.SYNC_WORKER_TAG
-import com.simprints.id.services.sync.SyncTaskParameters
+
 
 /**
  * Fabio - MasterSync: class to enqueue the workers
@@ -17,61 +20,58 @@ import com.simprints.id.services.sync.SyncTaskParameters
  * - dequeue workers
  */
 
-class MasterSync {
+class MasterSync(private val syncScopesBuilder: SyncScopesBuilder) {
 
     private val workerManager = WorkManager.getInstance()
+    private val syncScope:SyncScope?
+       get() = syncScopesBuilder.buildSyncScope()
 
-    fun enqueueOneTimeSyncWorker(syncParams: SyncTaskParameters) {
-        workerManager.beginUniqueWork(
-            SYNC_WORKER_TAG,
-            ExistingWorkPolicy.KEEP,
-            buildOneTimeSyncWorkerRequest(syncParams)
-        ).enqueue()
+    fun enqueueOneTimeSyncWorker() {
+        val syncScope = syncScopesBuilder.buildSyncScope()
+        syncScope?.let {
+            workerManager.beginUniqueWork(
+                SYNC_WORKER_TAG,
+                ExistingWorkPolicy.KEEP,
+                buildOneTimeSyncWorkerRequest(it)
+            ).enqueue()
+        }
     }
 
-    fun enqueuePeriodicSyncWorker(syncParams: SyncTaskParameters) {
-        PeriodicWorkRequestBuilder<SyncWorker>(SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
-            .setConstraints(getSyncWorkerConstraints())
-            .addTag(SYNC_WORKER_TAG)
-            .setInputData(syncParams.toData())
-            .build().also {
-                workerManager.enqueueUniquePeriodicWork(SYNC_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, it)
-            }
-    }
-
-    fun enqueueOneTimeCountWorker(syncParams: SyncTaskParameters) {
-        workerManager.beginUniqueWork(
-            COUNT_WORKER_TAG,
-            ExistingWorkPolicy.KEEP,
-            buildOneTimeSyncWorkerRequest(syncParams)
-        ).enqueue()
+    fun enqueuePeriodicSyncWorker() {
+        syncScope?.let {
+            PeriodicWorkRequestBuilder<SyncWorker>(SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
+                .setConstraints(getSyncWorkerConstraints())
+                .setInputData(workDataOf(SYNC_WORKER_SYNC_SCOPE_INPUT to syncScopesBuilder.fromSyncScopeToJson(it)))
+                .addTag(SYNC_WORKER_TAG)
+                .build().also { periodicWorker ->
+                    workerManager.enqueueUniquePeriodicWork(SYNC_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, periodicWorker)
+                }
+        }
     }
 
     fun dequeueAllSyncWorker() {
-        //StopShip - implement it.
+        workerManager.cancelAllWorkByTag(SUBCOUNT_WORKER_TAG)
+        workerManager.cancelAllWorkByTag(SUBDOWNSYNC_WORKER_TAG)
+        workerManager.cancelAllWorkByTag(SYNC_WORKER_TAG)
     }
 
-    private fun buildOneTimeCountWorkerRequest(syncParams: SyncTaskParameters) =
-        OneTimeWorkRequestBuilder<CountWorker>()
-            .setConstraints(getCountWorkerConstraints())
-            .addTag(COUNT_WORKER_TAG)
-            .setInputData(syncParams.toData())
-            .build()
 
-    private fun buildOneTimeSyncWorkerRequest(syncParams: SyncTaskParameters) =
+    private fun buildOneTimeSyncWorkerRequest(scope: SyncScope) =
         OneTimeWorkRequestBuilder<SyncWorker>()
-            .setInputData(syncParams.toData())
+            .setInputData(workDataOf(SYNC_WORKER_SYNC_SCOPE_INPUT to syncScopesBuilder.fromSyncScopeToJson(scope)))
             .setConstraints(getSyncWorkerConstraints())
             .addTag(SYNC_WORKER_TAG)
-            .build()
-
-    private fun getCountWorkerConstraints() =
-        Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
     private fun getSyncWorkerConstraints() =
         Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.CONNECTED)
-        .build()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+    fun isDownSyncRunning(): Boolean =
+        syncScope?.let { it ->
+            WorkManager.getInstance()
+                .getStatusesForUniqueWork(SyncWorker.getSyncChainWorkersUniqueNameForSync(it))
+                .value?.find { it.state == State.RUNNING } != null
+        } ?: false
 }
