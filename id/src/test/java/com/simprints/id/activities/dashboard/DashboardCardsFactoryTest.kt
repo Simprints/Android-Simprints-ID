@@ -3,9 +3,9 @@ package com.simprints.id.activities.dashboard
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.google.firebase.FirebaseApp
+import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.spy
-import com.nhaarman.mockito_kotlin.anyOrNull
 import com.simprints.id.R
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.models.DashboardCard
@@ -14,12 +14,12 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.sync.room.SyncStatusDao
-import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
+import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.db.DownSyncDao
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
@@ -48,7 +48,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
-    private lateinit var syncStatusDatabaseModel: SyncStatusDao
+    private lateinit var syncStatusDatabaseModel: DownSyncDao
 
     override var module by lazyVar {
         AppModuleForTests(app,
@@ -68,11 +68,11 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         dbManager.initialiseDb()
         WorkManager.initialize(app, Configuration.Builder().build())
 
-        whenever(syncStatusDatabase.syncStatusModel).thenReturn(mock())
-        syncStatusDatabaseModel = syncStatusDatabase.syncStatusModel
+        whenever(syncStatusDatabase.downSyncStatusModel).thenReturn(mock())
+        syncStatusDatabaseModel = syncStatusDatabase.downSyncStatusModel
 
-        whenever(syncStatusDatabaseModel.getSyncStatus()).thenReturn(mock())
-        whenever(syncStatusDatabaseModel.insertDefaultSyncStatus(anyNotNull())).then {  }
+        whenever(syncStatusDatabaseModel.getDownSyncStatus()).thenReturn(mock())
+        whenever(syncStatusDatabaseModel.insertOrReplaceDownSyncStatus(anyNotNull())).then { }
 
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
         setUserLogInState(true, getRoboSharedPreferences())
