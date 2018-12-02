@@ -1,5 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.workers
 
+import android.content.Context
 import android.widget.Toast
 import androidx.work.*
 import com.simprints.id.Application
@@ -20,7 +21,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class DownSyncMasterWorker : Worker() {
+class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
     @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
 

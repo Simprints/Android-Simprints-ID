@@ -1,6 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.controllers
 
 import androidx.work.*
+import androidx.work.WorkInfo.State.RUNNING
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.DOWNSYNC_MASTER_WORKER_TAG_PERIODIC
@@ -69,7 +70,7 @@ class DownSyncManager(private val syncScopesBuilder: SyncScopesBuilder) {
     fun isDownSyncRunning(): Boolean =
         syncScope?.let { it ->
             WorkManager.getInstance()
-                .getStatusesByTag(SYNC_WORKER_TAG)
-                .value?.find { it.state == State.RUNNING } != null
+                .getWorkInfosByTagLiveData(SYNC_WORKER_TAG)
+                .value?.find { it.state == RUNNING } != null
         } ?: false
 }

@@ -1,8 +1,10 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.workers
 
+import android.content.Context
 import android.widget.Toast
 import androidx.work.Data
 import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -14,7 +16,7 @@ import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 import javax.inject.Inject
 
-class SubCountWorker : Worker() {
+class SubCountWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
     companion object {
         const val SUBCOUNT_WORKER_SUB_SCOPE_INPUT = "SUBCOUNT_WORKER_SUB_SCOPE_INPUT"
@@ -27,7 +29,7 @@ class SubCountWorker : Worker() {
         getComponentAndInject()
 
         val input = inputData.getString(SUBCOUNT_WORKER_SUB_SCOPE_INPUT) ?: throw IllegalArgumentException("input required")
-        val subSyncScope = syncScopeBuilder.fromJsonToSubSyncScope(input)  ?: throw IllegalArgumentException("SyncScope required")
+        val subSyncScope = syncScopeBuilder.fromJsonToSubSyncScope(input) ?: throw IllegalArgumentException("SyncScope required")
         val key = subSyncScope.uniqueKey
         val component = getComponentAndInject()
 

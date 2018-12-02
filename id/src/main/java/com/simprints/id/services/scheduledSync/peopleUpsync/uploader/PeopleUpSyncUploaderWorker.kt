@@ -1,6 +1,8 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
+import android.content.Context
 import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -13,7 +15,7 @@ import javax.inject.Inject
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
-class PeopleUpSyncUploaderWorker : Worker() {
+class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var localDbManager: LocalDbManager

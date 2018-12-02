@@ -1,6 +1,8 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
+import android.content.Context
 import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
@@ -10,7 +12,7 @@ import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
 
-class SessionEventsUploaderWorker : Worker() {
+class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
