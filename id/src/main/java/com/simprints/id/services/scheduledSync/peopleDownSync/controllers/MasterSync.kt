@@ -2,7 +2,8 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.controllers
 
 import androidx.work.*
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_MASTER_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.DOWNSYNC_MASTER_WORKER_TAG_PERIODIC
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_WORKER_TAG
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_REPEAT_INTERVAL
@@ -19,7 +20,7 @@ class MasterSync(private val syncScopesBuilder: SyncScopesBuilder) {
     fun enqueueOneTimeSyncWorker() {
         syncScope?.let {
             workerManager.beginUniqueWork(
-                SYNC_MASTER_WORKER_TAG,
+                DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME,
                 ExistingWorkPolicy.KEEP,
                 buildOneTimeSyncWorkerRequest(it)
             ).enqueue()
@@ -29,7 +30,7 @@ class MasterSync(private val syncScopesBuilder: SyncScopesBuilder) {
     fun enqueuePeriodicSyncWorker() {
         syncScope?.let {
             workerManager.enqueueUniquePeriodicWork(
-                SYNC_MASTER_WORKER_TAG,
+                DOWNSYNC_MASTER_WORKER_TAG_PERIODIC,
                 ExistingPeriodicWorkPolicy.KEEP,
                 buildPeriodicDownSyncMasterWorker(it))
         }
@@ -39,7 +40,7 @@ class MasterSync(private val syncScopesBuilder: SyncScopesBuilder) {
         PeriodicWorkRequestBuilder<DownSyncMasterWorker>(SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
             .setInputData(getDataForDownSyncMaster(it))
             .setConstraints(getSyncWorkerConstraints())
-            .addTag(SYNC_MASTER_WORKER_TAG)
+            .addTag(DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME)
             .addTag(SYNC_WORKER_TAG)
             .addTag("oneTime")
             .build()
@@ -52,7 +53,7 @@ class MasterSync(private val syncScopesBuilder: SyncScopesBuilder) {
         OneTimeWorkRequestBuilder<DownSyncMasterWorker>()
             .setInputData(getDataForDownSyncMaster(scope))
             .setConstraints(getSyncWorkerConstraints())
-            .addTag(SYNC_MASTER_WORKER_TAG)
+            .addTag(DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME)
             .addTag(SYNC_WORKER_TAG)
             .addTag("periodic")
             .build()
