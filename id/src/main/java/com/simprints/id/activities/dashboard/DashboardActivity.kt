@@ -17,9 +17,6 @@ import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.Constants
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.controllers.MasterSync
-import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.showToast

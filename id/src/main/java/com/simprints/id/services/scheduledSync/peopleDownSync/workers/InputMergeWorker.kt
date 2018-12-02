@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers
+package com.simprints.id.services.scheduledSync.peopleDownSync.workers
 
 import android.widget.Toast
 import androidx.work.Worker

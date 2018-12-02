@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers
+package com.simprints.id.services.scheduledSync.peopleDownSync.workers
 
 import android.widget.Toast
 import androidx.work.*
@@ -6,13 +6,15 @@ import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unsafe.SimprintsError
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SubCountWorker.Companion.SUBCOUNT_WORKER_SUB_SCOPE_INPUT
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SubCountWorker.Companion.SUBCOUNT_WORKER_TAG
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SubDownSyncWorker.Companion.SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SubDownSyncWorker.Companion.SUBDOWNSYNC_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SUBCOUNT_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SUBDOWNSYNC_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_WORKER_CHAIN
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker.Companion.SUBCOUNT_WORKER_SUB_SCOPE_INPUT
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker.Companion.SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT
 import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -22,22 +24,19 @@ import javax.inject.Inject
  * Fabio - Sync Worker: Worker to chain CountWorker and DownSyncWorker
  * passing SyncParams as Input of the CountWorker.
  */
-class SyncWorker : Worker() {
+class DownSyncMasterWorker : Worker() {
 
     @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
 
     companion object {
         const val SYNC_WORKER_REPEAT_INTERVAL = 1L //StopShip: 1h?
         val SYNC_WORKER_REPEAT_UNIT = TimeUnit.HOURS
-        const val SYNC_WORKER_TAG = "SYNC_WORKER_TAG"
 
         const val SYNC_WORKER_SYNC_SCOPE_INPUT = "SYNC_WORKER_SYNC_SCOPE_INPUT"
-        private const val SYNC_WORKER_CHAIN = "SYNC_WORKER_CHAIN"
 
         fun getSyncChainWorkersUniqueNameForSync(scope: SyncScope) = "${SYNC_WORKER_CHAIN}_${scope.uniqueKey}"
         fun getDownSyncWorkerKeyForScope(scope: SubSyncScope) = "${SUBCOUNT_WORKER_TAG}_${scope.uniqueKey}"
         fun getCountWorkerKeyForScope(scope: SubSyncScope) = "${SUBCOUNT_WORKER_TAG}_${scope.uniqueKey}"
-
     }
 
     override fun doWork(): Result {
@@ -56,7 +55,7 @@ class SyncWorker : Worker() {
         return Result.SUCCESS.also {
             if (BuildConfig.DEBUG) {
                 applicationContext.runOnUiThread {
-                    val message = "WM - SyncWorker($scope): $it"
+                    val message = "WM - DownSyncMasterWorker($scope): $it"
                     Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
                     Timber.d(message)
                 }
@@ -78,6 +77,7 @@ class SyncWorker : Worker() {
             .setInputData(data)
             .addTag(getDownSyncWorkerKeyForScope(subSyncScope))
             .addTag(SUBDOWNSYNC_WORKER_TAG)
+            .addTag(SYNC_WORKER_TAG)
             .build()
     }
 
@@ -90,6 +90,7 @@ class SyncWorker : Worker() {
             .setInputData(data)
             .addTag(getCountWorkerKeyForScope(subSyncScope))
             .addTag(SUBCOUNT_WORKER_TAG)
+            .addTag(SYNC_WORKER_TAG)
             .build()
     }
 

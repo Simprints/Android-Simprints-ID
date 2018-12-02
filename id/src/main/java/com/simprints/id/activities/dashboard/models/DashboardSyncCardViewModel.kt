@@ -12,11 +12,11 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.controllers.MasterSync
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.*
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SyncWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.MasterSync
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.room.*
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_WORKER_TAG
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -45,7 +45,7 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
     private var newSyncStatusViewModel: NewSyncStatusViewModel
 
-    private val syncScope:SyncScope?
+    private val syncScope: SyncScope?
         get() = syncScopesBuilder.buildSyncScope()
 
     private val dateFormat: DateFormat by lazy {
@@ -218,6 +218,6 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
         val downSyncStatus = downSyncDbModel.getDownSyncStatus()
         val upSyncStatus = upSyncDbModel.getUpSyncStatus()
-        val downSyncWorkerStatus = syncScope?.let { WorkManager.getInstance().getStatusesForUniqueWork(SyncWorker.getSyncChainWorkersUniqueNameForSync(syncScope)) }
+        val downSyncWorkerStatus = syncScope?.let { WorkManager.getInstance().getStatusesByTag(SYNC_WORKER_TAG) }
     }
 }

@@ -5,7 +5,7 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncOption
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameter
 import com.simprints.id.session.sessionParameters.SessionParameters

@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan
+package com.simprints.id.services.scheduledSync.peopleDownSync.models
 
 data class SyncScope(val projectId: String,
                      val userId: String?,

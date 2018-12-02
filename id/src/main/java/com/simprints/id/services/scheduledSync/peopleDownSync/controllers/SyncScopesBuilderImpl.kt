@@ -1,9 +1,11 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan
+package com.simprints.id.services.scheduledSync.peopleDownSync.controllers
 
 import com.google.gson.Gson
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Constants
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 
 class SyncScopesBuilderImpl(val loginInfoManager: LoginInfoManager,
                             val preferencesManager: PreferencesManager,

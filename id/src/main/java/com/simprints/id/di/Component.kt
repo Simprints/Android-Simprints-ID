@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.activities.SyncSchedulerHelper
 import com.simprints.id.activities.TutorialActivity
 import com.simprints.id.activities.about.AboutActivity
 import com.simprints.id.activities.about.AboutPresenter
@@ -33,13 +32,12 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.tasks.CountTask
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.tasks.DownSyncTask
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SubCountWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SubDownSyncWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers.SyncWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.SyncCountWorker
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
@@ -85,14 +83,12 @@ interface AppComponent {
     fun inject(longConsentPresenter: LongConsentPresenter)
     fun inject(scannerManager: ScannerManager)
     fun inject(syncSchedulerHelper: SyncSchedulerHelper)
-    fun inject(peopleDownSyncWorker: PeopleDownSyncWorker)
     fun inject(dashboardSyncCardView: DashboardSyncCardView)
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
     fun inject(sessionSyncUploaderWorker: SessionEventsUploaderWorker)
-    fun inject(syncCountWorker: SyncCountWorker)
     fun inject(countTask: CountTask)
     fun inject(downSyncTask: DownSyncTask)
     fun inject(subCountWorker: SubCountWorker)
     fun inject(subDownSyncWorker: SubDownSyncWorker)
-    fun inject(syncWorker: SyncWorker)
+    fun inject(syncWorker: DownSyncMasterWorker)
 }

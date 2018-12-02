@@ -1,12 +1,12 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.tasks
+package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.DownSyncStatus
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.getStatusId
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.room.DownSyncStatus
+import com.simprints.id.services.scheduledSync.peopleDownSync.room.NewSyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.room.getStatusId
 import io.reactivex.Single
 import timber.log.Timber
 import javax.inject.Inject

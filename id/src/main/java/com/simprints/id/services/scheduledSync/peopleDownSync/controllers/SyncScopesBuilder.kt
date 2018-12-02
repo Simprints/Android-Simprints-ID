@@ -1,4 +1,7 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan
+package com.simprints.id.services.scheduledSync.peopleDownSync.controllers
+
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 
 interface SyncScopesBuilder {
 

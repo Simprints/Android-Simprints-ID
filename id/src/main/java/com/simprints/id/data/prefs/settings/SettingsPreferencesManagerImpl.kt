@@ -13,7 +13,7 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.preferences.NoSuchPreferenceError
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncOption
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier

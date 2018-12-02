@@ -2,7 +2,7 @@ package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.domain.Constants
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncOption
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
 

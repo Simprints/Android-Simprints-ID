@@ -1,12 +1,12 @@
-package com.simprints.id.activities
+package com.simprints.id.services.scheduledSync
 
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.isDownSyncActiveOnLaunch
-import com.simprints.id.services.scheduledSync.peopleDownSync.isDownSyncActiveOnUserAction
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.controllers.MasterSync
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.MasterSync
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.isDownSyncActiveOnLaunch
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.isDownSyncActiveOnUserAction
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import javax.inject.Inject
 

@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers
+package com.simprints.id.services.scheduledSync.peopleDownSync.workers
 
 import android.widget.Toast
 import androidx.work.Data
@@ -8,8 +8,8 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unsafe.SimprintsError
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.tasks.CountTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
 import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 import javax.inject.Inject
@@ -21,7 +21,6 @@ import javax.inject.Inject
 class SubCountWorker : Worker() {
 
     companion object {
-        const val SUBCOUNT_WORKER_TAG = "SUBCOUNT_WORKER_TAG"
         const val SUBCOUNT_WORKER_SUB_SCOPE_INPUT = "SUBCOUNT_WORKER_SUB_SCOPE_INPUT"
     }
 
