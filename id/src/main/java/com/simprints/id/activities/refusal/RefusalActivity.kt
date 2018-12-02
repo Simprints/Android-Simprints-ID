@@ -14,7 +14,7 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.libsimprints.Constants
 import kotlinx.android.synthetic.main.activity_refusal.*
-import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
+import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 
 class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
