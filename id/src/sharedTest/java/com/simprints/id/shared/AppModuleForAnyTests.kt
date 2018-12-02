@@ -11,7 +11,6 @@ import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -20,6 +19,7 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.shared.DependencyRule.RealRule
@@ -128,6 +128,6 @@ open class AppModuleForAnyTests(app: Application,
     override fun providePeopleUpSyncMaster(): PeopleUpSyncMaster =
         peopleUpSyncMasterRule.resolveDependency { super.providePeopleUpSyncMaster() }
 
-    override fun provideAndInitializeSyncStatusDatabase(): SyncStatusDatabase =
-        syncStatusDatabaseRule.resolveDependency { super.provideAndInitializeSyncStatusDatabase() }
+    override fun provideSyncStatusDatabase(): SyncStatusDatabase =
+        syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase() }
 }

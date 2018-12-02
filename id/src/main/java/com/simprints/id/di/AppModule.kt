@@ -191,7 +191,7 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideNewSyncStatusDatabase(): SyncStatusDatabase =
+    open fun provideSyncStatusDatabase(): SyncStatusDatabase =
         SyncStatusDatabase.getDatabase(provideContext())
 
     @Provides

@@ -33,7 +33,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var sessionEventManager: SessionEventsManager
 
-    @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
+    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     private val cardsFactory = DashboardCardsFactory(view.getLifeCycleOwner(), component)
     private val syncSchedulerHelper: SyncSchedulerHelper
@@ -114,7 +114,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         // STOPSHIP : please god remove this
         dbManager.local.deletePeopleFromLocal(SyncTaskParameters.build(Constants.GROUP.GLOBAL, preferencesManager.selectedModules, loginInfoManager)).blockingAwait()
         doAsync {
-            newSyncStatusDatabase.downSyncStatusModel.lolDelete()
+            syncStatusDatabase.downSyncStatusModel.lolDelete()
         }
 
 //        dbManager.signOut()
