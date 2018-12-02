@@ -1,11 +1,11 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan
+package com.simprints.id.services.scheduledSync.peopleDownSync
 
 /**
  * - [Fabio] MasterSync
  * - [Fabio] SyncHelper
  * - [Fabio] DownSyncWorker
  * - [Fabio] CountWorker
- * - [Fabio] SyncWorker
+ * - [Fabio] DownSyncMasterWorker
  *
  * - [Aashay] DownSyncDao
  * - [Aashay] DownSyncStatus

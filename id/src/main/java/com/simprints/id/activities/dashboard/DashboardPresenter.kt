@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard
 
-import com.simprints.id.activities.SyncSchedulerHelper
 import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.activities.dashboard.models.DashboardSyncCardViewModel
@@ -12,7 +11,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Constants
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.peopleDownSync.room.NewSyncStatusDatabase
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
@@ -132,8 +132,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
         true
     }
 
-    private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
-        dashboardSyncCardViewModel.peopleToUpload > 0 || dashboardSyncCardViewModel.peopleToDownload > 0
+    private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) = true //StopShip
+        //dashboardSyncCardViewModel.peopleToUpload > 0 || dashboardSyncCardViewModel.peopleToDownload > 0
 
     private fun cancelAllDownSyncWorkers() {
         syncSchedulerHelper.cancelDownSyncWorkers()

@@ -7,7 +7,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.room.NewSyncStatusDatabase
 import timber.log.Timber
 import javax.inject.Inject
 

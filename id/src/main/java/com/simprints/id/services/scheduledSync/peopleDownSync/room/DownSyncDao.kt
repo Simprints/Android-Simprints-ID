@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room
+package com.simprints.id.services.scheduledSync.peopleDownSync.room
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao

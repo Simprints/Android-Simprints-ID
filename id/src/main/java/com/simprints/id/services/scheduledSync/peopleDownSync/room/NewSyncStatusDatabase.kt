@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room
+package com.simprints.id.services.scheduledSync.peopleDownSync.room
 
 import android.content.Context
 import androidx.room.Database

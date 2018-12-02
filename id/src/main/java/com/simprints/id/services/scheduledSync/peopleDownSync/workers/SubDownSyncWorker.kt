@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.workers
+package com.simprints.id.services.scheduledSync.peopleDownSync.workers
 
 import android.widget.Toast
 import androidx.work.Worker
@@ -7,8 +7,8 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unsafe.SimprintsError
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.tasks.DownSyncTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
 import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 import javax.inject.Inject
@@ -20,7 +20,6 @@ import javax.inject.Inject
 class SubDownSyncWorker: Worker() {
 
     companion object {
-        const val SUBDOWNSYNC_WORKER_TAG = "SUBDOWNSYNC_WORKER_TAG"
         const val SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT = "SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT"
 
         private const val DEFAULT_COUNTER_FOR_INVALID_VALUE = -1

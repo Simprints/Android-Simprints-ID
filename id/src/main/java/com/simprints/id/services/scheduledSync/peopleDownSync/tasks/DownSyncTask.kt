@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.newplan.tasks
+package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
@@ -7,10 +7,10 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.DownSyncDao
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.getStatusId
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.room.DownSyncDao
+import com.simprints.id.services.scheduledSync.peopleDownSync.room.NewSyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.room.getStatusId
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
 import io.reactivex.Completable

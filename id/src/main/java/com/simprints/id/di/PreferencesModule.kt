@@ -23,9 +23,8 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncOption
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.tools.serializers.ModuleIdOptionsStringSetSerializer
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
 import dagger.Module

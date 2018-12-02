@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync
+package com.simprints.id.services.scheduledSync.peopleDownSync.models
 
 enum class PeopleDownSyncOption {
     OFF,

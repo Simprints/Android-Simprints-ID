@@ -6,7 +6,6 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.domain.Constants
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncOption
 import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier

@@ -36,12 +36,9 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
-import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncMaster
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.SyncScopesBuilderImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.newplan.room.NewSyncStatusDatabase
-import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.OneTimeDownSyncCountMaster
-import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.PeriodicDownSyncCountMaster
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilderImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.room.NewSyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
@@ -93,18 +90,6 @@ open class AppModule(val app: Application) {
             PeopleUpSyncUploaderMaster(),
             PeopleUpSyncPeriodicFlusherMaster()
         )
-
-    @Provides
-    @Singleton
-    open fun providePeopleDownSyncMaster() = PeopleDownSyncMaster()
-
-    @Provides
-    @Singleton
-    open fun provideOneTimeDownSyncCountMaster() = OneTimeDownSyncCountMaster()
-
-    @Provides
-    @Singleton
-    open fun providePeriodicDownSyncCountMaster() = PeriodicDownSyncCountMaster()
 
     @Provides
     @Singleton
