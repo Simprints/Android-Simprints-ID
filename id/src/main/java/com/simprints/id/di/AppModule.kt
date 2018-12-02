@@ -20,8 +20,6 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.sync.room.SyncStatus
-import com.simprints.id.data.db.sync.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -36,9 +34,9 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilderImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
@@ -57,7 +55,6 @@ import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Module
 import dagger.Provides
-import org.jetbrains.anko.doAsync
 import javax.inject.Singleton
 
 @Module
@@ -186,16 +183,6 @@ open class AppModule(val app: Application) {
                                          timeHelper: TimeHelper,
                                          analyticsManager: AnalyticsManager): SessionEventsManager =
         SessionEventsManagerImpl(ctx.deviceId, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, analyticsManager)
-
-    @Provides
-    @Singleton
-    open fun provideAndInitializeSyncStatusDatabase(): SyncStatusDatabase {
-        val syncStatusDb = SyncStatusDatabase.getDatabase(provideContext())
-        doAsync {
-            syncStatusDb.syncStatusModel.insertDefaultSyncStatus(SyncStatus())
-        }
-        return syncStatusDb
-    }
 
     @Provides
     @Singleton

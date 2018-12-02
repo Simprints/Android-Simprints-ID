@@ -1,12 +1,14 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.workers
 
+import android.content.Context
 import android.widget.Toast
 import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.simprints.id.BuildConfig
 import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 
-class InputMergeWorker : Worker() {
+class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
     override fun doWork(): Result {
         Timber.d("$inputData")

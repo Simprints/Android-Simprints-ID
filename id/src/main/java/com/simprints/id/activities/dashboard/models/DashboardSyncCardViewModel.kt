@@ -2,9 +2,9 @@ package com.simprints.id.activities.dashboard.models
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.work.State
+import androidx.work.WorkInfo
+import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkManager
-import androidx.work.WorkStatus
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -15,8 +15,9 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.db.DownSyncDao
+import com.simprints.id.services.scheduledSync.peopleDownSync.db.DownSyncStatus
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.db.*
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_WORKER_TAG
 import com.simprints.id.services.scheduledSync.peopleUpsync.db.UpSyncDao
 import com.simprints.id.services.scheduledSync.peopleUpsync.db.UpSyncStatus
@@ -56,7 +57,6 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
     }
 
     var cardView: DashboardSyncCardView? = null
-
 
     private var latestDownSyncTime: Long? = null
     private var latestUpSyncTime: Long? = null
@@ -136,7 +136,6 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
                 Completable.complete()
             }
 
-
     private fun observeAndUpdatePeopleToDownloadAndLatestDownSyncTimes() {
 
         val downSyncStatusObserver = Observer<List<DownSyncStatus>> { downSyncStatuses ->
@@ -198,13 +197,13 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
     private fun observeDownSyncStatusAndUpdateButton() {
 
-        val downSyncObserver = Observer<List<WorkStatus>> { subWorkersStatusInSyncChain ->
-            val isAnyOfWorkersInSyncChainRunning = subWorkersStatusInSyncChain.firstOrNull{ it.state == State.RUNNING } != null
+        val downSyncObserver = Observer<List<WorkInfo>> { subWorkersStatusInSyncChain ->
+            val isAnyOfWorkersInSyncChainRunning = subWorkersStatusInSyncChain.firstOrNull { it.state == RUNNING } != null
 
             if (isSyncRunning != isAnyOfWorkersInSyncChainRunning) {
                 isSyncRunning = isAnyOfWorkersInSyncChainRunning
                 updateCardView()
-                if(!isSyncRunning) {
+                if (!isSyncRunning) {
                     updateSyncInfo()
                 }
             }
@@ -221,6 +220,6 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
         val downSyncStatus = downSyncDbModel.getDownSyncStatus()
         val upSyncStatus = upSyncDbModel.getUpSyncStatus()
-        val downSyncWorkerStatus = syncScope?.let { WorkManager.getInstance().getStatusesByTag(SYNC_WORKER_TAG) }
+        val downSyncWorkerStatus = syncScope?.let { WorkManager.getInstance().getWorkInfosByTagLiveData(SYNC_WORKER_TAG) }
     }
 }

@@ -16,7 +16,7 @@ open class RlSession : RealmObject {
     lateinit var language: String
     lateinit var projectId: String
     var startTime: Long = 0L
-    lateinit var realmEvents: RealmList<RlEvent>
+    var realmEvents: RealmList<RlEvent> = RealmList()
 
     var relativeEndTime: Long = 0L
     var relativeUploadTime: Long = 0L
@@ -74,5 +74,4 @@ fun RlSession.toDomainSession(): SessionEvents {
     session.analyticsId = this.analyticsId
     return session
 }
-
 
