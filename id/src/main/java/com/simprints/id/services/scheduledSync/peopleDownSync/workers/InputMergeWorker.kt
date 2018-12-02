@@ -6,10 +6,6 @@ import com.simprints.id.BuildConfig
 import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 
-/**
- * Tris - Worker to fetch counter for (p, u, m) using CountTask.
- * Invocated by CountWorker
- */
 class InputMergeWorker : Worker() {
 
     override fun doWork(): Result {

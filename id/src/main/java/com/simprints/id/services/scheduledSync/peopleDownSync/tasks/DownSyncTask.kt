@@ -7,10 +7,10 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.di.AppComponent
+import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.db.DownSyncDao
+import com.simprints.id.services.scheduledSync.peopleDownSync.db.getStatusId
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.room.DownSyncDao
-import com.simprints.id.services.scheduledSync.peopleDownSync.room.NewSyncStatusDatabase
-import com.simprints.id.services.scheduledSync.peopleDownSync.room.getStatusId
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
 import io.reactivex.Completable
@@ -23,15 +23,6 @@ import java.io.Reader
 import java.util.*
 import javax.inject.Inject
 
-/**
- * Ridwan - DownSyncTask: task to:
- * a) Make NetworkRequest
- * b) save patients in Realm
- * c) InsertOrUpdate
- *      DownSyncStatus(p,u,m).LastPatientId = X
- *      DownSyncStatus(p,u,m).LastPatientUpdatedAt = X
- *      DownSyncStatus(p,u,m).LastSyncTime = X
- */
 class DownSyncTask(component: AppComponent, subSyncScope: SubSyncScope) {
 
     val projectId = subSyncScope.projectId
@@ -41,7 +32,7 @@ class DownSyncTask(component: AppComponent, subSyncScope: SubSyncScope) {
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var newSyncStatusDatabase: NewSyncStatusDatabase
+    @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
     private var downSyncDao: DownSyncDao
 
     private var reader: JsonReader? = null

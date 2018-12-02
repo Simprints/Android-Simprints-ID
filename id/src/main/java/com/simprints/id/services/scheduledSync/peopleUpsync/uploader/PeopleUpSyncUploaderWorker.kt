@@ -7,7 +7,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
-import com.simprints.id.services.scheduledSync.peopleDownSync.room.NewSyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -19,7 +19,7 @@ class PeopleUpSyncUploaderWorker : Worker() {
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var analyticsManager: AnalyticsManager
-    @Inject lateinit var newSyncStatusDatabase: NewSyncStatusDatabase
+    @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
 
     val projectId by lazy {
         inputData.getString(PROJECT_ID_KEY) ?: throw IllegalArgumentException("Project Id required")

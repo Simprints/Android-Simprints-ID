@@ -20,16 +20,12 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-/**
- * Fabio - Sync Worker: Worker to chain CountWorker and DownSyncWorker
- * passing SyncParams as Input of the CountWorker.
- */
 class DownSyncMasterWorker : Worker() {
 
     @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
 
     companion object {
-        const val SYNC_WORKER_REPEAT_INTERVAL = 1L //StopShip: 1h?
+        const val SYNC_WORKER_REPEAT_INTERVAL = 6L
         val SYNC_WORKER_REPEAT_UNIT = TimeUnit.HOURS
 
         const val SYNC_WORKER_SYNC_SCOPE_INPUT = "SYNC_WORKER_SYNC_SCOPE_INPUT"

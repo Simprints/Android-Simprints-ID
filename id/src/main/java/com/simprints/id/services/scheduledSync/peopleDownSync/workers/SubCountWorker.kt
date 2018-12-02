@@ -14,10 +14,6 @@ import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 import javax.inject.Inject
 
-/**
- * Tris - Worker to fetch counter for (p, u, m) using CountTask.
- * Invocated by CountWorker
- */
 class SubCountWorker : Worker() {
 
     companion object {
