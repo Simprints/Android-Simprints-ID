@@ -13,10 +13,6 @@ import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 import javax.inject.Inject
 
-/**
- * Tris - Worker to execute sync for (p, u, m) using DownSyncTask.
- * Invocated by DownSyncWorker
- */
 class SubDownSyncWorker: Worker() {
 
     companion object {

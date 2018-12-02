@@ -3,19 +3,14 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.db.DownSyncStatus
+import com.simprints.id.services.scheduledSync.peopleDownSync.db.getStatusId
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.room.DownSyncStatus
-import com.simprints.id.services.scheduledSync.peopleDownSync.room.NewSyncStatusDatabase
-import com.simprints.id.services.scheduledSync.peopleDownSync.room.getStatusId
 import io.reactivex.Single
 import timber.log.Timber
 import javax.inject.Inject
 
-/**
- * Ridwan - CountTask: task to:
- * a) Make NetworkRequest - DONE
- * b) InsertOrUpdate DownSyncStatus(p,u,m).totalToDownload = X in Room
- */
 class CountTask(component: AppComponent, subSyncScope: SubSyncScope) {
 
     val projectId = subSyncScope.projectId
@@ -24,7 +19,7 @@ class CountTask(component: AppComponent, subSyncScope: SubSyncScope) {
 
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var newSyncStatusDatabase: NewSyncStatusDatabase
+    @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
 
     init {
         component.inject(this)

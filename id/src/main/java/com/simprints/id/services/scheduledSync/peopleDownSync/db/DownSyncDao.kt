@@ -1,14 +1,10 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.room
+package com.simprints.id.services.scheduledSync.peopleDownSync.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-
-/**
- * Aashay - DownSyncDao: Dao to make queries for DownSyncStatus
- */
 
 @Dao
 interface DownSyncDao {

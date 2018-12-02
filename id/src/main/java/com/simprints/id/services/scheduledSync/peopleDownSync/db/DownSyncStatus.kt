@@ -1,20 +1,8 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.room
+package com.simprints.id.services.scheduledSync.peopleDownSync.db
 
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-
-/**
- * Aashay - DownSyncStatus: room entity
- *  1) Id
- *  2) ProjectId: String
- *  9) UserId: String?
- *  3) ModuleId: String?
- *  4) LastPatientId: String?
- *  5) LastPatientUpdatedAt: Long?
- *  6) TotalToDownload
- *  7) LastSyncTime
- */
 
 @Entity(tableName = "DownSyncStatus")
 class DownSyncStatus(

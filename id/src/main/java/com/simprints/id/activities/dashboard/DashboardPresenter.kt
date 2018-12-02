@@ -12,7 +12,7 @@ import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.services.scheduledSync.peopleDownSync.room.NewSyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
@@ -33,7 +33,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var sessionEventManager: SessionEventsManager
 
-    @Inject lateinit var newSyncStatusDatabase: NewSyncStatusDatabase
+    @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
 
     private val cardsFactory = DashboardCardsFactory(view.getLifeCycleOwner(), component)
     private val syncSchedulerHelper: SyncSchedulerHelper

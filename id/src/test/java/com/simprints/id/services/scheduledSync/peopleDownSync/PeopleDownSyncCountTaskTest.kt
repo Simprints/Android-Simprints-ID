@@ -1,6 +1,8 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync
 
+import androidx.test.core.app.ApplicationProvider
 import com.google.firebase.FirebaseApp
+import com.simprints.id.Application
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -8,7 +10,9 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Constants
-import com.simprints.id.services.scheduledSync.peopleDownSync.peopleCount.PeopleDownSyncCountTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.mock
 import com.simprints.id.shared.whenever
@@ -35,6 +39,9 @@ class PeopleDownSyncCountTaskTest: RxJavaTest {
     private val preferencesManagerMock: PreferencesManager = mock()
     private val loginInfoManagerMock: LoginInfoManager = mock()
 
+    private val app: Application
+        get() = ApplicationProvider.getApplicationContext()
+
     @Before
     fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
@@ -59,7 +66,7 @@ class PeopleDownSyncCountTaskTest: RxJavaTest {
     }
 
     private fun makeFakeNumberOfPeopleToDownSyncCountRequest(peopleToDownload: Int,
-                                                             peopleInLocalDb: Int): TestObserver<Int> {
+                                                             peopleInLocalDb: Int): TestObserver<Void>? {
 
         whenever(remoteDbManagerMock.getNumberOfPatientsForSyncParams(anyNotNull())).thenReturn(Single.just(peopleToDownload))
         whenever(localDbManagerMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleInLocalDb))
@@ -67,9 +74,9 @@ class PeopleDownSyncCountTaskTest: RxJavaTest {
         whenever(preferencesManagerMock.moduleId).thenReturn("0")
         whenever(loginInfoManagerMock.getSignedInUserIdOrEmpty()).thenReturn("")
         whenever(loginInfoManagerMock.getSignedInProjectIdOrEmpty()).thenReturn("")
-        whenever(dbManagerMock.calculateNPatientsToDownSyncForSyncParams(anyInt(), anyNotNull())).thenReturn(Single.just(20000))
+        whenever(dbManagerMock.calculateNPatientsToDownSync(anyNotNull())).thenReturn(Single.just(20000))
 
-        val peopleToDownSyncTask = PeopleDownSyncCountTask(remoteDbManagerMock, dbManagerMock, preferencesManagerMock, loginInfoManagerMock)
+        val peopleToDownSyncTask = DownSyncTask(app, SubSyncScope(DEFAULT_PROJECT_ID, null, null))
         return peopleToDownSyncTask.execute().test()
     }
 }

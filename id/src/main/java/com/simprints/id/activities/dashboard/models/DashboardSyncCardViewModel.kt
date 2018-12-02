@@ -12,11 +12,14 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.MasterSync
+import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.room.*
+import com.simprints.id.services.scheduledSync.peopleDownSync.db.*
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleUpsync.db.UpSyncDao
+import com.simprints.id.services.scheduledSync.peopleUpsync.db.UpSyncStatus
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -38,10 +41,10 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var localDbManager: LocalDbManager
-    @Inject lateinit var newSyncStatusDatabase: NewSyncStatusDatabase
+    @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
 
-    private var masterSync: MasterSync
+    private var masterSync: DownSyncManager
 
     private var newSyncStatusViewModel: NewSyncStatusViewModel
 
@@ -68,7 +71,7 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
     init {
         component.inject(this)
-        masterSync = MasterSync(syncScopesBuilder)
+        masterSync = DownSyncManager(syncScopesBuilder)
 
         newSyncStatusViewModel = NewSyncStatusViewModel(
             newSyncStatusDatabase.downSyncStatusModel,

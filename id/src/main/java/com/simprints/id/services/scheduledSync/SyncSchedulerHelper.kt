@@ -3,7 +3,7 @@ package com.simprints.id.services.scheduledSync
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.MasterSync
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.isDownSyncActiveOnLaunch
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.isDownSyncActiveOnUserAction
@@ -17,11 +17,11 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
     @Inject lateinit var scheduledSessionsSyncManager: SessionEventsSyncManager
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
 
-    private var master: MasterSync //StopShip: DI
+    private var master: DownSyncManager //StopShip: DI
 
     init {
         appComponent.inject(this)
-        master = MasterSync(syncScopesBuilder)
+        master = DownSyncManager(syncScopesBuilder)
     }
 
     fun scheduleBackgroundSyncs() {
@@ -32,13 +32,13 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
     //LaunchPresenter and DashboardPresenter.
     fun startDownSyncOnLaunchIfPossible() {
         if (preferencesManager.peopleDownSyncOption.isDownSyncActiveOnLaunch()) {
-            master.enqueueOneTimeSyncWorker()
+            master.enqueueOneTimeDownSyncMasterWorker()
         }
     }
 
     fun startDownSyncOnUserActionIfPossible() {
         if (preferencesManager.peopleDownSyncOption.isDownSyncActiveOnUserAction()) {
-            master.enqueueOneTimeSyncWorker()
+            master.enqueueOneTimeDownSyncMasterWorker()
         }
     }
 
@@ -47,7 +47,7 @@ class SyncSchedulerHelper(appComponent: AppComponent) {
     }
 
     private fun scheduleDownSyncPeople() {
-        master.enqueuePeriodicSyncWorker()
+        master.enqueuePeriodicDownSyncMasterWorker()
     }
 
     private fun scheduleSessionsSync() {
