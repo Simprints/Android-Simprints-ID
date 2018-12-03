@@ -15,4 +15,3 @@ data class SyncScope(val group: Constants.GROUP,
         }
     } ?: listOf(SubSyncScope(group, projectId, userId, null))
 }
-
