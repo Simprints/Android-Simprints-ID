@@ -3,6 +3,7 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncDao
+import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
@@ -24,7 +25,7 @@ import java.util.*
 class DownSyncTaskImpl(val localDbManager: LocalDbManager,
                        val remoteDbManager: RemoteDbManager,
                        val timeHelper: TimeHelper,
-                       syncStatusDatabase: SyncStatusDatabase): DownSyncTask {
+                       syncStatusDatabase: SyncStatusDatabase) : DownSyncTask {
 
     lateinit var subSyncScope: SubSyncScope
 
@@ -52,8 +53,7 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
 
     private fun Single<out PeopleRemoteInterface>.makeDownSyncApiCallAndGetResponse(): Single<ResponseBody> =
         flatMap {
-            it.downSync(
-                projectId, userId, moduleId, getLastKnownPatientId(), getLastKnownPatientUpdatedAt()
+            it.downSync(projectId, userId, moduleId, getLastKnownPatientId(), getLastKnownPatientUpdatedAt()
             ).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
         }
 
@@ -99,8 +99,28 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
         reader?.close()
     }
 
-    private fun getLastKnownPatientId(): String? = downSyncDao.getDownSyncStatusForId(getDownSyncId())?.lastPatientId
-    private fun getLastKnownPatientUpdatedAt(): Long? = downSyncDao.getDownSyncStatusForId(getDownSyncId())?.lastPatientUpdatedAt
+    private fun getLastKnownPatientId(): String? =
+        downSyncDao.getDownSyncStatusForId(getDownSyncId())?.lastPatientId
+        ?: getLastPatientIdFromRealmAndMigrateIt()
+
+    private fun getLastPatientIdFromRealmAndMigrateIt(): String? = fetchRlSessionInfoFromRealmAndMigrateIt().lastPatientId
+    private fun getLastKnownPatientUpdatedAt(): Long? = fetchRlSessionInfoFromRealmAndMigrateIt().lastPatientUpdatedAt
+    private fun fetchRlSessionInfoFromRealmAndMigrateIt(): DownSyncStatus {
+        val rlSyncInfo = localDbManager.getRlSyncInfo(subSyncScope).blockingGet()
+        val currentDownSyncStatus = downSyncDao.getDownSyncStatusForId(getDownSyncId())
+
+        val newDownSyncStatus =
+            currentDownSyncStatus?.copy(
+                lastPatientId = rlSyncInfo.lastKnownPatientId,
+                lastPatientUpdatedAt = rlSyncInfo.lastKnownPatientUpdatedAt.time)
+            ?: DownSyncStatus(subSyncScope, rlSyncInfo.lastKnownPatientId, rlSyncInfo.lastKnownPatientUpdatedAt.time)
+
+        downSyncDao.insertOrReplaceDownSyncStatus(newDownSyncStatus)
+        localDbManager.deleteSyncInfo(subSyncScope)
+
+        return newDownSyncStatus
+    }
+
     private fun updateDownSyncTimestampOnBatchDownload() {
         downSyncDao.updateLastSyncTime(getDownSyncId(), timeHelper.now())
     }
