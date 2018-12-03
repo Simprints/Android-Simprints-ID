@@ -22,6 +22,7 @@ import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import timber.log.Timber
 import javax.inject.Inject
 
 @RunWith(RobolectricTestRunner::class)
@@ -37,16 +38,16 @@ class DownSyncManagerTest: DaggerForTests() {
     override fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)
         app = (RuntimeEnvironment.application as TestApplication)
-        WorkManager.initialize(app, Configuration.Builder().build())
+        try {
+            WorkManager.initialize(app, Configuration.Builder().build())
+        } catch (e: IllegalStateException) {
+            Timber.d("WorkManager already initialized")
+        }
         super.setUp()
         testAppComponent.inject(this)
         MockitoAnnotations.initMocks(this)
     }
 
-    @After
-    fun tearDown() {
-        WorkManager.getInstance().pruneWork()
-    }
     @Test
     fun createOneTimeWorkRequest_shouldCreateWithConstraints() {
         val workRequest = downSyncManager.buildOneTimeDownSyncMasterWorker(syncScope)

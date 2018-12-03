@@ -39,7 +39,7 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
             Result.SUCCESS
         } catch (e: Throwable) {
             analyticsManager.logThrowable(e)
-            Result.FAILURE
+            Result.SUCCESS
         }.also {
             if (BuildConfig.DEBUG) {
                 applicationContext.runOnUiThread {
