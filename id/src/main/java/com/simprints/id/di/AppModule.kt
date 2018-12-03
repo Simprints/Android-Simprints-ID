@@ -34,9 +34,17 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilderImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
@@ -198,4 +206,29 @@ open class AppModule(val app: Application) {
     @Singleton
     open fun provideSyncScopesBuilder(loginInfoManager: LoginInfoManager, preferencesManager: PreferencesManager): SyncScopesBuilder =
         SyncScopesBuilderImpl(loginInfoManager, preferencesManager)
+
+    @Provides
+    @Singleton
+    open fun provideDownSyncManager(syncScopesBuilder: SyncScopesBuilder): DownSyncManager =
+        DownSyncManagerImpl(syncScopesBuilder)
+
+    @Provides
+    @Singleton
+    open fun provideSyncSchedulerHelper(preferencesManager: PreferencesManager,
+                                        loginInfoManager: LoginInfoManager,
+                                        sessionEventsSyncManager: SessionEventsSyncManager,
+                                        downSyncManager: DownSyncManager): SyncSchedulerHelper =
+        SyncSchedulerHelperImpl(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager)
+
+    @Provides
+    @Singleton
+    open fun provideCountTask(dbManager: DbManager,
+                              syncStatusDatabase: SyncStatusDatabase): CountTask = CountTaskImpl(dbManager, syncStatusDatabase)
+
+    @Provides
+    @Singleton
+    open fun provideDownSyncTask(localDbManager: LocalDbManager,
+                                 remoteDbManager: RemoteDbManager,
+                                 timeHelper: TimeHelper,
+                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(localDbManager, remoteDbManager, timeHelper, syncStatusDatabase)
 }

@@ -32,9 +32,9 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
-import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
@@ -82,12 +82,12 @@ interface AppComponent {
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(longConsentPresenter: LongConsentPresenter)
     fun inject(scannerManager: ScannerManager)
-    fun inject(syncSchedulerHelper: SyncSchedulerHelper)
+    fun inject(syncSchedulerHelper: SyncSchedulerHelperImpl)
     fun inject(dashboardSyncCardView: DashboardSyncCardView)
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
     fun inject(sessionSyncUploaderWorker: SessionEventsUploaderWorker)
-    fun inject(countTask: CountTask)
-    fun inject(downSyncTask: DownSyncTask)
+    fun inject(countTask: CountTaskImpl)
+    fun inject(downSyncTask: DownSyncTaskImpl)
     fun inject(subCountWorker: SubCountWorker)
     fun inject(subDownSyncWorker: SubDownSyncWorker)
     fun inject(syncWorker: DownSyncMasterWorker)

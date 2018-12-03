@@ -8,7 +8,6 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -24,17 +23,17 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
 
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
+    @Inject lateinit var countTask: CountTask
 
     override fun doWork(): Result {
-        getComponentAndInject()
+        inject()
 
         val input = inputData.getString(SUBCOUNT_WORKER_SUB_SCOPE_INPUT) ?: throw IllegalArgumentException("input required")
         val subSyncScope = syncScopeBuilder.fromJsonToSubSyncScope(input) ?: throw IllegalArgumentException("SyncScope required")
         val key = subSyncScope.uniqueKey
-        val component = getComponentAndInject()
 
         return try {
-            val totalCount = CountTask(component, subSyncScope).execute().blockingGet()
+            val totalCount = countTask.execute(subSyncScope).blockingGet()
 
             outputData = Data.Builder().putInt(key, totalCount.toInt()).build()
             Result.SUCCESS
@@ -52,11 +51,10 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
         }
     }
 
-    private fun getComponentAndInject(): AppComponent {
+    private fun inject() {
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-            return context.component
         } else throw SimprintsError("Cannot get app component in Worker")
     }
 }
