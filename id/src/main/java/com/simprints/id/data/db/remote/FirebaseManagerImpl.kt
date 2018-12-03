@@ -25,7 +25,7 @@ import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.session.Session
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
@@ -218,19 +218,19 @@ open class FirebaseManagerImpl(
                 .map { it.count }
         }
 
-    override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
+    override fun getNumberOfPatientsForSyncScope(syncScope: SyncScope): Single<Int> =
         getPeopleApiClient().flatMap { api ->
-            syncParams.moduleIds?.let { moduleIds ->
-                sumCountsForEachModule(moduleIds, syncParams)
-            } ?: api.requestPeopleCount(syncParams.projectId, syncParams.userId, null)
+            syncScope.moduleIds?.let { moduleIds ->
+                sumCountsForEachModule(moduleIds, syncScope)
+            } ?: api.requestPeopleCount(syncScope.projectId, syncScope.userId, null)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .map { it.count }
         }
 
-    private fun sumCountsForEachModule(moduleIds: Set<String>, syncParams: SyncTaskParameters): Single<Int> =
+    private fun sumCountsForEachModule(moduleIds: Set<String>, syncScope: SyncScope): Single<Int> =
         Single.merge(moduleIds.map {
-            getNumberOfPatientsInModule(syncParams.projectId, it)
+            getNumberOfPatientsInModule(syncScope.projectId, it)
                 .subscribeOn(Schedulers.io())
         }).toList().map { it.sum() }
 

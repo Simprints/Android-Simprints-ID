@@ -1,11 +1,11 @@
-package com.simprints.id.services.scheduledSync.peopleUpsync.db
+package com.simprints.id.data.db.local.room
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.simprints.id.services.scheduledSync.peopleUpsync.db.UpSyncStatus.Companion.UP_SYNC_STATUS_CONST_ID
+import com.simprints.id.data.db.local.room.UpSyncStatus.Companion.UP_SYNC_STATUS_CONST_ID
 
 /**
  * Aashay - UpSyncDao: Dao to make queries for UpSyncDao

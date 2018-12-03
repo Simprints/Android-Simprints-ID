@@ -1,24 +1,23 @@
 package com.simprints.id.data.db.local.realm
 
 import android.content.Context
-import com.google.gson.Gson
-import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.models.*
 import com.simprints.id.data.db.local.realm.models.adapters.toProject
 import com.simprints.id.data.db.local.realm.models.adapters.toRealmProject
-import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.network.DownSyncParams
+import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_Project
+import com.simprints.id.data.db.local.realm.models.toDomainPerson
+import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.toLibPerson
-import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
-import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -40,7 +39,6 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
         const val PATIENT_ID_FIELD = "patientId"
         const val MODULE_ID_FIELD = "moduleId"
         const val TO_SYNC_FIELD = "toSync"
-        const val UPDATE_TIME_FIELD = "updatedAt"
     }
 
     private var realmConfig: RealmConfiguration? = null
@@ -67,24 +65,6 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
             realm.executeTransaction {
                 it.insertOrUpdate(people.map(Person::toRealmPerson))
             }
-        }
-            .ignoreElement()
-
-    override fun savePeopleFromStreamAndUpdateSyncInfo(readerOfPeopleArray: JsonReader,
-                                                       gson: Gson,
-                                                       downSyncParams: DownSyncParams,
-                                                       shouldStop: (personSaved: fb_Person) -> Boolean): Completable =
-        useRealmInstance { realm ->
-            realm.executeTransaction {
-                while (readerOfPeopleArray.hasNext()) {
-                    val lastPersonSaved = parseFromStreamAndSavePerson(gson, readerOfPeopleArray, it)
-                    it.insertOrUpdate(rl_SyncInfo(downSyncParams.toGroup(), rl_Person(lastPersonSaved), downSyncParams.moduleId))
-                    if (shouldStop(lastPersonSaved)) {
-                        break
-                    }
-                }
-            }
-            updateSyncInfo(downSyncParams)
         }
             .ignoreElement()
 
@@ -141,18 +121,6 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
             }
         }, BackpressureStrategy.BUFFER)
 
-    override fun getSyncInfoFor(typeSync: Constants.GROUP, specificModule: String?): Single<rl_SyncInfo> =
-        useRealmInstance { realm ->
-            realm
-                .where(rl_SyncInfo::class.java).equalTo(SYNC_ID_FIELD, typeSync.ordinal)
-                .apply {
-                    specificModule?.let { this.equalTo(MODULE_ID_FIELD, it) }
-                }
-                .findFirst()
-                ?.let { realm.copyFromRealm(it) }
-                ?: throw NoStoredLastSyncedInfoException()
-        }
-
     override fun loadProjectFromLocal(projectId: String): Single<Project> =
         useRealmInstance { realm ->
             realm
@@ -162,40 +130,23 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 ?: throw NoSuchStoredProjectException()
         }
 
-    override fun deletePeopleFromLocal(syncParams: SyncTaskParameters): Completable =
+    override fun deletePeopleFromLocal(syncScope: SyncScope): Completable =
         useRealmInstance { realm ->
-            realm.executeTransaction {
-            syncParams.moduleIds?.let { moduleIds -> // Delete everyone for each moduleId
-                moduleIds.forEach { moduleId ->
-                    it.buildQueryForPerson(DownSyncParams(syncParams, moduleId, this))
+            realm.executeTransaction { realmInTransaction ->
+                syncScope.toSubSyncScopes().forEach {
+                    realmInTransaction.buildQueryForPerson(it)
                         .findAll()
                         .deleteAllFromRealm()
                 }
-            } ?: it.buildQueryForPerson(DownSyncParams(syncParams, null, this))
-                    .findAll()
-                    .deleteAllFromRealm()
             }
-        }
-            .ignoreElement()
-
-    override fun deleteSyncInfoFromLocal(syncParams: SyncTaskParameters): Completable =
-        useRealmInstance { realm ->
-            realm.executeTransaction {
-                it.where(rl_SyncInfo::class.java)
-                    .equalTo(rl_SyncInfo.SYNC_ID_FIELD, syncParams.toGroup().ordinal)
-                    .findAll()
-                    .deleteAllFromRealm()
-            }
-        }
-            .ignoreElement()
+        }.ignoreElement()
 
     override fun saveProjectIntoLocal(project: Project): Completable =
         useRealmInstance { realm ->
             realm.executeTransaction {
                 it.insertOrUpdate(project.toRealmProject())
             }
-        }
-            .ignoreElement()
+        }.ignoreElement()
 
     private fun getRealmConfig(): Single<RealmConfiguration> =
         realmConfig
@@ -232,34 +183,12 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 sortBy?.let { this.sort(sortBy.keys.toTypedArray(), sortBy.values.toTypedArray()) }
             }
 
-    private fun Realm.buildQueryForPerson(downSyncParams: DownSyncParams): RealmQuery<rl_Person> =
+    private fun Realm.buildQueryForPerson(subSyncScope: SubSyncScope): RealmQuery<rl_Person> =
         buildQueryForPerson(
-            userId = downSyncParams.userId,
-            moduleId = downSyncParams.moduleId
+            userId = subSyncScope.userId,
+            moduleId = subSyncScope.moduleId
+
         )
-
-    override fun updateSyncInfo(downSyncParams: DownSyncParams): Completable =
-        useRealmInstance { realm ->
-            realm.buildQueryForPerson(downSyncParams)
-                .equalTo(TO_SYNC_FIELD, false)
-                .sort(UPDATE_TIME_FIELD, Sort.DESCENDING)
-                .findAll()
-                .first()
-                ?.let { person ->
-                    realm.executeTransaction {
-                        it.insertOrUpdate(rl_SyncInfo(downSyncParams.toGroup(), person, downSyncParams.moduleId))
-                    }
-                }
-        }
-            .ignoreElement()
-
-    private fun parseFromStreamAndSavePerson(gson: Gson,
-                                             readerOfPersonsArray: JsonReader,
-                                             realm: Realm): fb_Person {
-        return gson.fromJson<fb_Person>(readerOfPersonsArray, fb_Person::class.java).apply {
-            realm.insertOrUpdate(rl_Person(this))
-        }
-    }
 
     override fun loadPeopleFromLocal(destinationList: MutableList<LibPerson>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
         val result = when (group) {

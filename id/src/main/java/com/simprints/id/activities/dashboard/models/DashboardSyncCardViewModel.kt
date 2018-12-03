@@ -8,6 +8,10 @@ import androidx.work.WorkManager
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.room.DownSyncDao
+import com.simprints.id.data.db.local.room.DownSyncStatus
+import com.simprints.id.data.db.local.room.UpSyncDao
+import com.simprints.id.data.db.local.room.UpSyncStatus
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -15,12 +19,8 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.db.DownSyncDao
-import com.simprints.id.services.scheduledSync.peopleDownSync.db.DownSyncStatus
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_WORKER_TAG
-import com.simprints.id.services.scheduledSync.peopleUpsync.db.UpSyncDao
-import com.simprints.id.services.scheduledSync.peopleUpsync.db.UpSyncStatus
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -74,8 +74,8 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
         masterSync = DownSyncManager(syncScopesBuilder)
 
         newSyncStatusViewModel = NewSyncStatusViewModel(
-            newSyncStatusDatabase.downSyncStatusModel,
-            newSyncStatusDatabase.upSyncStatusModel,
+            newSyncStatusDatabase.downSyncDao,
+            newSyncStatusDatabase.upSyncDao,
             syncScope)
 
         initViewModel()

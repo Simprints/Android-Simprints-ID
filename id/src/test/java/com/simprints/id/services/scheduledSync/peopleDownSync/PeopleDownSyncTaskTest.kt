@@ -10,7 +10,7 @@ import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.network.SimApiClient
-import com.simprints.id.services.scheduledSync.peopleDownSync.db.DownSyncDao
+import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
@@ -186,8 +186,8 @@ class PeopleDownSyncTaskTest : RxJavaTest {
 //        whenever(dbManager.remote).thenReturn(remoteDbManagerSpy)
 //        whenever(dbManager.remote.getPeopleApiClient()).thenReturn(Single.just(remotePeopleApi))
 //
-//        whenever(syncStatusDatabase.downSyncStatusModel).thenReturn(mock())
-//        syncStatusDatabaseModel = syncStatusDatabase.downSyncStatusModel
+//        whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
+//        syncStatusDatabaseModel = syncStatusDatabase.downSyncDao
 //        whenever(syncStatusDatabaseModel.getPeopleToDownSync()).doReturn(25000)
 //        doNothing().whenever(syncStatusDatabaseModel).updateLastDownSyncTime(anyLong())
 //        doNothing().whenever(syncStatusDatabaseModel).updatePeopleToDownSyncCount(anyInt())

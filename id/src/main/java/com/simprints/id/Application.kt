@@ -51,10 +51,13 @@ open class Application : MultiDexApplication() {
     }
 
     open fun initModules() {
-        if (isReleaseWithLogfileVariant()) {
-            Timber.plant(FileLoggingTree())
-        } else if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+
+        if (Timber.treeCount() <= 0) {
+            if (isReleaseWithLogfileVariant()) {
+                Timber.plant(FileLoggingTree())
+            } else if (BuildConfig.DEBUG) {
+                Timber.plant(Timber.DebugTree())
+            }
         }
 
         initFabric()
@@ -66,8 +69,8 @@ open class Application : MultiDexApplication() {
 
     private fun initFabric() {
         val crashlyticsKit = Crashlytics.Builder()
-                .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
-                .build()
+            .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
+            .build()
 
         Fabric.with(this, crashlyticsKit)
     }

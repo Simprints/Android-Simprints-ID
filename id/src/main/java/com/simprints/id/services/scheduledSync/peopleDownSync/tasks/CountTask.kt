@@ -4,8 +4,8 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
-import com.simprints.id.services.scheduledSync.peopleDownSync.db.DownSyncStatus
-import com.simprints.id.services.scheduledSync.peopleDownSync.db.getStatusId
+import com.simprints.id.data.db.local.room.DownSyncStatus
+import com.simprints.id.data.db.local.room.getStatusId
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import io.reactivex.Single
 import timber.log.Timber
@@ -35,13 +35,13 @@ class CountTask(component: AppComponent, subSyncScope: SubSyncScope) {
     private fun Single<out Int>.insertNewCountForDownSyncStatus() =
         map {
 
-            val downSyncStatus = newSyncStatusDatabase.downSyncStatusModel.getDownSyncStatusForId(getDownSyncId())
+            val downSyncStatus = newSyncStatusDatabase.downSyncDao.getDownSyncStatusForId(getDownSyncId())
                 ?: DownSyncStatus(projectId = projectId, userId = userId, moduleId = moduleId)
             downSyncStatus.totalToDownload = it
-            newSyncStatusDatabase.downSyncStatusModel.insertOrReplaceDownSyncStatus(downSyncStatus)
+            newSyncStatusDatabase.downSyncDao.insertOrReplaceDownSyncStatus(downSyncStatus)
 
             it
         }
 
-    private fun getDownSyncId() = newSyncStatusDatabase.downSyncStatusModel.getStatusId(projectId, userId, moduleId)
+    private fun getDownSyncId() = newSyncStatusDatabase.downSyncDao.getStatusId(projectId, userId, moduleId)
 }

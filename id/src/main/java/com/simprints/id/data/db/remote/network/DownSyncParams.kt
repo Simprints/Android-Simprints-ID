@@ -1,9 +1,10 @@
 package com.simprints.id.data.db.remote.network
 
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.exceptions.safe.data.db.NoStoredLastSyncedInfoException
-import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.data.db.local.room.DownSyncDao
+import com.simprints.id.data.db.local.room.getStatusId
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import java.io.Serializable
+import java.util.*
 
 /**
  * An hashmap with (all optionals):
@@ -15,12 +16,12 @@ import java.io.Serializable
  *
  * Based on syncParams and last updated user
  */
-class DownSyncParams(private val syncParams: SyncTaskParameters,
+class DownSyncParams(subSyncScope: SubSyncScope,
                      specificModule: String? = null,
-                     localDbManager: LocalDbManager) : Serializable {
+                     downSyncDao: DownSyncDao) : Serializable {
 
-    val projectId: String = syncParams.projectId
-    val userId: String? = syncParams.userId
+    val projectId: String = subSyncScope.projectId
+    val userId: String? = subSyncScope.userId
     val moduleId: String? = specificModule
 
     var lastKnownPatientId: String? = null
@@ -28,23 +29,16 @@ class DownSyncParams(private val syncParams: SyncTaskParameters,
 
     init {
         try {
-            localDbManager
-                .getSyncInfoFor(syncParams.toGroup(), moduleId)
-                .blockingGet().let {
-                    lastKnownPatientUpdatedAt = it.lastKnownPatientUpdatedAt.time
-                    if (it.lastKnownPatientId.isNotEmpty())
-                        lastKnownPatientId = it.lastKnownPatientId
-                }
-        } catch (e: NoStoredLastSyncedInfoException) {
+            val downSyncStatus = downSyncDao.getDownSyncStatusForId(downSyncDao.getStatusId(subSyncScope))
+            downSyncStatus?.lastPatientUpdatedAt?.let {
+                lastKnownPatientUpdatedAt = Date(it).time
+            }
+
+            downSyncStatus?.lastPatientId?.let {
+                lastKnownPatientId = it
+            }
+        } catch (t: Throwable) {
+            t.printStackTrace()
         }
     }
-
-    fun toGroup() = syncParams.toGroup()
 }
-
-fun SyncTaskParameters.toDownSyncParams(localDbManager: LocalDbManager): List<DownSyncParams> =
-    this.moduleIds?.let { moduleIds ->
-        moduleIds.map { moduleId ->
-            DownSyncParams(this, moduleId, localDbManager)
-        }
-    } ?: listOf(DownSyncParams(this, null, localDbManager))

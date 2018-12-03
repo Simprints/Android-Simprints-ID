@@ -3,7 +3,6 @@ package com.simprints.id.data.db.local.realm
 import com.simprints.id.data.db.local.realm.models.rl_Fingerprint
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_Project
-import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.domain.Constants
 import io.realm.*
 import io.realm.annotations.RealmModule
@@ -11,7 +10,7 @@ import java.util.*
 
 internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
 
-    @RealmModule(classes = [rl_Fingerprint::class, rl_Person::class, rl_Project::class, rl_SyncInfo::class])
+    @RealmModule(classes = [rl_Fingerprint::class, rl_Person::class, rl_Project::class])
     class PeopleModule
 
     companion object {
