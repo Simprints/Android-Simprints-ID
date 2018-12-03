@@ -2,9 +2,9 @@ package com.simprints.id.activities.dashboard
 
 import androidx.lifecycle.LifecycleOwner
 import com.simprints.id.R
-import com.simprints.id.activities.dashboard.models.DashboardCard
-import com.simprints.id.activities.dashboard.models.DashboardCardType
-import com.simprints.id.activities.dashboard.models.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.DashboardCard
+import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
+import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager

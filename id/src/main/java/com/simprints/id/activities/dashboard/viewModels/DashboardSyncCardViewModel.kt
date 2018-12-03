@@ -1,6 +1,6 @@
-package com.simprints.id.activities.dashboard.models
+package com.simprints.id.activities.dashboard.viewModels
 
-import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.RUNNING
@@ -30,12 +30,7 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
-                                 component: AppComponent,
-                                 type: DashboardCardType,
-                                 position: Int,
-                                 imageRes: Int,
-                                 title: String) : DashboardCard(type, position, imageRes, title, "") {
+class DashboardSyncCardViewModel(val lifecycleOwner: LifecycleOwner, val component: AppComponent, defaultState: State) : ViewModel() {
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -46,7 +41,24 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
     @Inject lateinit var downSyncManager: DownSyncManager
 
-    private var syncStatusViewModel: SyncStatusViewModel
+    val stateLiveData: MutableLiveData<State> = MutableLiveData()
+    var viewModelState: State = State()
+        set(value) {
+            field = value
+            stateLiveData.value = value
+        }
+
+    init {
+        viewModelState = defaultState
+    }
+
+    data class State(var onSyncActionClicked: (cardModel: DashboardSyncCardViewModel) -> Unit = {},
+                     var peopleToUpload: Int = 0,
+                     var peopleToDownload: Int = 0,
+                     var peopleInDb: Int = 0,
+                     var isSyncRunning: Boolean = false,
+                     var lastSyncTime: String = "")
+
 
     private val syncScope: SyncScope?
         get() = syncScopesBuilder.buildSyncScope()
@@ -55,32 +67,26 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
-    var cardView: DashboardSyncCardView? = null
-
     private var latestDownSyncTime: Long? = null
     private var latestUpSyncTime: Long? = null
+    var isSyncRunning: Boolean = false
 
-    var onSyncActionClicked: (cardModel: DashboardSyncCardViewModel) -> Unit = {}
-    var peopleToUpload = 0
-    var peopleToDownload = 0
-    var peopleInDb = 0
-    var isSyncRunning = false
-
-    var lastSyncTime = ""
+    private var downSyncStatus: LiveData<List<DownSyncStatus>>
+    private var upSyncStatus: LiveData<UpSyncStatus?>
+    private var downSyncWorkerStatus: LiveData<MutableList<WorkInfo>>?
 
     init {
         component.inject(this)
 
-        syncStatusViewModel = SyncStatusViewModel(
-            syncStatusDatabase.downSyncDao,
-            syncStatusDatabase.upSyncDao,
-            syncScope)
+        downSyncStatus = syncStatusDatabase.downSyncDao.getDownSyncStatus()
+        upSyncStatus = syncStatusDatabase.upSyncDao.getUpSyncStatus()
+        downSyncWorkerStatus = syncScope?.let { WorkManager.getInstance().getWorkInfosByTagLiveData(SYNC_WORKER_TAG) }
 
         initViewModel()
     }
 
     private fun initViewModel() {
-        isSyncRunning = downSyncManager.isDownSyncRunning()
+        val isSyncRunning = downSyncManager.isDownSyncRunning()
         if (isSyncRunning) {
             registerObservers()
             updateSyncInfo()
@@ -114,23 +120,24 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
     private fun updateTotalPeopleToDownSyncCount(): Completable =
         Completable.fromAction {
-            peopleToDownload = 0
+            val peopleToDownload = 0
             syncScope?.toSubSyncScopes()?.forEach { it ->
                 peopleToDownload += dbManager.calculateNPatientsToDownSync(it.projectId, it.userId, it.moduleId).blockingGet()
             }
+            viewModelState = viewModelState.copy(peopleToDownload = peopleToDownload)
         }
 
     private fun updateTotalLocalPeopleCount(): Completable =
         dbManager.getPeopleCountFromLocalForSyncGroup(preferencesManager.syncGroup)
             .flatMapCompletable {
-                peopleInDb = it
+                viewModelState = viewModelState.copy(peopleInDb = it)
                 Completable.complete()
             }
 
     private fun updateLocalPeopleToUpSyncCount(): Completable =
         localDbManager.getPeopleCountFromLocal(toSync = true)
             .flatMapCompletable {
-                peopleToUpload = it
+                viewModelState = viewModelState.copy(peopleToUpload = it)
                 Completable.complete()
             }
 
@@ -144,15 +151,15 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
                     peopleToDownSync += it.totalToDownload
                     it.lastSyncTime?.let { lastSyncTime -> latestDownSyncTimeForModules.add(lastSyncTime) }
                 }
-                if(isSyncRunning) {
-                    peopleToDownload = peopleToDownSync
+                if (isSyncRunning) {
+                    viewModelState = viewModelState.copy(peopleToDownload = peopleToDownSync)
                 }
                 latestDownSyncTime = latestDownSyncTimeForModules.max()
-                lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
-                updateCardView()
+                val lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
+                viewModelState = viewModelState.copy(lastSyncTime = lastSyncTime)
             }
         }
-        syncStatusViewModel.downSyncStatus.observe(lifecycleOwner, downSyncStatusObserver)
+        downSyncStatus.observe(lifecycleOwner, downSyncStatusObserver)
     }
 
     private fun observeAndUpdateLatestUpSyncTime() {
@@ -207,18 +214,6 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
                 }
             }
         }
-        syncStatusViewModel.downSyncWorkerStatus?.observe(lifecycleOwner, downSyncObserver)
-    }
-
-    private fun updateCardView() = cardView?.bind(this)
-
-    class SyncStatusViewModel(
-        downSyncDbModel: DownSyncDao,
-        upSyncDbModel: UpSyncDao,
-        syncScope: SyncScope?) {
-
-        val downSyncStatus = downSyncDbModel.getDownSyncStatus()
-        val upSyncStatus = upSyncDbModel.getUpSyncStatus()
-        val downSyncWorkerStatus = syncScope?.let { WorkManager.getInstance().getWorkInfosByTagLiveData(SYNC_WORKER_TAG) }
+        downSyncWorkerStatus?.observe(lifecycleOwner, downSyncObserver)
     }
 }

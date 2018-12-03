@@ -4,10 +4,15 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.dashboard.models.DashboardCard
-import com.simprints.id.activities.dashboard.models.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.DashboardCard
+import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import javax.inject.Inject
 
@@ -28,12 +33,14 @@ class DashboardSyncCardView(rootView: View) : DashboardCardView(rootView) {
         (rootView.context.applicationContext as Application).component.inject(this)
     }
 
-    override fun bind(cardModel: DashboardCard) {
-        super.bind(cardModel)
-
-        if (cardModel is DashboardSyncCardViewModel) {
-            cardModel.cardView = this
-            updateViews(cardModel)
+    override fun bind(viewModel: ViewModel) {
+        val cardViewModel = viewModel as? DashboardSyncCardViewModel
+        cardViewModel?.let {
+            it.stateLiveData.observe(this, Observer<DashboardSyncCardViewModel.State> {
+                image?.setImageResource(it.imageRes)
+                title?.text = it.title
+                description?.text = it.description
+            })
         }
     }
 
