@@ -42,12 +42,11 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var localDbManager: LocalDbManager
-    @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
+    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
+    @Inject lateinit var downSyncManager: DownSyncManager
 
-    private var masterSync: DownSyncManager
-
-    private var newSyncStatusViewModel: NewSyncStatusViewModel
+    private var syncStatusViewModel: SyncStatusViewModel
 
     private val syncScope: SyncScope?
         get() = syncScopesBuilder.buildSyncScope()
@@ -71,18 +70,17 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
 
     init {
         component.inject(this)
-        masterSync = DownSyncManager(syncScopesBuilder)
 
-        newSyncStatusViewModel = NewSyncStatusViewModel(
-            newSyncStatusDatabase.downSyncDao,
-            newSyncStatusDatabase.upSyncDao,
+        syncStatusViewModel = SyncStatusViewModel(
+            syncStatusDatabase.downSyncDao,
+            syncStatusDatabase.upSyncDao,
             syncScope)
 
         initViewModel()
     }
 
     private fun initViewModel() {
-        isSyncRunning = masterSync.isDownSyncRunning()
+        isSyncRunning = downSyncManager.isDownSyncRunning()
         if (isSyncRunning) {
             registerObservers()
             updateSyncInfo()
@@ -146,14 +144,15 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
                     peopleToDownSync += it.totalToDownload
                     it.lastSyncTime?.let { lastSyncTime -> latestDownSyncTimeForModules.add(lastSyncTime) }
                 }
-                peopleToDownload = peopleToDownSync
+                if(isSyncRunning) {
+                    peopleToDownload = peopleToDownSync
+                }
                 latestDownSyncTime = latestDownSyncTimeForModules.max()
-
                 lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
                 updateCardView()
             }
         }
-        newSyncStatusViewModel.downSyncStatus.observe(lifecycleOwner, downSyncStatusObserver)
+        syncStatusViewModel.downSyncStatus.observe(lifecycleOwner, downSyncStatusObserver)
     }
 
     private fun observeAndUpdateLatestUpSyncTime() {
@@ -163,7 +162,7 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
             lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
             updateCardView()
         }
-        newSyncStatusViewModel.upSyncStatus.observe(lifecycleOwner, upSyncObserver)
+        syncStatusViewModel.upSyncStatus.observe(lifecycleOwner, upSyncObserver)
     }
 
     private fun calculateLatestSyncTimeIfPossible(lastDownSyncTime: Long?, lastUpSyncTime: Long?): String {
@@ -208,12 +207,12 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
                 }
             }
         }
-        newSyncStatusViewModel.downSyncWorkerStatus?.observe(lifecycleOwner, downSyncObserver)
+        syncStatusViewModel.downSyncWorkerStatus?.observe(lifecycleOwner, downSyncObserver)
     }
 
     private fun updateCardView() = cardView?.bind(this)
 
-    class NewSyncStatusViewModel(
+    class SyncStatusViewModel(
         downSyncDbModel: DownSyncDao,
         upSyncDbModel: UpSyncDao,
         syncScope: SyncScope?) {

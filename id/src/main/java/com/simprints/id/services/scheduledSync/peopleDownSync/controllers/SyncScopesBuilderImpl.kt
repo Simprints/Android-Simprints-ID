@@ -15,6 +15,7 @@ class SyncScopesBuilderImpl(val loginInfoManager: LoginInfoManager,
     override fun fromSyncScopeToJson(syncScope: SyncScope): String? = toJson(syncScope)
     override fun fromJsonToSubSyncScope(json: String): SubSyncScope? = fromJson(json)
     override fun fromSubSyncScopeToJson(syncScope: SubSyncScope): String? = toJson(syncScope)
+
     override fun buildSyncScope(): SyncScope? {
 
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
@@ -24,14 +25,15 @@ class SyncScopesBuilderImpl(val loginInfoManager: LoginInfoManager,
         if(projectId.isEmpty()) return null
         if(possibleUserId.isNullOrEmpty()) return null
 
-        if(preferencesManager.syncGroup == Constants.GROUP.GLOBAL) {
-            possibleUserId = null
+        when(preferencesManager.syncGroup) {
+            Constants.GROUP.GLOBAL -> {
+                possibleUserId = null
+                possibleModuleIds = null
+            }
+            Constants.GROUP.USER -> possibleModuleIds = null
+            Constants.GROUP.MODULE -> possibleUserId = null
         }
 
-        if(preferencesManager.syncGroup == Constants.GROUP.USER ||
-           preferencesManager.syncGroup == Constants.GROUP.GLOBAL) {
-            possibleModuleIds = null
-        }
         return SyncScope(projectId, possibleUserId, possibleModuleIds)
     }
 
