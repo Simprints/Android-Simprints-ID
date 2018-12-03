@@ -5,11 +5,12 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
+import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.views.DashboardCardView
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 
-class DashboardCardAdapter(private val cardModels: ArrayList<ViewModel>) :
+class DashboardCardAdapter(private val cardModels: ArrayList<CardViewModel>) :
     RecyclerView.Adapter<DashboardCardView>() {
 
     enum class CardViewType {

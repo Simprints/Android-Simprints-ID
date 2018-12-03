@@ -4,14 +4,10 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.dashboard.viewModels.DashboardCard
-import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import javax.inject.Inject
@@ -25,7 +21,8 @@ class DashboardSyncCardView(rootView: View) : DashboardCardView(rootView) {
     private val syncButton: Button = rootView.findViewById(R.id.dashboardSyncCardSyncButton)
     private val totalPeopleInLocal: TextView = rootView.findViewById(R.id.totalPeopleInLocal)
 
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject
+    lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     private var syncButtonEnabled = true
 
@@ -36,21 +33,17 @@ class DashboardSyncCardView(rootView: View) : DashboardCardView(rootView) {
     override fun bind(viewModel: ViewModel) {
         val cardViewModel = viewModel as? DashboardSyncCardViewModel
         cardViewModel?.let {
-            it.stateLiveData.observe(this, Observer<DashboardSyncCardViewModel.State> {
-                image?.setImageResource(it.imageRes)
-                title?.text = it.title
-                description?.text = it.description
+            it.stateLiveData.observe(this, Observer<DashboardSyncCardViewModel.State> { state ->
+                with(state) {
+                    setTotalPeopleInDbCounter(peopleInDb)
+                    setUploadCounter(peopleToUpload)
+                    setListenerForSyncButton(onSyncActionClicked)
+                    setSyncButtonState(isSyncRunning)
+                    setDownloadCounter(peopleToDownload)
+                    setLastSyncTime(lastSyncTime)
+                }
             })
         }
-    }
-
-    private fun updateViews(cardModel: DashboardSyncCardViewModel) {
-        setTotalPeopleInDbCounter(cardModel.peopleInDb)
-        setUploadCounter(cardModel.peopleToUpload)
-        setListenerForSyncButton(cardModel)
-        setSyncButtonState(cardModel.isSyncRunning)
-        setDownloadCounter(cardModel.peopleToDownload)
-        setLastSyncTime(cardModel.lastSyncTime)
     }
 
     private fun setSyncButtonState(isSyncRunning: Boolean) {
@@ -70,8 +63,8 @@ class DashboardSyncCardView(rootView: View) : DashboardCardView(rootView) {
         syncUploadCount.text = "${Math.max(peopleToUpload, 0)}"
     }
 
-    private fun setListenerForSyncButton(cardModel: DashboardSyncCardViewModel) {
-        syncButton.setOnClickListener { cardModel.onSyncActionClicked(cardModel) }
+    private fun setListenerForSyncButton(onActionClicked: () -> Unit) {
+        syncButton.setOnClickListener { onActionClicked() }
     }
 
     private fun setLastSyncTime(lastSyncTime: String) {

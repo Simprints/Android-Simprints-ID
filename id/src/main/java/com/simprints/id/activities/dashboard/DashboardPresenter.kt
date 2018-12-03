@@ -1,7 +1,9 @@
 package com.simprints.id.activities.dashboard
 
-import com.simprints.id.activities.dashboard.viewModels.DashboardCard
+import androidx.lifecycle.ViewModel
+import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
+import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
@@ -20,6 +22,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import org.jetbrains.anko.doAsync
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 class DashboardPresenter(private val view: DashboardContract.View,
                          val component: AppComponent) : DashboardContract.Presenter {
@@ -37,7 +40,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private val cardsFactory = DashboardCardsFactory(view.getLifeCycleOwner(), component)
 
-    override val cardsModelsList: ArrayList<DashboardCard> = arrayListOf()
+    override val cardsViewModelsList: ArrayList<CardViewModel> = arrayListOf()
 
     init {
         component.inject(this)
@@ -50,15 +53,16 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun initCards() {
-        cardsModelsList.clear()
+        cardsViewModelsList.clear()
         Single.merge(
             cardsFactory.createCards()
                 .map {
                     it.doOnSuccess { dashboardCard ->
                         if (dashboardCard is DashboardSyncCardViewModel) {
                             initSyncCardModel(dashboardCard)
+                        } else if (dashboardCard is DashboardCardViewModel) {
+                            addCard(dashboardCard)
                         }
-                        addCard(dashboardCard)
                     }
                 }
         )
@@ -78,7 +82,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun initSyncCardModel(it: DashboardSyncCardViewModel) {
-        it.onSyncActionClicked = {
+        it.viewModelState.onSyncActionClicked = {
             when {
                 userIsOffline() -> view.showToastForUserOffline()
                 !areThereRecordsToSync(it) -> view.showToastForRecordsUpToDate()
@@ -87,11 +91,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
         }
     }
 
-    private fun addCard(dashboardCard: DashboardCard) {
+    private fun addCard(dashboardCard: DashboardCardViewModel) {
         removeCardIfExist(dashboardCard.type)
 
-        cardsModelsList.add(dashboardCard)
-        cardsModelsList.sortBy { it.position }
+        cardsViewModelsList.add(dashboardCard)
+        cardsViewModelsList.sortBy { it.position }
         view.updateCardViews()
     }
 
@@ -104,8 +108,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun removeCardIfExist(projectType: DashboardCardType) {
-        cardsModelsList.findLast { it.type == projectType }.also {
-            cardsModelsList.remove(it)
+        cardsViewModelsList.findLast { it.type == projectType }.also {
+            cardsViewModelsList.remove(it)
         }
     }
 
