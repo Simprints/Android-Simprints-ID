@@ -49,9 +49,9 @@ class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder): Dow
         workerManager.cancelAllWorkByTag(SYNC_WORKER_TAG)
     }
 
-    private fun buildPeriodicDownSyncMasterWorker(it: SyncScope): PeriodicWorkRequest =
+    override fun buildPeriodicDownSyncMasterWorker(syncScope: SyncScope): PeriodicWorkRequest =
         PeriodicWorkRequestBuilder<DownSyncMasterWorker>(SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
-            .setInputData(getDataForDownSyncMasterWorker(it))
+            .setInputData(getDataForDownSyncMasterWorker(syncScope))
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTag(DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME)
             .addTag(SYNC_WORKER_TAG)
@@ -60,9 +60,9 @@ class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder): Dow
 
 
 
-    private fun buildOneTimeDownSyncMasterWorker(scope: SyncScope) =
+    override fun buildOneTimeDownSyncMasterWorker(syncScope: SyncScope) =
         OneTimeWorkRequestBuilder<DownSyncMasterWorker>()
-            .setInputData(getDataForDownSyncMasterWorker(scope))
+            .setInputData(getDataForDownSyncMasterWorker(syncScope))
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTag(DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME)
             .addTag(SYNC_WORKER_TAG)
