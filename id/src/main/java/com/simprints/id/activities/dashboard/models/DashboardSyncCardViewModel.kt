@@ -80,14 +80,22 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
     }
 
     private fun initViewModel() {
-        isSyncRunning = downSyncManager.isDownSyncRunning()
-        if (isSyncRunning) {
-            registerObservers()
-            updateSyncInfo()
-            updateCardView()
-        } else {
-            fetchDownSyncCounterAndThenRegisterObservers()
-        }
+        downSyncManager
+            .isDownSyncRunning()
+            .subscribeBy(onSuccess = {
+                isSyncRunning = it
+                if (isSyncRunning) {
+                    registerObservers()
+                    updateSyncInfo()
+                    updateCardView()
+                } else {
+                    fetchDownSyncCounterAndThenRegisterObservers()
+                }
+            }, onError = {
+                registerObservers()
+                updateCardView()
+                it.printStackTrace()
+            })
     }
 
     private fun fetchDownSyncCounterAndThenRegisterObservers() {
@@ -144,7 +152,7 @@ class DashboardSyncCardViewModel(private val lifecycleOwner: LifecycleOwner,
                     peopleToDownSync += it.totalToDownload
                     it.lastSyncTime?.let { lastSyncTime -> latestDownSyncTimeForModules.add(lastSyncTime) }
                 }
-                if(isSyncRunning) {
+                if (isSyncRunning) {
                     peopleToDownload = peopleToDownSync
                 }
                 latestDownSyncTime = latestDownSyncTimeForModules.max()

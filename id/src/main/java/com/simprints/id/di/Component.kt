@@ -35,9 +35,9 @@ import com.simprints.id.services.GuidSelectionService
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
