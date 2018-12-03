@@ -1,9 +1,11 @@
 package com.simprints.id.activities.dashboard
 
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
-import com.simprints.id.activities.dashboard.viewModels.DashboardCard
+import com.simprints.id.activities.dashboard.viewModels.CardViewModel
+import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.domain.ALERT_TYPE
 
 interface DashboardContract {
@@ -21,7 +23,7 @@ interface DashboardContract {
     }
 
     interface Presenter : BasePresenter {
-        val cardsModelsList: ArrayList<DashboardCard>
+        val cardsViewModelsList: ArrayList<CardViewModel>
 
         fun userDidWantToRefreshCardsIfPossible()
         fun userDidWantToSync()
