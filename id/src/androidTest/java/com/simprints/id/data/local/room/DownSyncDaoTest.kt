@@ -8,6 +8,7 @@ import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import junit.framework.Assert.assertNull
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -87,5 +88,12 @@ class DownSyncDaoTest {
         downSyncDao?.updateLastPatientUpdatedAt(downSyncDao!!.getStatusId(projectId, userId, moduleId), newLastPatientUpdatedAt)
         val byId = downSyncDao?.getDownSyncStatusForId(downSyncDao?.getStatusId(projectId, userId, moduleId) ?: "")
         assertThat(byId?.lastPatientUpdatedAt).isEqualTo(newLastPatientUpdatedAt)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun getDownSyncStatusTest_shouldReturnNullLiveData() {
+        val downSyncStatuses = downSyncDao?.getDownSyncStatus()
+        assertNull(downSyncStatuses?.value)
     }
 }
