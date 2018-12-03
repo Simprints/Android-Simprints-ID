@@ -377,6 +377,9 @@ dependencies {
 
     //Room
     testImplementation "androidx.room:room-testing:$room_version"
+
+    //WorkManager
+    androidTestImplementation "android.arch.work:work-testing:$work_version"
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {
