@@ -5,7 +5,7 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncOption
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameter
 import com.simprints.id.session.sessionParameters.SessionParameters
@@ -36,13 +36,17 @@ class SerializerModule {
     @Provides @Singleton @Named("FingerIdentifierSerializer") fun provideFingerIdentifierSerializer(): Serializer<FingerIdentifier> = EnumSerializer(FingerIdentifier::class.java)
     @Provides @Singleton @Named("CalloutActionSerializer") fun provideCalloutActionSerializer(): Serializer<CalloutAction> = EnumSerializer(CalloutAction::class.java)
     @Provides @Singleton @Named("GroupSerializer") fun provideGroupSerializer(): Serializer<Constants.GROUP> = EnumSerializer(Constants.GROUP::class.java)
-    @Provides @Singleton @Named("PeopleDownSyncStateSerializer") fun providePeopleDownSyncStateSerializer(): Serializer<PeopleDownSyncOption> =EnumSerializer(PeopleDownSyncOption::class.java)
+    @Provides @Singleton @Named("PeopleDownSyncTriggerSerializer") fun providePeopleDownSyncTriggerSerializer(): Serializer<PeopleDownSyncTrigger> = EnumSerializer(PeopleDownSyncTrigger::class.java)
     @Provides @Singleton fun provideGson(): Gson = Gson()
     @Provides @Singleton @Named("LocationSerializer") fun provideLocationSerializer(): Serializer<Location> = LocationSerializer()
 
     @Provides @Singleton @Named("FingerIdToBooleanSerializer") fun provideFingerIdToBooleanSerializer(@Named("FingerIdentifierSerializer") fingerIdentifierSerializer: Serializer<FingerIdentifier>,
                                                                 @Named("BooleanSerializer") booleanSerializer: Serializer<Boolean>,
                                                                 gson: Gson): Serializer<Map<FingerIdentifier, Boolean>> = MapSerializer(fingerIdentifierSerializer, booleanSerializer, gson)
+    @Provides @Singleton @Named("PeopleDownSyncTriggerToBooleanSerializer") fun providePeopleDownSyncTriggerToBooleanSerializer(
+        @Named("PeopleDownSyncTriggerSerializer") peopleDownSyncSyncTriggerSerializer: Serializer<PeopleDownSyncTrigger>,
+        @Named("BooleanSerializer") booleanSerializer: Serializer<Boolean>,
+        gson: Gson): Serializer<Map<PeopleDownSyncTrigger, Boolean>> = MapSerializer(peopleDownSyncSyncTriggerSerializer, booleanSerializer, gson)
 
     @Provides @Singleton @Named("LanguagesStringArraySerializer") fun provideLanguagesStringArraySerializer(): Serializer<Array<String>> = LanguagesStringArraySerializer()
     @Provides @Singleton @Named("ModuleIdOptionsStringSetSerializer") fun provideModuleIdOptionsStringSetSerializer(): Serializer<Set<String>> = ModuleIdOptionsStringSetSerializer()
