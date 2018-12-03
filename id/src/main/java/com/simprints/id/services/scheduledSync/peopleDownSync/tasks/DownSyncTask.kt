@@ -4,5 +4,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScop
 import io.reactivex.Completable
 
 interface DownSyncTask {
+
     fun execute(subSyncScope: SubSyncScope): Completable
 }
