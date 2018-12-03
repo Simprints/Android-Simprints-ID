@@ -24,6 +24,6 @@ open class PreferencesModuleForAnyTests(open var remoteConfigRule: DependencyRul
                                                    groupSerializer: Serializer<Constants.GROUP>,
                                                    languagesStringArraySerializer: Serializer<Array<String>>,
                                                    moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-                                                   peopleDownSyncTriggerSerializer: Serializer<PeopleDownSyncTrigger>): SettingsPreferencesManager =
-        settingsPreferencesManagerRule.resolveDependency { super.provideSettingsPreferencesManager(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer, languagesStringArraySerializer, moduleIdOptionsStringSetSerializer, peopleDownSyncTriggerSerializer) }
+                                                   peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>): SettingsPreferencesManager =
+        settingsPreferencesManagerRule.resolveDependency { super.provideSettingsPreferencesManager(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer, languagesStringArraySerializer, moduleIdOptionsStringSetSerializer, peopleDownSyncTriggerToBooleanSerializer) }
 }
