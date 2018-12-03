@@ -8,7 +8,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
@@ -27,6 +27,7 @@ import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
 import com.simprints.id.scanner.ScannerManager
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
@@ -54,12 +55,11 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     @Inject lateinit var scannerManager: ScannerManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
     private val activity = view as Activity
 
     private var permissionsAlreadyRequested = false
-
-    private var syncSchedulerHelper: SyncSchedulerHelper
 
     // True iff the app is waiting for the user to confirm consent
     private var waitingForConfirmation = true
@@ -80,7 +80,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         val component = (activity.application as Application).component
         component.inject(this)
         startConsentEventTime = timeHelper.now()
-        syncSchedulerHelper = SyncSchedulerHelper(component)
     }
 
     override fun start() {

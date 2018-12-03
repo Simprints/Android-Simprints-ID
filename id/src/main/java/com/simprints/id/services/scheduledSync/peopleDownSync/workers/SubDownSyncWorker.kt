@@ -7,7 +7,6 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
@@ -25,21 +24,20 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
 
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var scopesBuilder: SyncScopesBuilder
+    @Inject lateinit var downSyncTask: DownSyncTask
 
     override fun doWork(): Result {
-        getComponentAndInject()
+        inject()
 
         val input = inputData.getString(SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT) ?: throw IllegalArgumentException("input required")
         val subSyncScope = scopesBuilder.fromJsonToSubSyncScope(input) ?: throw IllegalArgumentException("SyncScope required")
         val key = subSyncScope.uniqueKey
         val counter = inputData.getIntArray(key)?.get(0) ?: DEFAULT_COUNTER_FOR_INVALID_VALUE
 
-        val component = getComponentAndInject()
-
         return try {
             when {
                 counter > 0 -> {
-                    DownSyncTask(component, subSyncScope).execute().blockingAwait()
+                    downSyncTask.execute(subSyncScope).blockingAwait()
                     Result.SUCCESS
                 }
                 counter == 0 -> {
@@ -61,11 +59,10 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
         }
     }
 
-    private fun getComponentAndInject(): AppComponent {
+    private fun inject() {
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-            return context.component
         } else throw SimprintsError("Cannot get app component in Worker")
     }
 }
