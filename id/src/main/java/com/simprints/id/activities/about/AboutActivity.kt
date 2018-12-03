@@ -2,10 +2,9 @@ package com.simprints.id.activities.about
 
 import android.app.AlertDialog
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.WindowManager
-import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.DataManager
@@ -37,7 +36,7 @@ class AboutActivity : AppCompatActivity(), AboutContract.View {
         setContentView(R.layout.activity_about)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        setSupportActionBar(toolbar_about as Toolbar?)
+        setSupportActionBar(toolbar_about)
         supportActionBar?.let {
             it.show()
             it.setDisplayHomeAsUpEnabled(true)

@@ -7,7 +7,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
-import com.simprints.id.services.scheduledSync.peopleUpsync.db.UpSyncDao
+import com.simprints.id.data.db.local.room.UpSyncDao
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderTask
 import com.simprints.id.shared.assertThrows
 import io.reactivex.Completable

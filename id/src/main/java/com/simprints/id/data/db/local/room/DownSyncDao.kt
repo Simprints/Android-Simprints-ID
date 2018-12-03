@@ -1,10 +1,11 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.db
+package com.simprints.id.data.db.local.room
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 
 @Dao
 interface DownSyncDao {
@@ -35,3 +36,4 @@ interface DownSyncDao {
     fun lolDelete()
 }
 fun DownSyncDao.getStatusId(projectId: String, userId: String?, moduleId: String?) = "${projectId}_${userId ?: ""}_${moduleId ?: ""}"
+fun DownSyncDao.getStatusId(subSyncScope: SubSyncScope) = getStatusId(subSyncScope.projectId, subSyncScope.userId, subSyncScope.moduleId)

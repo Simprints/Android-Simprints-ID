@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleUpsync.db
+package com.simprints.id.data.db.local.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -13,7 +13,7 @@ import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExist
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.session.Session
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -65,7 +65,7 @@ interface RemoteDbManager {
     fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable
 
     fun getNumberOfPatients(projectId: String, userId: String?, moduleId: String?): Single<Int>
-    fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int>
+    fun getNumberOfPatientsForSyncScope(syncScope: SyncScope): Single<Int>
     fun getNumberOfPatientsInModule(projectId: String, moduleId: String): Single<Int>
 
     fun loadProjectFromRemote(projectId: String): Single<Project>

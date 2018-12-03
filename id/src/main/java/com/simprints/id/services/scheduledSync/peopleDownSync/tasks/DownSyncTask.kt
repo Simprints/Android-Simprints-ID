@@ -8,8 +8,8 @@ import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
-import com.simprints.id.services.scheduledSync.peopleDownSync.db.DownSyncDao
-import com.simprints.id.services.scheduledSync.peopleDownSync.db.getStatusId
+import com.simprints.id.data.db.local.room.DownSyncDao
+import com.simprints.id.data.db.local.room.getStatusId
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
@@ -39,7 +39,7 @@ class DownSyncTask(component: AppComponent, subSyncScope: SubSyncScope) {
 
     init {
         component.inject(this)
-        downSyncDao = newSyncStatusDatabase.downSyncStatusModel
+        downSyncDao = newSyncStatusDatabase.downSyncDao
     }
 
     fun execute(): Completable =

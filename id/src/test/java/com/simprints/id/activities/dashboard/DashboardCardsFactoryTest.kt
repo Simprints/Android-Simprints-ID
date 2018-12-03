@@ -3,7 +3,6 @@ package com.simprints.id.activities.dashboard
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.google.firebase.FirebaseApp
-import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.spy
 import com.simprints.id.R
@@ -12,14 +11,13 @@ import com.simprints.id.activities.dashboard.models.DashboardCard
 import com.simprints.id.activities.dashboard.models.DashboardCardType
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
-import com.simprints.id.services.scheduledSync.peopleDownSync.db.DownSyncDao
+import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
@@ -68,8 +66,8 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         dbManager.initialiseDb()
         WorkManager.initialize(app, Configuration.Builder().build())
 
-        whenever(syncStatusDatabase.downSyncStatusModel).thenReturn(mock())
-        syncStatusDatabaseModel = syncStatusDatabase.downSyncStatusModel
+        whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
+        syncStatusDatabaseModel = syncStatusDatabase.downSyncDao
 
         whenever(syncStatusDatabaseModel.getDownSyncStatus()).thenReturn(mock())
         whenever(syncStatusDatabaseModel.insertOrReplaceDownSyncStatus(anyNotNull())).then { }
@@ -178,7 +176,6 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCard? {
         mockNPeopleForSyncRequest(remoteDbManagerMock, 0)
         mockNLocalPeople(localDbManagerMock, 0)
-        mockGetSyncInfoFor(localDbManagerMock)
 
         val testObserver = Single.merge(cardsFactory.createCards()).test()
         testObserver.awaitTerminalEvent()
@@ -193,14 +190,10 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     }
 
     private fun mockNPeopleForSyncRequest(remoteDbManager: RemoteDbManager, count: Int) {
-        whenever(remoteDbManager.getNumberOfPatientsForSyncParams(anyNotNull())).thenReturn(Single.just(count))
+        whenever(remoteDbManager.getNumberOfPatientsForSyncScope(anyNotNull())).thenReturn(Single.just(count))
     }
 
     private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {
         whenever(localDbManager.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.just(nLocalPeople))
-    }
-
-    private fun mockGetSyncInfoFor(localDbManager: LocalDbManager) {
-        whenever(localDbManager.getSyncInfoFor(anyNotNull(), anyOrNull())).thenReturn(Single.just(rl_SyncInfo().apply { lastSyncTime = Date() }))
     }
 }

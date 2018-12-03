@@ -38,7 +38,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         val task = PeopleUpSyncUploaderTask(
             loginInfoManager, localDbManager, remoteDbManager,
             projectId, /*userId, */PATIENT_UPLOAD_BATCH_SIZE,
-            newSyncStatusDatabase.upSyncStatusModel
+            newSyncStatusDatabase.upSyncDao
         )
 
         return try {

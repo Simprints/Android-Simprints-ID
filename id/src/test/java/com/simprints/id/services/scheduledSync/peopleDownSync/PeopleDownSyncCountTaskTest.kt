@@ -57,7 +57,7 @@ class PeopleDownSyncCountTaskTest : RxJavaTest {
 //    private fun makeFakeNumberOfPeopleToDownSyncCountRequest(peopleToDownload: Int,
 //                                                             peopleInLocalDb: Int): TestObserver<Void>? {
 //
-//        whenever(remoteDbManagerMock.getNumberOfPatientsForSyncParams(anyNotNull())).thenReturn(Single.just(peopleToDownload))
+//        whenever(remoteDbManagerMock.getNumberOfPatientsForSyncScope(anyNotNull())).thenReturn(Single.just(peopleToDownload))
 //        whenever(localDbManagerMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleInLocalDb))
 //        whenever(preferencesManagerMock.syncGroup).thenReturn(Constants.GROUP.GLOBAL)
 //        whenever(preferencesManagerMock.moduleId).thenReturn("0")
