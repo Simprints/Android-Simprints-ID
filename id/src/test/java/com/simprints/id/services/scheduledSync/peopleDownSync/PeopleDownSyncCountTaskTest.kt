@@ -65,7 +65,7 @@ class PeopleDownSyncCountTaskTest : RxJavaTest {
 //        whenever(loginInfoManagerMock.getSignedInProjectIdOrEmpty()).thenReturn("")
 //        whenever(dbManagerMock.calculateNPatientsToDownSync(anyNotNull())).thenReturn(Single.just(20000))
 //
-//        val peopleToDownSyncTask = DownSyncTask(app, SubSyncScope(DEFAULT_PROJECT_ID, null, null))
+//        val peopleToDownSyncTask = DownSyncTaskImpl(app, SubSyncScope(DEFAULT_PROJECT_ID, null, null))
 //        return peopleToDownSyncTask.execute().test()
 //    }
 }

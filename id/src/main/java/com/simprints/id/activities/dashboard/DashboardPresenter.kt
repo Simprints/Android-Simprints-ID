@@ -32,21 +32,21 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var sessionEventManager: SessionEventsManager
     @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
-
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
     private val cardsFactory = DashboardCardsFactory(view.getLifeCycleOwner(), component)
-    private val syncSchedulerHelper: SyncSchedulerHelper
 
     override val cardsModelsList: ArrayList<DashboardCard> = arrayListOf()
 
     init {
         component.inject(this)
-        syncSchedulerHelper = SyncSchedulerHelper(component)
     }
 
     override fun start() {
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
+        syncSchedulerHelper.startDownSyncOnLaunchIfPossible()
+
         initCards()
     }
 
@@ -63,11 +63,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
                     }
                 }
         )
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = { handleCardsCreated() },
-                onError = { handleCardsCreationFailed() })
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeBy(
+            onComplete = { handleCardsCreated() },
+            onError = { handleCardsCreationFailed() })
     }
 
     private fun handleCardsCreated() {
