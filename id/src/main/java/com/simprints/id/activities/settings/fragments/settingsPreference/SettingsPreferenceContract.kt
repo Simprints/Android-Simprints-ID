@@ -21,6 +21,8 @@ interface SettingsPreferenceContract {
 
         fun getPreferenceForBackgroundSyncToggle(): Preference
 
+        fun getSyncAndSearchConfigurationPreference(): Preference
+
         fun getAppVersionPreference(): Preference
 
         fun getScannerVersionPreference(): Preference
@@ -34,6 +36,8 @@ interface SettingsPreferenceContract {
         fun getKeyForSyncUponLaunchPreference(): String
 
         fun getKeyForBackgroundSyncPreference(): String
+
+        fun getKeyForSyncAndSearchConfigurationPreference(): String
 
         fun getKeyForAppVersionPreference(): String
 

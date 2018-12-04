@@ -55,6 +55,9 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun getPreferenceForBackgroundSyncToggle(): Preference =
         findPreference(getKeyForBackgroundSyncPreference())
 
+    override fun getSyncAndSearchConfigurationPreference(): Preference =
+        findPreference(getKeyForSyncAndSearchConfigurationPreference())
+
     override fun getAppVersionPreference(): Preference =
         findPreference(getKeyForAppVersionPreference())
 
@@ -75,6 +78,9 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
 
     override fun getKeyForBackgroundSyncPreference(): String =
         getString(R.string.background_sync_preference)
+
+    override fun getKeyForSyncAndSearchConfigurationPreference(): String =
+        getString(R.string.sync_and_search_configuration_preference)
 
     override fun getKeyForAppVersionPreference(): String =
         getString(R.string.app_version_preference)

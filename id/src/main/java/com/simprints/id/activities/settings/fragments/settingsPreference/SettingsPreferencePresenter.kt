@@ -88,6 +88,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         loadValueAndBindChangeListener(view.getPreferenceForDefaultFingers())
         loadValueAndBindChangeListener(view.getPreferenceForSyncUponLaunchToggle())
         loadValueAndBindChangeListener(view.getPreferenceForBackgroundSyncToggle())
+        loadValueAndBindChangeListener(view.getSyncAndSearchConfigurationPreference())
         loadValueAndBindChangeListener(view.getAppVersionPreference())
         loadValueAndBindChangeListener(view.getScannerVersionPreference())
     }
@@ -113,6 +114,9 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             view.getKeyForBackgroundSyncPreference() -> {
                 loadBackgroundSyncPreference(preference as SwitchPreference)
                 preference.setChangeListener { value: Boolean -> handleBackgroundSyncChanged(value) }
+            }
+            view.getKeyForSyncAndSearchConfigurationPreference() -> {
+                loadSyncAndSearchConfigurationPreference(preference)
             }
             view.getKeyForAppVersionPreference() -> {
                 loadAppVersionInPreference(preference)
@@ -154,6 +158,10 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
 
     private fun loadBackgroundSyncPreference(preference: SwitchPreference) {
         preference.isChecked = preferencesManager.scheduledBackgroundSync
+    }
+
+    private fun loadSyncAndSearchConfigurationPreference(preference: Preference) {
+        preference.summary = "${preferencesManager.syncGroup} Sync - ${preferencesManager.matchGroup} Search"
     }
 
     private fun loadAppVersionInPreference(preference: Preference) {
