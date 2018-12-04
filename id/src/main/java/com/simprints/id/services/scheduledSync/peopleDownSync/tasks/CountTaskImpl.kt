@@ -8,8 +8,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScop
 import io.reactivex.Single
 import timber.log.Timber
 
-class CountTaskImpl(private val dbManager: DbManager,
-                    private val syncStatusDatabase: SyncStatusDatabase) : CountTask {
+class CountTaskImpl(private val dbManager: DbManager) : CountTask {
 
     lateinit var subSyncScope: SubSyncScope
 
@@ -26,21 +25,6 @@ class CountTaskImpl(private val dbManager: DbManager,
         val (_, projectId, userId, moduleId) = subSyncScope
 
         Timber.d("Count task executing for module $moduleId")
-        return dbManager
-            .calculateNPatientsToDownSync(projectId, userId, moduleId)
-            .insertNewCountForDownSyncStatus()
+        return dbManager.calculateNPatientsToDownSync(projectId, userId, moduleId)
     }
-
-    private fun Single<out Int>.insertNewCountForDownSyncStatus() =
-        map {
-
-            val downSyncStatus = syncStatusDatabase.downSyncDao.getDownSyncStatusForId(getDownSyncId())
-                ?: DownSyncStatus(projectId = projectId, userId = userId, moduleId = moduleId)
-            downSyncStatus.totalToDownload = it
-            syncStatusDatabase.downSyncDao.insertOrReplaceDownSyncStatus(downSyncStatus)
-
-            it
-        }
-
-    private fun getDownSyncId() = syncStatusDatabase.downSyncDao.getStatusId(projectId, userId, moduleId)
 }

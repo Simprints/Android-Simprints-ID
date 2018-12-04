@@ -11,6 +11,7 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.toLibPerson
+import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -205,7 +206,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 .where(rl_SyncInfo::class.java).equalTo(rl_SyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
                 .findFirst()
                 ?.let { realm.copyFromRealm(it) }
-                ?: throw NoSuchStoredProjectException()
+                ?: throw NoSuchRlSessionInfoException()
         }
 
     /**
