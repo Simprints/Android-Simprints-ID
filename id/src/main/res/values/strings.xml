@@ -401,6 +401,7 @@
     <string name="select_fingers_preference">select_fingers</string>
     <string name="sync_upon_launch_preference">sync_upon_launch</string>
     <string name="background_sync_preference">background_sync</string>
+    <string name="sync_and_search_configuration_preference">sync_and_search_configuration</string>
     <string name="app_version_preference">app_version</string>
     <string name="scanner_version_preference">scanner_version</string>
     <string name="settings_language">Language</string>
@@ -410,6 +411,7 @@
     <string name="settings_background_sync">Background Sync</string>
     <string name="settings_general">GENERAL</string>
     <string name="settings_about">ABOUT</string>
+    <string name="settings_sync_and_search_configuration">Sync &amp; Search Configuration</string>
     <string name="settings_app_version">App Version</string>
     <string name="settings_scanner_version">Scanner Version</string>
     <string name="settings_modules_subtext">Choose the modules you would like to sync</string>

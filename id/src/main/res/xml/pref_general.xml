@@ -41,6 +41,10 @@
 
     <PreferenceCategory android:title="@string/settings_about">
         <Preference
+            android:key="@string/sync_and_search_configuration_preference"
+            android:title="@string/settings_sync_and_search_configuration"/>
+
+        <Preference
             android:key="@string/app_version_preference"
             android:title="@string/about_app_version" />
 
