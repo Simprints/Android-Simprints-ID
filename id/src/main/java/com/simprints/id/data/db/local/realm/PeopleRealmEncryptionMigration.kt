@@ -6,7 +6,8 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File
 
-class PeopleRealmEncryptionMigration(localDbKey: LocalDbKey, private val appContext: Context) {
+class PeopleRealmEncryptionMigration(localDbKey: LocalDbKey,
+                                     private val appContext: Context) {
 
     companion object {
         private const val LEGACY_APP_KEY_LENGTH: Int = 8
