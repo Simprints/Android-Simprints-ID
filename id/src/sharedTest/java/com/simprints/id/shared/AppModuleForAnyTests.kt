@@ -22,6 +22,7 @@ import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.shared.DependencyRule.RealRule
@@ -52,7 +53,8 @@ open class AppModuleForAnyTests(app: Application,
                                 open var peopleUpSyncMasterRule: DependencyRule = RealRule,
                                 open var syncStatusDatabaseRule: DependencyRule = RealRule,
                                 open var syncScopesBuilderRule: DependencyRule = RealRule,
-                                open var countTaskRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var countTaskRule: DependencyRule = RealRule,
+                                open var downSyncTaskRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -140,5 +142,8 @@ open class AppModuleForAnyTests(app: Application,
 
     override fun provideCountTask(dbManager: DbManager, syncStatusDatabase: SyncStatusDatabase): CountTask =
         countTaskRule.resolveDependency { super.provideCountTask(dbManager, syncStatusDatabase) }
+
+    override fun provideDownSyncTask(localDbManager: LocalDbManager, remoteDbManager: RemoteDbManager, timeHelper: TimeHelper, syncStatusDatabase: SyncStatusDatabase): DownSyncTask =
+        downSyncTaskRule.resolveDependency { super.provideDownSyncTask(localDbManager, remoteDbManager, timeHelper, syncStatusDatabase) }
 
 }
