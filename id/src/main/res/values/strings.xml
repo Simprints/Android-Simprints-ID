@@ -399,8 +399,7 @@
     <string name="select_language_preference">select_language</string>
     <string name="select_modules_preference">select_modules</string>
     <string name="select_fingers_preference">select_fingers</string>
-    <string name="sync_upon_launch_preference">sync_upon_launch</string>
-    <string name="background_sync_preference">background_sync</string>
+    <string name="sync_and_search_configuration_preference">sync_and_search_configuration</string>
     <string name="app_version_preference">app_version</string>
     <string name="scanner_version_preference">scanner_version</string>
     <string name="settings_language">Language</string>
@@ -410,12 +409,11 @@
     <string name="settings_background_sync">Background Sync</string>
     <string name="settings_general">GENERAL</string>
     <string name="settings_about">ABOUT</string>
+    <string name="settings_sync_and_search_configuration">Sync &amp; Search Configuration</string>
     <string name="settings_app_version">App Version</string>
     <string name="settings_scanner_version">Scanner Version</string>
     <string name="settings_modules_subtext">Choose the modules you would like to sync</string>
     <string name="settings_fingers_subtext">Choose the fingers you would like to scan</string>
-    <string name="settings_sync_launch_subtext">Attempt sync each time app is opened</string>
-    <string name="settings_background_sync_subtext">Automatically sync on a set schedule</string>
     <string name="settings_no_modules_toast">Invalid Selection. Please select at least one module.</string>
     <string name="settings_too_many_modules_toast">Invalid Selection. Please select no more than %1$d modules.</string>
     <string name="settings_invalid_selection">Invalid Selection</string>
