@@ -27,15 +27,23 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
         INITIALIZING,
         READY
     }
+
     private fun HelperState.isReady() = this == HelperState.READY
 
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var remoteDbManager: RemoteDbManager
-    @Inject lateinit var localDbManager: LocalDbManager
-    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
-    @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
+    @Inject
+    lateinit var loginInfoManager: LoginInfoManager
+    @Inject
+    lateinit var dbManager: DbManager
+    @Inject
+    lateinit var remoteDbManager: RemoteDbManager
+    @Inject
+    lateinit var localDbManager: LocalDbManager
+    @Inject
+    lateinit var syncStatusDatabase: SyncStatusDatabase
+    @Inject
+    lateinit var syncScopesBuilder: SyncScopesBuilder
 
     private var helperState: HelperState = HelperState.NEED_INITIALIZATION
 
@@ -85,7 +93,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
             latestUpSyncTime = upSyncStatus.lastUpSyncTime
             val lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
             vm.updateState(lastSyncTime = lastSyncTime, emitState = helperState.isReady())
-            fetchTotalAndUpSyncCounters()
+            fetchLocalAndUpsyncCounters()
         }
     }
 
@@ -129,7 +137,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
                 initForDownSyncRunningIfRequired()
             } else {
                 initForDownSyncNotRunningIfRequired()
-                fetchTotalAndUpSyncCounters()
+                fetchLocalAndUpsyncCounters()
             }
             vm.updateState(isDownSyncRunning = isDownSyncRunning, emitState = helperState.isReady())
         }
@@ -138,10 +146,9 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     private fun initForDownSyncNotRunningIfRequired() {
         if (helperState == HelperState.NEED_INITIALIZATION) {
             helperState = HelperState.INITIALIZING
-            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = false)
-
+            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isReady())
             fetchAllCounters {
-                setHelperStateToInitialized()
+                setHelperInitialized()
             }
         }
     }
@@ -149,10 +156,9 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     private fun initForDownSyncRunningIfRequired() {
         if (helperState == HelperState.NEED_INITIALIZATION) {
             helperState = HelperState.INITIALIZING
-            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = false)
-
-            fetchTotalAndUpSyncCounters {
-                setHelperStateToInitialized()
+            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isReady())
+            fetchLocalAndUpsyncCounters {
+                setHelperInitialized()
             }
         }
     }
@@ -172,7 +178,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
             })
     }
 
-    private fun fetchTotalAndUpSyncCounters(done: () -> Unit = {}) {
+    private fun fetchLocalAndUpsyncCounters(done: () -> Unit = {}) {
         updateTotalLocalPeopleCount()
             .andThen(updateLocalPeopleToUpSyncCount())
             .observeOn(AndroidSchedulers.mainThread())
@@ -184,7 +190,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
             }, onError = { it.printStackTrace() })
     }
 
-    private fun setHelperStateToInitialized() {
+    private fun setHelperInitialized() {
         helperState = HelperState.READY
         vm.registerObserverForDownSyncEvents()
         vm.registerObserverForUpSyncEvents()

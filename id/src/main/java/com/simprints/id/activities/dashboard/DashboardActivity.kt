@@ -26,8 +26,10 @@ import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
-    @Inject lateinit var preferences: PreferencesManager
-    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject
+    lateinit var preferences: PreferencesManager
+    @Inject
+    lateinit var loginInfoManager: LoginInfoManager
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -37,7 +39,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override lateinit var viewPresenter: DashboardContract.Presenter
     private lateinit var cardsViewAdapter: DashboardCardAdapter
     private var confirmationLogoutDialog: AlertDialog.Builder? = null
-    private lateinit var notification: LongConsentNotification
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +48,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         component.inject(this)
         setSupportActionBar(dashboardToolbar)
         LanguageHelper.setLanguage(this, preferences.language)
-        notification = LongConsentNotification(this)
 
         viewPresenter = DashboardPresenter(this, component)
         setMenuItemClickListener()
