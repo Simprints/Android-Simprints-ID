@@ -39,14 +39,16 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
         inject()
 
         val scope = getScope()
-        val subCountWorkers = buildChainOfSubCountWorker(scope)
-        val subDownSyncWorkers = scope.toSubSyncScopes().map { this.buildSubDownSyncWorker(it) }
+        if(scope.toSubSyncScopes().isNotEmpty()) {
+            val subCountWorkers = buildChainOfSubCountWorker(scope)
+            val subDownSyncWorkers = scope.toSubSyncScopes().map { this.buildSubDownSyncWorker(it) }
 
-        WorkManager.getInstance()
-            .beginUniqueWork(getSyncChainWorkersUniqueNameForSync(scope), ExistingWorkPolicy.KEEP, subCountWorkers) // STOPSHIP : fails if no modules
-            .then(buildInputMergerWorker())
-            .then(subDownSyncWorkers)
-            .enqueue()
+            WorkManager.getInstance()
+                .beginUniqueWork(getSyncChainWorkersUniqueNameForSync(scope), ExistingWorkPolicy.KEEP, subCountWorkers)
+                .then(buildInputMergerWorker())
+                .then(subDownSyncWorkers)
+                .enqueue()
+        }
 
         return Result.SUCCESS.also {
             if (BuildConfig.DEBUG) {

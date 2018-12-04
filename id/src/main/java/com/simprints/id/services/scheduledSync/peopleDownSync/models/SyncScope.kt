@@ -1,6 +1,9 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.models
 
-data class SyncScope(val projectId: String,
+import com.simprints.id.domain.Constants
+
+data class SyncScope(val group: Constants.GROUP,
+                     val projectId: String,
                      val userId: String?,
                      val moduleIds: Set<String>?) {
 
@@ -8,9 +11,7 @@ data class SyncScope(val projectId: String,
 
     fun toSubSyncScopes(): List<SubSyncScope> = moduleIds?.let { moduleIds ->
         moduleIds.map { moduleId ->
-            SubSyncScope(projectId, userId, moduleId)
+            SubSyncScope(group, projectId, userId, moduleId)
         }
-    } ?: listOf(SubSyncScope(projectId, userId, null))
+    } ?: listOf(SubSyncScope(group, projectId, userId, null))
 }
-
-
