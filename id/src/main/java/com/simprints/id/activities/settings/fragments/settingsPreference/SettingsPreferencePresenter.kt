@@ -161,8 +161,11 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     }
 
     private fun loadSyncAndSearchConfigurationPreference(preference: Preference) {
-        preference.summary = "${preferencesManager.syncGroup} Sync - ${preferencesManager.matchGroup} Search"
+        preference.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
+            " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
     }
+    
+    private fun Constants.GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
 
     private fun loadAppVersionInPreference(preference: Preference) {
         preference.summary = preferencesManager.appVersionName
