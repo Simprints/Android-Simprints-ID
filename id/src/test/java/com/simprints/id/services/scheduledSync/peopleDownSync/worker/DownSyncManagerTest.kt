@@ -52,19 +52,18 @@ class DownSyncManagerTest: DaggerForTests() {
     fun createOneTimeWorkRequest_shouldCreateWithConstraints() {
         val workRequest = downSyncManager.buildOneTimeDownSyncMasterWorker(syncScope)
         val workSpec = workRequest.workSpec
-        assertEquals(workSpec.constraints.requiredNetworkType, NetworkType.CONNECTED)
-        assertEquals(workSpec.workerClassName, DownSyncMasterWorker::class.qualifiedName)
-        assertEquals(workSpec.state, WorkInfo.State.ENQUEUED)
+        assertEquals(NetworkType.CONNECTED, workSpec.constraints.requiredNetworkType)
+        assertEquals(DownSyncMasterWorker::class.qualifiedName, workSpec.workerClassName)
+        assertEquals(WorkInfo.State.ENQUEUED, workSpec.state)
     }
 
     @Test
     fun createPeriodicWorkRequest_shouldCreatePeriodicWithConstraints() {
         val workRequest = downSyncManager.buildPeriodicDownSyncMasterWorker(syncScope)
         val workSpec = workRequest.workSpec
-        assertEquals(workSpec.constraints.requiredNetworkType, NetworkType.CONNECTED)
-        assertEquals(workSpec.workerClassName, DownSyncMasterWorker::class.qualifiedName)
+        assertEquals(NetworkType.CONNECTED, workSpec.constraints.requiredNetworkType)
+        assertEquals(DownSyncMasterWorker::class.qualifiedName, workSpec.workerClassName)
         assertTrue(workSpec.isPeriodic)
-        assertEquals(workSpec.state, WorkInfo.State.ENQUEUED)
+        assertEquals(WorkInfo.State.ENQUEUED, workSpec.state)
     }
-
 }
