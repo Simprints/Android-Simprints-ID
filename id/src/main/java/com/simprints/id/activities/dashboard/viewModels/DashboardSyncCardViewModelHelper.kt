@@ -10,6 +10,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -36,7 +37,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
 
-    private var managerState: HelperState = HelperState.NEED_INITIALIZATION
+    private var helperState: HelperState = HelperState.NEED_INITIALIZATION
 
     private val state: DashboardSyncCardViewModel.State
         get() = vm.viewModelState
@@ -62,20 +63,20 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
             syncScope?.toSubSyncScopes()?.forEach { it ->
                 peopleToDownload += dbManager.calculateNPatientsToDownSync(it.projectId, it.userId, it.moduleId).blockingGet()
             }
-            vm.updateState(peopleToDownload = peopleToDownload, emitState = managerState.isReady())
+            vm.updateState(peopleToDownload = peopleToDownload, emitState = helperState.isReady())
         }
 
     private fun updateTotalLocalPeopleCount(): Completable =
         dbManager.getPeopleCountFromLocalForSyncGroup(preferencesManager.syncGroup)
             .flatMapCompletable {
-                vm.updateState(peopleInDb = it, emitState = managerState.isReady())
+                vm.updateState(peopleInDb = it, emitState = helperState.isReady())
                 Completable.complete()
             }
 
     private fun updateLocalPeopleToUpSyncCount(): Completable =
         localDbManager.getPeopleCountFromLocal(toSync = true)
             .flatMapCompletable {
-                vm.updateState(peopleToUpload = it, emitState = managerState.isReady())
+                vm.updateState(peopleToUpload = it, emitState = helperState.isReady())
                 Completable.complete()
             }
 
@@ -83,8 +84,8 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
         if (upSyncStatus != null) {
             latestUpSyncTime = upSyncStatus.lastUpSyncTime
             val lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
-            vm.updateState(lastSyncTime = lastSyncTime, emitState = managerState.isReady())
-            fetchCountersExceptedDownSync()
+            vm.updateState(lastSyncTime = lastSyncTime, emitState = helperState.isReady())
+            fetchTotalAndUpSyncCounters()
         }
     }
 
@@ -101,7 +102,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
             vm.updateState(
                 lastSyncTime = lastSyncTime,
                 peopleToDownload = peopleToDownSync,
-                emitState = managerState.isReady())
+                emitState = helperState.isReady())
         }
     }
 
@@ -128,31 +129,35 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
                 initForDownSyncRunningIfRequired()
             } else {
                 initForDownSyncNotRunningIfRequired()
-                fetchCountersExceptedDownSync()
+                fetchTotalAndUpSyncCounters()
             }
-            vm.updateState(isDownSyncRunning = isDownSyncRunning, emitState = managerState.isReady())
+            vm.updateState(isDownSyncRunning = isDownSyncRunning, emitState = helperState.isReady())
         }
     }
 
     private fun initForDownSyncNotRunningIfRequired() {
-        if (managerState == HelperState.NEED_INITIALIZATION) {
-            managerState = HelperState.INITIALIZING
-            fetchAllCountersFromDb {
-                setManagerInitialized()
+        if (helperState == HelperState.NEED_INITIALIZATION) {
+            helperState = HelperState.INITIALIZING
+            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = false)
+
+            fetchAllCounters {
+                setHelperStateToInitialized()
             }
         }
     }
 
     private fun initForDownSyncRunningIfRequired() {
-        if (managerState == HelperState.NEED_INITIALIZATION) {
-            managerState = HelperState.INITIALIZING
-            fetchCountersExceptedDownSync {
-                setManagerInitialized()
+        if (helperState == HelperState.NEED_INITIALIZATION) {
+            helperState = HelperState.INITIALIZING
+            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = false)
+
+            fetchTotalAndUpSyncCounters {
+                setHelperStateToInitialized()
             }
         }
     }
 
-    private fun fetchAllCountersFromDb(done: () -> Unit) {
+    private fun fetchAllCounters(done: () -> Unit) {
         updateTotalPeopleToDownSyncCount()
             .andThen(updateTotalLocalPeopleCount())
             .andThen(updateLocalPeopleToUpSyncCount())
@@ -167,7 +172,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
             })
     }
 
-    private fun fetchCountersExceptedDownSync(done: () -> Unit = {}) {
+    private fun fetchTotalAndUpSyncCounters(done: () -> Unit = {}) {
         updateTotalLocalPeopleCount()
             .andThen(updateLocalPeopleToUpSyncCount())
             .observeOn(AndroidSchedulers.mainThread())
@@ -179,8 +184,8 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
             }, onError = { it.printStackTrace() })
     }
 
-    private fun setManagerInitialized() {
-        managerState = HelperState.READY
+    private fun setHelperStateToInitialized() {
+        helperState = HelperState.READY
         vm.registerObserverForDownSyncEvents()
         vm.registerObserverForUpSyncEvents()
         vm.updateState(emitState = true)
