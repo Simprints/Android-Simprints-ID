@@ -61,7 +61,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     private fun initRecyclerCardViews(viewPresenter: DashboardContract.Presenter) {
-        cardsViewAdapter = DashboardCardAdapter(viewPresenter.cardsModelsList)
+        cardsViewAdapter = DashboardCardAdapter(viewPresenter.cardsViewModelsList)
         (dashboardCardsView as RecyclerView).also {
             it.setHasFixedSize(false)
             it.itemAnimator = DefaultItemAnimator()
