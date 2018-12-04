@@ -41,9 +41,10 @@ class SubCountWorkerTest: DaggerForTests() {
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
     @Inject lateinit var countTask: CountTask
     @Inject lateinit var analyticsManager: AnalyticsManager
-    @Mock lateinit var workParams: WorkerParameters
-    private lateinit var subCountWorker: SubCountWorker
 
+    @Mock lateinit var workParams: WorkerParameters
+
+    private lateinit var subCountWorker: SubCountWorker
     private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
 
     override var module by lazyVar {
@@ -52,6 +53,7 @@ class SubCountWorkerTest: DaggerForTests() {
             countTaskRule = DependencyRule.MockRule,
             analyticsManagerRule = DependencyRule.SpyRule)
     }
+
     @Before
     override fun setUp() {
         FirebaseApp.initializeApp(RuntimeEnvironment.application)

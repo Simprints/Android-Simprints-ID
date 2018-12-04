@@ -42,6 +42,7 @@ class SubDownSyncWorkerTest: DaggerForTests() {
     @Inject lateinit var analyticsManager: AnalyticsManager
 
     @Mock lateinit var workParams: WorkerParameters
+
     private lateinit var subDownSyncWorker: SubDownSyncWorker
     private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
 
@@ -104,6 +105,4 @@ class SubDownSyncWorkerTest: DaggerForTests() {
         verify(analyticsManager, times(1)).logThrowable(any())
         assertEquals(ListenableWorker.Result.FAILURE, result)
     }
-
-
 }
