@@ -17,10 +17,6 @@ interface SettingsPreferenceContract {
 
         fun getPreferenceForDefaultFingers(): Preference
 
-        fun getPreferenceForSyncUponLaunchToggle(): Preference
-
-        fun getPreferenceForBackgroundSyncToggle(): Preference
-
         fun getSyncAndSearchConfigurationPreference(): Preference
 
         fun getAppVersionPreference(): Preference
@@ -32,10 +28,6 @@ interface SettingsPreferenceContract {
         fun getKeyForSelectModulesPreference(): String
 
         fun getKeyForDefaultFingersPreference(): String
-
-        fun getKeyForSyncUponLaunchPreference(): String
-
-        fun getKeyForBackgroundSyncPreference(): String
 
         fun getKeyForSyncAndSearchConfigurationPreference(): String
 

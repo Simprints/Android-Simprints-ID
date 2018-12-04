@@ -18,16 +18,6 @@
             android:summary="@string/settings_fingers_subtext"
             android:title="@string/settings_fingers" />
 
-        <SwitchPreference
-            android:key="@string/sync_upon_launch_preference"
-            android:summary="@string/settings_sync_launch_subtext"
-            android:title="@string/settings_sync_launch" />
-
-        <SwitchPreference
-            android:key="@string/background_sync_preference"
-            android:summary="@string/settings_background_sync_subtext"
-            android:title="@string/settings_background_sync" />
-
         <MultiSelectListPreference
             android:entries="@array/empty"
             android:entryValues="@array/empty"
