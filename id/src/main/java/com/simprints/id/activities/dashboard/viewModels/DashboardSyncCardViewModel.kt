@@ -19,11 +19,12 @@ import javax.inject.Inject
 
 class DashboardSyncCardViewModel(override val type: DashboardCardType,
                                  override val position: Int,
-                                 val lifecycleOwner: LifecycleOwner,
-                                 val component: AppComponent,
+                                 private val lifecycleOwner: LifecycleOwner,
+                                 component: AppComponent,
                                  defaultState: State = State()) : CardViewModel(type, position) {
 
-    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+    @Inject
+    lateinit var syncStatusDatabase: SyncStatusDatabase
     @Inject
     lateinit var syncScopesBuilder: SyncScopesBuilder
     private val syncScope: SyncScope?
@@ -33,10 +34,6 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
 
     val stateLiveData: MutableLiveData<State> = MutableLiveData()
     var viewModelState: State = State()
-
-    init {
-        viewModelState = defaultState
-    }
 
     data class State(var onSyncActionClicked: () -> Unit = {},
                      var peopleToUpload: Int = 0,
@@ -52,6 +49,8 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
 
     init {
         component.inject(this)
+
+        viewModelState = defaultState
 
         downSyncStatus = syncStatusDatabase.downSyncDao.getDownSyncStatus()
         upSyncStatus = syncStatusDatabase.upSyncDao.getUpSyncStatus()
