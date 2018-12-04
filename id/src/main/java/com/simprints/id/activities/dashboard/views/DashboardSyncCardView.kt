@@ -40,7 +40,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
                         setTotalPeopleInDbCounter(peopleInDb)
                         setUploadCounter(peopleToUpload)
                         setListenerForSyncButton(onSyncActionClicked)
-                        setSyncButtonState(isDownSyncRunning ?: false)
+                        setSyncButtonState(showSyncButton, isDownSyncRunning)
                         setDownloadCounter(peopleToDownload)
                         setLastSyncTime(lastSyncTime)
                     }
@@ -49,11 +49,17 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         }
     }
 
-    private fun setSyncButtonState(isSyncRunning: Boolean) {
+    private fun setSyncButtonState(showSyncButton:Boolean, isSyncRunning: Boolean) {
         if (isSyncRunning) {
             disableSyncButtonIfEnabled()
         } else {
             enableSyncButtonIfDisabledAndUpdateSyncInfo()
+        }
+
+        if(showSyncButton) {
+            syncButton.visibility = View.VISIBLE
+        } else {
+            syncButton.visibility = View.INVISIBLE
         }
     }
 
