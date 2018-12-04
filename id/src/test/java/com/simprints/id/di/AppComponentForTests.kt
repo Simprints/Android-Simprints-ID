@@ -11,6 +11,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.PeopleDownSyncTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.DownSyncManagerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.DownSyncMasterWorkerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubCountWorkerTest
+import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubDownSyncWorkerTest
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
@@ -33,4 +34,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(downSyncManagerTest: DownSyncManagerTest)
     fun inject(downSyncManagerWorkerTest: DownSyncMasterWorkerTest)
     fun inject(subCountWorkerTest: SubCountWorkerTest)
+    fun inject(subDownSyncWorkerTest: SubDownSyncWorkerTest)
 }
