@@ -43,9 +43,10 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
                 counter == 0 -> {
                     Result.SUCCESS
                 }
-                else -> throw Throwable("Counter failed for $subSyncScope!") //StopShip: create exteption
+                else -> throw Throwable("Counter failed for $subSyncScope!") //StopShip: create exception
             }
         } catch (e: Throwable) {
+            e.printStackTrace()
             analyticsManager.logThrowable(e)
             Result.FAILURE
         }.also {
