@@ -3,6 +3,7 @@ package com.simprints.id.data.db.local.realm
 import com.simprints.id.data.db.local.realm.models.rl_Fingerprint
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.rl_Project
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.domain.Constants
 import io.realm.*
 import io.realm.annotations.RealmModule
@@ -10,11 +11,11 @@ import java.util.*
 
 internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
 
-    @RealmModule(classes = [rl_Fingerprint::class, rl_Person::class, rl_Project::class])
+    @RealmModule(classes = [rl_Fingerprint::class, rl_Person::class, rl_Project::class, rl_SyncInfo::class])
     class PeopleModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 4
+        const val REALM_SCHEMA_VERSION: Long = 5
 
         const val PERSON_TABLE: String = "rl_Person"
         const val USER_TABLE: String = "rl_User"
@@ -48,7 +49,6 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         const val PERSON_CREATE_TIME = "createdAt"
 
         const val FINGERPRINT_PERSON = "person"
-
     }
 
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
@@ -58,6 +58,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
                 1 -> migrateTo2(realm.schema)
                 2 -> migrateTo3(realm.schema)
                 3 -> migrateTo4(realm.schema)
+                4 -> migrateTo5(realm.schema)
             }
         }
     }
@@ -139,6 +140,11 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     private fun migrateTo4(schema: RealmSchema) {
         schema.get(SYNC_INFO_TABLE)
             ?.addField(SYNC_INFO_MODULE_ID, String::class.java)
+    }
+
+    private fun migrateTo5(schema: RealmSchema) {
+        //We want to delete RlSyncInfo, but we need to migrate to Room.
+        //In the next version, we will drop this class.
     }
 
     private fun RealmObjectSchema.addStringAndMakeRequired(name: String): RealmObjectSchema =

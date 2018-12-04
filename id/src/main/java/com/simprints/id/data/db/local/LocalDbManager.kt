@@ -3,11 +3,13 @@ package com.simprints.id.data.db.local
 import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -52,4 +54,8 @@ interface LocalDbManager {
 
     fun deletePeopleFromLocal(syncScope: SyncScope): Completable
     fun loadPeopleFromLocal(destinationList: MutableList<LibPerson>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
+
+    //@Deprecated: do not use it. Use Room SyncStatus
+    fun getRlSyncInfo(subSyncScope: SubSyncScope): Single<rl_SyncInfo>
+    fun deleteSyncInfo(subSyncScope: SubSyncScope): Completable
 }

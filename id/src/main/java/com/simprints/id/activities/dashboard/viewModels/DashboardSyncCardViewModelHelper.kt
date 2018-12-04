@@ -28,7 +28,8 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
         READY
     }
 
-    private fun HelperState.isReady() = this == HelperState.READY
+    private fun HelperState.isInReady() = this == HelperState.READY
+    private fun HelperState.isInNeedInit() = this == HelperState.NEED_INITIALIZATION
 
     @Inject
     lateinit var preferencesManager: PreferencesManager
@@ -71,20 +72,20 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
             syncScope?.toSubSyncScopes()?.forEach { it ->
                 peopleToDownload += dbManager.calculateNPatientsToDownSync(it.projectId, it.userId, it.moduleId).blockingGet()
             }
-            vm.updateState(peopleToDownload = peopleToDownload, emitState = helperState.isReady())
+            vm.updateState(peopleToDownload = peopleToDownload, emitState = helperState.isInReady())
         }
 
     private fun updateTotalLocalPeopleCount(): Completable =
         dbManager.getPeopleCountFromLocalForSyncGroup(preferencesManager.syncGroup)
             .flatMapCompletable {
-                vm.updateState(peopleInDb = it, emitState = helperState.isReady())
+                vm.updateState(peopleInDb = it, emitState = helperState.isInReady())
                 Completable.complete()
             }
 
     private fun updateLocalPeopleToUpSyncCount(): Completable =
         localDbManager.getPeopleCountFromLocal(toSync = true)
             .flatMapCompletable {
-                vm.updateState(peopleToUpload = it, emitState = helperState.isReady())
+                vm.updateState(peopleToUpload = it, emitState = helperState.isInReady())
                 Completable.complete()
             }
 
@@ -92,7 +93,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
         if (upSyncStatus != null) {
             latestUpSyncTime = upSyncStatus.lastUpSyncTime
             val lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
-            vm.updateState(lastSyncTime = lastSyncTime, emitState = helperState.isReady())
+            vm.updateState(lastSyncTime = lastSyncTime, emitState = helperState.isInReady())
             fetchLocalAndUpsyncCounters()
         }
     }
@@ -110,7 +111,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
             vm.updateState(
                 lastSyncTime = lastSyncTime,
                 peopleToDownload = peopleToDownSync,
-                emitState = helperState.isReady())
+                emitState = helperState.isInReady())
         }
     }
 
@@ -132,21 +133,21 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     }
 
     fun onDownSyncRunningChangeState(isDownSyncRunning: Boolean) {
-        if (state.isDownSyncRunning != isDownSyncRunning) {
+        if (state.isDownSyncRunning != isDownSyncRunning || helperState.isInNeedInit()) {
             if (isDownSyncRunning) {
                 initForDownSyncRunningIfRequired()
             } else {
                 initForDownSyncNotRunningIfRequired()
                 fetchLocalAndUpsyncCounters()
             }
-            vm.updateState(isDownSyncRunning = isDownSyncRunning, emitState = helperState.isReady())
+            vm.updateState(isDownSyncRunning = isDownSyncRunning, emitState = helperState.isInReady())
         }
     }
 
     private fun initForDownSyncNotRunningIfRequired() {
         if (helperState == HelperState.NEED_INITIALIZATION) {
             helperState = HelperState.INITIALIZING
-            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isReady())
+            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
             fetchAllCounters {
                 setHelperInitialized()
             }
@@ -156,7 +157,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     private fun initForDownSyncRunningIfRequired() {
         if (helperState == HelperState.NEED_INITIALIZATION) {
             helperState = HelperState.INITIALIZING
-            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isReady())
+            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
             fetchLocalAndUpsyncCounters {
                 setHelperInitialized()
             }
