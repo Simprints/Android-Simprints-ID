@@ -49,11 +49,8 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun getPreferenceForDefaultFingers(): Preference =
         findPreference(getKeyForDefaultFingersPreference())
 
-    override fun getPreferenceForSyncUponLaunchToggle(): Preference =
-        findPreference(getKeyForSyncUponLaunchPreference())
-
-    override fun getPreferenceForBackgroundSyncToggle(): Preference =
-        findPreference(getKeyForBackgroundSyncPreference())
+    override fun getSyncAndSearchConfigurationPreference(): Preference =
+        findPreference(getKeyForSyncAndSearchConfigurationPreference())
 
     override fun getAppVersionPreference(): Preference =
         findPreference(getKeyForAppVersionPreference())
@@ -70,11 +67,8 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun getKeyForDefaultFingersPreference(): String =
         getString(R.string.select_fingers_preference)
 
-    override fun getKeyForSyncUponLaunchPreference(): String =
-        getString(R.string.sync_upon_launch_preference)
-
-    override fun getKeyForBackgroundSyncPreference(): String =
-        getString(R.string.background_sync_preference)
+    override fun getKeyForSyncAndSearchConfigurationPreference(): String =
+        getString(R.string.sync_and_search_configuration_preference)
 
     override fun getKeyForAppVersionPreference(): String =
         getString(R.string.app_version_preference)

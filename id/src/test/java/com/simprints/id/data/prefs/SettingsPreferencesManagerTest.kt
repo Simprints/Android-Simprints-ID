@@ -16,7 +16,7 @@ import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.verify
@@ -61,16 +61,16 @@ class SettingsPreferencesManagerTest : DaggerForTests() {
 
     @Test
     fun fetchingOverridableRemoteConfigPrimitive_worksAndBecomesOverridden() {
-        val originalValue = settingsPreferencesManager.syncOnCallout
-        Assert.assertEquals(SettingsPreferencesManagerImpl.SYNC_ON_CALLOUT_DEFAULT, originalValue)
+        val originalValue = settingsPreferencesManager.language
+        Assert.assertEquals(SettingsPreferencesManagerImpl.LANGUAGE_DEFAULT, originalValue)
 
-        settingsPreferencesManager.syncOnCallout = !originalValue
+        settingsPreferencesManager.language = SettingsPreferencesManagerImpl.LANGUAGE_DEFAULT + "q"
 
-        val newValue = settingsPreferencesManager.syncOnCallout
+        val newValue = settingsPreferencesManager.language
 
-        Assert.assertEquals(originalValue, !newValue)
+        Assert.assertNotEquals(originalValue, newValue)
 
-        verify(remoteConfigSpy, times(1)).getBoolean(SettingsPreferencesManagerImpl.SYNC_ON_CALLOUT_KEY)
+        verify(remoteConfigSpy, times(1)).getString(SettingsPreferencesManagerImpl.LANGUAGE_KEY)
     }
 
     @Test
