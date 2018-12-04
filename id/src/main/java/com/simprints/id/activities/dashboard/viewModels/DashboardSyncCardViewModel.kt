@@ -34,10 +34,6 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
     val stateLiveData: MutableLiveData<State> = MutableLiveData()
     var viewModelState: State = State()
 
-    init {
-        viewModelState = defaultState
-    }
-
     data class State(var onSyncActionClicked: () -> Unit = {},
                      var peopleToUpload: Int = 0,
                      var peopleToDownload: Int = 0,
@@ -51,6 +47,8 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
 
     init {
         component.inject(this)
+
+        viewModelState = defaultState
 
         downSyncStatus = syncStatusDatabase.downSyncDao.getDownSyncStatus()
         upSyncStatus = syncStatusDatabase.upSyncDao.getUpSyncStatus()
