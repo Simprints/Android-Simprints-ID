@@ -3,8 +3,7 @@ package com.simprints.id.services.scheduledSync
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.isDownSyncActiveOnLaunch
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.isDownSyncActiveOnUserAction
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 
 class SyncSchedulerHelperImpl(val preferencesManager: PreferencesManager,
@@ -14,19 +13,21 @@ class SyncSchedulerHelperImpl(val preferencesManager: PreferencesManager,
 
 
     override fun scheduleBackgroundSyncs() {
-        scheduleDownSyncPeople()
-        scheduleSessionsSync()
+        if (preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.PERIODIC_BACKGROUND] == true) {
+            scheduleDownSyncPeople()
+            scheduleSessionsSync()
+        }
     }
 
-    //LaunchPresenter and DashboardPresenter.
+    // LaunchPresenter
     override fun startDownSyncOnLaunchIfPossible() {
-        if (preferencesManager.peopleDownSyncOption.isDownSyncActiveOnLaunch()) {
+        if (preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT] == true) {
             downSyncManager.enqueueOneTimeDownSyncMasterWorker()
         }
     }
 
     override fun startDownSyncOnUserActionIfPossible() {
-        if (preferencesManager.peopleDownSyncOption.isDownSyncActiveOnUserAction()) {
+        if (preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL] == true) {
             downSyncManager.enqueueOneTimeDownSyncMasterWorker()
         }
     }

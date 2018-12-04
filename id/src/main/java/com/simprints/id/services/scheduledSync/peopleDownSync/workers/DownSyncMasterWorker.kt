@@ -31,7 +31,7 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
         const val SYNC_WORKER_SYNC_SCOPE_INPUT = "SYNC_WORKER_SYNC_SCOPE_INPUT"
 
         fun getSyncChainWorkersUniqueNameForSync(scope: SyncScope) = "${SYNC_WORKER_CHAIN}_${scope.uniqueKey}"
-        fun getDownSyncWorkerKeyForScope(scope: SubSyncScope) = "${SUBCOUNT_WORKER_TAG}_${scope.uniqueKey}"
+        fun getDownSyncWorkerKeyForScope(scope: SubSyncScope) = "${SUBDOWNSYNC_WORKER_TAG}_${scope.uniqueKey}"
         fun getCountWorkerKeyForScope(scope: SubSyncScope) = "${SUBCOUNT_WORKER_TAG}_${scope.uniqueKey}"
     }
 
@@ -69,6 +69,7 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
     private fun buildSubDownSyncWorker(subSyncScope: SubSyncScope): OneTimeWorkRequest {
         val data: Data = workDataOf(SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope))
 
+        //STOPSHIP: Think about putting the Network.CONNECTED constraint
         return OneTimeWorkRequestBuilder<SubDownSyncWorker>()
             .setInputData(data)
             .addTag(getDownSyncWorkerKeyForScope(subSyncScope))

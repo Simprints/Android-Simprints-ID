@@ -23,7 +23,7 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncOption
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
@@ -94,14 +94,14 @@ open class PreferencesModule {
                                                @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>,
                                                @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
                                                @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-                                               @Named("PeopleDownSyncStateSerializer") peopleDownSyncOptionSerializer: Serializer<PeopleDownSyncOption>): SettingsPreferencesManager =
+                                               @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>): SettingsPreferencesManager =
         SettingsPreferencesManagerImpl(prefs,
             remoteConfigWrapper,
             fingerIdToBooleanSerializer,
             groupSerializer,
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
-            peopleDownSyncOptionSerializer)
+            peopleDownSyncTriggerToBooleanSerializer)
 
     @Provides
     @Singleton
