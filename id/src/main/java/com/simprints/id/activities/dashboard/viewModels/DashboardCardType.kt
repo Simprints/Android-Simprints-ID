@@ -1,4 +1,4 @@
-package com.simprints.id.activities.dashboard.models
+package com.simprints.id.activities.dashboard.viewModels
 
 enum class DashboardCardType {
     PROJECT_INFO,
