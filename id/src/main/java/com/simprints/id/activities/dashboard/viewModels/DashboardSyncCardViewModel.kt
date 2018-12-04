@@ -42,7 +42,8 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
                      var peopleToUpload: Int = 0,
                      var peopleToDownload: Int = 0,
                      var peopleInDb: Int = 0,
-                     var isDownSyncRunning: Boolean? = null,
+                     var isDownSyncRunning: Boolean = false,
+                     val showSyncButton: Boolean = false,
                      var lastSyncTime: String = "")
 
     private var downSyncStatus: LiveData<List<DownSyncStatus>>
@@ -88,6 +89,7 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
                     peopleInDb: Int? = null,
                     isDownSyncRunning: Boolean? = null,
                     lastSyncTime: String? = null,
+                    showSyncButton: Boolean? = null,
                     emitState: Boolean = false) {
 
         viewModelState = viewModelState.let {
@@ -96,7 +98,8 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
                 peopleToDownload = peopleToDownload ?: it.peopleToDownload,
                 peopleInDb = peopleInDb ?: it.peopleInDb,
                 isDownSyncRunning = isDownSyncRunning ?: it.isDownSyncRunning,
-                lastSyncTime = lastSyncTime ?: it.lastSyncTime
+                lastSyncTime = lastSyncTime ?: it.lastSyncTime,
+                showSyncButton = showSyncButton ?: it.showSyncButton
             )
         }
 
