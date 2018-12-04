@@ -89,18 +89,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
             FingerIdentifier.LEFT_5TH_FINGER to false
         )
 
-        const val SYNC_ON_CALLOUT_KEY = "SyncOnCallout"
-        const val SYNC_ON_CALLOUT_DEFAULT = false
-
-        const val SCHEDULED_BACKGROUND_SYNC_KEY = "ScheduledBackgroundSync"
-        const val SCHEDULED_BACKGROUND_SYNC_DEFAULT = true
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY = "ScheduledBackgroundSyncOnlyOnWifi"
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT = false
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY = "ScheduledBackgroundSyncOnlyWhenCharging"
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT = false
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY = "ScheduledBackgroundSyncOnlyWhenNotLowBattery"
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT = true
-
         const val PROGRAM_NAME_KEY = "ProgramName"
         const val PROGRAM_NAME_DEFAULT = "this program"
 
@@ -188,18 +176,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     /** @throws JsonSyntaxException */
     override var fingerStatus: Map<FingerIdentifier, Boolean>
         by OverridableRemoteConfigComplexPreference(prefs, remoteConfigWrapper, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
-
-    override var syncOnCallout: Boolean
-        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SYNC_ON_CALLOUT_KEY, SYNC_ON_CALLOUT_DEFAULT)
-
-    override var scheduledBackgroundSync: Boolean
-        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_KEY, SCHEDULED_BACKGROUND_SYNC_DEFAULT)
-    override var scheduledBackgroundSyncOnlyOnWifi: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT)
-    override var scheduledBackgroundSyncOnlyWhenCharging: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT)
-    override var scheduledBackgroundSyncOnlyWhenNotLowBattery: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT)
 
     // Name of the partner's program
     override var programName: String
