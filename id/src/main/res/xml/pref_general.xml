@@ -12,14 +12,6 @@
             android:title="@string/settings_language" />
 
         <MultiSelectListPreference
-            android:entries="@array/empty"
-            android:entryValues="@array/empty"
-            android:key="@string/select_modules_preference"
-            android:summary="@string/settings_modules_subtext"
-            android:title="@string/settings_modules"
-            android:shouldDisableView="true"/>
-
-        <MultiSelectListPreference
             android:entries="@array/finger_array"
             android:entryValues="@array/finger_values"
             android:key="@string/select_fingers_preference"
@@ -35,6 +27,14 @@
             android:key="@string/background_sync_preference"
             android:summary="@string/settings_background_sync_subtext"
             android:title="@string/settings_background_sync" />
+
+        <MultiSelectListPreference
+            android:entries="@array/empty"
+            android:entryValues="@array/empty"
+            android:key="@string/select_modules_preference"
+            android:summary="@string/settings_modules_subtext"
+            android:title="@string/settings_modules"
+            android:shouldDisableView="true"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:layout="@layout/line_separator" />
