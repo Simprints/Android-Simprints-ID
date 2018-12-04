@@ -15,7 +15,8 @@ open class DashboardCardView(private val rootView: View) : RecyclerView.ViewHold
     private val title: TextView? = rootView.findViewById(R.id.dashboardCardTitle)
     protected val description: TextView? = rootView.findViewById(R.id.dashboardCardDescription)
 
-    private val lifecycleRegistry = LifecycleRegistry(this)
+    var lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
+
     init {
         lifecycleRegistry.markState(Lifecycle.State.INITIALIZED)
     }
@@ -25,7 +26,7 @@ open class DashboardCardView(private val rootView: View) : RecyclerView.ViewHold
     }
 
     fun onDisappear() {
-        lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
+        lifecycleRegistry.markState(Lifecycle.State.CREATED)
     }
 
     override fun getLifecycle(): Lifecycle {
