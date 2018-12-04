@@ -7,21 +7,21 @@ import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
+import org.jetbrains.anko.runOnUiThread
 
-open class DashboardCardView(rootView: View) : RecyclerView.ViewHolder(rootView), LifecycleOwner {
+open class DashboardCardView(private val rootView: View) : RecyclerView.ViewHolder(rootView), LifecycleOwner {
 
     private val image: ImageView? = rootView.findViewById(R.id.dashboardCardImage)
     private val title: TextView? = rootView.findViewById(R.id.dashboardCardTitle)
     protected val description: TextView? = rootView.findViewById(R.id.dashboardCardDescription)
 
     private val lifecycleRegistry = LifecycleRegistry(this)
-
     init {
         lifecycleRegistry.markState(Lifecycle.State.INITIALIZED)
     }
 
     fun onAppear() {
-        lifecycleRegistry.markState(Lifecycle.State.CREATED)
+        lifecycleRegistry.markState(Lifecycle.State.STARTED)
     }
 
     fun onDisappear() {
@@ -36,10 +36,12 @@ open class DashboardCardView(rootView: View) : RecyclerView.ViewHolder(rootView)
     open fun bind(viewModel: ViewModel) {
         val cardViewModel = viewModel as? DashboardCardViewModel
         cardViewModel?.let {
-            it.stateLiveData.observe(this, Observer<DashboardCardViewModel.State> {
-                image?.setImageResource(it.imageRes)
-                title?.text = it.title
-                description?.text = it.description
+            it.stateLiveData.observe(this, Observer<DashboardCardViewModel.State> { state ->
+                rootView.context.runOnUiThread {
+                    image?.setImageResource(state.imageRes)
+                    title?.text = state.title
+                    description?.text = state.description
+                }
             })
         }
     }

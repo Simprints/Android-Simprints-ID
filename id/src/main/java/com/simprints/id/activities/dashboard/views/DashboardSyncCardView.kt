@@ -10,10 +10,11 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
 import com.simprints.id.tools.utils.AndroidResourcesHelper
+import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 
 @SuppressLint("SetTextI18n")
-class DashboardSyncCardView(rootView: View) : DashboardCardView(rootView) {
+class DashboardSyncCardView(private val rootView: View) : DashboardCardView(rootView) {
 
     private val syncDescription: TextView = rootView.findViewById(R.id.dashboardCardSyncDescription)
     private val syncUploadCount: TextView = rootView.findViewById(R.id.dashboardCardSyncUploadText)
@@ -34,13 +35,15 @@ class DashboardSyncCardView(rootView: View) : DashboardCardView(rootView) {
         val cardViewModel = viewModel as? DashboardSyncCardViewModel
         cardViewModel?.let {
             it.stateLiveData.observe(this, Observer<DashboardSyncCardViewModel.State> { state ->
-                with(state) {
-                    setTotalPeopleInDbCounter(peopleInDb)
-                    setUploadCounter(peopleToUpload)
-                    setListenerForSyncButton(onSyncActionClicked)
-                    setSyncButtonState(isSyncRunning)
-                    setDownloadCounter(peopleToDownload)
-                    setLastSyncTime(lastSyncTime)
+                rootView.context.runOnUiThread {
+                    with(state) {
+                        setTotalPeopleInDbCounter(peopleInDb)
+                        setUploadCounter(peopleToUpload)
+                        setListenerForSyncButton(onSyncActionClicked)
+                        setSyncButtonState(isDownSyncRunning ?: false)
+                        setDownloadCounter(peopleToDownload)
+                        setLastSyncTime(lastSyncTime)
+                    }
                 }
             })
         }

@@ -60,9 +60,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
                     it.doOnSuccess { dashboardCard ->
                         if (dashboardCard is DashboardSyncCardViewModel) {
                             initSyncCardModel(dashboardCard)
-                        } else if (dashboardCard is DashboardCardViewModel) {
-                            addCard(dashboardCard)
                         }
+
+                        addCard(dashboardCard)
                     }
                 }
         )
@@ -91,7 +91,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         }
     }
 
-    private fun addCard(dashboardCard: DashboardCardViewModel) {
+    private fun addCard(dashboardCard: CardViewModel) {
         removeCardIfExist(dashboardCard.type)
 
         cardsViewModelsList.add(dashboardCard)
