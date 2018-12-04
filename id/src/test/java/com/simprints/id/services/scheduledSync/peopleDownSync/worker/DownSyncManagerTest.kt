@@ -62,9 +62,8 @@ class DownSyncManagerTest: DaggerForTests() {
         val workRequest = downSyncManager.buildPeriodicDownSyncMasterWorker(syncScope)
         val workSpec = workRequest.workSpec
         assertEquals(NetworkType.CONNECTED, workSpec.constraints.requiredNetworkType)
-        assertEquals( DownSyncMasterWorker::class.qualifiedName, workSpec.workerClassName)
+        assertEquals(DownSyncMasterWorker::class.qualifiedName, workSpec.workerClassName)
         assertTrue(workSpec.isPeriodic)
         assertEquals(WorkInfo.State.ENQUEUED, workSpec.state)
     }
-
 }
