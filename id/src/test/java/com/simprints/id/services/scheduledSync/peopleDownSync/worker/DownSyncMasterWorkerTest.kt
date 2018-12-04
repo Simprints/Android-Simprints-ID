@@ -69,27 +69,28 @@ class DownSyncMasterWorkerTest: DaggerForTests() {
             .getWorkInfosForUniqueWork(DownSyncMasterWorker.getSyncChainWorkersUniqueNameForSync(syncScope)).get()
         val seq = workInfo.asSequence().groupBy { it.state }
 
-        assertEquals(workInfo.size, 7)
-        assertEquals(seq[WorkInfo.State.ENQUEUED]?.size, numberOfEnqueuedSyncCountWorkers)
-        assertEquals(seq[WorkInfo.State.BLOCKED]?.size, numberOfBlockedDownSyncWorkers + numberOfBlockedInputMergerWorkers)
-        assertEquals(result, ListenableWorker.Result.SUCCESS)
+        assertEquals(numberOfBlockedInputMergerWorkers + numberOfBlockedDownSyncWorkers + numberOfEnqueuedSyncCountWorkers,
+            workInfo.size)
+        assertEquals(numberOfEnqueuedSyncCountWorkers, seq[WorkInfo.State.ENQUEUED]?.size)
+        assertEquals(numberOfBlockedDownSyncWorkers + numberOfBlockedInputMergerWorkers, seq[WorkInfo.State.BLOCKED]?.size)
+        assertEquals(ListenableWorker.Result.SUCCESS, result)
     }
 
     @Test
     fun getSyncChainWorkersUniqueNameForSync_shouldCreateUniqueName() {
         val workName = DownSyncMasterWorker.getSyncChainWorkersUniqueNameForSync(syncScope)
-        assertEquals(workName, uniqueNameForChainWorkers)
+        assertEquals(uniqueNameForChainWorkers, workName)
     }
 
     @Test
     fun getDownSyncWorkerKeyForScope_shouldCreateDownSyncWorkerKey() {
         val workerKey = DownSyncMasterWorker.getDownSyncWorkerKeyForScope(subSyncScope)
-        assertEquals(workerKey, workerKeyForSubDownSyncScope)
+        assertEquals(workerKeyForSubDownSyncScope, workerKey)
     }
 
     @Test
     fun getCountWorkerKeyForScope_shouldCreateCountWorkerKey() {
         val countWorkerKey = DownSyncMasterWorker.getCountWorkerKeyForScope(subSyncScope)
-        assertEquals(countWorkerKey, workerKeyForSubCountScope)
+        assertEquals(workerKeyForSubCountScope, countWorkerKey)
     }
 }
