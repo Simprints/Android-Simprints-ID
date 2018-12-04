@@ -13,7 +13,7 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.preferences.NoSuchPreferenceError
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncOption
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
@@ -25,7 +25,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           groupSerializer: Serializer<Constants.GROUP>,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
                                           moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-                                          downSyncOptionSerializer: Serializer<PeopleDownSyncOption>)
+                                          peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>)
     : SettingsPreferencesManager {
 
     companion object {
@@ -116,8 +116,12 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
         val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(ParentalConsent())
 
-        const val PEOPLE_DOWN_SYNC_STATE_KEY = "PeopleDownSyncOption"
-        val PEOPLE_DOWN_SYNC_STATE_DEFAULT = PeopleDownSyncOption.BACKGROUND
+        const val PEOPLE_DOWN_SYNC_TRIGGERS_KEY = "PeopleDownSyncTriggers"
+        val PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT = mapOf(
+            PeopleDownSyncTrigger.MANUAL to true,
+            PeopleDownSyncTrigger.PERIODIC_BACKGROUND to true,
+            PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT to false
+        )
     }
 
     // Should the UI automatically slide forward?
@@ -214,8 +218,8 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var parentalConsentOptionsJson: String
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT)
 
-    override var peopleDownSyncOption: PeopleDownSyncOption
-        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_STATE_KEY, PEOPLE_DOWN_SYNC_STATE_DEFAULT, downSyncOptionSerializer)
+    override var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_TRIGGERS_KEY, PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT, peopleDownSyncTriggerToSerializer)
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()
