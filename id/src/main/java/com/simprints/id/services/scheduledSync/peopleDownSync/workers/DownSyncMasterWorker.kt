@@ -43,7 +43,7 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
         val subDownSyncWorkers = scope.toSubSyncScopes().map { this.buildSubDownSyncWorker(it) }
 
         WorkManager.getInstance()
-            .beginUniqueWork(getSyncChainWorkersUniqueNameForSync(scope), ExistingWorkPolicy.KEEP, subCountWorkers)
+            .beginUniqueWork(getSyncChainWorkersUniqueNameForSync(scope), ExistingWorkPolicy.KEEP, subCountWorkers) // STOPSHIP : fails if no modules
             .then(buildInputMergerWorker())
             .then(subDownSyncWorkers)
             .enqueue()

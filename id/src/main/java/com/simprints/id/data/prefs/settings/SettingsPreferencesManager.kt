@@ -27,13 +27,6 @@ interface SettingsPreferencesManager {
     /** @throws JsonSyntaxException */
     var fingerStatus: Map<FingerIdentifier, Boolean>
 
-    var syncOnCallout: Boolean
-
-    var scheduledBackgroundSync: Boolean
-    var scheduledBackgroundSyncOnlyOnWifi: Boolean
-    var scheduledBackgroundSyncOnlyWhenCharging: Boolean
-    var scheduledBackgroundSyncOnlyWhenNotLowBattery: Boolean
-
     var programName: String
     var organizationName: String
 
