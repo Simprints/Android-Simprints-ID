@@ -40,7 +40,7 @@ class DebugViewModel(component: AppComponent) : DebugContract.Presenter {
                 val subScope = state.nPeople.keys.findLast { person.projectId == it.projectId && person.userId == it.userId && person.moduleId == it.moduleId }
                 subScope?.let {
                     state.nPeople[it] = (state.nPeople[it] ?: 0) + 1
-                }?: state.nPeople.put(SubSyncScope(Constants.GROUP.GLOBAL, person.projectId, person.userId, person.moduleId), 1)
+                }?: state.nPeople.put(SubSyncScope(person.projectId, person.userId, person.moduleId), 1)
                 person
             }.buffer(500)
             .map {

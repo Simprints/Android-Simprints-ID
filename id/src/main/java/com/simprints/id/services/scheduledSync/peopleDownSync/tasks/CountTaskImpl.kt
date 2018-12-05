@@ -22,7 +22,7 @@ class CountTaskImpl(private val dbManager: DbManager) : CountTask {
 
     override fun execute(subSyncScope: SubSyncScope): Single<Int> {
         this.subSyncScope = subSyncScope
-        val (_, projectId, userId, moduleId) = subSyncScope
+        val (projectId, userId, moduleId) = subSyncScope
 
         Timber.d("Count task executing for module $moduleId")
         return dbManager.calculateNPatientsToDownSync(projectId, userId, moduleId)
