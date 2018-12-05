@@ -264,7 +264,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     private fun addConsentEvent(result: ConsentEvent.Result) {
 
-        sessionEventsManager.updateSessionInBackground({
+        sessionEventsManager.updateSessionInBackground {
             it.events.add(
                 ConsentEvent(
                     it.timeRelativeToStartTime(startConsentEventTime),
@@ -279,7 +279,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             if (result == DECLINED || result == NO_RESPONSE) {
                 it.location = null
             }
-        })
+        }
     }
 
     override fun handleOnDestroy() {

@@ -35,7 +35,7 @@ class DebugActivity : AppCompatActivity() {
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
-    lateinit var viewModel: DebugContract.Presenter
+    private lateinit var viewModel: DebugContract.Presenter
 
     private val listOfLocalDbViewModels = mutableListOf<LocalDbViewModel>()
     private val listOfLocalDownSyncStatus = mutableListOf<RoomDownStatusViewModel>()
@@ -53,18 +53,25 @@ class DebugActivity : AppCompatActivity() {
         val component = (application as Application).component
         component.inject(this)
 
-        localDb_subscopes.layoutManager = LinearLayoutManager(this)
-        localDbViewAdapter = LocalDbRecycleViewAdapter(listOfLocalDbViewModels, this)
-        localDb_subscopes.adapter = localDbViewAdapter
-
-        localDb_room_down_status.layoutManager = LinearLayoutManager(this)
-        roomDownSyncStatusAdapter = RoomDownStatusRecycleViewAdapter(listOfLocalDownSyncStatus, this)
-        localDb_room_down_status.adapter = roomDownSyncStatusAdapter
-        syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData().observe(this, updateRoomDownSyncStatusUI)
+        setUpRecyclerViewForLocalDbInfo()
+        setUpRecyclerViewForRoomInfo()
 
         viewModel = DebugViewModel(component)
         viewModel.stateLiveData.observe(this, updateLocalDbCountersUI)
         viewModel.refresh()
+    }
+
+    private fun setUpRecyclerViewForRoomInfo() {
+        localDb_room_down_status.layoutManager = LinearLayoutManager(this)
+        roomDownSyncStatusAdapter = RoomDownStatusRecycleViewAdapter(listOfLocalDownSyncStatus, this)
+        localDb_room_down_status.adapter = roomDownSyncStatusAdapter
+        syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData().observe(this, updateRoomDownSyncStatusUI)
+    }
+
+    private fun setUpRecyclerViewForLocalDbInfo() {
+        localDb_subscopes.layoutManager = LinearLayoutManager(this)
+        localDbViewAdapter = LocalDbRecycleViewAdapter(listOfLocalDbViewModels, this)
+        localDb_subscopes.adapter = localDbViewAdapter
     }
 
     private val updateLocalDbCountersUI: Observer<in State> = Observer { state ->

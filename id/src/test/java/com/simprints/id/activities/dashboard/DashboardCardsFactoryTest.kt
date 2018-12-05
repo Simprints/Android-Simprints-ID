@@ -7,8 +7,9 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.spy
 import com.simprints.id.R
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.activities.dashboard.viewModels.DashboardCard
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
+import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -22,6 +23,7 @@ import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.*
+import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
 import org.junit.Assert
@@ -64,9 +66,10 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         super.setUp()
         testAppComponent.inject(this)
         dbManager.initialiseDb()
-        WorkManager.initialize(app, Configuration.Builder().build())
+        initWorkManagerIfRequired(app)
 
         whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
+        whenever(syncStatusDatabase.upSyncDao).thenReturn(mock())
         syncStatusDatabaseModel = syncStatusDatabase.downSyncDao
 
         whenever(syncStatusDatabaseModel.getDownSyncStatusLiveData()).thenReturn(mock())
@@ -154,6 +157,19 @@ class DashboardCardsFactoryTest : DaggerForTests() {
             app.getString(R.string.dashboard_card_lastscanner_title))
     }
 
+//    @Test
+//    fun shouldShowSyncCardWithRightCounters_whenSyncModulesAreSelected() {
+//        val factory = DashboardCardsFactory(activity, testAppComponent)
+//
+//        preferencesManager.selectedModules = setOf("module1", "module2", "module3")
+//        val patientsForModule = 5
+//        whenever(localDbManagerMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(patientsForModule))
+//
+//        val viewModelCards = Single.merge(factory.createCards()).test().values()
+//        val syncViewModelCard = viewModelCards.findLast { it.type == DashboardCardType.SYNC_DB } as DashboardSyncCardViewModel
+//
+//    }
+
     private fun assertThatCardEventsAreCreatedOnlyWhenRequired(cardsFactory: DashboardCardsFactory,
                                                                createEvent: () -> Any,
                                                                deleteEvent: () -> Unit,
@@ -173,7 +189,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         Assert.assertNull(card)
     }
 
-    private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCard? {
+    private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCardViewModel.State? {
         mockNPeopleForSyncRequest(remoteDbManagerMock, 0)
         mockNLocalPeople(localDbManagerMock, 0)
 
@@ -183,7 +199,10 @@ class DashboardCardsFactoryTest : DaggerForTests() {
             .assertNoErrors()
             .assertComplete()
         return try {
-            return testObserver.values().first { it.title == title }
+            val cardsViewModels = testObserver.values().filterIsInstance(DashboardCardViewModel::class.java)
+            return cardsViewModels.first {
+                it.stateLiveData.value?.title == title
+            }.stateLiveData.value
         } catch (e: Exception) {
             null
         }
