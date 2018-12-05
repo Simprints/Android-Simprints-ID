@@ -137,8 +137,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
         true
     }
 
-    private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) = true //StopShip
-        //dashboardSyncCardViewModel.peopleToUpload > 0 || dashboardSyncCardViewModel.peopleToDownload > 0
+    private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
+        dashboardSyncCardViewModel.viewModelState.peopleToUpload > 0 ||
+            dashboardSyncCardViewModel.viewModelState.peopleToDownload?.let { it > 0 } ?: false
 
     private fun cancelAllDownSyncWorkers() {
         syncSchedulerHelper.cancelDownSyncWorkers()
