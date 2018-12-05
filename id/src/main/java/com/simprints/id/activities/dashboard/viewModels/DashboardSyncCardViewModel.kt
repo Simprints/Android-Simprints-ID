@@ -15,7 +15,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SUBDOWNSYNC_WORKER_TAG
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_WORKER_TAG
 import javax.inject.Inject
 
 class DashboardSyncCardViewModel(override val type: DashboardCardType,
@@ -63,7 +62,7 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
     fun registerObserverForDownSyncWorkerState() {
         val downSyncObserver = Observer<List<WorkInfo>> { subWorkersStatusInSyncChain ->
             val isAnyOfWorkersInSyncChainRunning = subWorkersStatusInSyncChain.firstOrNull { it.state == RUNNING } != null
-            helper.onDownSyncRunningChangeState(isAnyOfWorkersInSyncChainRunning)
+            helper.onDownSyncWorkerStatusChange(isAnyOfWorkersInSyncChainRunning)
         }
         downSyncWorkerStatus?.observe(lifecycleOwner, downSyncObserver)
     }
