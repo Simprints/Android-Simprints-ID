@@ -34,7 +34,7 @@ class SyncScopesBuilderImpl(val loginInfoManager: LoginInfoManager,
             Constants.GROUP.MODULE -> possibleUserId = null
         }
 
-        return SyncScope(preferencesManager.syncGroup, projectId, possibleUserId, possibleModuleIds)
+        return SyncScope(projectId, possibleUserId, possibleModuleIds)
     }
 
     inline fun <reified T> fromJson(json: String): T? = try {
