@@ -71,6 +71,7 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         val nPeopleToDownload = 407
         val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
 
+        mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
         val testObserver = makeFakeDownloadRequest(peopleToDownload, localDbMock, subSyncScope)
         testObserver.awaitTerminalEvent()
         testObserver.assertNoErrors()
@@ -90,6 +91,7 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         val nPeopleToDownload = 513
         val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
 
+        mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
         val testObserver = makeFakeDownloadRequest(peopleToDownload, localDbMock, subSyncScope)
         testObserver.awaitTerminalEvent()
         testObserver.assertNoErrors()
@@ -110,14 +112,31 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         val nPeopleToDownload = 789
         val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
 
+        mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
         val testObserver = makeFakeDownloadRequest(peopleToDownload, localDbMock, subSyncScope)
         testObserver.awaitTerminalEvent()
         testObserver.assertNoErrors()
+        testObserver.assertError { true }
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
         assertPathUrlParam(peopleRequestUrl, projectIdTest)
         assertQueryUrlParam(peopleRequestUrl, "userId", userIdTest)
         verify(localDbMock, times(calculateCorrectNumberOfBatches(nPeopleToDownload))).insertOrUpdatePeopleInLocal(anyNotNull())
+    }
+
+    @Test
+    fun downloadPatients_patientSerializationFails_shouldTriggerOnError() {
+        val localDbMock = Mockito.mock(LocalDbManager::class.java)
+
+        val projectIdTest = "projectIDTest"
+        val subSyncScope = SubSyncScope(projectId = projectIdTest, userId = null, moduleId = null)
+        val nPeopleToDownload = 499
+        val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
+
+        mockServer.enqueue(mockSuccessfulResponseWithIncorrectModels(peopleToDownload))
+        val testObserver = makeFakeDownloadRequest(peopleToDownload, localDbMock, subSyncScope)
+        testObserver.awaitTerminalEvent()
+        testObserver.assertError { true }
     }
 
     private fun setupApi() {
@@ -130,10 +149,6 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         peopleToDownload: List<fb_Person>,
         localDbMock: LocalDbManager,
         subSyncScope: SubSyncScope): TestObserver<Void> {
-
-        val patientsToDownload = ArrayList(peopleToDownload)
-
-        mockServer.enqueue(mockResponseForDownloadPatients(patientsToDownload))
 
         whenever(localDbMock.insertOrUpdatePeopleInLocal(anyNotNull())).doReturn(Completable.complete())
 
@@ -155,11 +170,20 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         return sync.execute(subSyncScope).test()
     }
 
-    private fun mockResponseForDownloadPatients(patients: ArrayList<fb_Person>): MockResponse? {
+    private fun mockSuccessfulResponseForDownloadPatients(patients: List<fb_Person>): MockResponse? {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
         return MockResponse().let {
             it.setResponseCode(200)
             it.setBody(fbPersonJson)
+        }
+    }
+
+    private fun mockSuccessfulResponseWithIncorrectModels(patients: List<fb_Person>): MockResponse? {
+        val fbPersonJson = JsonHelper.gson.toJson(patients)
+        val badFbPersonJson = fbPersonJson.replace("fingerprints", "fungerprints")
+        return MockResponse().let {
+            it.setResponseCode(200)
+            it.setBody(badFbPersonJson)
         }
     }
 
