@@ -82,8 +82,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
         it.viewModelState.onSyncActionClicked = {
             when {
                 userIsOffline() -> view.showToastForUserOffline()
-                !areThereRecordsToDownSync(it) -> view.showToastForRecordsUpToDate()
-                areThereRecordsToDownSync(it) -> userDidWantToDownSync()
+                !areThereRecordsToSync(it) -> view.showToastForRecordsUpToDate()
+                areThereRecordsToSync(it) -> userDidWantToDownSync()
             }
         }
     }
@@ -134,7 +134,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
         true
     }
 
-    private fun areThereRecordsToDownSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
+    private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
+        dashboardSyncCardViewModel.viewModelState.peopleToUpload > 0 ||
             dashboardSyncCardViewModel.viewModelState.peopleToDownload?.let { it > 0 } ?: false
 
     private fun cancelAllDownSyncWorkers() {
