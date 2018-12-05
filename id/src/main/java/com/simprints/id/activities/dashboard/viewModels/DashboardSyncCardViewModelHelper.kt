@@ -21,7 +21,7 @@ import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
 
-class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewModel) {
+class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardViewModel) {
 
     enum class HelperState {
         NEED_INITIALIZATION,
@@ -50,7 +50,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     private var helperState: HelperState = HelperState.NEED_INITIALIZATION
 
     private val state: DashboardSyncCardViewModel.State
-        get() = vm.viewModelState
+        get() = viewModel.viewModelState
 
     private val syncScope: SyncScope?
         get() = syncScopesBuilder.buildSyncScope()
@@ -64,62 +64,67 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
 
     fun initViewModel(component: AppComponent) {
         component.inject(this)
-        vm.registerObserverForDownSyncWorkerState()
+        viewModel.registerObserverForDownSyncWorkerState()
     }
 
-    private fun updateTotalPeopleToDownSyncCount(): Completable =
+    private fun updateTotalDownSyncCount(): Completable =
         Completable.fromAction {
             try {
                 var peopleToDownload = 0
                 syncScope?.toSubSyncScopes()?.forEach { it ->
                     peopleToDownload += dbManager.calculateNPatientsToDownSync(it.projectId, it.userId, it.moduleId).blockingGet()
                 }
-                vm.updateState(peopleToDownload = peopleToDownload, emitState = helperState.isInReady())
+                viewModel.updateState(peopleToDownload = peopleToDownload, emitState = helperState.isInReady())
             } catch (t: Throwable) {
                 t.printStackTrace()
             }
         }
 
-    private fun updateTotalLocalPeopleCount(): Completable =
+    private fun updateTotalLocalCount(): Completable =
         dbManager.getPeopleCountFromLocalForSyncGroup(preferencesManager.syncGroup)
             .flatMapCompletable {
-                vm.updateState(peopleInDb = it, emitState = helperState.isInReady())
+                viewModel.updateState(peopleInDb = it, emitState = true)
                 Completable.complete()
             }
 
-    private fun updateLocalPeopleToUpSyncCount(): Completable =
+    private fun updateTotalUpSyncCount(): Completable =
         localDbManager.getPeopleCountFromLocal(toSync = true)
             .flatMapCompletable {
-                vm.updateState(peopleToUpload = it, emitState = helperState.isInReady())
+                viewModel.updateState(peopleToUpload = it, emitState = true)
                 Completable.complete()
             }
 
     fun onUpSyncStatusChanged(upSyncStatus: UpSyncStatus?) {
-        if (upSyncStatus != null) {
-            latestUpSyncTime = upSyncStatus.lastUpSyncTime
+        upSyncStatus?.let {
+            latestUpSyncTime = it.lastUpSyncTime
             val lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
-            vm.updateState(lastSyncTime = lastSyncTime, emitState = helperState.isInReady())
+            viewModel.updateState(lastSyncTime = lastSyncTime, emitState = helperState.isInReady())
             fetchLocalAndUpSyncCounters()
         }
     }
 
     fun onDownSyncStatusChanged(downSyncStatuses: List<DownSyncStatus>) {
-        if (downSyncStatuses.isNotEmpty() && state.isDownSyncRunning) {
-            val peopleToDownSync = updateTotalToDownSyncWithDownSyncStatus(downSyncStatuses)
-            val latestDownSyncTime = updateLatestDownSyncTimeWithDownSyncStatus(downSyncStatuses)
-            vm.updateState(
+        if (downSyncStatuses.isNotEmpty()) {
+
+            var peopleToDownSync: Int? = null
+            if(state.isDownSyncRunning) {
+                peopleToDownSync = updateTotalDownSyncCountUsingWorkers(downSyncStatuses)
+            }
+
+            val latestDownSyncTime = updateLatestDownSyncTime(downSyncStatuses)
+            viewModel.updateState(
                 lastSyncTime = latestDownSyncTime,
                 peopleToDownload = peopleToDownSync,
                 emitState = helperState.isInReady())
         }
     }
 
-    private fun updateLatestDownSyncTimeWithDownSyncStatus(downSyncStatuses: List<DownSyncStatus>): String? =
-        if (downSyncStatuses.isNotEmpty() && state.isDownSyncRunning) {
+    private fun updateLatestDownSyncTime(downSyncStatuses: List<DownSyncStatus>): String? =
+        if (downSyncStatuses.isNotEmpty()) {
             val latestDownSyncTimeForModules: ArrayList<Long> = ArrayList()
             syncScope?.let {
                 it.toSubSyncScopes().forEach { subSyncScope ->
-                    val downSyncStatusForSubScope = filterDownSyncStatues(subSyncScope, downSyncStatuses)
+                    val downSyncStatusForSubScope = filterDownSyncStatusesBySubSyncScope(subSyncScope, downSyncStatuses)
                     downSyncStatusForSubScope?.lastSyncTime?.let{ lastSyncTime -> latestDownSyncTimeForModules.add(lastSyncTime) }
                 }
             }
@@ -129,12 +134,12 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
             null
         }
 
-    private fun updateTotalToDownSyncWithDownSyncStatus(downSyncStatuses: List<DownSyncStatus>): Int? =
-        if (downSyncStatuses.isNotEmpty() && state.isDownSyncRunning) {
+    private fun updateTotalDownSyncCountUsingWorkers(downSyncStatuses: List<DownSyncStatus>): Int? =
+        if (downSyncStatuses.isNotEmpty()) {
             var peopleToDownSync = 0
             syncScope?.let {
                 it.toSubSyncScopes().forEach { subSyncScope ->
-                    peopleToDownSync += filterDownSyncStatues(subSyncScope, downSyncStatuses)?.totalToDownload ?: 0
+                    peopleToDownSync += filterDownSyncStatusesBySubSyncScope(subSyncScope, downSyncStatuses)?.totalToDownload ?: 0
                 }
             }
             peopleToDownSync
@@ -142,7 +147,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
             null
         }
 
-    private fun filterDownSyncStatues(subSyncScope: SubSyncScope, downSyncStatuses: List<DownSyncStatus>): DownSyncStatus? {
+    private fun filterDownSyncStatusesBySubSyncScope(subSyncScope: SubSyncScope, downSyncStatuses: List<DownSyncStatus>): DownSyncStatus? {
         with(subSyncScope) {
             return downSyncStatuses.findLast {
                 it.projectId == this.projectId &&
@@ -169,33 +174,33 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
         return ""
     }
 
-    fun onDownSyncRunningChangeState(isDownSyncRunning: Boolean) {
+    fun onDownSyncWorkerStatusChange(isDownSyncRunning: Boolean) {
         if (state.isDownSyncRunning != isDownSyncRunning || helperState.isInNeedInit()) {
             state.isDownSyncRunning = isDownSyncRunning
             if (isDownSyncRunning) {
-                initForDownSyncRunningIfRequired()
+                initWhenDownSyncRunningIfRequired()
             } else {
-                initForDownSyncNotRunningIfRequired()
+                initWhenDownSyncNotRunningIfRequired()
                 fetchLocalAndUpSyncCounters()
             }
-            vm.updateState(isDownSyncRunning = isDownSyncRunning, emitState = helperState.isInReady())
+            viewModel.updateState(isDownSyncRunning = isDownSyncRunning, emitState = helperState.isInReady())
         }
     }
 
-    private fun initForDownSyncNotRunningIfRequired() {
+    private fun initWhenDownSyncNotRunningIfRequired() {
         if (helperState == HelperState.NEED_INITIALIZATION) {
             helperState = HelperState.INITIALIZING
-            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
+            viewModel.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
             fetchAllCounters {
                 setHelperInitialized()
             }
         }
     }
 
-    private fun initForDownSyncRunningIfRequired() {
+    private fun initWhenDownSyncRunningIfRequired() {
         if (helperState == HelperState.NEED_INITIALIZATION) {
             helperState = HelperState.INITIALIZING
-            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
+            viewModel.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
             fetchLocalAndUpSyncCounters {
                 setHelperInitialized()
             }
@@ -203,9 +208,9 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     }
 
     private fun fetchAllCounters(done: () -> Unit) {
-        updateTotalPeopleToDownSyncCount()
-            .andThen(updateTotalLocalPeopleCount())
-            .andThen(updateLocalPeopleToUpSyncCount())
+        updateTotalDownSyncCount()
+            .andThen(updateTotalLocalCount())
+            .andThen(updateTotalUpSyncCount())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .doFinally {
@@ -218,8 +223,8 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     }
 
     private fun fetchLocalAndUpSyncCounters(done: () -> Unit = {}) {
-        updateTotalLocalPeopleCount()
-            .andThen(updateLocalPeopleToUpSyncCount())
+        updateTotalLocalCount()
+            .andThen(updateTotalUpSyncCount())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .doFinally {
@@ -231,8 +236,8 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
 
     private fun setHelperInitialized() {
         helperState = HelperState.READY
-        vm.registerObserverForDownSyncEvents()
-        vm.registerObserverForUpSyncEvents()
-        vm.updateState(emitState = true)
+        viewModel.registerObserverForDownSyncEvents()
+        viewModel.registerObserverForUpSyncEvents()
+        viewModel.updateState(emitState = true)
     }
 }

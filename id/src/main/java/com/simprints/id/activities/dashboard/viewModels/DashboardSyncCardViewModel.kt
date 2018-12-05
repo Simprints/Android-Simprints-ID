@@ -14,7 +14,7 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SUBDOWNSYNC_WORKER_TAG
 import javax.inject.Inject
 
 class DashboardSyncCardViewModel(override val type: DashboardCardType,
@@ -54,7 +54,7 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
 
         downSyncStatus = syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData()
         upSyncStatus = syncStatusDatabase.upSyncDao.getUpSyncStatus()
-        downSyncWorkerStatus = syncScope?.let { WorkManager.getInstance().getWorkInfosByTagLiveData(SYNC_WORKER_TAG) }
+        downSyncWorkerStatus = syncScope?.let { WorkManager.getInstance().getWorkInfosByTagLiveData(SUBDOWNSYNC_WORKER_TAG) }
 
         helper.initViewModel(component)
     }
@@ -62,7 +62,7 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
     fun registerObserverForDownSyncWorkerState() {
         val downSyncObserver = Observer<List<WorkInfo>> { subWorkersStatusInSyncChain ->
             val isAnyOfWorkersInSyncChainRunning = subWorkersStatusInSyncChain.firstOrNull { it.state == RUNNING } != null
-            helper.onDownSyncRunningChangeState(isAnyOfWorkersInSyncChainRunning)
+            helper.onDownSyncWorkerStatusChange(isAnyOfWorkersInSyncChainRunning)
         }
         downSyncWorkerStatus?.observe(lifecycleOwner, downSyncObserver)
     }

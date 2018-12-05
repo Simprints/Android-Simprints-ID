@@ -26,7 +26,7 @@ interface DashboardContract {
         val cardsViewModelsList: ArrayList<CardViewModel>
 
         fun userDidWantToRefreshCardsIfPossible()
-        fun userDidWantToSync()
+        fun userDidWantToDownSync()
         fun userDidWantToLogout()
         fun logout()
     }
