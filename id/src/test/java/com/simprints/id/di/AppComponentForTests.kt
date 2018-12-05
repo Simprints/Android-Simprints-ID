@@ -19,7 +19,6 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = arrayOf(AppModule::class, PreferencesModule::class, SerializerModule::class, AndroidInjectionModule::class))
 interface AppComponentForTests : AppComponent {
-    fun inject(aboutActivityTest: AboutActivityTest)
     fun inject(checkLoginFromIntentActivityTest: CheckLoginFromIntentActivityTest)
     fun inject(checkLoginFromMainLauncherActivityTest: CheckLoginFromMainLauncherActivityTest)
     fun inject(loginActivityTest: LoginActivityTest)
