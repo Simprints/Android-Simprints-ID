@@ -37,7 +37,7 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
 
     data class State(var onSyncActionClicked: () -> Unit = {},
                      var peopleToUpload: Int = 0,
-                     var peopleToDownload: Int = 0,
+                     var peopleToDownload: Int? = null,
                      var peopleInDb: Int = 0,
                      var isDownSyncRunning: Boolean = false,
                      val showSyncButton: Boolean = false,
@@ -52,7 +52,7 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
 
         viewModelState = defaultState
 
-        downSyncStatus = syncStatusDatabase.downSyncDao.getDownSyncStatus()
+        downSyncStatus = syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData()
         upSyncStatus = syncStatusDatabase.upSyncDao.getUpSyncStatus()
         downSyncWorkerStatus = syncScope?.let { WorkManager.getInstance().getWorkInfosByTagLiveData(SYNC_WORKER_TAG) }
 

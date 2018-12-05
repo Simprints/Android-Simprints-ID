@@ -53,6 +53,7 @@ interface LocalDbManager {
     fun loadProjectFromLocal(projectId: String): Single<Project>
 
     fun deletePeopleFromLocal(syncScope: SyncScope): Completable
+    fun deletePeopleFromLocal(subSyncScope: SubSyncScope): Completable
     fun loadPeopleFromLocal(destinationList: MutableList<LibPerson>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?)
 
     //@Deprecated: do not use it. Use Room SyncStatus

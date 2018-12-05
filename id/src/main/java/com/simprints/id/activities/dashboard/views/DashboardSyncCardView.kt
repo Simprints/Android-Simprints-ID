@@ -80,8 +80,8 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         syncDescription.text = lastSyncTime
     }
 
-    private fun setDownloadCounter(peopleToDownload: Int) {
-        syncDownloadCount.text = "${Math.max(peopleToDownload, 0)}"
+    private fun setDownloadCounter(peopleToDownload: Int?) {
+        syncDownloadCount.text = peopleToDownload?.let { "${Math.max(it, 0)}" } ?: ""
     }
 
     private fun disableSyncButtonIfEnabled() {

@@ -139,6 +139,15 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
             }
         }.ignoreElement()
 
+    override fun deletePeopleFromLocal(subSyncScope: SubSyncScope): Completable =
+        useRealmInstance { realm ->
+            realm.executeTransaction { realmInTransaction ->
+                realmInTransaction.buildQueryForPerson(subSyncScope)
+                    .findAll()
+                    .deleteAllFromRealm()
+            }
+        }.ignoreElement()
+
     override fun saveProjectIntoLocal(project: Project): Completable =
         useRealmInstance { realm ->
             realm.executeTransaction {

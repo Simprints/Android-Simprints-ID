@@ -93,7 +93,7 @@ class DownSyncDaoTest {
     @Test
     @Throws(Exception::class)
     fun getDownSyncStatusTest_shouldReturnNullLiveData() {
-        val downSyncStatuses = downSyncDao?.getDownSyncStatus()
+        val downSyncStatuses = downSyncDao?.getDownSyncStatusLiveData()
         assertNull(downSyncStatuses?.value)
     }
 }

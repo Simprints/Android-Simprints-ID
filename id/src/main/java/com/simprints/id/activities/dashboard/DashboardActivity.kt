@@ -9,7 +9,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.Application
+import com.simprints.id.BuildConfig
 import com.simprints.id.R
+import com.simprints.id.activities.about.DebugActivity
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -99,6 +101,9 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.app_menu, menu)
+        if(BuildConfig.DEBUG){
+            menu?.findItem(R.id.debug)?.isVisible = true
+        }
         return true
     }
 
@@ -110,6 +115,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
                 R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, LongConsentActivity::class.java), LONG_CONSENT_ACTIVITY_REQUEST_CODE)
                 R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
                 R.id.menuLogout -> viewPresenter.userDidWantToLogout()
+                R.id.debug -> if(BuildConfig.DEBUG) startActivity(Intent(this, DebugActivity::class.java))
             }
             true
         }

@@ -1,9 +1,8 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.activities.TutorialActivity
-import com.simprints.id.activities.about.AboutActivity
-import com.simprints.id.activities.about.AboutPresenter
+import com.simprints.id.activities.about.DebugActivity
+import com.simprints.id.activities.about.DebugViewModel
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
@@ -54,10 +53,9 @@ interface AppComponent {
     fun inject(app: Application)
     fun inject(guidSelectionService: GuidSelectionService)
     fun inject(alertActivity: AlertActivity)
-    fun inject(aboutActivity: AboutActivity)
+    fun inject(aboutActivity: DebugActivity)
     fun inject(longConsentActivity: LongConsentActivity)
     fun inject(refusalPresenter: RefusalPresenter)
-    fun inject(tutorialActivity: TutorialActivity)
     fun inject(matchingActivity: MatchingActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
@@ -67,7 +65,7 @@ interface AppComponent {
     fun inject(checkLoginFromIntentPresenter: CheckLoginFromIntentPresenter)
     fun inject(checkLoginFromMainLauncherPresenter: CheckLoginFromMainLauncherPresenter)
     fun inject(matchingPresenter: MatchingPresenter)
-    fun inject(aboutPresenter: AboutPresenter)
+    fun inject(aboutPresenter: DebugViewModel)
     fun inject(dashboardCardsFactory: DashboardCardsFactory)
     fun inject(dashboardSyncCardViewModel: DashboardSyncCardViewModel)
     fun inject(loginPresenter: LoginPresenter)
