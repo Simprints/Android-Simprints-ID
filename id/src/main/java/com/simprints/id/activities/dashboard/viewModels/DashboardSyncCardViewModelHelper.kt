@@ -21,7 +21,7 @@ import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
 
-class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewModel) {
+class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardViewModel) {
 
     enum class HelperState {
         NEED_INITIALIZATION,
@@ -50,7 +50,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     private var helperState: HelperState = HelperState.NEED_INITIALIZATION
 
     private val state: DashboardSyncCardViewModel.State
-        get() = vm.viewModelState
+        get() = viewModel.viewModelState
 
     private val syncScope: SyncScope?
         get() = syncScopesBuilder.buildSyncScope()
@@ -64,7 +64,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
 
     fun initViewModel(component: AppComponent) {
         component.inject(this)
-        vm.registerObserverForDownSyncWorkerState()
+        viewModel.registerObserverForDownSyncWorkerState()
     }
 
     private fun updateTotalPeopleToDownSyncCount(): Completable =
@@ -74,7 +74,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
                 syncScope?.toSubSyncScopes()?.forEach { it ->
                     peopleToDownload += dbManager.calculateNPatientsToDownSync(it.projectId, it.userId, it.moduleId).blockingGet()
                 }
-                vm.updateState(peopleToDownload = peopleToDownload, emitState = helperState.isInReady())
+                viewModel.updateState(peopleToDownload = peopleToDownload, emitState = helperState.isInReady())
             } catch (t: Throwable) {
                 t.printStackTrace()
             }
@@ -83,31 +83,31 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     private fun updateTotalLocalPeopleCount(): Completable =
         dbManager.getPeopleCountFromLocalForSyncGroup(preferencesManager.syncGroup)
             .flatMapCompletable {
-                vm.updateState(peopleInDb = it, emitState = helperState.isInReady())
+                viewModel.updateState(peopleInDb = it, emitState = helperState.isInReady())
                 Completable.complete()
             }
 
     private fun updateLocalPeopleToUpSyncCount(): Completable =
         localDbManager.getPeopleCountFromLocal(toSync = true)
             .flatMapCompletable {
-                vm.updateState(peopleToUpload = it, emitState = helperState.isInReady())
+                viewModel.updateState(peopleToUpload = it, emitState = helperState.isInReady())
                 Completable.complete()
             }
 
     fun onUpSyncStatusChanged(upSyncStatus: UpSyncStatus?) {
-        if (upSyncStatus != null) {
-            latestUpSyncTime = upSyncStatus.lastUpSyncTime
+        upSyncStatus?.let {
+            latestUpSyncTime = it.lastUpSyncTime
             val lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
-            vm.updateState(lastSyncTime = lastSyncTime, emitState = helperState.isInReady())
+            viewModel.updateState(lastSyncTime = lastSyncTime, emitState = helperState.isInReady())
             fetchLocalAndUpSyncCounters()
         }
     }
 
     fun onDownSyncStatusChanged(downSyncStatuses: List<DownSyncStatus>) {
-        if (downSyncStatuses.isNotEmpty() && state.isDownSyncRunning) {
+        if (downSyncStatuses.isNotEmpty()) {
             val peopleToDownSync = updateTotalToDownSyncWithDownSyncStatus(downSyncStatuses)
             val latestDownSyncTime = updateLatestDownSyncTimeWithDownSyncStatus(downSyncStatuses)
-            vm.updateState(
+            viewModel.updateState(
                 lastSyncTime = latestDownSyncTime,
                 peopleToDownload = peopleToDownSync,
                 emitState = helperState.isInReady())
@@ -115,7 +115,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     }
 
     private fun updateLatestDownSyncTimeWithDownSyncStatus(downSyncStatuses: List<DownSyncStatus>): String? =
-        if (downSyncStatuses.isNotEmpty() && state.isDownSyncRunning) {
+        if (downSyncStatuses.isNotEmpty()) {
             val latestDownSyncTimeForModules: ArrayList<Long> = ArrayList()
             syncScope?.let {
                 it.toSubSyncScopes().forEach { subSyncScope ->
@@ -130,7 +130,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
         }
 
     private fun updateTotalToDownSyncWithDownSyncStatus(downSyncStatuses: List<DownSyncStatus>): Int? =
-        if (downSyncStatuses.isNotEmpty() && state.isDownSyncRunning) {
+        if (downSyncStatuses.isNotEmpty()) {
             var peopleToDownSync = 0
             syncScope?.let {
                 it.toSubSyncScopes().forEach { subSyncScope ->
@@ -178,14 +178,14 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
                 initForDownSyncNotRunningIfRequired()
                 fetchLocalAndUpSyncCounters()
             }
-            vm.updateState(isDownSyncRunning = isDownSyncRunning, emitState = helperState.isInReady())
+            viewModel.updateState(isDownSyncRunning = isDownSyncRunning, emitState = helperState.isInReady())
         }
     }
 
     private fun initForDownSyncNotRunningIfRequired() {
         if (helperState == HelperState.NEED_INITIALIZATION) {
             helperState = HelperState.INITIALIZING
-            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
+            viewModel.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
             fetchAllCounters {
                 setHelperInitialized()
             }
@@ -195,7 +195,7 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
     private fun initForDownSyncRunningIfRequired() {
         if (helperState == HelperState.NEED_INITIALIZATION) {
             helperState = HelperState.INITIALIZING
-            vm.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
+            viewModel.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
             fetchLocalAndUpSyncCounters {
                 setHelperInitialized()
             }
@@ -231,8 +231,8 @@ class DashboardSyncCardViewModelHelper(private val vm: DashboardSyncCardViewMode
 
     private fun setHelperInitialized() {
         helperState = HelperState.READY
-        vm.registerObserverForDownSyncEvents()
-        vm.registerObserverForUpSyncEvents()
-        vm.updateState(emitState = true)
+        viewModel.registerObserverForDownSyncEvents()
+        viewModel.registerObserverForUpSyncEvents()
+        viewModel.updateState(emitState = true)
     }
 }
