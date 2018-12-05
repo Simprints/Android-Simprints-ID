@@ -53,7 +53,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         if (isSyncRunning) {
             disableSyncButtonIfEnabled()
         } else {
-            enableSyncButtonIfDisabledAndUpdateSyncInfo()
+            enableSyncButtonIfDisabled()
         }
 
         if(showSyncButton) {
@@ -92,7 +92,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         }
     }
 
-    private fun enableSyncButtonIfDisabledAndUpdateSyncInfo() {
+    private fun enableSyncButtonIfDisabled() {
         if (!syncButtonEnabled) {
             syncButtonEnabled = true
             syncButton.background = androidResourcesHelper.getDrawable(R.drawable.button_rounded_corners)
