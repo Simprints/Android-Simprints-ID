@@ -2,14 +2,15 @@ package com.simprints.id.activities.dashboard
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
-import com.simprints.id.activities.dashboard.models.DashboardCard
-import com.simprints.id.activities.dashboard.models.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.CardViewModel
+import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.views.DashboardCardView
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 
-class DashboardCardAdapter(private val cardModels: ArrayList<DashboardCard>) :
+class DashboardCardAdapter(private val cardModels: ArrayList<CardViewModel>) :
     RecyclerView.Adapter<DashboardCardView>() {
 
     enum class CardViewType {
@@ -35,4 +36,15 @@ class DashboardCardAdapter(private val cardModels: ArrayList<DashboardCard>) :
         }
 
     override fun getItemCount() = cardModels.size
+
+
+    override fun onViewAttachedToWindow(holder: DashboardCardView) {
+        super.onViewAttachedToWindow(holder)
+        holder.onAppear()
+    }
+
+    override fun onViewDetachedFromWindow(holder: DashboardCardView) {
+        super.onViewDetachedFromWindow(holder)
+        holder.onDisappear()
+    }
 }

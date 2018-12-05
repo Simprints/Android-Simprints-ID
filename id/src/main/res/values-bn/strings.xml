@@ -113,7 +113,7 @@
     <string name="settings_label">ফোন সেটিংস</string>
 
 
-    <!-- AboutActivity : the screen that shows project statistics and version numbers -->
+    <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
     <string name="database_information">ডাটাবেস তথ্য</string>
     <string name="user_count">ব্যবহারকারি সংখ্যা:</string>

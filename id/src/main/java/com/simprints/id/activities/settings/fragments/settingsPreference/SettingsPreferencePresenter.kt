@@ -3,7 +3,6 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
-import android.preference.SwitchPreference
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Constants
@@ -86,8 +85,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         loadValueAndBindChangeListener(view.getPreferenceForLanguage())
         loadValueAndBindChangeListener(view.getPreferenceForSelectModules())
         loadValueAndBindChangeListener(view.getPreferenceForDefaultFingers())
-        loadValueAndBindChangeListener(view.getPreferenceForSyncUponLaunchToggle())
-        loadValueAndBindChangeListener(view.getPreferenceForBackgroundSyncToggle())
+        loadValueAndBindChangeListener(view.getSyncAndSearchConfigurationPreference())
         loadValueAndBindChangeListener(view.getAppVersionPreference())
         loadValueAndBindChangeListener(view.getScannerVersionPreference())
     }
@@ -106,13 +104,8 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
                 loadDefaultFingersPreference(preference as MultiSelectListPreference)
                 preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
             }
-            view.getKeyForSyncUponLaunchPreference() -> {
-                loadSyncUponLaunchPreference(preference as SwitchPreference)
-                preference.setChangeListener { value: Boolean -> handleSyncUponLaunchChanged(value) }
-            }
-            view.getKeyForBackgroundSyncPreference() -> {
-                loadBackgroundSyncPreference(preference as SwitchPreference)
-                preference.setChangeListener { value: Boolean -> handleBackgroundSyncChanged(value) }
+            view.getKeyForSyncAndSearchConfigurationPreference() -> {
+                loadSyncAndSearchConfigurationPreference(preference)
             }
             view.getKeyForAppVersionPreference() -> {
                 loadAppVersionInPreference(preference)
@@ -148,13 +141,12 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         preference.values = getHashSetFromFingersMap(preferencesManager.fingerStatus).toHashSet()
     }
 
-    private fun loadSyncUponLaunchPreference(preference: SwitchPreference) {
-        preference.isChecked = preferencesManager.syncOnCallout
+    private fun loadSyncAndSearchConfigurationPreference(preference: Preference) {
+        preference.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
+            " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
     }
 
-    private fun loadBackgroundSyncPreference(preference: SwitchPreference) {
-        preference.isChecked = preferencesManager.scheduledBackgroundSync
-    }
+    private fun Constants.GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
 
     private fun loadAppVersionInPreference(preference: Preference) {
         preference.summary = preferencesManager.appVersionName
@@ -162,16 +154,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
 
     private fun loadScannerVersionInPreference(preference: Preference) {
         preference.summary = preferencesManager.hardwareVersionString
-    }
-
-    private fun handleSyncUponLaunchChanged(value: Boolean): Boolean {
-        preferencesManager.syncOnCallout = value
-        return true
-    }
-
-    private fun handleBackgroundSyncChanged(value: Boolean): Boolean {
-        preferencesManager.scheduledBackgroundSync = value
-        return true
     }
 
     private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String): Boolean {

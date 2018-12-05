@@ -4,16 +4,14 @@ import android.content.Context
 import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.db.local.realm.models.*
 import com.simprints.id.data.db.local.realm.models.adapters.toProject
 import com.simprints.id.data.db.local.realm.models.adapters.toRealmProject
-import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.data.db.local.realm.models.rl_Project
-import com.simprints.id.data.db.local.realm.models.toDomainPerson
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.toLibPerson
+import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -91,7 +89,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                                      moduleId: String?,
                                      toSync: Boolean?,
                                      sortBy: Map<String, Sort>?): Single<List<Person>> =
-        useRealmInstance {  realm ->
+        useRealmInstance { realm ->
             realm
                 .buildQueryForPerson(patientId, userId, moduleId, toSync, sortBy)
                 .findAll()
@@ -141,6 +139,15 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
             }
         }.ignoreElement()
 
+    override fun deletePeopleFromLocal(subSyncScope: SubSyncScope): Completable =
+        useRealmInstance { realm ->
+            realm.executeTransaction { realmInTransaction ->
+                realmInTransaction.buildQueryForPerson(subSyncScope)
+                    .findAll()
+                    .deleteAllFromRealm()
+            }
+        }.ignoreElement()
+
     override fun saveProjectIntoLocal(project: Project): Completable =
         useRealmInstance { realm ->
             realm.executeTransaction {
@@ -168,7 +175,6 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 realm.use(block)
             }
 
-
     private fun Realm.buildQueryForPerson(patientId: String? = null,
                                           userId: String? = null,
                                           moduleId: String? = null,
@@ -195,10 +201,30 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
             Constants.GROUP.GLOBAL -> loadPeopleFromLocal()
             Constants.GROUP.USER -> loadPeopleFromLocal(userId = userId)
             Constants.GROUP.MODULE -> loadPeopleFromLocal(moduleId = moduleId)
-        }
-            .blockingGet()
-            .map(Person::toLibPerson)
+        }.blockingGet().map(Person::toLibPerson)
         destinationList.addAll(result)
         callback?.onSuccess(false)
+    }
+
+    /**
+     *  @Deprecated: do not use it. Use Room DownSyncStatus
+     */
+    override fun getRlSyncInfo(subSyncScope: SubSyncScope): Single<rl_SyncInfo> =
+        useRealmInstance { realm ->
+            realm
+                .where(rl_SyncInfo::class.java).equalTo(rl_SyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
+                .findFirst()
+                ?.let { realm.copyFromRealm(it) }
+                ?: throw NoSuchRlSessionInfoException()
+        }
+
+    /**
+     *  @Deprecated: do not use it. Use Room DownSyncStatus
+     */
+    override fun deleteSyncInfo(subSyncScope: SubSyncScope): Completable = Completable.fromAction {
+        useRealmInstance { realm ->
+            realm.where(rl_SyncInfo::class.java).equalTo(rl_SyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
+                .findAll().deleteAllFromRealm()
+        }
     }
 }

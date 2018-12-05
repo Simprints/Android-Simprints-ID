@@ -31,7 +31,7 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
         const val SYNC_WORKER_SYNC_SCOPE_INPUT = "SYNC_WORKER_SYNC_SCOPE_INPUT"
 
         fun getSyncChainWorkersUniqueNameForSync(scope: SyncScope) = "${SYNC_WORKER_CHAIN}_${scope.uniqueKey}"
-        fun getDownSyncWorkerKeyForScope(scope: SubSyncScope) = "${SUBCOUNT_WORKER_TAG}_${scope.uniqueKey}"
+        fun getDownSyncWorkerKeyForScope(scope: SubSyncScope) = "${SUBDOWNSYNC_WORKER_TAG}_${scope.uniqueKey}"
         fun getCountWorkerKeyForScope(scope: SubSyncScope) = "${SUBCOUNT_WORKER_TAG}_${scope.uniqueKey}"
     }
 
@@ -39,14 +39,16 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
         inject()
 
         val scope = getScope()
-        val subCountWorkers = buildChainOfSubCountWorker(scope)
-        val subDownSyncWorkers = scope.toSubSyncScopes().map { this.buildSubDownSyncWorker(it) }
+        if(scope.toSubSyncScopes().isNotEmpty()) {
+            val subCountWorkers = buildChainOfSubCountWorker(scope)
+            val subDownSyncWorkers = scope.toSubSyncScopes().map { this.buildSubDownSyncWorker(it) }
 
-        WorkManager.getInstance()
-            .beginUniqueWork(getSyncChainWorkersUniqueNameForSync(scope), ExistingWorkPolicy.KEEP, subCountWorkers)
-            .then(buildInputMergerWorker())
-            .then(subDownSyncWorkers)
-            .enqueue()
+            WorkManager.getInstance()
+                .beginUniqueWork(getSyncChainWorkersUniqueNameForSync(scope), ExistingWorkPolicy.KEEP, subCountWorkers)
+                .then(buildInputMergerWorker())
+                .then(subDownSyncWorkers)
+                .enqueue()
+        }
 
         return Result.SUCCESS.also {
             if (BuildConfig.DEBUG) {
