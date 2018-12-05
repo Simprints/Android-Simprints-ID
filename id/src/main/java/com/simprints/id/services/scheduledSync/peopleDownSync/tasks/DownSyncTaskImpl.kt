@@ -1,5 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
+import androidx.work.ListenableWorker
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncDao
@@ -9,6 +10,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.tools.TimeHelper
@@ -43,14 +45,36 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
 
     override fun execute(subSyncScope: SubSyncScope): Completable {
         this.subSyncScope = subSyncScope
-        return remoteDbManager.getPeopleApiClient()
-            .makeDownSyncApiCallAndGetResponse()
-            .setupJsonReaderFromResponse()
-            .createPeopleObservableFromJsonReader()
-            .splitIntoBatches()
-            .saveBatchAndUpdateDownSyncStatus()
-            .doOnError { it.printStackTrace() }
-            .doFinally { finishDownload() }
+        val syncNeeded = syncNeeded()
+        return if (syncNeeded) {
+            remoteDbManager.getPeopleApiClient()
+                .makeDownSyncApiCallAndGetResponse()
+                .setupJsonReaderFromResponse()
+                .createPeopleObservableFromJsonReader()
+                .splitIntoBatches()
+                .saveBatchAndUpdateDownSyncStatus()
+                .doOnError { it.printStackTrace() }
+                .doFinally { finishDownload() }
+        } else {
+            Completable.complete()
+        }
+    }
+
+    private fun syncNeeded(): Boolean {
+        val counter = downSyncDao.getDownSyncStatusForId(getDownSyncId())?.totalToDownload
+        counter?.let {
+            return when {
+                counter > 0 -> {
+                    true
+                }
+                counter == 0 -> {
+                    false
+                }
+                else -> {
+                    throw Throwable("Counter failed for $subSyncScope!")
+                } //StopShip: create exception
+            }
+        } ?: throw Throwable("Counter failed for $subSyncScope!")
     }
 
     private fun Single<out PeopleRemoteInterface>.makeDownSyncApiCallAndGetResponse(): Single<ResponseBody> =
@@ -85,7 +109,7 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
         flatMapCompletable { batchOfPeople ->
             Completable.create { emitter ->
                 localDbManager.insertOrUpdatePeopleInLocal(batchOfPeople.map { it.toDomainPerson() }).blockingAwait()
-                Timber.d("Saved batch")
+                Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
                 decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
                 updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
                 updateLastKnownPatientId(batchOfPeople.last().patientId)
@@ -103,7 +127,7 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
 
     private fun getLastKnownPatientId(): String? =
         downSyncDao.getDownSyncStatusForId(getDownSyncId())?.lastPatientId
-        ?: getLastPatientIdFromRealmAndMigrateIt()
+            ?: getLastPatientIdFromRealmAndMigrateIt()
 
     private fun getLastKnownPatientUpdatedAt(): Long? =
         downSyncDao.getDownSyncStatusForId(getDownSyncId())?.lastPatientUpdatedAt
@@ -117,16 +141,20 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
             val currentDownSyncStatus = downSyncDao.getDownSyncStatusForId(getDownSyncId())
 
             val newDownSyncStatus =
-                    currentDownSyncStatus?.copy(
-                        lastPatientId = rlSyncInfo.lastKnownPatientId,
-                        lastPatientUpdatedAt = rlSyncInfo.lastKnownPatientUpdatedAt.time) ?:
-                    DownSyncStatus(subSyncScope, rlSyncInfo.lastKnownPatientId, rlSyncInfo.lastKnownPatientUpdatedAt.time)
+                currentDownSyncStatus?.copy(
+                    lastPatientId = rlSyncInfo.lastKnownPatientId,
+                    lastPatientUpdatedAt = rlSyncInfo.lastKnownPatientUpdatedAt.time)
+                    ?: DownSyncStatus(subSyncScope, rlSyncInfo.lastKnownPatientId, rlSyncInfo.lastKnownPatientUpdatedAt.time)
 
             downSyncDao.insertOrReplaceDownSyncStatus(newDownSyncStatus)
             localDbManager.deleteSyncInfo(subSyncScope)
             newDownSyncStatus
         } catch (e: Exception) {
-            e.printStackTrace()
+            if(e is NoSuchRlSessionInfoException) {
+                Timber.e("No such realm session info")
+            } else {
+                e.printStackTrace()
+            }
             null
         }
     }
@@ -134,18 +162,22 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
     private fun updateDownSyncTimestampOnBatchDownload() {
         downSyncDao.updateLastSyncTime(getDownSyncId(), timeHelper.now())
     }
+
     private fun decrementAndSavePeopleToDownSyncCount(decrement: Int) {
         val currentCount = downSyncDao.getDownSyncStatusForId(getDownSyncId())?.totalToDownload
         if (currentCount != null) {
             downSyncDao.updatePeopleToDownSync(getDownSyncId(), currentCount - decrement)
         }
     }
+
     private fun updateLastKnownPatientUpdatedAt(updatedAt: Date?) {
         downSyncDao.updateLastPatientUpdatedAt(getDownSyncId(), updatedAt?.time ?: 0L)
     }
+
     private fun updateLastKnownPatientId(patientId: String) {
         downSyncDao.updateLastPatientId(getDownSyncId(), patientId)
     }
+
     private fun getDownSyncId() = downSyncDao.getStatusId(projectId, userId, moduleId)
 
     companion object {

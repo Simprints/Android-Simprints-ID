@@ -90,6 +90,7 @@ open class Application : MultiDexApplication() {
                 exceptionToPrint = e.cause
             }
             Timber.d("Undeliverable exception received", exceptionToPrint)
+            exceptionToPrint.printStackTrace()
         }
     }
 }
