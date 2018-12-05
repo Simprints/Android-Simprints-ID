@@ -1,9 +1,8 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.activities.TutorialActivity
-import com.simprints.id.activities.about.AboutActivity
-import com.simprints.id.activities.about.AboutPresenter
+import com.simprints.id.activities.about.DebugActivity
+import com.simprints.id.activities.about.DebugViewModel
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
@@ -17,7 +16,8 @@ import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerpri
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
 import com.simprints.id.activities.dashboard.DashboardPresenter
-import com.simprints.id.activities.dashboard.models.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModelHelper
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.activities.launch.LaunchPresenter
 import com.simprints.id.activities.login.LoginActivity
@@ -35,9 +35,10 @@ import com.simprints.id.services.GuidSelectionService
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.InputMergeWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
@@ -52,10 +53,9 @@ interface AppComponent {
     fun inject(app: Application)
     fun inject(guidSelectionService: GuidSelectionService)
     fun inject(alertActivity: AlertActivity)
-    fun inject(aboutActivity: AboutActivity)
+    fun inject(aboutActivity: DebugActivity)
     fun inject(longConsentActivity: LongConsentActivity)
     fun inject(refusalPresenter: RefusalPresenter)
-    fun inject(tutorialActivity: TutorialActivity)
     fun inject(matchingActivity: MatchingActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
@@ -65,7 +65,7 @@ interface AppComponent {
     fun inject(checkLoginFromIntentPresenter: CheckLoginFromIntentPresenter)
     fun inject(checkLoginFromMainLauncherPresenter: CheckLoginFromMainLauncherPresenter)
     fun inject(matchingPresenter: MatchingPresenter)
-    fun inject(aboutPresenter: AboutPresenter)
+    fun inject(aboutPresenter: DebugViewModel)
     fun inject(dashboardCardsFactory: DashboardCardsFactory)
     fun inject(dashboardSyncCardViewModel: DashboardSyncCardViewModel)
     fun inject(loginPresenter: LoginPresenter)
@@ -91,4 +91,6 @@ interface AppComponent {
     fun inject(subCountWorker: SubCountWorker)
     fun inject(subDownSyncWorker: SubDownSyncWorker)
     fun inject(syncWorker: DownSyncMasterWorker)
+    fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
+    fun inject(inputMergeWorker: InputMergeWorker)
 }

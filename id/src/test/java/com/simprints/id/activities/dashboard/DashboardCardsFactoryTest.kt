@@ -7,8 +7,8 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.spy
 import com.simprints.id.R
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.activities.dashboard.models.DashboardCard
-import com.simprints.id.activities.dashboard.models.DashboardCardType
+import com.simprints.id.activities.dashboard.viewModels.DashboardCard
+import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -69,7 +69,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
         syncStatusDatabaseModel = syncStatusDatabase.downSyncDao
 
-        whenever(syncStatusDatabaseModel.getDownSyncStatus()).thenReturn(mock())
+        whenever(syncStatusDatabaseModel.getDownSyncStatusLiveData()).thenReturn(mock())
         whenever(syncStatusDatabaseModel.insertOrReplaceDownSyncStatus(anyNotNull())).then { }
 
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)

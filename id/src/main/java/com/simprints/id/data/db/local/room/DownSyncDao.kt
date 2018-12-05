@@ -11,7 +11,10 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScop
 interface DownSyncDao {
 
     @Query("select * from DownSyncStatus")
-    fun getDownSyncStatus(): LiveData<List<DownSyncStatus>>
+    fun getDownSyncStatusLiveData(): LiveData<List<DownSyncStatus>>
+
+    @Query("select * from DownSyncStatus")
+    fun getDownSyncStatus(): List<DownSyncStatus>
 
     @Query("select * from DownSyncStatus where id = :downSyncStatusId")
     fun getDownSyncStatusForId(downSyncStatusId: String): DownSyncStatus?
@@ -32,6 +35,9 @@ interface DownSyncDao {
     fun updateLastPatientUpdatedAt(downSyncStatusId: String, lastPatientUpdatedAt: Long)
 
     // STOPSHIP
+    @Query("delete from DownSyncStatus  where id = :downSyncStatusId")
+    fun deleteDownSyncStatus(downSyncStatusId: String)
+
     @Query("delete from DownSyncStatus")
     fun lolDelete()
 }
