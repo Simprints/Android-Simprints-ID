@@ -190,7 +190,7 @@
     <string name="main_error_graphic" translatable="false">main error graphic</string>
 
 
-    <!-- AboutActivity : the screen that shows project statistics and version numbers -->
+    <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
     <string name="database_information">Database Information</string>
     <string name="user_count">User Count:</string>

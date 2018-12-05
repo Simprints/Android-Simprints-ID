@@ -14,7 +14,7 @@ import com.simprints.id.testUtils.roboletric.createRoboAboutActivity
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Completable
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.activity_about.*
+import kotlinx.android.synthetic.main.activity_debug.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

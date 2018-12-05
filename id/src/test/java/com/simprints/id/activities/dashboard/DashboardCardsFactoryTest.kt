@@ -69,7 +69,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
         syncStatusDatabaseModel = syncStatusDatabase.downSyncDao
 
-        whenever(syncStatusDatabaseModel.getDownSyncStatus()).thenReturn(mock())
+        whenever(syncStatusDatabaseModel.getDownSyncStatusLiveData()).thenReturn(mock())
         whenever(syncStatusDatabaseModel.insertOrReplaceDownSyncStatus(anyNotNull())).then { }
 
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
