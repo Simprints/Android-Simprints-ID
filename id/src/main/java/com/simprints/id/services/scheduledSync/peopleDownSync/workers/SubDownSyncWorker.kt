@@ -31,20 +31,12 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
 
         val input = inputData.getString(SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT) ?: throw IllegalArgumentException("input required")
         val subSyncScope = scopesBuilder.fromJsonToSubSyncScope(input) ?: throw IllegalArgumentException("SyncScope required")
-        val key = subSyncScope.uniqueKey
-        val counter = inputData.getIntArray(key)?.get(0) ?: DEFAULT_COUNTER_FOR_INVALID_VALUE
+        //val key = subSyncScope.uniqueKey
+        //val counter = inputData.getIntArray(key)?.get(0) ?: DEFAULT_COUNTER_FOR_INVALID_VALUE
 
         return try {
-            when {
-                counter > 0 -> {
-                    downSyncTask.execute(subSyncScope).blockingAwait()
-                    Result.SUCCESS
-                }
-                counter == 0 -> {
-                    Result.SUCCESS
-                }
-                else -> throw Throwable("Counter failed for $subSyncScope!") //StopShip: create exception
-            }
+            downSyncTask.execute(subSyncScope).blockingAwait()
+            Result.SUCCESS
         } catch (e: Throwable) {
             e.printStackTrace()
             analyticsManager.logThrowable(e)

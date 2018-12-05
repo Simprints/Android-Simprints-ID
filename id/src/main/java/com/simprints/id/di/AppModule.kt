@@ -218,16 +218,13 @@ open class AppModule(val app: Application) {
         SyncSchedulerHelperImpl(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager)
 
     @Provides
-    @Singleton
     open fun provideCountTask(dbManager: DbManager,
                               syncStatusDatabase: SyncStatusDatabase): CountTask = CountTaskImpl(dbManager)
 
     @Provides
-    @Singleton
     open fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
 
     @Provides
-    @Singleton
     open fun provideDownSyncTask(localDbManager: LocalDbManager,
                                  remoteDbManager: RemoteDbManager,
                                  timeHelper: TimeHelper,
