@@ -2,7 +2,7 @@ package com.simprints.id.activities.dashboard
 
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
-import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
@@ -50,6 +50,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun initCards() {
+        cardsViewModelsList.forEach { it.stopObservers() }
         cardsViewModelsList.clear()
         Single.merge(
             cardsFactory.createCards()
@@ -135,7 +136,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
-        dashboardSyncCardViewModel.viewModelState.peopleToUpload > 0 ||
+        dashboardSyncCardViewModel.viewModelState.peopleToUpload?.let { it > 0 } ?: false ||
             dashboardSyncCardViewModel.viewModelState.peopleToDownload?.let { it > 0 } ?: false
 
     private fun cancelAllDownSyncWorkers() {

@@ -43,4 +43,7 @@ class SyncSchedulerHelperImpl(val preferencesManager: PreferencesManager,
     private fun scheduleSessionsSync() {
         sessionEventsSyncManager.scheduleSessionsSync()
     }
+
+    override fun isDownSyncManualTriggerOn(): Boolean =
+        preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL] ?: false
 }

@@ -1,13 +1,12 @@
-package com.simprints.id.activities.dashboard.viewModels
+package com.simprints.id.activities.dashboard.viewModels.syncCard
 
 import android.os.Looper
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkManager
+import com.simprints.id.activities.dashboard.viewModels.CardViewModel
+import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.UpSyncStatus
 import com.simprints.id.di.AppComponent
@@ -19,33 +18,24 @@ import javax.inject.Inject
 
 class DashboardSyncCardViewModel(override val type: DashboardCardType,
                                  override val position: Int,
-                                 private val lifecycleOwner: LifecycleOwner,
-                                 component: AppComponent,
-                                 defaultState: State = State()) : CardViewModel(type, position) {
+                                 val component: AppComponent,
+                                 defaultState: DashboardSyncCardViewModelState = DashboardSyncCardViewModelState()): CardViewModel(type, position), LifecycleOwner {
 
-    @Inject
-    lateinit var syncStatusDatabase: SyncStatusDatabase
-    @Inject
-    lateinit var syncScopesBuilder: SyncScopesBuilder
+    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+    @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
+
     private val syncScope: SyncScope?
         get() = syncScopesBuilder.buildSyncScope()
 
-    private val helper = DashboardSyncCardViewModelHelper(this)
+    private var helper: DashboardSyncCardViewModelHelper? = null
 
-    val stateLiveData: MutableLiveData<State> = MutableLiveData()
-    var viewModelState: State = State()
-
-    data class State(var onSyncActionClicked: () -> Unit = {},
-                     var peopleToUpload: Int = 0,
-                     var peopleToDownload: Int? = null,
-                     var peopleInDb: Int = 0,
-                     var isDownSyncRunning: Boolean = false,
-                     val showSyncButton: Boolean = false,
-                     var lastSyncTime: String = "")
+    val stateLiveData: MutableLiveData<DashboardSyncCardViewModelState> = MutableLiveData()
+    var viewModelState: DashboardSyncCardViewModelState = DashboardSyncCardViewModelState()
 
     private var downSyncStatus: LiveData<List<DownSyncStatus>>
     private var upSyncStatus: LiveData<UpSyncStatus?>
     private var downSyncWorkerStatus: LiveData<MutableList<WorkInfo>>?
+    var lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
 
     init {
         component.inject(this)
@@ -56,31 +46,36 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
         upSyncStatus = syncStatusDatabase.upSyncDao.getUpSyncStatus()
         downSyncWorkerStatus = syncScope?.let { WorkManager.getInstance().getWorkInfosByTagLiveData(SUBDOWNSYNC_WORKER_TAG) }
 
-        helper.initViewModel(component)
+        registerObserverForDownSyncWorkerState()
+        lifecycleRegistry.markState(Lifecycle.State.STARTED)
     }
 
-    fun registerObserverForDownSyncWorkerState() {
+    private fun registerObserverForDownSyncWorkerState() {
         val downSyncObserver = Observer<List<WorkInfo>> { subWorkersStatusInSyncChain ->
-            val isAnyOfWorkersInSyncChainRunning = subWorkersStatusInSyncChain.firstOrNull { it.state == RUNNING } != null
-            helper.onDownSyncWorkerStatusChange(isAnyOfWorkersInSyncChainRunning)
+            val isDownSyncRunning = subWorkersStatusInSyncChain.firstOrNull { it.state == RUNNING } != null
+            if (helper == null) {
+                helper = DashboardSyncCardViewModelHelper(this, component, isDownSyncRunning)
+            } else {
+                helper?.onDownSyncWorkerStatusChange(isDownSyncRunning)
+            }
         }
-        downSyncWorkerStatus?.observe(lifecycleOwner, downSyncObserver)
+        downSyncWorkerStatus?.observe(this, downSyncObserver)
     }
 
     fun registerObserverForDownSyncEvents() {
 
         val downSyncStatusObserver = Observer<List<DownSyncStatus>> { downSyncStatuses ->
-            helper.onDownSyncStatusChanged(downSyncStatuses)
+            helper?.onDownSyncStatusChanged(downSyncStatuses)
         }
-        downSyncStatus.observe(lifecycleOwner, downSyncStatusObserver)
+        downSyncStatus.observe(this, downSyncStatusObserver)
     }
 
     fun registerObserverForUpSyncEvents() {
 
         val upSyncObserver = Observer<UpSyncStatus?> { upSyncStatus ->
-            helper.onUpSyncStatusChanged(upSyncStatus)
+            helper?.onUpSyncStatusChanged(upSyncStatus)
         }
-        upSyncStatus.observe(lifecycleOwner, upSyncObserver)
+        upSyncStatus.observe(this, upSyncObserver)
     }
 
     fun updateState(peopleToUpload: Int? = null,
@@ -90,7 +85,6 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
                     lastSyncTime: String? = null,
                     showSyncButton: Boolean? = null,
                     emitState: Boolean = false) {
-
         viewModelState = viewModelState.let {
             it.copy(
                 peopleToUpload = peopleToUpload ?: it.peopleToUpload,
@@ -113,5 +107,13 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
         } else {
             stateLiveData.postValue(viewModelState)
         }
+    }
+
+    override fun stopObservers(){
+        lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
+    }
+
+    override fun getLifecycle(): Lifecycle {
+        return lifecycleRegistry
     }
 }

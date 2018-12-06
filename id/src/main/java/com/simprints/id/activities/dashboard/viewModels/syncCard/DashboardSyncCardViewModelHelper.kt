@@ -1,16 +1,13 @@
-package com.simprints.id.activities.dashboard.viewModels
+package com.simprints.id.activities.dashboard.viewModels.syncCard
 
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.UpSyncStatus
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Completable
@@ -21,35 +18,17 @@ import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
 
-class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardViewModel) {
+class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardViewModel,
+                                       component: AppComponent,
+                                       isDownSyncRunning: Boolean) {
 
-    enum class HelperState {
-        NEED_INITIALIZATION,
-        INITIALIZING,
-        READY
-    }
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
+    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
-    private fun HelperState.isInReady() = this == HelperState.READY
-    private fun HelperState.isInNeedInit() = this == HelperState.NEED_INITIALIZATION
-
-    @Inject
-    lateinit var preferencesManager: PreferencesManager
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-    @Inject
-    lateinit var dbManager: DbManager
-    @Inject
-    lateinit var remoteDbManager: RemoteDbManager
-    @Inject
-    lateinit var localDbManager: LocalDbManager
-    @Inject
-    lateinit var syncStatusDatabase: SyncStatusDatabase
-    @Inject
-    lateinit var syncScopesBuilder: SyncScopesBuilder
-
-    private var helperState: HelperState = HelperState.NEED_INITIALIZATION
-
-    private val state: DashboardSyncCardViewModel.State
+    private val state: DashboardSyncCardViewModelState
         get() = viewModel.viewModelState
 
     private val syncScope: SyncScope?
@@ -62,9 +41,60 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
-    fun initViewModel(component: AppComponent) {
+    init {
         component.inject(this)
-        viewModel.registerObserverForDownSyncWorkerState()
+
+        state.isDownSyncRunning = isDownSyncRunning
+        state.showSyncButton = syncSchedulerHelper.isDownSyncManualTriggerOn()
+
+        if (isDownSyncRunning) {
+            initWhenDownSyncRunningIfRequired()
+        } else {
+            initWhenDownSyncNotRunningIfRequired()
+        }
+    }
+
+    private fun initWhenDownSyncNotRunningIfRequired() {
+        fetchAllCounters {
+            setHelperInitialized()
+        }
+    }
+
+    private fun initWhenDownSyncRunningIfRequired() {
+        fetchLocalAndUpSyncCounters {
+            setHelperInitialized()
+        }
+    }
+
+    private fun fetchAllCounters(done: () -> Unit) {
+        Completable.mergeArray(updateTotalDownSyncCount(), updateTotalLocalCount(), updateTotalUpSyncCount())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .doFinally {
+                done()
+            }
+            .subscribeBy(onComplete = {
+            }, onError = {
+                it.printStackTrace()
+            })
+    }
+
+    private fun fetchLocalAndUpSyncCounters(done: () -> Unit = {}) {
+        updateTotalLocalCount()
+            .andThen(updateTotalUpSyncCount())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .doFinally {
+                done()
+            }
+            .subscribeBy(onComplete = {
+            }, onError = { it.printStackTrace() })
+    }
+
+    private fun setHelperInitialized() {
+        viewModel.registerObserverForDownSyncEvents()
+        viewModel.registerObserverForUpSyncEvents()
+        viewModel.updateState(emitState = true)
     }
 
     private fun updateTotalDownSyncCount(): Completable =
@@ -74,31 +104,31 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
                 syncScope?.toSubSyncScopes()?.forEach { it ->
                     peopleToDownload += dbManager.calculateNPatientsToDownSync(it.projectId, it.userId, it.moduleId).blockingGet()
                 }
-                viewModel.updateState(peopleToDownload = peopleToDownload, emitState = helperState.isInReady())
+                viewModel.updateState(peopleToDownload = peopleToDownload, emitState = true)
             } catch (t: Throwable) {
                 t.printStackTrace()
             }
-        }
+        }.subscribeOn(Schedulers.io())
 
     private fun updateTotalLocalCount(): Completable =
         dbManager.getPeopleCountFromLocalForSyncGroup(preferencesManager.syncGroup)
             .flatMapCompletable {
                 viewModel.updateState(peopleInDb = it, emitState = true)
                 Completable.complete()
-            }
+            }.subscribeOn(Schedulers.io())
 
     private fun updateTotalUpSyncCount(): Completable =
         localDbManager.getPeopleCountFromLocal(toSync = true)
             .flatMapCompletable {
                 viewModel.updateState(peopleToUpload = it, emitState = true)
                 Completable.complete()
-            }
+            }.subscribeOn(Schedulers.io())
 
     fun onUpSyncStatusChanged(upSyncStatus: UpSyncStatus?) {
         upSyncStatus?.let {
             latestUpSyncTime = it.lastUpSyncTime
             val lastSyncTime = calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
-            viewModel.updateState(lastSyncTime = lastSyncTime, emitState = helperState.isInReady())
+            viewModel.updateState(lastSyncTime = lastSyncTime, emitState = true)
             fetchLocalAndUpSyncCounters()
         }
     }
@@ -107,7 +137,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         if (downSyncStatuses.isNotEmpty()) {
 
             var peopleToDownSync: Int? = null
-            if(state.isDownSyncRunning) {
+            if (state.isDownSyncRunning) {
                 peopleToDownSync = updateTotalDownSyncCountUsingWorkers(downSyncStatuses)
             }
 
@@ -115,7 +145,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
             viewModel.updateState(
                 lastSyncTime = latestDownSyncTime,
                 peopleToDownload = peopleToDownSync,
-                emitState = helperState.isInReady())
+                emitState = true)
         }
     }
 
@@ -125,7 +155,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
             syncScope?.let {
                 it.toSubSyncScopes().forEach { subSyncScope ->
                     val downSyncStatusForSubScope = filterDownSyncStatusesBySubSyncScope(subSyncScope, downSyncStatuses)
-                    downSyncStatusForSubScope?.lastSyncTime?.let{ lastSyncTime -> latestDownSyncTimeForModules.add(lastSyncTime) }
+                    downSyncStatusForSubScope?.lastSyncTime?.let { lastSyncTime -> latestDownSyncTimeForModules.add(lastSyncTime) }
                 }
             }
             latestDownSyncTime = latestDownSyncTimeForModules.max()
@@ -175,69 +205,12 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     }
 
     fun onDownSyncWorkerStatusChange(isDownSyncRunning: Boolean) {
-        if (state.isDownSyncRunning != isDownSyncRunning || helperState.isInNeedInit()) {
+        if (state.isDownSyncRunning != isDownSyncRunning) {
             state.isDownSyncRunning = isDownSyncRunning
-            if (isDownSyncRunning) {
-                initWhenDownSyncRunningIfRequired()
-            } else {
-                initWhenDownSyncNotRunningIfRequired()
-                fetchLocalAndUpSyncCounters()
-            }
-            viewModel.updateState(isDownSyncRunning = isDownSyncRunning, emitState = helperState.isInReady())
-        }
-    }
-
-    private fun initWhenDownSyncNotRunningIfRequired() {
-        if (helperState == HelperState.NEED_INITIALIZATION) {
-            helperState = HelperState.INITIALIZING
-            viewModel.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
-            fetchAllCounters {
-                setHelperInitialized()
+            viewModel.updateState(isDownSyncRunning = isDownSyncRunning, emitState = state.peopleToDownload != null)
+            if(!state.isDownSyncRunning) {
+                updateTotalLocalCount().subscribeBy(onError = {it.printStackTrace()}, onComplete = {})
             }
         }
-    }
-
-    private fun initWhenDownSyncRunningIfRequired() {
-        if (helperState == HelperState.NEED_INITIALIZATION) {
-            helperState = HelperState.INITIALIZING
-            viewModel.updateState(showSyncButton = preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL], emitState = helperState.isInReady())
-            fetchLocalAndUpSyncCounters {
-                setHelperInitialized()
-            }
-        }
-    }
-
-    private fun fetchAllCounters(done: () -> Unit) {
-        updateTotalDownSyncCount()
-            .andThen(updateTotalLocalCount())
-            .andThen(updateTotalUpSyncCount())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .doFinally {
-                done()
-            }
-            .subscribeBy(onComplete = {
-            }, onError = {
-                it.printStackTrace()
-            })
-    }
-
-    private fun fetchLocalAndUpSyncCounters(done: () -> Unit = {}) {
-        updateTotalLocalCount()
-            .andThen(updateTotalUpSyncCount())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .doFinally {
-                done()
-            }
-            .subscribeBy(onComplete = {
-            }, onError = { it.printStackTrace() })
-    }
-
-    private fun setHelperInitialized() {
-        helperState = HelperState.READY
-        viewModel.registerObserverForDownSyncEvents()
-        viewModel.registerObserverForUpSyncEvents()
-        viewModel.updateState(emitState = true)
     }
 }

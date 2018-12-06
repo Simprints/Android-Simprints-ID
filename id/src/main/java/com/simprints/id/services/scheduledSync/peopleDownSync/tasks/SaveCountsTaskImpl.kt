@@ -11,12 +11,18 @@ class SaveCountsTaskImpl(syncStatusDatabase: SyncStatusDatabase) : SaveCountsTas
     private val dao = syncStatusDatabase.downSyncDao
 
     override fun execute(countsForSubScopes: Map<SubSyncScope, Int>) {
+        val listOfDownSyncStateToUpdate = mutableListOf<DownSyncStatus>()
         countsForSubScopes.forEach {
             val subScope = it.key
             val downSyncStatus = dao.getDownSyncStatusForId(dao.getStatusId(subScope))
                 ?: DownSyncStatus(projectId = subScope.projectId, userId = subScope.userId, moduleId = subScope.moduleId)
             downSyncStatus.totalToDownload = it.value
-            dao.insertOrReplaceDownSyncStatus(downSyncStatus)
+
+            listOfDownSyncStateToUpdate.add(downSyncStatus)
+        }
+
+        if(listOfDownSyncStateToUpdate.isNotEmpty()) {
+            dao.insertOrReplaceDownSyncStatuses(listOfDownSyncStateToUpdate)
         }
     }
 }

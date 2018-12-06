@@ -16,8 +16,8 @@ import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerpri
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
 import com.simprints.id.activities.dashboard.DashboardPresenter
-import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
-import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModelHelper
+import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModelHelper
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.activities.launch.LaunchPresenter
 import com.simprints.id.activities.login.LoginActivity
