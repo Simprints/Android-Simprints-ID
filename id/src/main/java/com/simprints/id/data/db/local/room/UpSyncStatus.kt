@@ -1,7 +1,9 @@
 package com.simprints.id.data.db.local.room
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 
 /**
  * Aashay - UpSyncStatus: room entity

@@ -320,6 +320,7 @@ dependencies {
     testImplementation 'androidx.test:monitor:1.1.0'
     testImplementation "androidx.test.ext:junit:1.0.0"
     testImplementation "androidx.test:core:$androidx_version"
+    testImplementation 'android.arch.core:core-testing:1.1.1'
 
     testImplementation "com.google.truth:truth:0.42"
     androidTestImplementation("com.google.truth:truth:0.42"){

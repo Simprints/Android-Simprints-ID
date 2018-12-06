@@ -35,7 +35,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
-    private val cardsFactory = DashboardCardsFactory(view.getLifeCycleOwner(), component)
+    private val cardsFactory = DashboardCardsFactory(component)
 
     override val cardsViewModelsList: ArrayList<CardViewModel> = arrayListOf()
 

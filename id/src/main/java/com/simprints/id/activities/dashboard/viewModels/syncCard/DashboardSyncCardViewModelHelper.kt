@@ -37,14 +37,14 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     private var latestDownSyncTime: Long? = null
     private var latestUpSyncTime: Long? = null
 
-    private val dateFormat: DateFormat by lazy {
+    val dateFormat: DateFormat by lazy {
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
     init {
         component.inject(this)
 
-        state.isDownSyncRunning = isDownSyncRunning
+        state.showRunningStateForSyncButton = isDownSyncRunning
         state.showSyncButton = syncSchedulerHelper.isDownSyncManualTriggerOn()
 
         if (isDownSyncRunning) {
@@ -137,7 +137,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         if (downSyncStatuses.isNotEmpty()) {
 
             var peopleToDownSync: Int? = null
-            if (state.isDownSyncRunning) {
+            if (state.showRunningStateForSyncButton) {
                 peopleToDownSync = updateTotalDownSyncCountUsingWorkers(downSyncStatuses)
             }
 
@@ -193,9 +193,9 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
 
         if (lastDownSyncDate != null && lastUpSyncDate != null) {
             return if (lastDownSyncDate.after(lastUpSyncDate)) {
-                lastDownSyncDate.toString()
+                dateFormat.format(lastDownSyncDate)
             } else {
-                lastUpSyncDate.toString()
+                dateFormat.format(lastUpSyncDate)
             }
         }
 
@@ -205,10 +205,10 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     }
 
     fun onDownSyncWorkerStatusChange(isDownSyncRunning: Boolean) {
-        if (state.isDownSyncRunning != isDownSyncRunning) {
-            state.isDownSyncRunning = isDownSyncRunning
+        if (state.showRunningStateForSyncButton != isDownSyncRunning) {
+            state.showRunningStateForSyncButton = isDownSyncRunning
             viewModel.updateState(isDownSyncRunning = isDownSyncRunning, emitState = state.peopleToDownload != null)
-            if(!state.isDownSyncRunning) {
+            if(!state.showRunningStateForSyncButton) {
                 updateTotalLocalCount().subscribeBy(onError = {it.printStackTrace()}, onComplete = {})
             }
         }

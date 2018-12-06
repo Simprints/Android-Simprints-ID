@@ -3,6 +3,7 @@ package com.simprints.id.di
 import com.simprints.id.activities.*
 import com.simprints.id.activities.alert.AlertActivityTest
 import com.simprints.id.activities.dashboard.DashboardCardsFactoryTest
+import com.simprints.id.activities.dashboard.DashboardSyncCardViewModelTest
 import com.simprints.id.data.db.DbManagerTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.secure.ProjectAuthenticatorTest
@@ -34,4 +35,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(downSyncManagerWorkerTest: DownSyncMasterWorkerTest)
     fun inject(subCountWorkerTest: SubCountWorkerTest)
     fun inject(subDownSyncWorkerTest: SubDownSyncWorkerTest)
+    fun inject(dashboardSyncCardViewModelTest: DashboardSyncCardViewModelTest)
 }
