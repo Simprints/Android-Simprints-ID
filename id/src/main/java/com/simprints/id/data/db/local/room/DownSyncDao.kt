@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.local.room
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 

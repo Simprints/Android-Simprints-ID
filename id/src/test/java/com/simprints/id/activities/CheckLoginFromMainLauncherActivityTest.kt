@@ -35,9 +35,6 @@ class CheckLoginFromMainLauncherActivityTest : DaggerForTests() {
     @Inject
     lateinit var dbManager: DbManager
 
-    @Inject
-    lateinit var dataManager: DataManager
-
     override var module by lazyVar {
         AppModuleForTests(app,
             localDbManagerRule = MockRule,

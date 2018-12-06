@@ -1,6 +1,7 @@
 package com.simprints.id.activities.dashboard
 
 import androidx.lifecycle.LifecycleOwner
+import androidx.work.WorkManager
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
@@ -10,29 +11,28 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import io.reactivex.Single
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
 
-class DashboardCardsFactory(private val lifeCycleOwner: LifecycleOwner,
-                            private val component: AppComponent) {
+class DashboardCardsFactory(private val component: AppComponent) {
 
     val dateFormat: DateFormat by lazy {
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
-    @Inject
-    lateinit var preferencesManager: PreferencesManager
-    @Inject
-    lateinit var dbManager: DbManager
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-    @Inject
-    lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var scopeBuilder: SyncScopesBuilder
+    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     init {
         component.inject(this)
@@ -72,7 +72,13 @@ class DashboardCardsFactory(private val lifeCycleOwner: LifecycleOwner,
         }
 
     private fun createSyncInfoCard(position: Int = 3): Single<DashboardSyncCardViewModel>? =
-        Single.just(DashboardSyncCardViewModel(DashboardCardType.SYNC_DB, position, component))
+        Single.just(DashboardSyncCardViewModel(
+            DashboardCardType.SYNC_DB,
+            position,
+            component,
+            scopeBuilder.buildSyncScope()?.let { WorkManager.getInstance().getWorkInfosByTagLiveData(ConstantsWorkManager.SUBDOWNSYNC_WORKER_TAG) },
+            syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData(),
+            syncStatusDatabase.upSyncDao.getUpSyncStatus()))
 
     private fun createLastScannerInfoCard(position: Int = 4): Single<DashboardCardViewModel>? {
         return if (preferencesManager.lastScannerUsed.isNotEmpty()) {

@@ -96,6 +96,7 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
     private fun buildInputMergerWorker(): OneTimeWorkRequest {
         return OneTimeWorkRequestBuilder<InputMergeWorker>()
             .setInputMerger(ArrayCreatingInputMerger::class.java)
+            .addTag(SYNC_WORKER_TAG)
             .build()
     }
 

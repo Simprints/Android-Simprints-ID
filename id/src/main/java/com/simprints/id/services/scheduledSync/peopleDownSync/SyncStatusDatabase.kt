@@ -22,6 +22,7 @@ abstract class SyncStatusDatabase : RoomDatabase() {
         fun getDatabase(context: Context): SyncStatusDatabase = Room
             .databaseBuilder(context.applicationContext, SyncStatusDatabase::class.java, SYNC_STATUS_DB_NAME)
             .fallbackToDestructiveMigration()
+            .allowMainThreadQueries()
             .build()
     }
 }

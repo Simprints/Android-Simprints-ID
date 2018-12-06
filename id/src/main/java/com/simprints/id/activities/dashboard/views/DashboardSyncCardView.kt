@@ -41,7 +41,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
                         setTotalPeopleInDbCounter(peopleInDb)
                         setUploadCounter(peopleToUpload)
                         setListenerForSyncButton(onSyncActionClicked)
-                        setSyncButtonState(showSyncButton, isDownSyncRunning)
+                        setSyncButtonState(showSyncButton, showRunningStateForSyncButton)
                         setDownloadCounter(peopleToDownload)
                         setLastSyncTime(lastSyncTime)
                     }
