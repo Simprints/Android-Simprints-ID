@@ -5,4 +5,6 @@ interface SyncSchedulerHelper {
     fun startDownSyncOnLaunchIfPossible()
     fun startDownSyncOnUserActionIfPossible()
     fun cancelDownSyncWorkers()
+
+    fun isDownSyncManualTriggerOn(): Boolean
 }

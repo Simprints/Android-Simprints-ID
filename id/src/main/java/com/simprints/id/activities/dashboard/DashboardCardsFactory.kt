@@ -4,7 +4,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
-import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -72,7 +72,7 @@ class DashboardCardsFactory(private val lifeCycleOwner: LifecycleOwner,
         }
 
     private fun createSyncInfoCard(position: Int = 3): Single<DashboardSyncCardViewModel>? =
-        Single.just(DashboardSyncCardViewModel(DashboardCardType.SYNC_DB, position, lifeCycleOwner, component))
+        Single.just(DashboardSyncCardViewModel(DashboardCardType.SYNC_DB, position, component))
 
     private fun createLastScannerInfoCard(position: Int = 4): Single<DashboardCardViewModel>? {
         return if (preferencesManager.lastScannerUsed.isNotEmpty()) {

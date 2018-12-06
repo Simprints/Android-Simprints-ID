@@ -9,15 +9,20 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
+import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.anyNotNull
+import com.simprints.id.shared.mock
 import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Completable
 import junit.framework.Assert.assertEquals
@@ -46,12 +51,17 @@ class SubDownSyncWorkerTest: DaggerForTests() {
     private lateinit var subDownSyncWorker: SubDownSyncWorker
     private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
 
-    override var module by lazyVar {
-        AppModuleForTests(app,
-            localDbManagerRule = DependencyRule.MockRule,
-            countTaskRule = DependencyRule.MockRule,
-            analyticsManagerRule = DependencyRule.SpyRule,
-            downSyncTaskRule = DependencyRule.MockRule)
+    var mockDownSyncTask:DownSyncTask = mock()
+
+    override var module: AppModuleForTests by lazyVar {
+        object: AppModuleForTests(app) {
+            override fun provideDownSyncTask(localDbManager: LocalDbManager,
+                                             remoteDbManager: RemoteDbManager,
+                                             timeHelper: TimeHelper,
+                                             syncStatusDatabase: SyncStatusDatabase): DownSyncTask {
+                return mockDownSyncTask
+            }
+        }
     }
 
     @Before
@@ -65,6 +75,7 @@ class SubDownSyncWorkerTest: DaggerForTests() {
         }
         super.setUp()
         testAppComponent.inject(this)
+
         MockitoAnnotations.initMocks(this)
         subDownSyncWorker = SubDownSyncWorker(context, workParams)
     }

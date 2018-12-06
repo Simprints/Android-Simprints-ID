@@ -2,11 +2,10 @@ package com.simprints.id.activities.dashboard
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
-import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.views.DashboardCardView
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 

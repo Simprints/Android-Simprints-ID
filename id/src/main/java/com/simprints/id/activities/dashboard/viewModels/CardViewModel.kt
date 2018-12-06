@@ -5,4 +5,6 @@ import androidx.lifecycle.ViewModel
 open class CardViewModel(
     open val type: DashboardCardType,
     open val position: Int
-) : ViewModel()
+) : ViewModel() {
+    open fun stopObservers() {}
+}

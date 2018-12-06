@@ -109,7 +109,6 @@ class DebugActivity : AppCompatActivity() {
 
     private fun onDeleteSubModule(subScopeToDelete: SubSyncScope) {
         localDbManager.deletePeopleFromLocal(subScopeToDelete).blockingAwait()
-        viewModel.refresh()
     }
 
     class State {

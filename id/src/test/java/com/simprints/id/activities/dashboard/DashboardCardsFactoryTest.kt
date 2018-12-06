@@ -1,7 +1,5 @@
 package com.simprints.id.activities.dashboard
 
-import androidx.work.Configuration
-import androidx.work.WorkManager
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.spy
@@ -9,7 +7,6 @@ import com.simprints.id.R
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
-import com.simprints.id.activities.dashboard.viewModels.DashboardSyncCardViewModel
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -156,19 +153,6 @@ class DashboardCardsFactoryTest : DaggerForTests() {
             { preferencesManager.lastScannerUsed = "" },
             app.getString(R.string.dashboard_card_lastscanner_title))
     }
-
-//    @Test
-//    fun shouldShowSyncCardWithRightCounters_whenSyncModulesAreSelected() {
-//        val factory = DashboardCardsFactory(activity, testAppComponent)
-//
-//        preferencesManager.selectedModules = setOf("module1", "module2", "module3")
-//        val patientsForModule = 5
-//        whenever(localDbManagerMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(patientsForModule))
-//
-//        val viewModelCards = Single.merge(factory.createCards()).test().values()
-//        val syncViewModelCard = viewModelCards.findLast { it.type == DashboardCardType.SYNC_DB } as DashboardSyncCardViewModel
-//
-//    }
 
     private fun assertThatCardEventsAreCreatedOnlyWhenRequired(cardsFactory: DashboardCardsFactory,
                                                                createEvent: () -> Any,

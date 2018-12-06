@@ -1,10 +1,7 @@
 package com.simprints.id.data.db.local.room
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 
 @Dao
@@ -21,6 +18,11 @@ interface DownSyncDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOrReplaceDownSyncStatus(downSyncStatus: DownSyncStatus)
+
+    @Transaction
+    fun insertOrReplaceDownSyncStatuses(downSyncStatus: List<DownSyncStatus>) {
+        downSyncStatus.forEach { insertOrReplaceDownSyncStatus(it) }
+    }
 
     @Query("update DownSyncStatus set totalToDownload = :totalToDownload where id = :downSyncStatusId")
     fun updatePeopleToDownSync(downSyncStatusId: String, totalToDownload: Int)
