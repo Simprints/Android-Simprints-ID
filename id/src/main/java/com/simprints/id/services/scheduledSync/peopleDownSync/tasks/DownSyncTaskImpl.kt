@@ -10,6 +10,7 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
+import com.simprints.id.exceptions.safe.sync.InterruptedSyncException
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.tools.TimeHelper
@@ -69,10 +70,10 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
                     false
                 }
                 else -> {
-                    throw Throwable("Counter failed for $subSyncScope!")
-                } //StopShip: create exception
+                    throw InterruptedSyncException("DownCounter failed for $subSyncScope!")
+                }
             }
-        } ?: throw Throwable("Counter failed for $subSyncScope!")
+        } ?: throw InterruptedSyncException("Counter failed for $subSyncScope!")
     }
 
     private fun Single<out PeopleRemoteInterface>.makeDownSyncApiCallAndGetResponse(): Single<ResponseBody> =
@@ -179,7 +180,7 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
     private fun getDownSyncId() = downSyncDao.getStatusId(projectId, userId, moduleId)
 
     companion object {
-        const val BATCH_SIZE_FOR_DOWNLOADING = 200 // STOPSHIP
+        const val BATCH_SIZE_FOR_DOWNLOADING = 200
         private const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 }

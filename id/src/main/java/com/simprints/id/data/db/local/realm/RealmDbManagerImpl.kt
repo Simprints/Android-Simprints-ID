@@ -212,7 +212,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     override fun getRlSyncInfo(subSyncScope: SubSyncScope): Single<rl_SyncInfo> =
         useRealmInstance { realm ->
             realm
-                .where(rl_SyncInfo::class.java).equalTo(rl_SyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal) // STOPSHIP - remove sync group from SubSyncScope
+                .where(rl_SyncInfo::class.java).equalTo(rl_SyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
                 .findFirst()
                 ?.let { realm.copyFromRealm(it) }
                 ?: throw NoSuchRlSessionInfoException()

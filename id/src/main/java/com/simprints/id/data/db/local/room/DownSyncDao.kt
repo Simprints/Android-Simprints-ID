@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.local.room
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 
@@ -37,7 +36,6 @@ interface DownSyncDao {
     @Query("update DownSyncStatus set lastPatientUpdatedAt = :lastPatientUpdatedAt where id = :downSyncStatusId")
     fun updateLastPatientUpdatedAt(downSyncStatusId: String, lastPatientUpdatedAt: Long)
 
-    // STOPSHIP
     @Query("delete from DownSyncStatus  where id = :downSyncStatusId")
     fun deleteDownSyncStatus(downSyncStatusId: String)
 
