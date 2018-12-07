@@ -11,6 +11,9 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMa
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_REPEAT_UNIT
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_SYNC_SCOPE_INPUT
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import org.jetbrains.anko.Android
 
 // Class to enqueue and dequeue DownSyncMasterWorker
 class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : DownSyncManager {
@@ -45,7 +48,7 @@ class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : Do
                 it.state == RUNNING
             } != null
         } ?: false
-    }
+    }.subscribeOn(AndroidSchedulers.mainThread())
 
     override fun dequeueAllSyncWorker() {
         workerManager.cancelAllWorkByTag(SYNC_WORKER_TAG)

@@ -1,7 +1,7 @@
 package com.simprints.id.activities
 
 import android.content.Intent
-import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -9,12 +9,14 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import com.simprints.id.Application
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
@@ -22,8 +24,11 @@ import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Person
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.PeopleGeneratorUtils
@@ -34,6 +39,8 @@ import com.simprints.id.testTools.LoginManagerTest
 import com.simprints.id.testTools.models.TestProject
 import com.simprints.id.testTools.remote.RemoteTestingManager
 import com.simprints.id.testTools.tryOnUiUntilTimeout
+import com.simprints.id.testTools.waitOnSystem
+import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import io.realm.Realm
@@ -44,6 +51,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import timber.log.Timber
+import java.util.concurrent.CompletableFuture
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
@@ -67,6 +76,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
+    @Inject lateinit var downSyncManager: DownSyncManager
 
     override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
         PreferencesModuleForAnyTests(
@@ -88,38 +98,80 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     @Before
     override fun setUp() {
-        app = InstrumentationRegistry.getTargetContext().applicationContext as Application
+        app = ApplicationProvider.getApplicationContext()
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
 
-        Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
+        Realm.init(app)
         super<FirstUseLocalAndRemote>.setUp()
 
         mockBeingSignedIn()
         app.initDependencies()
+        signOut()
 
         mockGlobalScope()
     }
 
     @Test
-    fun openDashboardWithGlobalSync_shouldShowDashboardSyncCard() {
-        createPeopleAndPrepareRemoteAndLocalDbs(mockGlobalScope())
+    fun openDashboardWithGlobalSync_shouldShowTheRightCounters() {
+        uploadFakePeopleAndPrepareLocalDb(mockGlobalScope())
         launchActivityRule.launchActivity(Intent())
         waitForDownSyncCountAndValidateUI()
     }
 
     @Test
-    fun openDashboardWithUserSync_shouldShowDashboardSyncCard() {
-        createPeopleAndPrepareRemoteAndLocalDbs(mockUserScope())
+    fun openDashboardWithUserSync_shouldShowTheRightCounters() {
+        uploadFakePeopleAndPrepareLocalDb(mockUserScope())
         launchActivityRule.launchActivity(Intent())
         waitForDownSyncCountAndValidateUI()
     }
 
     @Test
-    fun openDashboardWithModuleSync_shouldShowDashboardSyncCard() {
-        createPeopleAndPrepareRemoteAndLocalDbs(mockModuleScope())
+    fun openDashboardWithModuleSync_shouldShowTheRightCounters() {
+        uploadFakePeopleAndPrepareLocalDb(mockModuleScope())
         launchActivityRule.launchActivity(Intent())
         waitForDownSyncCountAndValidateUI()
+    }
+
+    @Test
+    fun downSyncRunning_shouldShowTheRightStateAndUpdateCountersAtTheEnd() {
+        uploadFakePeopleAndPrepareLocalDb(mockModuleScope())
+        downSyncManager.enqueueOneTimeDownSyncMasterWorker()
+
+        launchActivityRule.launchActivity(Intent())
+
+        tryOnUiUntilTimeout(2000, 200) {
+            onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.syncing)))
+        }
+
+        onView(withId(R.id.dashboardCardSyncUploadText))
+            .check(matches(withText("${peopleInDbForSyncScope(syncScopesBuilder.buildSyncScope(), true)}")))
+
+        onView(withId(R.id.dashboardCardSyncTotalLocalText))
+            .check(matches(withText("${peopleInDb.size}")))
+
+        tryOnUiUntilTimeout(10000, 200) {
+            onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_sync_now)))
+        }
+
+        onView(withId(R.id.dashboardCardSyncTotalLocalText))
+            .check(matches(withText("${localDbManager.getPeopleCountFromLocal().blockingGet()}")))
+
+        onView(withId(R.id.dashboardCardSyncDownloadText))
+            .check(matches(withText("0")))
+    }
+
+    @Test
+    fun openDashboardInOffline_shouldNotShowDownloadCounter() {
+        PeopleRemoteInterface.baseUrl = "http://wrong_url_simprints_com.com"
+        downSyncManager.enqueueOneTimeDownSyncMasterWorker()
+
+        launchActivityRule.launchActivity(Intent())
+        waitOnSystem(3000)
+
+        onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_sync_now)))
+        onView(withId(R.id.dashboardCardSyncDownloadText))
+            .check(matches(withText("")))
     }
 
     private fun waitForDownSyncCountAndValidateUI() {
@@ -142,17 +194,9 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     private fun peopleInDbForSyncScope(scope: SyncScope, toSync: Boolean): Int =
         peopleInDb.count {
             it.toSync == toSync &&
-                it.projectId == scope.projectId &&
-                if (scope.userId != null) {
-                    it.userId == scope.userId
-                } else {
-                    true
-                } &&
-                if (!scope.moduleIds.isNullOrEmpty()) {
-                    scope.moduleIds?.contains(it.moduleId) ?: false
-                } else {
-                    true
-                }
+            it.projectId == scope.projectId &&
+            if (scope.userId != null) {  it.userId == scope.userId } else { true } &&
+            if (!scope.moduleIds.isNullOrEmpty()) { scope.moduleIds?.contains(it.moduleId) ?: false } else { true }
         }
 
     private fun mockGlobalScope(): SyncScope {
@@ -172,7 +216,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     }
 
 
-    private fun createPeopleAndPrepareRemoteAndLocalDbs(syncScope: SyncScope) {
+    private fun uploadFakePeopleAndPrepareLocalDb(syncScope: SyncScope) {
         peopleOnServer = PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_SERVER_PER_MODULE, syncScope, listOf(false))
         remoteDbManagerSpy.uploadPeople(testProject.id, peopleOnServer).blockingAwait()
         peopleInDb.addAll(PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_DB_PER_MODULE, syncScope, listOf(true, false)))
