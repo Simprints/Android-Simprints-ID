@@ -44,11 +44,15 @@ import javax.inject.Inject
 
 class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
 
-    @Inject lateinit var dataManager: DataManager
-    @Inject lateinit var dbManager: DbManager
+    @Inject
+    lateinit var dataManager: DataManager
+    @Inject
+    lateinit var dbManager: DbManager
 
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var simNetworkUtils: SimNetworkUtils
+    @Inject
+    lateinit var loginInfoManager: LoginInfoManager
+    @Inject
+    lateinit var simNetworkUtils: SimNetworkUtils
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var analyticsManager: AnalyticsManager
@@ -102,7 +106,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             .andThen(veroTask(45, R.string.launch_bt_connect, scannerManager.initVero()))
             .andThen(veroTask(60, R.string.launch_bt_connect, scannerManager.connectToVero()) { addBluetoothConnectivityEvent() })
             .andThen(veroTask(75, R.string.launch_setup, scannerManager.resetVeroUI()))
-            .andThen(veroTask(90, R.string.launch_wake_un20, scannerManager.wakingUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() })
+            .andThen(veroTask(90, R.string.launch_wake_un20, scannerManager.wakeUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() })
             .subscribeBy(onError = { it.printStackTrace() }, onComplete = { handleSetupFinished() })
     }
 
@@ -263,7 +267,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun addConsentEvent(result: ConsentEvent.Result) {
-
         sessionEventsManager.updateSessionInBackground {
             it.events.add(
                 ConsentEvent(

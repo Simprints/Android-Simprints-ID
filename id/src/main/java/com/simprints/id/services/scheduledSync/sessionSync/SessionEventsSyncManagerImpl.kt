@@ -18,7 +18,6 @@ open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
 
     private fun getConstraints() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
-        .setRequiresBatteryNotLow(true)
         .build()
 
     companion object {
