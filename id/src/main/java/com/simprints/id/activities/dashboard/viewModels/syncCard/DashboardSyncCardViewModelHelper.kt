@@ -4,7 +4,6 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.UpSyncStatus
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -22,7 +21,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
                                        component: AppComponent,
                                        isDownSyncRunning: Boolean) {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
@@ -31,7 +30,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     private val state: DashboardSyncCardViewModelState
         get() = viewModel.viewModelState
 
-    private val syncScope: SyncScope?
+    private val syncScope: SyncScope
         get() = syncScopesBuilder.buildSyncScope()
 
     private var latestDownSyncTime: Long? = null
@@ -101,7 +100,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         Completable.fromAction {
             try {
                 var peopleToDownload = 0
-                syncScope?.toSubSyncScopes()?.forEach { it ->
+                syncScope.toSubSyncScopes().forEach { it ->
                     peopleToDownload += dbManager.calculateNPatientsToDownSync(it.projectId, it.userId, it.moduleId).blockingGet()
                 }
                 viewModel.updateState(peopleToDownload = peopleToDownload, emitState = true)
@@ -111,7 +110,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         }.subscribeOn(Schedulers.io())
 
     private fun updateTotalLocalCount(): Completable =
-        dbManager.getPeopleCountFromLocalForSyncGroup(preferencesManager.syncGroup)
+        dbManager.getPeopleCountFromLocalForSyncScope(syncScopeBuilder.buildSyncScope())
             .flatMapCompletable {
                 viewModel.updateState(peopleInDb = it, emitState = true)
                 Completable.complete()
@@ -152,12 +151,11 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     private fun updateLatestDownSyncTime(downSyncStatuses: List<DownSyncStatus>): String? =
         if (downSyncStatuses.isNotEmpty()) {
             val latestDownSyncTimeForModules: ArrayList<Long> = ArrayList()
-            syncScope?.let {
-                it.toSubSyncScopes().forEach { subSyncScope ->
-                    val downSyncStatusForSubScope = filterDownSyncStatusesBySubSyncScope(subSyncScope, downSyncStatuses)
-                    downSyncStatusForSubScope?.lastSyncTime?.let { lastSyncTime -> latestDownSyncTimeForModules.add(lastSyncTime) }
-                }
+            syncScope.toSubSyncScopes().forEach { subSyncScope ->
+                val downSyncStatusForSubScope = filterDownSyncStatusesBySubSyncScope(subSyncScope, downSyncStatuses)
+                downSyncStatusForSubScope?.lastSyncTime?.let { lastSyncTime -> latestDownSyncTimeForModules.add(lastSyncTime) }
             }
+
             latestDownSyncTime = latestDownSyncTimeForModules.max()
             calculateLatestSyncTimeIfPossible(latestDownSyncTime, latestUpSyncTime)
         } else {
@@ -167,7 +165,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     private fun updateTotalDownSyncCountUsingWorkers(downSyncStatuses: List<DownSyncStatus>): Int? =
         if (downSyncStatuses.isNotEmpty()) {
             var peopleToDownSync = 0
-            syncScope?.let {
+            syncScope.let {
                 it.toSubSyncScopes().forEach { subSyncScope ->
                     peopleToDownSync += filterDownSyncStatusesBySubSyncScope(subSyncScope, downSyncStatuses)?.totalToDownload ?: 0
                 }
@@ -181,8 +179,8 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         with(subSyncScope) {
             return downSyncStatuses.findLast {
                 it.projectId == this.projectId &&
-                it.userId == this.userId &&
-                it.moduleId == this.moduleId
+                    it.userId == this.userId &&
+                    it.moduleId == this.moduleId
             }
         }
     }
@@ -208,8 +206,8 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         if (state.showRunningStateForSyncButton != isDownSyncRunning) {
             state.showRunningStateForSyncButton = isDownSyncRunning
             viewModel.updateState(isDownSyncRunning = isDownSyncRunning, emitState = state.peopleToDownload != null)
-            if(!state.showRunningStateForSyncButton) {
-                updateTotalLocalCount().subscribeBy(onError = {it.printStackTrace()}, onComplete = {})
+            if (!state.showRunningStateForSyncButton) {
+                updateTotalLocalCount().subscribeBy(onError = { it.printStackTrace() }, onComplete = {})
             }
         }
     }

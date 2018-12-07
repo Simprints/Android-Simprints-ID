@@ -21,7 +21,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     private val syncUploadCount: TextView = rootView.findViewById(R.id.dashboardCardSyncUploadText)
     private val syncDownloadCount: TextView = rootView.findViewById(R.id.dashboardCardSyncDownloadText)
     private val syncButton: Button = rootView.findViewById(R.id.dashboardSyncCardSyncButton)
-    private val totalPeopleInLocal: TextView = rootView.findViewById(R.id.totalPeopleInLocal)
+    private val totalPeopleInLocal: TextView = rootView.findViewById(R.id.dashboardCardSyncTotalLocalText)
 
     @Inject
     lateinit var androidResourcesHelper: AndroidResourcesHelper

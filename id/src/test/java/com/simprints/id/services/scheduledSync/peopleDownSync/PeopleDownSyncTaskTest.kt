@@ -7,6 +7,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -69,7 +70,7 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         val projectIdTest = "projectIDTest"
         val subSyncScope = SubSyncScope(projectId = projectIdTest, userId = null, moduleId = null)
         val nPeopleToDownload = 407
-        val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
+        val peopleToDownload = getRandomPeople(nPeopleToDownload).map { it.toFirebasePerson() }.sortedBy { it.updatedAt }
 
         mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
         val testObserver = makeFakeDownloadRequest(peopleToDownload, localDbMock, subSyncScope)
@@ -89,7 +90,7 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         val moduleIdTest = "moduleIdTest"
         val subSyncScope = SubSyncScope(projectId = projectIdTest, userId = null, moduleId = moduleIdTest)
         val nPeopleToDownload = 513
-        val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
+        val peopleToDownload = getRandomPeople(nPeopleToDownload).map { it.toFirebasePerson() }.sortedBy { it.updatedAt }
 
         mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
         val testObserver = makeFakeDownloadRequest(peopleToDownload, localDbMock, subSyncScope)
@@ -110,7 +111,7 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         val userIdTest = "userIdTest"
         val subSyncScope = SubSyncScope(projectId = projectIdTest, userId = userIdTest, moduleId = null)
         val nPeopleToDownload = 789
-        val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
+        val peopleToDownload = getRandomPeople(nPeopleToDownload).map { it.toFirebasePerson() }.sortedBy { it.updatedAt }
 
         mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
         val testObserver = makeFakeDownloadRequest(peopleToDownload, localDbMock, subSyncScope)
@@ -131,7 +132,7 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         val projectIdTest = "projectIDTest"
         val subSyncScope = SubSyncScope(projectId = projectIdTest, userId = null, moduleId = null)
         val nPeopleToDownload = 499
-        val peopleToDownload = getRandomPeople(nPeopleToDownload).map { fb_Person(it) }.sortedBy { it.updatedAt }
+        val peopleToDownload = getRandomPeople(nPeopleToDownload).map { it.toFirebasePerson() }.sortedBy { it.updatedAt }
 
         mockServer.enqueue(mockSuccessfulResponseWithIncorrectModels(peopleToDownload))
         val testObserver = makeFakeDownloadRequest(peopleToDownload, localDbMock, subSyncScope)

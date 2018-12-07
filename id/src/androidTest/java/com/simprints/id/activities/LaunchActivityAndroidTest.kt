@@ -72,7 +72,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
             randomGeneratorRule = DependencyRule.MockRule,
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter },
             scannerManagerRule = DependencyRule.SpyRule,
-            simNetworkUtilsRule = DependencyRule.SpyRule)
+            simNetworkUtilsRule = DependencyRule.SpyRule,
+            syncSchedulerHelperRule = DependencyRule.MockRule)
     }
 
     private var mockBluetoothAdapter: MockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())

@@ -7,6 +7,7 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.session.Session
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -41,7 +42,7 @@ interface DbManager {
 
     fun refreshProjectInfoWithServer(projectId: String): Single<Project>
 
-    fun getPeopleCountFromLocalForSyncGroup(group: Constants.GROUP): Single<Int>
+    fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<Int>
 
     fun updateIdentification(projectId: String, selectedGuid: String, sessionId: String)
 

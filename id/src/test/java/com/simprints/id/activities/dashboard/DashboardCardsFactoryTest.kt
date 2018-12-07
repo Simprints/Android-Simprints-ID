@@ -15,7 +15,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
-import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
@@ -23,7 +22,6 @@ import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
-import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -46,8 +44,6 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
-    private lateinit var syncStatusDatabaseModel: DownSyncDao
-
     override var module by lazyVar {
         AppModuleForTests(app,
             remoteDbManagerRule = MockRule,
@@ -68,13 +64,13 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
         whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
         whenever(syncStatusDatabase.upSyncDao).thenReturn(mock())
-        syncStatusDatabaseModel = syncStatusDatabase.downSyncDao
 
-        whenever(syncStatusDatabaseModel.getDownSyncStatusLiveData()).thenReturn(mock())
-        whenever(syncStatusDatabaseModel.insertOrReplaceDownSyncStatus(anyNotNull())).then { }
+        whenever(syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData()).thenReturn(mock())
+        whenever(syncStatusDatabase.downSyncDao.insertOrReplaceDownSyncStatus(anyNotNull())).then { }
+        whenever(syncStatusDatabase.upSyncDao.getUpSyncStatus()).thenReturn(mock())
 
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
-        setUserLogInState(true, getRoboSharedPreferences())
+        setUserLogInState(true, getRoboSharedPreferences(), userId = "userId")
 
         mockLoadProject(localDbManagerMock, remoteDbManagerMock)
     }
@@ -183,6 +179,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         testObserver
             .assertNoErrors()
             .assertComplete()
+
         return try {
             val cardsViewModels = testObserver.values().filterIsInstance(DashboardCardViewModel::class.java)
             return cardsViewModels.first {

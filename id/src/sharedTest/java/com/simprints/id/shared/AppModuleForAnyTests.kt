@@ -19,7 +19,9 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
@@ -54,7 +56,8 @@ open class AppModuleForAnyTests(app: Application,
                                 open var syncStatusDatabaseRule: DependencyRule = RealRule,
                                 open var syncScopesBuilderRule: DependencyRule = RealRule,
                                 open var countTaskRule: DependencyRule = RealRule,
-                                open var downSyncTaskRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var downSyncTaskRule: DependencyRule = RealRule,
+                                open var syncSchedulerHelperRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -146,4 +149,6 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideDownSyncTask(localDbManager: LocalDbManager, remoteDbManager: RemoteDbManager, timeHelper: TimeHelper, syncStatusDatabase: SyncStatusDatabase): DownSyncTask =
         downSyncTaskRule.resolveDependency { super.provideDownSyncTask(localDbManager, remoteDbManager, timeHelper, syncStatusDatabase) }
 
+    override fun provideSyncSchedulerHelper(preferencesManager: PreferencesManager, loginInfoManager: LoginInfoManager, sessionEventsSyncManager: SessionEventsSyncManager, downSyncManager: DownSyncManager): SyncSchedulerHelper =
+        syncSchedulerHelperRule.resolveDependency { super.provideSyncSchedulerHelper(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager) }
 }

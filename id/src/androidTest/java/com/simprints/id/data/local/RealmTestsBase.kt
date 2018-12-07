@@ -4,6 +4,8 @@ import androidx.test.InstrumentationRegistry
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.toRealmPerson
+import com.simprints.id.domain.Person
 import com.simprints.id.shared.PeopleGeneratorUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -32,13 +34,13 @@ open class RealmTestsBase {
         deleteRealmFiles(config)
     }
 
-    protected fun getFakePerson(): rl_Person = PeopleGeneratorUtils.getRandomPerson()
+    protected fun getFakePerson(): rl_Person = PeopleGeneratorUtils.getRandomPerson().toRealmPerson()
 
     protected fun saveFakePerson(realm: Realm, fakePerson: rl_Person): rl_Person =
         fakePerson.also { realm.executeTransaction { it.insertOrUpdate(fakePerson) } }
 
-    protected fun saveFakePeople(realm: Realm, people: ArrayList<rl_Person>): ArrayList<rl_Person> =
-        people.also { realm.executeTransaction { it.insertOrUpdate(people) } }
+    protected fun saveFakePeople(realm: Realm, people: List<Person>): List<Person> =
+        people.also { realm.executeTransaction { it.insertOrUpdate(people.map { it.toRealmPerson() }) } }
 
 //    protected fun deleteAll(realm: Realm) = realm.executeTransaction { it.deleteAll() }
 

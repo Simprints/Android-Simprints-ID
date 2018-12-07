@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard
 
-import androidx.lifecycle.LifecycleOwner
 import androidx.work.WorkManager
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
@@ -76,7 +75,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
             DashboardCardType.SYNC_DB,
             position,
             component,
-            scopeBuilder.buildSyncScope()?.let { WorkManager.getInstance().getWorkInfosByTagLiveData(ConstantsWorkManager.SUBDOWNSYNC_WORKER_TAG) },
+            WorkManager.getInstance().getWorkInfosByTagLiveData(ConstantsWorkManager.SUBDOWNSYNC_WORKER_TAG),
             syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData(),
             syncStatusDatabase.upSyncDao.getUpSyncStatus()))
 

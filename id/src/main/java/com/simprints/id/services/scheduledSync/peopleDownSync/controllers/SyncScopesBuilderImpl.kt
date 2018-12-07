@@ -16,14 +16,14 @@ class SyncScopesBuilderImpl(val loginInfoManager: LoginInfoManager,
     override fun fromJsonToSubSyncScope(json: String): SubSyncScope? = fromJson(json)
     override fun fromSubSyncScopeToJson(syncScope: SubSyncScope): String? = toJson(syncScope)
 
-    override fun buildSyncScope(): SyncScope? {
+    override fun buildSyncScope(): SyncScope {
 
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         var possibleUserId: String? = loginInfoManager.getSignedInUserIdOrEmpty()
         var possibleModuleIds: Set<String>? = preferencesManager.selectedModules
 
-        if (projectId.isEmpty()) return null
-        if (possibleUserId.isNullOrEmpty()) return null
+        if (projectId.isEmpty()) throw IllegalArgumentException("ProjectId required for syncScope")
+        if (possibleUserId.isNullOrEmpty()) throw IllegalArgumentException("User not signed in. Required for syncScope")
 
         when (preferencesManager.syncGroup) {
             Constants.GROUP.GLOBAL -> {

@@ -1,21 +1,39 @@
 package com.simprints.id.shared
 
-import com.simprints.id.data.db.local.realm.models.rl_Fingerprint
-import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.tools.extensions.toRealmList
-import com.simprints.libcommon.Fingerprint
+import com.simprints.id.domain.Fingerprint
+import com.simprints.id.domain.Person
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import java.util.*
 
 object PeopleGeneratorUtils {
+
+    private val random = Random()
+
+    fun getRandomPeople(numberOfPeopleForEachSubScope: Int,
+                        syncScope: SyncScope,
+                        toSync: List<Boolean>): MutableList<Person> =
+        mutableListOf<Person>().also { fakePeople ->
+            syncScope.toSubSyncScopes().forEach { subScope ->
+                repeat(numberOfPeopleForEachSubScope) {
+                    fakePeople.add(
+                        getRandomPerson(
+                            UUID.randomUUID().toString(),
+                            subScope.projectId,
+                            subScope.userId ?: "",
+                            subScope.moduleId ?: "",
+                            toSync.takeRandom()))
+                }
+            }
+        }
 
     fun getRandomPeople(numberOfPeople: Int,
                         projectId: String = UUID.randomUUID().toString(),
                         userId: String = UUID.randomUUID().toString(),
                         moduleId: String = UUID.randomUUID().toString(),
-                        toSync: Boolean = false): ArrayList<rl_Person> {
+                        toSync: Boolean = false): ArrayList<Person> {
 
-        return arrayListOf<rl_Person>().also { list ->
-            (0 until numberOfPeople).forEach {
+        return arrayListOf<Person>().also { list ->
+            repeat(numberOfPeople) {
                 list.add(getRandomPerson(
                     UUID.randomUUID().toString(),
                     projectId,
@@ -31,8 +49,8 @@ object PeopleGeneratorUtils {
                         userId: String = UUID.randomUUID().toString(),
                         moduleId: String = UUID.randomUUID().toString(),
                         toSync: Boolean = false,
-                        fingerprints: Array<rl_Fingerprint> = arrayOf(getRandomFingerprint(), getRandomFingerprint())): rl_Person =
-        rl_Person(
+                        fingerprints: Array<Fingerprint> = arrayOf(getRandomFingerprint(), getRandomFingerprint())): Person =
+        Person(
             patientId = patientId,
             projectId = projectId,
             userId = userId,
@@ -40,17 +58,13 @@ object PeopleGeneratorUtils {
             createdAt = if (!toSync) getRandomTime() else null,
             updatedAt = if (!toSync) getRandomTime() else null,
             toSync = toSync,
-            fingerprints = fingerprints.toList().toRealmList()
+            fingerprints = fingerprints.toList()
         )
 
 
-    fun getRandomFingerprint(): rl_Fingerprint {
-        val fingerprint: Fingerprint = Fingerprint.generateRandomFingerprint()
-        return rl_Fingerprint(
-            fingerprint.fingerId.ordinal,
-            fingerprint.templateBytes,
-            50
-        )
+    fun getRandomFingerprint(): Fingerprint {
+        val commonFingerprint = com.simprints.libcommon.Fingerprint.generateRandomFingerprint()
+        return Fingerprint(commonFingerprint.fingerId.ordinal, commonFingerprint.templateBytes, 50)
     }
 
     private fun getRandomTime(minutesOffset: Int = 60): Date {
@@ -58,4 +72,7 @@ object PeopleGeneratorUtils {
             add(Calendar.MINUTE, (Math.random() * minutesOffset).toInt())
         }.time
     }
+
+    private fun <T> List<T>.takeRandom(): T =
+        this[random.nextInt(this.size)]
 }

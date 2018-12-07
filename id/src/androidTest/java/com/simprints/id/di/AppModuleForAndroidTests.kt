@@ -22,7 +22,9 @@ open class AppModuleForAndroidTests(app: Application,
                                     override var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
                                     override var simNetworkUtilsRule: DependencyRule = RealRule,
                                     override var secureApiInterfaceRule: DependencyRule = RealRule,
-                                    override var scannerManagerRule: DependencyRule = RealRule) : AppModuleForAnyTests(
+                                    override var scannerManagerRule: DependencyRule = RealRule,
+                                    override var syncScopesBuilderRule: DependencyRule = RealRule,
+                                    override var syncSchedulerHelperRule: DependencyRule = RealRule) : AppModuleForAnyTests(
     app,
     localDbManagerRule = localDbManagerRule,
     remoteDbManagerRule = remoteDbManagerRule,
@@ -40,5 +42,7 @@ open class AppModuleForAndroidTests(app: Application,
     scheduledSessionsSyncManagerRule = scheduledSessionsSyncManagerRule,
     simNetworkUtilsRule = simNetworkUtilsRule,
     secureApiInterfaceRule = secureApiInterfaceRule,
-    scannerManagerRule = scannerManagerRule
+    scannerManagerRule = scannerManagerRule,
+    syncScopesBuilderRule = syncScopesBuilderRule,
+    syncSchedulerHelperRule = syncSchedulerHelperRule
 )
