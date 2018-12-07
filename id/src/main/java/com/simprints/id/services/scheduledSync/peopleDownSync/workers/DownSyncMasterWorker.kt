@@ -71,7 +71,6 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
     private fun buildSubDownSyncWorker(subSyncScope: SubSyncScope): OneTimeWorkRequest {
         val data: Data = workDataOf(SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope))
 
-        //STOPSHIP: Think about putting the Network.CONNECTED constraint
         return OneTimeWorkRequestBuilder<SubDownSyncWorker>()
             .setInputData(data)
             .addTag(getDownSyncWorkerKeyForScope(subSyncScope))
