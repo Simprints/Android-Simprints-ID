@@ -17,9 +17,9 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 class DashboardPresenter(private val view: DashboardContract.View,
                          val component: AppComponent) : DashboardContract.Presenter {
@@ -63,12 +63,13 @@ class DashboardPresenter(private val view: DashboardContract.View,
                         addCard(dashboardCard)
                     }
                 }
-        )
-        .subscribeOn(AndroidSchedulers.mainThread())
+        ).subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribeBy(
             onComplete = { handleCardsCreated() },
-            onError = { handleCardsCreationFailed() })
+            onError = {
+                handleCardsCreationFailed()
+            })
     }
 
     private fun handleCardsCreated() {
@@ -113,7 +114,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override fun logout() {
         // STOPSHIP : please god remove this
-        syncScopeBuilder.buildSyncScope()?.let {
+        syncScopeBuilder.buildSyncScope().let {
             dbManager.local.deletePeopleFromLocal(it).blockingAwait()
             doAsync {
                 syncStatusDatabase.downSyncDao.lolDelete()

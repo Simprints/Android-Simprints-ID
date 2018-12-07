@@ -24,7 +24,8 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager
-import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.shared.DependencyRule.MockRule
+import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.liveData.testObserver
@@ -67,7 +68,8 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     private val downSyncDao by lazy { syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData() }
     private val upSyncDao by lazy { syncStatusDatabase.upSyncDao.getUpSyncStatus() }
     private val syncScope by lazy { syncSCopeBuilder.buildSyncScope() }
-    private val subSyncScopes by lazy { syncScope!!.toSubSyncScopes() }
+    private val subSyncScopes by lazy { syncScope.toSubSyncScopes() }
+    private lateinit var dashboardCardViewModel: DashboardSyncCardViewModel
 
     override var preferencesModule by lazyVar {
         PreferencesModuleForAnyTests(
@@ -82,7 +84,6 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
             localDbManagerRule = MockRule)
     }
 
-    private lateinit var dashboardCardViewModel: DashboardSyncCardViewModel
 
     @Before
     override fun setUp() {
@@ -137,7 +138,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         val lastState = vm.observedValues.last()
 
         Truth.assert_().that(lastState?.peopleToDownload).isEqualTo(100)
-        verify(dbManagerMock, times(0)).calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull())
+        verifyCalculateNPatientsToDownSyncWasCalled(0)
     }
 
     @Test
@@ -200,9 +201,9 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
 
         vm.observedValues.last()
 
-        verify(localDbManagerMock, times(requiredCallsToInitTotalCounter)).getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
-        verify(dbManagerMock, times(requiredCallToInitAndUpdateUpSyncCounter)).getPeopleCountFromLocalForSyncGroup(anyNotNull())
-        verify(dbManagerMock, times(0)).calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull())
+        verifyGetPeopleCountFromLocalWasCalled(requiredCallsToInitTotalCounter)
+        verifyGetPeopleCountFromLocalForSyncScopeWasCalled(requiredCallToInitAndUpdateUpSyncCounter)
+        verifyCalculateNPatientsToDownSyncWasCalled(0)
     }
 
     @Test
@@ -220,8 +221,8 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
 
         val lastState = vm.observedValues.last()
 
-        verify(localDbManagerMock, times(requiredCallsToInitTotalCounter)).getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
-        verify(dbManagerMock, times(requiredCallToInitUpSyncCounter)).getPeopleCountFromLocalForSyncGroup(anyNotNull())
+        verifyGetPeopleCountFromLocalWasCalled(requiredCallsToInitTotalCounter)
+        verifyGetPeopleCountFromLocalForSyncScopeWasCalled(requiredCallToInitUpSyncCounter)
         Truth.assert_().that(lastState?.peopleToDownload).isEqualTo(50)
     }
 
@@ -257,7 +258,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         }
 
         peopleInDb?.let {
-            whenever(dbManagerMock.getPeopleCountFromLocalForSyncGroup(anyNotNull())).thenReturn(Single.just(peopleInDb))
+            whenever(dbManagerMock.getPeopleCountFromLocalForSyncScope(anyNotNull())).thenReturn(Single.just(peopleInDb))
         }
 
         peopleToDownload?.let {
@@ -286,6 +287,20 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     private fun insertAnUpSyncStatusInDb(upSyncStatus: UpSyncStatus) {
         syncStatusDatabase.upSyncDao.insertLastUpSyncTime(upSyncStatus)
     }
+
+    private fun verifyGetPeopleCountFromLocalWasCalled(requiredCallsToInitTotalCounter: Int) {
+        verify(localDbManagerMock, times(requiredCallsToInitTotalCounter)).getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+    }
+
+    private fun verifyCalculateNPatientsToDownSyncWasCalled(times: Int) {
+        verify(dbManagerMock, times(times)).calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull())
+
+    }
+
+    private fun verifyGetPeopleCountFromLocalForSyncScopeWasCalled(requiredCallToInitAndUpdateUpSyncCounter: Int) {
+        verify(dbManagerMock, times(requiredCallToInitAndUpdateUpSyncCounter)).getPeopleCountFromLocalForSyncScope(anyNotNull())
+    }
+
 
     @After
     fun cleanUp() {

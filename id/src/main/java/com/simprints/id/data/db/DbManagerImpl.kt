@@ -19,6 +19,7 @@ import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.toLibPerson
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.session.Session
 import com.simprints.id.tools.TimeHelper
@@ -148,7 +149,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
             },
             onError = {
                 remote.downloadPerson(guid, projectId).subscribeBy(
-                    onSuccess = {  fbPerson ->
+                    onSuccess = { fbPerson ->
                         destinationList.add(fbPerson.toDomainPerson().toLibPerson())
                         callback.onSuccess(true)
                     },
@@ -205,20 +206,14 @@ open class DbManagerImpl(override val local: LocalDbManager,
             }
         }
 
-    private fun sumCountsForEachModule(moduleIds: Set<String>): Single<Int> =
-        Single.merge(moduleIds.map {
-            local.getPeopleCountFromLocal(moduleId =  it, toSync = false)
-        }).toList().map { it.sum() }
-
-    override fun getPeopleCountFromLocalForSyncGroup(group: Constants.GROUP): Single<Int> =
-        when (group) {
-            Constants.GROUP.GLOBAL ->
-                local.getPeopleCountFromLocal()
-            Constants.GROUP.USER ->
-                local.getPeopleCountFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
-            Constants.GROUP.MODULE ->
-                sumCountsForEachModule(preferencesManager.selectedModules)
-        }
+    override fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<Int> =
+        Single.just(
+            syncScope.toSubSyncScopes().map {
+                local.getPeopleCountFromLocal(
+                    userId = it.userId,
+                    moduleId = it.moduleId).blockingGet()
+            }.sum()
+        )
 
     override fun saveIdentification(probe: LibPerson, matchSize: Int, matches: List<Identification>) {
         preferencesManager.lastIdentificationDate = Date()
