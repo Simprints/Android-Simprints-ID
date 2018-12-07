@@ -1,5 +1,6 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.google.common.truth.Truth.assertThat
@@ -25,11 +26,10 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsMasterTaskTest: RxJavaTest, DaggerForTests() {
 

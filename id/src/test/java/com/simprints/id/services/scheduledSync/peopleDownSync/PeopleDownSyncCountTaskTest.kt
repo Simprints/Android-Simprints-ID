@@ -1,5 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.db.DbManager
@@ -21,11 +23,9 @@ import io.reactivex.observers.TestObserver
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class PeopleDownSyncCountTaskTest : RxJavaTest {
 
@@ -37,7 +37,7 @@ class PeopleDownSyncCountTaskTest : RxJavaTest {
 
     @Before
     fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
+        FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
     }
 
     @Test

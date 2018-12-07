@@ -1,8 +1,13 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.worker
 
 import android.content.Context
-import androidx.work.*
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.ListenableWorker
+import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.google.firebase.FirebaseApp
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
@@ -11,6 +16,8 @@ import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
@@ -18,34 +25,29 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncSc
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
-import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.mock
 import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Completable
-import junit.framework.Assert.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
-import timber.log.Timber
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SubDownSyncWorkerTest: DaggerForTests() {
 
     @Inject lateinit var context: Context
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
-    @Inject lateinit var downSyncTask: DownSyncTask
-    @Inject lateinit var analyticsManager: AnalyticsManager
-
+    @Inject lateinit var analyticsManagerMock: AnalyticsManager
     @Mock lateinit var workParams: WorkerParameters
 
     private lateinit var subDownSyncWorker: SubDownSyncWorker
@@ -55,6 +57,13 @@ class SubDownSyncWorkerTest: DaggerForTests() {
 
     override var module: AppModuleForTests by lazyVar {
         object: AppModuleForTests(app) {
+            override fun provideAnalyticsManager(loginInfoManager: LoginInfoManager, preferencesManager: PreferencesManager, firebaseAnalytics: FirebaseAnalytics): AnalyticsManager {
+                return mock()
+            }
+
+            override fun provideLocalDbManager(ctx: Context): LocalDbManager {
+                return mock()
+            }
             override fun provideDownSyncTask(localDbManager: LocalDbManager,
                                              remoteDbManager: RemoteDbManager,
                                              timeHelper: TimeHelper,
@@ -66,17 +75,15 @@ class SubDownSyncWorkerTest: DaggerForTests() {
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
-        try {
-            WorkManager.initialize(app, Configuration.Builder().build())
-        } catch (e: IllegalStateException) {
-            Timber.d("WorkManager already initialized")
-        }
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
+        initWorkManagerIfRequired(app)
+
         super.setUp()
         testAppComponent.inject(this)
 
         MockitoAnnotations.initMocks(this)
+        whenever(mockDownSyncTask.execute(any())).thenReturn(Completable.complete())
         subDownSyncWorker = SubDownSyncWorker(context, workParams)
     }
 
@@ -85,35 +92,23 @@ class SubDownSyncWorkerTest: DaggerForTests() {
         whenever(workParams.inputData).thenReturn(workDataOf(
             SubDownSyncWorker.SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT to syncScopesBuilder.fromSubSyncScopeToJson(subSyncScope),
             subSyncScope.uniqueKey to intArrayOf(5)))
-        whenever(downSyncTask.execute(anyNotNull())).thenReturn(Completable.complete())
         val result = subDownSyncWorker.doWork()
 
-        verify(downSyncTask, times(1)).execute(anyNotNull())
+        verify(mockDownSyncTask, times(1)).execute(anyNotNull())
         assertEquals(ListenableWorker.Result.SUCCESS, result)
     }
 
     @Test
-    fun executeWorkerWithZeroCount_shouldSucceed() {
-        whenever(workParams.inputData).thenReturn(workDataOf(
-            SubDownSyncWorker.SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT to syncScopesBuilder.fromSubSyncScopeToJson(subSyncScope),
-            subSyncScope.uniqueKey to intArrayOf(0)))
-        whenever(downSyncTask.execute(anyNotNull())).thenReturn(Completable.complete())
-        val result = subDownSyncWorker.doWork()
-
-        verify(downSyncTask, times(0)).execute(anyNotNull())
-        assertEquals(ListenableWorker.Result.SUCCESS, result)
-    }
-
-    @Test
-    fun executeWorkerWithInvalidValue_shouldFail() {
+    fun tasksFails_shouldFail() {
         whenever(workParams.inputData).thenReturn(workDataOf(
             SubDownSyncWorker.SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT to syncScopesBuilder.fromSubSyncScopeToJson(subSyncScope),
             subSyncScope.uniqueKey to intArrayOf(-1)))
-        whenever(downSyncTask.execute(anyNotNull())).thenReturn(Completable.complete())
+
+        whenever(mockDownSyncTask.execute(any())).thenReturn(Completable.error(Throwable("some_error")))
         val result = subDownSyncWorker.doWork()
 
-        verify(downSyncTask, times(0)).execute(anyNotNull())
-        verify(analyticsManager, times(1)).logThrowable(any())
+        verify(mockDownSyncTask, times(1)).execute(anyNotNull())
+        verify(analyticsManagerMock, times(1)).logThrowable(any())
         assertEquals(ListenableWorker.Result.FAILURE, result)
     }
 }

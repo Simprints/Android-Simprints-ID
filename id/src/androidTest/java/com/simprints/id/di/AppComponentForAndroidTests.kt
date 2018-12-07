@@ -27,6 +27,6 @@ interface AppComponentForAndroidTests : AppComponent {
     fun inject(guidSelectionServiceTest: GuidSelectionServiceTest)
     fun inject(launchActivityAndroidTest: LaunchActivityAndroidTest)
     fun inject(localSessionEventsManagerImplTest: RealmSessionEventsDbManagerImplTest)
-    fun inject(sessionEventsUploaderTaskEndToEndTest: SessionEventsUploaderTaskEndToEndTest)
     fun inject(dashboardActivityAndroidTest: DashboardActivityAndroidTest)
+    fun inject(sessionEventsUploaderTaskEndToEndTest: SessionEventsUploaderTaskEndToEndTest)
 }

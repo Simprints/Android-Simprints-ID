@@ -7,9 +7,9 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 
-class SyncScopesBuilderImpl(val loginInfoManager: LoginInfoManager,
-                            val preferencesManager: PreferencesManager,
-                            val gson: Gson = Gson()) : SyncScopesBuilder {
+open class SyncScopesBuilderImpl(val loginInfoManager: LoginInfoManager,
+                                 val preferencesManager: PreferencesManager,
+                                 val gson: Gson = Gson()) : SyncScopesBuilder {
 
     override fun fromJsonToSyncScope(json: String): SyncScope? = fromJson(json)
     override fun fromSyncScopeToJson(syncScope: SyncScope): String? = toJson(syncScope)

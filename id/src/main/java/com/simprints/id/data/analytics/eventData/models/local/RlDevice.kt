@@ -14,7 +14,7 @@ open class RlDevice : RealmObject {
     var deviceModel: String = Build.MANUFACTURER + "_" + Build.MODEL
     var deviceId: String = ""
 
-    constructor() {}
+    constructor()
     constructor(device: Device): this() {
         id = device.id
         androidSdkVersion = device.androidSdkVersion

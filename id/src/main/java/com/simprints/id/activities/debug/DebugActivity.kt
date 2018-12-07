@@ -13,20 +13,13 @@ import com.simprints.id.activities.debug.RoomDownStatusRecycleViewAdapter
 import com.simprints.id.activities.debug.RoomDownStatusViewModel
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
-import com.simprints.id.data.db.local.room.getStatusId
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import kotlinx.android.synthetic.main.activity_debug.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.jetbrains.anko.custom.async
-import org.jetbrains.anko.doAsync
-import java.text.DateFormat
-import java.util.*
 import javax.inject.Inject
 
 class DebugActivity : AppCompatActivity() {

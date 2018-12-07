@@ -1,5 +1,7 @@
 package com.simprints.id.activities
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -15,18 +17,17 @@ import com.simprints.id.shared.mockSettingsPreferencesManager
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.createRoboLaunchActivity
+import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
-import junit.framework.Assert
+import junit.framework.TestCase.assertEquals
 import kotlinx.android.synthetic.main.activity_launch.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
@@ -51,8 +52,10 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
+        initWorkManagerIfRequired(app)
+
         super.setUp()
         testAppComponent.inject(this)
     }
@@ -69,10 +72,10 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity, calloutAction, PROGRAM_NAME, ORGANIZATION_NAME)
-        Assert.assertEquals(defaultGeneralConsentText, generalConsentText)
+        assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
-        Assert.assertEquals("", parentConsentText)
+        assertEquals("", parentConsentText)
     }
 
     @Test
@@ -87,10 +90,10 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity, calloutAction, PROGRAM_NAME, ORGANIZATION_NAME)
-        Assert.assertEquals(defaultGeneralConsentText, generalConsentText)
+        assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
-        Assert.assertEquals("", parentConsentText)
+        assertEquals("", parentConsentText)
     }
 
     @Test
@@ -105,11 +108,11 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity, calloutAction, PROGRAM_NAME, ORGANIZATION_NAME)
-        Assert.assertEquals(defaultGeneralConsentText, generalConsentText)
+        assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
         val defaultParentalConsentText = ParentalConsent().assembleText(activity, calloutAction, PROGRAM_NAME, ORGANIZATION_NAME)
-        Assert.assertEquals(defaultParentalConsentText, parentConsentText)
+        assertEquals(defaultParentalConsentText, parentConsentText)
     }
 
     @Test
@@ -124,11 +127,11 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity, calloutAction, PROGRAM_NAME, ORGANIZATION_NAME)
-        Assert.assertEquals(defaultGeneralConsentText, generalConsentText)
+        assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
         val defaultParentalConsentText = ParentalConsent().assembleText(activity, calloutAction, PROGRAM_NAME, ORGANIZATION_NAME)
-        Assert.assertEquals(defaultParentalConsentText, parentConsentText)
+        assertEquals(defaultParentalConsentText, parentConsentText)
     }
 
     @Test
@@ -143,7 +146,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity, calloutAction, PROGRAM_NAME, ORGANIZATION_NAME)
-        Assert.assertEquals(defaultGeneralConsentText, generalConsentText)
+        assertEquals(defaultGeneralConsentText, generalConsentText)
     }
 
     @Test
@@ -158,7 +161,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val targetConsentText = EXTRA_UNRECOGNISED_CONSENT_TARGET.assembleText(activity, calloutAction, PROGRAM_NAME, ORGANIZATION_NAME)
-        Assert.assertEquals(targetConsentText, generalConsentText)
+        assertEquals(targetConsentText, generalConsentText)
     }
 
     @Test
@@ -173,7 +176,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val targetConsentText = PARTIALLY_MISSING_CONSENT_TARGET.assembleText(activity, calloutAction, PROGRAM_NAME, ORGANIZATION_NAME)
-        Assert.assertEquals(targetConsentText, generalConsentText)
+        assertEquals(targetConsentText, generalConsentText)
     }
 
     private fun mockSettingsPreferencesManagerForLaunchAct(parentalConsentExists: Boolean = false,

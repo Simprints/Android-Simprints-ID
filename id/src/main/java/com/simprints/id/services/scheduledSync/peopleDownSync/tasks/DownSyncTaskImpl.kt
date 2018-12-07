@@ -1,6 +1,5 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
-import androidx.work.ListenableWorker
 import com.google.gson.stream.JsonReader
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncDao
@@ -22,7 +21,6 @@ import okhttp3.ResponseBody
 import timber.log.Timber
 import java.io.InputStreamReader
 import java.io.Reader
-import java.lang.Exception
 import java.util.*
 
 class DownSyncTaskImpl(val localDbManager: LocalDbManager,
@@ -149,11 +147,11 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
             downSyncDao.insertOrReplaceDownSyncStatus(newDownSyncStatus)
             localDbManager.deleteSyncInfo(subSyncScope)
             newDownSyncStatus
-        } catch (e: Exception) {
-            if(e is NoSuchRlSessionInfoException) {
+        } catch (t: Throwable) {
+            if (t is NoSuchRlSessionInfoException) {
                 Timber.e("No such realm session info")
             } else {
-                e.printStackTrace()
+                t.printStackTrace()
             }
             null
         }

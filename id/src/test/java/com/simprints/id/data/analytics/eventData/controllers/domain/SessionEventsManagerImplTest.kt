@@ -1,5 +1,6 @@
 package com.simprints.id.data.analytics.eventData.controllers.domain
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.spy
@@ -22,17 +23,16 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import io.reactivex.Completable
 import io.reactivex.Single
-import junit.framework.Assert.assertNotNull
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.times
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsManagerImplTest {
 

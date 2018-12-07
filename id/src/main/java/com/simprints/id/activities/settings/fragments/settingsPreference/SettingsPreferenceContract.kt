@@ -44,7 +44,5 @@ interface SettingsPreferenceContract {
         fun showToastForInvalidSelectionOfFingers()
     }
 
-    interface Presenter: BasePresenter {
-
-    }
+    interface Presenter : BasePresenter
 }

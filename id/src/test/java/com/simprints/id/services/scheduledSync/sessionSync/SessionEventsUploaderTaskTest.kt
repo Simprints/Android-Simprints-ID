@@ -1,5 +1,6 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonObject
 import com.nhaarman.mockito_kotlin.anyOrNull
@@ -33,12 +34,11 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 import java.util.concurrent.TimeUnit
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
 
