@@ -27,7 +27,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class PeopleDownSyncCountTaskTest : RxJavaTest {
+class CountTaskTest : RxJavaTest {
 
     private val remoteDbManagerMock: RemoteDbManager = mock()
     private val localDbManagerMock: LocalDbManager = mock()

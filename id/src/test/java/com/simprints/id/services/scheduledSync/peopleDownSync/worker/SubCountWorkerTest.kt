@@ -3,7 +3,9 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.worker
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.*
+import androidx.work.ListenableWorker
+import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.google.common.truth.Truth
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.any
@@ -25,6 +27,7 @@ import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.mock
 import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
 import org.junit.Assert.assertEquals
@@ -34,7 +37,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
-import timber.log.Timber
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
@@ -66,11 +68,7 @@ class SubCountWorkerTest: DaggerForTests() {
     override fun setUp() {
         app = ApplicationProvider.getApplicationContext()
         FirebaseApp.initializeApp(app)
-        try {
-            WorkManager.initialize(app, Configuration.Builder().build())
-        } catch (e: IllegalStateException) {
-            Timber.d("WorkManager already initialized")
-        }
+        initWorkManagerIfRequired(app)
         super.setUp()
         testAppComponent.inject(this)
         MockitoAnnotations.initMocks(this)

@@ -11,7 +11,6 @@ import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.exceptions.safe.sync.InterruptedSyncException
-import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
@@ -27,7 +26,7 @@ import java.util.*
 class DownSyncTaskImpl(val localDbManager: LocalDbManager,
                        val remoteDbManager: RemoteDbManager,
                        val timeHelper: TimeHelper,
-                       syncStatusDatabase: SyncStatusDatabase) : DownSyncTask {
+                       private val downSyncDao: DownSyncDao) : DownSyncTask {
 
     lateinit var subSyncScope: SubSyncScope
 
@@ -37,8 +36,6 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
         get() = subSyncScope.userId
     val moduleId
         get() = subSyncScope.moduleId
-
-    var downSyncDao: DownSyncDao = syncStatusDatabase.downSyncDao
 
     private var reader: JsonReader? = null
 
@@ -152,7 +149,7 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
             if (t is NoSuchRlSessionInfoException) {
                 Timber.e("No such realm session info")
             } else {
-                t.printStackTrace()
+                Timber.e(t)
             }
             null
         }

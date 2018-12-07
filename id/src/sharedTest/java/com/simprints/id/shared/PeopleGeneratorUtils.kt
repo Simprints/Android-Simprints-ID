@@ -2,6 +2,7 @@ package com.simprints.id.shared
 
 import com.simprints.id.domain.Fingerprint
 import com.simprints.id.domain.Person
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import java.util.*
 
@@ -9,20 +10,28 @@ object PeopleGeneratorUtils {
 
     private val random = Random()
 
+    fun getRandomPeople(nPeople: Int,
+                        subSyncScope: SubSyncScope,
+                        toSync: List<Boolean>): MutableList<Person> =
+        mutableListOf<Person>().also { fakePeople ->
+            repeat(nPeople) {
+                fakePeople.add(
+                    getRandomPerson(
+                        UUID.randomUUID().toString(),
+                        subSyncScope.projectId,
+                        subSyncScope.userId ?: "",
+                        subSyncScope.moduleId ?: "",
+                        toSync.takeRandom()))
+            }
+        }
+
+
     fun getRandomPeople(numberOfPeopleForEachSubScope: Int,
                         syncScope: SyncScope,
                         toSync: List<Boolean>): MutableList<Person> =
         mutableListOf<Person>().also { fakePeople ->
             syncScope.toSubSyncScopes().forEach { subScope ->
-                repeat(numberOfPeopleForEachSubScope) {
-                    fakePeople.add(
-                        getRandomPerson(
-                            UUID.randomUUID().toString(),
-                            subScope.projectId,
-                            subScope.userId ?: "",
-                            subScope.moduleId ?: "",
-                            toSync.takeRandom()))
-                }
+                fakePeople.addAll(getRandomPeople(numberOfPeopleForEachSubScope, subScope, toSync))
             }
         }
 
@@ -49,14 +58,16 @@ object PeopleGeneratorUtils {
                         userId: String = UUID.randomUUID().toString(),
                         moduleId: String = UUID.randomUUID().toString(),
                         toSync: Boolean = false,
+                        createdAt: Date = getRandomTime(),
+                        updateAt: Date = getRandomTime(),
                         fingerprints: Array<Fingerprint> = arrayOf(getRandomFingerprint(), getRandomFingerprint())): Person =
         Person(
             patientId = patientId,
             projectId = projectId,
             userId = userId,
             moduleId = moduleId,
-            createdAt = if (!toSync) getRandomTime() else null,
-            updatedAt = if (!toSync) getRandomTime() else null,
+            createdAt = if (!toSync) createdAt else null,
+            updatedAt = if (!toSync) updateAt else null,
             toSync = toSync,
             fingerprints = fingerprints.toList()
         )

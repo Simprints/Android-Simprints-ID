@@ -228,5 +228,5 @@ open class AppModule(val app: Application) {
     open fun provideDownSyncTask(localDbManager: LocalDbManager,
                                  remoteDbManager: RemoteDbManager,
                                  timeHelper: TimeHelper,
-                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(localDbManager, remoteDbManager, timeHelper, syncStatusDatabase)
+                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(localDbManager, remoteDbManager, timeHelper, syncStatusDatabase.downSyncDao)
 }
