@@ -1,5 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.*
 import com.simprints.id.activities.ShadowAndroidXMultiDex
@@ -35,14 +37,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import kotlin.math.ceil
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class PeopleDownSyncTaskTest : RxJavaTest {
+class SubDownSyncTaskTest : RxJavaTest {
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
@@ -55,7 +55,7 @@ class PeopleDownSyncTaskTest : RxJavaTest {
 
     @Before
     fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
+        FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
 
         whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just(""))
 
@@ -117,7 +117,6 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         val testObserver = makeFakeDownloadRequest(peopleToDownload, localDbMock, subSyncScope)
         testObserver.awaitTerminalEvent()
         testObserver.assertNoErrors()
-        testObserver.assertError { true }
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
         assertPathUrlParam(peopleRequestUrl, projectIdTest)
@@ -166,6 +165,7 @@ class PeopleDownSyncTaskTest : RxJavaTest {
         whenever(syncStatusDatabaseModel.getDownSyncStatusForId(anyString())).doReturn(DownSyncStatus(subSyncScope.projectId, totalToDownload = peopleToDownload.size))
         doNothing().whenever(syncStatusDatabaseModel).updateLastSyncTime(anyString(), anyLong())
         doNothing().whenever(syncStatusDatabaseModel).updatePeopleToDownSync(anyString(), anyInt())
+        whenever(localDbMock.getRlSyncInfo(anyNotNull())).thenReturn(Single.error(Throwable("no RlInfo")))
 
         val sync = DownSyncTaskImpl(localDbMock, remoteDbManagerSpy, TimeHelperImpl(), syncStatusDatabase)
         return sync.execute(subSyncScope).test()
@@ -190,6 +190,7 @@ class PeopleDownSyncTaskTest : RxJavaTest {
 
     private fun calculateCorrectNumberOfBatches(nPeopleToDownload: Int) =
         ceil(nPeopleToDownload.toDouble() / DownSyncTaskImpl.BATCH_SIZE_FOR_DOWNLOADING.toDouble()).toInt()
+
 
     @After
     @Throws

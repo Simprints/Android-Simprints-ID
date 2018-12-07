@@ -38,6 +38,7 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
             outputData = Data.Builder().putInt(key, totalCount.toInt()).build()
             Result.SUCCESS
         } catch (e: Throwable) {
+            e.printStackTrace()
             analyticsManager.logThrowable(e)
             Result.SUCCESS
         }.also {

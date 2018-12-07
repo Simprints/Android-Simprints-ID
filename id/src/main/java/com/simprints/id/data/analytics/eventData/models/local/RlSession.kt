@@ -25,7 +25,7 @@ open class RlSession : RealmObject {
     var location: RlLocation? = null
     var analyticsId: String? = null
 
-    constructor() {}
+    constructor()
 
     constructor(sessionEvents: SessionEvents) : this() {
         this.id = sessionEvents.id

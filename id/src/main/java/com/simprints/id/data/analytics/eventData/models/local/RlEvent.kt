@@ -21,7 +21,7 @@ open class RlEvent : RealmObject {
 
     fun getType(): EventType? = typeEventDescription?.let { valueOf(it) }
 
-    constructor() {}
+    constructor()
     constructor(event: Event) : this() {
         saveType(event.type)
         id = event.id

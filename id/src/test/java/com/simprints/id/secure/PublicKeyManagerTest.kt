@@ -1,12 +1,13 @@
 package com.simprints.id.secure
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
+import com.simprints.id.shared.givenNetworkFailurePercentIs
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.retrofit.FakeResponseInterceptor
-import com.simprints.id.shared.givenNetworkFailurePercentIs
 import com.simprints.id.testUtils.roboletric.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
@@ -15,14 +16,13 @@ import okhttp3.OkHttpClient
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Retrofit
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 import java.io.IOException
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class PublicKeyManagerTest : RxJavaTest {
 

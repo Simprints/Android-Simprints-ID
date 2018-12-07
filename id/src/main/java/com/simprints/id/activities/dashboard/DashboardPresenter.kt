@@ -18,7 +18,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import org.jetbrains.anko.doAsync
 import javax.inject.Inject
 
 class DashboardPresenter(private val view: DashboardContract.View,
@@ -113,17 +112,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun logout() {
-        // STOPSHIP : please god remove this
-        syncScopeBuilder.buildSyncScope().let {
-            dbManager.local.deletePeopleFromLocal(it).blockingAwait()
-            doAsync {
-                syncStatusDatabase.downSyncDao.lolDelete()
-            }
-        }
-
-//        dbManager.signOut()
-//        cancelAllDownSyncWorkers()
-//        sessionEventManager.signOut()
+        dbManager.signOut()
+        cancelAllDownSyncWorkers()
+        sessionEventManager.signOut()
     }
 
     override fun userDidWantToLogout() {

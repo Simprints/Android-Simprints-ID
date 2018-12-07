@@ -1,5 +1,7 @@
 package com.simprints.id.secure
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.verify
@@ -29,13 +31,11 @@ import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.io.IOException
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
 
@@ -65,8 +65,8 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
         super.setUp()
         testAppComponent.inject(this)
 

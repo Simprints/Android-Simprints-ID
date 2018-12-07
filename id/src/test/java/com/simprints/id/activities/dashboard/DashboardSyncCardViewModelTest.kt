@@ -2,6 +2,8 @@ package com.simprints.id.activities.dashboard
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkInfo
 import androidx.work.workDataOf
 import com.google.common.truth.Truth
@@ -36,20 +38,17 @@ import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
 
@@ -87,8 +86,8 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
         super.setUp()
         testAppComponent.inject(this)
         initWorkManagerIfRequired(app)
@@ -299,11 +298,5 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
 
     private fun verifyGetPeopleCountFromLocalForSyncScopeWasCalled(requiredCallToInitAndUpdateUpSyncCounter: Int) {
         verify(dbManagerMock, times(requiredCallToInitAndUpdateUpSyncCounter)).getPeopleCountFromLocalForSyncScope(anyNotNull())
-    }
-
-
-    @After
-    fun cleanUp() {
-        dashboardCardViewModel.stopObservers()
     }
 }
