@@ -113,7 +113,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     override fun logout() {
         dbManager.signOut()
-        cancelAllDownSyncWorkers()
+        syncSchedulerHelper.cancelDownSyncWorkers()
         sessionEventManager.signOut()
     }
 
@@ -130,8 +130,4 @@ class DashboardPresenter(private val view: DashboardContract.View,
     private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
         dashboardSyncCardViewModel.viewModelState.peopleToUpload?.let { it > 0 } ?: false ||
             dashboardSyncCardViewModel.viewModelState.peopleToDownload?.let { it > 0 } ?: false
-
-    private fun cancelAllDownSyncWorkers() {
-        syncSchedulerHelper.cancelDownSyncWorkers()
-    }
 }

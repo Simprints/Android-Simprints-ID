@@ -83,8 +83,9 @@ open class AppModuleForAnyTests(app: Application,
                                   preferencesManager: PreferencesManager,
                                   sessionEventsManager: SessionEventsManager,
                                   timeHelper: TimeHelper,
-                                  peopleUpSyncMaster: PeopleUpSyncMaster): DbManager =
-        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper, peopleUpSyncMaster) }
+                                  peopleUpSyncMaster: PeopleUpSyncMaster,
+                                  database: SyncStatusDatabase): DbManager =
+        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper, peopleUpSyncMaster, database) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,

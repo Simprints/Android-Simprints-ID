@@ -66,7 +66,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     private val workInfoLiveData: MutableLiveData<MutableList<WorkInfo>> = MutableLiveData()
     private val downSyncDao by lazy { syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData() }
     private val upSyncDao by lazy { syncStatusDatabase.upSyncDao.getUpSyncStatus() }
-    private val syncScope by lazy { syncSCopeBuilder.buildSyncScope() }
+    private val syncScope by lazy { syncSCopeBuilder.buildSyncScope()!! }
     private val subSyncScopes by lazy { syncScope.toSubSyncScopes() }
     private lateinit var dashboardCardViewModel: DashboardSyncCardViewModel
 

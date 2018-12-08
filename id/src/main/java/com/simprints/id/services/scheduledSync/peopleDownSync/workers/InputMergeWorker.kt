@@ -50,7 +50,7 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
     private fun prepareInputForTask(): Map<SubSyncScope, Int> {
         val inputForTask = mutableMapOf<SubSyncScope, Int>()
         val scope = syncScopeBuilder.buildSyncScope()
-        scope.toSubSyncScopes().forEach {
+        scope?.toSubSyncScopes()?.forEach {
             val counter = inputData.getIntArray(it.uniqueKey)?.get(0)
             counter?.let{ counterForSubSync ->
                 inputForTask[it] = counterForSubSync

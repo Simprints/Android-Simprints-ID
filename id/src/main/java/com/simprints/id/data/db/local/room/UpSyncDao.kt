@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.local.room
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -19,4 +18,7 @@ interface UpSyncDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertLastUpSyncTime(upSyncStatus: UpSyncStatus)
+
+    @Query("delete from UpSyncStatus")
+    fun deleteAll()
 }

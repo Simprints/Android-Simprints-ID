@@ -102,8 +102,9 @@ open class AppModule(val app: Application) {
                               preferencesManager: PreferencesManager,
                               sessionEventsManager: SessionEventsManager,
                               timeHelper: TimeHelper,
-                              peopleUpSyncMaster: PeopleUpSyncMaster): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper, peopleUpSyncMaster)
+                              peopleUpSyncMaster: PeopleUpSyncMaster,
+                              database: SyncStatusDatabase): DbManager =
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper, peopleUpSyncMaster, database)
 
     @Provides
     @Singleton

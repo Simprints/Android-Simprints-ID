@@ -40,7 +40,7 @@ interface DownSyncDao {
     fun deleteDownSyncStatus(downSyncStatusId: String)
 
     @Query("delete from DownSyncStatus")
-    fun lolDelete()
+    fun deleteAll()
 }
 fun DownSyncDao.getStatusId(projectId: String, userId: String?, moduleId: String?) = "${projectId}_${userId ?: ""}_${moduleId ?: ""}"
 fun DownSyncDao.getStatusId(subSyncScope: SubSyncScope) = getStatusId(subSyncScope.projectId, subSyncScope.userId, subSyncScope.moduleId)
