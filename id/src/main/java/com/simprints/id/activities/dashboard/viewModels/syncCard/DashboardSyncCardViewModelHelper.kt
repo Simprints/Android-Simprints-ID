@@ -30,7 +30,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     private val state: DashboardSyncCardViewModelState
         get() = viewModel.viewModelState
 
-    private val syncScope: SyncScope
+    private val syncScope: SyncScope?
         get() = syncScopesBuilder.buildSyncScope()
 
     private var latestDownSyncTime: Long? = null
@@ -100,7 +100,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         Completable.fromAction {
             try {
                 var peopleToDownload = 0
-                syncScope.toSubSyncScopes().forEach { it ->
+                syncScope?.toSubSyncScopes()?.forEach { it ->
                     peopleToDownload += dbManager.calculateNPatientsToDownSync(it.projectId, it.userId, it.moduleId).blockingGet()
                 }
                 viewModel.updateState(peopleToDownload = peopleToDownload, emitState = true)
@@ -110,11 +110,13 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         }.subscribeOn(Schedulers.io())
 
     private fun updateTotalLocalCount(): Completable =
-        dbManager.getPeopleCountFromLocalForSyncScope(syncScopeBuilder.buildSyncScope())
-            .flatMapCompletable {
-                viewModel.updateState(peopleInDb = it, emitState = true)
-                Completable.complete()
-            }.subscribeOn(Schedulers.io())
+        syncScopeBuilder.buildSyncScope()?.let {
+            dbManager.getPeopleCountFromLocalForSyncScope(it)
+                .flatMapCompletable {
+                    viewModel.updateState(peopleInDb = it, emitState = true)
+                    Completable.complete()
+                }.subscribeOn(Schedulers.io())
+        } ?: Completable.complete()
 
     private fun updateTotalUpSyncCount(): Completable =
         localDbManager.getPeopleCountFromLocal(toSync = true)
@@ -151,7 +153,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     private fun updateLatestDownSyncTime(downSyncStatuses: List<DownSyncStatus>): String? =
         if (downSyncStatuses.isNotEmpty()) {
             val latestDownSyncTimeForModules: ArrayList<Long> = ArrayList()
-            syncScope.toSubSyncScopes().forEach { subSyncScope ->
+            syncScope?.toSubSyncScopes()?.forEach { subSyncScope ->
                 val downSyncStatusForSubScope = filterDownSyncStatusesBySubSyncScope(subSyncScope, downSyncStatuses)
                 downSyncStatusForSubScope?.lastSyncTime?.let { lastSyncTime -> latestDownSyncTimeForModules.add(lastSyncTime) }
             }
@@ -165,7 +167,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     private fun updateTotalDownSyncCountUsingWorkers(downSyncStatuses: List<DownSyncStatus>): Int? =
         if (downSyncStatuses.isNotEmpty()) {
             var peopleToDownSync = 0
-            syncScope.let {
+            syncScope?.let {
                 it.toSubSyncScopes().forEach { subSyncScope ->
                     peopleToDownSync += filterDownSyncStatusesBySubSyncScope(subSyncScope, downSyncStatuses)?.totalToDownload ?: 0
                 }
@@ -212,3 +214,4 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         }
     }
 }
+

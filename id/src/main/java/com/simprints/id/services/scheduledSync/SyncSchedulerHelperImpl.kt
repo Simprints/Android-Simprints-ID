@@ -32,6 +32,15 @@ class SyncSchedulerHelperImpl(val preferencesManager: PreferencesManager,
         }
     }
 
+    override fun cancelAllWorkers() {
+        cancelDownSyncWorkers()
+        cancelSessionsSyncWorker()
+    }
+
+    override fun cancelSessionsSyncWorker() {
+        sessionEventsSyncManager.cancelSyncWorkers()
+    }
+
     override fun cancelDownSyncWorkers() {
         downSyncManager.dequeueAllSyncWorker()
     }

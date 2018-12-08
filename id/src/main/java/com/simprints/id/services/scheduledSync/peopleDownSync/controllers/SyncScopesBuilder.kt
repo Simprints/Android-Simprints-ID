@@ -10,5 +10,5 @@ interface SyncScopesBuilder {
 
     fun fromJsonToSubSyncScope(json: String): SubSyncScope?
     fun fromSubSyncScopeToJson(syncScope: SubSyncScope): String?
-    fun buildSyncScope(): SyncScope
+    fun buildSyncScope(): SyncScope?
 }

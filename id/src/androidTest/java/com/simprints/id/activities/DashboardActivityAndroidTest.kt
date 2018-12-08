@@ -9,8 +9,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.data.db.local.LocalDbManager
@@ -24,11 +22,9 @@ import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Person
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.PeopleGeneratorUtils
@@ -40,7 +36,6 @@ import com.simprints.id.testTools.models.TestProject
 import com.simprints.id.testTools.remote.RemoteTestingManager
 import com.simprints.id.testTools.tryOnUiUntilTimeout
 import com.simprints.id.testTools.waitOnSystem
-import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import io.realm.Realm
@@ -51,8 +46,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import timber.log.Timber
-import java.util.concurrent.CompletableFuture
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
@@ -77,6 +70,9 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var downSyncManager: DownSyncManager
+
+    private val syncScope
+        get() = syncScopesBuilder.buildSyncScope()!!
 
     override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
         PreferencesModuleForAnyTests(
@@ -110,6 +106,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
         signOut()
 
         mockGlobalScope()
+        downSyncManager.dequeueAllSyncWorker()
     }
 
     @Test
@@ -145,7 +142,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
         }
 
         onView(withId(R.id.dashboardCardSyncUploadText))
-            .check(matches(withText("${peopleInDbForSyncScope(syncScopesBuilder.buildSyncScope(), true)}")))
+            .check(matches(withText("${peopleInDbForSyncScope(syncScope, true)}")))
 
         onView(withId(R.id.dashboardCardSyncTotalLocalText))
             .check(matches(withText("${peopleInDb.size}")))
@@ -178,14 +175,13 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
         tryOnUiUntilTimeout(10000, 200) {
             onView(withId(R.id.dashboardCardSyncDownloadText))
                 .check(matches(Matchers.not(withText(""))))
-                .check(matches(Matchers.not(withText("0"))))
         }
 
         onView(withId(R.id.dashboardCardSyncDownloadText))
-            .check(matches(withText("${peopleOnServer.size - peopleInDbForSyncScope(syncScopesBuilder.buildSyncScope(), false)}")))
+            .check(matches(withText("${peopleOnServer.size - peopleInDbForSyncScope(syncScope, false)}")))
 
         onView(withId(R.id.dashboardCardSyncUploadText))
-            .check(matches(withText("${peopleInDbForSyncScope(syncScopesBuilder.buildSyncScope(), true)}")))
+            .check(matches(withText("${peopleInDbForSyncScope(syncScope, true)}")))
 
         onView(withId(R.id.dashboardCardSyncTotalLocalText))
             .check(matches(withText("${peopleInDb.size}")))
@@ -201,18 +197,18 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     private fun mockGlobalScope(): SyncScope {
         whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(Constants.GROUP.GLOBAL)
-        return syncScopesBuilder.buildSyncScope()
+        return syncScope
     }
 
     private fun mockUserScope(): SyncScope {
         whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(Constants.GROUP.USER)
-        return syncScopesBuilder.buildSyncScope()
+        return syncScope
     }
 
     private fun mockModuleScope(): SyncScope {
         whenever(settingsPreferencesManagerSpy.moduleIdOptions).thenReturn(setOf("module1", "module2", "module3"))
         whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(Constants.GROUP.MODULE)
-        return syncScopesBuilder.buildSyncScope()
+        return syncScope
     }
 
 

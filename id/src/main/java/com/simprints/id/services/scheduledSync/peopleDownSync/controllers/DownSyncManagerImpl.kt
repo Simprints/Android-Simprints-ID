@@ -12,19 +12,16 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMa
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_SYNC_SCOPE_INPUT
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import org.jetbrains.anko.Android
 
 // Class to enqueue and dequeue DownSyncMasterWorker
 class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : DownSyncManager {
 
-    private val workerManager = WorkManager.getInstance()
     private val syncScope: SyncScope?
        get() = syncScopesBuilder.buildSyncScope()
 
     override fun enqueueOneTimeDownSyncMasterWorker() {
         syncScope?.let {
-            workerManager.beginUniqueWork(
+            WorkManager.getInstance().beginUniqueWork(
                 DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME,
                 ExistingWorkPolicy.KEEP,
                 buildOneTimeDownSyncMasterWorker(it)
@@ -34,7 +31,7 @@ class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : Do
 
     override fun enqueuePeriodicDownSyncMasterWorker() {
         syncScope?.let {
-            workerManager.enqueueUniquePeriodicWork(
+            WorkManager.getInstance().enqueueUniquePeriodicWork(
                 DOWNSYNC_MASTER_WORKER_TAG_PERIODIC,
                 ExistingPeriodicWorkPolicy.KEEP,
                 buildPeriodicDownSyncMasterWorker(it))
@@ -51,7 +48,7 @@ class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : Do
     }.subscribeOn(AndroidSchedulers.mainThread())
 
     override fun dequeueAllSyncWorker() {
-        workerManager.cancelAllWorkByTag(SYNC_WORKER_TAG)
+        WorkManager.getInstance().cancelAllWorkByTag(SYNC_WORKER_TAG)
     }
 
     override fun buildPeriodicDownSyncMasterWorker(syncScope: SyncScope): PeriodicWorkRequest =

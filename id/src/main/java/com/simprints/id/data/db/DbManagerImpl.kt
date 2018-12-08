@@ -19,6 +19,7 @@ import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.toLibPerson
 import com.simprints.id.secure.models.Tokens
+import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.session.Session
@@ -42,7 +43,8 @@ open class DbManagerImpl(override val local: LocalDbManager,
                          private val preferencesManager: PreferencesManager,
                          private val sessionEventsManager: SessionEventsManager,
                          private val timeHelper: TimeHelper,
-                         private val peopleUpSyncMaster: PeopleUpSyncMaster) : DbManager {
+                         private val peopleUpSyncMaster: PeopleUpSyncMaster,
+                         private val syncStatusDatabase: SyncStatusDatabase) : DbManager {
 
     override fun initialiseDb() {
         remote.initialiseRemoteDb()
@@ -89,14 +91,17 @@ open class DbManagerImpl(override val local: LocalDbManager,
     private fun resumePeopleUpSync(projectId: String, userId: String): Completable =
         Completable.create {
             peopleUpSyncMaster.resume(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
-
             it.onComplete()
         }
 
     override fun signOut() {
+        //TODO: move peopleUpSyncMaster to SyncScheduler and call .pause in CheckLoginPresenter.checkSignedInOrThrow
+        //If you user clears the data (then doesn't call signout), workers still stay scheduled.
         peopleUpSyncMaster.pause(loginInfoManager.signedInProjectId/*, loginInfoManager.signedInUserId*/) // TODO: uncomment userId when multitenancy is properly implemented
         loginInfoManager.cleanCredentials()
         remote.signOutOfRemoteDb()
+        syncStatusDatabase.downSyncDao.deleteAll()
+        syncStatusDatabase.upSyncDao.deleteAll()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
     }
 
@@ -115,12 +120,12 @@ open class DbManagerImpl(override val local: LocalDbManager,
         local.insertOrUpdatePersonInLocal(rl_Person(fbPerson, toSync = true))
             .doOnComplete {
                 sessionEventsManager
-                    .updateSession({
+                    .updateSession {
                         it.events.add(EnrollmentEvent(
                             it.nowRelativeToStartTime(timeHelper),
                             fbPerson.patientId
                         ))
-                    })
+                    }
                     .andThen(scheduleUpsync(fbPerson.projectId, fbPerson.userId))
                     .subscribeOn(Schedulers.io())
                     .subscribeBy(onComplete = {}, onError = {
