@@ -78,7 +78,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     }
 
     private fun setLastSyncTime(lastSyncTime: String) {
-        syncDescription.text = lastSyncTime
+        syncDescription.text = String.format(androidResourcesHelper.getString(R.string.dashboard_card_sync_last_sync), lastSyncTime)
     }
 
     private fun setDownloadCounter(peopleToDownload: Int?) {
