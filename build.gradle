@@ -30,6 +30,11 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
         jcenter()
+        // The two following repositories are a quick fix as a temporary outage
+        // See: https://stackoverflow.com/questions/53704155/could-not-find-com-google-gmsgoogle-services4-0-1
+        // TODO: remove when the outage is over
+        maven { url 'https://dl.bintray.com/android/android-tools' }
+        maven { url 'https://dl.bintray.com/firebase/gradle' }
     }
 
     dependencies {
@@ -38,7 +43,7 @@ buildscript {
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.5.4"
-        classpath "com.google.gms:google-services:3.2.0"
+        classpath "com.google.gms:google-services:4.2.0"
         classpath "io.realm:realm-gradle-plugin:4.3.3"
         classpath "com.google.firebase:firebase-plugins:1.1.4"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
