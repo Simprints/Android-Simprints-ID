@@ -104,4 +104,22 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
         assertEquals(numberOfBlockedDownSyncWorkers + numberOfBlockedInputMergerWorkers, seq[WorkInfo.State.BLOCKED]?.size)
         assertEquals(ListenableWorker.Result.SUCCESS, result)
     }
+
+    @Test
+    @Ignore
+    // Passes in isolation similar to the test above
+    fun doWorkTest_shouldReturnSuccessImmediatelyWithEmptySubSyncScopeList() {
+        val noModuleSyncScope = SyncScope(projectId, null, setOf())
+        whenever(workParams.inputData).thenReturn(workDataOf(DownSyncMasterWorker.SYNC_WORKER_SYNC_SCOPE_INPUT to syncScopesBuilder.fromSyncScopeToJson(noModuleSyncScope)))
+        downSyncMasterWorker = DownSyncMasterWorker(context, workParams)
+
+        val result = downSyncMasterWorker.doWork()
+        val workInfo = WorkManager.getInstance()
+            .getWorkInfosForUniqueWork(DownSyncMasterWorker.getSyncChainWorkersUniqueNameForSync(syncScope)).get()
+        val seq = workInfo.asSequence().groupBy { it.state }
+        assertEquals(0, workInfo.size)
+        assertEquals(null, seq[WorkInfo.State.ENQUEUED]?.size)
+        assertEquals(null, seq[WorkInfo.State.BLOCKED]?.size)
+        assertEquals(ListenableWorker.Result.SUCCESS, result)
+    }
 }

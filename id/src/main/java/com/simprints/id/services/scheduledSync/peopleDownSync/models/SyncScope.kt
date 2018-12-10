@@ -8,15 +8,12 @@ data class SyncScope(val projectId: String,
 
     val uniqueKey: String = "${projectId}_${userId ?: ""}${moduleIds?.fold("") { acc, s -> "${acc}_$s"} ?: "_"}"
 
-    fun toSubSyncScopes(): List<SubSyncScope> = moduleIds?.let { moduleIds ->
-        if (moduleIds.isEmpty()) {
-            return listOf(SubSyncScope(projectId, userId, null))
-        }
-
-        moduleIds.map { moduleId ->
-            SubSyncScope(projectId, userId, moduleId)
-        }
-    } ?: listOf(SubSyncScope(projectId, userId, null))
+    fun toSubSyncScopes(): List<SubSyncScope> =
+        moduleIds?.let { moduleIds ->
+            moduleIds.map { moduleId ->
+                SubSyncScope(projectId, userId, moduleId)
+            }
+        } ?: listOf(SubSyncScope(projectId, userId, null))
 
     val group: Constants.GROUP
         get() = when {
