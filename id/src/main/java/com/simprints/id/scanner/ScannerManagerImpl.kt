@@ -27,7 +27,8 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             .andThen(initVero())
             .andThen(connectToVero())
             .andThen(resetVeroUI())
-            .andThen(wakingUpVero())
+            .andThen(shutdownVero())
+            .andThen(wakeUpVero())
 
     override fun disconnectVero(): Completable = Completable.create { result ->
         if (scanner == null) {
@@ -35,7 +36,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         } else {
             scanner?.disconnect(WrapperScannerCallback({
                 result.onComplete()
-            }, { _ ->
+            }, {
                 result.onComplete()
             }))
         }
@@ -44,7 +45,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
     override fun initVero(): Completable = Completable.create {
         val pairedScanners = ScannerUtils.getPairedScanners(bluetoothAdapter)
         when {
-            pairedScanners.size == 0 -> it.onError(ScannerNotPairedException())
+            pairedScanners.isEmpty() -> it.onError(ScannerNotPairedException())
             pairedScanners.size > 1 -> it.onError(MultipleScannersPairedException())
             else -> {
                 val macAddress = pairedScanners[0]
@@ -84,7 +85,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         }
     }
 
-    override fun wakingUpVero(): Completable = Completable.create { result ->
+    override fun wakeUpVero(): Completable = Completable.create { result ->
         if (scanner == null) {
             result.onError(NullScannerError())
         } else {
@@ -106,6 +107,21 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
                 } ?: result.onComplete()
             }
             ))
+        }
+    }
+
+    override fun shutdownVero(): Completable = Completable.create { result ->
+        if (scanner == null) {
+            result.onError(NullScannerError())
+        } else {
+            scanner?.un20Shutdown(WrapperScannerCallback({
+                Timber.d("ScannerManager: UN20 off.")
+                preferencesManager.hardwareVersion = scanner?.ucVersion ?: -1
+
+                result.onComplete()
+            }, {
+                result.onError(UnknownBluetoothIssueException())
+            }))
         }
     }
 

@@ -59,8 +59,4 @@ class DefaultOkHttpClientBuilder {
 
             return@Interceptor chain.proceed(newRequest)
         }
-
-
-
-
 }

@@ -11,7 +11,7 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -70,6 +70,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
             analyticsManagerRule = SpyRule,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
+            scheduledSessionsSyncManagerRule = MockRule,
             sessionEventsLocalDbManagerRule = MockRule)
     }
 
