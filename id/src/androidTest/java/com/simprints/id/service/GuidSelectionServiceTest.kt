@@ -2,83 +2,103 @@ package com.simprints.id.service
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
-import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import com.jayway.awaitility.Awaitility
-import com.jayway.awaitility.Duration
 import com.simprints.id.Application
-import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.events.GuidSelectionEvent
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.models.domain.events.GuidSelectionEvent
+import com.simprints.id.data.analytics.eventData.models.local.RlSession
+import com.simprints.id.data.analytics.eventData.models.local.toDomainSession
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.shared.DefaultTestConstants
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.shared.DependencyRule
+import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.testSnippets.launchActivityEnrol
-import com.simprints.id.testTools.CalloutCredentials
+import com.simprints.id.testSnippets.setupLoginInfoToBeSignedIn
+import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
+import com.simprints.id.testTemplates.FirstUseLocal
+import com.simprints.id.testTools.ActivityUtils
+import com.simprints.id.testTools.tryOnUiUntilTimeout
+import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.SimHelper
+import io.realm.Realm
+import io.realm.RealmConfiguration
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
-import com.simprints.id.testSnippets.*
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class GuidSelectionServiceTest : DaggerForAndroidTests() {
+class GuidSelectionServiceTest : DaggerForAndroidTests(), FirstUseLocal {
 
-    @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
-    @Inject lateinit var loginInfoManagerSpy: LoginInfoManager
+    override var peopleRealmConfiguration: RealmConfiguration? = null
+    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
-    val scanTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
-
-    val calloutCredentials: CalloutCredentials = CalloutCredentials(
-        "00000002-0000-0000-0000-000000000000",
-        "the_one_and_only_module",
-        "the_lone_user")
+    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
+        PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
+    }
 
     override var module by lazyVar {
-        AppModuleForAndroidTests(
-            app,
+        AppModuleForAndroidTests(app,
+            randomGeneratorRule = DependencyRule.MockRule,
             sessionEventsManagerRule = DependencyRule.SpyRule,
             analyticsManagerRule = DependencyRule.MockRule,
-            loginInfoManagerRule = DependencyRule.MockRule)
+            loginInfoManagerRule = DependencyRule.SpyRule)
     }
+
+    private val realmForDataEvent
+        get() = (realmSessionEventsManager as RealmSessionEventsDbManagerImpl).getRealmInstance().blockingGet()
+
+    @Inject lateinit var randomGeneratorMock: RandomGenerator
+    @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
+    @Inject lateinit var loginInfoManagerSpy: LoginInfoManager
+    @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
+
+    @Rule @JvmField val scanTestRule = ActivityUtils.checkLoginFromIntentActivityTestRule()
 
     @Before
     override fun setUp() {
         app = InstrumentationRegistry.getTargetContext().applicationContext as Application
-        super.setUp()
+        super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
 
-        setupLoginInfoToBeSignedIn(loginInfoManagerSpy, calloutCredentials.projectId, calloutCredentials.userId)
+        setupRandomGeneratorToGenerateKey(DefaultTestConstants.DEFAULT_REALM_KEY, randomGeneratorMock)
+        setupLoginInfoToBeSignedIn(loginInfoManagerSpy, DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId, DEFAULT_TEST_CALLOUT_CREDENTIALS.userId)
 
         app.initDependencies()
+
+        Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
+        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
+        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
+        super<FirstUseLocal>.setUp()
     }
 
     @Test
     fun testWithStartedService() {
-        launchActivityEnrol(calloutCredentials, scanTestRule)
+        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, scanTestRule)
         var session = sessionEventsManagerSpy.createSession().blockingGet()
 
-        sessionEventsManagerSpy.updateSession({
-            session.projectId = loginInfoManagerSpy.getSignedInProjectIdOrEmpty()
-        }).blockingGet()
+        sessionEventsManagerSpy.updateSession {
+            it.projectId = loginInfoManagerSpy.getSignedInProjectIdOrEmpty()
+        }.blockingGet()
 
-        val simHelper = SimHelper(calloutCredentials.projectId, calloutCredentials.userId)
+        val simHelper = SimHelper(DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId, DEFAULT_TEST_CALLOUT_CREDENTIALS.userId)
         simHelper.confirmIdentity(app, session.id, "some_guid_confirmed")
 
-        Awaitility.await().atMost(30, TimeUnit.SECONDS).pollDelay(Duration.TWO_SECONDS).until<Any> {
-            val potentialSessionWithGUIDEvent = sessionEventsManagerSpy.getCurrentSession().blockingGet()
-            potentialSessionWithGUIDEvent.events.findLast { it is GuidSelectionEvent } != null
+        tryOnUiUntilTimeout(10000, 500) {
+            realmForDataEvent.refresh()
+            session = realmForDataEvent.where(RlSession::class.java).equalTo("id", session.id).findFirst()?.toDomainSession()
+            val potentialGuidSelectionEvent = session.events.filterIsInstance(GuidSelectionEvent::class.java).first()
+            Assert.assertNotNull(potentialGuidSelectionEvent)
+            Assert.assertEquals(potentialGuidSelectionEvent.selectedId, "some_guid_confirmed")
         }
-
-        session = sessionEventsManagerSpy.getCurrentSession().blockingGet()
-        val potentialGuidSelectionEvent = session.events.findLast { it is GuidSelectionEvent } as GuidSelectionEvent?
-        Assert.assertNotNull(potentialGuidSelectionEvent)
-        Assert.assertEquals(potentialGuidSelectionEvent?.selectedId, "some_guid_confirmed")
     }
 }
