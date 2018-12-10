@@ -6,6 +6,7 @@ import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testUtils.roboletric.TestApplication
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -49,5 +50,11 @@ class SyncScopeTest {
     fun syncScopeGeneratesSubScopesWithNoModules(){
         val syncScope = SyncScope("projectId", "userId", null)
         assertThat(syncScope.toSubSyncScopes().first()).isEqualTo(SubSyncScope("projectId", "userId", null))
+    }
+
+    @Test
+    fun syncScopeGeneratesEmptySubScopesWithEmptyModuleList() {
+        val syncScope = SyncScope("projectId", null, setOf())
+        Assert.assertTrue(syncScope.toSubSyncScopes().isEmpty())
     }
 }
