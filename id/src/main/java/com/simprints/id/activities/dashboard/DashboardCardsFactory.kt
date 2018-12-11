@@ -75,7 +75,6 @@ class DashboardCardsFactory(private val component: AppComponent) {
             DashboardCardType.SYNC_DB,
             position,
             component,
-            WorkManager.getInstance().getWorkInfosByTagLiveData(ConstantsWorkManager.SUBDOWNSYNC_WORKER_TAG),
             syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData(),
             syncStatusDatabase.upSyncDao.getUpSyncStatus()))
 

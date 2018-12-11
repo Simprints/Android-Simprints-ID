@@ -1,6 +1,7 @@
 package com.simprints.id.activities.dashboard.views
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -10,6 +11,8 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModelState
+import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
+import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState.*
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
@@ -26,8 +29,6 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     @Inject
     lateinit var androidResourcesHelper: AndroidResourcesHelper
 
-    private var syncButtonEnabled = true
-
     init {
         (rootView.context.applicationContext as Application).component.inject(this)
     }
@@ -41,7 +42,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
                         setTotalPeopleInDbCounter(peopleInDb)
                         setUploadCounter(peopleToUpload)
                         setListenerForSyncButton(onSyncActionClicked)
-                        setSyncButtonState(showSyncButton, showRunningStateForSyncButton)
+                        setSyncButtonState(syncCardState)
                         setDownloadCounter(peopleToDownload)
                         setLastSyncTime(lastSyncTime)
                     }
@@ -50,17 +51,12 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         }
     }
 
-    private fun setSyncButtonState(showSyncButton:Boolean, isSyncRunning: Boolean) {
-        if (isSyncRunning) {
-            disableSyncButtonIfEnabled()
-        } else {
-            enableSyncButtonIfDisabled()
-        }
-
-        if(showSyncButton) {
-            syncButton.visibility = View.VISIBLE
-        } else {
-            syncButton.visibility = View.INVISIBLE
+    private fun setSyncButtonState(showSyncCard: SyncCardState) {
+        when(showSyncCard) {
+            SYNC_RUNNING -> setSyncButtonStyleForRunning()
+            SYNC_CALCULATING -> setSyncButtonStyleForCalculating()
+            SYNC_DISABLED -> setSyncButtonStyleForDisabled()
+            SYNC_ENABLED -> setSyncButtonStyleForEnabled()
         }
     }
 
@@ -85,19 +81,29 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
         syncDownloadCount.text = peopleToDownload?.let { "${Math.max(it, 0)}" } ?: ""
     }
 
-    private fun disableSyncButtonIfEnabled() {
-        if (syncButtonEnabled) {
-            syncButtonEnabled = false
-            syncButton.background = androidResourcesHelper.getDrawable(R.drawable.button_rounded_corners_disabled)
-            syncButton.text = androidResourcesHelper.getString(R.string.syncing)
-        }
+    private fun setSyncButtonStyleForDisabled() {
+        syncButton.isEnabled = false
+        syncButton.visibility = View.INVISIBLE
     }
 
-    private fun enableSyncButtonIfDisabled() {
-        if (!syncButtonEnabled) {
-            syncButtonEnabled = true
-            syncButton.background = androidResourcesHelper.getDrawable(R.drawable.button_rounded_corners)
-            syncButton.text = androidResourcesHelper.getString(R.string.dashboard_card_sync_now)
-        }
+    private fun setSyncButtonStyleForEnabled() {
+        syncButton.isEnabled = true
+        setSyncButtonStyle(androidResourcesHelper.getString(R.string.dashboard_card_sync_now), androidResourcesHelper.getDrawable(R.drawable.button_rounded_corners))
+    }
+
+    private fun setSyncButtonStyleForRunning() {
+        syncButton.isEnabled = false
+        setSyncButtonStyle(androidResourcesHelper.getString(R.string.dashboard_card_syncing), androidResourcesHelper.getDrawable(R.drawable.button_rounded_corners_disabled))
+    }
+
+    private fun setSyncButtonStyleForCalculating() {
+        syncButton.isEnabled = false
+        setSyncButtonStyle(androidResourcesHelper.getString(R.string.dashboard_card_calculating), androidResourcesHelper.getDrawable(R.drawable.button_rounded_corners_disabled))
+    }
+
+    private fun setSyncButtonStyle(text: String, background: Drawable?) {
+        syncButton.background = background
+        syncButton.text = text
+        syncButton.visibility = View.VISIBLE
     }
 }
