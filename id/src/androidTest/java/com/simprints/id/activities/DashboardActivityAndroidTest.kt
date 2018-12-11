@@ -2,6 +2,7 @@ package com.simprints.id.activities
 
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -37,11 +38,11 @@ import com.simprints.id.testTools.models.TestProject
 import com.simprints.id.testTools.remote.RemoteTestingManager
 import com.simprints.id.testTools.tryOnUiUntilTimeout
 import com.simprints.id.testTools.waitOnSystem
-import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Before
@@ -137,13 +138,20 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     @Test
     fun downSyncRunning_shouldShowTheRightStateAndUpdateCountersAtTheEnd() {
         uploadFakePeopleAndPrepareLocalDb(mockGlobalScope())
-        downSyncManager.enqueueOneTimeDownSyncMasterWorker()
 
         launchActivityRule.launchActivity(Intent())
 
-        tryOnUiUntilTimeout(10000, 200) {
-            onView(withId(R.id.dashboardSyncCardSyncButton))
-                .check(matches(withText(R.string.dashboard_card_syncing)))
+        waitOnSystem(2000)
+
+        downSyncManager.enqueueOneTimeDownSyncMasterWorker()
+
+        tryOnUiUntilTimeout(10000, 20) {
+            onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_calculating)))
+        }
+
+        tryOnUiUntilTimeout(10000, 20) {
+            Espresso.onView(withId(R.id.dashboardCardSyncDescription))
+                .check(matches(withText(not(String.format(app.getString(R.string.dashboard_card_syncing), "")))))
         }
 
         onView(withId(R.id.dashboardCardSyncUploadText))
