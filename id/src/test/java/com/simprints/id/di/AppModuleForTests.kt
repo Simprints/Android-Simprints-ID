@@ -29,7 +29,8 @@ open class AppModuleForTests(app: Application,
                              override var syncStatusDatabaseRule: DependencyRule = RealRule,
                              override var syncScopesBuilderRule: DependencyRule = RealRule,
                              override var countTaskRule: DependencyRule = RealRule,
-                             override var downSyncTaskRule: DependencyRule = RealRule)
+                             override var downSyncTaskRule: DependencyRule = RealRule,
+                             override var downSyncManagerRule: DependencyRule = RealRule)
     : AppModuleForAnyTests(
     app,
     localDbManagerRule = localDbManagerRule,
@@ -52,7 +53,8 @@ open class AppModuleForTests(app: Application,
     syncStatusDatabaseRule = syncStatusDatabaseRule,
     syncScopesBuilderRule = syncScopesBuilderRule,
     countTaskRule = countTaskRule,
-    downSyncTaskRule = downSyncTaskRule) {
+    downSyncTaskRule = downSyncTaskRule,
+    downSyncManagerRule = downSyncManagerRule) {
 
     override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
 }

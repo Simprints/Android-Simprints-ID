@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
+import androidx.work.WorkManager
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.data.db.local.LocalDbManager
@@ -36,6 +37,7 @@ import com.simprints.id.testTools.models.TestProject
 import com.simprints.id.testTools.remote.RemoteTestingManager
 import com.simprints.id.testTools.tryOnUiUntilTimeout
 import com.simprints.id.testTools.waitOnSystem
+import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import io.realm.Realm
@@ -106,7 +108,9 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
         signOut()
 
         mockGlobalScope()
-        downSyncManager.dequeueAllSyncWorker()
+
+        WorkManager.getInstance().cancelAllWork()
+        WorkManager.getInstance().pruneWork()
     }
 
     @Test
@@ -132,13 +136,14 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     @Test
     fun downSyncRunning_shouldShowTheRightStateAndUpdateCountersAtTheEnd() {
-        uploadFakePeopleAndPrepareLocalDb(mockModuleScope())
+        uploadFakePeopleAndPrepareLocalDb(mockGlobalScope())
         downSyncManager.enqueueOneTimeDownSyncMasterWorker()
 
         launchActivityRule.launchActivity(Intent())
 
-        tryOnUiUntilTimeout(2000, 200) {
-            onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.syncing)))
+        tryOnUiUntilTimeout(10000, 200) {
+            onView(withId(R.id.dashboardSyncCardSyncButton))
+                .check(matches(withText(R.string.dashboard_card_syncing)))
         }
 
         onView(withId(R.id.dashboardCardSyncUploadText))
@@ -206,7 +211,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     }
 
     private fun mockModuleScope(): SyncScope {
-        whenever(settingsPreferencesManagerSpy.moduleIdOptions).thenReturn(setOf("module1", "module2", "module3"))
+        whenever(settingsPreferencesManagerSpy.selectedModules).thenReturn(setOf("module1", "module2", "module3"))
         whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(Constants.GROUP.MODULE)
         return syncScope
     }
