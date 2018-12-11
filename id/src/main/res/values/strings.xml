@@ -96,8 +96,7 @@
 
     <!--SyncerSync Button Text -->
     <string name="sync_data">Sync Data</string>
-    <string name="syncing">Syncing…</string>
-    <string name="syncing_calculating">Syncing… Calculating</string>
+    <string name="syncing_calculating">Calculating… </string>
     <string name="syncing_with_progress">Syncing… %1$d/%2$d</string>
     <string name="not_signed_in">Not Signed In</string>
     <!-- Toast Messages -->
@@ -383,6 +382,8 @@
     <string name="dashboard_card_available_on_phone">Available on Phone</string>
     <string name="dashboard_card_to_upload">To Upload</string>
     <string name="dashboard_card_to_download">To Download</string>
+    <string name="dashboard_card_syncing">Syncing…</string>
+    <string name="dashboard_card_calculating">Calculating…</string>
 
     <string name="menu_privacy_notice">Privacy Notice</string>
     <string name="privacy_notice_title">Privacy Notice</string>

@@ -1,23 +1,26 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.controllers
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.work.*
-import androidx.work.WorkInfo.State.RUNNING
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.DOWNSYNC_MASTER_WORKER_TAG_PERIODIC
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SUBDOWNSYNC_WORKER_TAG
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_WORKER_TAG
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_REPEAT_INTERVAL
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_REPEAT_UNIT
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_SYNC_SCOPE_INPUT
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 
 // Class to enqueue and dequeue DownSyncMasterWorker
 class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : DownSyncManager {
 
     private val syncScope: SyncScope?
-       get() = syncScopesBuilder.buildSyncScope()
+        get() = syncScopesBuilder.buildSyncScope()
 
     override fun enqueueOneTimeDownSyncMasterWorker() {
         syncScope?.let {
@@ -38,14 +41,20 @@ class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : Do
         }
     }
 
-    override fun isDownSyncRunning(): Single<Boolean> = Single.fromCallable {
-        syncScope?.let { it ->
-            val workersInfo = WorkManager.getInstance().getWorkInfosByTag(SYNC_WORKER_TAG).get()
-            workersInfo.find {
-                it.state == RUNNING
-            } != null
-        } ?: false
-    }.subscribeOn(AndroidSchedulers.mainThread())
+    override fun onSyncStateUpdated(): LiveData<SyncState> {
+        val liveDataSyncWorkersInfo = WorkManager.getInstance().getWorkInfosByTagLiveData(SUBDOWNSYNC_WORKER_TAG)
+
+        return Transformations.map(liveDataSyncWorkersInfo) {
+
+            val isSyncCounting = it.any { workInfo -> workInfo.state == WorkInfo.State.BLOCKED }
+            val isSyncRunning = it.any { workInfo -> workInfo.state == WorkInfo.State.RUNNING }
+            when {
+                isSyncCounting -> SyncState.CALCULATING
+                isSyncRunning -> SyncState.RUNNING
+                else -> SyncState.NOT_RUNNING
+            }
+        }
+    }
 
     override fun dequeueAllSyncWorker() {
         WorkManager.getInstance().cancelAllWorkByTag(SYNC_WORKER_TAG)
@@ -59,7 +68,6 @@ class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : Do
             .addTag(SYNC_WORKER_TAG)
             .addTag("oneTime")
             .build()
-
 
 
     override fun buildOneTimeDownSyncMasterWorker(syncScope: SyncScope) =

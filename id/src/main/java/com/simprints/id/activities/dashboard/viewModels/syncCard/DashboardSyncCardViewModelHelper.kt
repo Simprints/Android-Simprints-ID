@@ -16,6 +16,8 @@ import io.reactivex.schedulers.Schedulers
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
+import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState.*
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
 
 class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardViewModel,
                                        component: AppComponent,
@@ -40,11 +42,10 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
+    private var lastIsDownSyncRunning: Boolean = isDownSyncRunning
+
     init {
         component.inject(this)
-
-        state.showRunningStateForSyncButton = isDownSyncRunning
-        state.showSyncButton = syncSchedulerHelper.isDownSyncManualTriggerOn()
 
         if (isDownSyncRunning) {
             initWhenDownSyncRunningIfRequired()
@@ -54,12 +55,21 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     }
 
     private fun initWhenDownSyncNotRunningIfRequired() {
+        viewModel.updateState(syncCardState = SYNC_CALCULATING, emitState = true)
         fetchAllCounters {
+            val newSyncButtonState = if (syncSchedulerHelper.isDownSyncManualTriggerOn()) {
+                SYNC_ENABLED
+            } else {
+                SYNC_DISABLED
+            }
+            viewModel.updateState(syncCardState = newSyncButtonState, emitState = true)
+
             setHelperInitialized()
         }
     }
 
     private fun initWhenDownSyncRunningIfRequired() {
+        viewModel.updateState(syncCardState = SYNC_RUNNING, emitState = true)
         fetchLocalAndUpSyncCounters {
             setHelperInitialized()
         }
@@ -138,7 +148,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         if (downSyncStatuses.isNotEmpty()) {
 
             var peopleToDownSync: Int? = null
-            if (state.showRunningStateForSyncButton) {
+            if (state.syncCardState == SYNC_RUNNING) {
                 peopleToDownSync = updateTotalDownSyncCountUsingWorkers(downSyncStatuses)
             }
 
@@ -204,13 +214,22 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         return ""
     }
 
-    fun onDownSyncWorkerStatusChange(isDownSyncRunning: Boolean) {
-        if (state.showRunningStateForSyncButton != isDownSyncRunning) {
-            state.showRunningStateForSyncButton = isDownSyncRunning
-            viewModel.updateState(isDownSyncRunning = isDownSyncRunning, emitState = state.peopleToDownload != null)
-            if (!state.showRunningStateForSyncButton) {
+    fun onSyncStateChange(syncState: SyncState) {
+        when (syncState) {
+            SyncState.RUNNING -> viewModel.updateState(syncCardState = SYNC_RUNNING, emitState = true)
+            SyncState.NOT_RUNNING -> {
+                goToSyncEnabledIfAllowed()
                 updateTotalLocalCount().subscribeBy(onError = { it.printStackTrace() }, onComplete = {})
             }
+            SyncState.CALCULATING ->  viewModel.updateState(syncCardState = SYNC_CALCULATING, emitState = true)
+        }
+    }
+
+    private fun goToSyncEnabledIfAllowed() {
+        if (syncSchedulerHelper.isDownSyncManualTriggerOn()) {
+            viewModel.updateState(syncCardState = SYNC_ENABLED, emitState = true)
+        } else {
+            viewModel.updateState(syncCardState = SYNC_DISABLED, emitState = true)
         }
     }
 }

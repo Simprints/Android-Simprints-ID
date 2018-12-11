@@ -79,12 +79,12 @@ class DashboardPresenter(private val view: DashboardContract.View,
         view.stopRequestIfRequired()
     }
 
-    private fun initSyncCardModel(it: DashboardSyncCardViewModel) {
-        it.viewModelState.onSyncActionClicked = {
+    private fun initSyncCardModel(viewModel: DashboardSyncCardViewModel) {
+        viewModel.viewModelState.onSyncActionClicked = {
             when {
                 userIsOffline() -> view.showToastForUserOffline()
-                !areThereRecordsToSync(it) -> view.showToastForRecordsUpToDate()
-                areThereRecordsToSync(it) -> userDidWantToDownSync()
+                !viewModel.areThereRecordsToSync() -> view.showToastForRecordsUpToDate()
+                viewModel.areThereRecordsToSync() -> userDidWantToDownSync()
             }
         }
     }
@@ -126,8 +126,4 @@ class DashboardPresenter(private val view: DashboardContract.View,
     } catch (e: IllegalStateException) {
         true
     }
-
-    private fun areThereRecordsToSync(dashboardSyncCardViewModel: DashboardSyncCardViewModel) =
-        dashboardSyncCardViewModel.viewModelState.peopleToUpload?.let { it > 0 } ?: false ||
-            dashboardSyncCardViewModel.viewModelState.peopleToDownload?.let { it > 0 } ?: false
 }

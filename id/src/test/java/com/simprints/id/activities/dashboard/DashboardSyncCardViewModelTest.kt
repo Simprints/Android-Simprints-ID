@@ -14,6 +14,7 @@ import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
@@ -122,8 +123,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         val vm = dashboardCardViewModel.stateLiveData.testObserver()
         val lastState = vm.observedValues.last()
 
-        Truth.assert_().that(lastState?.showSyncButton).isEqualTo(true)
-        Truth.assert_().that(lastState?.showRunningStateForSyncButton).isEqualTo(false)
+        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_ENABLED)
     }
 
     @Test
@@ -150,8 +150,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         val vm = dashboardCardViewModel.stateLiveData.testObserver()
         val lastState = vm.observedValues.last()
 
-        Truth.assert_().that(lastState?.showSyncButton).isEqualTo(true)
-        Truth.assert_().that(lastState?.showRunningStateForSyncButton).isEqualTo(true)
+        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_DISABLED)
     }
 
 
@@ -235,7 +234,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
 
         val lastState = vm.observedValues.last()
 
-        Truth.assert_().that(lastState?.showSyncButton).isEqualTo(false)
+        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_DISABLED)
     }
 
     @Test
@@ -248,7 +247,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
 
         val lastState = vm.observedValues.last()
 
-        Truth.assert_().that(lastState?.showSyncButton).isEqualTo(true)
+        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_ENABLED)
     }
 
     private fun mockCounters(peopleInDb: Int? = null, peopleToUpload: Int? = null, peopleToDownload: Int? = null) {
@@ -270,7 +269,6 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
             DashboardCardType.SYNC_DB,
             1,
             testAppComponent,
-            workInfoLiveData,
             downSyncDao,
             upSyncDao)
 
