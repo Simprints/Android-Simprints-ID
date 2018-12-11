@@ -4,8 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.WorkInfo
-import androidx.work.workDataOf
 import com.google.common.truth.Truth
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.anyOrNull
@@ -24,9 +22,10 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
@@ -45,7 +44,6 @@ import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -63,13 +61,14 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
     @Inject lateinit var syncSCopeBuilder: SyncScopesBuilder
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var downSyncManagerMock: DownSyncManager
 
-    private val workInfoLiveData: MutableLiveData<MutableList<WorkInfo>> = MutableLiveData()
     private val downSyncDao by lazy { syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData() }
     private val upSyncDao by lazy { syncStatusDatabase.upSyncDao.getUpSyncStatus() }
     private val syncScope by lazy { syncSCopeBuilder.buildSyncScope()!! }
     private val subSyncScopes by lazy { syncScope.toSubSyncScopes() }
     private lateinit var dashboardCardViewModel: DashboardSyncCardViewModel
+    private val fakeSyncStateLiveData = MutableLiveData<SyncState>()
 
     override var preferencesModule by lazyVar {
         PreferencesModuleForAnyTests(
@@ -81,7 +80,8 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         AppModuleForTests(app,
             dbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
-            localDbManagerRule = MockRule)
+            localDbManagerRule = MockRule,
+            downSyncManagerRule = MockRule)
     }
 
 
@@ -99,12 +99,14 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         mockLoadProject(localDbManagerMock, remoteDbManagerMock)
 
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to true))
+        whenever(downSyncManagerMock.onSyncStateUpdated()).thenReturn(fakeSyncStateLiveData)
     }
 
     @Test
     fun downSyncIsNotRunning_shouldFetchDownSyncCounterFromRetrofit() {
+        insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
         mockCounters(1, 2, 3)
-        insertASyncWorkInfoEvent()
+
         dashboardCardViewModel = createViewModelDashboardToTest()
         val vm = dashboardCardViewModel.stateLiveData.testObserver()
         val lastState = vm.observedValues.last()
@@ -117,8 +119,9 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun downSyncIsNotRunning_shouldEnableTheSyncButton() {
+        insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
         mockCounters(1, 2, 3)
-        insertASyncWorkInfoEvent()
+
         dashboardCardViewModel = createViewModelDashboardToTest()
         val vm = dashboardCardViewModel.stateLiveData.testObserver()
         val lastState = vm.observedValues.last()
@@ -128,8 +131,8 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun downSyncIsRunning_shouldFetchDownSyncCounterFromWorkers() {
+        insertASyncWorkInfoEvent(SyncState.RUNNING)
         mockCounters(1, 2)
-        insertASyncWorkInfoEvent(WorkInfo.State.RUNNING)
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), totalToDownload = 100))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
@@ -143,21 +146,21 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     @Test
     fun downSyncIsRunning_shouldShowARunningStateForSyncButton() {
         mockCounters(1, 2)
-        insertASyncWorkInfoEvent(WorkInfo.State.RUNNING)
+        insertASyncWorkInfoEvent(SyncState.RUNNING)
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), totalToDownload = 100))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
         val vm = dashboardCardViewModel.stateLiveData.testObserver()
         val lastState = vm.observedValues.last()
 
-        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_DISABLED)
+        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_RUNNING)
     }
 
 
     @Test
     fun upSyncIsTheLatestSync_shouldShowUpSyncTimeAsLatestTimestamp() {
         mockCounters(1, 2)
-        insertASyncWorkInfoEvent(WorkInfo.State.RUNNING)
+        insertASyncWorkInfoEvent(SyncState.RUNNING)
         val latestSyncTime = timeHelper.now()
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = timeHelper.nowMinus(2, TimeUnit.MINUTES)))
         insertAnUpSyncStatusInDb(UpSyncStatus(lastUpSyncTime = latestSyncTime))
@@ -173,7 +176,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     @Test
     fun downSyncIsTheLatestSync_shouldShowUpSyncTimeAsLatestTimestamp() {
         mockCounters(1, 2)
-        insertASyncWorkInfoEvent(WorkInfo.State.RUNNING)
+        insertASyncWorkInfoEvent(SyncState.RUNNING)
         val latestSyncTime = timeHelper.now()
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = timeHelper.nowMinus(2, TimeUnit.MINUTES)))
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = latestSyncTime))
@@ -191,11 +194,11 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         val requiredCallsToInitTotalCounter = 1
         val requiredCallToInitAndUpdateUpSyncCounter = 2
         mockCounters(1, 2)
-        insertASyncWorkInfoEvent(WorkInfo.State.RUNNING)
+        insertASyncWorkInfoEvent(SyncState.RUNNING)
 
         dashboardCardViewModel = createViewModelDashboardToTest()
         val vm = dashboardCardViewModel.stateLiveData.testObserver()
-        insertASyncWorkInfoEvent(WorkInfo.State.SUCCEEDED)
+        insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
 
         vm.observedValues.last()
 
@@ -209,7 +212,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         val requiredCallsToInitTotalCounter = 1
         val requiredCallToInitUpSyncCounter = 1
         mockCounters(1, 2)
-        insertASyncWorkInfoEvent(WorkInfo.State.RUNNING)
+        insertASyncWorkInfoEvent(SyncState.RUNNING)
 
         dashboardCardViewModel = createViewModelDashboardToTest()
         val vm = dashboardCardViewModel.stateLiveData.testObserver()
@@ -228,7 +231,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     fun manualTriggerIsOff_shouldNotShowTheSyncButton() {
         mockCounters(1, 2, 3)
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to false))
-        insertASyncWorkInfoEvent(WorkInfo.State.RUNNING)
+        insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
         dashboardCardViewModel = createViewModelDashboardToTest()
         val vm = dashboardCardViewModel.stateLiveData.testObserver()
 
@@ -241,13 +244,13 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     fun manualTriggerIsOn_shouldShowTheSyncButton() {
         mockCounters(1, 2, 3)
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to true))
-        insertASyncWorkInfoEvent(WorkInfo.State.RUNNING)
+        insertASyncWorkInfoEvent(SyncState.RUNNING)
         dashboardCardViewModel = createViewModelDashboardToTest()
         val vm = dashboardCardViewModel.stateLiveData.testObserver()
 
         val lastState = vm.observedValues.last()
 
-        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_ENABLED)
+        Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_RUNNING)
     }
 
     private fun mockCounters(peopleInDb: Int? = null, peopleToUpload: Int? = null, peopleToDownload: Int? = null) {
@@ -272,9 +275,10 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
             downSyncDao,
             upSyncDao)
 
-    private fun insertASyncWorkInfoEvent(state: WorkInfo.State = WorkInfo.State.SUCCEEDED) {
-        workInfoLiveData.value = mutableListOf(
-            WorkInfo(UUID(1, 2), state, workDataOf(), listOf(ConstantsWorkManager.SUBDOWNSYNC_WORKER_TAG)))
+    private fun insertASyncWorkInfoEvent(vararg states: SyncState) {
+        states.forEach {
+            fakeSyncStateLiveData.postValue(it)
+        }
     }
 
     private fun insertADownSyncStatusInDb(downSyncStatus: DownSyncStatus) {

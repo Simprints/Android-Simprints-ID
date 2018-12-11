@@ -57,7 +57,8 @@ open class AppModuleForAnyTests(app: Application,
                                 open var syncScopesBuilderRule: DependencyRule = RealRule,
                                 open var countTaskRule: DependencyRule = RealRule,
                                 open var downSyncTaskRule: DependencyRule = RealRule,
-                                open var syncSchedulerHelperRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var syncSchedulerHelperRule: DependencyRule = RealRule,
+                                open var downSyncManagerRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -120,7 +121,7 @@ open class AppModuleForAnyTests(app: Application,
         sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, analyticsManager) }
 
     override fun provideSessionEventsLocalDbManager(ctx: Context,
-                                            secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+                                                    secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
         sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager) }
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
@@ -152,4 +153,8 @@ open class AppModuleForAnyTests(app: Application,
 
     override fun provideSyncSchedulerHelper(preferencesManager: PreferencesManager, loginInfoManager: LoginInfoManager, sessionEventsSyncManager: SessionEventsSyncManager, downSyncManager: DownSyncManager): SyncSchedulerHelper =
         syncSchedulerHelperRule.resolveDependency { super.provideSyncSchedulerHelper(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager) }
+
+    override fun provideDownSyncManager(syncScopesBuilder: SyncScopesBuilder): DownSyncManager =
+        downSyncManagerRule.resolveDependency { super.provideDownSyncManager(syncScopesBuilder) }
+
 }
