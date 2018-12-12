@@ -106,7 +106,7 @@ class SerializerModule {
     //CallingPackage
     @Provides @Singleton @Named("InvalidCallingPackageError") fun provideInvalidCallingPackageError(): Error = InvalidCalloutError(ALERT_TYPE.INVALID_CALLING_PACKAGE)
     @Provides @Singleton @Named("CallingPackageReader") fun provideCallingPackageReader(@Named("InvalidCallingPackageError") invalidCallingPackageError: Error): Reader<String> = OptionalParameterReader(SIMPRINTS_CALLING_PACKAGE, "", invalidCallingPackageError)
-    @Provides @Singleton @Named("CallingPackageValidator") fun provideCallingPackageValidator(): Validator<String> = NoOpValidator<String>()
+    @Provides @Singleton @Named("CallingPackageValidator") fun provideCallingPackageValidator(): Validator<String> = NoOpValidator()
     @Provides @Singleton @Named("CallingPackageExtractor") fun provideCallingPackageExtractor(@Named("CallingPackageReader") callingPackageReader: Reader<String>, @Named("CallingPackageValidator") callingPackageValidator: Validator<String>): Extractor<String> = ParameterExtractor(callingPackageReader, callingPackageValidator)
 
     //MetadataReader
@@ -128,7 +128,7 @@ class SerializerModule {
 
     @Provides @Singleton @Named("ParametersReader") fun provideParametersReader(@Named("ExpectedParametersLister") expectedParametersLister: ExpectedParametersLister): Reader<Set<CalloutParameter>> = UnexpectedParametersReader(expectedParametersLister)
 
-    @Provides @Singleton @Named("GuidGenerator") fun provideGuidGenerator(): Extractor<String> = ParameterExtractor(GeneratorReader({ UUID.randomUUID().toString() }), NoOpValidator())
+    @Provides @Singleton @Named("GuidGenerator") fun provideGuidGenerator(): Extractor<String> = ParameterExtractor(GeneratorReader { UUID.randomUUID().toString() }, NoOpValidator())
     @Provides @Singleton @Named("PatientIdExtractor") fun providePatientIdExtractor(@Named("UpdateIdExtractor") updateIdExtractor: Extractor<String>, @Named("VerifyIdExtractor") verifyIdExtractor: Extractor<String>, @Named("GuidGenerator") guidGenerator: Extractor<String>): Extractor<String> {
         val patientIdSwitch = mapOf(
             CalloutAction.UPDATE to updateIdExtractor,

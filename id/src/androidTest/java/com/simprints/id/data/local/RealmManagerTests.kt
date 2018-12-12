@@ -17,10 +17,6 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class RealmManagerTests : RealmTestsBase() {
 
-    companion object {
-        const val FAKE_DB_FIELD = "infoField"
-    }
-
     private lateinit var realm: Realm
     private lateinit var realmManager: RealmDbManagerImpl
 

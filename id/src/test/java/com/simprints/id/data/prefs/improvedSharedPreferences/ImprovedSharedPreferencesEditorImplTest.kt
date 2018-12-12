@@ -12,15 +12,15 @@ import org.mockito.ArgumentMatchers.*
 class ImprovedSharedPreferencesEditorImplTest {
 
     companion object {
-        val aKey = "aKey"
-        val aByte: Byte = 0
-        val aShort: Short = 1
-        val anInt: Int = 2
-        val aLong: Long = 3
-        val aFloat: Float = 4.0f
-        val aDouble: Double = 5.0
-        val aString = "aString"
-        val aBoolean = false
+        const val aKey = "aKey"
+        const val aByte: Byte = 0
+        const val aShort: Short = 1
+        const val anInt: Int = 2
+        const val aLong: Long = 3
+        const val aFloat: Float = 4.0f
+        const val aDouble: Double = 5.0
+        const val aString = "aString"
+        const val aBoolean = false
         val aClass = ImprovedSharedPreferencesImplTest::class
     }
 

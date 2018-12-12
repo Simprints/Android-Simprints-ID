@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
-import com.simprints.id.activities.about.DebugActivity
+import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
