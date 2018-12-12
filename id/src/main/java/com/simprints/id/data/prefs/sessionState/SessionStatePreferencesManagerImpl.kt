@@ -26,10 +26,10 @@ class SessionStatePreferencesManagerImpl(private val context: Context,
     SessionTimestampsPreferencesManager by sessionTimestamps {
 
     companion object {
-        private val SESSION_ID_KEY = "SessionId"
-        private val SESSION_ID_DEFAULT = ""
+        private const val SESSION_ID_KEY = "SessionId"
+        private const val SESSION_ID_DEFAULT = ""
 
-        private val LOCATION_KEY = "Location"
+        private const val LOCATION_KEY = "Location"
         private val LOCATION_DEFAULT = Location("", "")
     }
 

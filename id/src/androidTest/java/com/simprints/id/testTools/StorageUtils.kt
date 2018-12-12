@@ -48,7 +48,7 @@ object StorageUtils {
         }
     }
 
-    fun clearSharedPrefs(context: Context) {
+    private fun clearSharedPrefs(context: Context) {
         log("StorageUtils.clearApplicationData(): clearing shared prefs.")
         context.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE).edit().clear().commit()
     }

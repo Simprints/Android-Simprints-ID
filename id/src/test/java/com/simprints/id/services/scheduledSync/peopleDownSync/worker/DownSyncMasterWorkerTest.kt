@@ -39,7 +39,6 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
 
     @Inject lateinit var context: Context
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
-    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     @Mock lateinit var workParams: WorkerParameters
     private lateinit var downSyncMasterWorker: DownSyncMasterWorker

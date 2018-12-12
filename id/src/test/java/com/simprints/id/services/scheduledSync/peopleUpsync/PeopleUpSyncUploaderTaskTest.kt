@@ -47,10 +47,6 @@ class PeopleUpSyncUploaderTaskTest {
     private val syncedPerson2 = notYetSyncedPerson2.copy(toSync = false)
     private val syncedPerson3 = notYetSyncedPerson3.copy(toSync = false)
 
-    private val dateFormat: DateFormat by lazy {
-        DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
-    }
-
     @Test
     fun userNotSignedIn1_shouldThrowIllegalStateException() {
         mockSignedInUser(differentProjectId, userIdToSync)

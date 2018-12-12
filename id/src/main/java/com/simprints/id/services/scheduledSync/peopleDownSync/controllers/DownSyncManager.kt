@@ -6,8 +6,6 @@ import androidx.work.PeriodicWorkRequest
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
 
-import io.reactivex.Single
-
 interface DownSyncManager {
     fun enqueueOneTimeDownSyncMasterWorker()
     fun buildOneTimeDownSyncMasterWorker(syncScope: SyncScope): OneTimeWorkRequest
