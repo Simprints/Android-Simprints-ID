@@ -15,6 +15,7 @@ import com.simprints.id.di.DaggerForTests
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.roboletric.*
+import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
 import org.junit.Before
 import org.junit.Test
@@ -45,6 +46,7 @@ class CheckLoginFromMainLauncherActivityTest : DaggerForTests() {
     override fun setUp() {
         app = (ApplicationProvider.getApplicationContext() as TestApplication)
         FirebaseApp.initializeApp(app)
+        initWorkManagerIfRequired(app)
         super.setUp()
         testAppComponent.inject(this)
         dbManager.initialiseDb()
