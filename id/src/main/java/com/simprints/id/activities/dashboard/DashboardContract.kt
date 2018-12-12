@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard
 
-import androidx.lifecycle.LifecycleOwner
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
