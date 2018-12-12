@@ -7,11 +7,7 @@ import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.UpSyncStatus
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
-import javax.inject.Inject
 
 class DashboardSyncCardViewModel(override val type: DashboardCardType,
                                  override val position: Int,
@@ -25,7 +21,7 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
 
     var helper: DashboardSyncCardViewModelHelper? = null
 
-    val stateLiveData: MutableLiveData<DashboardSyncCardViewModelState> = MutableLiveData()
+    val viewModelStateLiveData: MutableLiveData<DashboardSyncCardViewModelState> = MutableLiveData()
     var viewModelState: DashboardSyncCardViewModelState = DashboardSyncCardViewModelState()
 
     private var lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
@@ -90,9 +86,9 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
 
     private fun emitState() {
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            stateLiveData.value = viewModelState
+            viewModelStateLiveData.value = viewModelState
         } else {
-            stateLiveData.postValue(viewModelState)
+            viewModelStateLiveData.postValue(viewModelState)
         }
     }
 
