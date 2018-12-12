@@ -7,6 +7,7 @@ import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import timber.log.Timber
 import javax.inject.Inject
@@ -27,6 +28,9 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
                 sessionEventsManager
             )
             task.execute().blockingAwait()
+            Result.SUCCESS
+        } catch (e: NoSessionsFoundException) {
+            Timber.d("No sessions found")
             Result.SUCCESS
         } catch (throwable: Throwable) {
             Timber.e(throwable)
