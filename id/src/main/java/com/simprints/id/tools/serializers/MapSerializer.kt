@@ -2,6 +2,7 @@ package com.simprints.id.tools.serializers
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 
 /**
  * Simple Map serializer.
@@ -15,7 +16,7 @@ class MapSerializer<K: Any, V: Any>(private val kSerializer: Serializer<K>,
     : Serializer<Map<K, V>> {
 
     companion object {
-        val stringMapType = object : TypeToken<Map<String, String>>() {}.type
+        val stringMapType: Type = object : TypeToken<Map<String, String>>() {}.type
     }
 
     override fun serialize(value: Map<K, V>): String {

@@ -127,12 +127,6 @@ fun createAndSaveOpenFakeSession(timeHelper: TimeHelper,
                                  id: String = UUID.randomUUID().toString() + "open") =
     createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000)).also { saveSessionInDb(it, realmSessionEventsManager) }.id
 
-fun createAndSaveExpiredOpenFakeSession(timeHelper: TimeHelper,
-                                        realmSessionEventsManager: SessionEventsLocalDbManager,
-                                        projectId: String,
-                                        id: String = UUID.randomUUID().toString() + "open_expired_session") =
-    createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(SessionEvents.GRACE_PERIOD + 1000)).also { saveSessionInDb(it, realmSessionEventsManager) }.id
-
 fun saveSessionInDb(session: SessionEvents, realmSessionEventsManager: SessionEventsLocalDbManager) {
     realmSessionEventsManager.insertOrUpdateSessionEvents(session).blockingAwait()
 }

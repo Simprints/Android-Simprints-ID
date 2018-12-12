@@ -1,5 +1,6 @@
 package com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters
 
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.simprints.id.data.analytics.eventData.models.domain.events.*
 import com.simprints.id.data.analytics.eventData.models.domain.session.DatabaseInfo
@@ -10,7 +11,7 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEv
 
 class SessionEventsApiAdapterFactory {
 
-    val gson by lazy {
+    val gson: Gson by lazy {
         val builder = GsonBuilder()
         with(builder) {
 

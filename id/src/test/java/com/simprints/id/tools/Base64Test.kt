@@ -13,7 +13,7 @@ import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class rl_PersonTest {
+class Base64Test {
 
     @Test
     fun testAndroidBase64ReturnsSameValueOfGuava() {

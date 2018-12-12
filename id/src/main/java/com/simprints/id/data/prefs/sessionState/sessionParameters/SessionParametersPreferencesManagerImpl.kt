@@ -12,29 +12,29 @@ class SessionParametersPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     companion object {
 
-        private val CALLOUT_ACTION_KEY = "CalloutAction"
+        private const val CALLOUT_ACTION_KEY = "CalloutAction"
         private val CALLOUT_ACTION_DEFAULT = CalloutAction.MISSING
 
-        private val PROJECT_ID_KEY = "ProjectId"
-        private val PROJECT_ID_DEFAULT = ""
+        private const val PROJECT_ID_KEY = "ProjectId"
+        private const val PROJECT_ID_DEFAULT = ""
 
-        private val MODULE_ID_KEY = "ModuleId"
-        private val MODULE_ID_DEFAULT = ""
+        private const val MODULE_ID_KEY = "ModuleId"
+        private const val MODULE_ID_DEFAULT = ""
 
-        private val USER_ID_KEY = "UserId"
-        private val USER_ID_DEFAULT = ""
+        private const val USER_ID_KEY = "UserId"
+        private const val USER_ID_DEFAULT = ""
 
-        private val PATIENT_ID_KEY = "PatientId"
-        private val PATIENT_ID_DEFAULT = ""
+        private const val PATIENT_ID_KEY = "PatientId"
+        private const val PATIENT_ID_DEFAULT = ""
 
-        private val CALLING_PACKAGE_KEY = "CallingPackage"
-        private val CALLING_PACKAGE_DEFAULT = ""
+        private const val CALLING_PACKAGE_KEY = "CallingPackage"
+        private const val CALLING_PACKAGE_DEFAULT = ""
 
-        private val METADATA_KEY = "Metadata"
-        private val METADATA_DEFAULT = ""
+        private const val METADATA_KEY = "Metadata"
+        private const val METADATA_DEFAULT = ""
 
-        private val RESULT_FORMAT_KEY = "ResultFormat"
-        private val RESULT_FORMAT_DEFAULT = ""
+        private const val RESULT_FORMAT_KEY = "ResultFormat"
+        private const val RESULT_FORMAT_DEFAULT = ""
     }
 
     // CalloutAction of the current session

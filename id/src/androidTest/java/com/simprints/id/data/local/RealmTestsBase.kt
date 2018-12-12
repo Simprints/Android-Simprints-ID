@@ -37,10 +37,10 @@ open class RealmTestsBase {
     protected fun getFakePerson(): rl_Person = PeopleGeneratorUtils.getRandomPerson().toRealmPerson()
 
     protected fun saveFakePerson(realm: Realm, fakePerson: rl_Person): rl_Person =
-        fakePerson.also { realm.executeTransaction { it.insertOrUpdate(fakePerson) } }
+        fakePerson.also { realm.executeTransaction { realm -> realm.insertOrUpdate(fakePerson) } }
 
     protected fun saveFakePeople(realm: Realm, people: List<Person>): List<Person> =
-        people.also { realm.executeTransaction { it.insertOrUpdate(people.map { it.toRealmPerson() }) } }
+        people.also { realm.executeTransaction { realm -> realm.insertOrUpdate(people.map { person -> person.toRealmPerson() }) } }
 
 //    protected fun deleteAll(realm: Realm) = realm.executeTransaction { it.deleteAll() }
 

@@ -18,8 +18,6 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
 
     companion object {
         const val SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT = "SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT"
-
-        private const val DEFAULT_COUNTER_FOR_INVALID_VALUE = -1
     }
 
     @Inject lateinit var analyticsManager: AnalyticsManager
