@@ -2,7 +2,6 @@ package com.simprints.id.activities.dashboard.viewModels
 
 import android.os.Looper
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 
 open class DashboardCardViewModel(override val type: DashboardCardType,
                                   override val position: Int,

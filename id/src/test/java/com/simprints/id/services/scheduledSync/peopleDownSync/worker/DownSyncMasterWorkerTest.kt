@@ -12,7 +12,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.TestApplication
@@ -52,9 +52,9 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
     private val numberOfEnqueuedSyncCountWorkers = 3
     private val numberOfBlockedDownSyncWorkers = 3
     private val numberOfBlockedInputMergerWorkers = 1
-    private val uniqueNameForChainWorkers = "${ConstantsWorkManager.SYNC_WORKER_CHAIN}_${syncScope.uniqueKey}"
-    private val workerKeyForSubDownSyncScope = "${ConstantsWorkManager.SUBDOWNSYNC_WORKER_TAG}_${subSyncScope.uniqueKey}"
-    private val workerKeyForSubCountScope = "${ConstantsWorkManager.SUBCOUNT_WORKER_TAG}_${subSyncScope.uniqueKey}"
+    private val uniqueNameForChainWorkers = "${WorkManagerConstants.SYNC_WORKER_CHAIN}_${syncScope.uniqueKey}"
+    private val workerKeyForSubDownSyncScope = "${WorkManagerConstants.SUBDOWNSYNC_WORKER_TAG}_${subSyncScope.uniqueKey}"
+    private val workerKeyForSubCountScope = "${WorkManagerConstants.SUBCOUNT_WORKER_TAG}_${subSyncScope.uniqueKey}"
 
     @Before
     override fun setUp() {
