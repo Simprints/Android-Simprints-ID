@@ -22,7 +22,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
@@ -61,7 +60,6 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
     @Inject lateinit var syncSCopeBuilder: SyncScopesBuilder
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var downSyncManagerMock: DownSyncManager
 
     private val downSyncDao by lazy { syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData() }
     private val upSyncDao by lazy { syncStatusDatabase.upSyncDao.getUpSyncStatus() }
@@ -99,7 +97,6 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         mockLoadProject(localDbManagerMock, remoteDbManagerMock)
 
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to true))
-        whenever(downSyncManagerMock.onSyncStateUpdated()).thenReturn(fakeSyncStateLiveData)
     }
 
     @Test
@@ -273,7 +270,8 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
             1,
             testAppComponent,
             downSyncDao,
-            upSyncDao)
+            upSyncDao,
+            fakeSyncStateLiveData)
 
     private fun insertASyncWorkInfoEvent(vararg states: SyncState) {
         states.forEach {

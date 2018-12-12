@@ -15,14 +15,12 @@ import javax.inject.Inject
 
 class DashboardSyncCardViewModel(override val type: DashboardCardType,
                                  override val position: Int,
-                                 val component: AppComponent,
+                                 private val component: AppComponent,
                                  private val downSyncStatus: LiveData<List<DownSyncStatus>>,
                                  private val upSyncStatus: LiveData<UpSyncStatus?>,
+                                 private val syncState: LiveData<SyncState>,
                                  defaultState: DashboardSyncCardViewModelState = DashboardSyncCardViewModelState()) : CardViewModel(type, position), LifecycleOwner {
 
-    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
-    @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
-    @Inject lateinit var downSyncManager: DownSyncManager
     private var lastSyncState: SyncState = SyncState.NOT_RUNNING
 
     var helper: DashboardSyncCardViewModelHelper? = null
@@ -33,7 +31,6 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
     private var lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
 
     init {
-        component.inject(this)
         viewModelState = defaultState
         registerObserverForDownSyncWorkerState()
         lifecycleRegistry.markState(Lifecycle.State.STARTED)
@@ -51,7 +48,7 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
             lastSyncState = syncState
         }
 
-        downSyncManager.onSyncStateUpdated().observe(this, downSyncObserver)
+        syncState.observe(this, downSyncObserver)
     }
 
     fun registerObserverForDownSyncEvents() {
