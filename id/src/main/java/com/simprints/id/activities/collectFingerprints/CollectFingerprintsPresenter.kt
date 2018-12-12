@@ -292,7 +292,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun addCaptureEventInSession(finger: Finger) {
-        sessionEventsManager.updateSessionInBackground({ sessionEvents ->
+        sessionEventsManager.updateSessionInBackground { sessionEvents ->
             sessionEvents.events.add(FingerprintCaptureEvent(
                 sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
                 sessionEvents.nowRelativeToStartTime(timeHelper),
@@ -303,7 +303,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                     FingerprintCaptureEvent.Fingerprint(it.qualityScore, Utils.byteArrayToBase64(it.templateBytes))
                 }
             ))
-        })
+        }
     }
 
     private fun createMapAndShowDialog() {

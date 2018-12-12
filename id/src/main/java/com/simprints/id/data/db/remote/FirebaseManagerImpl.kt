@@ -198,8 +198,8 @@ open class FirebaseManagerImpl(
     // TODO: stop leaking fb_Person model in the domain layer
     /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
-        getPeopleApiClient().flatMap {
-            it.requestPerson(patientId, projectId)
+        getPeopleApiClient().flatMap { api ->
+            api.requestPerson(patientId, projectId)
                 .retry(::retryCriteria)
                 .handleResponse {
                     when (it.code()) {

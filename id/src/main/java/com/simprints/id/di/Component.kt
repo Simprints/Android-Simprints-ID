@@ -1,8 +1,8 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.activities.about.DebugActivity
-import com.simprints.id.activities.about.DebugViewModel
+import com.simprints.id.activities.debug.DebugActivity
+import com.simprints.id.activities.debug.DebugViewModel
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
