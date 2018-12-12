@@ -19,7 +19,6 @@ interface DashboardContract {
         fun showConfirmationDialogForLogout()
         fun showToastForUserOffline()
         fun showToastForRecordsUpToDate()
-        fun getLifeCycleOwner(): LifecycleOwner
     }
 
     interface Presenter : BasePresenter {
