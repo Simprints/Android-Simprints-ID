@@ -105,7 +105,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         mockCounters(1, 2, 3)
 
         dashboardCardViewModel = createViewModelDashboardToTest()
-        val vm = dashboardCardViewModel.stateLiveData.testObserver()
+        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
         val lastState = vm.observedValues.last()
 
         Truth.assert_().that(lastState?.peopleInDb).isEqualTo(1)
@@ -120,7 +120,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         mockCounters(1, 2, 3)
 
         dashboardCardViewModel = createViewModelDashboardToTest()
-        val vm = dashboardCardViewModel.stateLiveData.testObserver()
+        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
         val lastState = vm.observedValues.last()
 
         Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_ENABLED)
@@ -133,7 +133,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), totalToDownload = 100))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
-        val vm = dashboardCardViewModel.stateLiveData.testObserver()
+        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
         val lastState = vm.observedValues.last()
 
         Truth.assert_().that(lastState?.peopleToDownload).isEqualTo(100)
@@ -147,7 +147,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), totalToDownload = 100))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
-        val vm = dashboardCardViewModel.stateLiveData.testObserver()
+        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
         val lastState = vm.observedValues.last()
 
         Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_RUNNING)
@@ -164,7 +164,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = timeHelper.nowMinus(1, TimeUnit.MINUTES)))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
-        val vm = dashboardCardViewModel.stateLiveData.testObserver()
+        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
         val lastState = vm.observedValues.last()
 
         Truth.assert_().that(lastState?.lastSyncTime).isEqualTo(dashboardCardViewModel.helper?.dateFormat?.format(latestSyncTime))
@@ -180,7 +180,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         insertAnUpSyncStatusInDb(UpSyncStatus(lastUpSyncTime = timeHelper.nowMinus(1, TimeUnit.MINUTES)))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
-        val vm = dashboardCardViewModel.stateLiveData.testObserver()
+        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
         val lastState = vm.observedValues.last()
 
         Truth.assert_().that(lastState?.lastSyncTime).isEqualTo(dashboardCardViewModel.helper?.dateFormat?.format(latestSyncTime))
@@ -194,7 +194,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         insertASyncWorkInfoEvent(SyncState.RUNNING)
 
         dashboardCardViewModel = createViewModelDashboardToTest()
-        val vm = dashboardCardViewModel.stateLiveData.testObserver()
+        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
         insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
 
         vm.observedValues.last()
@@ -212,7 +212,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         insertASyncWorkInfoEvent(SyncState.RUNNING)
 
         dashboardCardViewModel = createViewModelDashboardToTest()
-        val vm = dashboardCardViewModel.stateLiveData.testObserver()
+        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
 
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), totalToDownload = 100))
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), totalToDownload = 50))
@@ -230,7 +230,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to false))
         insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
         dashboardCardViewModel = createViewModelDashboardToTest()
-        val vm = dashboardCardViewModel.stateLiveData.testObserver()
+        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
 
         val lastState = vm.observedValues.last()
 
@@ -243,7 +243,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to true))
         insertASyncWorkInfoEvent(SyncState.RUNNING)
         dashboardCardViewModel = createViewModelDashboardToTest()
-        val vm = dashboardCardViewModel.stateLiveData.testObserver()
+        val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
 
         val lastState = vm.observedValues.last()
 
