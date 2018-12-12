@@ -23,7 +23,6 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
                                        component: AppComponent,
                                        isDownSyncRunning: Boolean) {
 
-    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
@@ -118,7 +117,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         }.subscribeOn(Schedulers.io())
 
     private fun updateTotalLocalCount(): Completable =
-        syncScopeBuilder.buildSyncScope()?.let { syncScope ->
+        syncScope?.let { syncScope ->
             dbManager.getPeopleCountFromLocalForSyncScope(syncScope)
                 .flatMapCompletable {
                     viewModel.updateState(peopleInDb = it, emitState = true)
