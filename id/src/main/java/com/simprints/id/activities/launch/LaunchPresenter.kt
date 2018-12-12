@@ -8,7 +8,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
@@ -44,16 +43,10 @@ import javax.inject.Inject
 
 class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
 
-    @Inject
-    lateinit var dataManager: DataManager
-    @Inject
-    lateinit var dbManager: DbManager
-
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-    @Inject
-    lateinit var simNetworkUtils: SimNetworkUtils
-
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var scannerManager: ScannerManager
@@ -61,8 +54,8 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
+    private var startConsentEventTime: Long = 0
     private val activity = view as Activity
-
     private var permissionsAlreadyRequested = false
 
     // True iff the app is waiting for the user to confirm consent
@@ -77,8 +70,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             confirmConsentAndContinueToNextActivity()
         }
     }
-
-    private var startConsentEventTime: Long = 0
 
     init {
         val component = (activity.application as Application).component

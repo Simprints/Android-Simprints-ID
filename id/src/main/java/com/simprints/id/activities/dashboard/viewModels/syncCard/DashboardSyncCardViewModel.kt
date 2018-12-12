@@ -17,14 +17,13 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
                                  private val syncState: LiveData<SyncState>,
                                  defaultState: DashboardSyncCardViewModelState = DashboardSyncCardViewModelState()) : CardViewModel(type, position), LifecycleOwner {
 
-    private var lastSyncState: SyncState = SyncState.NOT_RUNNING
 
     var helper: DashboardSyncCardViewModelHelper? = null
-
     val viewModelStateLiveData: MutableLiveData<DashboardSyncCardViewModelState> = MutableLiveData()
     var viewModelState: DashboardSyncCardViewModelState = DashboardSyncCardViewModelState()
 
     private var lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
+    private var lastSyncState: SyncState = SyncState.NOT_RUNNING
 
     init {
         viewModelState = defaultState
