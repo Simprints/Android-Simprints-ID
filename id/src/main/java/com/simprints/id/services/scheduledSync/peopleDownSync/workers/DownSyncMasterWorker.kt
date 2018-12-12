@@ -6,6 +6,7 @@ import androidx.work.*
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -103,6 +104,6 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw SimprintsError("Cannot get app component in Worker")
+        } else throw WorkerInjectionFailedError.forWorker<DownSyncMasterWorker>()
     }
 }
