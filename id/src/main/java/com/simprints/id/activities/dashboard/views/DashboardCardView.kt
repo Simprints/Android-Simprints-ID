@@ -15,7 +15,7 @@ open class DashboardCardView(private val rootView: View) : RecyclerView.ViewHold
     private val title: TextView? = rootView.findViewById(R.id.dashboardCardTitle)
     protected val description: TextView? = rootView.findViewById(R.id.dashboardCardDescription)
 
-    var lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
+    private var lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
 
     init {
         lifecycleRegistry.markState(Lifecycle.State.INITIALIZED)
@@ -32,7 +32,6 @@ open class DashboardCardView(private val rootView: View) : RecyclerView.ViewHold
     override fun getLifecycle(): Lifecycle {
         return lifecycleRegistry
     }
-
 
     open fun bind(viewModel: ViewModel) {
         val cardViewModel = viewModel as? DashboardCardViewModel

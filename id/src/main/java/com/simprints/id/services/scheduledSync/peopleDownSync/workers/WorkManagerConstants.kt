@@ -1,6 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.workers
 
-class ConstantsWorkManager {
+class WorkManagerConstants {
     companion object {
         const val SUBCOUNT_WORKER_TAG = "SUBCOUNT_WORKER_TAG" //Tag for each SubCountWorker
         const val SUBDOWNSYNC_WORKER_TAG = "SUBDOWNSYNC_WORKER_TAG" //Tag for each SubDownSyncWorker
