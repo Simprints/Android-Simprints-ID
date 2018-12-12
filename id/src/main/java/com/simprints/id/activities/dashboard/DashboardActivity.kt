@@ -150,6 +150,4 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override fun showToastForRecordsUpToDate() {
         showToast(R.string.records_up_to_date)
     }
-
-    override fun getLifeCycleOwner(): LifecycleOwner = this
 }
