@@ -1,13 +1,9 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync
+package com.simprints.id.data.db.local.room
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.simprints.id.data.db.local.room.DownSyncDao
-import com.simprints.id.data.db.local.room.DownSyncStatus
-import com.simprints.id.data.db.local.room.UpSyncDao
-import com.simprints.id.data.db.local.room.UpSyncStatus
 
 @Database(entities = [DownSyncStatus::class, UpSyncStatus::class], version = 1, exportSchema = false)
 abstract class SyncStatusDatabase : RoomDatabase() {
