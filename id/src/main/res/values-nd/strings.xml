@@ -3,8 +3,6 @@
 
     <!-- This language is Ndebele as spoken in Zimbabwe -->
 
-    <string name="consent_general_title">Imvume evamile</string>
-
     <string name="consent_enrol">Sizacela ukusebenzisa amafingerprint enu ukuze ungene kucwayisiso Ukukhanya njalo senelise ukukwazi kwelakusasa.&#160;</string>
     <string name="consent_id_verify">Ngicela ukusebenzisa ifingerprint yakho ukuze ngithole ulwazi lwakho lweUkukhanya.&#160;</string>
     <string name="consent_share_data_no">ISimprints yinhlanganiso eyaseUK engadingi inotho izenelisa ukuthola ulwazi lwakho lwefingerprint lokubakwazi ukuthi ungaphi ngalesosikhathi.&#160;</string>
