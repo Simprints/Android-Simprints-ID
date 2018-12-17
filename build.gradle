@@ -21,11 +21,6 @@ buildscript {
             url "https://plugins.gradle.org/m2/"
         }
         jcenter()
-        // The two following repositories are a quick fix as a temporary outage
-        // See: https://stackoverflow.com/questions/53704155/could-not-find-com-google-gmsgoogle-services4-0-1
-        // TODO: remove when the outage is over
-        maven { url 'https://dl.bintray.com/android/android-tools' }
-        maven { url 'https://dl.bintray.com/firebase/gradle' }
     }
 
     dependencies {
