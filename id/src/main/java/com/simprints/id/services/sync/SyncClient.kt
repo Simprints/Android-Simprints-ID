@@ -10,9 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import org.jetbrains.anko.coroutines.experimental.bg
+import kotlinx.coroutines.*
 import timber.log.Timber
 
 class SyncClient(context: Context)
@@ -24,9 +22,11 @@ class SyncClient(context: Context)
     fun sync(syncParameters: SyncTaskParameters,
              onStarted: () -> Unit,
              onBusy: (e: Exception) -> Unit) {
-        async(UI) {
+        GlobalScope.launch(Dispatchers.Main) {
             try {
-                bg { startSyncAndObserve(syncParameters) }.await()
+                withContext(Dispatchers.Default) {
+                    startSyncAndObserve(syncParameters)
+                }
                 onStarted()
             } catch (exception: TaskInProgressException) {
                 onBusy(exception)
@@ -60,9 +60,9 @@ class SyncClient(context: Context)
         val observable = currentProgressReplayObservable
         if (observable != null) {
             disposables.add(observable
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribeWith(observer))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribeWith(observer))
         }
     }
 

@@ -1,6 +1,8 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
+import android.content.Context
 import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -9,15 +11,21 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import timber.log.Timber
 import javax.inject.Inject
+import androidx.work.Result
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
-class PeopleUpSyncUploaderWorker : Worker() {
+class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters)
+    : Worker(context, params) {
 
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var localDbManager: LocalDbManager
-    @Inject lateinit var remoteDbManager: RemoteDbManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject
+    lateinit var loginInfoManager: LoginInfoManager
+    @Inject
+    lateinit var localDbManager: LocalDbManager
+    @Inject
+    lateinit var remoteDbManager: RemoteDbManager
+    @Inject
+    lateinit var analyticsManager: AnalyticsManager
 
     val projectId by lazy {
         inputData.getString(PROJECT_ID_KEY) ?: throw IllegalArgumentException("Project Id required")
@@ -38,14 +46,14 @@ class PeopleUpSyncUploaderWorker : Worker() {
 
         return try {
             task.execute()
-            Result.SUCCESS
+            Result.success()
         } catch (exception: TransientSyncFailureException) {
             Timber.e(exception)
-            Result.RETRY
+            Result.retry()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
             analyticsManager.logThrowable(throwable)
-            Result.FAILURE
+            Result.failure()
         }
     }
 
