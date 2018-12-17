@@ -228,6 +228,7 @@ dependencies {
     testImplementation 'org.robolectric:shadows-multidex:3.7.1'
     testImplementation 'com.android.support.test:monitor:1.0.2'
 
+    implementation "org.checkerframework:checker-compat-qual:2.5.3"
     testImplementation "com.google.truth:truth:0.42"
     androidTestImplementation("com.google.truth:truth:0.42"){
         exclude group: "com.google.guava"
