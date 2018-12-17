@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- This language is Shona as spoken in Zimbabwe -->
+
+    <string name="consent_general_title">Mvumo</string>
+
+    <string name="consent_enrol">Ndinoda kushandisa mafingerprint enyu kuti mupinde mu %1$s zvakare kuti tikuzivei mune ramangwana.&#160;</string>
+    <string name="consent_id_verify">Ndinoda kushandisa fingerprint yenyu kuti ndikwanise kuwana zvinyorwa zvenyu mu %1$s.&#160;</string>
+    <string name="consent_share_data_no">Simprints, vekuUK isingaiti zvekutsvaka upfumi ichawana mukana kuhumbowo hwefingerprint nenzvimbo yamuri nguvaino.&#160;</string>
+    <string name="consent_privacy_rights">Kana mukapa mvumo, munokwanisa kubuda chero nguva ipi zvayo motiudza kuti tidzime zvese zvatinazvo zvine chekuita nemi.&#160;</string>
+    <string name="consent_confirmation">Ndinokumbira kutora fingerprint yenyu. Tapota tiudzei kuti \"Ndabvuma\", \"Handibvumi\" kana \"Ndine mibvunzo\".</string>
+
+    <string name="launch_consent_decline_button">Handibvumi</string>
+    <string name="launch_consent_accept_button">Ndabvuma</string>
+
+</resources>
