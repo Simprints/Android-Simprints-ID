@@ -1,14 +1,18 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher
 
+import android.content.Context
 import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import timber.log.Timber
 import javax.inject.Inject
+import androidx.work.Result
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
-class PeopleUpSyncPeriodicFlusherWorker : Worker() {
+class PeopleUpSyncPeriodicFlusherWorker(context : Context, params : WorkerParameters)
+    : Worker(context, params) {
 
     @Inject lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
 
@@ -25,7 +29,7 @@ class PeopleUpSyncPeriodicFlusherWorker : Worker() {
         injectDependencies()
         peopleUpSyncMaster.schedule(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
 
-        return Result.SUCCESS
+        return Result.success()
     }
 
     private fun injectDependencies() {
