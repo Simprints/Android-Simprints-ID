@@ -13,7 +13,8 @@ import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.assertThrows
 import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.delegates.lazyVar
-import junit.framework.Assert
+import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertNotSame
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,7 +53,7 @@ class SecureDataManagerTest : DaggerForAndroidTests() {
         secureDataManager.setLocalDatabaseKey("project_id2", "legacy_key")
         val secondLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id2")
 
-        Assert.assertNotSame(firstLocalDbKey, secondLocalDbKey)
+        assertNotSame(firstLocalDbKey, secondLocalDbKey)
     }
 
     @Test
@@ -67,7 +68,7 @@ class SecureDataManagerTest : DaggerForAndroidTests() {
         secureDataManager.setLocalDatabaseKey("project_id3", "legacy_key")
         val secondLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id3")
 
-        Assert.assertEquals(firstLocalDbKey, secondLocalDbKey)
+        assertEquals(firstLocalDbKey, secondLocalDbKey)
     }
 
     @Test
