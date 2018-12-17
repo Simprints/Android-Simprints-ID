@@ -7,9 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.simprints.id.data.db.local.room.UpSyncStatus.Companion.UP_SYNC_STATUS_CONST_ID
 
-/**
- * Aashay - UpSyncDao: Dao to make queries for UpSyncDao
- */
 @Dao
 interface UpSyncDao {
 
