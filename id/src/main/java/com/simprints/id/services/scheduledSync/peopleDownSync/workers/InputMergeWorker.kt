@@ -15,11 +15,17 @@ import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 import javax.inject.Inject
 
-class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class InputMergeWorker(context: Context, params: WorkerParameters)
+    : Worker(context, params) {
 
-    @Inject lateinit var saveCountsTask: SaveCountsTask
-    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject
+    lateinit var saveCountsTask: SaveCountsTask
+
+    @Inject
+    lateinit var syncScopeBuilder: SyncScopesBuilder
+
+    @Inject
+    lateinit var analyticsManager: AnalyticsManager
 
     override fun doWork(): Result {
         inject()
@@ -28,23 +34,16 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
         // Move from {"subScopeUniqueKey": count} -> {subScope: count}
         val inputForTask = prepareInputForTask()
 
-        return try {
+        val result = try {
             saveCountsTask.execute(inputForTask)
-            outputData = inputData
-            Result.SUCCESS
+            Result.success(inputData)
         } catch (e: Throwable) {
             e.printStackTrace()
             analyticsManager.logThrowable(e)
-            Result.FAILURE
-        }.also {
-            if (BuildConfig.DEBUG) {
-                applicationContext.runOnUiThread {
-                    val message = "WM - InputMergeWorker: $it $inputData"
-                    Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
-                    Timber.d(message)
-                }
-            }
+            Result.failure()
         }
+        toastForDebugBuilds(result)
+        return result
     }
 
     private fun prepareInputForTask(): Map<SubSyncScope, Int> {
@@ -52,11 +51,21 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
         val scope = syncScopeBuilder.buildSyncScope()
         scope?.toSubSyncScopes()?.forEach {
             val counter = inputData.getIntArray(it.uniqueKey)?.get(0)
-            counter?.let{ counterForSubSync ->
+            counter?.let { counterForSubSync ->
                 inputForTask[it] = counterForSubSync
             }
         }
         return inputForTask
+    }
+
+    private fun toastForDebugBuilds(result: Result) {
+        if (BuildConfig.DEBUG) {
+            applicationContext.runOnUiThread {
+                val message = "WM - InputMergeWorker: $result $inputData"
+                Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+                Timber.d(message)
+            }
+        }
     }
 
     private fun inject() {

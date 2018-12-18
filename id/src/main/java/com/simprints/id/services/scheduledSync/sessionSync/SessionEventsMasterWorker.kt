@@ -11,7 +11,6 @@ import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import timber.log.Timber
 import javax.inject.Inject
-import androidx.work.Result
 
 class SessionEventsMasterWorker(context: Context, params: WorkerParameters)
     : Worker(context, params) {

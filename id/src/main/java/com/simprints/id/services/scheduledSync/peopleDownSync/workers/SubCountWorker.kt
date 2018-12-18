@@ -10,6 +10,7 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
 import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
@@ -21,33 +22,45 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
         const val SUBCOUNT_WORKER_SUB_SCOPE_INPUT = "SUBCOUNT_WORKER_SUB_SCOPE_INPUT"
     }
 
-    @Inject lateinit var analyticsManager: AnalyticsManager
-    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
-    @Inject lateinit var countTask: CountTask
+    @Inject
+    lateinit var analyticsManager: AnalyticsManager
+
+    @Inject
+    lateinit var syncScopeBuilder: SyncScopesBuilder
+
+    @Inject
+    lateinit var countTask: CountTask
 
     override fun doWork(): Result {
         inject()
 
-        val input = inputData.getString(SUBCOUNT_WORKER_SUB_SCOPE_INPUT) ?: throw IllegalArgumentException("input required")
-        val subSyncScope = syncScopeBuilder.fromJsonToSubSyncScope(input) ?: throw IllegalArgumentException("SyncScope required")
+        val input = inputData.getString(SUBCOUNT_WORKER_SUB_SCOPE_INPUT)
+            ?: throw IllegalArgumentException("input required")
+        val subSyncScope = syncScopeBuilder.fromJsonToSubSyncScope(input)
+            ?: throw IllegalArgumentException("SyncScope required")
         val key = subSyncScope.uniqueKey
 
         return try {
             val totalCount = countTask.execute(subSyncScope).blockingGet()
-
-            outputData = Data.Builder().putInt(key, totalCount.toInt()).build()
-            Result.SUCCESS
+            val data = Data.Builder()
+                .putInt(key, totalCount.toInt())
+                .build()
+            toastForDebugBuilds(subSyncScope, data)
+            Result.success(data)
         } catch (e: Throwable) {
             e.printStackTrace()
             analyticsManager.logThrowable(e)
-            Result.SUCCESS
-        }.also {
-            if (BuildConfig.DEBUG) {
-                applicationContext.runOnUiThread {
-                    val message = "WM - SubCountWorker($subSyncScope): $it - ${outputData.keyValueMap}"
-                    Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
-                    Timber.d(message)
-                }
+            toastForDebugBuilds(subSyncScope)
+            Result.success()
+        }
+    }
+
+    private fun toastForDebugBuilds(subSyncScope: SubSyncScope, data: Data? = null) {
+        if (BuildConfig.DEBUG) {
+            applicationContext.runOnUiThread {
+                val message = "WM - SubCountWorker($subSyncScope): Success - ${data?.keyValueMap}"
+                Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
+                Timber.d(message)
             }
         }
     }

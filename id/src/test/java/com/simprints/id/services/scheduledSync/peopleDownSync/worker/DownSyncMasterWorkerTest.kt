@@ -100,7 +100,7 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
             workInfo.size)
         assertEquals(numberOfEnqueuedSyncCountWorkers, seq[WorkInfo.State.ENQUEUED]?.size)
         assertEquals(numberOfBlockedDownSyncWorkers + numberOfBlockedInputMergerWorkers, seq[WorkInfo.State.BLOCKED]?.size)
-        assertEquals(ListenableWorker.Result.SUCCESS, result)
+        assert(result is ListenableWorker.Result.Success)
     }
 
     @Test
@@ -118,6 +118,6 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
         assertEquals(0, workInfo.size)
         assertEquals(null, seq[WorkInfo.State.ENQUEUED]?.size)
         assertEquals(null, seq[WorkInfo.State.BLOCKED]?.size)
-        assertEquals(ListenableWorker.Result.SUCCESS, result)
+        assert(result is ListenableWorker.Result.Success)
     }
 }

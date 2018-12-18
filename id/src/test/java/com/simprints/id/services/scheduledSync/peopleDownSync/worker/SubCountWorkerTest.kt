@@ -6,7 +6,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.google.common.truth.Truth
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.times
@@ -15,9 +14,9 @@ import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -30,7 +29,6 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,13 +39,17 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SubCountWorkerTest: DaggerForTests() {
+class SubCountWorkerTest : DaggerForTests() {
 
-    @Inject lateinit var context: Context
-    @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject
+    lateinit var context: Context
+    @Inject
+    lateinit var syncScopesBuilder: SyncScopesBuilder
+    @Inject
+    lateinit var analyticsManager: AnalyticsManager
 
-    @Mock lateinit var workParams: WorkerParameters
+    @Mock
+    lateinit var workParams: WorkerParameters
 
     private val countTaskMock: CountTask = mock()
 
@@ -81,8 +83,8 @@ class SubCountWorkerTest: DaggerForTests() {
         whenever(countTaskMock.execute(anyNotNull())).thenReturn(Single.just(5))
         val workerResult = subCountWorker.doWork()
 
-        Truth.assertThat(subCountWorker.outputData.getInt(subSyncScope.uniqueKey, 0)).isEqualTo(5)
-        assertEquals(ListenableWorker.Result.SUCCESS, workerResult)
+        assert(workerResult is ListenableWorker.Result.Success &&
+            workerResult.outputData.getInt(subSyncScope.uniqueKey, 0) == 5)
     }
 
     @Test
@@ -91,6 +93,6 @@ class SubCountWorkerTest: DaggerForTests() {
         val workerResult = subCountWorker.doWork()
 
         verify(analyticsManager, times(1)).logThrowable(any())
-        assertEquals(ListenableWorker.Result.SUCCESS, workerResult)
+        assert(workerResult is ListenableWorker.Result.Success)
     }
 }

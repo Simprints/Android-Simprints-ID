@@ -129,7 +129,7 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
         val activity = controller.get()
 
         val spm = shadowOf(pm)
-        spm.addResolveInfoForIntent(pm.scannerAppIntent(), injectHowToResolveScannerAppIntent(pm))
+        spm.addResolveInfoForIntent(pm.scannerAppIntent(), injectHowToResolveScannerAppIntent())
 
         controller.start().resume().visible()
         activity.loginButtonScanQr.performClick()
