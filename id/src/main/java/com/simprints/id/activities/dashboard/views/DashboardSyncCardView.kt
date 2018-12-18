@@ -1,187 +1,109 @@
 package com.simprints.id.activities.dashboard.views
 
 import android.annotation.SuppressLint
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.CardView
+import android.graphics.drawable.Drawable
 import android.view.View
-import android.widget.ImageView
-import android.widget.ProgressBar
+import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.dashboard.models.DashboardCard
-import com.simprints.id.activities.dashboard.models.DashboardSyncCard
-import com.simprints.id.data.db.sync.models.SyncManagerState
-import com.simprints.id.services.progress.DownloadProgress
-import com.simprints.id.services.progress.Progress
-import com.simprints.id.services.progress.UploadProgress
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.textResource
+import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModelState
+import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
+import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState.*
+import com.simprints.id.tools.utils.AndroidResourcesHelper
+import org.jetbrains.anko.runOnUiThread
+import javax.inject.Inject
 
 @SuppressLint("SetTextI18n")
 class DashboardSyncCardView(private val rootView: View) : DashboardCardView(rootView) {
 
-    private val syncCard: CardView = rootView.findViewById(R.id.dashboardCardSync)
-
-    private val syncStateIcon: ImageView = rootView.findViewById(R.id.dashboardCardSyncState)
     private val syncDescription: TextView = rootView.findViewById(R.id.dashboardCardSyncDescription)
     private val syncUploadCount: TextView = rootView.findViewById(R.id.dashboardCardSyncUploadText)
     private val syncDownloadCount: TextView = rootView.findViewById(R.id.dashboardCardSyncDownloadText)
+    private val syncButton: Button = rootView.findViewById(R.id.dashboardSyncCardSyncButton)
+    private val totalPeopleInLocal: TextView = rootView.findViewById(R.id.dashboardCardSyncTotalLocalText)
 
-    private val syncProgressBar: ProgressBar = rootView.findViewById(R.id.dashboardCardSyncProgressBar)
-    private val syncAction: TextView = rootView.findViewById(R.id.dashboardCardSyncAction)
+    @Inject
+    lateinit var androidResourcesHelper: AndroidResourcesHelper
 
-    fun updateCard(cardModel: DashboardCard) {
-        bind(cardModel)
+    init {
+        (rootView.context.applicationContext as Application).component.inject(this)
     }
 
-    override fun bind(cardModel: DashboardCard) {
-        super.bind(cardModel)
-
-        if (cardModel is DashboardSyncCard) {
-            cardModel.cardView = this
-            setUploadCounter(cardModel)
-            setDownloadCounter(cardModel)
-            updateState(cardModel)
+    override fun bind(viewModel: ViewModel) {
+        val cardViewModel = viewModel as? DashboardSyncCardViewModel
+        cardViewModel?.let {
+            it.viewModelStateLiveData.observe(this, Observer<DashboardSyncCardViewModelState> { state ->
+                rootView.context.runOnUiThread {
+                    with(state) {
+                        setTotalPeopleInDbCounter(peopleInDb)
+                        setUploadCounter(peopleToUpload)
+                        setListenerForSyncButton(onSyncActionClicked)
+                        setSyncButtonState(syncCardState)
+                        setDownloadCounter(peopleToDownload)
+                        setLastSyncTime(lastSyncTime)
+                    }
+                }
+            })
         }
     }
 
-    fun updateState(cardModel: DashboardSyncCard) {
-        when (cardModel.syncState) {
-            SyncManagerState.NOT_STARTED -> setUIForSyncNotStarted(cardModel)
-            SyncManagerState.STARTED -> setUIForSyncStarted()
-            SyncManagerState.IN_PROGRESS -> setUIForSyncInProgress(cardModel)
-            SyncManagerState.SUCCEED -> setUIForSyncSucceeded(cardModel)
-            SyncManagerState.FAILED -> setUIForSyncFailed(cardModel)
+    private fun setSyncButtonState(showSyncCard: SyncCardState) {
+        when(showSyncCard) {
+            SYNC_RUNNING -> setSyncButtonStyleForRunning()
+            SYNC_CALCULATING -> setSyncButtonStyleForCalculating()
+            SYNC_DISABLED -> setSyncButtonStyleForDisabled()
+            SYNC_ENABLED -> setSyncButtonStyleForEnabled()
         }
     }
 
-    private fun setUIForSyncNotStarted(dataModel: DashboardSyncCard) {
-        syncStateIcon.visibility = View.INVISIBLE
 
-        syncProgressBar.visibility = View.INVISIBLE
-
-        if (dataModel.syncNeeded) {
-            showSyncNeededText()
-        } else {
-            showLastSyncTimeText(dataModel)
-        }
-
-        enableSyncButton(dataModel)
+    private fun setTotalPeopleInDbCounter(peopleInDb: Int?) {
+        totalPeopleInLocal.text = peopleInDb?.let { "${Math.max(it, 0)}" } ?: ""
     }
 
-    private fun setUIForSyncStarted() {
-        syncStateIcon.apply {
-            visibility = View.VISIBLE
-            setImageResource(R.drawable.ic_syncing)
-        }
-
-        syncProgressBar.visibility = View.INVISIBLE
-
-        syncDescription.textResource = R.string.syncing_calculating
-
-        disableSyncButton()
+    private fun setUploadCounter(peopleToUpload: Int?) {
+        syncUploadCount.text = peopleToUpload?.let { "${Math.max(it, 0)}" } ?: ""
     }
 
-    private fun setUIForSyncSucceeded(dataModel: DashboardSyncCard) {
-        syncStateIcon.apply {
-            visibility = View.VISIBLE
-            setImageResource(R.drawable.ic_sync_success)
-        }
-
-        syncProgressBar.visibility = View.INVISIBLE
-
-        showLastSyncTimeText(dataModel)
-
-        enableSyncButton(dataModel)
+    private fun setListenerForSyncButton(onActionClicked: () -> Unit) {
+        syncButton.setOnClickListener { onActionClicked() }
     }
 
-    private fun setUIForSyncFailed(dataModel: DashboardSyncCard) {
-        syncStateIcon.apply {
-            visibility = View.VISIBLE
-            setImageResource(R.drawable.ic_sync_failed)
-        }
-
-        syncProgressBar.visibility = View.INVISIBLE
-
-        syncDescription.textResource = R.string.dashboard_card_sync_failed
-
-        enableSyncButton(dataModel)
+    private fun setLastSyncTime(lastSyncTime: String) {
+        syncDescription.text = String.format(androidResourcesHelper.getString(R.string.dashboard_card_sync_last_sync), lastSyncTime)
     }
 
-    private fun setUIForSyncInProgress(dataModel: DashboardSyncCard) {
-        syncStateIcon.apply {
-            visibility = View.VISIBLE
-            setImageResource(R.drawable.ic_syncing)
-        }
-
-        val progressEmitted = dataModel.progress
-        updateCountersDuringSync(progressEmitted)
-        updateProgressBar(progressEmitted)
-
-        description.text = ""
-
-        syncDescription.textResource = R.string.syncing
-
-        disableSyncButton()
+    private fun setDownloadCounter(peopleToDownload: Int?) {
+        syncDownloadCount.text = peopleToDownload?.let { "${Math.max(it, 0)}" } ?: ""
     }
 
-    private fun updateProgressBar(progressEmitted: Progress?) {
-        syncProgressBar.apply {
-            visibility = View.VISIBLE
-            isIndeterminate = false
-            max = progressEmitted?.maxValue ?: 0
-            progress = progressEmitted?.currentValue ?: 0
-        }
+    private fun setSyncButtonStyleForDisabled() {
+        syncButton.isEnabled = false
+        syncButton.visibility = View.INVISIBLE
     }
 
-    private fun updateCountersDuringSync(progress: Progress?) {
-        when (progress) {
-            null -> {
-                syncDownloadCount.text = ""
-                syncUploadCount.text = ""
-            }
-            is DownloadProgress -> syncDownloadCount.text = "${Math.max(progress.maxValue - progress.currentValue, 0)}"
-            is UploadProgress -> syncUploadCount.text = "${Math.max(progress.maxValue - progress.currentValue, 0)}"
-        }
+    private fun setSyncButtonStyleForEnabled() {
+        syncButton.isEnabled = true
+        setSyncButtonStyle(androidResourcesHelper.getString(R.string.dashboard_card_sync_now), androidResourcesHelper.getDrawable(R.drawable.button_rounded_corners))
     }
 
-    private fun setUploadCounter(cardModel: DashboardSyncCard) {
-        syncUploadCount.text = "${Math.max(cardModel.peopleToUpload, 0)}"
+    private fun setSyncButtonStyleForRunning() {
+        syncButton.isEnabled = false
+        setSyncButtonStyle(androidResourcesHelper.getString(R.string.dashboard_card_syncing), androidResourcesHelper.getDrawable(R.drawable.button_rounded_corners_disabled))
     }
 
-    private fun setDownloadCounter(cardModel: DashboardSyncCard) {
-        syncDownloadCount.text = ""
-        cardModel.peopleToDownload?.let {
-            syncDownloadCount.text = "${Math.max(it, 0)}"
-        }
+    private fun setSyncButtonStyleForCalculating() {
+        syncButton.isEnabled = false
+        setSyncButtonStyle(androidResourcesHelper.getString(R.string.dashboard_card_calculating), androidResourcesHelper.getDrawable(R.drawable.button_rounded_corners_disabled))
     }
 
-    private fun showLastSyncTimeText(dataModel: DashboardSyncCard) {
-        syncDescription.text = ""
-        dataModel.lastSyncTime?.let {
-            syncDescription.text = String.format(rootView.context.getString(R.string.dashboard_card_sync_last_sync), it)
-        }
-    }
-
-    private fun showSyncNeededText() {
-        syncDescription.textResource = R.string.dashboard_card_sync_needed
-    }
-
-    private fun enableSyncButton(dataModel: DashboardSyncCard) {
-        syncAction.apply {
-            textColor = ContextCompat.getColor(rootView.context, R.color.colorAccent)
-        }
-        syncCard.apply {
-            setOnClickListener { dataModel.onSyncActionClicked(dataModel) }
-        }
-    }
-
-    private fun disableSyncButton() {
-        syncAction.apply {
-            textColor = ContextCompat.getColor(rootView.context, R.color.simprints_grey)
-        }
-        syncCard.apply {
-            setOnClickListener { }
-        }
+    private fun setSyncButtonStyle(text: String, background: Drawable?) {
+        syncButton.background = background
+        syncButton.text = text
+        syncButton.visibility = View.VISIBLE
     }
 }

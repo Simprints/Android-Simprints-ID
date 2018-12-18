@@ -1,15 +1,15 @@
 package com.simprints.id.activities
 
 import android.content.Intent
-import android.support.test.InstrumentationRegistry
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.assertion.ViewAssertions
-import android.support.test.espresso.matcher.ViewMatchers.withId
-import android.support.test.espresso.matcher.ViewMatchers.withText
-import android.support.test.filters.LargeTest
-import android.support.test.rule.ActivityTestRule
-import android.support.test.rule.GrantPermissionRule
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.InstrumentationRegistry
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.filters.LargeTest
+import androidx.test.rule.ActivityTestRule
+import androidx.test.rule.GrantPermissionRule
+import androidx.test.runner.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -30,7 +30,6 @@ import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.mockSettingsPreferencesManager
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
-
 import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
@@ -73,7 +72,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
             randomGeneratorRule = DependencyRule.MockRule,
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter },
             scannerManagerRule = DependencyRule.SpyRule,
-            simNetworkUtilsRule = DependencyRule.SpyRule)
+            simNetworkUtilsRule = DependencyRule.SpyRule,
+            syncSchedulerHelperRule = DependencyRule.MockRule)
     }
 
     private var mockBluetoothAdapter: MockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())

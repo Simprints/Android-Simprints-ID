@@ -1,16 +1,17 @@
 package com.simprints.id.secure.cryptography
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testUtils.roboletric.TestApplication
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ProjectSecretEncrypterTest {
 
     private val publicKeyString = PublicKeyString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB")

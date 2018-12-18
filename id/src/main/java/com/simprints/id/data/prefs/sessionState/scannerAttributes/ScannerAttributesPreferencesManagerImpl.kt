@@ -9,14 +9,14 @@ class ScannerAttributesPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
 
     companion object {
 
-        private val MAC_ADDRESS_KEY = "MacAddress"
-        private val MAC_ADDRESS_DEFAULT = ""
+        private const val MAC_ADDRESS_KEY = "MacAddress"
+        private const val MAC_ADDRESS_DEFAULT = ""
 
-        private val HARDWARE_VERSION_KEY = "HardwareVersion"
-        private val HARDWARE_VERSION_DEFAULT: Short = -1
+        private const val HARDWARE_VERSION_KEY = "HardwareVersion"
+        private const val HARDWARE_VERSION_DEFAULT: Short = -1
 
-        private val SCANNER_ID_KEY = "ScannerId"
-        private val SCANNER_ID_DEFAULT = ""
+        private const val SCANNER_ID_KEY = "ScannerId"
+        private const val SCANNER_ID_DEFAULT = ""
 
     }
 

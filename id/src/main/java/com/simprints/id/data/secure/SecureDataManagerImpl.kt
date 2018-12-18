@@ -8,9 +8,9 @@ import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.RandomGeneratorImpl
 
-class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
-                            private val prefsManager: PreferencesManager,
-                            private val randomGenerator: RandomGenerator = RandomGeneratorImpl())
+open class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
+                                 private val prefsManager: PreferencesManager,
+                                 private val randomGenerator: RandomGenerator = RandomGeneratorImpl())
     : SecureDataManager {
 
     companion object {

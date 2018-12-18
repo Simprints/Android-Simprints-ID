@@ -25,7 +25,7 @@ import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.session.Session
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
@@ -36,6 +36,7 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync
 import retrofit2.HttpException
 import timber.log.Timber
@@ -197,8 +198,8 @@ open class FirebaseManagerImpl(
     // TODO: stop leaking fb_Person model in the domain layer
     /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
-        getPeopleApiClient().flatMap {
-            it.requestPerson(patientId, projectId)
+        getPeopleApiClient().flatMap { api ->
+            api.requestPerson(patientId, projectId)
                 .retry(::retryCriteria)
                 .handleResponse {
                     when (it.code()) {
@@ -209,9 +210,33 @@ open class FirebaseManagerImpl(
                 }
         }
 
-    override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
-        getPeopleApiClient().flatMap {
-            it.requestPeopleCount(syncParams.projectId, syncParams.userId, syncParams.moduleId)
+    override fun getNumberOfPatients(projectId: String, userId: String?, moduleId: String?): Single<Int> =
+        getPeopleApiClient().flatMap { api ->
+            api.requestPeopleCount(projectId = projectId, userId = userId, moduleId = moduleId)
+                .retry(::retryCriteria)
+                .handleResponse(::defaultResponseErrorHandling)
+                .map { it.count }
+        }
+
+    override fun getNumberOfPatientsForSyncScope(syncScope: SyncScope): Single<Int> =
+        getPeopleApiClient().flatMap { api ->
+            syncScope.moduleIds?.let { moduleIds ->
+                sumCountsForEachModule(moduleIds, syncScope)
+            } ?: api.requestPeopleCount(syncScope.projectId, syncScope.userId, null)
+                .retry(::retryCriteria)
+                .handleResponse(::defaultResponseErrorHandling)
+                .map { it.count }
+        }
+
+    private fun sumCountsForEachModule(moduleIds: Set<String>, syncScope: SyncScope): Single<Int> =
+        Single.merge(moduleIds.map {
+            getNumberOfPatientsInModule(syncScope.projectId, it)
+                .subscribeOn(Schedulers.io())
+        }).toList().map { it.sum() }
+
+    override fun getNumberOfPatientsInModule(projectId: String, moduleId: String): Single<Int> =
+        getPeopleApiClient().flatMap { api ->
+            api.requestPeopleCount(projectId = projectId, userId = null, moduleId = moduleId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .map { it.count }

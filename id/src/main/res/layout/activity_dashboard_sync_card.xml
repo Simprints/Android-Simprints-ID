@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/dashboardCardSync"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="4dp"
     android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
     android:layout_marginTop="4dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginBottom="4dp"
     card_view:cardCornerRadius="5dp">
 
     <LinearLayout
@@ -15,158 +15,135 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/dashboardCardSyncDbInfo"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:padding="8dp">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp">
+                android:layout_marginStart="10dp"
+                android:text="@string/dashboard_card_enrolment_info"
+                android:layout_alignParentStart="true"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/dashboardCardImage"
-                    android:layout_width="50dp"
-                    android:layout_height="60dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true" />
+            <Button
+                android:id="@+id/dashboardSyncCardSyncButton"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="5dp"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/button_rounded_corners"
+                android:fontFamily="@font/muli"
+                android:padding="8dp"
+                android:text="@string/dashboard_card_sync_now"
+                android:textColor="@color/simprints_white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_toEndOf="@id/dashboardCardImage"
-                    android:layout_toRightOf="@id/dashboardCardImage"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/dashboardCardTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/dashboardCardDescription"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="7dp"
-                        android:maxLines="2"
-                        android:textSize="15sp"
-                        android:textStyle="italic"
-                        android:visibility="gone" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="7dp"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:id="@+id/dashboardCardSyncUploadIcon"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginStart="8dp"
-                            android:src="@drawable/dashboard_sync_upload" />
-
-                        <TextView
-                            android:id="@+id/dashboardCardSyncUploadText"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="16dp"
-                            android:layout_marginStart="16dp"
-                            android:layout_weight="1"
-                            android:maxLines="1"
-                            android:textSize="13sp"
-                            android:textStyle="italic" />
-
-                        <ImageView
-                            android:id="@+id/dashboardCardSyncDownloadIcon"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginStart="8dp"
-                            android:src="@drawable/dashboard_sync_download" />
-
-                        <TextView
-                            android:id="@+id/dashboardCardSyncDownloadText"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="16dp"
-                            android:layout_marginStart="16dp"
-                            android:layout_weight="1"
-                            android:maxLines="1"
-                            android:textSize="13sp"
-                            android:textStyle="italic" />
-                    </LinearLayout>
-
-                </LinearLayout>
-            </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="0dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/dashboardCardSyncAction"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/dashboardCardSyncTotalLocalText"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:minWidth="50dp"
-                    android:text="@string/dashboard_card_sync_action"
-                    android:textColor="@color/colorAccent"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/dashboardCardSyncDescription"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:textSize="13sp"
-                    android:textStyle="italic" />
-
-                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:text="@string/dashboard_card_available_on_phone"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
-                    <ImageView
-                        android:id="@+id/dashboardCardSyncState"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_marginLeft="3dp"
-                        android:layout_marginStart="3dp" />
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/simprints_grey" />
 
-                </LinearLayout>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/dashboardCardSyncUploadText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:text="@string/dashboard_card_to_upload"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/simprints_grey" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/dashboardCardSyncDownloadText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:text="@string/dashboard_card_to_download"
+                    android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/dashboardCardSyncProgressBar"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        <TextView
+            android:id="@+id/dashboardCardSyncDescription"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="-8dp"
-            android:layout_marginTop="-4dp"
-            android:scaleY="3" />
-
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="7dp"
+            android:textColor="@color/colorAccent"
+            android:textSize="12sp"
+            android:textStyle="bold" />
     </LinearLayout>
-</android.support.v7.widget.CardView>
+</androidx.cardview.widget.CardView>

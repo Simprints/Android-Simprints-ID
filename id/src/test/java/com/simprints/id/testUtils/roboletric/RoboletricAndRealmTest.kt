@@ -22,7 +22,6 @@ import org.mockito.Mockito
 import org.mockito.stubbing.Answer
 
 const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
-const val SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY = "SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY"
 
 fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteDbManagerMock: RemoteDbManager) {
     val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }

@@ -10,7 +10,7 @@ import org.junit.Test
 
 class ExpectedParametersListerImplTest {
 
-    val commonExpectedKeys = setOf(
+    private val commonExpectedKeys = setOf(
         Constants.SIMPRINTS_API_KEY,
         Constants.SIMPRINTS_MODULE_ID,
         Constants.SIMPRINTS_USER_ID,
@@ -19,9 +19,9 @@ class ExpectedParametersListerImplTest {
         Constants.SIMPRINTS_CALLING_PACKAGE
     )
 
-    val expectedParametersLister = ExpectedParametersListerImpl()
+    private val expectedParametersLister = ExpectedParametersListerImpl()
 
-    val anyCalloutParameters = mock<CalloutParameters>()
+    private val anyCalloutParameters = mock<CalloutParameters>()
 
     @Test
     fun testListExpectedParameterKeysFromVerificationCalloutContainsVerifyGuidKeyButNotUpdateGuidKey() {

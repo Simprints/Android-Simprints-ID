@@ -137,7 +137,7 @@
     <!-- Content Descriptions -->
 
 
-    <!-- AboutActivity : the screen that shows project statistics and version numbers -->
+    <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
     <string name="database_information">معلومات در مورد دیتابیس</string>
     <string name="user_count">تعداد استفاده کننده:</string>

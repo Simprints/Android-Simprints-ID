@@ -1,16 +1,19 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
+import android.content.Context
 import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
 
-class SessionEventsUploaderWorker : Worker() {
+class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
@@ -60,6 +63,6 @@ class SessionEventsUploaderWorker : Worker() {
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        }
+        } else throw WorkerInjectionFailedError.forWorker<SessionEventsUploaderWorker>()
     }
 }

@@ -1,14 +1,17 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher
 
+import android.content.Context
 import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.simprints.id.Application
+import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import timber.log.Timber
 import javax.inject.Inject
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
-class PeopleUpSyncPeriodicFlusherWorker : Worker() {
+class PeopleUpSyncPeriodicFlusherWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
     @Inject lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
 
@@ -32,7 +35,7 @@ class PeopleUpSyncPeriodicFlusherWorker : Worker() {
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        }
+        } else throw WorkerInjectionFailedError.forWorker<PeopleUpSyncPeriodicFlusherWorker>()
     }
 
     companion object {

@@ -26,6 +26,7 @@ import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
 import com.simprints.id.scanner.ScannerManager
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
@@ -42,32 +43,20 @@ import javax.inject.Inject
 
 class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
 
-    @Inject
-    lateinit var dataManager: DataManager
-    @Inject
-    lateinit var dbManager: DbManager
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var scannerManager: ScannerManager
+    @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-    @Inject
-    lateinit var simNetworkUtils: SimNetworkUtils
-
-    @Inject
-    lateinit var preferencesManager: PreferencesManager
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
-    @Inject
-    lateinit var scannerManager: ScannerManager
-    @Inject
-    lateinit var timeHelper: TimeHelper
-    @Inject
-    lateinit var sessionEventsManager: SessionEventsManager
-
+    private var startConsentEventTime: Long = 0
     private val activity = view as Activity
-
     private var permissionsAlreadyRequested = false
-
-    private var syncSchedulerHelper: SyncSchedulerHelper
 
     // True iff the app is waiting for the user to confirm consent
     private var waitingForConfirmation = true
@@ -82,13 +71,10 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         }
     }
 
-    private var startConsentEventTime: Long = 0
-
     init {
         val component = (activity.application as Application).component
         component.inject(this)
         startConsentEventTime = timeHelper.now()
-        syncSchedulerHelper = SyncSchedulerHelper(component)
     }
 
     override fun start() {
@@ -96,7 +82,9 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         view.initTextsInButtons()
         view.initConsentTabs()
 
-        syncSchedulerHelper.scheduleSyncsAndStartPeopleSyncIfNecessary()
+        syncSchedulerHelper.scheduleBackgroundSyncs()
+        syncSchedulerHelper.startDownSyncOnLaunchIfPossible()
+
         setTextToConsentTabs()
 
         startSetup()
