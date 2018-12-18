@@ -8,7 +8,6 @@ import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import timber.log.Timber
 import javax.inject.Inject
-import androidx.work.Result
 
 // TODO: uncomment userId when multitenancy is properly implemented
 

@@ -12,7 +12,6 @@ import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
-import androidx.work.Result
 
 class SessionEventsUploaderWorker(context: Context, params: WorkerParameters)
     : Worker(context, params) {

@@ -6,14 +6,13 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import timber.log.Timber
 import javax.inject.Inject
-import androidx.work.Result
 
 // TODO: uncomment userId when multitenancy is properly implemented
 

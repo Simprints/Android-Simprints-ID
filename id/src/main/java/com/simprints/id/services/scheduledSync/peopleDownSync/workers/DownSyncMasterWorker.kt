@@ -22,7 +22,8 @@ import javax.inject.Inject
 
 class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
-    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
+    @Inject
+    lateinit var syncScopeBuilder: SyncScopesBuilder
 
     companion object {
         const val SYNC_WORKER_REPEAT_INTERVAL = 6L
@@ -39,7 +40,7 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
         inject()
 
         val scope = getScope()
-        if(scope.toSubSyncScopes().isNotEmpty()) {
+        if (scope.toSubSyncScopes().isNotEmpty()) {
             val subCountWorkers = buildChainOfSubCountWorker(scope)
             val subDownSyncWorkers = scope.toSubSyncScopes().map { this.buildSubDownSyncWorker(it) }
 
@@ -49,14 +50,18 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
                 .then(subDownSyncWorkers)
                 .enqueue()
         }
+        return Result.success()
+            .also {
+                toastForDebugBuilds(scope, it)
+            }
+    }
 
-        return Result.SUCCESS.also {
-            if (BuildConfig.DEBUG) {
-                applicationContext.runOnUiThread {
-                    val message = "WM - DownSyncMasterWorker($scope): $it"
-                    Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
-                    Timber.d(message)
-                }
+    private fun toastForDebugBuilds(scope: SyncScope, result: Result) {
+        if (BuildConfig.DEBUG) {
+            applicationContext.runOnUiThread {
+                val message = "WM - DownSyncMasterWorker($scope): $result"
+                Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+                Timber.d(message)
             }
         }
     }
