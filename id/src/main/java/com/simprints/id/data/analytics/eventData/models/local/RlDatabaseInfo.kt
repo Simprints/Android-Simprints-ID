@@ -12,7 +12,7 @@ open class RlDatabaseInfo : RealmObject {
     var recordCount: Int = 0
     var sessionCount: Int = 0
 
-    constructor() {}
+    constructor()
 
     constructor(databaseInfo: DatabaseInfo) : this() {
         id = databaseInfo.id

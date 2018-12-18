@@ -53,10 +53,12 @@
 -keep class com.simprints.id.domain.ALERT_TYPE { *; }
 -keep class com.simprints.id.session.Session { *; }
 
+-keep class com.simprints.id.data.db.remote.local.** { *; }
 -keep class com.simprints.id.data.db.remote.models.** { *; }
--keep class com.simprints.id.data.db.sync.models.** { *; }
+-keep class com.simprints.id.services.scheduledSync.peopleDownSync.models.** { *; }
 -keep class com.simprints.id.data.analytics.eventData.models.** { *; }
 -keep class com.simprints.id.tools.utils.SimNetworkUtils$Connection { *; }
+
 -keep class com.simprints.id.session.callout.** { *; }
 -keep class com.simprints.id.tools.json.** { *; }
 -keepclassmembers enum * { *; }
@@ -80,3 +82,9 @@
 # Dagger
 -dontwarn com.google.errorprone.annotations.**
 
+# Kotlin Coroutines
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepclassmembernames class kotlinx.** {
+    volatile <fields>;
+}

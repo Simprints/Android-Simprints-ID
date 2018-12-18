@@ -2,8 +2,9 @@ package com.simprints.id.activities
 
 import android.app.Activity
 import android.content.Intent
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
@@ -32,15 +33,13 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowToast
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class LoginActivityTest : RxJavaTest, DaggerForTests() {
 
     companion object {
@@ -62,8 +61,8 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
         super.setUp()
         testAppComponent.inject(this)
         dbManagerSpy.initialiseDb()
@@ -100,7 +99,7 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
         val shadowLoginAct = shadowOf(loginAct)
 
         assertEquals(1, shadowLoginAct.resultCode)
-        assertTrue(shadowLoginAct.isFinishing)
+        assertTrue(loginAct.isFinishing)
     }
 
     @Test
@@ -115,14 +114,15 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
 
         assertNotNull(nextActivity)
 
-        val isIntentForGooglePlay: Boolean = nextActivity.dataString.contains("play.google.com")
+        val isIntentForGooglePlay: Boolean = (nextActivity.dataString
+            ?: "").contains("play.google.com")
         assertTrue(isIntentForGooglePlay)
     }
 
     @Test
     fun qrScanPressedAndScannerAppIsAvailable_shouldOpenScannerApp() {
 
-        val app = RuntimeEnvironment.application as Application
+        val app = ApplicationProvider.getApplicationContext() as TestApplication
         val pm = app.packageManager
 
         val controller = createRoboLoginActivity()

@@ -1,5 +1,6 @@
 package com.simprints.id.di
 
+import com.simprints.id.activities.DashboardActivityAndroidTest
 import com.simprints.id.activities.LaunchActivityAndroidTest
 import com.simprints.id.coreFeatures.CollectFingerprintsActivityTest
 import com.simprints.id.coreFeatures.HappyWorkflowAllMainFeatures
@@ -26,5 +27,6 @@ interface AppComponentForAndroidTests : AppComponent {
     fun inject(guidSelectionServiceTest: GuidSelectionServiceTest)
     fun inject(launchActivityAndroidTest: LaunchActivityAndroidTest)
     fun inject(localSessionEventsManagerImplTest: RealmSessionEventsDbManagerImplTest)
+    fun inject(dashboardActivityAndroidTest: DashboardActivityAndroidTest)
     fun inject(sessionEventsUploaderTaskEndToEndTest: SessionEventsUploaderTaskEndToEndTest)
 }

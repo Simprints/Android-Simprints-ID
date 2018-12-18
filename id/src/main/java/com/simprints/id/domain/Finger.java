@@ -3,11 +3,13 @@ package com.simprints.id.domain;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+
 
 import com.simprints.id.R;
 import com.simprints.libcommon.Fingerprint;
 import com.simprints.libsimprints.FingerIdentifier;
+
+import androidx.annotation.NonNull;
 
 
 public class Finger implements Parcelable, Comparable<Finger>{

@@ -3,6 +3,7 @@ package com.simprints.id.data.prefs.settings
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.preferenceType.ComplexPreference
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
@@ -12,6 +13,7 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.preferences.NoSuchPreferenceError
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
@@ -21,7 +23,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           private val remoteConfigWrapper: RemoteConfigWrapper,
                                           private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                           groupSerializer: Serializer<Constants.GROUP>,
-                                          languagesStringArraySerializer: Serializer<Array<String>>)
+                                          languagesStringArraySerializer: Serializer<Array<String>>,
+                                          moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
+                                          peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>)
     : SettingsPreferencesManager {
 
     companion object {
@@ -53,6 +57,12 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val TIMEOUT_KEY = "TimeoutInt"
         const val TIMEOUT_DEFAULT = 3
 
+        const val MODULE_ID_OPTIONS_KEY = "ModuleIdOptions"
+        val MODULE_ID_OPTIONS_DEFAULT = setOf<String>()
+
+        const val SELECTED_MODULES_KEY = "SelectedModules"
+        val SELECTED_MODULES_DEFAULT = setOf<String>()
+
         const val SYNC_GROUP_KEY = "SyncGroup"
         val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
 
@@ -79,18 +89,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
             FingerIdentifier.LEFT_5TH_FINGER to false
         )
 
-        const val SYNC_ON_CALLOUT_KEY = "SyncOnCallout"
-        const val SYNC_ON_CALLOUT_DEFAULT = false
-
-        const val SCHEDULED_BACKGROUND_SYNC_KEY = "ScheduledBackgroundSync"
-        const val SCHEDULED_BACKGROUND_SYNC_DEFAULT = true
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY = "ScheduledBackgroundSyncOnlyOnWifi"
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT = false
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY = "ScheduledBackgroundSyncOnlyWhenCharging"
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT = false
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY = "ScheduledBackgroundSyncOnlyWhenNotLowBattery"
-        const val SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT = true
-
         const val PROGRAM_NAME_KEY = "ProgramName"
         const val PROGRAM_NAME_DEFAULT = "this program"
 
@@ -105,6 +103,13 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
         val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(ParentalConsent())
+
+        const val PEOPLE_DOWN_SYNC_TRIGGERS_KEY = "PeopleDownSyncTriggers"
+        val PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT = mapOf(
+            PeopleDownSyncTrigger.MANUAL to true,
+            PeopleDownSyncTrigger.PERIODIC_BACKGROUND to true,
+            PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT to false
+        )
     }
 
     // Should the UI automatically slide forward?
@@ -143,6 +148,14 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var timeoutS: Int
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, TIMEOUT_KEY, TIMEOUT_DEFAULT)
 
+    // What modules will be available to sync by for this project. Serialize as pipe (|) separated list. Empty list indicates that module sync should not be possible.
+    override var moduleIdOptions: Set<String>
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODULE_ID_OPTIONS_KEY, MODULE_ID_OPTIONS_DEFAULT, moduleIdOptionsStringSetSerializer)
+
+    // What modules were selected by the user
+    override var selectedModules: Set<String>
+        by ComplexPreference(prefs, SELECTED_MODULES_KEY, SELECTED_MODULES_DEFAULT, moduleIdOptionsStringSetSerializer)
+
     // Sync group. Default is user
     override var syncGroup: Constants.GROUP
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
@@ -164,18 +177,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var fingerStatus: Map<FingerIdentifier, Boolean>
         by OverridableRemoteConfigComplexPreference(prefs, remoteConfigWrapper, FINGER_STATUS_KEY, FINGER_STATUS_DEFAULT, fingerIdToBooleanSerializer)
 
-    override var syncOnCallout: Boolean
-        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SYNC_ON_CALLOUT_KEY, SYNC_ON_CALLOUT_DEFAULT)
-
-    override var scheduledBackgroundSync: Boolean
-        by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_KEY, SCHEDULED_BACKGROUND_SYNC_DEFAULT)
-    override var scheduledBackgroundSyncOnlyOnWifi: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_ON_WIFI_DEFAULT)
-    override var scheduledBackgroundSyncOnlyWhenCharging: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_CHARGING_DEFAULT)
-    override var scheduledBackgroundSyncOnlyWhenNotLowBattery: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_KEY, SCHEDULED_BACKGROUND_SYNC_ONLY_WHEN_NOT_LOW_BATTERY_DEFAULT)
-
     // Name of the partner's program
     override var programName: String
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PROGRAM_NAME_KEY, PROGRAM_NAME_DEFAULT)
@@ -192,6 +193,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // The options of the parental consent as a JSON string of booleans
     override var parentalConsentOptionsJson: String
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT)
+
+    override var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_TRIGGERS_KEY, PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT, peopleDownSyncTriggerToSerializer)
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()

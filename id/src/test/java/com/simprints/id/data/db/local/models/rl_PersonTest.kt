@@ -1,21 +1,22 @@
 package com.simprints.id.data.db.local.models
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.shared.PeopleGeneratorUtils
+import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.FingerIdentifier
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.*
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class rl_PersonTest {
 
     @Test

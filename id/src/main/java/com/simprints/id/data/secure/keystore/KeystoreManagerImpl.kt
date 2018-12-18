@@ -21,7 +21,7 @@ import javax.crypto.Cipher
 import javax.security.auth.x500.X500Principal
 
 open class KeystoreManagerImpl(private val context: Context,
-                               val asymmetricEncrypter: AsymmetricEncrypter = AsymmetricEncrypterImpl(Cipher.getInstance(TRANSFORMATION))) : KeystoreManager {
+                               private val asymmetricEncrypter: AsymmetricEncrypter = AsymmetricEncrypterImpl(Cipher.getInstance(TRANSFORMATION))) : KeystoreManager {
 
     companion object {
         private const val RSA = "RSA"
