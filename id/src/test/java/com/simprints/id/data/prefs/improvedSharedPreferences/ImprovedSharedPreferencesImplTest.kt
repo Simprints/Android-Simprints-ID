@@ -7,7 +7,7 @@ import com.simprints.id.shared.assertThrows
 import com.simprints.id.shared.mock
 import com.simprints.id.shared.verifyOnlyInteraction
 import com.simprints.id.shared.whenever
-import junit.framework.Assert.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.ArgumentMatchers.*
 import kotlin.reflect.KClass
@@ -15,22 +15,22 @@ import kotlin.reflect.KClass
 class ImprovedSharedPreferencesImplTest {
 
     companion object {
-        val aKey = "aKey"
+        const val aKey = "aKey"
 
-        val storedInt: Int = -1
-        val storedLong: Long = -2
-        val storedFloat: Float = -3.0f
-        val storedString: String = "storedString"
-        val storedBoolean: Boolean = true
+        const val storedInt: Int = -1
+        const val storedLong: Long = -2
+        const val storedFloat: Float = -3.0f
+        const val storedString: String = "storedString"
+        const val storedBoolean: Boolean = true
 
-        val aByte: Byte = 1
-        val aShort: Short = 2
-        val anInt: Int = 3
-        val aLong: Long = 4
-        val aFloat: Float = 5.0f
-        val aDouble: Double = 6.0
-        val aBoolean: Boolean = false
-        val aString: String = "aString"
+        const val aByte: Byte = 1
+        const val aShort: Short = 2
+        const val anInt: Int = 3
+        const val aLong: Long = 4
+        const val aFloat: Float = 5.0f
+        const val aDouble: Double = 6.0
+        const val aBoolean: Boolean = false
+        const val aString: String = "aString"
         val aClass: KClass<*> = ImprovedSharedPreferencesImplTest::class
     }
 
@@ -114,7 +114,7 @@ class ImprovedSharedPreferencesImplTest {
 
     @Test
     fun testGetPrimitiveReturnsStoredLongAsDoubleBitsWhenDefaultIsDouble() {
-        assertEquals(Double.fromBits(storedLong), improvedPrefs.getPrimitive(aKey, aDouble))
+        assertEquals(Double.fromBits(storedLong), improvedPrefs.getPrimitive(aKey, aDouble), 0.0)
     }
 
     @Test

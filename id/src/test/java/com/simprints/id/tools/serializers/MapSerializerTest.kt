@@ -9,10 +9,10 @@ import org.junit.Test
 class MapSerializerTest {
 
     companion object {
-        private val originalInt = 1
-        private val serializedInt = "1"
-        private val originalBoolean = true
-        private val serializedBoolean = "true"
+        private const val originalInt = 1
+        private const val serializedInt = "1"
+        private const val originalBoolean = true
+        private const val serializedBoolean = "true"
         private val originalMap = mapOf(originalInt to originalBoolean)
     }
 

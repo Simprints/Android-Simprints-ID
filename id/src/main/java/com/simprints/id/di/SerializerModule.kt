@@ -5,6 +5,7 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
 import com.simprints.id.exceptions.unsafe.InvalidCalloutError
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameter
 import com.simprints.id.session.sessionParameters.SessionParameters
@@ -35,14 +36,20 @@ class SerializerModule {
     @Provides @Singleton @Named("FingerIdentifierSerializer") fun provideFingerIdentifierSerializer(): Serializer<FingerIdentifier> = EnumSerializer(FingerIdentifier::class.java)
     @Provides @Singleton @Named("CalloutActionSerializer") fun provideCalloutActionSerializer(): Serializer<CalloutAction> = EnumSerializer(CalloutAction::class.java)
     @Provides @Singleton @Named("GroupSerializer") fun provideGroupSerializer(): Serializer<Constants.GROUP> = EnumSerializer(Constants.GROUP::class.java)
+    @Provides @Singleton @Named("PeopleDownSyncTriggerSerializer") fun providePeopleDownSyncTriggerSerializer(): Serializer<PeopleDownSyncTrigger> = EnumSerializer(PeopleDownSyncTrigger::class.java)
     @Provides @Singleton fun provideGson(): Gson = Gson()
     @Provides @Singleton @Named("LocationSerializer") fun provideLocationSerializer(): Serializer<Location> = LocationSerializer()
 
     @Provides @Singleton @Named("FingerIdToBooleanSerializer") fun provideFingerIdToBooleanSerializer(@Named("FingerIdentifierSerializer") fingerIdentifierSerializer: Serializer<FingerIdentifier>,
                                                                 @Named("BooleanSerializer") booleanSerializer: Serializer<Boolean>,
                                                                 gson: Gson): Serializer<Map<FingerIdentifier, Boolean>> = MapSerializer(fingerIdentifierSerializer, booleanSerializer, gson)
+    @Provides @Singleton @Named("PeopleDownSyncTriggerToBooleanSerializer") fun providePeopleDownSyncTriggerToBooleanSerializer(
+        @Named("PeopleDownSyncTriggerSerializer") peopleDownSyncSyncTriggerSerializer: Serializer<PeopleDownSyncTrigger>,
+        @Named("BooleanSerializer") booleanSerializer: Serializer<Boolean>,
+        gson: Gson): Serializer<Map<PeopleDownSyncTrigger, Boolean>> = MapSerializer(peopleDownSyncSyncTriggerSerializer, booleanSerializer, gson)
 
     @Provides @Singleton @Named("LanguagesStringArraySerializer") fun provideLanguagesStringArraySerializer(): Serializer<Array<String>> = LanguagesStringArraySerializer()
+    @Provides @Singleton @Named("ModuleIdOptionsStringSetSerializer") fun provideModuleIdOptionsStringSetSerializer(): Serializer<Set<String>> = ModuleIdOptionsStringSetSerializer()
 
     //Action
     @Provides @Singleton @Named("ActionReader") fun provideActionReader(): Reader<CalloutAction> = ActionReader()
@@ -53,7 +60,7 @@ class SerializerModule {
     //ModuleId
     @Provides @Singleton @Named("InvalidModuleIdError") fun provideInvalidModuleIdError(): Error = InvalidCalloutError(ALERT_TYPE.INVALID_MODULE_ID)
     @Provides @Singleton @Named("MissingModuleIdError") fun provideMissingModuleIdError(): Error = InvalidCalloutError(ALERT_TYPE.MISSING_MODULE_ID)
-    @Provides @Singleton @Named("ModuleIdValidator") fun provideModuleIdValidator(): Validator<String> = NoOpValidator<String>()
+    @Provides @Singleton @Named("ModuleIdValidator") fun provideModuleIdValidator(@Named("InvalidModuleIdError") invalidModuleIdError: Error): Validator<String> = ModuleIdValidator(invalidModuleIdError)
     @Provides @Singleton @Named("ModuleIdExtractor")fun provideModuleIdExtractor(@Named("ModuleIdReader") moduleIdReader: Reader<String>, @Named("ModuleIdValidator") moduleIdValidator: Validator<String>): Extractor<String> = ParameterExtractor(moduleIdReader, moduleIdValidator)
     @Provides @Singleton @Named("ModuleIdReader") fun provideModuleIdReader(@Named("MissingModuleIdError") missingModuleIdError: Error, @Named("InvalidModuleIdError") invalidModuleIdError: Error): Reader<String> =
         MandatoryParameterReader(SIMPRINTS_MODULE_ID, String::class, missingModuleIdError, invalidModuleIdError)
@@ -99,7 +106,7 @@ class SerializerModule {
     //CallingPackage
     @Provides @Singleton @Named("InvalidCallingPackageError") fun provideInvalidCallingPackageError(): Error = InvalidCalloutError(ALERT_TYPE.INVALID_CALLING_PACKAGE)
     @Provides @Singleton @Named("CallingPackageReader") fun provideCallingPackageReader(@Named("InvalidCallingPackageError") invalidCallingPackageError: Error): Reader<String> = OptionalParameterReader(SIMPRINTS_CALLING_PACKAGE, "", invalidCallingPackageError)
-    @Provides @Singleton @Named("CallingPackageValidator") fun provideCallingPackageValidator(): Validator<String> = NoOpValidator<String>()
+    @Provides @Singleton @Named("CallingPackageValidator") fun provideCallingPackageValidator(): Validator<String> = NoOpValidator()
     @Provides @Singleton @Named("CallingPackageExtractor") fun provideCallingPackageExtractor(@Named("CallingPackageReader") callingPackageReader: Reader<String>, @Named("CallingPackageValidator") callingPackageValidator: Validator<String>): Extractor<String> = ParameterExtractor(callingPackageReader, callingPackageValidator)
 
     //MetadataReader
@@ -121,7 +128,7 @@ class SerializerModule {
 
     @Provides @Singleton @Named("ParametersReader") fun provideParametersReader(@Named("ExpectedParametersLister") expectedParametersLister: ExpectedParametersLister): Reader<Set<CalloutParameter>> = UnexpectedParametersReader(expectedParametersLister)
 
-    @Provides @Singleton @Named("GuidGenerator") fun provideGuidGenerator(): Extractor<String> = ParameterExtractor(GeneratorReader({ UUID.randomUUID().toString() }), NoOpValidator())
+    @Provides @Singleton @Named("GuidGenerator") fun provideGuidGenerator(): Extractor<String> = ParameterExtractor(GeneratorReader { UUID.randomUUID().toString() }, NoOpValidator())
     @Provides @Singleton @Named("PatientIdExtractor") fun providePatientIdExtractor(@Named("UpdateIdExtractor") updateIdExtractor: Extractor<String>, @Named("VerifyIdExtractor") verifyIdExtractor: Extractor<String>, @Named("GuidGenerator") guidGenerator: Extractor<String>): Extractor<String> {
         val patientIdSwitch = mapOf(
             CalloutAction.UPDATE to updateIdExtractor,

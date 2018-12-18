@@ -1,6 +1,6 @@
 package com.simprints.id.testTools
 
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 
 
 object StringUtils {

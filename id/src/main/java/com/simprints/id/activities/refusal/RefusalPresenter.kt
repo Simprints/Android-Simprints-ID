@@ -51,13 +51,13 @@ class RefusalPresenter(private val view: RefusalContract.View,
     override fun handleSubmitButtonClick(refusalText: String) {
         saveRefusalFormInDb(getRefusalForm(refusalText))
         reason?.let { refusalReason ->
-            sessionEventsManager.updateSession({
+            sessionEventsManager.updateSession {
                 it.events.add(RefusalEvent(
-                    it.timeRelativeToStartTime(refusalStartTime),
-                    it.nowRelativeToStartTime(timeHelper),
-                    RefusalEvent.Answer.fromRefusalReason(refusalReason),
-                    refusalText))
-            }).subscribeBy(onError = {
+                        it.timeRelativeToStartTime(refusalStartTime),
+                        it.nowRelativeToStartTime(timeHelper),
+                        RefusalEvent.Answer.fromRefusalReason(refusalReason),
+                        refusalText))
+            }.subscribeBy(onError = {
                 analyticsManager.logThrowable(it)
                 view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
             }, onComplete = {

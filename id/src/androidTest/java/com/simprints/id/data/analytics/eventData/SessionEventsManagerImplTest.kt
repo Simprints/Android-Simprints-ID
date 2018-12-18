@@ -1,8 +1,8 @@
 package com.simprints.id.data.analytics.eventData
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.filters.SmallTest
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.InstrumentationRegistry
+import androidx.test.filters.SmallTest
+import androidx.test.runner.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.Application
@@ -17,9 +17,8 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEv
 import com.simprints.id.data.analytics.eventData.models.local.RlSession
 import com.simprints.id.data.analytics.eventData.models.local.toDomainSession
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
@@ -326,7 +325,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
     private fun mockLocalToAddFakePersonAfterLogin(guid: String) {
         Mockito.doAnswer {
             it.callRealMethod()
-            localDbManager.insertOrUpdatePersonInLocal(rl_Person(fb_Person(PeopleGeneratorUtils.getRandomPerson(patientId = guid))))
+            localDbManager.insertOrUpdatePersonInLocal(PeopleGeneratorUtils.getRandomPerson(patientId = guid).toRealmPerson())
                 .onErrorComplete().blockingAwait()
         }.`when`(localDbManager).signInToLocal(anyNotNull())
     }

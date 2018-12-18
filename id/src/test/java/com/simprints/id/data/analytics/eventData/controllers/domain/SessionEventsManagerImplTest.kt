@@ -1,9 +1,11 @@
 package com.simprints.id.data.analytics.eventData.controllers.domain
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.spy
 import com.nhaarman.mockito_kotlin.verify
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.ArtificialTerminationEvent
@@ -21,18 +23,17 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import io.reactivex.Completable
 import io.reactivex.Single
-import junit.framework.Assert.assertNotNull
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.times
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsManagerImplTest {
 
     private val sessionEventsSyncManagerMock: SessionEventsSyncManager = mock()
@@ -97,7 +98,7 @@ class SessionEventsManagerImplTest {
         assertThat(oldOpenSession?.isClosed()).isTrue()
         assertThat(oldOpenSession?.events?.filterIsInstance(ArtificialTerminationEvent::class.java)).hasSize(1)
 
-        verify(sessionEventsSyncManagerMock, times(1)).scheduleSyncIfNecessary()
+        verify(sessionEventsSyncManagerMock, times(1)).scheduleSessionsSync()
     }
 
     @Test

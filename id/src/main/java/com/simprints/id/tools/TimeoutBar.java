@@ -3,11 +3,12 @@ package com.simprints.id.tools;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.CountDownTimer;
-import android.support.v4.content.ContextCompat;
 import android.widget.ProgressBar;
 
 import com.simprints.id.R;
 import com.simprints.id.domain.Finger;
+
+import androidx.core.content.ContextCompat;
 
 public class TimeoutBar {
     private Context context;

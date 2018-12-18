@@ -8,6 +8,7 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
@@ -18,12 +19,16 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters)
 
     @Inject
     lateinit var loginInfoManager: LoginInfoManager
+
     @Inject
     lateinit var sessionEventsManager: SessionEventsManager
+
     @Inject
     lateinit var analyticsManager: AnalyticsManager
+
     @Inject
     lateinit var timeHelper: TimeHelper
+
     @Inject
     lateinit var remoteDbManager: RemoteDbManager
 
@@ -70,6 +75,8 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters)
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
+        } else {
+            throw WorkerInjectionFailedError.forWorker<SessionEventsUploaderWorker>()
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.remote.network
 
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.sync.models.PeopleCount
+import com.simprints.id.data.db.remote.models.PeopleCount
 import com.simprints.id.network.NetworkConstants
 import io.reactivex.Single
 import okhttp3.ResponseBody

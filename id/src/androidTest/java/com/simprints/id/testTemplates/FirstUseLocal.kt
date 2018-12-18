@@ -1,6 +1,6 @@
 package com.simprints.id.testTemplates
 
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionRealmConfig
 import com.simprints.id.data.db.local.models.LocalDbKey

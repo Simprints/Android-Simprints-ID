@@ -20,8 +20,8 @@ open class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
         arrayListOf<Connection>().apply {
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    cm.allNetworks?.map {
-                        cm.getNetworkInfo(it).let {
+                    cm.allNetworks?.map { network ->
+                        cm.getNetworkInfo(network).let {
                             add(SimNetworkUtils.Connection(it.typeName, it.detailedState))
                         }
                     }
