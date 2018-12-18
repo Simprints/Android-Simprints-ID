@@ -1,11 +1,11 @@
 package com.simprints.id.data.local
 
-import android.support.test.InstrumentationRegistry
+import androidx.test.InstrumentationRegistry
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
-import com.simprints.id.domain.Constants.GROUP.*
+import com.simprints.id.data.db.local.realm.models.toRealmPerson
+import com.simprints.id.domain.Person
 import com.simprints.id.shared.PeopleGeneratorUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -34,15 +34,13 @@ open class RealmTestsBase {
         deleteRealmFiles(config)
     }
 
-    protected fun getFakePerson(): rl_Person = PeopleGeneratorUtils.getRandomPerson()
+    protected fun getFakePerson(): rl_Person = PeopleGeneratorUtils.getRandomPerson().toRealmPerson()
 
     protected fun saveFakePerson(realm: Realm, fakePerson: rl_Person): rl_Person =
-        fakePerson.also { realm.executeTransaction { it.insertOrUpdate(fakePerson) } }
+        fakePerson.also { realm.executeTransaction { realm -> realm.insertOrUpdate(fakePerson) } }
 
-    protected fun saveFakePeople(realm: Realm, people: ArrayList<rl_Person>): ArrayList<rl_Person> =
-        people.also { realm.executeTransaction { it.insertOrUpdate(people) } }
-
-    protected fun deleteAll(realm: Realm) = realm.executeTransaction { it.deleteAll() }
+    protected fun saveFakePeople(realm: Realm, people: List<Person>): List<Person> =
+        people.also { realm.executeTransaction { realm -> realm.insertOrUpdate(people.map { person -> person.toRealmPerson() }) } }
 
     protected fun rl_Person.deepEquals(other: rl_Person): Boolean = when {
         this.patientId != other.patientId -> false
@@ -54,17 +52,6 @@ open class RealmTestsBase {
         this.updatedAt != other.updatedAt -> false
         else -> true
     }
-
-    protected fun saveFakeSyncInfo(realm: Realm,
-                                   userId: String = "",
-                                   moduleId: String = ""): rl_SyncInfo = when {
-        userId.isNotEmpty() -> rl_SyncInfo(USER, PeopleGeneratorUtils.getRandomPerson(toSync = false))
-        moduleId.isNotEmpty() -> rl_SyncInfo(MODULE, PeopleGeneratorUtils.getRandomPerson(toSync = false))
-        else -> rl_SyncInfo(GLOBAL, PeopleGeneratorUtils.getRandomPerson(toSync = false))
-    }.also { info -> realm.executeTransaction { it.insertOrUpdate(info) } }
-
-    protected fun rl_SyncInfo.deepEquals(other: rl_SyncInfo): Boolean =
-        syncGroupId == other.syncGroupId && lastSyncTime == other.lastSyncTime
 
     protected fun deleteRealmFiles(realmConfig: RealmConfiguration) {
         Realm.deleteRealm(realmConfig)

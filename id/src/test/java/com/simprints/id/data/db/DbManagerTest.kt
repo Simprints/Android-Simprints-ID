@@ -1,12 +1,17 @@
 package com.simprints.id.data.db
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
@@ -34,15 +39,13 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class DbManagerTest : RxJavaTest, DaggerForTests() {
 
     private var mockServer = MockWebServer()
@@ -66,8 +69,8 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
         super.setUp()
         testAppComponent.inject(this)
 
@@ -79,7 +82,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun savingPerson_shouldSaveThenScheduleUpSync() {
-        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().apply {
+        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
             updatedAt = null
             createdAt = null
         })
@@ -115,7 +118,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     fun loadingPersonMissingInLocalDb_shouldStillLoadFromRemoteDb() {
         val person = PeopleGeneratorUtils.getRandomPerson()
 
-        mockServer.enqueue(mockResponseForDownloadPatient(fb_Person(person)))
+        mockServer.enqueue(mockResponseForDownloadPatient(person.toFirebasePerson()))
 
         val result = mutableListOf<Person>()
 
@@ -137,7 +140,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun savingPerson_serverProblemStillSavesPerson() {
-        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().apply {
+        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
             updatedAt = null
             createdAt = null
         })
@@ -158,7 +161,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun savingPerson_noConnectionStillSavesPerson() {
-        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().apply {
+        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
             updatedAt = null
             createdAt = null
         })

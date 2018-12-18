@@ -1,8 +1,8 @@
 package com.simprints.id
 
-import android.support.test.filters.SmallTest
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.filters.SmallTest
+import androidx.test.rule.ActivityTestRule
+import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.testTools.waitOnSystem
 import io.reactivex.Observable

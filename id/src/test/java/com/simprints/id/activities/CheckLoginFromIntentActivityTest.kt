@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
@@ -24,6 +26,7 @@ import com.simprints.id.shared.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
+import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
 import org.junit.Assert
 import org.junit.Assert.*
@@ -32,18 +35,16 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 // for O_MR1 = 27, Roboletric hangs around after it calls SharedPrefs.'apply' and then it accesses to
 // the SharedPrefs again. https://github.com/robolectric/robolectric/issues/3641
-@RunWith(RobolectricTestRunner::class)
+@RunWith(AndroidJUnit4::class)
 @Config(
     application = TestApplication::class,
-    sdk = [Build.VERSION_CODES.N_MR1])
+    sdk = [Build.VERSION_CODES.N_MR1], shadows = [ShadowAndroidXMultiDex::class])
 class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
     companion object {
@@ -76,8 +77,9 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
+        initWorkManagerIfRequired(app)
         super.setUp()
         testAppComponent.inject(this)
         setupLocalAndRemoteManagersForApiTesting(
@@ -120,6 +122,18 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
         Assert.assertEquals(DEFAULT_PROJECT_ID, preferences.projectId)
         Assert.assertEquals(DEFAULT_USER_ID, preferences.userId)
+    }
+
+    @Test
+    fun invalidModuleIdInParams_shouldAlertActComeUp() {
+
+        val intent = createACallingAppIntentWithProjectId(moduleId = "invalid module ID with pipes |")
+
+        val controller = createRoboCheckLoginFromIntentViewActivity(intent).start()
+        val activity = controller.get() as CheckLoginFromIntentActivity
+        controller.visible()
+
+        assertActivityStarted(AlertActivity::class.java, activity)
     }
 
     @Test
@@ -171,7 +185,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
         val activity = startCheckLoginFromIntentActivity(loginIntent)
         val sActivity = shadowOf(activity)
 
-        assertFalse(sActivity.isFinishing)
+        assertFalse(activity.isFinishing)
         val intent = sActivity.nextStartedActivity
         assertActivityStarted(LaunchActivity::class.java, intent)
 
@@ -180,7 +194,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
             Activity.RESULT_OK,
             Intent().putExtra("result", "some_result"))
 
-        assertTrue(sActivity.isFinishing)
+        assertTrue(activity.isFinishing)
         assertEquals(sActivity.resultCode, Activity.RESULT_OK)
         assertEquals(sActivity.resultIntent.getStringExtra("result"), "some_result")
     }
@@ -194,7 +208,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
         controller.resume().visible()
         val sActivity = shadowOf(activity)
 
-        assertFalse(sActivity.isFinishing)
+        assertFalse(activity.isFinishing)
         val intent = sActivity.nextStartedActivity
         assertActivityStarted(LoginActivity::class.java, intent)
 
@@ -207,7 +221,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
         controller.resume()
         assertActivityStarted(LaunchActivity::class.java, sActivity)
-        assertFalse(sActivity.isFinishing)
+        assertFalse(activity.isFinishing)
     }
 
     @Test
@@ -219,7 +233,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
         controller.resume().visible()
         val sActivity = shadowOf(activity)
 
-        assertFalse(sActivity.isFinishing)
+        assertFalse(activity.isFinishing)
         val intent = sActivity.nextStartedActivity
         assertActivityStarted(LoginActivity::class.java, intent)
 

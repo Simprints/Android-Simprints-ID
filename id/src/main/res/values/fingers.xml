@@ -26,9 +26,6 @@
         <item>RIGHT_5TH_FINGER</item>
     </string-array>
 
-    <string-array name="default_fingers">
-        <item>LEFT_THUMB</item>
-        <item>LEFT_INDEX_FINGER</item>
-    </string-array>
+    <string-array name="empty"/>
 
 </resources>

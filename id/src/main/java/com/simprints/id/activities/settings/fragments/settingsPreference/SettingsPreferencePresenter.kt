@@ -3,9 +3,9 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
-import android.preference.SwitchPreference
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.Constants
 import com.simprints.libsimprints.FingerIdentifier
 import javax.inject.Inject
 
@@ -21,8 +21,35 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     }
 
     override fun start() {
+        configureSelectModulePreference()
         configureAvailableLanguageEntriesFromProjectLanguages()
         loadPreferenceValuesAndBindThemToChangeListeners()
+    }
+
+    private fun configureSelectModulePreference() {
+        clearSelectModulePreferenceOfOldValues()
+        configureVisibilityOfSelectModulePreference()
+        configureSelectModuleEntriesFromModuleIdOptions()
+    }
+
+    private fun clearSelectModulePreferenceOfOldValues() {
+        preferencesManager.selectedModules = preferencesManager.selectedModules.filter {
+            preferencesManager.moduleIdOptions.contains(it)
+        }.toSet()
+    }
+
+    private fun configureVisibilityOfSelectModulePreference() {
+        val isModuleListNonEmpty = preferencesManager.moduleIdOptions.isNotEmpty()
+        val isModuleSync = preferencesManager.syncGroup == Constants.GROUP.MODULE
+
+        view.setSelectModulePreferenceEnabled(isModuleSync and isModuleListNonEmpty) // TODO : log in analytics if XOR these conditions is true
+    }
+
+    private fun configureSelectModuleEntriesFromModuleIdOptions() {
+        val preference = view.getPreferenceForSelectModules() as MultiSelectListPreference
+
+        preference.entries = preferencesManager.moduleIdOptions.toTypedArray()
+        preference.entryValues = preferencesManager.moduleIdOptions.toTypedArray()
     }
 
     private fun configureAvailableLanguageEntriesFromProjectLanguages() {
@@ -56,9 +83,9 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
 
     private fun loadPreferenceValuesAndBindThemToChangeListeners() {
         loadValueAndBindChangeListener(view.getPreferenceForLanguage())
+        loadValueAndBindChangeListener(view.getPreferenceForSelectModules())
         loadValueAndBindChangeListener(view.getPreferenceForDefaultFingers())
-        loadValueAndBindChangeListener(view.getPreferenceForSyncUponLaunchToggle())
-        loadValueAndBindChangeListener(view.getPreferenceForBackgroundSyncToggle())
+        loadValueAndBindChangeListener(view.getSyncAndSearchConfigurationPreference())
         loadValueAndBindChangeListener(view.getAppVersionPreference())
         loadValueAndBindChangeListener(view.getScannerVersionPreference())
     }
@@ -69,17 +96,16 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
                 loadLanguagePreference(preference as ListPreference)
                 preference.setChangeListener { value: String -> handleLanguagePreferenceChanged(preference, value) }
             }
+            view.getKeyForSelectModulesPreference() -> {
+                loadSelectModulesPreference(preference as MultiSelectListPreference)
+                preference.setChangeListener { value: HashSet<String> -> handleSelectModulesChanged(value) }
+            }
             view.getKeyForDefaultFingersPreference() -> {
                 loadDefaultFingersPreference(preference as MultiSelectListPreference)
                 preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
             }
-            view.getKeyForSyncUponLaunchPreference() -> {
-                loadSyncUponLaunchPreference(preference as SwitchPreference)
-                preference.setChangeListener { value: Boolean -> handleSyncUponLaunchChanged(value) }
-            }
-            view.getKeyForBackgroundSyncPreference() -> {
-                loadBackgroundSyncPreference(preference as SwitchPreference)
-                preference.setChangeListener { value: Boolean -> handleBackgroundSyncChanged(value) }
+            view.getKeyForSyncAndSearchConfigurationPreference() -> {
+                loadSyncAndSearchConfigurationPreference(preference)
             }
             view.getKeyForAppVersionPreference() -> {
                 loadAppVersionInPreference(preference)
@@ -107,17 +133,20 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         }
     }
 
+    private fun loadSelectModulesPreference(preference: MultiSelectListPreference) {
+        preference.values = preferencesManager.selectedModules
+    }
+
     private fun loadDefaultFingersPreference(preference: MultiSelectListPreference) {
         preference.values = getHashSetFromFingersMap(preferencesManager.fingerStatus).toHashSet()
     }
 
-    private fun loadSyncUponLaunchPreference(preference: SwitchPreference) {
-        preference.isChecked = preferencesManager.syncOnCallout
+    private fun loadSyncAndSearchConfigurationPreference(preference: Preference) {
+        preference.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
+            " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
     }
 
-    private fun loadBackgroundSyncPreference(preference: SwitchPreference) {
-        preference.isChecked = preferencesManager.scheduledBackgroundSync
-    }
+    private fun Constants.GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
 
     private fun loadAppVersionInPreference(preference: Preference) {
         preference.summary = preferencesManager.appVersionName
@@ -125,16 +154,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
 
     private fun loadScannerVersionInPreference(preference: Preference) {
         preference.summary = preferencesManager.hardwareVersionString
-    }
-
-    private fun handleSyncUponLaunchChanged(value: Boolean): Boolean {
-        preferencesManager.syncOnCallout = value
-        return true
-    }
-
-    private fun handleBackgroundSyncChanged(value: Boolean): Boolean {
-        preferencesManager.scheduledBackgroundSync = value
-        return true
     }
 
     private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String): Boolean {
@@ -147,6 +166,27 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             null
         }
         return true
+    }
+
+    private fun handleSelectModulesChanged(moduleIdHash: HashSet<String>): Boolean {
+        when {
+            moduleIdHash.size == 0 -> handleNoModulesSelected(moduleIdHash)
+            moduleIdHash.size > MAX_SELECTED_MODULES -> handleTooManyModulesSelected(moduleIdHash)
+            else -> preferencesManager.selectedModules = moduleIdHash
+        }
+        return true
+    }
+
+    private fun handleNoModulesSelected(moduleIdHash: HashSet<String>) {
+        view.showToastForNoModulesSelected()
+        moduleIdHash.clear()
+        moduleIdHash.addAll(preferencesManager.selectedModules)
+    }
+
+    private fun handleTooManyModulesSelected(moduleIdHash: HashSet<String>) {
+        view.showToastForTooManyModulesSelected(MAX_SELECTED_MODULES)
+        moduleIdHash.clear()
+        moduleIdHash.addAll(preferencesManager.selectedModules)
     }
 
     private fun handleDefaultFingersChanged(preference: MultiSelectListPreference,
@@ -171,4 +211,8 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         mutableMapOf<FingerIdentifier, Boolean>().apply {
             fingersHash.map { FingerIdentifier.valueOf(it) }.forEach { this[it] = true }
         }
+
+    companion object {
+        const val MAX_SELECTED_MODULES = 6
+    }
 }

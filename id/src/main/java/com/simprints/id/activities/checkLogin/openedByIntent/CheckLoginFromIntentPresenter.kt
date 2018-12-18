@@ -37,12 +37,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private var possibleLegacyApiKey: String = ""
     private var setupFailed: Boolean = false
 
-    @Inject
-    lateinit var sessionEventsManager: SessionEventsManager
-    @Inject
-    lateinit var dbManager: LocalDbManager
-    @Inject
-    lateinit var simNetworkUtils: SimNetworkUtils
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var dbManager: LocalDbManager
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
 
     init {
         component.inject(this)

@@ -1,10 +1,12 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.di.DaggerForTests
@@ -24,12 +26,11 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsMasterTaskTest: RxJavaTest, DaggerForTests() {
 
     private val projectId = "projectId"

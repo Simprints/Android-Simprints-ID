@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
@@ -25,6 +24,8 @@ import com.simprints.id.tools.TimeHelper;
 import com.simprints.libcommon.Person;
 
 import javax.inject.Inject;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import static com.simprints.id.tools.utils.AndroidResourcesHelperImpl.getStringPlural;
 

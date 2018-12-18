@@ -8,20 +8,20 @@ class SessionTimestampsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
 
     companion object {
 
-        private val MS_SINCE_BOOT_ON_SESSION_START_KEY = "MsSinceBootOnSessionStart"
-        private val MS_SINCE_BOOT_ON_SESSION_START_DEFAULT = 0L
+        private const val MS_SINCE_BOOT_ON_SESSION_START_KEY = "MsSinceBootOnSessionStart"
+        private const val MS_SINCE_BOOT_ON_SESSION_START_DEFAULT = 0L
 
-        private val MS_SINCE_BOOT_ON_LOAD_END_KEY = "MsSinceBootOnLoadEnd"
-        private val MS_SINCE_BOOT_ON_LOAD_END_DEFAULT = -1L
+        private const val MS_SINCE_BOOT_ON_LOAD_END_KEY = "MsSinceBootOnLoadEnd"
+        private const val MS_SINCE_BOOT_ON_LOAD_END_DEFAULT = -1L
 
-        private val MS_SINCE_BOOT_ON_MAIN_START_KEY = "MsSinceBootOnMainStart"
-        private val MS_SINCE_BOOT_ON_MAIN_START_DEFAULT = -1L
+        private const val MS_SINCE_BOOT_ON_MAIN_START_KEY = "MsSinceBootOnMainStart"
+        private const val MS_SINCE_BOOT_ON_MAIN_START_DEFAULT = -1L
 
-        private val MS_SINCE_BOOT_ON_MATCH_START_KEY = "MsSinceBootOnMatchStart"
-        private val MS_SINCE_BOOT_ON_MATCH_START_DEFAULT = -1L
+        private const val MS_SINCE_BOOT_ON_MATCH_START_KEY = "MsSinceBootOnMatchStart"
+        private const val MS_SINCE_BOOT_ON_MATCH_START_DEFAULT = -1L
 
-        private val MS_SINCE_BOOT_ON_SESSION_END_KEY = "MsSinceBootOnSessionEnd"
-        private val MS_SINCE_BOOT_ON_SESSION_END_DEFAULT = -1L
+        private const val MS_SINCE_BOOT_ON_SESSION_END_KEY = "MsSinceBootOnSessionEnd"
+        private const val MS_SINCE_BOOT_ON_SESSION_END_DEFAULT = -1L
     }
 
     // Milliseconds since boot, on current session start

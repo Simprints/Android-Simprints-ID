@@ -19,7 +19,9 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 // Class to manage the current activeSession
@@ -47,7 +49,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     override fun createSession(): Single<SessionEvents> =
         createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN).let {
             Timber.d("Created session: ${it.id}")
-            sessionEventsSyncManager.scheduleSyncIfNecessary()
+            sessionEventsSyncManager.scheduleSessionsSync()
 
             closeLastSessionsIfPending()
                 .andThen(insertOrUpdateSessionEvents(it))
@@ -175,7 +177,13 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     }
 
     override fun signOut() {
-        deleteSessions().blockingAwait()
+        deleteSessions()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onComplete = {}, onError = {
+                it.printStackTrace()
+            })
+
         sessionEventsSyncManager.cancelSyncWorkers()
     }
 

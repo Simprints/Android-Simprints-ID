@@ -2,7 +2,7 @@ package com.simprints.id.activities.refusal
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -14,7 +14,7 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.libsimprints.Constants
 import kotlinx.android.synthetic.main.activity_refusal.*
-import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
+import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 
 class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
