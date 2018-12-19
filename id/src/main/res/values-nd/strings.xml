@@ -9,7 +9,7 @@
     <string name="consent_privacy_rights">Ungavuma ukhululekile ukuphuma iloba yisiphi isikhathi njalo ucele ulwazi lwakho lucitshwe.&#160;</string>
     <string name="consent_confirmation">Ngicela ukusebenzisa ifingerprint yakho. Ngicela uthi \"ngiyavuma\", \"Angivumi\" kumbe \"Ngilemibuzo.\"</string>
 
-    <string name="launch_consent_decline_button">Angivumi</string>
-    <string name="launch_consent_accept_button">Ngiyavuma</string>
+    <string name="launch_consent_decline_button">Yala</string>
+    <string name="launch_consent_accept_button">Vuma</string>
 
 </resources>
