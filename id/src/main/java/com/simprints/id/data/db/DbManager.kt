@@ -7,14 +7,12 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.progress.Progress
-import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.session.Session
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
 import com.simprints.libcommon.Person as LibPerson
 
@@ -44,17 +42,15 @@ interface DbManager {
 
     fun refreshProjectInfoWithServer(projectId: String): Single<Project>
 
-    fun getPeopleCount(group: Constants.GROUP): Single<Int>
+    fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<Int>
 
     fun updateIdentification(projectId: String, selectedGuid: String, sessionId: String)
 
     fun saveRefusalForm(refusalForm: RefusalForm)
 
-    fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int>
+    fun calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?): Single<Int>
 
     fun saveSession(session: Session)
-
-    fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress>
 
     fun recoverLocalDb(group: Constants.GROUP): Completable
 

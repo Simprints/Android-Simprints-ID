@@ -2,29 +2,28 @@ package com.simprints.id.activities
 
 import android.app.Activity
 import android.content.SharedPreferences
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.data.DataManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
-import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.tools.delegates.lazyVar
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class CheckLoginFromMainLauncherActivityTest : DaggerForTests() {
 
     private lateinit var editor: SharedPreferences.Editor
@@ -35,9 +34,6 @@ class CheckLoginFromMainLauncherActivityTest : DaggerForTests() {
     @Inject
     lateinit var dbManager: DbManager
 
-    @Inject
-    lateinit var dataManager: DataManager
-
     override var module by lazyVar {
         AppModuleForTests(app,
             localDbManagerRule = MockRule,
@@ -47,8 +43,8 @@ class CheckLoginFromMainLauncherActivityTest : DaggerForTests() {
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
         super.setUp()
         testAppComponent.inject(this)
         dbManager.initialiseDb()

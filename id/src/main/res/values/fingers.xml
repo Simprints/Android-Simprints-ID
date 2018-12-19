@@ -31,4 +31,6 @@
         <item>LEFT_INDEX_FINGER</item>
     </string-array>
 
+    <string-array name="empty"/>
+
 </resources>

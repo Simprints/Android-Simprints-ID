@@ -1,15 +1,15 @@
 package com.simprints.id.activities.dashboard
 
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
-import com.simprints.id.activities.dashboard.models.DashboardCard
-import com.simprints.id.activities.dashboard.models.DashboardSyncCard
+import com.simprints.id.activities.dashboard.viewModels.CardViewModel
+import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.views.DashboardCardView
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 
-class DashboardCardAdapter(private val cardModels: ArrayList<DashboardCard>) :
+class DashboardCardAdapter(private val cardModels: ArrayList<CardViewModel>) :
     RecyclerView.Adapter<DashboardCardView>() {
 
     enum class CardViewType {
@@ -18,7 +18,7 @@ class DashboardCardAdapter(private val cardModels: ArrayList<DashboardCard>) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (cardModels[position] is DashboardSyncCard) {
+        return if (cardModels[position] is DashboardSyncCardViewModel) {
             CardViewType.SYNC.ordinal
         } else {
             CardViewType.GENERAL.ordinal
@@ -35,4 +35,15 @@ class DashboardCardAdapter(private val cardModels: ArrayList<DashboardCard>) :
         }
 
     override fun getItemCount() = cardModels.size
+
+
+    override fun onViewAttachedToWindow(holder: DashboardCardView) {
+        super.onViewAttachedToWindow(holder)
+        holder.onAppear()
+    }
+
+    override fun onViewDetachedFromWindow(holder: DashboardCardView) {
+        super.onViewDetachedFromWindow(holder)
+        holder.onDisappear()
+    }
 }

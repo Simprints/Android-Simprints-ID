@@ -13,11 +13,11 @@ interface SettingsPreferenceContract {
 
         fun getPreferenceForLanguage(): Preference
 
+        fun getPreferenceForSelectModules(): Preference
+
         fun getPreferenceForDefaultFingers(): Preference
 
-        fun getPreferenceForSyncUponLaunchToggle(): Preference
-
-        fun getPreferenceForBackgroundSyncToggle(): Preference
+        fun getSyncAndSearchConfigurationPreference(): Preference
 
         fun getAppVersionPreference(): Preference
 
@@ -25,20 +25,24 @@ interface SettingsPreferenceContract {
 
         fun getKeyForLanguagePreference(): String
 
+        fun getKeyForSelectModulesPreference(): String
+
         fun getKeyForDefaultFingersPreference(): String
 
-        fun getKeyForSyncUponLaunchPreference(): String
-
-        fun getKeyForBackgroundSyncPreference(): String
+        fun getKeyForSyncAndSearchConfigurationPreference(): String
 
         fun getKeyForAppVersionPreference(): String
 
         fun getKeyForScannerVersionPreference(): String
 
+        fun setSelectModulePreferenceEnabled(enabled: Boolean)
+
+        fun showToastForNoModulesSelected()
+
+        fun showToastForTooManyModulesSelected(maxModules: Int)
+
         fun showToastForInvalidSelectionOfFingers()
     }
 
-    interface Presenter: BasePresenter {
-
-    }
+    interface Presenter : BasePresenter
 }

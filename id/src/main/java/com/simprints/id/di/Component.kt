@@ -1,9 +1,8 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.activities.TutorialActivity
-import com.simprints.id.activities.about.AboutActivity
-import com.simprints.id.activities.about.AboutPresenter
+import com.simprints.id.activities.about.DebugActivity
+import com.simprints.id.activities.about.DebugViewModel
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
@@ -17,9 +16,10 @@ import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerpri
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
 import com.simprints.id.activities.dashboard.DashboardPresenter
-import com.simprints.id.activities.dashboard.models.DashboardSyncCard
+import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
+import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModelHelper
+import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.activities.launch.LaunchPresenter
-import com.simprints.id.activities.launch.SyncSchedulerHelper
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentActivity
@@ -32,11 +32,17 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
-import com.simprints.id.services.scheduledSync.peopleSync.ScheduledPeopleSync
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.InputMergeWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
-import com.simprints.id.services.scheduledSync.sessionSync.ScheduledSessionsSync
-import com.simprints.id.services.sync.SyncService
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderWorker
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
@@ -47,10 +53,9 @@ interface AppComponent {
     fun inject(app: Application)
     fun inject(guidSelectionService: GuidSelectionService)
     fun inject(alertActivity: AlertActivity)
-    fun inject(aboutActivity: AboutActivity)
+    fun inject(aboutActivity: DebugActivity)
     fun inject(longConsentActivity: LongConsentActivity)
     fun inject(refusalPresenter: RefusalPresenter)
-    fun inject(tutorialActivity: TutorialActivity)
     fun inject(matchingActivity: MatchingActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
@@ -59,11 +64,10 @@ interface AppComponent {
     fun inject(checkLoginPresenter: CheckLoginPresenter)
     fun inject(checkLoginFromIntentPresenter: CheckLoginFromIntentPresenter)
     fun inject(checkLoginFromMainLauncherPresenter: CheckLoginFromMainLauncherPresenter)
-    fun inject(syncService: SyncService)
     fun inject(matchingPresenter: MatchingPresenter)
-    fun inject(aboutPresenter: AboutPresenter)
+    fun inject(aboutPresenter: DebugViewModel)
     fun inject(dashboardCardsFactory: DashboardCardsFactory)
-    fun inject(dashboardSyncCard: DashboardSyncCard)
+    fun inject(dashboardSyncCardViewModel: DashboardSyncCardViewModel)
     fun inject(loginPresenter: LoginPresenter)
     fun inject(collectFingerprintsPresenter: CollectFingerprintsPresenter)
     fun inject(collectFingerprintsScanningHelper: CollectFingerprintsScanningHelper)
@@ -73,12 +77,20 @@ interface AppComponent {
     fun inject(dashboardPresenter: DashboardPresenter)
     fun inject(alertPresenter: AlertPresenter)
     fun inject(launchPresenter: LaunchPresenter)
-    fun inject(scheduledPeopleSync: ScheduledPeopleSync)
     fun inject(peopleUpSyncUploaderWorker: PeopleUpSyncUploaderWorker)
     fun inject(peopleUpSyncPeriodicFlusherWorker: PeopleUpSyncPeriodicFlusherWorker)
-    fun inject(scheduledSessionsSync: ScheduledSessionsSync)
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(longConsentPresenter: LongConsentPresenter)
     fun inject(scannerManager: ScannerManager)
-    fun inject(syncSchedulerHelper: SyncSchedulerHelper)
+    fun inject(syncSchedulerHelper: SyncSchedulerHelperImpl)
+    fun inject(dashboardSyncCardView: DashboardSyncCardView)
+    fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
+    fun inject(sessionSyncUploaderWorker: SessionEventsUploaderWorker)
+    fun inject(countTask: CountTaskImpl)
+    fun inject(downSyncTask: DownSyncTaskImpl)
+    fun inject(subCountWorker: SubCountWorker)
+    fun inject(subDownSyncWorker: SubDownSyncWorker)
+    fun inject(syncWorker: DownSyncMasterWorker)
+    fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
+    fun inject(inputMergeWorker: InputMergeWorker)
 }

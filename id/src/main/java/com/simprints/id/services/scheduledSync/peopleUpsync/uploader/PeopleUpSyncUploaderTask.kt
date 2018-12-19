@@ -7,25 +7,29 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
+import com.simprints.id.data.db.local.room.UpSyncDao
+import com.simprints.id.data.db.local.room.UpSyncStatus
 import io.reactivex.Flowable
 import timber.log.Timber
 import java.io.IOException
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
-class PeopleUpSyncUploaderTask(
+class PeopleUpSyncUploaderTask (
     private val loginInfoManager: LoginInfoManager,
     private val localDbManager: LocalDbManager,
     private val remoteDbManager: RemoteDbManager,
     private val projectId: String,
     /*private val userId: String,*/
-    private val batchSize: Int
+    private val batchSize: Int,
+    private val upSyncStatusModel: UpSyncDao
 ) {
 
     /**
      * @throws TransientSyncFailureException if a temporary network / backend error caused
      * the sync to fail.
      */
+
     fun execute() {
         checkUserIsSignedIn()
 
@@ -58,6 +62,7 @@ class PeopleUpSyncUploaderTask(
         Timber.d("Uploaded a batch of ${people.size} people")
         markPeopleAsSynced(people)
         Timber.d("Marked a batch of ${people.size} people as synced")
+        updateLastUpSyncTime()
     }
 
     private fun uploadPeople(people: List<Person>) =
@@ -82,6 +87,10 @@ class PeopleUpSyncUploaderTask(
         localDbManager
             .insertOrUpdatePeopleInLocal(updatedPeople)
             .blockingAwait()
+    }
+
+    private fun updateLastUpSyncTime() {
+        upSyncStatusModel.insertLastUpSyncTime(UpSyncStatus(lastUpSyncTime = System.currentTimeMillis()))
     }
 
 }

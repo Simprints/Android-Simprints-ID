@@ -1,6 +1,6 @@
 package com.simprints.id
 
-import android.support.multidex.MultiDexApplication
+import androidx.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
 import com.simprints.id.data.db.DbManager
@@ -51,10 +51,13 @@ open class Application : MultiDexApplication() {
     }
 
     open fun initModules() {
-        if (isReleaseWithLogfileVariant()) {
-            Timber.plant(FileLoggingTree())
-        } else if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+
+        if (Timber.treeCount() <= 0) {
+            if (isReleaseWithLogfileVariant()) {
+                Timber.plant(FileLoggingTree())
+            } else if (BuildConfig.DEBUG) {
+                Timber.plant(Timber.DebugTree())
+            }
         }
 
         initFabric()
@@ -66,8 +69,8 @@ open class Application : MultiDexApplication() {
 
     private fun initFabric() {
         val crashlyticsKit = Crashlytics.Builder()
-                .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
-                .build()
+            .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
+            .build()
 
         Fabric.with(this, crashlyticsKit)
     }
@@ -87,6 +90,7 @@ open class Application : MultiDexApplication() {
                 exceptionToPrint = e.cause
             }
             Timber.d("Undeliverable exception received", exceptionToPrint)
+            exceptionToPrint.printStackTrace()
         }
     }
 }

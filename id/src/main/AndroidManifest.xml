@@ -83,11 +83,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
         <activity
-            android:name=".activities.HelpActivity"
-            android:label="@string/help_title"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".activities.login.LoginActivity"
             android:label="@string/login_title"
             android:launchMode="singleTop"
@@ -99,12 +94,7 @@
             android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.TutorialActivity"
-            android:label="@string/tutorial_title"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.about.AboutActivity"
+            android:name=".activities.about.DebugActivity"
             android:label="@string/about_title"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
@@ -141,9 +131,6 @@
                 <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
             </intent-filter>
         </service>
-        <service
-            android:name=".services.sync.SyncService"
-            android:exported="false" />
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"

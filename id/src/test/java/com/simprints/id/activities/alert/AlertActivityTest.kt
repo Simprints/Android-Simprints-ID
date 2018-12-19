@@ -4,11 +4,14 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.support.v4.content.res.ResourcesCompat
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.IntentKeys
-import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
+import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.domain.ALERT_TYPE
@@ -18,19 +21,17 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.createRoboAlertActivity
 import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.delegates.lazyVar
-import junit.framework.Assert
 import kotlinx.android.synthetic.main.activity_alert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class AlertActivityTest : DaggerForTests() {
 
     @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
@@ -46,8 +47,8 @@ class AlertActivityTest : DaggerForTests() {
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
         super.setUp()
         testAppComponent.inject(this)
 
@@ -73,7 +74,7 @@ class AlertActivityTest : DaggerForTests() {
         activity.right_button.performClick()
 
         val intent = Shadows.shadowOf(activity).nextStartedActivity
-        Assert.assertEquals(intent.action, "android.settings.BLUETOOTH_SETTINGS")
+        assertEquals(intent.action, "android.settings.BLUETOOTH_SETTINGS")
 
         checkAlertIsShownCorrectly(activity, alertType)
     }
@@ -87,7 +88,7 @@ class AlertActivityTest : DaggerForTests() {
         activity.right_button.performClick()
 
         val intent = Shadows.shadowOf(activity).nextStartedActivity
-        Assert.assertEquals(intent.action, "android.settings.WIFI_SETTINGS")
+        assertEquals(intent.action, "android.settings.WIFI_SETTINGS")
 
         checkAlertIsShownCorrectly(activity, alertType)
     }
@@ -97,20 +98,20 @@ class AlertActivityTest : DaggerForTests() {
     }
 
     private fun checkAlertIsShownCorrectly(alertActivity: AlertActivity, alertType: ALERT_TYPE) {
-        Assert.assertEquals(getBackgroundColor(alertActivity.alertLayout), getColorWithColorRes(alertType.backgroundColor))
+        assertEquals(getBackgroundColor(alertActivity.alertLayout), getColorWithColorRes(alertType.backgroundColor))
 
-        if (alertType.isTwoButton) Assert.assertEquals(getBackgroundColor(alertActivity.left_button), getColorWithColorRes(alertType.backgroundColor))
-        Assert.assertEquals(getBackgroundColor(alertActivity.right_button), getColorWithColorRes(alertType.backgroundColor))
+        if (alertType.isTwoButton) assertEquals(getBackgroundColor(alertActivity.left_button), getColorWithColorRes(alertType.backgroundColor))
+        assertEquals(getBackgroundColor(alertActivity.right_button), getColorWithColorRes(alertType.backgroundColor))
 
-        Assert.assertEquals(alertActivity.alert_title.text, alertActivity.resources.getString(alertType.alertTitleId))
+        assertEquals(alertActivity.alert_title.text, alertActivity.resources.getString(alertType.alertTitleId))
 
         val alertImageDrawableShown = Shadows.shadowOf(alertActivity.alert_image.drawable).createdFromResId
-        Assert.assertEquals(alertImageDrawableShown, alertType.alertMainDrawableId)
+        assertEquals(alertImageDrawableShown, alertType.alertMainDrawableId)
 
-        Assert.assertEquals(alertActivity.message.text, alertActivity.resources.getString(alertType.alertMessageId))
+        assertEquals(alertActivity.message.text, alertActivity.resources.getString(alertType.alertMessageId))
 
-        if (alertType.isTwoButton) Assert.assertEquals(alertActivity.left_button.text, alertActivity.resources.getString(alertType.alertLeftButtonTextId))
-        Assert.assertEquals(alertActivity.right_button.text, alertActivity.resources.getString(alertType.alertRightButtonTextId))
+        if (alertType.isTwoButton) assertEquals(alertActivity.left_button.text, alertActivity.resources.getString(alertType.alertLeftButtonTextId))
+        assertEquals(alertActivity.right_button.text, alertActivity.resources.getString(alertType.alertRightButtonTextId))
     }
 
     private fun getBackgroundColor(view: View): Int =
