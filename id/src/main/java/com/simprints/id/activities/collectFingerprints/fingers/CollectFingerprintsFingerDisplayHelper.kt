@@ -2,7 +2,7 @@ package com.simprints.id.activities.collectFingerprints.fingers
 
 import android.app.Activity
 import android.os.Handler
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.FingerPageAdapter

@@ -1,15 +1,15 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEvent
-import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEvent.UserInfo
-import com.simprints.id.data.analytics.eventData.models.events.AuthorizationEvent.Result.AUTHORIZED
-import com.simprints.id.data.analytics.eventData.models.events.CallbackEvent
-import com.simprints.id.data.analytics.eventData.models.events.CalloutEvent
-import com.simprints.id.data.analytics.eventData.models.events.ConnectivitySnapshotEvent
-import com.simprints.id.data.analytics.eventData.models.session.DatabaseInfo
-import com.simprints.id.data.analytics.eventData.models.session.SessionEvents
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.domain.events.AuthorizationEvent
+import com.simprints.id.data.analytics.eventData.models.domain.events.AuthorizationEvent.Result.AUTHORIZED
+import com.simprints.id.data.analytics.eventData.models.domain.events.AuthorizationEvent.UserInfo
+import com.simprints.id.data.analytics.eventData.models.domain.events.CallbackEvent
+import com.simprints.id.data.analytics.eventData.models.domain.events.CalloutEvent
+import com.simprints.id.data.analytics.eventData.models.domain.events.ConnectivitySnapshotEvent
+import com.simprints.id.data.analytics.eventData.models.domain.session.DatabaseInfo
+import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
@@ -22,10 +22,8 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.StringsUtils
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -39,12 +37,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private var possibleLegacyApiKey: String = ""
     private var setupFailed: Boolean = false
 
-    @Inject
-    lateinit var sessionEventsManager: SessionEventsManager
-    @Inject
-    lateinit var dbManager: LocalDbManager
-    @Inject
-    lateinit var simNetworkUtils: SimNetworkUtils
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var dbManager: LocalDbManager
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
 
     init {
         component.inject(this)
@@ -92,9 +87,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     override fun handleNotSignedInUser() {
-        sessionEventsManager.updateSessionInBackground({
+        sessionEventsManager.updateSessionInBackground {
             addAuthorizationEvent(it, AuthorizationEvent.Result.NOT_AUTHORIZED)
-        })
+        }
 
         if (!loginAlreadyTried.get()) {
             loginAlreadyTried.set(true)
@@ -137,16 +132,19 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         loginInfoManager.signedInUserId = preferencesManager.userId
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
         addInfoIntoSessionEventsAfterUserSignIn()
+        sessionEventsManager.updateSessionInBackground {
+            it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+        }
+
         view.openLaunchActivity()
     }
 
     private fun addInfoIntoSessionEventsAfterUserSignIn() {
-
         try {
             Singles.zip(
                 fetchAnalyticsId(),
                 fetchPeopleCountInLocalDatabase(),
-                fetchSessionCountInLocalDatabase()) { gaId: String, peopleDbCount: Int, sessionDbCount: Int->
+                fetchSessionCountInLocalDatabase()) { gaId: String, peopleDbCount: Int, sessionDbCount: Int ->
                 return@zip Triple(gaId, peopleDbCount, sessionDbCount)
             }.flatMapCompletable { gaIdAndDbCounts ->
                 populateSessionWithAnalyticsIdAndDbInfo(gaIdAndDbCounts.first, gaIdAndDbCounts.second, gaIdAndDbCounts.third)
@@ -160,7 +158,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private fun fetchPeopleCountInLocalDatabase(): Single<Int> = dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }
     private fun fetchSessionCountInLocalDatabase(): Single<Int> = sessionEventsManager.getSessionCount().onErrorReturn { -1 }
     private fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, peopleDbCount: Int, sessionDbCount: Int): Completable =
-        sessionEventsManager.updateSession({
+        sessionEventsManager.updateSession {
             it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             it.analyticsId = gaId
             it.databaseInfo = DatabaseInfo(peopleDbCount, sessionDbCount)
@@ -169,7 +167,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
                 addAuthorizationEvent(it, AUTHORIZED)
             }
-        })
+        }
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.events.add(AuthorizationEvent(
@@ -184,13 +182,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     override fun handleActivityResult(requestCode: Int, resultCode: Int, returnCallout: Callout) {
-        sessionEventsManager.updateSession({
+        sessionEventsManager.updateSessionInBackground {
             it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), returnCallout))
             it.closeIfRequired(timeHelper)
-        }).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onComplete = {}, onError = {
-                it.printStackTrace()
-            })
+        }
     }
 }

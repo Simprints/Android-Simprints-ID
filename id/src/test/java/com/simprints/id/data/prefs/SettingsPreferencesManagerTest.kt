@@ -1,9 +1,12 @@
 package com.simprints.id.data.prefs
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
 import com.nhaarman.mockito_kotlin.times
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.di.DaggerForTests
@@ -15,17 +18,15 @@ import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.verify
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SettingsPreferencesManagerTest : DaggerForTests() {
 
     @Inject lateinit var remoteConfigSpy: FirebaseRemoteConfig
@@ -36,8 +37,8 @@ class SettingsPreferencesManagerTest : DaggerForTests() {
     }
 
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
         super.setUp()
         testAppComponent.inject(this)
 
@@ -60,16 +61,16 @@ class SettingsPreferencesManagerTest : DaggerForTests() {
 
     @Test
     fun fetchingOverridableRemoteConfigPrimitive_worksAndBecomesOverridden() {
-        val originalValue = settingsPreferencesManager.syncOnCallout
-        Assert.assertEquals(SettingsPreferencesManagerImpl.SYNC_ON_CALLOUT_DEFAULT, originalValue)
+        val originalValue = settingsPreferencesManager.language
+        Assert.assertEquals(SettingsPreferencesManagerImpl.LANGUAGE_DEFAULT, originalValue)
 
-        settingsPreferencesManager.syncOnCallout = !originalValue
+        settingsPreferencesManager.language = SettingsPreferencesManagerImpl.LANGUAGE_DEFAULT + "q"
 
-        val newValue = settingsPreferencesManager.syncOnCallout
+        val newValue = settingsPreferencesManager.language
 
-        Assert.assertEquals(originalValue, !newValue)
+        Assert.assertNotEquals(originalValue, newValue)
 
-        verify(remoteConfigSpy, times(1)).getBoolean(SettingsPreferencesManagerImpl.SYNC_ON_CALLOUT_KEY)
+        verify(remoteConfigSpy, times(1)).getString(SettingsPreferencesManagerImpl.LANGUAGE_KEY)
     }
 
     @Test

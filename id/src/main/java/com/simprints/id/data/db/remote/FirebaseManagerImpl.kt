@@ -7,7 +7,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.JsonElement
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.eventData.SessionsRemoteInterface
+import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
+import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.*
@@ -24,7 +25,7 @@ import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.session.Session
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
@@ -35,6 +36,7 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync
 import retrofit2.HttpException
 import timber.log.Timber
@@ -208,9 +210,33 @@ open class FirebaseManagerImpl(
                 }
         }
 
-    override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
-        getPeopleApiClient().flatMap {
-            it.requestPeopleCount(syncParams.projectId, syncParams.userId, syncParams.moduleId)
+    override fun getNumberOfPatients(projectId: String, userId: String?, moduleId: String?): Single<Int> =
+        getPeopleApiClient().flatMap { api ->
+            api.requestPeopleCount(projectId = projectId, userId = userId, moduleId = moduleId)
+                .retry(::retryCriteria)
+                .handleResponse(::defaultResponseErrorHandling)
+                .map { it.count }
+        }
+
+    override fun getNumberOfPatientsForSyncScope(syncScope: SyncScope): Single<Int> =
+        getPeopleApiClient().flatMap { api ->
+            syncScope.moduleIds?.let { moduleIds ->
+                sumCountsForEachModule(moduleIds, syncScope)
+            } ?: api.requestPeopleCount(syncScope.projectId, syncScope.userId, null)
+                .retry(::retryCriteria)
+                .handleResponse(::defaultResponseErrorHandling)
+                .map { it.count }
+        }
+
+    private fun sumCountsForEachModule(moduleIds: Set<String>, syncScope: SyncScope): Single<Int> =
+        Single.merge(moduleIds.map {
+            getNumberOfPatientsInModule(syncScope.projectId, it)
+                .subscribeOn(Schedulers.io())
+        }).toList().map { it.sum() }
+
+    override fun getNumberOfPatientsInModule(projectId: String, moduleId: String): Single<Int> =
+        getPeopleApiClient().flatMap { api ->
+            api.requestPeopleCount(projectId = projectId, userId = null, moduleId = moduleId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .map { it.count }
@@ -251,7 +277,8 @@ open class FirebaseManagerImpl(
     private fun buildSessionsApi(authToken: String): SessionsRemoteInterface = SimApiClient(
         SessionsRemoteInterface::class.java,
         SessionsRemoteInterface.baseUrl,
-        authToken
+        authToken,
+        jsonAdapter = SessionEventsApiAdapterFactory().gson
     ).api
 
     override fun getProjectApiClient(): Single<ProjectRemoteInterface> =

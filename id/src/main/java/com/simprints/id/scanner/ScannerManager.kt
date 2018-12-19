@@ -12,7 +12,8 @@ interface ScannerManager {
     fun disconnectVero(): Completable
     fun initVero(): Completable
     fun connectToVero(): Completable
-    fun wakingUpVero(): Completable
+    fun wakeUpVero(): Completable
+    fun shutdownVero(): Completable
     fun resetVeroUI(): Completable
     fun getAlertType(it: Throwable): ALERT_TYPE
     fun disconnectScannerIfNeeded()

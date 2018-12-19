@@ -2,12 +2,16 @@ package com.simprints.id.activities.dashboard
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DefaultItemAnimator
 import android.view.Menu
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.Application
+import com.simprints.id.BuildConfig
 import com.simprints.id.R
+import com.simprints.id.activities.about.DebugActivity
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -17,9 +21,9 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.launchAlert
+import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
-import org.jetbrains.anko.support.v4.onRefresh
 import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
@@ -37,7 +41,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override lateinit var viewPresenter: DashboardContract.Presenter
     private lateinit var cardsViewAdapter: DashboardCardAdapter
     private var confirmationLogoutDialog: AlertDialog.Builder? = null
-    private lateinit var notification: LongConsentNotification
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +50,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         component.inject(this)
         setSupportActionBar(dashboardToolbar)
         LanguageHelper.setLanguage(this, preferences.language)
-        notification = LongConsentNotification(this)
 
         viewPresenter = DashboardPresenter(this, component)
         setMenuItemClickListener()
@@ -61,8 +63,8 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     private fun initRecyclerCardViews(viewPresenter: DashboardContract.Presenter) {
-        cardsViewAdapter = DashboardCardAdapter(viewPresenter.cardsModelsList)
-        dashboardCardsView.also {
+        cardsViewAdapter = DashboardCardAdapter(viewPresenter.cardsViewModelsList)
+        (dashboardCardsView as RecyclerView).also {
             it.setHasFixedSize(false)
             it.itemAnimator = DefaultItemAnimator()
             it.layoutManager = WrapContentLinearLayoutManager(this)
@@ -71,7 +73,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     private fun initSwipeRefreshLayout(viewPresenter: DashboardContract.Presenter) {
-        swipeRefreshLayout.onRefresh {
+        swipeRefreshLayout.setOnRefreshListener {
             viewPresenter.userDidWantToRefreshCardsIfPossible()
         }
     }
@@ -99,6 +101,9 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.app_menu, menu)
+        if(BuildConfig.DEBUG){
+            menu?.findItem(R.id.debug)?.isVisible = true
+        }
         return true
     }
 
@@ -110,6 +115,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
                 R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, LongConsentActivity::class.java), LONG_CONSENT_ACTIVITY_REQUEST_CODE)
                 R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
                 R.id.menuLogout -> viewPresenter.userDidWantToLogout()
+                R.id.debug -> if(BuildConfig.DEBUG) startActivity(Intent(this, DebugActivity::class.java))
             }
             true
         }
@@ -136,4 +142,14 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override fun launchAlertView(error: ALERT_TYPE) {
         this.launchAlert(error)
     }
+
+    override fun showToastForUserOffline() {
+        showToast(R.string.login_no_network)
+    }
+
+    override fun showToastForRecordsUpToDate() {
+        showToast(R.string.records_up_to_date)
+    }
+
+    override fun getLifeCycleOwner(): LifecycleOwner = this
 }

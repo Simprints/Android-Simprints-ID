@@ -1,6 +1,6 @@
-package com.simprints.id.tools.utils;
+package com.simprints.id.tools.utils
 
-import android.net.NetworkInfo;
+import android.net.NetworkInfo
 
 interface SimNetworkUtils {
 

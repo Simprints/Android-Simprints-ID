@@ -18,20 +18,22 @@
             android:summary="@string/settings_fingers_subtext"
             android:title="@string/settings_fingers" />
 
-        <SwitchPreference
-            android:key="@string/sync_upon_launch_preference"
-            android:summary="@string/settings_sync_launch_subtext"
-            android:title="@string/settings_sync_launch" />
-
-        <SwitchPreference
-            android:key="@string/background_sync_preference"
-            android:summary="@string/settings_background_sync_subtext"
-            android:title="@string/settings_background_sync" />
+        <MultiSelectListPreference
+            android:entries="@array/empty"
+            android:entryValues="@array/empty"
+            android:key="@string/select_modules_preference"
+            android:summary="@string/settings_modules_subtext"
+            android:title="@string/settings_modules"
+            android:shouldDisableView="true"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:layout="@layout/line_separator" />
 
     <PreferenceCategory android:title="@string/settings_about">
+        <Preference
+            android:key="@string/sync_and_search_configuration_preference"
+            android:title="@string/settings_sync_and_search_configuration"/>
+
         <Preference
             android:key="@string/app_version_preference"
             android:title="@string/about_app_version" />

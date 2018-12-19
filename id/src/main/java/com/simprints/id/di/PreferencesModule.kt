@@ -23,6 +23,7 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
@@ -91,7 +92,16 @@ open class PreferencesModule {
                                                remoteConfigWrapper: RemoteConfigWrapper,
                                                @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                                @Named("GroupSerializer") groupSerializer: Serializer<Constants.GROUP>,
-                                               @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>): SettingsPreferencesManager = SettingsPreferencesManagerImpl(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer, languagesStringArraySerializer)
+                                               @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
+                                               @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
+                                               @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>): SettingsPreferencesManager =
+        SettingsPreferencesManagerImpl(prefs,
+            remoteConfigWrapper,
+            fingerIdToBooleanSerializer,
+            groupSerializer,
+            languagesStringArraySerializer,
+            moduleIdOptionsStringSetSerializer,
+            peopleDownSyncTriggerToBooleanSerializer)
 
     @Provides
     @Singleton
