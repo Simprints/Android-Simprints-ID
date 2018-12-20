@@ -1,0 +1,34 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.simprints.clientapi">
+
+    <application>
+        <activity android:name=".activities.odk.OdkActivity">
+
+            <intent-filter>
+                <action android:name="com.simprints.simodkadapter.REGISTER" />
+                <action android:name="com.simprints.simodkadapter.IDENTIFY" />
+                <action android:name="com.simprints.simodkadapter.UPDATE" />
+                <action android:name="com.simprints.simodkadapter.VERIFY" />
+                <action android:name="com.simprints.simodkadapter.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="com.simprints.simodkadapter.REGISTER" />
+                <action android:name="com.simprints.simodkadapter.IDENTIFY" />
+                <action android:name="com.simprints.simodkadapter.UPDATE" />
+                <action android:name="com.simprints.simodkadapter.VERIFY" />
+                <action android:name="com.simprints.simodkadapter.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+
+        </activity>
+    </application>
+
+</manifest>

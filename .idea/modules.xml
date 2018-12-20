@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/faces/faces.iml" filepath="$PROJECT_DIR$/faces/faces.iml" />
       <module fileurl="file://$PROJECT_DIR$/fingerprints/fingerprints.iml" filepath="$PROJECT_DIR$/fingerprints/fingerprints.iml" />
+      <module fileurl="file://$PROJECT_DIR$/clientapi/clientapi.iml" filepath="$PROJECT_DIR$/clientapi/clientapi.iml" />
       <module fileurl="file://$PROJECT_DIR$/id/id.iml" filepath="$PROJECT_DIR$/id/id.iml" />
       <module fileurl="file://$PROJECT_DIR$/libcommon/libcommon.iml" filepath="$PROJECT_DIR$/libcommon/libcommon.iml" />
       <module fileurl="file://$PROJECT_DIR$/libsimprints/libsimprints.iml" filepath="$PROJECT_DIR$/libsimprints/libsimprints.iml" />
