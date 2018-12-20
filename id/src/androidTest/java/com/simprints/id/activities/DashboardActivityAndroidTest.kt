@@ -56,8 +56,10 @@ import javax.inject.Inject
 class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRemote {
 
     companion object {
+        private val modules = setOf("module1", "module2", "module3")
         private const val N_PEOPLE_ON_SERVER_PER_MODULE = 300 //300 * 3 = 900
         private const val N_PEOPLE_ON_DB_PER_MODULE = 30
+        private const val PEOPLE_UPLOAD_BATCH_SIZE = 80
         private const val SIGNED_ID_USER = "some_user"
     }
 
@@ -219,7 +221,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     }
 
     private fun mockModuleScope(): SyncScope {
-        whenever(settingsPreferencesManagerSpy.selectedModules).thenReturn(setOf("module1", "module2", "module3"))
+        whenever(settingsPreferencesManagerSpy.selectedModules).thenReturn(modules)
         whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(Constants.GROUP.MODULE)
         return syncScope
     }
@@ -227,7 +229,9 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     private fun uploadFakePeopleAndPrepareLocalDb(syncScope: SyncScope) {
         peopleOnServer = PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_SERVER_PER_MODULE, syncScope, listOf(false))
-        remoteDbManagerSpy.uploadPeople(testProject.id, peopleOnServer).blockingAwait()
+        peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).forEach {
+            remoteDbManagerSpy.uploadPeople(testProject.id, it).blockingAwait()
+        }
         peopleInDb.addAll(PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_DB_PER_MODULE, syncScope, listOf(true, false)))
         localDbManager.insertOrUpdatePeopleInLocal(peopleInDb).blockingAwait()
     }
