@@ -1,7 +1,7 @@
 package com.simprints.clientapi.activities.odk
 
-import com.simprints.clientapi.BasePresenter
-import com.simprints.clientapi.BaseView
+import com.simprints.clientapi.activities.BasePresenter
+import com.simprints.clientapi.activities.BaseView
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
