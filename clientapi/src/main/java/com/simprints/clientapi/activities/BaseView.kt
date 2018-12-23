@@ -1,4 +1,4 @@
-package com.simprints.clientapi
+package com.simprints.clientapi.activities
 
 
 interface BaseView<T> {
