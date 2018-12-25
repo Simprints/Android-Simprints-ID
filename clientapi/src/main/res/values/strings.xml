@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name" translatable="false">Client API</string>
+    <string name="title_activity_project_id_error">ProjectIdErrorActivity</string>
 </resources>
