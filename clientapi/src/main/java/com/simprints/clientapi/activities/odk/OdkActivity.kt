@@ -3,7 +3,10 @@ package com.simprints.clientapi.activities.odk
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.clientapi.exceptions.InvalidProjectIdException
+import com.simprints.clientapi.validators.EnrollmentValidator
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
@@ -36,8 +39,14 @@ class OdkActivity : AppCompatActivity(), OdkContract.View {
     }
 
     override fun requestRegisterCallout() {
-        val registerIntent = Intent(SIMPRINTS_REGISTER_INTENT).apply { putExtras(intent) }
-        startActivityForResult(registerIntent, REGISTER_REQUEST_CODE)
+        try {
+            EnrollmentValidator(intent).validateClientRequest()
+            val registerIntent = Intent(SIMPRINTS_REGISTER_INTENT).apply { putExtras(intent) }
+            startActivityForResult(registerIntent, REGISTER_REQUEST_CODE)
+        } catch (ex: InvalidProjectIdException) {
+            // TODO: map to error screen
+            Log.d("", ex.toString())
+        }
     }
 
     override fun requestIdentifyCallout() {
@@ -66,14 +75,14 @@ class OdkActivity : AppCompatActivity(), OdkContract.View {
         else
             when (requestCode) {
                 REGISTER_REQUEST_CODE -> presenter.processRegistration(
-                        data.getParcelableExtra(SIMPRINTS_REGISTRATION)
+                    data.getParcelableExtra(SIMPRINTS_REGISTRATION)
                 )
                 IDENTIFY_REQUEST_CODE -> presenter.processIdentification(
-                        data.getParcelableArrayListExtra<Identification>(SIMPRINTS_IDENTIFICATIONS),
-                        data.getStringExtra(SIMPRINTS_SESSION_ID)
+                    data.getParcelableArrayListExtra<Identification>(SIMPRINTS_IDENTIFICATIONS),
+                    data.getStringExtra(SIMPRINTS_SESSION_ID)
                 )
                 VERIFY_REQUEST_CODE -> presenter.processVerification(
-                        data.getParcelableExtra(SIMPRINTS_VERIFICATION)
+                    data.getParcelableExtra(SIMPRINTS_VERIFICATION)
                 )
                 else -> presenter.processReturnError()
             }
@@ -85,21 +94,21 @@ class OdkActivity : AppCompatActivity(), OdkContract.View {
     }
 
     override fun returnIdentification(idList: String, confidenceList: String, tierList: String, sessionId: String) =
-            Intent().let {
-                it.putExtra(ODK_GUIDS_KEY, idList)
-                it.putExtra(ODK_CONFIDENCES_KEY, confidenceList)
-                it.putExtra(ODK_TIERS_KEY, tierList)
-                it.putExtra(ODK_SESSION_ID, sessionId)
-                sendOkResult(it)
-            }
+        Intent().let {
+            it.putExtra(ODK_GUIDS_KEY, idList)
+            it.putExtra(ODK_CONFIDENCES_KEY, confidenceList)
+            it.putExtra(ODK_TIERS_KEY, tierList)
+            it.putExtra(ODK_SESSION_ID, sessionId)
+            sendOkResult(it)
+        }
 
     override fun returnVerification(id: String, confidence: String, tier: String) =
-            Intent().let {
-                it.putExtra(ODK_GUIDS_KEY, id)
-                it.putExtra(ODK_CONFIDENCES_KEY, confidence)
-                it.putExtra(ODK_TIERS_KEY, tier)
-                sendOkResult(it)
-            }
+        Intent().let {
+            it.putExtra(ODK_GUIDS_KEY, id)
+            it.putExtra(ODK_CONFIDENCES_KEY, confidence)
+            it.putExtra(ODK_TIERS_KEY, tier)
+            sendOkResult(it)
+        }
 
     private fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)

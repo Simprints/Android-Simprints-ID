@@ -1,9 +1,10 @@
-package com.simprints.clientapi.requests.legcay
+package com.simprints.clientapi.legacy.requests
 
 import android.os.Parcel
 import android.os.Parcelable
 import com.simprints.clientapi.requests.SimprintsIdRequest
 
+// TODO: Create legacy call outs
 data class LegcayEnrollmentRequest(val apiKey: String,
                                    val moduleId: String,
                                    val userId: String,
