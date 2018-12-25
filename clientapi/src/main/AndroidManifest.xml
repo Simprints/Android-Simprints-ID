@@ -1,9 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.simprints.clientapi">
 
     <application>
         <activity android:name=".activities.odk.OdkActivity">
-
             <intent-filter>
                 <action android:name="com.simprints.simodkadapter.REGISTER" />
                 <action android:name="com.simprints.simodkadapter.IDENTIFY" />
@@ -14,7 +14,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="com.simprints.simodkadapter.REGISTER" />
                 <action android:name="com.simprints.simodkadapter.IDENTIFY" />
@@ -27,8 +26,13 @@
 
                 <data android:mimeType="*/*" />
             </intent-filter>
-
         </activity>
+
+        <activity
+            android:name=".activities.errors.ProjectIdErrorActivity"
+            android:label="@string/title_activity_project_id_error"
+            android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>
