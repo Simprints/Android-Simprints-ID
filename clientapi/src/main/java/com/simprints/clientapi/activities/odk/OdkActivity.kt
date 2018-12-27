@@ -5,11 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.clientrequests.extractors.EnrollmentExtractor
+import com.simprints.clientapi.clientrequests.requests.ClientRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.getIntentForError
 import com.simprints.clientapi.clientrequests.validators.EnrollmentValidator
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
+
 
 class OdkActivity : AppCompatActivity(), OdkContract.View {
 
