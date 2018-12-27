@@ -1,12 +1,12 @@
-package com.simprints.clientapi.validators
+package com.simprints.clientapi.clientrequests.validators
 
-import android.content.Intent
+import com.simprints.clientapi.clientrequests.extractors.EnrollmentExtractor
 import com.simprints.clientapi.exceptions.InvalidMetadataException
 import com.simprints.clientapi.exceptions.InvalidModuleIdException
 import com.simprints.clientapi.exceptions.InvalidProjectIdException
 import com.simprints.clientapi.exceptions.InvalidUserIdException
 
-class EnrollmentValidator(intent: Intent) : ClientRequestValidator(intent) {
+class EnrollmentValidator(extractor: EnrollmentExtractor) : ClientRequestValidator(extractor) {
 
     override fun validateClientRequest() {
         if (!hasValidProjectId() || !hasValidApiKey())

@@ -3,10 +3,10 @@ package com.simprints.clientapi.activities.odk
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.clientapi.exceptions.InvalidProjectIdException
-import com.simprints.clientapi.validators.EnrollmentValidator
+import com.simprints.clientapi.clientrequests.extractors.EnrollmentExtractor
+import com.simprints.clientapi.routers.ClientRequestErrorRouter.getIntentForError
+import com.simprints.clientapi.clientrequests.validators.EnrollmentValidator
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
@@ -17,6 +17,7 @@ class OdkActivity : AppCompatActivity(), OdkContract.View {
         private const val REGISTER_REQUEST_CODE = 97
         private const val IDENTIFY_REQUEST_CODE = 98
         private const val VERIFY_REQUEST_CODE = 99
+        private const val ERROR_REQUEST_CODE = 100
 
         private const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
         private const val ODK_GUIDS_KEY = "odk-guids"
@@ -40,12 +41,11 @@ class OdkActivity : AppCompatActivity(), OdkContract.View {
 
     override fun requestRegisterCallout() {
         try {
-            EnrollmentValidator(intent).validateClientRequest()
+            EnrollmentValidator(EnrollmentExtractor(intent)).validateClientRequest()
             val registerIntent = Intent(SIMPRINTS_REGISTER_INTENT).apply { putExtras(intent) }
             startActivityForResult(registerIntent, REGISTER_REQUEST_CODE)
-        } catch (ex: InvalidProjectIdException) {
-            // TODO: map to error screen
-            Log.d("", ex.toString())
+        } catch (ex: Exception) {
+            startActivityForResult(getIntentForError(this, ex), ERROR_REQUEST_CODE)
         }
     }
 
