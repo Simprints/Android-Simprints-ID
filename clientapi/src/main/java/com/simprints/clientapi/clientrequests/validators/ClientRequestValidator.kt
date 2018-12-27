@@ -2,11 +2,12 @@ package com.simprints.clientapi.clientrequests.validators
 
 import com.google.gson.Gson
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
+import com.simprints.clientapi.clientrequests.requests.ClientRequest
 
 
 abstract class ClientRequestValidator(private val extractor: ClientRequestExtractor) {
 
-    abstract fun validateClientRequest()
+    abstract fun validateClientRequest(): ClientRequest
 
     fun hasValidProjectId(): Boolean = !extractor.getProjectId().isNullOrBlank()
 
