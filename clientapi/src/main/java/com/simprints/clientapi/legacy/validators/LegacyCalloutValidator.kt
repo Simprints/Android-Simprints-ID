@@ -1,8 +1,7 @@
 package com.simprints.clientapi.legacy.validators
 
 import android.content.Intent
-import com.simprints.clientapi.validators.ClientRequestValidator
-import com.simprints.libsimprints.Constants
+import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 
 abstract class LegacyCalloutValidator(intent: Intent) : ClientRequestValidator(intent) {
 
