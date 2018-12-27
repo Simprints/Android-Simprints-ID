@@ -9,7 +9,7 @@ import com.simprints.clientapi.exceptions.InvalidProjectIdException
 import com.simprints.clientapi.exceptions.InvalidUserIdException
 
 
-class ClientRequestErrorRouter {
+object ClientRequestErrorRouter {
 
     fun getIntentForError(context: Context, ex: Exception): Intent = when (ex) {
         is InvalidProjectIdException -> Intent(context, OdkActivity::class.java)
