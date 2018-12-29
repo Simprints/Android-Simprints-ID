@@ -1,4 +1,4 @@
-package com.simprints.clientapi.requests
+package com.simprints.clientapi.simprintsrequests
 
 interface SimprintsIdRequest {
 

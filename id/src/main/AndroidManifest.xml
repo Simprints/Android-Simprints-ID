@@ -44,6 +44,24 @@
             android:launchMode="standard"
             android:screenOrientation="portrait">
             <intent-filter>
+                <action android:name="com.simprints.clientapp.REGISTER" />
+                <action android:name="com.simprints.clientapp.IDENTIFY" />
+                <action android:name="com.simprints.clientapp.UPDATE" />
+                <action android:name="com.simprints.clientapp.VERIFY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.simprints.legacy.REGISTER" />
+                <action android:name="com.simprints.legacy.IDENTIFY" />
+                <action android:name="com.simprints.legacy.UPDATE" />
+                <action android:name="com.simprints.legacy.VERIFY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
                 <action android:name="com.simprints.id.REGISTER" />
                 <action android:name="com.simprints.id.IDENTIFY" />
                 <action android:name="com.simprints.id.UPDATE" />
@@ -120,7 +138,8 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".activities.collectFingerprints.SplashScreenActivity"
+        <activity
+            android:name=".activities.collectFingerprints.SplashScreenActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
 
         <service

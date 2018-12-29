@@ -4,16 +4,17 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.clientapi.activities.ClientRequestActivity
 import com.simprints.clientapi.clientrequests.extractors.EnrollmentExtractor
-import com.simprints.clientapi.clientrequests.requests.ClientRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.getIntentForError
-import com.simprints.clientapi.clientrequests.validators.EnrollmentValidator
+import com.simprints.clientapi.routers.SimprintsRequestRouter.CLIENT_APP_REGISTER
+import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
 
 
-class OdkActivity : AppCompatActivity(), OdkContract.View {
+class OdkActivity : AppCompatActivity(), OdkContract.View, ClientRequestActivity {
 
     companion object {
         private const val REGISTER_REQUEST_CODE = 97
@@ -29,10 +30,12 @@ class OdkActivity : AppCompatActivity(), OdkContract.View {
     }
 
     override lateinit var presenter: OdkContract.Presenter
+    override lateinit var enrollmentExtractor: EnrollmentExtractor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        enrollmentExtractor = EnrollmentExtractor(intent)
         presenter = OdkPresenter(this, intent.action).apply { start() }
     }
 
@@ -41,14 +44,9 @@ class OdkActivity : AppCompatActivity(), OdkContract.View {
         finish()
     }
 
-    override fun requestRegisterCallout() {
-        try {
-            EnrollmentValidator(EnrollmentExtractor(intent)).validateClientRequest()
-            val registerIntent = Intent(SIMPRINTS_REGISTER_INTENT).apply { putExtras(intent) }
-            startActivityForResult(registerIntent, REGISTER_REQUEST_CODE)
-        } catch (ex: Exception) {
-            startActivityForResult(getIntentForError(this, ex), ERROR_REQUEST_CODE)
-        }
+    override fun requestRegisterCallout(request: EnrollmentRequest) {
+        val intent = Intent(CLIENT_APP_REGISTER).apply { putExtra(request.requestName, request) }
+        startActivityForResult(intent, REGISTER_REQUEST_CODE)
     }
 
     override fun requestIdentifyCallout() {
@@ -111,6 +109,9 @@ class OdkActivity : AppCompatActivity(), OdkContract.View {
             it.putExtra(ODK_TIERS_KEY, tier)
             sendOkResult(it)
         }
+
+    override fun showErrorForException(exception: Exception) =
+        startActivityForResult(getIntentForError(this, exception), ERROR_REQUEST_CODE)
 
     private fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)
