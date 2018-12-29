@@ -134,6 +134,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':libcommon')
     implementation project(':libsimprints')
+    implementation project(':clientapi')
 
     implementation deps.simprints.libscanner
     implementation deps.simprints.libmatcher
