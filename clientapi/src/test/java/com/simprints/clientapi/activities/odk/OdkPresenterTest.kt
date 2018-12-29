@@ -4,6 +4,12 @@ import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_CONF
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_VERIFY
+import com.simprints.clientapi.mockextractors.MockEnrollmentExtractor.mockEnrollmentExtractor
+import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_METADATA
+import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_MODULE_ID
+import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_PROJECT_ID
+import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_USER_ID
+import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
@@ -12,6 +18,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.junit.MockitoJUnitRunner
 import java.util.*
@@ -25,8 +32,17 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
+        val enrollmentExtractor = mockEnrollmentExtractor
+        `when`(view.enrollmentExtractor).thenReturn(enrollmentExtractor)
+
         OdkPresenter(view, ACTION_REGISTER).apply { start() }
-        Mockito.verify(view, times(1)).requestRegisterCallout()
+        Mockito.verify(view, times(1)).requestRegisterCallout(EnrollmentRequest(
+            projectId = MOCK_PROJECT_ID,
+            moduleId = MOCK_MODULE_ID,
+            userId = MOCK_USER_ID,
+            metadata = MOCK_METADATA,
+            callingPackage = ""
+        ))
     }
 
     @Test
