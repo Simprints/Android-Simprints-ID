@@ -1,8 +1,9 @@
 package com.simprints.clientapi.activities.odk
 
-import android.content.Intent
 import com.simprints.clientapi.activities.BasePresenter
 import com.simprints.clientapi.activities.BaseView
+import com.simprints.clientapi.activities.ClientRequestActivity
+import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
@@ -10,11 +11,11 @@ import com.simprints.libsimprints.Verification
 
 interface OdkContract {
 
-    interface View : BaseView<Presenter> {
+    interface View : BaseView<Presenter>, ClientRequestActivity {
 
         fun returnActionErrorToClient()
 
-        fun requestRegisterCallout()
+        fun requestRegisterCallout(request: EnrollmentRequest)
 
         fun requestIdentifyCallout()
 
@@ -27,6 +28,8 @@ interface OdkContract {
         fun returnIdentification(idList: String, confidenceList: String, tierList: String, sessionId: String)
 
         fun returnVerification(id: String, confidence: String, tier: String)
+
+        fun showErrorForException(exception: Exception)
 
     }
 
