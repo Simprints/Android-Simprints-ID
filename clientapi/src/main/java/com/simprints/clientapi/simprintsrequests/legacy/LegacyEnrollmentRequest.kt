@@ -1,14 +1,16 @@
-package com.simprints.clientapi.simprintsrequests
+package com.simprints.clientapi.simprintsrequests.legacy
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
+import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 
 
-data class EnrollmentRequest(val projectId: String,
-                             val moduleId: String,
-                             val userId: String,
-                             val callingPackage: String,
-                             val metadata: String) : SimprintsIdRequest {
+data class LegacyEnrollmentRequest(val legacyApiKey: String,
+                                   val moduleId: String,
+                                   val userId: String,
+                                   val callingPackage: String,
+                                   val metadata: String) : SimprintsIdRequest {
 
     override val requestName: String = REQUEST_NAME
 
@@ -20,7 +22,7 @@ data class EnrollmentRequest(val projectId: String,
         parcel.readString() ?: "")
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(projectId)
+        parcel.writeString(legacyApiKey)
         parcel.writeString(moduleId)
         parcel.writeString(userId)
         parcel.writeString(callingPackage)
@@ -32,7 +34,7 @@ data class EnrollmentRequest(val projectId: String,
     }
 
     companion object CREATOR : Parcelable.Creator<EnrollmentRequest> {
-        private const val REQUEST_NAME = "enrollmentRequest"
+        private const val REQUEST_NAME = "legacyEnrollmentRequest"
 
         override fun createFromParcel(parcel: Parcel): EnrollmentRequest {
             return EnrollmentRequest(parcel)

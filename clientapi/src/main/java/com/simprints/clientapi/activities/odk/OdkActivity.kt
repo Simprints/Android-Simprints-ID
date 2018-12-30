@@ -7,8 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.activities.ClientRequestActivity
 import com.simprints.clientapi.clientrequests.extractors.EnrollmentExtractor
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.getIntentForError
-import com.simprints.clientapi.routers.SimprintsRequestRouter.CLIENT_APP_REGISTER
-import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
+import com.simprints.clientapi.routers.SimprintsRequestRouter.ERROR_REQUEST_CODE
+import com.simprints.clientapi.routers.SimprintsRequestRouter.IDENTIFY_REQUEST_CODE
+import com.simprints.clientapi.routers.SimprintsRequestRouter.REGISTER_REQUEST_CODE
+import com.simprints.clientapi.routers.SimprintsRequestRouter.VERIFY_REQUEST_CODE
+import com.simprints.clientapi.routers.SimprintsRequestRouter.routeSimprintsRequest
+import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
@@ -17,11 +21,6 @@ import com.simprints.libsimprints.Identification
 class OdkActivity : AppCompatActivity(), OdkContract.View, ClientRequestActivity {
 
     companion object {
-        private const val REGISTER_REQUEST_CODE = 97
-        private const val IDENTIFY_REQUEST_CODE = 98
-        private const val VERIFY_REQUEST_CODE = 99
-        private const val ERROR_REQUEST_CODE = 100
-
         private const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
         private const val ODK_GUIDS_KEY = "odk-guids"
         private const val ODK_CONFIDENCES_KEY = "odk-confidences"
@@ -42,11 +41,6 @@ class OdkActivity : AppCompatActivity(), OdkContract.View, ClientRequestActivity
     override fun returnActionErrorToClient() {
         setResult(SIMPRINTS_INVALID_INTENT_ACTION, intent)
         finish()
-    }
-
-    override fun requestRegisterCallout(request: EnrollmentRequest) {
-        val intent = Intent(CLIENT_APP_REGISTER).apply { putExtra(request.requestName, request) }
-        startActivityForResult(intent, REGISTER_REQUEST_CODE)
     }
 
     override fun requestIdentifyCallout() {
@@ -112,6 +106,9 @@ class OdkActivity : AppCompatActivity(), OdkContract.View, ClientRequestActivity
 
     override fun showErrorForException(exception: Exception) =
         startActivityForResult(getIntentForError(this, exception), ERROR_REQUEST_CODE)
+
+    override fun sendSimprintsRequest(request: SimprintsIdRequest) =
+        routeSimprintsRequest(this, request)
 
     private fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)
