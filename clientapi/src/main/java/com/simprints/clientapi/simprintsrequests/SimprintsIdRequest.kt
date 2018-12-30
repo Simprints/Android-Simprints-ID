@@ -1,6 +1,8 @@
 package com.simprints.clientapi.simprintsrequests
 
-interface SimprintsIdRequest {
+import android.os.Parcelable
+
+interface SimprintsIdRequest : Parcelable {
 
     val requestName: String
 

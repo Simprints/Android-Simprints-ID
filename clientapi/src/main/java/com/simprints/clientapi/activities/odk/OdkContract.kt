@@ -3,7 +3,6 @@ package com.simprints.clientapi.activities.odk
 import com.simprints.clientapi.activities.BasePresenter
 import com.simprints.clientapi.activities.BaseView
 import com.simprints.clientapi.activities.ClientRequestActivity
-import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
@@ -14,8 +13,6 @@ interface OdkContract {
     interface View : BaseView<Presenter>, ClientRequestActivity {
 
         fun returnActionErrorToClient()
-
-        fun requestRegisterCallout(request: EnrollmentRequest)
 
         fun requestIdentifyCallout()
 

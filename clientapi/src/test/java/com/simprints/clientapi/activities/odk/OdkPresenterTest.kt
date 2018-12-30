@@ -36,7 +36,7 @@ class OdkPresenterTest {
         `when`(view.enrollmentExtractor).thenReturn(enrollmentExtractor)
 
         OdkPresenter(view, ACTION_REGISTER).apply { start() }
-        Mockito.verify(view, times(1)).requestRegisterCallout(EnrollmentRequest(
+        Mockito.verify(view, times(1)).sendSimprintsRequest(EnrollmentRequest(
             projectId = MOCK_PROJECT_ID,
             moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
