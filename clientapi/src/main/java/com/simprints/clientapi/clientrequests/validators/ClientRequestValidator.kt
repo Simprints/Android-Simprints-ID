@@ -8,19 +8,19 @@ abstract class ClientRequestValidator(private val extractor: ClientRequestExtrac
 
     abstract fun validateClientRequest()
 
-    fun hasValidProjectId(): Boolean = !extractor.getProjectId().isNullOrBlank()
+    protected fun hasValidProjectId(): Boolean = !extractor.getProjectId().isNullOrBlank()
 
-    fun hasValidModuleId(): Boolean = !extractor.getModuleId().isNullOrBlank()
+    protected fun hasValidModuleId(): Boolean = !extractor.getModuleId().isNullOrBlank()
 
-    fun hasValidUserId(): Boolean = !extractor.getUserId().isNullOrBlank()
+    protected fun hasValidUserId(): Boolean = !extractor.getUserId().isNullOrBlank()
 
     // TODO: remove legacy
-    fun hasValidApiKey(): Boolean = !extractor.getLegacyApiKey().isNullOrBlank()
+    protected fun hasValidApiKey(): Boolean = !extractor.getLegacyApiKey().isNullOrBlank()
 
-    fun hasMetadata(): Boolean = !extractor.getMetatdata().isNullOrBlank()
+    protected fun hasMetadata(): Boolean = !extractor.getMetatdata().isNullOrBlank()
 
     // TODO: inject gson dependency
-    fun hasValidMetadata(): Boolean = try {
+    protected fun hasValidMetadata(): Boolean = try {
         Gson().fromJson(extractor.getMetatdata(), Any::class.java)
         true
     } catch (ex: com.google.gson.JsonSyntaxException) {
