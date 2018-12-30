@@ -9,12 +9,14 @@ import org.mockito.Mockito
 
 object MockEnrollmentExtractor {
 
-    val mockEnrollmentExtractor: EnrollmentExtractor = Mockito.mock(EnrollmentExtractor::class.java)
-
-    init {
+    fun getValidEnrollmentExtractorMock(): EnrollmentExtractor {
+        val mockEnrollmentExtractor = Mockito.mock(EnrollmentExtractor::class.java)
         Mockito.`when`(mockEnrollmentExtractor.getProjectId()).thenReturn(MOCK_PROJECT_ID)
         Mockito.`when`(mockEnrollmentExtractor.getUserId()).thenReturn(MOCK_USER_ID)
         Mockito.`when`(mockEnrollmentExtractor.getModuleId()).thenReturn(MOCK_MODULE_ID)
         Mockito.`when`(mockEnrollmentExtractor.getMetatdata()).thenReturn(MOCK_METADATA)
+
+        return mockEnrollmentExtractor
     }
+
 }
