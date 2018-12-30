@@ -7,13 +7,11 @@ import android.os.Parcelable
 data class EnrollmentRequest(val projectId: String,
                              val moduleId: String,
                              val userId: String,
-                             val callingPackage: String,
                              val metadata: String) : SimprintsIdRequest {
 
     override val requestName: String = REQUEST_NAME
 
     constructor(parcel: Parcel) : this(
-        parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
@@ -23,7 +21,6 @@ data class EnrollmentRequest(val projectId: String,
         parcel.writeString(projectId)
         parcel.writeString(moduleId)
         parcel.writeString(userId)
-        parcel.writeString(callingPackage)
         parcel.writeString(metadata)
     }
 

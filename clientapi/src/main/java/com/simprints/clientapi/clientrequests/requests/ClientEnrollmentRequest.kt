@@ -22,8 +22,7 @@ class ClientEnrollmentRequest(
         projectId = projectId,
         userId = userId,
         moduleId = moduleId,
-        metadata = metadata ?: "",
-        callingPackage = ""
+        metadata = metadata ?: ""
     )
 
 }

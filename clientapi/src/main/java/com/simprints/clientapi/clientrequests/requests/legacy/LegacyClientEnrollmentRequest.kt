@@ -3,8 +3,8 @@ package com.simprints.clientapi.clientrequests.requests.legacy
 import com.simprints.clientapi.clientrequests.requests.ApiVersion
 import com.simprints.clientapi.clientrequests.requests.ApiVersion.V1
 import com.simprints.clientapi.clientrequests.requests.ClientRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollmentRequest
 import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollmentRequest
 
 class LegacyClientEnrollmentRequest(
     val apiKey: String,
@@ -24,8 +24,7 @@ class LegacyClientEnrollmentRequest(
         legacyApiKey = apiKey,
         userId = userId,
         moduleId = moduleId,
-        metadata = metadata ?: "",
-        callingPackage = ""
+        metadata = metadata ?: ""
     )
 
 }
