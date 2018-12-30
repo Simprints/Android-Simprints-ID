@@ -1,8 +1,10 @@
 package com.simprints.clientapi.clientrequests.requests.legacy
 
 import com.simprints.clientapi.clientrequests.requests.ApiVersion
-import com.simprints.clientapi.clientrequests.requests.ApiVersion.*
+import com.simprints.clientapi.clientrequests.requests.ApiVersion.V1
 import com.simprints.clientapi.clientrequests.requests.ClientRequest
+import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollmentRequest
+import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 
 class LegacyClientEnrollmentRequest(
     val apiKey: String,
@@ -17,5 +19,13 @@ class LegacyClientEnrollmentRequest(
 ) {
 
     override val apiVersion: ApiVersion = V1
+
+    override fun toSimprintsRequest(): SimprintsIdRequest = LegacyEnrollmentRequest(
+        legacyApiKey = apiKey,
+        userId = userId,
+        moduleId = moduleId,
+        metadata = metadata ?: "",
+        callingPackage = ""
+    )
 
 }

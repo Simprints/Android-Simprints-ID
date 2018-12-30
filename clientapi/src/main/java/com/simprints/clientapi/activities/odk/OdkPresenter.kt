@@ -1,12 +1,10 @@
 package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.clientrequests.builders.EnrollmentBuilder
-import com.simprints.clientapi.clientrequests.requests.ClientEnrollmentRequest
 import com.simprints.clientapi.clientrequests.validators.EnrollmentValidator
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
-import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
@@ -53,8 +51,8 @@ class OdkPresenter(private val view: OdkContract.View,
     private fun handleEnrollmentRequest() {
         EnrollmentBuilder(view.enrollmentExtractor, EnrollmentValidator(view.enrollmentExtractor)).let {
             try {
-                val request = it.build() as ClientEnrollmentRequest
-                view.requestRegisterCallout(EnrollmentRequest(request))
+                val request = it.build()
+                view.sendSimprintsRequest(request.toSimprintsRequest())
             } catch (exception: Exception) {
                 view.showErrorForException(exception)
             }
