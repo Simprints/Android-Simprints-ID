@@ -9,13 +9,11 @@ import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 data class LegacyEnrollmentRequest(val legacyApiKey: String,
                                    val moduleId: String,
                                    val userId: String,
-                                   val callingPackage: String,
                                    val metadata: String) : SimprintsIdRequest {
 
     override val requestName: String = REQUEST_NAME
 
     constructor(parcel: Parcel) : this(
-        parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
@@ -25,7 +23,6 @@ data class LegacyEnrollmentRequest(val legacyApiKey: String,
         parcel.writeString(legacyApiKey)
         parcel.writeString(moduleId)
         parcel.writeString(userId)
-        parcel.writeString(callingPackage)
         parcel.writeString(metadata)
     }
 

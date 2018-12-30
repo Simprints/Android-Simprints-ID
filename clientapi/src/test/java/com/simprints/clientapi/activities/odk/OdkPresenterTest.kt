@@ -10,6 +10,7 @@ import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_MODULE_ID
 import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_PROJECT_ID
 import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_USER_ID
 import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
+import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollmentRequest
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
@@ -40,8 +41,22 @@ class OdkPresenterTest {
             projectId = MOCK_PROJECT_ID,
             moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
-            metadata = MOCK_METADATA,
-            callingPackage = ""
+            metadata = MOCK_METADATA
+        ))
+    }
+
+    @Test
+    fun startPresenterForLegacyRegister_ShouldRequestLegacyRegister() {
+        val enrollmentExtractor = getValidEnrollmentExtractorMock()
+        `when`(enrollmentExtractor.getLegacyApiKey()).thenReturn("API_KEY")
+        `when`(view.enrollmentExtractor).thenReturn(enrollmentExtractor)
+
+        OdkPresenter(view, ACTION_REGISTER).apply { start() }
+        Mockito.verify(view, times(1)).sendSimprintsRequest(LegacyEnrollmentRequest(
+            legacyApiKey = "API_KEY",
+            moduleId = MOCK_MODULE_ID,
+            userId = MOCK_USER_ID,
+            metadata = MOCK_METADATA
         ))
     }
 
