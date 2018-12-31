@@ -6,6 +6,7 @@ import com.simprints.clientapi.clientrequests.requests.ClientRequest
 import com.simprints.clientapi.clientrequests.requests.legacy.LegacyClientEnrollmentRequest
 import com.simprints.clientapi.clientrequests.validators.EnrollmentValidator
 
+
 class EnrollmentBuilder(private val extractor: EnrollmentExtractor, validator: EnrollmentValidator)
     : ClientRequestBuilder(extractor, validator) {
 
