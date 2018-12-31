@@ -12,7 +12,7 @@ abstract class ClientRequestBuilder(private val extractor: ClientRequestExtracto
 
     protected abstract fun buildLegacyClientRequest(): ClientRequest
 
-    protected open fun isLegacyRequest(): Boolean = !extractor.getLegacyApiKey().isNullOrBlank()
+    open fun isLegacyRequest(): Boolean = !extractor.getLegacyApiKey().isNullOrBlank()
 
     fun build(): ClientRequest {
         validator.validateClientRequest()

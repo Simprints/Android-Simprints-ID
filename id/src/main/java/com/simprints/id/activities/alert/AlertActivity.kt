@@ -12,6 +12,7 @@ import com.simprints.id.activities.IntentKeys
 import com.simprints.id.domain.ALERT_TYPE
 import kotlinx.android.synthetic.main.activity_alert.*
 
+
 class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override lateinit var viewPresenter: AlertContract.Presenter
@@ -85,4 +86,5 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun closeActivity() = finish()
     override fun closeAllActivities() = finishAffinity()
+
 }

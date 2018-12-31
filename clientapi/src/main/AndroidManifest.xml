@@ -29,7 +29,7 @@
         </activity>
 
         <activity
-            android:name=".activities.errors.ProjectIdErrorActivity"
+            android:name=".activities.errors.ErrorActivity"
             android:label="@string/title_activity_project_id_error"
             android:theme="@style/AppTheme.NoActionBar" />
 
