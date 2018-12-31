@@ -6,8 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.activities.ClientRequestActivity
 import com.simprints.clientapi.clientrequests.extractors.EnrollmentExtractor
-import com.simprints.clientapi.routers.ClientRequestErrorRouter.getIntentForError
-import com.simprints.clientapi.routers.SimprintsRequestRouter.ERROR_REQUEST_CODE
+import com.simprints.clientapi.routers.ClientRequestErrorRouter.routeClientRequestError
 import com.simprints.clientapi.routers.SimprintsRequestRouter.IDENTIFY_REQUEST_CODE
 import com.simprints.clientapi.routers.SimprintsRequestRouter.REGISTER_REQUEST_CODE
 import com.simprints.clientapi.routers.SimprintsRequestRouter.VERIFY_REQUEST_CODE
@@ -105,7 +104,7 @@ class OdkActivity : AppCompatActivity(), OdkContract.View, ClientRequestActivity
         }
 
     override fun showErrorForException(exception: Exception) =
-        startActivityForResult(getIntentForError(this, exception), ERROR_REQUEST_CODE)
+        routeClientRequestError(this, exception)
 
     override fun sendSimprintsRequest(request: SimprintsIdRequest) =
         routeSimprintsRequest(this, request)
