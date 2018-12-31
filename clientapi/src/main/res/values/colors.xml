@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="alert_yellow">#ffcc00</color>
+    <color name="simprints_blue">#00B3D1</color>
+    <color name="simprints_white">#ffffff</color>
+    <color name="simprints_separator">#FFC0C0C0</color>
+</resources>
