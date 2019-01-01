@@ -17,13 +17,11 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_error)
 
-        presenter = ErrorPresenter(this, intent.getStringExtra(MESSAGE_KEY))
+        presenter = ErrorPresenter(this, intent.getStringExtra(MESSAGE_KEY)).apply { start() }
         textView_close_button.setOnClickListener { presenter.handleCloseClick() }
     }
 
-    override fun closeActivity() {
-        finishAffinity()
-    }
+    override fun closeActivity() = finishAffinity()
 
     override fun setErrorMessageText(message: String) {
         textView_message.text = message
