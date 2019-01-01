@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.errors
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.R
@@ -21,10 +22,13 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
         textView_close_button.setOnClickListener { presenter.handleCloseClick() }
     }
 
-    override fun closeActivity() = finishAffinity()
+    override fun closeActivity() {
+        setResult(Activity.RESULT_CANCELED)
+        finishAffinity()
+    }
 
     override fun setErrorMessageText(message: String) {
-        textView_message.text = message
+        textView_message.text = getString(R.string.configuration_error_message, message)
     }
 
 }

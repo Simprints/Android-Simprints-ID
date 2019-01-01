@@ -103,8 +103,10 @@ class OdkActivity : AppCompatActivity(), OdkContract.View, ClientRequestActivity
             sendOkResult(it)
         }
 
-    override fun showErrorForException(exception: Exception) =
+    override fun showErrorForException(exception: Exception) {
         routeClientRequestError(this, exception)
+        finish()
+    }
 
     override fun sendSimprintsRequest(request: SimprintsIdRequest) =
         routeSimprintsRequest(this, request)
