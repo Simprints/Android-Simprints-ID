@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Client API</string>
-    <string name="title_activity_project_id_error">ProjectIdErrorActivity</string>
+    <string name="title_activity_project_id_error" translatable="false">ProjectIdErrorActivity</string>
 
     <!-- Error Screen Layout -->
     <string name="main_error_graphic" translatable="false">Main Error Graphic</string>
