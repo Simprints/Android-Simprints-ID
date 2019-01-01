@@ -1,6 +1,6 @@
 package com.simprints.clientapi.activities.errors
 
-class ErrorPresenter(val view: ErrorContract.View, val errorMessage: String)
+class ErrorPresenter(val view: ErrorContract.View, private val errorMessage: String)
     : ErrorContract.Presenter {
 
     override fun start() {
