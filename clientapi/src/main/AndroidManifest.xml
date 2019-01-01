@@ -3,7 +3,10 @@
     package="com.simprints.clientapi">
 
     <application>
-        <activity android:name=".activities.odk.OdkActivity">
+
+        <activity
+            android:name=".activities.odk.OdkActivity"
+            android:theme="@style/ClientApiTheme.Launcher">
             <intent-filter>
                 <action android:name="com.simprints.simodkadapter.REGISTER" />
                 <action android:name="com.simprints.simodkadapter.IDENTIFY" />
@@ -31,7 +34,7 @@
         <activity
             android:name=".activities.errors.ErrorActivity"
             android:label="@string/title_activity_project_id_error"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/ClientApiTheme.NoActionBar" />
 
     </application>
 
