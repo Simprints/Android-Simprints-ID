@@ -52,7 +52,7 @@
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline"
-        app:srcCompat="@drawable/error_hint_key" />
+        app:srcCompat="@drawable/error_hint_cog" />
 
     <TextView
         android:id="@+id/textView_message"
