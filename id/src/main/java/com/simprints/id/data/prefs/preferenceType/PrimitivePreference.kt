@@ -2,7 +2,6 @@ package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
-import com.simprints.id.tools.delegates.lazyVar
 import isPrimitive
 import kotlin.reflect.KProperty
 
@@ -29,9 +28,13 @@ open class PrimitivePreference<T : Any>(private val prefs: ImprovedSharedPrefere
         }
     }
 
-    protected var value: T by lazyVar {
-        prefs.getPrimitive(key, defValue)
-    }
+    protected var value: T
+        get() = prefs.getPrimitive(key, defValue)
+        set(value) {
+            prefs.edit()
+                .putPrimitive(key, value)
+                .apply()
+        }
 
     @Synchronized
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
@@ -39,8 +42,5 @@ open class PrimitivePreference<T : Any>(private val prefs: ImprovedSharedPrefere
     @Synchronized
     open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
         this.value = value
-        prefs.edit()
-            .putPrimitive(key, value)
-            .apply()
     }
 }
