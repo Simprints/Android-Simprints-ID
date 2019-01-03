@@ -4,11 +4,11 @@ import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_CONF
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_VERIFY
-import com.simprints.clientapi.mockextractors.MockEnrollmentExtractor.getValidEnrollmentExtractorMock
-import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_METADATA
-import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_MODULE_ID
-import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_PROJECT_ID
-import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_USER_ID
+import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_METADATA
+import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_MODULE_ID
+import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_PROJECT_ID
+import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_USER_ID
+import com.simprints.clientapi.mockextractors.MockEnrollmentFactory
 import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
 import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollmentRequest
 import com.simprints.libsimprints.Identification
@@ -33,7 +33,7 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
-        val enrollmentExtractor = getValidEnrollmentExtractorMock()
+        val enrollmentExtractor = MockEnrollmentFactory.getValidMockExtractor()
         `when`(view.enrollmentExtractor).thenReturn(enrollmentExtractor)
 
         OdkPresenter(view, ACTION_REGISTER).apply { start() }
@@ -47,7 +47,7 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForLegacyRegister_ShouldRequestLegacyRegister() {
-        val enrollmentExtractor = getValidEnrollmentExtractorMock()
+        val enrollmentExtractor = MockEnrollmentFactory.getValidMockExtractor()
         `when`(enrollmentExtractor.getLegacyApiKey()).thenReturn("API_KEY")
         `when`(view.enrollmentExtractor).thenReturn(enrollmentExtractor)
 
