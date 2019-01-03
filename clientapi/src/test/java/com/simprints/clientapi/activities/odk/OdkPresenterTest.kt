@@ -13,10 +13,10 @@ import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Compani
 import com.simprints.clientapi.requestFactories.MockEnrollmentFactory
 import com.simprints.clientapi.requestFactories.MockIdentifyFactory
 import com.simprints.clientapi.requestFactories.MockVerifyFactory
-import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
+import com.simprints.clientapi.simprintsrequests.EnrollRequest
 import com.simprints.clientapi.simprintsrequests.IdentifyRequest
 import com.simprints.clientapi.simprintsrequests.VerifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollmentRequest
+import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollRequest
 import com.simprints.clientapi.simprintsrequests.legacy.LegacyIdentifyRequest
 import com.simprints.clientapi.simprintsrequests.legacy.LegacyVerifyRequest
 import com.simprints.libsimprints.Identification
@@ -42,10 +42,10 @@ class OdkPresenterTest {
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
         val enrollmentExtractor = MockEnrollmentFactory.getMockExtractor()
-        `when`(view.enrollmentExtractor).thenReturn(enrollmentExtractor)
+        `when`(view.enrollExtractor).thenReturn(enrollmentExtractor)
 
         OdkPresenter(view, ACTION_REGISTER).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(EnrollmentRequest(
+        Mockito.verify(view, times(1)).sendSimprintsRequest(EnrollRequest(
             projectId = MOCK_PROJECT_ID,
             moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
@@ -56,10 +56,10 @@ class OdkPresenterTest {
     @Test
     fun startPresenterForLegacyRegister_ShouldRequestLegacyRegister() {
         val enrollmentExtractor = MockEnrollmentFactory.getMockExtractor(withLegacyApiKey = true)
-        `when`(view.enrollmentExtractor).thenReturn(enrollmentExtractor)
+        `when`(view.enrollExtractor).thenReturn(enrollmentExtractor)
 
         OdkPresenter(view, ACTION_REGISTER).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(LegacyEnrollmentRequest(
+        Mockito.verify(view, times(1)).sendSimprintsRequest(LegacyEnrollRequest(
             legacyApiKey = MOCK_LEGACY_API_KEY,
             moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
@@ -128,7 +128,7 @@ class OdkPresenterTest {
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
         OdkPresenter(view, "Garbage").apply { start() }
-        Mockito.verify(view, times(1)).returnActionErrorToClient()
+        Mockito.verify(view, times(1)).returnIntentActionErrorToClient()
     }
 
     @Test
@@ -169,7 +169,7 @@ class OdkPresenterTest {
     @Test
     fun processReturnError_ShouldCallActionError() {
         OdkPresenter(view, "").processReturnError()
-        Mockito.verify(view, times(1)).returnActionErrorToClient()
+        Mockito.verify(view, times(1)).returnIntentActionErrorToClient()
     }
 
     @Test
