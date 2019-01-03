@@ -4,10 +4,10 @@ import android.os.Parcel
 import android.os.Parcelable
 
 
-data class LegacyEnrollmentRequest(val legacyApiKey: String,
-                                   val moduleId: String,
-                                   val userId: String,
-                                   val metadata: String) : LegacySimprintsIdRequest {
+data class LegacyEnrollRequest(val legacyApiKey: String,
+                               val moduleId: String,
+                               val userId: String,
+                               val metadata: String) : LegacySimprintsIdRequest {
 
     override val requestName: String = REQUEST_NAME
 
@@ -29,14 +29,14 @@ data class LegacyEnrollmentRequest(val legacyApiKey: String,
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<LegacyEnrollmentRequest> {
+    companion object CREATOR : Parcelable.Creator<LegacyEnrollRequest> {
         private const val REQUEST_NAME = "legacyEnrollmentRequest"
 
-        override fun createFromParcel(parcel: Parcel): LegacyEnrollmentRequest {
-            return LegacyEnrollmentRequest(parcel)
+        override fun createFromParcel(parcel: Parcel): LegacyEnrollRequest {
+            return LegacyEnrollRequest(parcel)
         }
 
-        override fun newArray(size: Int): Array<LegacyEnrollmentRequest?> {
+        override fun newArray(size: Int): Array<LegacyEnrollRequest?> {
             return arrayOfNulls(size)
         }
     }
