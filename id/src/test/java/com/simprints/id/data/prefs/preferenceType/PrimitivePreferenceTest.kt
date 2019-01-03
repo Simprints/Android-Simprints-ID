@@ -55,12 +55,10 @@ class PrimitivePreferenceTest {
 
     @Suppress("UNUSED_VARIABLE", "UnnecessaryVariable")
     @Test
-    fun testSecondGetValueDoesNotReadPreferences() {
+    fun testSecondGetValueDoesReadPreferences() {
         val firstGet = stringPref
         val secondGet = stringPref
-        verifyOnlyInteraction(improvedPrefs) {
-            getPrimitive(aKey, aString)
-        }
+        verify(improvedPrefs, times(2)).getPrimitive(aKey, aString)
     }
 
     @Suppress("UNUSED_VARIABLE")
@@ -82,10 +80,10 @@ class PrimitivePreferenceTest {
 
     @Suppress("UNUSED_VALUE", "UNUSED_VARIABLE")
     @Test
-    fun testGetValueAfterSetValueDoesNotReadPreferences() {
+    fun testGetValueAfterSetValueDoesReadPreferences() {
         stringPref = storedString
         val firstGet = stringPref
-        verify(improvedPrefs, never()).getPrimitive(aKey, aString)
+        verify(improvedPrefs, times(1)).getPrimitive(aKey, aString)
     }
 
     @Suppress("UnnecessaryVariable")
