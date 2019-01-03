@@ -3,7 +3,7 @@ package com.simprints.clientapi.clientrequests.validators
 import com.simprints.clientapi.exceptions.InvalidModuleIdException
 import com.simprints.clientapi.exceptions.InvalidProjectIdException
 import com.simprints.clientapi.exceptions.InvalidUserIdException
-import com.simprints.clientapi.mockextractors.MockClientRequestFactory
+import com.simprints.clientapi.requestFactories.MockClientRequestFactory
 import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mockito

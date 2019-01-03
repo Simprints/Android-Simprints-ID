@@ -1,7 +1,7 @@
 package com.simprints.clientapi.clientrequests.validators
 
 import com.simprints.clientapi.exceptions.InvalidVerifyIdException
-import com.simprints.clientapi.mockextractors.MockVerifyFactory
+import com.simprints.clientapi.requestFactories.MockVerifyFactory
 import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mockito
