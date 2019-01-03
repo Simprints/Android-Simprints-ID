@@ -2,14 +2,13 @@ package com.simprints.clientapi.simprintsrequests.legacy
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 
 
 data class LegacyVerifyRequest(val legacyApiKey: String,
                                val moduleId: String,
                                val userId: String,
                                val metadata: String,
-                               val verifyGuid: String) : SimprintsIdRequest {
+                               val verifyGuid: String) : LegacySimprintsIdRequest {
 
     override val requestName: String = REQUEST_NAME
 

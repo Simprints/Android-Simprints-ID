@@ -4,10 +4,10 @@ import android.os.Parcel
 import android.os.Parcelable
 
 
-data class LegacyEnrollmentRequest(val legacyApiKey: String,
-                                   val moduleId: String,
-                                   val userId: String,
-                                   val metadata: String) : LegacySimprintsIdRequest {
+data class LegacyIdentifyRequest(val legacyApiKey: String,
+                                 val moduleId: String,
+                                 val userId: String,
+                                 val metadata: String) : LegacySimprintsIdRequest {
 
     override val requestName: String = REQUEST_NAME
 
@@ -15,8 +15,7 @@ data class LegacyEnrollmentRequest(val legacyApiKey: String,
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
-        parcel.readString() ?: ""
-    )
+        parcel.readString() ?: "")
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(legacyApiKey)
@@ -29,14 +28,14 @@ data class LegacyEnrollmentRequest(val legacyApiKey: String,
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<LegacyEnrollmentRequest> {
-        private const val REQUEST_NAME = "legacyEnrollmentRequest"
+    companion object CREATOR : Parcelable.Creator<LegacyIdentifyRequest> {
+        private const val REQUEST_NAME = "legacyIdentifyRequest"
 
-        override fun createFromParcel(parcel: Parcel): LegacyEnrollmentRequest {
-            return LegacyEnrollmentRequest(parcel)
+        override fun createFromParcel(parcel: Parcel): LegacyIdentifyRequest {
+            return LegacyIdentifyRequest(parcel)
         }
 
-        override fun newArray(size: Int): Array<LegacyEnrollmentRequest?> {
+        override fun newArray(size: Int): Array<LegacyIdentifyRequest?> {
             return arrayOfNulls(size)
         }
     }
