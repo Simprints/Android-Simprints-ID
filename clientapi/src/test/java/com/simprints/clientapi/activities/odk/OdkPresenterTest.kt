@@ -11,10 +11,13 @@ import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Compani
 import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_USER_ID
 import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_VERIFY_GUID
 import com.simprints.clientapi.requestFactories.MockEnrollmentFactory
+import com.simprints.clientapi.requestFactories.MockIdentifyFactory
 import com.simprints.clientapi.requestFactories.MockVerifyFactory
 import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
+import com.simprints.clientapi.simprintsrequests.IdentifyRequest
 import com.simprints.clientapi.simprintsrequests.VerifyRequest
 import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollmentRequest
+import com.simprints.clientapi.simprintsrequests.legacy.LegacyIdentifyRequest
 import com.simprints.clientapi.simprintsrequests.legacy.LegacyVerifyRequest
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
@@ -66,8 +69,30 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForIdentify_ShouldRequestIdentify() {
+        val identifyExtractor = MockIdentifyFactory.getMockExtractor()
+        `when`(view.identifyExtractor).thenReturn(identifyExtractor)
+
         OdkPresenter(view, ACTION_IDENTIFY).apply { start() }
-        Mockito.verify(view, times(1)).requestIdentifyCallout()
+        Mockito.verify(view, times(1)).sendSimprintsRequest(IdentifyRequest(
+            projectId = MOCK_PROJECT_ID,
+            moduleId = MOCK_MODULE_ID,
+            userId = MOCK_USER_ID,
+            metadata = MOCK_METADATA
+        ))
+    }
+
+    @Test
+    fun startPresenterForLegacyIdentify_ShouldRequestLegacyIdentify() {
+        val identifyExtractor = MockIdentifyFactory.getMockExtractor(withLegacyApiKey = true)
+        `when`(view.identifyExtractor).thenReturn(identifyExtractor)
+
+        OdkPresenter(view, ACTION_IDENTIFY).apply { start() }
+        Mockito.verify(view, times(1)).sendSimprintsRequest(LegacyIdentifyRequest(
+            legacyApiKey = MOCK_LEGACY_API_KEY,
+            moduleId = MOCK_MODULE_ID,
+            userId = MOCK_USER_ID,
+            metadata = MOCK_METADATA
+        ))
     }
 
     @Test
@@ -86,8 +111,8 @@ class OdkPresenterTest {
     }
 
     @Test
-    fun startPresenterForVerify_ShouldRequestLegacyVerify() {
-        val verifyExractor = MockVerifyFactory.getMockExtractor(true)
+    fun startPresenterForLegacyVerify_ShouldRequestLegacyVerify() {
+        val verifyExractor = MockVerifyFactory.getMockExtractor(withLegacyApiKey = true)
         `when`(view.verifyExtractor).thenReturn(verifyExractor)
 
         OdkPresenter(view, ACTION_VERIFY).apply { start() }

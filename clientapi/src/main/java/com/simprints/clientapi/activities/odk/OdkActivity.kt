@@ -3,22 +3,16 @@ package com.simprints.clientapi.activities.odk
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.activities.ClientRequestActivity
-import com.simprints.clientapi.clientrequests.extractors.EnrollmentExtractor
-import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
-import com.simprints.clientapi.routers.ClientRequestErrorRouter.routeClientRequestError
 import com.simprints.clientapi.routers.SimprintsRequestRouter.IDENTIFY_REQUEST_CODE
 import com.simprints.clientapi.routers.SimprintsRequestRouter.REGISTER_REQUEST_CODE
 import com.simprints.clientapi.routers.SimprintsRequestRouter.VERIFY_REQUEST_CODE
-import com.simprints.clientapi.routers.SimprintsRequestRouter.routeSimprintsRequest
-import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
 
 
-class OdkActivity : AppCompatActivity(), OdkContract.View, ClientRequestActivity {
+class OdkActivity : ClientRequestActivity(), OdkContract.View {
 
     companion object {
         private const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
@@ -29,30 +23,10 @@ class OdkActivity : AppCompatActivity(), OdkContract.View, ClientRequestActivity
     }
 
     override lateinit var presenter: OdkContract.Presenter
-    override lateinit var enrollmentExtractor: EnrollmentExtractor
-    override lateinit var verifyExtractor: VerifyExtractor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        enrollmentExtractor = EnrollmentExtractor(intent)
-        verifyExtractor = VerifyExtractor(intent)
         presenter = OdkPresenter(this, intent.action).apply { start() }
-    }
-
-    override fun returnActionErrorToClient() {
-        setResult(SIMPRINTS_INVALID_INTENT_ACTION, intent)
-        finish()
-    }
-
-    override fun requestIdentifyCallout() {
-        val identifyIntent = Intent(SIMPRINTS_IDENTIFY_INTENT).apply { putExtras(intent) }
-        startActivityForResult(identifyIntent, IDENTIFY_REQUEST_CODE)
-    }
-
-    override fun requestVerifyCallout() {
-        val verifyIntent = Intent(SIMPRINTS_VERIFY_INTENT).apply { putExtras(intent) }
-        startActivityForResult(verifyIntent, VERIFY_REQUEST_CODE)
     }
 
     override fun requestConfirmIdentityCallout() {
@@ -105,14 +79,6 @@ class OdkActivity : AppCompatActivity(), OdkContract.View, ClientRequestActivity
             it.putExtra(ODK_TIERS_KEY, tier)
             sendOkResult(it)
         }
-
-    override fun showErrorForException(exception: Exception) {
-        routeClientRequestError(this, exception)
-        finish()
-    }
-
-    override fun sendSimprintsRequest(request: SimprintsIdRequest) =
-        routeSimprintsRequest(this, request)
 
     private fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)

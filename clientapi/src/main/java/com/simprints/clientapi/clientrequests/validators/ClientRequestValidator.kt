@@ -10,7 +10,12 @@ import com.simprints.clientapi.exceptions.InvalidUserIdException
 
 abstract class ClientRequestValidator(private val extractor: ClientRequestExtractor) {
 
-    abstract fun validateClientRequest()
+    open fun validateClientRequest() {
+        validateProjectIdOrLegacyApiKey()
+        validateUserId()
+        validateModuleId()
+        validateMetadata()
+    }
 
     protected open fun validateProjectIdOrLegacyApiKey() = try {
         validateProjectId()
