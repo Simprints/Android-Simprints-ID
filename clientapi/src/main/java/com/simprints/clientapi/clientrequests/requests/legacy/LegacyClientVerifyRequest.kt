@@ -2,6 +2,7 @@ package com.simprints.clientapi.clientrequests.requests.legacy
 
 import com.simprints.clientapi.clientrequests.requests.ApiVersion
 import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.legacy.LegacyVerifyRequest
 
 
 class LegacyClientVerifyRequest(
@@ -15,8 +16,12 @@ class LegacyClientVerifyRequest(
     override val apiVersion: ApiVersion = ApiVersion.V1
     override val projectId: String = ""
 
-    override fun toSimprintsRequest(): SimprintsIdRequest {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun toSimprintsRequest(): SimprintsIdRequest = LegacyVerifyRequest(
+        legacyApiKey = legacyApiKey,
+        userId = userId,
+        moduleId = moduleId,
+        metadata = metadata ?: "",
+        verifyGuid = verifyGuid
+    )
 
 }

@@ -17,6 +17,4 @@ abstract class ClientRequestExtractor(private val intent: Intent) {
     // TODO: remove legacy code
     open fun getLegacyApiKey(): String? = intent.getStringExtra(Constants.SIMPRINTS_API_KEY)
 
-    protected fun readString(key: String): String? = intent.getStringExtra(key)
-
 }

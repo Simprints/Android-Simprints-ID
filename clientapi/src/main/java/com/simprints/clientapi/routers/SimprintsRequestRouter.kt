@@ -2,10 +2,12 @@ package com.simprints.clientapi.routers
 
 import android.app.Activity
 import android.content.Intent
-import com.simprints.clientapi.activities.odk.OdkActivity
+import com.simprints.clientapi.activities.errors.ErrorActivity
 import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollmentRequest
 import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.VerifyRequest
+import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollmentRequest
+import com.simprints.clientapi.simprintsrequests.legacy.LegacyVerifyRequest
 
 
 object SimprintsRequestRouter {
@@ -25,14 +27,21 @@ object SimprintsRequestRouter {
     private const val LEGACY_UPDATE = "com.simprints.legacy.UPDATE"
     private const val LEGACY_VERIFY = "com.simprints.legacy.VERIFY"
 
-    fun routeSimprintsRequest(activity: Activity, request: SimprintsIdRequest) = when (request) {
-        is EnrollmentRequest -> activity.startActivityForResult(
+    fun routeSimprintsRequest(act: Activity, request: SimprintsIdRequest) = when (request) {
+        is EnrollmentRequest -> act.startActivityForResult(
             request.toIntent(REGISTER), REGISTER_REQUEST_CODE
         )
-        is LegacyEnrollmentRequest -> activity.startActivityForResult(
+        is LegacyEnrollmentRequest -> act.startActivityForResult(
             request.toIntent(LEGACY_REGISTER), REGISTER_REQUEST_CODE
         )
-        else -> activity.startActivityForResult(Intent(activity, OdkActivity::class.java), ERROR_REQUEST_CODE)
+        is VerifyRequest -> act.startActivityForResult(
+            request.toIntent(VERIFY), VERIFY_REQUEST_CODE
+        )
+        is LegacyVerifyRequest -> act.startActivityForResult(
+            request.toIntent(LEGACY_VERIFY), VERIFY_REQUEST_CODE
+        )
+        // TODO handle error
+        else -> act.startActivityForResult(Intent(act, ErrorActivity::class.java), ERROR_REQUEST_CODE)
     }
 
     private fun SimprintsIdRequest.toIntent(action: String): Intent =
