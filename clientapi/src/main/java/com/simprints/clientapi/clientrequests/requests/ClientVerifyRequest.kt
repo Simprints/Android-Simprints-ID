@@ -1,6 +1,7 @@
 package com.simprints.clientapi.clientrequests.requests
 
 import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.VerifyRequest
 
 
 class ClientVerifyRequest(
@@ -13,8 +14,12 @@ class ClientVerifyRequest(
 
     override val apiVersion: ApiVersion = ApiVersion.V2
 
-    override fun toSimprintsRequest(): SimprintsIdRequest {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun toSimprintsRequest(): SimprintsIdRequest = VerifyRequest(
+        projectId = projectId,
+        userId = userId,
+        moduleId = moduleId,
+        metadata = metadata ?: "",
+        verifyGuid = verifyGuid
+    )
 
 }
