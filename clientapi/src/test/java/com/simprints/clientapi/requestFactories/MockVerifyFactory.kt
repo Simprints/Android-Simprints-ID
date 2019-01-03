@@ -1,4 +1,4 @@
-package com.simprints.clientapi.mockextractors
+package com.simprints.clientapi.requestFactories
 
 import com.simprints.clientapi.clientrequests.builders.VerifyBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
