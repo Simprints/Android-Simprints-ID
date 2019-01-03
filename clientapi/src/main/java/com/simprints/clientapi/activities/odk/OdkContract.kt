@@ -2,7 +2,7 @@ package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.activities.BasePresenter
 import com.simprints.clientapi.activities.BaseView
-import com.simprints.clientapi.activities.ClientRequestActivity
+import com.simprints.clientapi.activities.ClientRequestView
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
@@ -10,13 +10,7 @@ import com.simprints.libsimprints.Verification
 
 interface OdkContract {
 
-    interface View : BaseView<Presenter>, ClientRequestActivity {
-
-        fun returnActionErrorToClient()
-
-        fun requestIdentifyCallout()
-
-        fun requestVerifyCallout()
+    interface View : BaseView<Presenter>, ClientRequestView {
 
         fun requestConfirmIdentityCallout()
 
@@ -25,8 +19,6 @@ interface OdkContract {
         fun returnIdentification(idList: String, confidenceList: String, tierList: String, sessionId: String)
 
         fun returnVerification(id: String, confidence: String, tier: String)
-
-        fun showErrorForException(exception: Exception)
 
     }
 

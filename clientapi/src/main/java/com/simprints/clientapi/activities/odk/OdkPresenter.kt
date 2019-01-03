@@ -2,8 +2,10 @@ package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.builders.EnrollmentBuilder
+import com.simprints.clientapi.clientrequests.builders.IdentifyBuilder
 import com.simprints.clientapi.clientrequests.builders.VerifyBuilder
 import com.simprints.clientapi.clientrequests.validators.EnrollmentValidator
+import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
@@ -26,10 +28,10 @@ class OdkPresenter(private val view: OdkContract.View,
 
     override fun start() = when (action) {
         ACTION_REGISTER -> handleEnrollmentRequest()
-        ACTION_IDENTIFY -> view.requestIdentifyCallout()
+        ACTION_IDENTIFY -> handleIdentifyRequest()
         ACTION_VERIFY -> handleVerifyRequest()
         ACTION_CONFIRM_IDENTITY -> view.requestConfirmIdentityCallout()
-        else -> view.returnActionErrorToClient()
+        else -> view.returnIntentActionErrorToClient()
     }
 
     override fun processRegistration(registration: Registration) =
@@ -49,7 +51,7 @@ class OdkPresenter(private val view: OdkContract.View,
         verification.tier.toString()
     )
 
-    override fun processReturnError() = view.returnActionErrorToClient()
+    override fun processReturnError() = view.returnIntentActionErrorToClient()
 
     private fun handleEnrollmentRequest() = validateAndSendRequest(
         EnrollmentBuilder(view.enrollmentExtractor, EnrollmentValidator(view.enrollmentExtractor))
@@ -59,11 +61,15 @@ class OdkPresenter(private val view: OdkContract.View,
         VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor))
     )
 
+    private fun handleIdentifyRequest() = validateAndSendRequest(
+        IdentifyBuilder(view.identifyExtractor, IdentifyValidator(view.identifyExtractor))
+    )
+
     private fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
         val request = builder.build()
         view.sendSimprintsRequest(request.toSimprintsRequest())
     } catch (exception: Exception) {
-        view.showErrorForException(exception)
+        view.handleClientRequestError(exception)
     }
 
 }
