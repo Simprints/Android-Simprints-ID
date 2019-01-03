@@ -2,7 +2,7 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.requests.ApiVersion
 import com.simprints.clientapi.clientrequests.requests.legacy.LegacyClientRequest
-import com.simprints.clientapi.mockextractors.MockClientRequestFactory
+import com.simprints.clientapi.requestFactories.MockClientRequestFactory
 import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mockito
