@@ -15,11 +15,10 @@ object MockVerifyFactory : MockClientRequestFactory() {
     override fun getValidator(extractor: ClientRequestExtractor): VerifyValidator =
         VerifyValidator(extractor as VerifyExtractor)
 
-    override fun getValidMockExtractor(): VerifyExtractor {
+    override fun getMockExtractor(withLegacyApiKey: Boolean): VerifyExtractor {
         val mockVerifyExtractor = Mockito.mock(VerifyExtractor::class.java)
-        setMockDefaultExtractor(mockVerifyExtractor)
+        setMockDefaultExtractor(mockVerifyExtractor, withLegacyApiKey)
         Mockito.`when`(mockVerifyExtractor.getVerifyGuid()).thenReturn(MockClientRequestFactory.MOCK_VERIFY_GUID)
         return mockVerifyExtractor
     }
-
 }

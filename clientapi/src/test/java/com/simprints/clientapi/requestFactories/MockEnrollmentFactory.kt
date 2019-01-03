@@ -14,10 +14,11 @@ object MockEnrollmentFactory : MockClientRequestFactory() {
     override fun getValidator(extractor: ClientRequestExtractor): EnrollmentValidator =
         EnrollmentValidator(extractor as EnrollmentExtractor)
 
-    override fun getValidMockExtractor(): EnrollmentExtractor {
+    override fun getMockExtractor(withLegacyApiKey: Boolean): EnrollmentExtractor {
         val mockEnrollmentExtractor = Mockito.mock(EnrollmentExtractor::class.java)
-        setMockDefaultExtractor(mockEnrollmentExtractor)
+        setMockDefaultExtractor(mockEnrollmentExtractor, withLegacyApiKey)
         return mockEnrollmentExtractor
     }
+
 
 }

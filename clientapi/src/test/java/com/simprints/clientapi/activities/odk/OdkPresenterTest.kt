@@ -33,7 +33,7 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
-        val enrollmentExtractor = MockEnrollmentFactory.getValidMockExtractor()
+        val enrollmentExtractor = MockEnrollmentFactory.getMockExtractor()
         `when`(view.enrollmentExtractor).thenReturn(enrollmentExtractor)
 
         OdkPresenter(view, ACTION_REGISTER).apply { start() }
@@ -47,7 +47,7 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForLegacyRegister_ShouldRequestLegacyRegister() {
-        val enrollmentExtractor = MockEnrollmentFactory.getValidMockExtractor()
+        val enrollmentExtractor = MockEnrollmentFactory.getMockExtractor()
         `when`(enrollmentExtractor.getLegacyApiKey()).thenReturn("API_KEY")
         `when`(view.enrollmentExtractor).thenReturn(enrollmentExtractor)
 
