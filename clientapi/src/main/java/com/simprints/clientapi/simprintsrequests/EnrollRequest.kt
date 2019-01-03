@@ -4,10 +4,10 @@ import android.os.Parcel
 import android.os.Parcelable
 
 
-data class EnrollmentRequest(val projectId: String,
-                             val moduleId: String,
-                             val userId: String,
-                             val metadata: String) : SimprintsIdRequest {
+data class EnrollRequest(val projectId: String,
+                         val moduleId: String,
+                         val userId: String,
+                         val metadata: String) : SimprintsIdRequest {
 
     override val requestName: String = REQUEST_NAME
 
@@ -29,14 +29,14 @@ data class EnrollmentRequest(val projectId: String,
         return 0
     }
 
-    companion object CREATOR : Parcelable.Creator<EnrollmentRequest> {
+    companion object CREATOR : Parcelable.Creator<EnrollRequest> {
         private const val REQUEST_NAME = "enrollmentRequest"
 
-        override fun createFromParcel(parcel: Parcel): EnrollmentRequest {
-            return EnrollmentRequest(parcel)
+        override fun createFromParcel(parcel: Parcel): EnrollRequest {
+            return EnrollRequest(parcel)
         }
 
-        override fun newArray(size: Int): Array<EnrollmentRequest?> {
+        override fun newArray(size: Int): Array<EnrollRequest?> {
             return arrayOfNulls(size)
         }
     }
