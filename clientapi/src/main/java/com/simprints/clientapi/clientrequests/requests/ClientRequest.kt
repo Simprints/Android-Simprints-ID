@@ -3,13 +3,15 @@ package com.simprints.clientapi.clientrequests.requests
 import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 
 
-abstract class ClientRequest(open val projectId: String,
-                             open val moduleId: String,
-                             open val userId: String,
-                             open val metadata: String?) {
+interface ClientRequest {
 
-    abstract val apiVersion: ApiVersion
+    val projectId: String
+    val moduleId: String
+    val userId: String
+    val metadata: String?
 
-    abstract fun toSimprintsRequest(): SimprintsIdRequest
+    val apiVersion: ApiVersion
+
+    fun toSimprintsRequest(): SimprintsIdRequest
 
 }

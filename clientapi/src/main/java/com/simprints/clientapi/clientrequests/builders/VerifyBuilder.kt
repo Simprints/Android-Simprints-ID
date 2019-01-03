@@ -19,7 +19,7 @@ class VerifyBuilder(private val extractor: VerifyExtractor, validator: VerifyVal
     )
 
     override fun buildLegacyClientRequest(): ClientRequest = LegacyClientVerifyRequest(
-        apiKey = extractor.getLegacyApiKey()!!,
+        legacyApiKey = extractor.getLegacyApiKey()!!,
         userId = extractor.getUserId()!!,
         moduleId = extractor.getModuleId()!!,
         metadata = extractor.getMetatdata(),

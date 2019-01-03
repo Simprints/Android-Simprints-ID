@@ -1,5 +1,6 @@
 package com.simprints.clientapi.mockextractors
 
+import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import org.mockito.Mockito
@@ -15,6 +16,8 @@ abstract class MockClientRequestFactory {
     }
 
     abstract fun getValidator(extractor: ClientRequestExtractor): ClientRequestValidator
+
+    abstract fun getBuilder(extractor: ClientRequestExtractor): ClientRequestBuilder
 
     abstract fun getValidMockExtractor(): ClientRequestExtractor
 
