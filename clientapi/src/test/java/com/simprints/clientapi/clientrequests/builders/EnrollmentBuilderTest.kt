@@ -4,11 +4,11 @@ import com.simprints.clientapi.clientrequests.requests.ApiVersion
 import com.simprints.clientapi.clientrequests.requests.ClientEnrollmentRequest
 import com.simprints.clientapi.clientrequests.requests.legacy.LegacyClientEnrollmentRequest
 import com.simprints.clientapi.clientrequests.validators.EnrollmentValidator
-import com.simprints.clientapi.mockextractors.MockEnrollmentExtractor.getValidEnrollmentExtractorMock
-import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_METADATA
-import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_MODULE_ID
-import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_PROJECT_ID
-import com.simprints.clientapi.mockextractors.MockExtractorParams.MOCK_USER_ID
+import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_METADATA
+import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_MODULE_ID
+import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_PROJECT_ID
+import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_USER_ID
+import com.simprints.clientapi.mockextractors.MockEnrollmentFactory
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito.`when`
@@ -18,8 +18,8 @@ class EnrollmentBuilderTest {
     @Test
     fun buildClientRequest_shouldSucceed() {
         val request = EnrollmentBuilder(
-            getValidEnrollmentExtractorMock(),
-            EnrollmentValidator(getValidEnrollmentExtractorMock())
+            MockEnrollmentFactory.getValidMockExtractor(),
+            EnrollmentValidator(MockEnrollmentFactory.getValidMockExtractor())
         ).build() as ClientEnrollmentRequest
 
         assertEquals(request.apiVersion, ApiVersion.V2)
@@ -31,7 +31,7 @@ class EnrollmentBuilderTest {
 
     @Test
     fun buildLegacyClientRequest() {
-        val extractor = getValidEnrollmentExtractorMock()
+        val extractor = MockEnrollmentFactory.getValidMockExtractor()
         `when`(extractor.getLegacyApiKey()).thenReturn("API_KEY")
         val request = EnrollmentBuilder(extractor, EnrollmentValidator(extractor)).build()
             as LegacyClientEnrollmentRequest
