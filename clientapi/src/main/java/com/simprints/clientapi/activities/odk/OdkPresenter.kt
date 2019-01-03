@@ -1,10 +1,10 @@
 package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
-import com.simprints.clientapi.clientrequests.builders.EnrollmentBuilder
+import com.simprints.clientapi.clientrequests.builders.EnrollBuilder
 import com.simprints.clientapi.clientrequests.builders.IdentifyBuilder
 import com.simprints.clientapi.clientrequests.builders.VerifyBuilder
-import com.simprints.clientapi.clientrequests.validators.EnrollmentValidator
+import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.extensions.getConfidencesString
@@ -54,7 +54,7 @@ class OdkPresenter(private val view: OdkContract.View,
     override fun processReturnError() = view.returnIntentActionErrorToClient()
 
     private fun handleEnrollmentRequest() = validateAndSendRequest(
-        EnrollmentBuilder(view.enrollmentExtractor, EnrollmentValidator(view.enrollmentExtractor))
+        EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
     )
 
     private fun handleVerifyRequest() = validateAndSendRequest(

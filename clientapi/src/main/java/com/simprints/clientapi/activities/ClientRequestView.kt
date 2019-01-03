@@ -1,6 +1,6 @@
 package com.simprints.clientapi.activities
 
-import com.simprints.clientapi.clientrequests.extractors.EnrollmentExtractor
+import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
@@ -8,7 +8,7 @@ import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 
 interface ClientRequestView {
 
-    val enrollmentExtractor: EnrollmentExtractor
+    val enrollExtractor: EnrollExtractor
 
     val verifyExtractor: VerifyExtractor
 

@@ -1,7 +1,7 @@
 package com.simprints.clientapi.activities
 
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.clientapi.clientrequests.extractors.EnrollmentExtractor
+import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.routers.ClientRequestErrorRouter
@@ -11,8 +11,8 @@ import com.simprints.libsimprints.Constants
 
 abstract class ClientRequestActivity : AppCompatActivity(), ClientRequestView {
 
-    override val enrollmentExtractor: EnrollmentExtractor
-        get() = EnrollmentExtractor(intent)
+    override val enrollExtractor: EnrollExtractor
+        get() = EnrollExtractor(intent)
 
     override val verifyExtractor: VerifyExtractor
         get() = VerifyExtractor(intent)
