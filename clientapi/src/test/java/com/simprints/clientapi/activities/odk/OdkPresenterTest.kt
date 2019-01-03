@@ -4,11 +4,11 @@ import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_CONF
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_VERIFY
-import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_METADATA
-import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_MODULE_ID
-import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_PROJECT_ID
-import com.simprints.clientapi.mockextractors.MockClientRequestFactory.Companion.MOCK_USER_ID
-import com.simprints.clientapi.mockextractors.MockEnrollmentFactory
+import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_METADATA
+import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_MODULE_ID
+import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_PROJECT_ID
+import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_USER_ID
+import com.simprints.clientapi.requestFactories.MockEnrollmentFactory
 import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
 import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollmentRequest
 import com.simprints.libsimprints.Identification
