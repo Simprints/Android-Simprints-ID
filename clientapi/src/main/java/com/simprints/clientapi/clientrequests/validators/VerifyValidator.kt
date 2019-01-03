@@ -7,10 +7,7 @@ import com.simprints.clientapi.exceptions.InvalidVerifyIdException
 class VerifyValidator(val extractor: VerifyExtractor) : ClientRequestValidator(extractor) {
 
     override fun validateClientRequest() {
-        validateProjectIdOrLegacyApiKey()
-        validateUserId()
-        validateModuleId()
-        validateMetadata()
+        super.validateClientRequest()
         validateVerifyGuid(extractor.getVerifyGuid())
     }
 
