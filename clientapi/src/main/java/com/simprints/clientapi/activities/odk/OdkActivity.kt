@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.activities.ClientRequestActivity
 import com.simprints.clientapi.clientrequests.extractors.EnrollmentExtractor
+import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.routeClientRequestError
 import com.simprints.clientapi.routers.SimprintsRequestRouter.IDENTIFY_REQUEST_CODE
 import com.simprints.clientapi.routers.SimprintsRequestRouter.REGISTER_REQUEST_CODE
@@ -29,11 +30,13 @@ class OdkActivity : AppCompatActivity(), OdkContract.View, ClientRequestActivity
 
     override lateinit var presenter: OdkContract.Presenter
     override lateinit var enrollmentExtractor: EnrollmentExtractor
+    override lateinit var verifyExtractor: VerifyExtractor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         enrollmentExtractor = EnrollmentExtractor(intent)
+        verifyExtractor = VerifyExtractor(intent)
         presenter = OdkPresenter(this, intent.action).apply { start() }
     }
 
