@@ -1,14 +1,18 @@
 package com.simprints.clientapi.mockextractors
 
+import com.simprints.clientapi.clientrequests.builders.VerifyBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
-import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import org.mockito.Mockito
 
+
 object MockVerifyFactory : MockClientRequestFactory() {
 
-    override fun getValidator(extractor: ClientRequestExtractor): ClientRequestValidator =
+    override fun getBuilder(extractor: ClientRequestExtractor): VerifyBuilder =
+        VerifyBuilder(extractor as VerifyExtractor, getValidator(extractor))
+
+    override fun getValidator(extractor: ClientRequestExtractor): VerifyValidator =
         VerifyValidator(extractor as VerifyExtractor)
 
     override fun getValidMockExtractor(): VerifyExtractor {

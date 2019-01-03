@@ -5,16 +5,11 @@ import com.simprints.clientapi.simprintsrequests.EnrollmentRequest
 import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 
 class ClientEnrollmentRequest(
-    projectId: String,
-    moduleId: String,
-    userId: String,
-    metadata: String?
-) : ClientRequest(
-    projectId = projectId,
-    moduleId = moduleId,
-    userId = userId,
-    metadata = metadata
-) {
+    override val projectId: String,
+    override val moduleId: String,
+    override val userId: String,
+    override val metadata: String?
+) : ClientRequest {
 
     override val apiVersion: ApiVersion = V2
 
