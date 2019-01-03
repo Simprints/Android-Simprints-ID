@@ -10,7 +10,7 @@ class VerifyValidatorTest : ClientRequestValidatorTest(MockVerifyFactory) {
 
     @Test
     fun validateClientRequest_shouldFailOnVerifyGuid() {
-        val extractor = MockVerifyFactory.getValidMockExtractor()
+        val extractor = MockVerifyFactory.getMockExtractor()
         Mockito.`when`(extractor.getVerifyGuid()).thenReturn("")
 
         try {
