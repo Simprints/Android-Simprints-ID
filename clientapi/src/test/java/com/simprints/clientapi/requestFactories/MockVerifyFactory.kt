@@ -21,4 +21,5 @@ object MockVerifyFactory : MockClientRequestFactory() {
         Mockito.`when`(mockVerifyExtractor.getVerifyGuid()).thenReturn(MockClientRequestFactory.MOCK_VERIFY_GUID)
         return mockVerifyExtractor
     }
+
 }

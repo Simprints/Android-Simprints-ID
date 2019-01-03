@@ -1,7 +1,10 @@
 package com.simprints.clientapi.activities.odk
 
+import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.builders.EnrollmentBuilder
+import com.simprints.clientapi.clientrequests.builders.VerifyBuilder
 import com.simprints.clientapi.clientrequests.validators.EnrollmentValidator
+import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
@@ -24,7 +27,7 @@ class OdkPresenter(private val view: OdkContract.View,
     override fun start() = when (action) {
         ACTION_REGISTER -> handleEnrollmentRequest()
         ACTION_IDENTIFY -> view.requestIdentifyCallout()
-        ACTION_VERIFY -> view.requestVerifyCallout()
+        ACTION_VERIFY -> handleVerifyRequest()
         ACTION_CONFIRM_IDENTITY -> view.requestConfirmIdentityCallout()
         else -> view.returnActionErrorToClient()
     }
@@ -48,15 +51,19 @@ class OdkPresenter(private val view: OdkContract.View,
 
     override fun processReturnError() = view.returnActionErrorToClient()
 
-    private fun handleEnrollmentRequest() {
-        EnrollmentBuilder(view.enrollmentExtractor, EnrollmentValidator(view.enrollmentExtractor)).let {
-            try {
-                val request = it.build()
-                view.sendSimprintsRequest(request.toSimprintsRequest())
-            } catch (exception: Exception) {
-                view.showErrorForException(exception)
-            }
-        }
+    private fun handleEnrollmentRequest() = validateAndSendRequest(
+        EnrollmentBuilder(view.enrollmentExtractor, EnrollmentValidator(view.enrollmentExtractor))
+    )
+
+    private fun handleVerifyRequest() = validateAndSendRequest(
+        VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor))
+    )
+
+    private fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
+        val request = builder.build()
+        view.sendSimprintsRequest(request.toSimprintsRequest())
+    } catch (exception: Exception) {
+        view.showErrorForException(exception)
     }
 
 }
