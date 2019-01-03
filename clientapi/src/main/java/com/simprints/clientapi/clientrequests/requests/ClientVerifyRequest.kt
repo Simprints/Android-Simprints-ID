@@ -4,17 +4,12 @@ import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 
 
 class ClientVerifyRequest(
-    projectId: String,
-    moduleId: String,
-    userId: String,
-    metadata: String?,
+    override val projectId: String,
+    override val moduleId: String,
+    override val userId: String,
+    override val metadata: String?,
     val verifyGuid: String
-) : ClientRequest(
-    projectId = projectId,
-    moduleId = moduleId,
-    userId = userId,
-    metadata = metadata
-) {
+) : ClientRequest {
 
     override val apiVersion: ApiVersion = ApiVersion.V2
 

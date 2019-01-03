@@ -18,7 +18,7 @@ class EnrollmentBuilder(private val extractor: EnrollmentExtractor, validator: E
     )
 
     override fun buildLegacyClientRequest(): ClientRequest = LegacyClientEnrollmentRequest(
-        apiKey = extractor.getLegacyApiKey()!!,
+        legacyApiKey = extractor.getLegacyApiKey()!!,
         userId = extractor.getUserId()!!,
         moduleId = extractor.getModuleId()!!,
         metadata = extractor.getMetatdata()
