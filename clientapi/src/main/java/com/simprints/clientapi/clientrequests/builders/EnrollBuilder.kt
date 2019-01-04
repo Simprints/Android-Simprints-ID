@@ -4,6 +4,7 @@ import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.requests.ClientEnrollRequest
 import com.simprints.clientapi.clientrequests.requests.ClientRequest
 import com.simprints.clientapi.clientrequests.requests.legacy.LegacyClientEnrollRequest
+import com.simprints.clientapi.clientrequests.requests.legacy.LegacyClientRequest
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 
 
@@ -17,7 +18,7 @@ class EnrollBuilder(private val extractor: EnrollExtractor, validator: EnrollVal
         metadata = extractor.getMetatdata()
     )
 
-    override fun buildLegacyClientRequest(): ClientRequest = LegacyClientEnrollRequest(
+    override fun buildLegacyClientRequest(): LegacyClientRequest = LegacyClientEnrollRequest(
         legacyApiKey = extractor.getLegacyApiKey()!!,
         userId = extractor.getUserId()!!,
         moduleId = extractor.getModuleId()!!,
