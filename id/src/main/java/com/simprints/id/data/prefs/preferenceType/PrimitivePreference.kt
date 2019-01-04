@@ -8,15 +8,6 @@ import kotlin.reflect.KProperty
 /**
  * Delegate to read/write values of primitive types ([Byte], [Short], [Int], [Long], [Float], [Double],
  * [String] or [Boolean]) from the Shared Preferences.
- *
- * Thread-safety: a property delegated to PrimitivePreference can be accessed concurrently
- * from different threads.
- *
- * Lazy-initialization: reads to Shared Preferences are performed not on instantiation but on first
- * access.
- *
- * Caching: the value of the property is cached to reduce the number of reads and writes to the
- * Shared Preferences: at most one read on first access, and one write per set.
  */
 open class PrimitivePreference<T : Any>(private val prefs: ImprovedSharedPreferences,
                                         private val key: String,
