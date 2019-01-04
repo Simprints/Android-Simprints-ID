@@ -2,6 +2,7 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.requests.ClientRequest
+import com.simprints.clientapi.clientrequests.requests.legacy.LegacyClientRequest
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 
 
@@ -10,7 +11,7 @@ abstract class ClientRequestBuilder(private val extractor: ClientRequestExtracto
 
     protected abstract fun buildClientRequest(): ClientRequest
 
-    protected abstract fun buildLegacyClientRequest(): ClientRequest
+    protected abstract fun buildLegacyClientRequest(): LegacyClientRequest
 
     open fun isLegacyRequest(): Boolean = !extractor.getLegacyApiKey().isNullOrBlank()
 

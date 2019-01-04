@@ -4,6 +4,7 @@ import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.requests.ClientIdentifyRequest
 import com.simprints.clientapi.clientrequests.requests.ClientRequest
 import com.simprints.clientapi.clientrequests.requests.legacy.LegacyClientIdentifyRequest
+import com.simprints.clientapi.clientrequests.requests.legacy.LegacyClientRequest
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 
 
@@ -17,7 +18,7 @@ class IdentifyBuilder(val extractor: IdentifyExtractor, validator: IdentifyValid
         metadata = extractor.getMetatdata()
     )
 
-    override fun buildLegacyClientRequest(): ClientRequest = LegacyClientIdentifyRequest(
+    override fun buildLegacyClientRequest(): LegacyClientRequest = LegacyClientIdentifyRequest(
         legacyApiKey = extractor.getLegacyApiKey()!!,
         userId = extractor.getUserId()!!,
         moduleId = extractor.getModuleId()!!,
