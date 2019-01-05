@@ -1,42 +1,19 @@
 package com.simprints.clientapi.simprintsrequests.legacy
 
-import android.os.Parcel
-import android.os.Parcelable
+import kotlinx.android.parcel.IgnoredOnParcel
+import kotlinx.android.parcel.Parcelize
 
 
-data class LegacyIdentifyRequest(val legacyApiKey: String,
-                                 val moduleId: String,
-                                 val userId: String,
-                                 val metadata: String) : LegacySimprintsIdRequest {
+@Parcelize
+data class LegacyIdentifyRequest(override val legacyApiKey: String,
+                                 override val moduleId: String,
+                                 override val userId: String,
+                                 override val metadata: String) : LegacySimprintsIdRequest {
 
+    @IgnoredOnParcel
     override val requestName: String = REQUEST_NAME
 
-    constructor(parcel: Parcel) : this(
-        parcel.readString() ?: "",
-        parcel.readString() ?: "",
-        parcel.readString() ?: "",
-        parcel.readString() ?: "")
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(legacyApiKey)
-        parcel.writeString(moduleId)
-        parcel.writeString(userId)
-        parcel.writeString(metadata)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<LegacyIdentifyRequest> {
+    companion object {
         private const val REQUEST_NAME = "legacyIdentifyRequest"
-
-        override fun createFromParcel(parcel: Parcel): LegacyIdentifyRequest {
-            return LegacyIdentifyRequest(parcel)
-        }
-
-        override fun newArray(size: Int): Array<LegacyIdentifyRequest?> {
-            return arrayOfNulls(size)
-        }
     }
 }

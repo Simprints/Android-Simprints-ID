@@ -9,6 +9,7 @@ import com.simprints.clientapi.routers.SimprintsRequestRouter
 import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 import com.simprints.libsimprints.Constants
 
+
 abstract class ClientRequestActivity : AppCompatActivity(), ClientRequestView {
 
     override val enrollExtractor: EnrollExtractor
