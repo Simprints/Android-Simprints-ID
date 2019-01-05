@@ -1,17 +1,13 @@
 package com.simprints.clientapi.activities.odk
 
-import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
-import com.simprints.clientapi.clientrequests.builders.EnrollBuilder
-import com.simprints.clientapi.clientrequests.builders.IdentifyBuilder
-import com.simprints.clientapi.clientrequests.builders.VerifyBuilder
+import com.simprints.clientapi.clientrequests.builders.*
+import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
-import com.simprints.clientapi.simprintsrequests.SimprintsActionRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacySimprintsActionRequest
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
@@ -32,7 +28,7 @@ class OdkPresenter(private val view: OdkContract.View,
         ACTION_REGISTER -> handleEnrollmentRequest()
         ACTION_IDENTIFY -> handleIdentifyRequest()
         ACTION_VERIFY -> handleVerifyRequest()
-        ACTION_CONFIRM_IDENTITY -> view.requestConfirmIdentityCallout()
+        ACTION_CONFIRM_IDENTITY -> handleConfirmIdentifyRequest()
         else -> view.returnIntentActionErrorToClient()
     }
 
@@ -67,13 +63,14 @@ class OdkPresenter(private val view: OdkContract.View,
         IdentifyBuilder(view.identifyExtractor, IdentifyValidator(view.identifyExtractor))
     )
 
+    private fun handleConfirmIdentifyRequest() = validateAndSendRequest(
+        ConfirmIdentifyBuilder(view.confirmIdentifyExtractor,
+            ConfirmIdentifyValidator(view.confirmIdentifyExtractor))
+    )
+
     private fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
         val request = builder.build()
-        when (request) {
-            is SimprintsActionRequest -> view.sendSimprintsActionRequest(request)
-            is LegacySimprintsActionRequest -> view.sendLegacySimprintsActionRequest(request)
-            else -> view.returnIntentActionErrorToClient()
-        }
+        view.sendSimprintsRequest(request)
     } catch (exception: Exception) {
         view.handleClientRequestError(exception)
     }

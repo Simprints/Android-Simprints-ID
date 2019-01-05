@@ -54,13 +54,17 @@ dependencies {
     // Anko
     implementation "org.jetbrains.anko:anko:0.10.8"
 
-    // Testing
+    // Unit Testing
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     testImplementation 'org.robolectric:robolectric:4.1'
     testImplementation "org.mockito:mockito-core:2.19.0"
 
+    // Android Testing
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test:rules:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.1.1'
+    
 }
 
 repositories {

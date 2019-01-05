@@ -6,19 +6,11 @@ import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 
 interface LegacySimprintsIdRequest : SimprintsIdRequest {
 
-    override val apiVersion: ApiVersion get() = ApiVersion.V1
-    override val projectId: String get() = ""
     val legacyApiKey: String
 
-}
-
-interface LegacySimprintsActionRequest : LegacySimprintsIdRequest {
-
-    val userId: String
-    val moduleId: String
-    val metadata: String
+    override val apiVersion: ApiVersion get() = ApiVersion.V1
+    override val projectId: String get() = ""
 
 }
 
-interface SimprintsConfirmationRequest : LegacySimprintsIdRequest
 

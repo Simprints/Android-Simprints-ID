@@ -155,6 +155,8 @@
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
+                <action android:name="com.simprints.clientapp.CONFIRM_IDENTITY" />
+                <action android:name="com.simprints.legacy.CONFIRM_IDENTITY" />
             </intent-filter>
         </service>
 
