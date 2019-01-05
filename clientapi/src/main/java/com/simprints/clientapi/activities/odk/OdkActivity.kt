@@ -7,6 +7,8 @@ import com.simprints.clientapi.activities.ClientRequestActivity
 import com.simprints.clientapi.routers.SimprintsRequestRouter.IDENTIFY_REQUEST_CODE
 import com.simprints.clientapi.routers.SimprintsRequestRouter.REGISTER_REQUEST_CODE
 import com.simprints.clientapi.routers.SimprintsRequestRouter.VERIFY_REQUEST_CODE
+import com.simprints.clientapi.simprintsrequests.EnrollRequest
+import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
@@ -83,6 +85,12 @@ class OdkActivity : ClientRequestActivity(), OdkContract.View {
     private fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)
         finish()
+    }
+
+    private fun doStuff(stuff: SimprintsIdRequest) {
+        when (stuff) {
+            is EnrollRequest -> ""
+        }
     }
 
 }
