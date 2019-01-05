@@ -7,7 +7,7 @@ import kotlinx.android.parcel.Parcelize
 data class EnrollRequest(override val projectId: String,
                          override val moduleId: String,
                          override val userId: String,
-                         override val metadata: String) : SimprintsIdRequest {
+                         override val metadata: String) : SimprintsActionRequest {
 
     @IgnoredOnParcel
     override val requestName: String = REQUEST_NAME

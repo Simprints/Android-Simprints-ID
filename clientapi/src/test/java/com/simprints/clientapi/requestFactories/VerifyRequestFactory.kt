@@ -7,7 +7,7 @@ import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import org.mockito.Mockito
 
 
-object MockVerifyFactory : MockClientRequestFactory() {
+object VerifyRequestFactory : RequestFactory() {
 
     override fun getBuilder(extractor: ClientRequestExtractor): VerifyBuilder =
         VerifyBuilder(extractor as VerifyExtractor, getValidator(extractor))
@@ -18,7 +18,7 @@ object MockVerifyFactory : MockClientRequestFactory() {
     override fun getMockExtractor(withLegacyApiKey: Boolean): VerifyExtractor {
         val mockVerifyExtractor = Mockito.mock(VerifyExtractor::class.java)
         setMockDefaultExtractor(mockVerifyExtractor, withLegacyApiKey)
-        Mockito.`when`(mockVerifyExtractor.getVerifyGuid()).thenReturn(MockClientRequestFactory.MOCK_VERIFY_GUID)
+        Mockito.`when`(mockVerifyExtractor.getVerifyGuid()).thenReturn(RequestFactory.MOCK_VERIFY_GUID)
         return mockVerifyExtractor
     }
 

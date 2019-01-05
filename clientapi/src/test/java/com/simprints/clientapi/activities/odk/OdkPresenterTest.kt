@@ -4,15 +4,15 @@ import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_CONF
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_VERIFY
-import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_LEGACY_API_KEY
-import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_METADATA
-import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_MODULE_ID
-import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_PROJECT_ID
-import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_USER_ID
-import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_VERIFY_GUID
-import com.simprints.clientapi.requestFactories.MockEnrollmentFactory
-import com.simprints.clientapi.requestFactories.MockIdentifyFactory
-import com.simprints.clientapi.requestFactories.MockVerifyFactory
+import com.simprints.clientapi.requestFactories.EnrollRequestFactory
+import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_LEGACY_API_KEY
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_METADATA
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_MODULE_ID
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_PROJECT_ID
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_USER_ID
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_VERIFY_GUID
+import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.simprintsrequests.EnrollRequest
 import com.simprints.clientapi.simprintsrequests.IdentifyRequest
 import com.simprints.clientapi.simprintsrequests.VerifyRequest
@@ -41,11 +41,11 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
-        val enrollmentExtractor = MockEnrollmentFactory.getMockExtractor()
+        val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         `when`(view.enrollExtractor).thenReturn(enrollmentExtractor)
 
         OdkPresenter(view, ACTION_REGISTER).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(EnrollRequest(
+        Mockito.verify(view, times(1)).sendSimprintsActionRequest(EnrollRequest(
             projectId = MOCK_PROJECT_ID,
             moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
@@ -55,11 +55,11 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForLegacyRegister_ShouldRequestLegacyRegister() {
-        val enrollmentExtractor = MockEnrollmentFactory.getMockExtractor(withLegacyApiKey = true)
+        val enrollmentExtractor = EnrollRequestFactory.getMockExtractor(withLegacyApiKey = true)
         `when`(view.enrollExtractor).thenReturn(enrollmentExtractor)
 
         OdkPresenter(view, ACTION_REGISTER).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(LegacyEnrollRequest(
+        Mockito.verify(view, times(1)).sendLegacySimprintsActionRequest(LegacyEnrollRequest(
             legacyApiKey = MOCK_LEGACY_API_KEY,
             moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
@@ -69,11 +69,11 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForIdentify_ShouldRequestIdentify() {
-        val identifyExtractor = MockIdentifyFactory.getMockExtractor()
+        val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
         `when`(view.identifyExtractor).thenReturn(identifyExtractor)
 
         OdkPresenter(view, ACTION_IDENTIFY).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(IdentifyRequest(
+        Mockito.verify(view, times(1)).sendSimprintsActionRequest(IdentifyRequest(
             projectId = MOCK_PROJECT_ID,
             moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
@@ -83,11 +83,11 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForLegacyIdentify_ShouldRequestLegacyIdentify() {
-        val identifyExtractor = MockIdentifyFactory.getMockExtractor(withLegacyApiKey = true)
+        val identifyExtractor = IdentifyRequestFactory.getMockExtractor(withLegacyApiKey = true)
         `when`(view.identifyExtractor).thenReturn(identifyExtractor)
 
         OdkPresenter(view, ACTION_IDENTIFY).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(LegacyIdentifyRequest(
+        Mockito.verify(view, times(1)).sendLegacySimprintsActionRequest(LegacyIdentifyRequest(
             legacyApiKey = MOCK_LEGACY_API_KEY,
             moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
@@ -97,11 +97,11 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForVerify_ShouldRequestVerify() {
-        val verifyExractor = MockVerifyFactory.getMockExtractor()
+        val verifyExractor = VerifyRequestFactory.getMockExtractor()
         `when`(view.verifyExtractor).thenReturn(verifyExractor)
 
         OdkPresenter(view, ACTION_VERIFY).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(VerifyRequest(
+        Mockito.verify(view, times(1)).sendSimprintsActionRequest(VerifyRequest(
             projectId = MOCK_PROJECT_ID,
             moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
@@ -112,11 +112,11 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForLegacyVerify_ShouldRequestLegacyVerify() {
-        val verifyExractor = MockVerifyFactory.getMockExtractor(withLegacyApiKey = true)
+        val verifyExractor = VerifyRequestFactory.getMockExtractor(withLegacyApiKey = true)
         `when`(view.verifyExtractor).thenReturn(verifyExractor)
 
         OdkPresenter(view, ACTION_VERIFY).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(LegacyVerifyRequest(
+        Mockito.verify(view, times(1)).sendLegacySimprintsActionRequest(LegacyVerifyRequest(
             legacyApiKey = MOCK_LEGACY_API_KEY,
             moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,

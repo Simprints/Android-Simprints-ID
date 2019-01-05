@@ -9,7 +9,7 @@ data class LegacyVerifyRequest(override val legacyApiKey: String,
                                override val moduleId: String,
                                override val userId: String,
                                override val metadata: String,
-                               val verifyGuid: String) : LegacySimprintsIdRequest {
+                               val verifyGuid: String) : LegacySimprintsActionRequest {
 
     @IgnoredOnParcel
     override val requestName: String = REQUEST_NAME
