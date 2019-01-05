@@ -7,7 +7,7 @@ import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import org.mockito.Mockito
 
 
-object MockIdentifyFactory : MockClientRequestFactory() {
+object IdentifyRequestFactory : RequestFactory() {
 
     override fun getValidator(extractor: ClientRequestExtractor): IdentifyValidator =
         IdentifyValidator(extractor as IdentifyExtractor)

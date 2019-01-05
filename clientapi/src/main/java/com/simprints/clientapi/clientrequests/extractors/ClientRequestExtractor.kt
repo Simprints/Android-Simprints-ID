@@ -6,15 +6,18 @@ import com.simprints.libsimprints.Constants
 
 abstract class ClientRequestExtractor(private val intent: Intent) {
 
-    open fun getProjectId(): String = intent.getStringExtra(Constants.SIMPRINTS_PROJECT_ID)
+    open fun getProjectId(): String = intent.extractString(Constants.SIMPRINTS_PROJECT_ID)
 
-    open fun getUserId(): String = intent.getStringExtra(Constants.SIMPRINTS_USER_ID)
+    open fun getUserId(): String = intent.extractString(Constants.SIMPRINTS_USER_ID)
 
-    open fun getModuleId(): String = intent.getStringExtra(Constants.SIMPRINTS_MODULE_ID)
+    open fun getModuleId(): String = intent.extractString(Constants.SIMPRINTS_MODULE_ID)
 
-    open fun getMetatdata(): String = intent.getStringExtra(Constants.SIMPRINTS_METADATA)
+    open fun getMetatdata(): String = intent.extractString(Constants.SIMPRINTS_METADATA)
 
     // TODO: remove legacy code
-    open fun getLegacyApiKey(): String = intent.getStringExtra(Constants.SIMPRINTS_API_KEY)
+    open fun getLegacyApiKey(): String = intent.extractString(Constants.SIMPRINTS_API_KEY)
+
+    protected open fun Intent.extractString(key: String): String =
+        this.getStringExtra(Constants.SIMPRINTS_PROJECT_ID) ?: ""
 
 }

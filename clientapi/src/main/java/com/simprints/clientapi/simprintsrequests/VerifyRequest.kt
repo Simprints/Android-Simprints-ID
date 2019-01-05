@@ -8,7 +8,7 @@ data class VerifyRequest(override val projectId: String,
                          override val moduleId: String,
                          override val userId: String,
                          override val metadata: String,
-                         val verifyGuid: String) : SimprintsIdRequest {
+                         val verifyGuid: String) : SimprintsActionRequest {
 
     @IgnoredOnParcel
     override val requestName: String = REQUEST_NAME

@@ -5,7 +5,7 @@ import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import org.mockito.Mockito
 
-abstract class MockClientRequestFactory {
+abstract class RequestFactory {
 
     companion object {
         const val MOCK_PROJECT_ID = "projectId"
@@ -31,8 +31,11 @@ abstract class MockClientRequestFactory {
         Mockito.`when`(mockExtractor.getModuleId()).thenReturn(MOCK_MODULE_ID)
         Mockito.`when`(mockExtractor.getMetatdata()).thenReturn(MOCK_METADATA)
 
+
         if (withLegacyApiKey)
             Mockito.`when`(mockExtractor.getLegacyApiKey()).thenReturn(MOCK_LEGACY_API_KEY)
+        else
+            Mockito.`when`(mockExtractor.getLegacyApiKey()).thenReturn("")
     }
 
 }

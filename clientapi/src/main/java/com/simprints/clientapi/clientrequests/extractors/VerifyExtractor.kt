@@ -6,6 +6,6 @@ import com.simprints.libsimprints.Constants
 
 class VerifyExtractor(val intent: Intent) : ClientRequestExtractor(intent) {
 
-    fun getVerifyGuid(): String = intent.getStringExtra(Constants.SIMPRINTS_VERIFY_GUID)
+    fun getVerifyGuid(): String = intent.extractString(Constants.SIMPRINTS_VERIFY_GUID)
 
 }
