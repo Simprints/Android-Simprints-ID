@@ -1,6 +1,6 @@
 package com.simprints.clientapi.clientrequests.builders
 
-import com.simprints.clientapi.requestFactories.MockEnrollmentFactory
+import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 
 
-class EnrollBuilderTest : ClientRequestBuilderTest(MockEnrollmentFactory)
+class EnrollBuilderTest : ActionRequestBuilderTest(EnrollRequestFactory)

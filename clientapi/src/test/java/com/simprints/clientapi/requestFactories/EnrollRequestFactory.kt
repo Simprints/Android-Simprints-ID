@@ -6,7 +6,7 @@ import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import org.mockito.Mockito
 
-object MockEnrollmentFactory : MockClientRequestFactory() {
+object EnrollRequestFactory : RequestFactory() {
 
     override fun getBuilder(extractor: ClientRequestExtractor): EnrollBuilder =
         EnrollBuilder(extractor as EnrollExtractor, getValidator(extractor))

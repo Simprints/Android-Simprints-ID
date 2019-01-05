@@ -10,6 +10,8 @@ import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
+import com.simprints.clientapi.simprintsrequests.SimprintsActionRequest
+import com.simprints.clientapi.simprintsrequests.legacy.LegacySimprintsActionRequest
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
@@ -67,7 +69,11 @@ class OdkPresenter(private val view: OdkContract.View,
 
     private fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
         val request = builder.build()
-        view.sendSimprintsRequest(request)
+        when (request) {
+            is SimprintsActionRequest -> view.sendSimprintsActionRequest(request)
+            is LegacySimprintsActionRequest -> view.sendLegacySimprintsActionRequest(request)
+            else -> view.returnIntentActionErrorToClient()
+        }
     } catch (exception: Exception) {
         view.handleClientRequestError(exception)
     }

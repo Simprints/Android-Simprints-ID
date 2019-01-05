@@ -3,12 +3,12 @@ package com.simprints.clientapi.clientrequests.validators
 import com.simprints.clientapi.exceptions.InvalidModuleIdException
 import com.simprints.clientapi.exceptions.InvalidProjectIdException
 import com.simprints.clientapi.exceptions.InvalidUserIdException
-import com.simprints.clientapi.requestFactories.MockClientRequestFactory
+import com.simprints.clientapi.requestFactories.RequestFactory
 import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mockito
 
-abstract class ClientRequestValidatorTest(private val mockFactory: MockClientRequestFactory) {
+abstract class ClientRequestValidatorTest(private val mockFactory: RequestFactory) {
 
     @Test
     fun validateClientRequest_shouldNotFail() {
