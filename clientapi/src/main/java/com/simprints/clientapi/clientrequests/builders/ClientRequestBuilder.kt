@@ -1,26 +1,26 @@
 package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
-import com.simprints.clientapi.clientrequests.requests.ClientRequest
-import com.simprints.clientapi.clientrequests.requests.legacy.LegacyClientRequest
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
+import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.legacy.LegacySimprintsIdRequest
 
 
 abstract class ClientRequestBuilder(private val extractor: ClientRequestExtractor,
                                     private val validator: ClientRequestValidator) {
 
-    protected abstract fun buildClientRequest(): ClientRequest
+    protected abstract fun buildSimprintsRequest(): SimprintsIdRequest
 
-    protected abstract fun buildLegacyClientRequest(): LegacyClientRequest
+    protected abstract fun buildLegacySimprintsRequest(): LegacySimprintsIdRequest
 
-    open fun isLegacyRequest(): Boolean = !extractor.getLegacyApiKey().isNullOrBlank()
+    open fun isLegacyRequest(): Boolean = !extractor.getLegacyApiKey().isBlank()
 
-    fun build(): ClientRequest {
+    fun build(): SimprintsIdRequest {
         validator.validateClientRequest()
         return if (isLegacyRequest())
-            buildLegacyClientRequest()
+            buildLegacySimprintsRequest()
         else
-            buildClientRequest()
+            buildSimprintsRequest()
     }
 
 }
