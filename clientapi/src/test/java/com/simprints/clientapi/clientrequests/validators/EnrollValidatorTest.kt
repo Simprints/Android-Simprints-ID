@@ -1,6 +1,6 @@
 package com.simprints.clientapi.clientrequests.validators
 
-import com.simprints.clientapi.requestFactories.MockEnrollmentFactory
+import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 
 
-class EnrollValidatorTest : ClientRequestValidatorTest(MockEnrollmentFactory)
+class EnrollValidatorTest : ClientRequestValidatorTest(EnrollRequestFactory)

@@ -8,7 +8,7 @@ import kotlinx.android.parcel.Parcelize
 data class LegacyIdentifyRequest(override val legacyApiKey: String,
                                  override val moduleId: String,
                                  override val userId: String,
-                                 override val metadata: String) : LegacySimprintsIdRequest {
+                                 override val metadata: String) : LegacySimprintsActionRequest {
 
     @IgnoredOnParcel
     override val requestName: String = REQUEST_NAME

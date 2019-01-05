@@ -1,6 +1,6 @@
 package com.simprints.clientapi.clientrequests.validators
 
-import com.simprints.clientapi.requestFactories.MockIdentifyFactory
+import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 
 
-class IdentifyValidatorTest : ClientRequestValidatorTest(MockIdentifyFactory)
+class IdentifyValidatorTest : ClientRequestValidatorTest(IdentifyRequestFactory)
