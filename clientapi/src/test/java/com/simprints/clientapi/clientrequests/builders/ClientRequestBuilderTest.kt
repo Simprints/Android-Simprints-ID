@@ -1,9 +1,9 @@
 package com.simprints.clientapi.clientrequests.builders
 
-import com.simprints.clientapi.clientrequests.requests.ApiVersion
-import com.simprints.clientapi.clientrequests.requests.legacy.LegacyClientRequest
 import com.simprints.clientapi.requestFactories.MockClientRequestFactory
 import com.simprints.clientapi.requestFactories.MockClientRequestFactory.Companion.MOCK_LEGACY_API_KEY
+import com.simprints.clientapi.simprintsrequests.ApiVersion
+import com.simprints.clientapi.simprintsrequests.legacy.LegacySimprintsIdRequest
 import org.junit.Assert
 import org.junit.Test
 
@@ -24,7 +24,7 @@ abstract class ClientRequestBuilderTest(val mockFactory: MockClientRequestFactor
     @Test
     open fun buildLegacyClientRequest_shouldSucceed() {
         val extractor = mockFactory.getMockExtractor(withLegacyApiKey = true)
-        val request = mockFactory.getBuilder(extractor).build() as LegacyClientRequest
+        val request = mockFactory.getBuilder(extractor).build() as LegacySimprintsIdRequest
 
         Assert.assertEquals(request.apiVersion, ApiVersion.V1)
         Assert.assertEquals(request.legacyApiKey, MOCK_LEGACY_API_KEY)

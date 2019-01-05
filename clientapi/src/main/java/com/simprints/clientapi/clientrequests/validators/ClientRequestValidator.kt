@@ -24,30 +24,30 @@ abstract class ClientRequestValidator(private val extractor: ClientRequestExtrac
     }
 
     protected open fun validateProjectId() {
-        if (extractor.getProjectId().isNullOrBlank())
+        if (extractor.getProjectId().isBlank())
             throw InvalidProjectIdException("Missing Project ID")
     }
 
     protected open fun validateUserId() {
-        if (extractor.getUserId().isNullOrBlank())
+        if (extractor.getUserId().isBlank())
             throw InvalidUserIdException("Missing User ID")
     }
 
     protected open fun validateModuleId() {
-        if (extractor.getModuleId().isNullOrBlank())
+        if (extractor.getModuleId().isBlank())
             throw InvalidModuleIdException("Missing Module ID")
-        else if (extractor.getModuleId()!!.contains("|"))
+        else if (extractor.getModuleId().contains("|"))
             throw InvalidModuleIdException("Illegal Module ID")
     }
 
     // TODO: remove legacy
     protected open fun validateLegacyApiKey() {
-        if (extractor.getLegacyApiKey().isNullOrBlank())
+        if (extractor.getLegacyApiKey().isBlank())
             throw InvalidProjectIdException("Missing Project ID or Legacy API Key")
     }
 
     protected open fun validateMetadata() {
-        if (!extractor.getMetatdata().isNullOrBlank())
+        if (!extractor.getMetatdata().isBlank())
             if (!hasValidMetadata())
                 throw InvalidMetadataException("Invalid Metadata")
     }

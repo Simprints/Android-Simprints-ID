@@ -1,46 +1,21 @@
 package com.simprints.clientapi.simprintsrequests.legacy
 
-import android.os.Parcel
-import android.os.Parcelable
+import kotlinx.android.parcel.IgnoredOnParcel
+import kotlinx.android.parcel.Parcelize
 
 
-data class LegacyVerifyRequest(val legacyApiKey: String,
-                               val moduleId: String,
-                               val userId: String,
-                               val metadata: String,
+@Parcelize
+data class LegacyVerifyRequest(override val legacyApiKey: String,
+                               override val moduleId: String,
+                               override val userId: String,
+                               override val metadata: String,
                                val verifyGuid: String) : LegacySimprintsIdRequest {
 
+    @IgnoredOnParcel
     override val requestName: String = REQUEST_NAME
 
-    constructor(parcel: Parcel) : this(
-        parcel.readString() ?: "",
-        parcel.readString() ?: "",
-        parcel.readString() ?: "",
-        parcel.readString() ?: "",
-        parcel.readString() ?: "")
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(legacyApiKey)
-        parcel.writeString(moduleId)
-        parcel.writeString(userId)
-        parcel.writeString(metadata)
-        parcel.writeString(verifyGuid)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<LegacyVerifyRequest> {
+    companion object {
         private const val REQUEST_NAME = "legacyVerifyRequest"
-
-        override fun createFromParcel(parcel: Parcel): LegacyVerifyRequest {
-            return LegacyVerifyRequest(parcel)
-        }
-
-        override fun newArray(size: Int): Array<LegacyVerifyRequest?> {
-            return arrayOfNulls(size)
-        }
     }
 
 }

@@ -67,7 +67,7 @@ class OdkPresenter(private val view: OdkContract.View,
 
     private fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
         val request = builder.build()
-        view.sendSimprintsRequest(request.toSimprintsRequest())
+        view.sendSimprintsRequest(request)
     } catch (exception: Exception) {
         view.handleClientRequestError(exception)
     }
