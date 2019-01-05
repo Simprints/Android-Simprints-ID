@@ -1,13 +1,14 @@
 package com.simprints.clientapi.activities
 
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.routers.ClientRequestErrorRouter
-import com.simprints.clientapi.routers.SimprintsRequestRouter
-import com.simprints.clientapi.simprintsrequests.SimprintsActionRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacySimprintsActionRequest
+import com.simprints.clientapi.routers.SimprintsRequestRouter.routeSimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.SimprintsConfirmationRequest
+import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 import com.simprints.libsimprints.Constants
 
 
@@ -22,11 +23,16 @@ abstract class ClientRequestActivity : AppCompatActivity(), ClientRequestView {
     override val identifyExtractor: IdentifyExtractor
         get() = IdentifyExtractor(intent)
 
-    override fun sendSimprintsActionRequest(request: SimprintsActionRequest) =
-        SimprintsRequestRouter.routeSimprintsActionRequest(this, request)
+    override val confirmIdentifyExtractor: ConfirmIdentifyExtractor
+        get() = ConfirmIdentifyExtractor(intent)
 
-    override fun sendLegacySimprintsActionRequest(request: LegacySimprintsActionRequest) =
-        SimprintsRequestRouter.routeLegacySimprintsRequest(this, request)
+
+    override fun sendSimprintsRequest(request: SimprintsIdRequest) {
+        routeSimprintsIdRequest(this, request)
+
+        if (request is SimprintsConfirmationRequest)
+            finishAffinity()
+    }
 
     override fun handleClientRequestError(exception: Exception) {
         ClientRequestErrorRouter.routeClientRequestError(this, exception)

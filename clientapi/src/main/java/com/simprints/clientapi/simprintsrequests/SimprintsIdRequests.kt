@@ -4,13 +4,14 @@ import android.os.Parcelable
 
 interface SimprintsIdRequest : Parcelable {
 
-    val apiVersion: ApiVersion get() = ApiVersion.V2
     val requestName: String
     val projectId: String
 
+    val apiVersion: ApiVersion get() = ApiVersion.V2
+
 }
 
-interface SimprintsActionRequest : SimprintsIdRequest {
+interface SimprintsActionRequest {
 
     val userId: String
     val moduleId: String
@@ -18,4 +19,5 @@ interface SimprintsActionRequest : SimprintsIdRequest {
 
 }
 
-interface SimprintsConfirmationRequest : SimprintsIdRequest
+interface SimprintsConfirmationRequest
+
