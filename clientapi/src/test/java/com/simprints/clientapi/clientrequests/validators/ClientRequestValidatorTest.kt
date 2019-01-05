@@ -11,12 +11,12 @@ import org.mockito.Mockito
 abstract class ClientRequestValidatorTest(private val mockFactory: RequestFactory) {
 
     @Test
-    fun validateClientRequest_shouldNotFail() {
+    open fun validateClientRequest_shouldNotFail() {
         mockFactory.getValidator(mockFactory.getMockExtractor()).validateClientRequest()
     }
 
     @Test
-    fun validateClientRequest_shouldFailOnProjectId() {
+    open fun validateClientRequest_shouldFailOnProjectId() {
         val extractor = mockFactory.getMockExtractor()
         Mockito.`when`(extractor.getProjectId()).thenReturn("")
         Mockito.`when`(extractor.getLegacyApiKey()).thenReturn("")
@@ -30,7 +30,7 @@ abstract class ClientRequestValidatorTest(private val mockFactory: RequestFactor
     }
 
     @Test
-    fun validateClientRequest_shouldFailOnUserId() {
+    open fun validateClientRequest_shouldFailOnUserId() {
         val extractor = mockFactory.getMockExtractor()
         Mockito.`when`(extractor.getUserId()).thenReturn("")
 
@@ -43,7 +43,7 @@ abstract class ClientRequestValidatorTest(private val mockFactory: RequestFactor
     }
 
     @Test
-    fun validateClientRequest_shouldFailOnModuleId() {
+    open fun validateClientRequest_shouldFailOnModuleId() {
         val extractor = mockFactory.getMockExtractor()
         Mockito.`when`(extractor.getModuleId()).thenReturn("")
 
@@ -56,7 +56,7 @@ abstract class ClientRequestValidatorTest(private val mockFactory: RequestFactor
     }
 
     @Test
-    fun validateClientRequest_shouldSucceedOnEmptyMetadata() {
+    open fun validateClientRequest_shouldSucceedOnEmptyMetadata() {
         val extractor = mockFactory.getMockExtractor()
         Mockito.`when`(extractor.getMetatdata()).thenReturn("")
 

@@ -1,10 +1,10 @@
 package com.simprints.clientapi.activities
 
+import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
-import com.simprints.clientapi.simprintsrequests.SimprintsActionRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacySimprintsActionRequest
+import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 
 
 interface ClientRequestView {
@@ -15,9 +15,9 @@ interface ClientRequestView {
 
     val identifyExtractor: IdentifyExtractor
 
-    fun sendSimprintsActionRequest(request: SimprintsActionRequest)
+    val confirmIdentifyExtractor: ConfirmIdentifyExtractor
 
-    fun sendLegacySimprintsActionRequest(request: LegacySimprintsActionRequest)
+    fun sendSimprintsRequest(request: SimprintsIdRequest)
 
     fun handleClientRequestError(exception: Exception)
 
