@@ -32,6 +32,31 @@
         </activity>
 
         <activity
+            android:name=".activities.libsimprints.LibSimprintsActivity"
+            android:theme="@style/ClientApiTheme.Launcher">
+            <intent-filter>
+                <action android:name="com.simprints.id.REGISTER" />
+                <action android:name="com.simprints.id.IDENTIFY" />
+                <action android:name="com.simprints.id.VERIFY" />
+                <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.simprints.id.REGISTER" />
+                <action android:name="com.simprints.id.IDENTIFY" />
+                <action android:name="com.simprints.id.VERIFY" />
+                <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".activities.errors.ErrorActivity"
             android:label="@string/title_activity_project_id_error"
             android:theme="@style/ClientApiTheme.NoActionBar" />

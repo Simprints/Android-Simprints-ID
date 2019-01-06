@@ -3,16 +3,15 @@ package com.simprints.clientapi.activities.odk
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import com.simprints.clientapi.activities.ClientRequestActivity
+import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.routers.SimprintsRequestRouter.IDENTIFY_REQUEST_CODE
 import com.simprints.clientapi.routers.SimprintsRequestRouter.REGISTER_REQUEST_CODE
 import com.simprints.clientapi.routers.SimprintsRequestRouter.VERIFY_REQUEST_CODE
-import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
 
 
-class OdkActivity : ClientRequestActivity(), OdkContract.View {
+class OdkActivity : RequestActivity(), OdkContract.View {
 
     companion object {
         private const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
@@ -27,14 +26,6 @@ class OdkActivity : ClientRequestActivity(), OdkContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         presenter = OdkPresenter(this, intent.action).apply { start() }
-    }
-
-    override fun requestConfirmIdentityCallout() {
-        startService(Intent(SIMPRINTS_SELECT_GUID_INTENT).apply {
-            putExtras(intent)
-            setPackage(Constants.SIMPRINTS_PACKAGE_NAME)
-        })
-        finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

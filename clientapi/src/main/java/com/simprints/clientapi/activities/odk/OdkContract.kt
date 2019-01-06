@@ -2,7 +2,7 @@ package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.activities.BasePresenter
 import com.simprints.clientapi.activities.BaseView
-import com.simprints.clientapi.activities.ClientRequestView
+import com.simprints.clientapi.activities.baserequest.RequestContract
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
@@ -10,9 +10,7 @@ import com.simprints.libsimprints.Verification
 
 interface OdkContract {
 
-    interface View : BaseView<Presenter>, ClientRequestView {
-
-        fun requestConfirmIdentityCallout()
+    interface View : BaseView<Presenter>, RequestContract.RequestView {
 
         fun returnRegistration(registrationId: String)
 
@@ -22,7 +20,7 @@ interface OdkContract {
 
     }
 
-    interface Presenter : BasePresenter {
+    interface Presenter : BasePresenter, RequestContract.RequestPresenter {
 
         fun processRegistration(registration: Registration)
 
