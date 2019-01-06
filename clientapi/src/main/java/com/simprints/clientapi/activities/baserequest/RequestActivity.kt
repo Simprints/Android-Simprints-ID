@@ -1,4 +1,4 @@
-package com.simprints.clientapi.activities
+package com.simprints.clientapi.activities.baserequest
 
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
@@ -12,7 +12,7 @@ import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
 import com.simprints.libsimprints.Constants
 
 
-abstract class ClientRequestActivity : AppCompatActivity(), ClientRequestView {
+abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
 
     override val enrollExtractor: EnrollExtractor
         get() = EnrollExtractor(intent)
