@@ -34,6 +34,12 @@ interface LazyVar<T> {
 }
 
 /**
+ * *** USE WITH CAUTION ***
+ * This implementation of LazyVar has been found to be the source of many bugs involving
+ * unintentional caching of state. These issues have been difficult to debug, as the debugger often
+ * hangs when trying to step into code that uses lazyVar. In most cases the performance gain is
+ * negligible, and often the native kotlin [lazy] or even var would be just fine.
+ *
  * Creates a new instance of the [LazyVar] that uses the specified initialization function [initializer]
  * and the default thread-safety mode [LazyThreadSafetyMode.SYNCHRONIZED].
  *
