@@ -1,7 +1,7 @@
 package com.simprints.id.data.db
 
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.events.EnrollmentEvent
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.domain.events.EnrollmentEvent
 import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
@@ -13,31 +13,31 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
-import com.simprints.id.data.db.sync.SyncExecutor
+import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.Constants
+import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
-import com.simprints.id.exceptions.safe.setup.FetchingGuidForVerificationFailedException
+import com.simprints.id.domain.toLibPerson
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.progress.Progress
-import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.session.Session
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
-import com.simprints.id.tools.json.JsonHelper
-import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.*
+import com.simprints.libcommon.Person as LibPerson
 
 open class DbManagerImpl(override val local: LocalDbManager,
                     override val remote: RemoteDbManager,
@@ -45,9 +45,11 @@ open class DbManagerImpl(override val local: LocalDbManager,
                     private val loginInfoManager: LoginInfoManager,
                     private val preferencesManager: PreferencesManager,
                     private val sessionEventsManager: SessionEventsManager,
+                         private val timeHelper: TimeHelper,
                     override val remotePeopleManager: RemotePeopleManager,
                     override val remoteProjectManager: RemoteProjectManager,
-                    private val timeHelper: TimeHelper) : DbManager {
+                         private val peopleUpSyncMaster: PeopleUpSyncMaster,
+                         private val syncStatusDatabase: SyncStatusDatabase) : DbManager {
 
     override fun initialiseDb() {
         remote.initialiseRemoteDb()
@@ -61,27 +63,58 @@ open class DbManagerImpl(override val local: LocalDbManager,
         }
     }
 
-    override fun signIn(projectId: String, tokens: Tokens): Completable =
+    override fun signIn(projectId: String, userId: String, tokens: Tokens): Completable =
         remote.signInToRemoteDb(tokens)
-            .andThen {
-                try {
-                    local.signInToLocal(secureDataManager.getLocalDbKeyOrThrow(projectId))
-                    it.onComplete()
-                } catch (t: Throwable) {
-                    it.onError(t)
-                }
-            }
+            .andThen(signInToLocal(projectId))
+            .andThen(refreshProjectInfoWithServer(projectId))
+            .flatMapCompletable(storeCredentials(userId))
+            .andThen(resumePeopleUpSync(projectId, userId))
             .trace("signInToRemoteDb")
 
+    private fun signInToLocal(projectId: String): Completable =
+        Completable.create {
+            try {
+                local.signInToLocal(secureDataManager.getLocalDbKeyOrThrow(projectId))
+                it.onComplete()
+            } catch (t: Throwable) {
+                it.onError(t)
+            }
+        }
+
+    private fun storeCredentials(userId: String) = { project: Project ->
+        Completable.create {
+            try {
+                loginInfoManager.storeCredentials(project.id, project.legacyId, userId)
+                it.onComplete()
+            } catch (t: Throwable) {
+                it.onError(t)
+            }
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun resumePeopleUpSync(projectId: String, userId: String): Completable =
+        Completable.create {
+            peopleUpSyncMaster.resume(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
+            it.onComplete()
+        }
+
     override fun signOut() {
+        //TODO: move peopleUpSyncMaster to SyncScheduler and call .pause in CheckLoginPresenter.checkSignedInOrThrow
+        //If you user clears the data (then doesn't call signout), workers still stay scheduled.
+        peopleUpSyncMaster.pause(loginInfoManager.signedInProjectId/*, loginInfoManager.signedInUserId*/) // TODO: uncomment userId when multitenancy is properly implemented
+        loginInfoManager.cleanCredentials()
         remote.signOutOfRemoteDb()
+        syncStatusDatabase.downSyncDao.deleteAll()
+        syncStatusDatabase.upSyncDao.deleteAll()
+        preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
     }
 
     override fun isDbInitialised(): Boolean =
         remote.isRemoteDbInitialized()
 
     // Data transfer
-    override fun savePerson(person: Person): Completable =
+    override fun savePerson(person: LibPerson): Completable =
         savePerson(fb_Person(
             person,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
@@ -89,15 +122,16 @@ open class DbManagerImpl(override val local: LocalDbManager,
             preferencesManager.moduleId))
 
     override fun savePerson(fbPerson: fb_Person): Completable = // TODO Investigate this interesting nested subscription
-        local.insertOrUpdatePersonInLocal(rl_Person(fbPerson))
+        local.insertOrUpdatePersonInLocal(rl_Person(fbPerson, toSync = true))
             .doOnComplete {
-                sessionEventsManager.updateSession({
-                    it.events.add(EnrollmentEvent(
-                        it.nowRelativeToStartTime(timeHelper),
-                        fbPerson.patientId
-                    ))
-                }).andThen(uploadPersonAndDownloadAgain(fbPerson))
-                    .updatePersonInLocal()
+                sessionEventsManager
+                    .updateSession {
+                        it.events.add(EnrollmentEvent(
+                            it.nowRelativeToStartTime(timeHelper),
+                            fbPerson.patientId
+                        ))
+                    }
+                    .andThen(scheduleUpsync(fbPerson.projectId, fbPerson.userId))
                     .subscribeOn(Schedulers.io())
                     .subscribeBy(onComplete = {}, onError = {
                         it.printStackTrace()
@@ -107,47 +141,56 @@ open class DbManagerImpl(override val local: LocalDbManager,
             .observeOn(AndroidSchedulers.mainThread())
             .trace("savePerson")
 
-    private fun uploadPersonAndDownloadAgain(fbPerson: fb_Person): Single<fb_Person> =
-        remotePeopleManager
-            .uploadPerson(fbPerson)
-            .andThen(remotePeopleManager.downloadPerson(fbPerson.patientId, fbPerson.projectId))
-            .trace("uploadPersonAndDownloadAgain")
+    @Suppress("UNUSED_PARAMETER")
+    private fun scheduleUpsync(projectId: String, userId: String): Completable = Completable.create {
+        peopleUpSyncMaster.schedule(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
+        it.onComplete()
+    }
 
-    private fun Single<out fb_Person>.updatePersonInLocal(): Completable = flatMapCompletable {
-        local.insertOrUpdatePersonInLocal(rl_Person(it))
-    }.trace("updatePersonInLocal")
-
-    override fun loadPerson(destinationList: MutableList<Person>,
+    override fun loadPerson(destinationList: MutableList<LibPerson>,
                             projectId: String,
                             guid: String,
                             callback: DataCallback) {
 
-        local.loadPersonFromLocal(guid).subscribeBy(onSuccess = {
-            destinationList.add(it)
-            callback.onSuccess(false)
-        }, onError = { e ->
-            remotePeopleManager.downloadPerson(guid, projectId).subscribeBy(
-                onSuccess = { destinationList.add(rl_Person(it).libPerson); callback.onSuccess(true) },
-                onError = { callback.onFailure(DATA_ERROR.NOT_FOUND) })
-        })
+        local.loadPersonFromLocal(guid).subscribeBy(
+            onSuccess = { person ->
+                destinationList.add(person.toLibPerson())
+                callback.onSuccess(false)
+            },
+            onError = {
+                remote.downloadPerson(guid, projectId).subscribeBy(
+                    onSuccess = { fbPerson ->
+                        destinationList.add(fbPerson.toDomainPerson().toLibPerson())
+                        callback.onSuccess(true)
+                    },
+                    onError = {
+                        callback.onFailure(DATA_ERROR.NOT_FOUND)
+                    }
+                )
+            })
     }
 
     override fun loadPerson(projectId: String,
                             guid: String): Single<PersonFetchResult> =
         local.loadPersonFromLocal(guid).map { PersonFetchResult(it, false) }
             .onErrorResumeNext {
-                remotePeopleManager.downloadPerson(guid, loginInfoManager.getSignedInProjectIdOrEmpty())
-                    .map { PersonFetchResult(rl_Person(it).libPerson, true) }
+                remote
+                    .downloadPerson(guid, loginInfoManager.getSignedInProjectIdOrEmpty())
+                    .map { fbPerson ->
+                        PersonFetchResult(fbPerson.toDomainPerson(), true)
+                    }
             }
 
 
-    override fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?) {
-        val result = when (group) {
-            Constants.GROUP.GLOBAL -> local.loadPeopleFromLocal().blockingGet().map { it.libPerson }
-            Constants.GROUP.USER -> local.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty()).blockingGet().map { it.libPerson }
-            Constants.GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = preferencesManager.moduleId).blockingGet().map { it.libPerson }
+    override fun loadPeople(destinationList: MutableList<LibPerson>, group: Constants.GROUP, callback: DataCallback?) {
+        val people = when (group) {
+            Constants.GROUP.GLOBAL -> local.loadPeopleFromLocal()
+            Constants.GROUP.USER -> local.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
+            Constants.GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = preferencesManager.moduleId)
         }
-        destinationList.addAll(result)
+            .blockingGet()
+            .map(Person::toLibPerson)
+        destinationList.addAll(people)
         callback?.onSuccess(false)
     }
 
@@ -166,25 +209,23 @@ open class DbManagerImpl(override val local: LocalDbManager,
                 .andThen(Single.just(it))
         }.trace("refreshProjectInfoWithServer")
 
-    override fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int> =
-        local.getPeopleCountFromLocal(
-            userId = syncParams.userId,
-            moduleId = syncParams.moduleId,
-            toSync = false).map {
-            Math.max(nPatientsOnServerForSyncParam - it, 0)
+    override fun calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?): Single<Int> =
+        remote.getNumberOfPatients(projectId, userId, moduleId).flatMap { nPatientsOnServer ->
+            local.getPeopleCountFromLocal(userId = userId, moduleId = moduleId, toSync = false).map {
+                Math.max(nPatientsOnServer - it, 0)
+            }
         }
 
-    override fun getPeopleCount(group: Constants.GROUP): Single<Int> =
-        when (group) {
-            Constants.GROUP.GLOBAL ->
-                local.getPeopleCountFromLocal()
-            Constants.GROUP.USER ->
-                local.getPeopleCountFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
-            Constants.GROUP.MODULE ->
-                local.getPeopleCountFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty(), moduleId = preferencesManager.moduleId)
-        }
+    override fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<Int> =
+        Single.just(
+            syncScope.toSubSyncScopes().map {
+                local.getPeopleCountFromLocal(
+                    userId = it.userId,
+                    moduleId = it.moduleId).blockingGet()
+            }.sum()
+        )
 
-    override fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>) {
+    override fun saveIdentification(probe: LibPerson, matchSize: Int, matches: List<Identification>) {
         preferencesManager.lastIdentificationDate = Date()
         remote.saveIdentificationInRemote(
             probe,
@@ -205,7 +246,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
             sessionId)
     }
 
-    override fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
+    override fun saveVerification(probe: LibPerson, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
         preferencesManager.lastVerificationDate = Date()
         remote.saveVerificationInRemote(
             probe,
@@ -230,12 +271,6 @@ open class DbManagerImpl(override val local: LocalDbManager,
     override fun saveSession(session: Session) {
         remote.saveSessionInRemote(session)
     }
-
-    override fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress> =
-        SyncExecutor(
-            this,
-            JsonHelper.gson
-        ).sync(interrupted, parameters).trace("sync")
 
     override fun recoverLocalDb(group: Constants.GROUP): Completable {
         val firebaseManager = remote as FirebaseManagerImpl

@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.remote.network
 
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.sync.models.PeopleCount
+import com.simprints.id.data.db.remote.models.PeopleCount
 import com.simprints.id.network.NetworkConstants
 import io.reactivex.Single
 import okhttp3.ResponseBody
@@ -26,7 +26,7 @@ interface PeopleRemoteInterface {
 
     @POST("projects/{projectId}/patients")
     fun uploadPeople(@Path("projectId") projectId: String,
-                     @Body patientsJson: HashMap<String, ArrayList<fb_Person>>): Single<Result<Unit>>
+                     @Body patientsJson: HashMap<String, List<fb_Person>>): Single<Result<Void?>>
 
     @GET("projects/{projectId}/patients/{patientId}")
     fun requestPerson(

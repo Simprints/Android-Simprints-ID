@@ -1,7 +1,11 @@
 package com.simprints.id.secure
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.firebase.FirebaseApp
+import com.nhaarman.mockito_kotlin.verify
+import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -13,11 +17,12 @@ import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.anyNotNull
+import com.simprints.id.shared.createMockBehaviorService
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.shared.createMockBehaviorService
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.getRoboSharedPreferences
 import com.simprints.id.testUtils.roboletric.initLogInStateMock
@@ -28,14 +33,12 @@ import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.io.IOException
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
 
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
@@ -47,6 +50,10 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var loginInfoManagerMock: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var longConsentManager: LongConsentManager
+    @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
+
+    private val projectId = "project_id"
+    private val userId = "user_id"
 
     override var module by lazyVar {
         AppModuleForTests(
@@ -56,14 +63,15 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
             remoteProjectManagerRule = MockRule,
             loginInfoManagerRule = MockRule,
             scheduledPeopleSyncManagerRule = MockRule,
-            longConsentManagerRule = MockRule
+            longConsentManagerRule = MockRule,
+            peopleUpSyncMasterRule = MockRule
         )
     }
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
         super.setUp()
         testAppComponent.inject(this)
 
@@ -87,7 +95,7 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
             getMockAttestationManager())
 
         val testObserver = authenticator
-            .authenticate(NonceScope("project_id", "user_id"), "encrypted_project_secret", "project_id", null)
+            .authenticate(NonceScope(projectId, userId), "encrypted_project_secret", projectId, null)
             .test()
 
         testObserver.awaitTerminalEvent()
@@ -95,18 +103,20 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
         testObserver
             .assertNoErrors()
             .assertComplete()
+
+        verify(peopleUpSyncMasterMock).resume(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
     }
 
     @Test
     fun offline_authenticationShouldThrowException() {
 
-        val nonceScope = NonceScope("project_id", "user_id")
+        val nonceScope = NonceScope(projectId, userId)
 
         val testObserver = LegacyCompatibleProjectAuthenticator(
             testAppComponent,
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(apiClient.retrofit))
-            .authenticate(nonceScope, "encrypted_project_secret", "project_id", null)
+            .authenticate(nonceScope, "encrypted_project_secret", projectId, null)
             .test()
 
         testObserver.awaitTerminalEvent()

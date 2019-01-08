@@ -131,7 +131,7 @@
     <string name="settings_label">د ټیلفون تنظیمات</string>
 
 
-    <!-- AboutActivity : the screen that shows project statistics and version numbers -->
+    <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
     <string name="database_information">د ډیټابیس په اړه معلومات</string>
     <string name="user_count">د ګټه اخیستونکو شمیر:</string>

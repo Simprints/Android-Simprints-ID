@@ -1,17 +1,23 @@
 package com.simprints.id.data.db
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
+import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.id.shared.createMockBehaviorService
@@ -34,15 +40,13 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class DbManagerTest : RxJavaTest, DaggerForTests() {
 
     private var mockServer = MockWebServer()
@@ -52,6 +56,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
     @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
     @Inject lateinit var sessionEventsLocalDbManagerSpy: SessionEventsLocalDbManager
+    @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
     @Inject lateinit var dbManager: DbManager
 
     override var module by lazyVar {
@@ -60,14 +65,15 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
             localDbManagerRule = ReplaceRule { spy(LocalDbManager::class.java) },
             remoteDbManagerRule = SpyRule,
             remotePeopleManagerRule = SpyRule,
-            sessionEventsLocalDbManagerRule = MockRule
+            peopleUpSyncMasterRule = MockRule
+            sessionEventsLocalDbManagerRule = MockRule,
         )
     }
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
         super.setUp()
         testAppComponent.inject(this)
 
@@ -78,8 +84,8 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     }
 
     @Test
-    fun savingPerson_shouldSaveThenUpdatePersonLocally() {
-        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().apply {
+    fun savingPerson_shouldSaveThenScheduleUpSync() {
+        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
             updatedAt = null
             createdAt = null
         })
@@ -101,24 +107,21 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
         Thread.sleep(1000)
 
         val argument = argumentCaptor<rl_Person>()
-        verify(localDbManagerSpy, times(2)).insertOrUpdatePersonInLocal(argument.capture())
+        verify(localDbManagerSpy, times(1)).insertOrUpdatePersonInLocal(argument.capture())
 
         // First time we save the person in the local dbManager, it doesn't have times and it needs to be sync
         Assert.assertNull(argument.firstValue.createdAt)
         Assert.assertNull(argument.firstValue.updatedAt)
         Assert.assertTrue(argument.firstValue.toSync)
 
-        // Second time, it's after we download the person from our server, with timestamp.
-        Assert.assertNotNull(argument.secondValue.createdAt)
-        Assert.assertNotNull(argument.secondValue.updatedAt)
-        Assert.assertFalse(argument.secondValue.toSync)
+        verify(peopleUpSyncMasterMock).schedule(fakePerson.projectId/*, fakePerson.userId*/) // TODO: uncomment userId when multitenancy is properly implemented
     }
 
     @Test
     fun loadingPersonMissingInLocalDb_shouldStillLoadFromRemoteDb() {
         val person = PeopleGeneratorUtils.getRandomPerson()
 
-        mockServer.enqueue(mockResponseForDownloadPatient(fb_Person(person)))
+        mockServer.enqueue(mockResponseForDownloadPatient(person.toFirebasePerson()))
 
         val result = mutableListOf<Person>()
 
@@ -140,7 +143,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun savingPerson_serverProblemStillSavesPerson() {
-        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().apply {
+        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
             updatedAt = null
             createdAt = null
         })
@@ -161,7 +164,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun savingPerson_noConnectionStillSavesPerson() {
-        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().apply {
+        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
             updatedAt = null
             createdAt = null
         })

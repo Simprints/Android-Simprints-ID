@@ -31,6 +31,12 @@
         <item>
             Wolayata
         </item>
+        <item>
+            Shona
+        </item>
+        <item>
+            Ndebele
+        </item>
     </string-array>
     <string-array name="language_values">
         <item>
@@ -62,6 +68,12 @@
         </item>
         <item>
             wal
+        </item>
+        <item>
+            sn
+        </item>
+        <item>
+            nd
         </item>
     </string-array>
 

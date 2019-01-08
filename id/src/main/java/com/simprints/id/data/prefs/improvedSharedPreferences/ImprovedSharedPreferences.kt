@@ -1,12 +1,13 @@
 package com.simprints.id.data.prefs.improvedSharedPreferences
 
-import android.content.SharedPreferences
+import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
+import com.simprints.id.exceptions.unsafe.MismatchedTypeError
 
 /**
  * Extension of the SharedPreferences interface of the Android framework.
  * Adds generic read and write capabilities, and provides a more test friendly boundary.
  */
-interface ImprovedSharedPreferences : SharedPreferences {
+interface ImprovedSharedPreferences {
 
     /**
      * Retrieve a value of primitive type ([Byte], [Short], [Int], [Long], [Float], [Double],
@@ -14,8 +15,8 @@ interface ImprovedSharedPreferences : SharedPreferences {
      *
      * Return the value if it exists, or the provided default value if it does not.
      *
-     * Throw a [NonPrimitiveTypeException] if T is not a primitive type.
-     * Throw a [MismatchedTypeException] if an exception occurred during retrieval due to the
+     * @throws [NonPrimitiveTypeError] if T is not a primitive type.
+     * @throws [MismatchedTypeError] if an exception occurred during retrieval due to the
      * stored value type being different from the requested type.
      */
     fun <T : Any> getPrimitive(key: String, defaultValue: T): T
@@ -28,14 +29,16 @@ interface ImprovedSharedPreferences : SharedPreferences {
      * Note that you must call [Editor.commit] or [Editor.apply] to have any
      * changes you perform in the Editor actually show up in the preferencesManager.
      */
-    override fun edit(): ImprovedSharedPreferences.Editor
+    fun edit(): ImprovedSharedPreferences.Editor
+
+    fun getString(key: String, defaultValue: String): String
 
     /**
      * Interface used for modifying values in preferencesManager. All changes you make in an editor are
      * batched, and will not actually show up in the preferencesManager until you call [Editor.commit] or
      * [Editor.apply]
      */
-    interface Editor : SharedPreferences.Editor {
+    interface Editor {
 
         /**
          * Set a value of primitive type ([Byte], [Short], [Int], [Long], [Float], [Double],
@@ -45,8 +48,12 @@ interface ImprovedSharedPreferences : SharedPreferences {
          * Return a reference to the same [ImprovedSharedPreferences.Editor] object, so you can
          * chain put calls together.
          *
-         * Throw a [NonPrimitiveTypeException] if T is not a primitive type.
+         * Throw a [NonPrimitiveTypeError] if T is not a primitive type.
          */
         fun <T : Any> putPrimitive(key: String, value: T): ImprovedSharedPreferences.Editor
+
+        fun commit()
+
+        fun apply()
     }
 }

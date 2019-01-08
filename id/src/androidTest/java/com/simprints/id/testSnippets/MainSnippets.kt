@@ -1,39 +1,40 @@
 package com.simprints.id.testSnippets
 
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.click
-import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
-import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.matcher.RootMatchers.isDialog
-import android.support.test.espresso.matcher.ViewMatchers.*
-import android.support.test.rule.ActivityTestRule
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.isDialog
+import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.rule.ActivityTestRule
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.testTools.*
 import com.simprints.id.testTools.StringUtils.getResourceString
+import com.simprints.id.shared.models.TestCalloutCredentials
 import com.simprints.libsimprints.*
 import org.hamcrest.Matchers.*
 import org.junit.Assert.*
 
-fun launchActivityEnrol(calloutCredentials: CalloutCredentials,
+fun launchActivityEnrol(testCalloutCredentials: TestCalloutCredentials,
                         enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("launchActivityEnrol")
-    ActivityUtils.launchActivityAndRunOnUiThread(calloutCredentials,
+    ActivityUtils.launchActivityAndRunOnUiThread(testCalloutCredentials,
         Constants.SIMPRINTS_REGISTER_INTENT, enrolTestRule)
 }
 
-fun launchActivityIdentify(calloutCredentials: CalloutCredentials,
+fun launchActivityIdentify(testCalloutCredentials: TestCalloutCredentials,
                            identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("launchActivityIdentify")
-    ActivityUtils.launchActivityAndRunOnUiThread(calloutCredentials,
+    ActivityUtils.launchActivityAndRunOnUiThread(testCalloutCredentials,
         Constants.SIMPRINTS_IDENTIFY_INTENT, identifyTestRule)
 }
 
-fun launchActivityVerify(calloutCredentials: CalloutCredentials,
+fun launchActivityVerify(testCalloutCredentials: TestCalloutCredentials,
                          verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>,
                          guid: String?) {
     log("launchActivityVerify")
-    ActivityUtils.launchActivityAndRunOnUiThread(calloutCredentials,
+    ActivityUtils.launchActivityAndRunOnUiThread(testCalloutCredentials,
         Constants.SIMPRINTS_VERIFY_INTENT, verifyTestRule,
         verifyGuidExtra = guid)
 }
@@ -42,7 +43,7 @@ fun fullHappyWorkflow(numberOfScans: Int = 2, dialogResult: String = "✓ LEFT T
     log("fullHappyWorkflow")
     setupActivityAndContinue()
 
-    (0 until numberOfScans).forEach { collectFingerprintsPressScan() }
+    repeat(numberOfScans) { collectFingerprintsPressScan() }
 
     checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult)
 }

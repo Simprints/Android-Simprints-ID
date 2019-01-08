@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="6dp">
+
+    <TextView
+        android:id="@+id/debug_down_status_project"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:paddingStart="3dp"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/debug_down_status_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:paddingStart="3dp"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/debug_down_status_module"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:paddingStart="3dp"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/debug_down_status_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:paddingStart="3dp"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/debug_down_status_lastPatient"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:paddingStart="3dp"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/debug_down_status_lastPatient_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingStart="3dp"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/debug_down_status_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingStart="3dp"
+        android:singleLine="true" />
+
+    <Button
+        android:id="@+id/debug_down_state_button_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete"/>
+</LinearLayout>

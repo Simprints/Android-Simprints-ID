@@ -2,7 +2,7 @@ package com.simprints.id.testUtils
 
 import android.app.Activity
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import org.hamcrest.CoreMatchers
 import org.junit.Assert
 import org.robolectric.Shadows

@@ -10,6 +10,7 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractor
 import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
@@ -25,6 +26,7 @@ abstract class CheckLoginPresenter(
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var sessionParametersExtractor: SessionParametersExtractor
+    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
     init {
         component.inject(this)
@@ -35,6 +37,8 @@ abstract class CheckLoginPresenter(
             checkSignedInOrThrow()
             handleSignedInUser()
         } catch (e: Throwable) {
+
+            syncSchedulerHelper.cancelAllWorkers()
             when (e) {
                 is DifferentProjectIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_PROJECT_ID)
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_USER_ID)
@@ -64,8 +68,9 @@ abstract class CheckLoginPresenter(
             isUserIdStoredAndMatches() &&
             isFirebaseTokenValid()
 
-        if (!isUserSignedIn)
+        if (!isUserSignedIn) {
             throw NotSignedInException()
+        }
     }
 
     private fun isEncryptedProjectSecretPresent(): Boolean = loginInfoManager.getEncryptedProjectSecretOrEmpty().isNotEmpty()
