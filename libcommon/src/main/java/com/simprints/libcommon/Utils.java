@@ -1,11 +1,14 @@
 package com.simprints.libcommon;
 
-import android.support.annotation.NonNull;
+
 import android.util.Base64;
+
+import androidx.annotation.NonNull;
 
 public class Utils {
 
-    public static @NonNull String byteArrayToBase64(@NonNull byte[] bytes)
+    public static @NonNull
+    String byteArrayToBase64(@NonNull byte[] bytes)
     {
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }

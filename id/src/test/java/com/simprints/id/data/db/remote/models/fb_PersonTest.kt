@@ -1,30 +1,33 @@
 package com.simprints.id.data.db.remote.models
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.gson.JsonObject
+import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.data.db.local.realm.models.toRealmFingerprint
+import com.simprints.id.data.db.local.realm.models.toRealmPerson
+import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.json.JsonHelper
-import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libcommon.Person
 import com.simprints.libsimprints.FingerIdentifier
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.*
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class fb_PersonTest {
 
     val fbPersonJson = "{\"id\":\"aeed3784-a399-445a-9dcd-0a373184709c\",\"projectId\":\"test10MProject\",\"moduleId\":\"module2\",\"userId\":\"user2\",\"createdAt\":1520621879620,\"updatedAt\":1520621879620,\"fingerprints\":{\"LEFT_THUMB\":[{\"quality\":52,\"template\":\"Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA\"}],\"LEFT_INDEX_FINGER\":[{\"quality\":60,\"template\":\"Rk1SACAyMAAAAAGkAAABLAGQAMUAxQEAABBPQUAcACxpAEA3ADd4AEAsADv4AIAfAD5uAEA0AEh7AECPAFFzAIBkAF14AEA/AF54AEAZAGmHAEA0AG/7AEANAHkNAEBRAHn1AEAVAHqRAEBgAH11AIAbAH4GAEAjAISKAEAGAI8UAIBUAJF7AEC7AJnqAECWALDkAIAzALGQAEAVALMRAIByALZyAIAiALyeAECLAMnhAIBEAMuMAICDANBiAEA2ANMVAICqANdiAEAwANmuAEBuAOFxAIA8AOOhAIApAOgpAECqAO1nAEAZAO+zAEBFAPGzAEBdAPSbAEBjAPb0AIB6APZpAEDNAP5oAIB0AP9sAEBfAQH0AEBfAQPRAEBoAQroAIAhAQq7AEDYARd1AEDGARh4AIBfARhNAEB3ARnqAEBYARnZAIBuAR3kAEAYASO7AEDFASyGAICVAS5vAIBqATReAEA4ATjdAEAtATzaAEDGAUOGAEBGAUldAEDEAVCNAECjAVN9AEA4AVpiAEBPAWRoAECjAW6DAIBwAXl1AAAA\"}]}}"
     @Test
     fun buildFbPersonFromRlPerson() {
-        val rlPerson = PeopleGeneratorUtils.getRandomPerson().also {
-            it.fingerprints.clear()
-            it.fingerprints.add(PeopleGeneratorUtils.getRandomFingerprint().also { it.fingerId = FingerIdentifier.RIGHT_THUMB.ordinal })
-            it.fingerprints.add(PeopleGeneratorUtils.getRandomFingerprint().also { it.fingerId = FingerIdentifier.LEFT_THUMB.ordinal })
+        val rlPerson = PeopleGeneratorUtils.getRandomPerson("patientId").toRealmPerson().apply {
+            fingerprints.clear()
+            fingerprints.add(PeopleGeneratorUtils.getRandomFingerprint().toRealmFingerprint().also { it.fingerId = FingerIdentifier.RIGHT_THUMB.ordinal })
+            fingerprints.add(PeopleGeneratorUtils.getRandomFingerprint().toRealmFingerprint().also { it.fingerId = FingerIdentifier.LEFT_THUMB.ordinal })
         }
 
         val fbPerson = fb_Person(rlPerson)
@@ -79,7 +82,7 @@ class fb_PersonTest {
 
     @Test
     fun serialiseFbPerson_skipUnwantedFields() {
-        val fbPerson = fb_Person(PeopleGeneratorUtils.getRandomPerson())
+        val fbPerson = PeopleGeneratorUtils.getRandomPerson().toFirebasePerson()
         val jsonString = JsonHelper.toJson(fbPerson)
         val personJson = JsonHelper.gson.fromJson(jsonString, JsonObject::class.java)
 

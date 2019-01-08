@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.simprints.id.activities.CheckLoginFromIntentActivityTest
-import com.simprints.id.data.analytics.eventData.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
@@ -23,7 +23,6 @@ import org.mockito.Mockito
 import org.mockito.stubbing.Answer
 
 const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
-const val SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY = "SHARED_PREFS_FOR_MOCK_LOCAL_DB_KEY"
 
 fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteProjectManagerMock: RemoteProjectManager) {
     val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }
@@ -77,7 +76,7 @@ fun setupLocalAndRemoteManagersForApiTesting(mockServer: MockWebServer? = null,
 
     PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
     whenever(localDbManagerSpy.insertOrUpdatePersonInLocal(anyNotNull())).thenReturn(Completable.complete())
-    whenever(localDbManagerSpy.loadPersonFromLocal(any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
+    whenever(localDbManagerSpy.loadPersonFromLocal(any())).thenReturn(Single.error(IllegalStateException()))
     whenever(localDbManagerSpy.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.create { it.onError(IllegalStateException()) })
 
     setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)

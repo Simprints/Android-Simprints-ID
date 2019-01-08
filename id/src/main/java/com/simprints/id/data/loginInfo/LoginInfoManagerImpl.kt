@@ -6,7 +6,7 @@ import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.secure.cryptography.Hasher
 import io.reactivex.Single
 
-class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) : LoginInfoManager {
+open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) : LoginInfoManager {
 
     companion object {
         const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"

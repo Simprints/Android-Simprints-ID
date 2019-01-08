@@ -10,16 +10,14 @@ import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.progress.Progress
-import com.simprints.id.services.sync.SyncTaskParameters
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.session.Session
-import com.simprints.libcommon.Person
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
+import com.simprints.libcommon.Person as LibPerson
 
 interface DbManager {
 
@@ -31,39 +29,37 @@ interface DbManager {
     // Lifecycle
     fun initialiseDb()
 
-    fun signIn(projectId: String, tokens: Tokens): Completable
+    fun signIn(projectId: String, userId: String, tokens: Tokens): Completable
     fun signOut()
 
     fun isDbInitialised(): Boolean
 
     // Data transfer
-    fun savePerson(person: Person): Completable
+    fun savePerson(person: LibPerson): Completable
     fun savePerson(fbPerson: fb_Person): Completable
 
-    fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
+    fun loadPerson(destinationList: MutableList<LibPerson>, projectId: String, guid: String, callback: DataCallback)
     fun loadPerson(projectId: String, guid: String): Single<PersonFetchResult>
 
-    fun loadPeople(destinationList: MutableList<Person>, group: Constants.GROUP, callback: DataCallback?)
+    fun loadPeople(destinationList: MutableList<LibPerson>, group: Constants.GROUP, callback: DataCallback?)
 
     fun loadProject(projectId: String): Single<Project>
 
     fun refreshProjectInfoWithServer(projectId: String): Single<Project>
 
-    fun getPeopleCount(group: Constants.GROUP): Single<Int>
+    fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<Int>
 
     fun updateIdentification(projectId: String, selectedGuid: String, sessionId: String)
 
     fun saveRefusalForm(refusalForm: RefusalForm)
 
-    fun calculateNPatientsToDownSync(nPatientsOnServerForSyncParam: Int, syncParams: SyncTaskParameters): Single<Int>
+    fun calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?): Single<Int>
 
     fun saveSession(session: Session)
 
-    fun sync(parameters: SyncTaskParameters, interrupted: () -> Boolean): Observable<Progress>
-
     fun recoverLocalDb(group: Constants.GROUP): Completable
 
-    fun saveVerification(probe: Person, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
+    fun saveVerification(probe: LibPerson, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
 
-    fun saveIdentification(probe: Person, matchSize: Int, matches: List<Identification>)
+    fun saveIdentification(probe: LibPerson, matchSize: Int, matches: List<Identification>)
 }

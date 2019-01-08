@@ -1,10 +1,10 @@
 package com.simprints.id.activities.login
 
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.events.AuthenticationEvent
-import com.simprints.id.data.analytics.eventData.models.events.AuthenticationEvent.UserInfo
-import com.simprints.id.data.analytics.eventData.models.events.AuthenticationEvent.Result.*
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent
+import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent.Result.*
+import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent.UserInfo
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -26,7 +26,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 class LoginPresenter(val view: LoginContract.View,
-                     private val component: AppComponent,
+                     component: AppComponent,
                      override var projectAuthenticator: LegacyCompatibleProjectAuthenticator) : LoginContract.Presenter {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -93,7 +93,7 @@ class LoginPresenter(val view: LoginContract.View,
                                                                   suppliedProjectId: String,
                                                                   suppliedUserId: String) {
 
-        sessionEventsManager.updateSessionInBackground({
+        sessionEventsManager.updateSessionInBackground {
             if (result == AUTHENTICATED) {
                 it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             }
@@ -103,7 +103,7 @@ class LoginPresenter(val view: LoginContract.View,
                 it.timeRelativeToStartTime(timeHelper.now()),
                 UserInfo(suppliedProjectId, suppliedUserId),
                 result))
-        })
+        }
     }
 
     private fun handleSignInError(e: Throwable,

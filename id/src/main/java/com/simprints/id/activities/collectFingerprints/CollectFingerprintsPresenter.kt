@@ -14,8 +14,8 @@ import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerp
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.events.FingerprintCaptureEvent
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
@@ -33,6 +33,7 @@ import com.simprints.libcommon.Utils
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Registration
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.min
@@ -286,11 +287,12 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun handleUnexpectedError(error: SimprintsError) {
         analyticsManager.logError(error)
+        Timber.e(error)
         view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }
 
     private fun addCaptureEventInSession(finger: Finger) {
-        sessionEventsManager.updateSessionInBackground({ sessionEvents ->
+        sessionEventsManager.updateSessionInBackground { sessionEvents ->
             sessionEvents.events.add(FingerprintCaptureEvent(
                 sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
                 sessionEvents.nowRelativeToStartTime(timeHelper),
@@ -301,7 +303,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                     FingerprintCaptureEvent.Fingerprint(it.qualityScore, Utils.byteArrayToBase64(it.templateBytes))
                 }
             ))
-        })
+        }
     }
 
     private fun createMapAndShowDialog() {

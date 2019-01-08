@@ -1,13 +1,16 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.spy
 import com.simprints.id.R
-import com.simprints.id.activities.dashboard.models.DashboardCard
-import com.simprints.id.activities.dashboard.models.DashboardCardType
-import com.simprints.id.data.DataManager
+import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
+import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
@@ -16,10 +19,12 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
-import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
+import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.*
+import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
 import org.junit.Assert
@@ -27,17 +32,14 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.any
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.util.*
 import javax.inject.Inject
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = TestApplication::class)
+@RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class DashboardCardsFactoryTest : DaggerForTests() {
 
-    @Inject lateinit var dataManager: DataManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var remotePeopleManagerMock: RemotePeopleManager
     @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
@@ -45,25 +47,37 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     override var module by lazyVar {
         AppModuleForTests(app,
             remoteDbManagerRule = MockRule,
             remotePeopleManagerRule = MockRule,
             remoteProjectManagerRule = MockRule,
-            localDbManagerRule = MockRule)
+            localDbManagerRule = MockRule,
+            syncStatusDatabaseRule = MockRule)
     }
+
+    val activity = spy<DashboardActivity>()
 
     @Before
     override fun setUp() {
-        FirebaseApp.initializeApp(RuntimeEnvironment.application)
-        app = (RuntimeEnvironment.application as TestApplication)
+        app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        FirebaseApp.initializeApp(app)
         super.setUp()
         testAppComponent.inject(this)
         dbManager.initialiseDb()
+        initWorkManagerIfRequired(app)
+
+        whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
+        whenever(syncStatusDatabase.upSyncDao).thenReturn(mock())
+
+        whenever(syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData()).thenReturn(mock())
+        whenever(syncStatusDatabase.downSyncDao.insertOrReplaceDownSyncStatus(anyNotNull())).then { }
+        whenever(syncStatusDatabase.upSyncDao.getUpSyncStatus()).thenReturn(mock())
 
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
-        setUserLogInState(true, getRoboSharedPreferences())
+        setUserLogInState(true, getRoboSharedPreferences(), userId = "userId")
 
         mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
     }
@@ -71,6 +85,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     @Test
     fun shouldCreateTheProjectCard_onlyWhenItHasAValidProject() {
         val factory = DashboardCardsFactory(testAppComponent)
+
         val card = getCardIfCreated(factory, "project name")
         Assert.assertEquals(card?.description, "project desc")
 
@@ -162,18 +177,21 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         Assert.assertNull(card)
     }
 
-    private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCard? {
+    private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCardViewModel.State? {
         mockNPeopleForSyncRequest(remotePeopleManagerMock, 0)
         mockNLocalPeople(localDbManagerMock, 0)
-        mockGetSyncInfoFor(localDbManagerMock)
 
         val testObserver = Single.merge(cardsFactory.createCards()).test()
         testObserver.awaitTerminalEvent()
         testObserver
             .assertNoErrors()
             .assertComplete()
+
         return try {
-            return testObserver.values().first { it.title == title }
+            val cardsViewModels = testObserver.values().filterIsInstance(DashboardCardViewModel::class.java)
+            return cardsViewModels.first {
+                it.stateLiveData.value?.title == title
+            }.stateLiveData.value
         } catch (e: Exception) {
             null
         }
@@ -185,9 +203,5 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {
         whenever(localDbManager.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.just(nLocalPeople))
-    }
-
-    private fun mockGetSyncInfoFor(localDbManager: LocalDbManager) {
-        whenever(localDbManager.getSyncInfoFor(anyNotNull())).thenReturn(Single.just(rl_SyncInfo().apply { lastSyncTime = Date() }))
     }
 }

@@ -48,7 +48,7 @@ class ComplexPreferenceTest {
         defaultGroupEnum,
         EnumSerializer(Constants.GROUP::class.java))
 
-    private var enumFromWrontIndexInSharedPrefs by ComplexPreference(
+    private var enumFromWrongIndexInSharedPrefs by ComplexPreference(
         improvedPrefs,
         cKey,
         defaultGroupEnum,
@@ -100,7 +100,7 @@ class ComplexPreferenceTest {
     @Test
     fun testDeserializingEnumWithWrongIndexInSharedPrefsThrowsAnException() {
         //SharedPref: 5
-        assertThrows<MismatchedTypeError> { enumFromWrontIndexInSharedPrefs }
+        assertThrows<MismatchedTypeError> { enumFromWrongIndexInSharedPrefs }
     }
 
     @Test
