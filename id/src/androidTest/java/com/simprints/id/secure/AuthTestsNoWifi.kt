@@ -6,9 +6,7 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
@@ -43,11 +41,7 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
-    @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
-
     @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
-
-    @Inject lateinit var remoteProjectManagerSpy: RemoteProjectManager
 
     @Inject lateinit var remoteSessionsManagerSpy: RemoteSessionsManager
 

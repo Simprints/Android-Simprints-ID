@@ -6,22 +6,18 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
-import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.data.db.remote.models.*
+import com.simprints.id.data.db.remote.models.fb_IdEvent
+import com.simprints.id.data.db.remote.models.fb_IdEventUpdate
+import com.simprints.id.data.db.remote.models.fb_RefusalForm
+import com.simprints.id.data.db.remote.models.fb_VfEvent
 import com.simprints.id.data.db.remote.tools.Routes
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.domain.Person
-import com.simprints.id.domain.Project
-import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.session.Session
 import com.simprints.id.tools.extensions.toMap
 import com.simprints.id.tools.extensions.trace
@@ -30,10 +26,8 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
-import java.io.IOException
 import com.simprints.libcommon.Person as LibPerson
 
 open class FirebaseManagerImpl(
