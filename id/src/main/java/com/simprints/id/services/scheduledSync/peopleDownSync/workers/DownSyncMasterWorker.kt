@@ -22,8 +22,7 @@ import javax.inject.Inject
 
 class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
-    @Inject
-    lateinit var syncScopeBuilder: SyncScopesBuilder
+    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
 
     companion object {
         const val SYNC_WORKER_REPEAT_INTERVAL = 6L
@@ -74,8 +73,9 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
     }
 
     private fun buildSubDownSyncWorker(subSyncScope: SubSyncScope): OneTimeWorkRequest {
-        val data: Data = workDataOf(SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope))
-
+        val data: Data = workDataOf(
+            SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope)
+        )
         return OneTimeWorkRequestBuilder<SubDownSyncWorker>()
             .setInputData(data)
             .addTag(getDownSyncWorkerKeyForScope(subSyncScope))
@@ -84,10 +84,12 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
             .build()
     }
 
-    private fun buildChainOfSubCountWorker(scope: SyncScope) = scope.toSubSyncScopes().map { this.buildSubCountWorker(it) }
+    private fun buildChainOfSubCountWorker(scope: SyncScope) =
+        scope.toSubSyncScopes().map { this.buildSubCountWorker(it) }
 
     private fun buildSubCountWorker(subSyncScope: SubSyncScope): OneTimeWorkRequest {
-        val data: Data = workDataOf(SUBCOUNT_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope))
+        val data: Data =
+            workDataOf(SUBCOUNT_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope))
 
         return OneTimeWorkRequestBuilder<SubCountWorker>()
             .setInputData(data)

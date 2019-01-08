@@ -13,23 +13,13 @@ import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
 
-class SessionEventsUploaderWorker(context: Context, params: WorkerParameters)
-    : Worker(context, params) {
+class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-
-    @Inject
-    lateinit var sessionEventsManager: SessionEventsManager
-
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
-
-    @Inject
-    lateinit var timeHelper: TimeHelper
-
-    @Inject
-    lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var remoteDbManager: RemoteDbManager
 
     private val sessionsApiClient by lazy {
         remoteDbManager.getSessionsApiClient().blockingGet()
@@ -55,7 +45,8 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters)
                 sessionIdsToUpload,
                 sessionEventsManager,
                 timeHelper,
-                sessionsApiClient)
+                sessionsApiClient
+            )
 
             task.execute().blockingAwait()
             Timber.d("SessionEventsUploaderWorker done()")

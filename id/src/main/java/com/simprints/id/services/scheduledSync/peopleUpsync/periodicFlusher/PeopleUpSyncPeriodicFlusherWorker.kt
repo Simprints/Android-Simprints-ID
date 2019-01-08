@@ -11,11 +11,9 @@ import javax.inject.Inject
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
-class PeopleUpSyncPeriodicFlusherWorker(context: Context, params: WorkerParameters)
-    : Worker(context, params) {
+class PeopleUpSyncPeriodicFlusherWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
-    @Inject
-    lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
+    @Inject lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
 
     val projectId by lazy {
         inputData.getString(PROJECT_ID_KEY) ?: throw IllegalArgumentException("Project Id required")

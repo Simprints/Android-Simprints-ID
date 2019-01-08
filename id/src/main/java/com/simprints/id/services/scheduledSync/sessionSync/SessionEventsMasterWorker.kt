@@ -12,17 +12,11 @@ import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import timber.log.Timber
 import javax.inject.Inject
 
-class SessionEventsMasterWorker(context: Context, params: WorkerParameters)
-    : Worker(context, params) {
+class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-
-    @Inject
-    lateinit var sessionEventsManager: SessionEventsManager
-
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
 
     override fun doWork(): Result {
         Timber.d("SessionEventsMasterWorker doWork()")

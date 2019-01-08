@@ -21,14 +21,9 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
         const val SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT = "SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT"
     }
 
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
-
-    @Inject
-    lateinit var scopesBuilder: SyncScopesBuilder
-
-    @Inject
-    lateinit var downSyncTask: DownSyncTask
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var scopesBuilder: SyncScopesBuilder
+    @Inject lateinit var downSyncTask: DownSyncTask
 
     override fun doWork(): Result {
         inject()

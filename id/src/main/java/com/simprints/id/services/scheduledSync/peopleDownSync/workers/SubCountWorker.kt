@@ -22,14 +22,9 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
         const val SUBCOUNT_WORKER_SUB_SCOPE_INPUT = "SUBCOUNT_WORKER_SUB_SCOPE_INPUT"
     }
 
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
-
-    @Inject
-    lateinit var syncScopeBuilder: SyncScopesBuilder
-
-    @Inject
-    lateinit var countTask: CountTask
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
+    @Inject lateinit var countTask: CountTask
 
     override fun doWork(): Result {
         inject()

@@ -41,15 +41,11 @@ import javax.inject.Inject
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SubCountWorkerTest : DaggerForTests() {
 
-    @Inject
-    lateinit var context: Context
-    @Inject
-    lateinit var syncScopesBuilder: SyncScopesBuilder
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var context: Context
+    @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
+    @Inject lateinit var analyticsManager: AnalyticsManager
 
-    @Mock
-    lateinit var workParams: WorkerParameters
+    @Mock lateinit var workParams: WorkerParameters
 
     private val countTaskMock: CountTask = mock()
 
@@ -57,9 +53,11 @@ class SubCountWorkerTest : DaggerForTests() {
     private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
 
     override var module: AppModuleForTests by lazyVar {
-        object : AppModuleForTests(app,
+        object : AppModuleForTests(
+            app,
             localDbManagerRule = DependencyRule.MockRule,
-            analyticsManagerRule = DependencyRule.SpyRule) {
+            analyticsManagerRule = DependencyRule.SpyRule
+        ) {
             override fun provideCountTask(dbManager: DbManager, syncStatusDatabase: SyncStatusDatabase): CountTask {
                 return countTaskMock
             }
@@ -75,7 +73,13 @@ class SubCountWorkerTest : DaggerForTests() {
         testAppComponent.inject(this)
         MockitoAnnotations.initMocks(this)
         subCountWorker = SubCountWorker(context, workParams)
-        whenever(workParams.inputData).thenReturn(workDataOf(SUBCOUNT_WORKER_SUB_SCOPE_INPUT to syncScopesBuilder.fromSubSyncScopeToJson(subSyncScope)))
+        whenever(workParams.inputData).thenReturn(
+            workDataOf(
+                SUBCOUNT_WORKER_SUB_SCOPE_INPUT to syncScopesBuilder.fromSubSyncScopeToJson(
+                    subSyncScope
+                )
+            )
+        )
     }
 
     @Test
@@ -83,8 +87,10 @@ class SubCountWorkerTest : DaggerForTests() {
         whenever(countTaskMock.execute(anyNotNull())).thenReturn(Single.just(5))
         val workerResult = subCountWorker.doWork()
 
-        assert(workerResult is ListenableWorker.Result.Success &&
-            workerResult.outputData.getInt(subSyncScope.uniqueKey, 0) == 5)
+        assert(
+            workerResult is ListenableWorker.Result.Success &&
+                workerResult.outputData.getInt(subSyncScope.uniqueKey, 0) == 5
+        )
     }
 
     @Test
