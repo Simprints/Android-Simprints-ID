@@ -18,6 +18,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
@@ -42,7 +43,6 @@ import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -112,7 +112,7 @@ open class AppModule(val app: Application) {
                               timeHelper: TimeHelper,
                               peopleUpSyncMaster: PeopleUpSyncMaster,
                               database: SyncStatusDatabase): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper)
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
 
     @Provides
     @Singleton
@@ -195,9 +195,9 @@ open class AppModule(val app: Application) {
                                          sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                          preferencesManager: PreferencesManager,
                                          timeHelper: TimeHelper,
-                                         sessionEventsManager: RemoteSessionsManager,
                                          analyticsManager: AnalyticsManager): SessionEventsManager =
-        SessionEventsManagerImpl(ctx, sessionEventsLocalDbManager, loginInfoManager, preferencesManager, timeHelper, sessionEventsManager, analyticsManager)
+        SessionEventsManagerImpl(ctx.deviceId, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, analyticsManager)
+
 
     @Provides
     @Singleton
@@ -236,11 +236,9 @@ open class AppModule(val app: Application) {
 
     @Provides
     open fun provideDownSyncTask(localDbManager: LocalDbManager,
-                                 remoteDbManager: RemoteDbManager,
+                                 remotePeopleManager: RemotePeopleManager,
                                  timeHelper: TimeHelper,
-                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(localDbManager, remoteDbManager, timeHelper, syncStatusDatabase.downSyncDao)
-    open fun provideScheduledSessionsSyncManager(): ScheduledSessionsSyncManager =
-        ScheduledSessionsSyncManager()
+                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(localDbManager, remotePeopleManager, timeHelper, syncStatusDatabase.downSyncDao)
 
     @Provides
     @Singleton

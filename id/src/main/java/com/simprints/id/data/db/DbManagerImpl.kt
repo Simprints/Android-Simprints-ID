@@ -6,14 +6,14 @@ import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
-import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
-import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
@@ -22,7 +22,6 @@ import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.toLibPerson
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.session.Session
@@ -40,14 +39,14 @@ import java.util.*
 import com.simprints.libcommon.Person as LibPerson
 
 open class DbManagerImpl(override val local: LocalDbManager,
-                    override val remote: RemoteDbManager,
-                    private val secureDataManager: SecureDataManager,
-                    private val loginInfoManager: LoginInfoManager,
-                    private val preferencesManager: PreferencesManager,
-                    private val sessionEventsManager: SessionEventsManager,
+                         override val remote: RemoteDbManager,
+                         private val secureDataManager: SecureDataManager,
+                         private val loginInfoManager: LoginInfoManager,
+                         private val preferencesManager: PreferencesManager,
+                         private val sessionEventsManager: SessionEventsManager,
+                         override val remotePeopleManager: RemotePeopleManager,
+                         override val remoteProjectManager: RemoteProjectManager,
                          private val timeHelper: TimeHelper,
-                    override val remotePeopleManager: RemotePeopleManager,
-                    override val remoteProjectManager: RemoteProjectManager,
                          private val peopleUpSyncMaster: PeopleUpSyncMaster,
                          private val syncStatusDatabase: SyncStatusDatabase) : DbManager {
 
@@ -158,7 +157,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
                 callback.onSuccess(false)
             },
             onError = {
-                remote.downloadPerson(guid, projectId).subscribeBy(
+                remotePeopleManager.downloadPerson(guid, projectId).subscribeBy(
                     onSuccess = { fbPerson ->
                         destinationList.add(fbPerson.toDomainPerson().toLibPerson())
                         callback.onSuccess(true)
@@ -174,7 +173,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
                             guid: String): Single<PersonFetchResult> =
         local.loadPersonFromLocal(guid).map { PersonFetchResult(it, false) }
             .onErrorResumeNext {
-                remote
+                remotePeopleManager
                     .downloadPerson(guid, loginInfoManager.getSignedInProjectIdOrEmpty())
                     .map { fbPerson ->
                         PersonFetchResult(fbPerson.toDomainPerson(), true)
@@ -210,7 +209,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
         }.trace("refreshProjectInfoWithServer")
 
     override fun calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?): Single<Int> =
-        remote.getNumberOfPatients(projectId, userId, moduleId).flatMap { nPatientsOnServer ->
+        remotePeopleManager.getNumberOfPatients(projectId, userId, moduleId).flatMap { nPatientsOnServer ->
             local.getPeopleCountFromLocal(userId = userId, moduleId = moduleId, toSync = false).map {
                 Math.max(nPatientsOnServer - it, 0)
             }

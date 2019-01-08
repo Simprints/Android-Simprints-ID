@@ -198,7 +198,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     }
 
     private fun mockNPeopleForSyncRequest(remotePeopleManager: RemotePeopleManager, count: Int) {
-        whenever(remotePeopleManager.getNumberOfPatientsForSyncParams(anyNotNull())).thenReturn(Single.just(count))
+        whenever(remotePeopleManager.getNumberOfPatients(anyNotNull(), any(), any())).thenReturn(Single.just(count))
     }
 
     private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {
