@@ -15,17 +15,11 @@ import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 import javax.inject.Inject
 
-class InputMergeWorker(context: Context, params: WorkerParameters)
-    : Worker(context, params) {
+class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
-    @Inject
-    lateinit var saveCountsTask: SaveCountsTask
-
-    @Inject
-    lateinit var syncScopeBuilder: SyncScopesBuilder
-
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var saveCountsTask: SaveCountsTask
+    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
+    @Inject lateinit var analyticsManager: AnalyticsManager
 
     override fun doWork(): Result {
         inject()

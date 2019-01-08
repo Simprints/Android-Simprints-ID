@@ -16,23 +16,13 @@ import javax.inject.Inject
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
-class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters)
-    : Worker(context, params) {
+class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-
-    @Inject
-    lateinit var localDbManager: LocalDbManager
-
-    @Inject
-    lateinit var remoteDbManager: RemoteDbManager
-
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
-
-    @Inject
-    lateinit var newSyncStatusDatabase: SyncStatusDatabase
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
 
     val projectId by lazy {
         inputData.getString(PROJECT_ID_KEY) ?: throw IllegalArgumentException("Project Id required")
