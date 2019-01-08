@@ -7,7 +7,6 @@ import com.nhaarman.mockito_kotlin.any
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
