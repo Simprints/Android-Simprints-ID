@@ -94,7 +94,7 @@ open class AppModuleForAnyTests(app: Application,
                                   timeHelper: TimeHelper,
                                   peopleUpSyncMaster: PeopleUpSyncMaster,
                                   database: SyncStatusDatabase): DbManager =
-        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper, peopleUpSyncMaster, database) }
+        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper, peopleUpSyncMaster, database) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,
@@ -126,7 +126,7 @@ open class AppModuleForAnyTests(app: Application,
                                              timeHelper: TimeHelper,
                                              analyticsManager: AnalyticsManager): SessionEventsManager =
 
-        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, loginInfoManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, sessionEventsManager, analyticsManager) }
+        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, analyticsManager) }
 
     override fun provideSessionEventsLocalDbManager(ctx: Context,
                                                     secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
@@ -165,8 +165,8 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideCountTask(dbManager: DbManager, syncStatusDatabase: SyncStatusDatabase): CountTask =
         countTaskRule.resolveDependency { super.provideCountTask(dbManager, syncStatusDatabase) }
 
-    override fun provideDownSyncTask(localDbManager: LocalDbManager, remoteDbManager: RemoteDbManager, timeHelper: TimeHelper, syncStatusDatabase: SyncStatusDatabase): DownSyncTask =
-        downSyncTaskRule.resolveDependency { super.provideDownSyncTask(localDbManager, remoteDbManager, timeHelper, syncStatusDatabase) }
+    override fun provideDownSyncTask(localDbManager: LocalDbManager, remotePeopleManager: RemotePeopleManager, timeHelper: TimeHelper, syncStatusDatabase: SyncStatusDatabase): DownSyncTask =
+        downSyncTaskRule.resolveDependency { super.provideDownSyncTask(localDbManager, remotePeopleManager, timeHelper, syncStatusDatabase) }
 
     override fun provideSyncSchedulerHelper(preferencesManager: PreferencesManager, loginInfoManager: LoginInfoManager, sessionEventsSyncManager: SessionEventsSyncManager, downSyncManager: DownSyncManager): SyncSchedulerHelper =
         syncSchedulerHelperRule.resolveDependency { super.provideSyncSchedulerHelper(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager) }

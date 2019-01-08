@@ -9,6 +9,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.exceptions.safe.sync.InterruptedSyncException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -24,7 +25,7 @@ import java.io.Reader
 import java.util.*
 
 class DownSyncTaskImpl(val localDbManager: LocalDbManager,
-                       val remoteDbManager: RemoteDbManager,
+                       val remotePeopleManager: RemotePeopleManager,
                        val timeHelper: TimeHelper,
                        private val downSyncDao: DownSyncDao) : DownSyncTask {
 
@@ -43,7 +44,7 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
         this.subSyncScope = subSyncScope
         val syncNeeded = syncNeeded()
         return if (syncNeeded) {
-            remoteDbManager.getPeopleApiClient()
+            remotePeopleManager.getPeopleApiClient()
                 .makeDownSyncApiCallAndGetResponse()
                 .setupJsonReaderFromResponse()
                 .createPeopleObservableFromJsonReader()

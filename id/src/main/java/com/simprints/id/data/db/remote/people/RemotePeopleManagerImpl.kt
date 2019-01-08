@@ -3,11 +3,12 @@ package com.simprints.id.data.db.remote.people
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
-import com.simprints.id.services.sync.SyncTaskParameters
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
 import io.reactivex.Completable
@@ -19,8 +20,8 @@ import java.io.IOException
 open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager) : RemotePeopleManager {
 
     override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
-        getPeopleApiClient().flatMap {
-            it.requestPerson(patientId, projectId)
+        getPeopleApiClient().flatMap { peopleRemoteInterface ->
+            peopleRemoteInterface.requestPerson(patientId, projectId)
                 .retry(::retryCriteria)
                 .handleResponse {
                     when (it.code()) {
@@ -31,19 +32,16 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
                 }
         }
 
-    override fun uploadPerson(fbPerson: fb_Person): Completable =
-        uploadPeople(fbPerson.projectId, arrayListOf(fbPerson))
-
-    override fun uploadPeople(projectId: String, patientsToUpload: ArrayList<fb_Person>): Completable =
+    override fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable =
         getPeopleApiClient().flatMapCompletable {
-            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload))
+            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::toFirebasePerson)))
                 .retry(::retryCriteria)
                 .handleResult(::defaultResponseErrorHandling)
         }
 
-    override fun getNumberOfPatientsForSyncParams(syncParams: SyncTaskParameters): Single<Int> =
-        getPeopleApiClient().flatMap {
-            it.requestPeopleCount(syncParams.projectId, syncParams.userId, syncParams.moduleId)
+    override fun getNumberOfPatients(projectId: String, userId: String?, moduleId: String?): Single<Int> =
+        getPeopleApiClient().flatMap { peopleRemoteInterface ->
+            peopleRemoteInterface.requestPeopleCount(projectId, userId, moduleId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .map { it.count }

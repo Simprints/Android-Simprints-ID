@@ -21,6 +21,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
@@ -65,7 +66,7 @@ class SubDownSyncWorkerTest: DaggerForTests() {
                 return mock()
             }
             override fun provideDownSyncTask(localDbManager: LocalDbManager,
-                                             remoteDbManager: RemoteDbManager,
+                                             remotePeopleManager: RemotePeopleManager,
                                              timeHelper: TimeHelper,
                                              syncStatusDatabase: SyncStatusDatabase): DownSyncTask {
                 return mockDownSyncTask

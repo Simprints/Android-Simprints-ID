@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.tools.TimeHelper
@@ -19,10 +19,10 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
 
     private val sessionsApiClient by lazy {
-        remoteDbManager.getSessionsApiClient().blockingGet()
+        remoteSessionsManager.getSessionsApiClient().blockingGet()
     }
 
     private val sessionIdsToUpload by lazy {
