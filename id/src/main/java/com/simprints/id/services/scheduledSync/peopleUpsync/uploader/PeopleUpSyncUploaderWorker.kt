@@ -6,11 +6,11 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,14 +44,14 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
 
         return try {
             task.execute()
-            Result.SUCCESS
+            Result.success()
         } catch (exception: TransientSyncFailureException) {
             Timber.e(exception)
-            Result.RETRY
+            Result.retry()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
             analyticsManager.logThrowable(throwable)
-            Result.FAILURE
+            Result.failure()
         }
     }
 
@@ -59,7 +59,9 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw WorkerInjectionFailedError.forWorker<PeopleUpSyncUploaderWorker>()
+        } else {
+            throw WorkerInjectionFailedError.forWorker<PeopleUpSyncUploaderWorker>()
+        }
     }
 
     companion object {

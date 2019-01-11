@@ -2,10 +2,9 @@ package com.simprints.id.testUtils.roboletric
 
 import android.content.pm.ActivityInfo
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 
-inline fun injectHowToResolveScannerAppIntent(pm: PackageManager): ResolveInfo {
+fun injectHowToResolveScannerAppIntent(): ResolveInfo {
 
     // Pretend that ScannerQR app is installed
     val info = ResolveInfo()
