@@ -28,14 +28,14 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
                 sessionEventsManager
             )
             task.execute().blockingAwait()
-            Result.SUCCESS
+            Result.success()
         } catch (e: NoSessionsFoundException) {
             Timber.d("No sessions found")
-            Result.SUCCESS
+            Result.success()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
             analyticsManager.logThrowable(throwable)
-            Result.FAILURE
+            Result.failure()
         }
     }
 
@@ -43,6 +43,8 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw WorkerInjectionFailedError.forWorker<SessionEventsMasterWorker>()
+        } else {
+            throw WorkerInjectionFailedError.forWorker<SessionEventsMasterWorker>()
+        }
     }
 }
