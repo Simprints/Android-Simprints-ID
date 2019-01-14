@@ -3,7 +3,7 @@ package com.simprints.id.secure
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.shared.whenever
 
-inline fun mockLoginInfoManager(loginInfoManagerMock: LoginInfoManager,
+fun mockLoginInfoManager(loginInfoManagerMock: LoginInfoManager,
                                 encryptedProjectSecret: String = "encryptedProjectSecret",
                                 projectId: String = "project_id",
                                 signedInUserId: String = "signedInUserId"): LoginInfoManager {
