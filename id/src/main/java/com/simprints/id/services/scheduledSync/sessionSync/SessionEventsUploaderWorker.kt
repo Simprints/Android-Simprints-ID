@@ -31,7 +31,8 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
     }
 
     private val signedProjectId by lazy {
-        inputData.getString(SessionEventsSyncMasterTask.PROJECT_ID_KEY) ?: throw IllegalArgumentException("Project Id required")
+        inputData.getString(SessionEventsSyncMasterTask.PROJECT_ID_KEY)
+            ?: throw IllegalArgumentException("Project Id required")
     }
 
     override fun doWork(): Result {
@@ -44,18 +45,19 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
                 sessionIdsToUpload,
                 sessionEventsManager,
                 timeHelper,
-                sessionsApiClient)
+                sessionsApiClient
+            )
 
             task.execute().blockingAwait()
             Timber.d("SessionEventsUploaderWorker done()")
 
-            Result.SUCCESS
+            Result.success()
         } catch (throwable: Throwable) {
             Timber.d("SessionEventsUploaderWorker error()")
 
             Timber.e(throwable)
             analyticsManager.logThrowable(throwable)
-            Result.FAILURE
+            Result.failure()
         }
     }
 
@@ -63,6 +65,8 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw WorkerInjectionFailedError.forWorker<SessionEventsUploaderWorker>()
+        } else {
+            throw WorkerInjectionFailedError.forWorker<SessionEventsUploaderWorker>()
+        }
     }
 }
