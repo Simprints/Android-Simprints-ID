@@ -7,29 +7,23 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.firebase.FirebaseApp
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
+import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.mock
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Completable
 import org.junit.Before
@@ -42,7 +36,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SubDownSyncWorkerTest: DaggerForTests() {
+class SubDownSyncWorkerTest : DaggerForTests() {
 
     @Inject lateinit var context: Context
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
@@ -52,24 +46,14 @@ class SubDownSyncWorkerTest: DaggerForTests() {
     private lateinit var subDownSyncWorker: SubDownSyncWorker
     private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
 
-    var mockDownSyncTask:DownSyncTask = mock()
+    private var mockDownSyncTask: DownSyncTask = mock()
 
-    override var module: AppModuleForTests by lazyVar {
-        object: AppModuleForTests(app) {
-            override fun provideAnalyticsManager(loginInfoManager: LoginInfoManager, preferencesManager: PreferencesManager, firebaseAnalytics: FirebaseAnalytics): AnalyticsManager {
-                return mock()
-            }
-
-            override fun provideLocalDbManager(ctx: Context): LocalDbManager {
-                return mock()
-            }
-            override fun provideDownSyncTask(localDbManager: LocalDbManager,
-                                             remoteDbManager: RemoteDbManager,
-                                             timeHelper: TimeHelper,
-                                             syncStatusDatabase: SyncStatusDatabase): DownSyncTask {
-                return mockDownSyncTask
-            }
-        }
+    override var module by lazyVar {
+        AppModuleForTests(app,
+            analyticsManagerRule = DependencyRule.MockRule,
+            localDbManagerRule = DependencyRule.MockRule,
+            downSyncTaskRule = DependencyRule.ReplaceRule { mockDownSyncTask }
+        )
     }
 
     @Before

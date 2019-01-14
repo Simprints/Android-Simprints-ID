@@ -13,8 +13,6 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -53,15 +51,11 @@ class SubCountWorkerTest : DaggerForTests() {
     private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
 
     override var module: AppModuleForTests by lazyVar {
-        object : AppModuleForTests(
-            app,
+        AppModuleForTests(app,
             localDbManagerRule = DependencyRule.MockRule,
-            analyticsManagerRule = DependencyRule.SpyRule
-        ) {
-            override fun provideCountTask(dbManager: DbManager, syncStatusDatabase: SyncStatusDatabase): CountTask {
-                return countTaskMock
-            }
-        }
+            analyticsManagerRule = DependencyRule.SpyRule,
+            countTaskRule = DependencyRule.ReplaceRule { countTaskMock }
+        )
     }
 
     @Before
