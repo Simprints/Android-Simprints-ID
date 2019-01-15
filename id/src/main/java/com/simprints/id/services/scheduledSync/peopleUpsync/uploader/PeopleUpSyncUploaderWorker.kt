@@ -44,14 +44,14 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
 
         return try {
             task.execute()
-            Result.SUCCESS
+            Result.success()
         } catch (exception: TransientSyncFailureException) {
             Timber.e(exception)
-            Result.RETRY
+            Result.retry()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
             analyticsManager.logThrowable(throwable)
-            Result.FAILURE
+            Result.failure()
         }
     }
 
@@ -59,7 +59,9 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw WorkerInjectionFailedError.forWorker<PeopleUpSyncUploaderWorker>()
+        } else {
+            throw WorkerInjectionFailedError.forWorker<PeopleUpSyncUploaderWorker>()
+        }
     }
 
     companion object {

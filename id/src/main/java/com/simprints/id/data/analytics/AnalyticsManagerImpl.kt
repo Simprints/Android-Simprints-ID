@@ -32,7 +32,12 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
     override val analyticsId: Single<String> = Single.create<String> {
         firebaseAnalytics.appInstanceId.addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                it.onSuccess(task.result)
+                val result = task.result
+                if (result == null) {
+                    it.onError(NullPointerException())
+                } else {
+                    it.onSuccess(result)
+                }
             } else {
                 it.onError(task.exception as Throwable)
             }

@@ -32,7 +32,6 @@ import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Completable
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -95,7 +94,7 @@ class SubDownSyncWorkerTest: DaggerForTests() {
         val result = subDownSyncWorker.doWork()
 
         verify(mockDownSyncTask, times(1)).execute(anyNotNull())
-        assertEquals(ListenableWorker.Result.SUCCESS, result)
+        assert(result is ListenableWorker.Result.Success)
     }
 
     @Test
@@ -109,6 +108,6 @@ class SubDownSyncWorkerTest: DaggerForTests() {
 
         verify(mockDownSyncTask, times(1)).execute(anyNotNull())
         verify(analyticsManagerMock, times(1)).logThrowable(any())
-        assertEquals(ListenableWorker.Result.FAILURE, result)
+        assert(result is ListenableWorker.Result.Failure)
     }
 }

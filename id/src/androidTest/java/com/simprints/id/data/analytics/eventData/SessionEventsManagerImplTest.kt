@@ -44,7 +44,7 @@ import com.simprints.mockscanner.MockScannerManager
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.Sort
-import junit.framework.Assert.*
+import junit.framework.TestCase.*
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Before
