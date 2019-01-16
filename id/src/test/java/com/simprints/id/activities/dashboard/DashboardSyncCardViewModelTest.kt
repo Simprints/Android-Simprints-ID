@@ -16,12 +16,13 @@ import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.local.room.UpSyncStatus
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
@@ -54,6 +55,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     var rule: TestRule = InstantTaskExecutorRule()
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var preferencesManagerSpy: PreferencesManager
     @Inject lateinit var dbManagerMock: DbManager
@@ -78,6 +80,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         AppModuleForTests(app,
             dbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
+            remoteProjectManagerRule = MockRule,
             localDbManagerRule = MockRule,
             downSyncManagerRule = MockRule)
     }
@@ -94,7 +97,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
         setUserLogInState(true, getRoboSharedPreferences())
 
-        mockLoadProject(localDbManagerMock, remoteDbManagerMock)
+        mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
 
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to true))
     }
