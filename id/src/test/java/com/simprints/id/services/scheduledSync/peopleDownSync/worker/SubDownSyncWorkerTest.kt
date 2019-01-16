@@ -16,7 +16,7 @@ import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
@@ -64,7 +64,7 @@ class SubDownSyncWorkerTest: DaggerForTests() {
                 return mock()
             }
             override fun provideDownSyncTask(localDbManager: LocalDbManager,
-                                             remoteDbManager: RemoteDbManager,
+                                             remotePeopleManager: RemotePeopleManager,
                                              timeHelper: TimeHelper,
                                              syncStatusDatabase: SyncStatusDatabase): DownSyncTask {
                 return mockDownSyncTask
