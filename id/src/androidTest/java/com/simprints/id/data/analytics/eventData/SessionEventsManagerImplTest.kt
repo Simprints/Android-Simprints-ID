@@ -81,6 +81,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
             app,
             localDbManagerRule = DependencyRule.SpyRule,
             remoteDbManagerRule = DependencyRule.SpyRule,
+            remoteSessionsManagerRule = DependencyRule.SpyRule,
             sessionEventsManagerRule = DependencyRule.SpyRule,
             scheduledSessionsSyncManagerRule = DependencyRule.MockRule,
             randomGeneratorRule = DependencyRule.MockRule,
