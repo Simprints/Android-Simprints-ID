@@ -7,7 +7,7 @@ import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
@@ -20,7 +20,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var localDbManager: LocalDbManager
-    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var remotePeopleManager: RemotePeopleManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
 
@@ -37,7 +37,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         injectDependencies()
 
         val task = PeopleUpSyncUploaderTask(
-            loginInfoManager, localDbManager, remoteDbManager,
+            loginInfoManager, localDbManager, remotePeopleManager,
             projectId, /*userId, */PATIENT_UPLOAD_BATCH_SIZE,
             newSyncStatusDatabase.upSyncDao
         )
