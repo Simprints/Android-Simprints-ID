@@ -1,4 +1,4 @@
-package com.simprints.id.experimental
+package com.simprints.id.experimental.testTools
 
 import com.simprints.id.di.AppComponentForTests
 import com.simprints.id.di.AppModuleForTests
