@@ -1,4 +1,4 @@
-package com.simprints.id.experimental
+package com.simprints.id.experimental.testTools
 
 import com.nhaarman.mockito_kotlin.atLeast
 import com.nhaarman.mockito_kotlin.atMost

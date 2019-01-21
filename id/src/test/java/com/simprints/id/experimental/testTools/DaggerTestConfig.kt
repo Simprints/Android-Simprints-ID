@@ -1,4 +1,4 @@
-package com.simprints.id.experimental
+package com.simprints.id.experimental.testTools
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
@@ -9,7 +9,7 @@ import timber.log.Timber
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.functions
 
-class TestConfig<T : NewDaggerForTests>(val test: T) {
+class DaggerTestConfig<T : NewDaggerForTests>(val test: T) {
 
     init {
         test.app = (ApplicationProvider.getApplicationContext() as TestApplication)
@@ -17,12 +17,12 @@ class TestConfig<T : NewDaggerForTests>(val test: T) {
 
     fun setupAllAndFinish() = setupFirebase().setupWorkManager().finish()
 
-    fun setupFirebase(): TestConfig<T> {
+    fun setupFirebase(): DaggerTestConfig<T> {
         FirebaseApp.initializeApp(test.app)
         return this
     }
 
-    fun setupWorkManager(): TestConfig<T> {
+    fun setupWorkManager(): DaggerTestConfig<T> {
         try {
             WorkManager.initialize(test.app, Configuration.Builder().build())
         } catch (e: IllegalStateException) {
@@ -31,14 +31,14 @@ class TestConfig<T : NewDaggerForTests>(val test: T) {
         return this
     }
 
-    fun finish(): TestConfig<T> = initComponent().inject()
+    fun finish(): DaggerTestConfig<T> = initComponent().inject()
 
-    fun initComponent(): TestConfig<T> {
+    fun initComponent(): DaggerTestConfig<T> {
         test.initComponent()
         return this
     }
 
-    fun inject(): TestConfig<T> {
+    fun inject(): DaggerTestConfig<T> {
 
         // Go through all the functions of the AppComponent and try to find the one corresponding to the test
         val injectFunction = test.testAppComponent::class.functions.find { function ->

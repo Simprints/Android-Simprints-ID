@@ -9,7 +9,8 @@ import com.simprints.id.activities.dashboard.DashboardCardsFactoryTest
 import com.simprints.id.activities.dashboard.DashboardSyncCardViewModelTest
 import com.simprints.id.data.db.DbManagerTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
-import com.simprints.id.experimental.NewSettingsPreferencesManagerTest
+import com.simprints.id.experimental.testExamples.NewProjectSecretManagerTest
+import com.simprints.id.experimental.testExamples.NewSettingsPreferencesManagerTest
 import com.simprints.id.secure.ProjectAuthenticatorTest
 import com.simprints.id.secure.ProjectSecretManagerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.SubDownSyncTaskTest
@@ -41,4 +42,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(subDownSyncWorkerTest: SubDownSyncWorkerTest)
     fun inject(dashboardSyncCardViewModelTest: DashboardSyncCardViewModelTest)
     fun inject(newSettingsPreferencesManagerTest: NewSettingsPreferencesManagerTest)
+    fun inject(newProjectSecretManagerTest: NewProjectSecretManagerTest)
 }
