@@ -7,7 +7,7 @@ import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
 
-open class NewDaggerForTests {
+abstract class NewDaggerForTests {
 
     lateinit var testAppComponent: AppComponentForTests
     lateinit var app: TestApplication
