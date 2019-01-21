@@ -34,8 +34,7 @@ class NewSettingsPreferencesManagerTest : NewDaggerForTests() {
 
     @Before
     fun setup() {
-        setupRobolectricTest()
-        testAppComponent.inject(this) // Challenge : can this be factored into the above method?
+        TestConfig(this).setupFirebase().finish()
 
         whenever { remoteConfigSpy.getBoolean(RemoteConfigWrapper.PROJECT_SPECIFIC_MODE_KEY) } thenReturn true
     }
