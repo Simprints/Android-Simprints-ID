@@ -67,7 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.15"
-        android:background="@color/simprints_separator"
+        android:background="@color/simprints_light_grey"
         android:orientation="horizontal">
 
         <TextView
