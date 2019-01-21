@@ -34,7 +34,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     override fun setLayoutBackgroundColor(color: Int) = alertLayout.setBackgroundColor(color)
     override fun setLeftButtonBackgroundColor(color: Int) = left_button.setBackgroundColor(color)
     override fun setRightButtonBackgroundColor(color: Int) = right_button.setBackgroundColor(color)
-    override fun setAlertTitleWithStringRes(stringRes: Int) = alert_title.setText(stringRes)
+    override fun setAlertTitleWithStringRes(stringRes: Int) { alert_title.text = getString(stringRes).toUpperCase() }
     override fun setAlertImageWithDrawableId(drawableId: Int) = alert_image.setImageResource(drawableId)
     override fun setAlertHintImageWithDrawableId(alertHintDrawableId: Int) {
         if (alertHintDrawableId != -1) {
