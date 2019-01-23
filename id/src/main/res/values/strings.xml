@@ -83,12 +83,12 @@
     <!-- Button Labels -->
     <string name="rescan_label">Re-scan</string>
     <string name="rescan_label_question">Re-scan?</string>
-    <string name="scan_label">SCAN</string>
-    <string name="cancel_button" tools:ignore="ButtonCase">CANCEL</string>
+    <string name="scan_label">Scan</string>
+    <string name="cancel_button" tools:ignore="ButtonCase">Cancel</string>
     <string name="ok">OK</string>
-    <string name="scan">SCAN</string>
-    <string name="confirm">CONFIRM</string>
-    <string name="restart">RESTART</string>
+    <string name="scan">Scan</string>
+    <string name="confirm">Confirm</string>
+    <string name="restart">Restart</string>
     <!-- Content Descriptions -->
     <string name="finger_image_description" translatable="false">Hands with arrow pointing to a finger</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
