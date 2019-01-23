@@ -2,8 +2,8 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_VERIFY_GUID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
-import com.simprints.clientapi.simprintsrequests.VerifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyVerifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.VerifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyVerifyRequest
 import org.junit.Assert
 
 

@@ -1,4 +1,4 @@
-package com.simprints.clientapi.simprintsrequests
+package com.simprints.clientapi.simprintsrequests.requests
 
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize

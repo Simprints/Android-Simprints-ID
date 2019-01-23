@@ -8,7 +8,7 @@ import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView)
-    : RequestContract.RequestPresenter {
+    : RequestContract.Presenter {
 
     override fun processEnrollRequest() = validateAndSendRequest(
         EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))

@@ -1,10 +1,10 @@
-package com.simprints.clientapi.simprintsrequests
+package com.simprints.clientapi.simprintsrequests.requests
 
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class EnrollRequest(
+data class IdentifyRequest(
     override val projectId: String,
     override val moduleId: String,
     override val userId: String,
@@ -15,7 +15,7 @@ data class EnrollRequest(
     override val requestName: String = REQUEST_NAME
 
     companion object {
-        private const val REQUEST_NAME = "enrollmentRequest"
+        private const val REQUEST_NAME = "identifyRequest"
     }
 
 }
