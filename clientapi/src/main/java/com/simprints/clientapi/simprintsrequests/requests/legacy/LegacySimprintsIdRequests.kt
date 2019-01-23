@@ -1,7 +1,7 @@
-package com.simprints.clientapi.simprintsrequests.legacy
+package com.simprints.clientapi.simprintsrequests.requests.legacy
 
 import com.simprints.clientapi.simprintsrequests.ApiVersion
-import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.SimprintsIdRequest
 
 
 interface LegacySimprintsIdRequest : SimprintsIdRequest {
