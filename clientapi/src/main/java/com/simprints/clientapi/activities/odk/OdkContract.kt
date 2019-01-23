@@ -20,7 +20,7 @@ interface OdkContract {
 
     }
 
-    interface Presenter : BasePresenter, RequestContract.RequestPresenter {
+    interface Presenter : BasePresenter, RequestContract.Presenter {
 
         fun processRegistration(registration: Registration)
 

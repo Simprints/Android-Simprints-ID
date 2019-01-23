@@ -2,8 +2,8 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
 import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.clientapi.simprintsrequests.ConfirmIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyConfirmIdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.ConfirmIdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyConfirmIdentifyRequest
 import org.junit.Assert
 
 

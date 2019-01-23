@@ -1,14 +1,10 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import com.simprints.clientapi.requestFactories.*
-import com.simprints.clientapi.simprintsrequests.ConfirmIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.EnrollRequest
-import com.simprints.clientapi.simprintsrequests.IdentifyRequest
-import com.simprints.clientapi.simprintsrequests.VerifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyConfirmIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyVerifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyConfirmIdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyEnrollRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyIdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyVerifyRequest
 import com.simprints.libsimprints.Constants
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,12 +25,8 @@ class LibSimprintsPresenterTest {
         Mockito.`when`(view.enrollExtractor).thenReturn(enrollmentExtractor)
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT).apply { start() }
-        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(EnrollRequest(
-            projectId = RequestFactory.MOCK_PROJECT_ID,
-            moduleId = RequestFactory.MOCK_MODULE_ID,
-            userId = RequestFactory.MOCK_USER_ID,
-            metadata = RequestFactory.MOCK_METADATA
-        ))
+        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(
+            EnrollRequestFactory.getValidSimprintsRequest())
     }
 
     @Test
@@ -57,12 +49,8 @@ class LibSimprintsPresenterTest {
         Mockito.`when`(view.identifyExtractor).thenReturn(identifyExtractor)
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT).apply { start() }
-        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(IdentifyRequest(
-            projectId = RequestFactory.MOCK_PROJECT_ID,
-            moduleId = RequestFactory.MOCK_MODULE_ID,
-            userId = RequestFactory.MOCK_USER_ID,
-            metadata = RequestFactory.MOCK_METADATA
-        ))
+        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(
+            IdentifyRequestFactory.getValidSimprintsRequest())
     }
 
     @Test
@@ -85,13 +73,8 @@ class LibSimprintsPresenterTest {
         Mockito.`when`(view.verifyExtractor).thenReturn(verifyExractor)
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT).apply { start() }
-        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(VerifyRequest(
-            projectId = RequestFactory.MOCK_PROJECT_ID,
-            moduleId = RequestFactory.MOCK_MODULE_ID,
-            userId = RequestFactory.MOCK_USER_ID,
-            metadata = RequestFactory.MOCK_METADATA,
-            verifyGuid = RequestFactory.MOCK_VERIFY_GUID
-        ))
+        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(
+            VerifyRequestFactory.getValidSimprintsRequest())
     }
 
     @Test
@@ -115,11 +98,8 @@ class LibSimprintsPresenterTest {
         Mockito.`when`(view.confirmIdentifyExtractor).thenReturn(confirmIdentify)
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_SELECT_GUID_INTENT).apply { start() }
-        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(ConfirmIdentifyRequest(
-            projectId = RequestFactory.MOCK_PROJECT_ID,
-            sessionId = RequestFactory.MOCK_SESSION_ID,
-            selectedGuid = RequestFactory.MOCK_SELECTED_GUID
-        ))
+        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(
+            ConfirmIdentifyFactory.getValidSimprintsRequest())
     }
 
     @Test
