@@ -4,6 +4,10 @@ import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
+import com.simprints.clientapi.simprintsrequests.responses.EnrollResponse
+import com.simprints.clientapi.simprintsrequests.responses.IdentificationResponse
+import com.simprints.clientapi.simprintsrequests.responses.RefusalFormResponse
+import com.simprints.clientapi.simprintsrequests.responses.VerifyResponse
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Verification
@@ -46,5 +50,25 @@ class OdkPresenter(val view: OdkContract.View,
     )
 
     override fun processReturnError() = view.returnIntentActionErrorToClient()
+
+    override fun handleEnrollResponse(enroll: EnrollResponse) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun handleIdentifyResponse(identify: IdentificationResponse) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun handleVerifyResponse(verify: VerifyResponse) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun handleResponseError() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
 }

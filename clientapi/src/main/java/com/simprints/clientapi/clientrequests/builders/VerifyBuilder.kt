@@ -2,10 +2,10 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
-import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
-import com.simprints.clientapi.simprintsrequests.VerifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacySimprintsIdRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyVerifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.VerifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacySimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyVerifyRequest
 
 
 class VerifyBuilder(private val extractor: VerifyExtractor, validator: VerifyValidator)

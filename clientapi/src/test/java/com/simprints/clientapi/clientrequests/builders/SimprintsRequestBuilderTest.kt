@@ -3,7 +3,7 @@ package com.simprints.clientapi.clientrequests.builders
 import com.simprints.clientapi.requestFactories.RequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_LEGACY_API_KEY
 import com.simprints.clientapi.simprintsrequests.ApiVersion
-import com.simprints.clientapi.simprintsrequests.legacy.LegacySimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacySimprintsIdRequest
 import org.junit.Assert
 import org.junit.Test
 

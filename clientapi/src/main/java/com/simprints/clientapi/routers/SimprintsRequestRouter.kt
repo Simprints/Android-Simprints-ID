@@ -3,11 +3,11 @@ package com.simprints.clientapi.routers
 import android.app.Activity
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.extensions.toIntent
-import com.simprints.clientapi.simprintsrequests.*
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyConfirmIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyVerifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.*
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyConfirmIdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyEnrollRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyIdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyVerifyRequest
 
 
 object SimprintsRequestRouter {

@@ -2,10 +2,10 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
-import com.simprints.clientapi.simprintsrequests.EnrollRequest
-import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacySimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.EnrollRequest
+import com.simprints.clientapi.simprintsrequests.requests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyEnrollRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacySimprintsIdRequest
 
 
 class EnrollBuilder(private val extractor: EnrollExtractor, validator: EnrollValidator)

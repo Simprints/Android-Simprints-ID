@@ -7,14 +7,8 @@ import com.simprints.clientapi.activities.baserequest.RequestContract
 
 interface LibSimprintsContract {
 
-    interface View : BaseView<Presenter>, RequestContract.RequestView {
+    interface View : BaseView<Presenter>, RequestContract.RequestView
 
-
-    }
-
-    interface Presenter : BasePresenter {
-
-
-    }
+    interface Presenter : BasePresenter, RequestContract.Presenter
 
 }

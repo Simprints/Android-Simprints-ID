@@ -2,10 +2,10 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
-import com.simprints.clientapi.simprintsrequests.IdentifyRequest
-import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacySimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.IdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyIdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacySimprintsIdRequest
 
 
 class IdentifyBuilder(val extractor: IdentifyExtractor, validator: IdentifyValidator) :
