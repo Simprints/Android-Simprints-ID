@@ -1,6 +1,6 @@
-package com.simprints.clientapi.simprintsrequests.legacy
+package com.simprints.clientapi.simprintsrequests.requests.legacy
 
-import com.simprints.clientapi.simprintsrequests.SimprintsActionRequest
+import com.simprints.clientapi.simprintsrequests.requests.SimprintsActionRequest
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
