@@ -103,7 +103,7 @@ class AlertActivityTest : DaggerForTests() {
         if (alertType.isTwoButton) assertEquals(getBackgroundColor(alertActivity.left_button), getColorWithColorRes(alertType.backgroundColor))
         assertEquals(getBackgroundColor(alertActivity.right_button), getColorWithColorRes(alertType.backgroundColor))
 
-        assertEquals(alertActivity.alert_title.text, alertActivity.resources.getString(alertType.alertTitleId).toUpperCase())
+        assertEquals(alertActivity.alert_title.text, alertActivity.resources.getString(alertType.alertTitleId))
 
         val alertImageDrawableShown = Shadows.shadowOf(alertActivity.alert_image.drawable).createdFromResId
         assertEquals(alertImageDrawableShown, alertType.alertMainDrawableId)
