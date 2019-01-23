@@ -10,20 +10,15 @@ import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_LEGACY_API_KEY
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_METADATA
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_MODULE_ID
-import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_PROJECT_ID
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SELECTED_GUID
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_USER_ID
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_VERIFY_GUID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
-import com.simprints.clientapi.simprintsrequests.ConfirmIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.EnrollRequest
-import com.simprints.clientapi.simprintsrequests.IdentifyRequest
-import com.simprints.clientapi.simprintsrequests.VerifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyConfirmIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyEnrollRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacyVerifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyConfirmIdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyEnrollRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyIdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyVerifyRequest
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
@@ -50,12 +45,8 @@ class OdkPresenterTest {
         `when`(view.enrollExtractor).thenReturn(enrollmentExtractor)
 
         OdkPresenter(view, ACTION_REGISTER).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(EnrollRequest(
-            projectId = MOCK_PROJECT_ID,
-            moduleId = MOCK_MODULE_ID,
-            userId = MOCK_USER_ID,
-            metadata = MOCK_METADATA
-        ))
+        Mockito.verify(view, times(1)).sendSimprintsRequest(
+            EnrollRequestFactory.getValidSimprintsRequest())
     }
 
     @Test
@@ -78,12 +69,8 @@ class OdkPresenterTest {
         `when`(view.identifyExtractor).thenReturn(identifyExtractor)
 
         OdkPresenter(view, ACTION_IDENTIFY).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(IdentifyRequest(
-            projectId = MOCK_PROJECT_ID,
-            moduleId = MOCK_MODULE_ID,
-            userId = MOCK_USER_ID,
-            metadata = MOCK_METADATA
-        ))
+        Mockito.verify(view, times(1)).sendSimprintsRequest(
+            IdentifyRequestFactory.getValidSimprintsRequest())
     }
 
     @Test
@@ -106,13 +93,8 @@ class OdkPresenterTest {
         `when`(view.verifyExtractor).thenReturn(verifyExractor)
 
         OdkPresenter(view, ACTION_VERIFY).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(VerifyRequest(
-            projectId = MOCK_PROJECT_ID,
-            moduleId = MOCK_MODULE_ID,
-            userId = MOCK_USER_ID,
-            metadata = MOCK_METADATA,
-            verifyGuid = MOCK_VERIFY_GUID
-        ))
+        Mockito.verify(view, times(1)).sendSimprintsRequest(
+            VerifyRequestFactory.getValidSimprintsRequest())
     }
 
     @Test
@@ -183,11 +165,8 @@ class OdkPresenterTest {
         `when`(view.confirmIdentifyExtractor).thenReturn(confirmIdentify)
 
         OdkPresenter(view, ACTION_CONFIRM_IDENTITY).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(ConfirmIdentifyRequest(
-            projectId = MOCK_PROJECT_ID,
-            sessionId = MOCK_SESSION_ID,
-            selectedGuid = MOCK_SELECTED_GUID
-        ))
+        Mockito.verify(view, times(1)).sendSimprintsRequest(
+            ConfirmIdentifyFactory.getValidSimprintsRequest())
     }
 
     @Test

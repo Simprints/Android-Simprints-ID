@@ -4,11 +4,19 @@ import com.simprints.clientapi.clientrequests.builders.ConfirmIdentifyBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
+import com.simprints.clientapi.simprintsrequests.requests.ConfirmIdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.SimprintsIdRequest
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
 
 object ConfirmIdentifyFactory : RequestFactory() {
+
+    override fun getValidSimprintsRequest(): SimprintsIdRequest = ConfirmIdentifyRequest(
+        projectId = MOCK_PROJECT_ID,
+        sessionId = MOCK_SESSION_ID,
+        selectedGuid = MOCK_SELECTED_GUID
+    )
 
     override fun getValidator(extractor: ClientRequestExtractor): ConfirmIdentifyValidator =
         ConfirmIdentifyValidator(extractor as ConfirmIdentifyExtractor)

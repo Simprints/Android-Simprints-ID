@@ -1,9 +1,9 @@
 package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.clientapi.simprintsrequests.SimprintsActionRequest
-import com.simprints.clientapi.simprintsrequests.SimprintsIdRequest
-import com.simprints.clientapi.simprintsrequests.legacy.LegacySimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.SimprintsActionRequest
+import com.simprints.clientapi.simprintsrequests.requests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacySimprintsIdRequest
 import org.junit.Assert
 import org.junit.Test
 
