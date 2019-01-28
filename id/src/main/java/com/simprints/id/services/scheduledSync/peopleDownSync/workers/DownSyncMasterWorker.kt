@@ -39,7 +39,7 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
         inject()
 
         val scope = getScope()
-        if(scope.toSubSyncScopes().isNotEmpty()) {
+        if (scope.toSubSyncScopes().isNotEmpty()) {
             val subCountWorkers = buildChainOfSubCountWorker(scope)
             val subDownSyncWorkers = scope.toSubSyncScopes().map { this.buildSubDownSyncWorker(it) }
 
@@ -49,14 +49,18 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
                 .then(subDownSyncWorkers)
                 .enqueue()
         }
+        return Result.success()
+            .also {
+                toastForDebugBuilds(scope, it)
+            }
+    }
 
-        return Result.SUCCESS.also {
-            if (BuildConfig.DEBUG) {
-                applicationContext.runOnUiThread {
-                    val message = "WM - DownSyncMasterWorker($scope): $it"
-                    Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
-                    Timber.d(message)
-                }
+    private fun toastForDebugBuilds(scope: SyncScope, result: Result) {
+        if (BuildConfig.DEBUG) {
+            applicationContext.runOnUiThread {
+                val message = "WM - DownSyncMasterWorker($scope): $result"
+                Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+                Timber.d(message)
             }
         }
     }
@@ -69,8 +73,9 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
     }
 
     private fun buildSubDownSyncWorker(subSyncScope: SubSyncScope): OneTimeWorkRequest {
-        val data: Data = workDataOf(SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope))
-
+        val data: Data = workDataOf(
+            SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope)
+        )
         return OneTimeWorkRequestBuilder<SubDownSyncWorker>()
             .setInputData(data)
             .addTag(getDownSyncWorkerKeyForScope(subSyncScope))
@@ -79,10 +84,12 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
             .build()
     }
 
-    private fun buildChainOfSubCountWorker(scope: SyncScope) = scope.toSubSyncScopes().map { this.buildSubCountWorker(it) }
+    private fun buildChainOfSubCountWorker(scope: SyncScope) =
+        scope.toSubSyncScopes().map { this.buildSubCountWorker(it) }
 
     private fun buildSubCountWorker(subSyncScope: SubSyncScope): OneTimeWorkRequest {
-        val data: Data = workDataOf(SUBCOUNT_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope))
+        val data: Data =
+            workDataOf(SUBCOUNT_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope))
 
         return OneTimeWorkRequestBuilder<SubCountWorker>()
             .setInputData(data)

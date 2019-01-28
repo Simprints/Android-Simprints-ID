@@ -11,12 +11,14 @@ import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
@@ -38,6 +40,8 @@ import javax.inject.Inject
 class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var remotePeopleManagerMock: RemotePeopleManager
+    @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -47,6 +51,8 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     override var module by lazyVar {
         AppModuleForTests(app,
             remoteDbManagerRule = MockRule,
+            remotePeopleManagerRule = MockRule,
+            remoteProjectManagerRule = MockRule,
             localDbManagerRule = MockRule,
             syncStatusDatabaseRule = MockRule)
     }
@@ -72,7 +78,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
         setUserLogInState(true, getRoboSharedPreferences(), userId = "userId")
 
-        mockLoadProject(localDbManagerMock, remoteDbManagerMock)
+        mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
     }
 
     @Test
@@ -83,7 +89,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         Assert.assertEquals(card?.description, "project desc")
 
         whenever(localDbManagerMock.loadProjectFromLocal(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
-        whenever(remoteDbManagerMock.loadProjectFromRemote(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
+        whenever(remoteProjectManagerMock.loadProjectFromRemote(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
 
         val testObserver = Single.merge(factory.createCards()).test()
         testObserver.awaitTerminalEvent()
@@ -156,7 +162,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
                                                                deleteEvent: () -> Unit,
                                                                cardTitle: String) {
         val event = createEvent()
-        mockNPeopleForSyncRequest(remoteDbManagerMock, 0)
+        mockNPeopleForSyncRequest(remotePeopleManagerMock, 0)
 
         var card = getCardIfCreated(
             cardsFactory,
@@ -171,7 +177,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     }
 
     private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCardViewModel.State? {
-        mockNPeopleForSyncRequest(remoteDbManagerMock, 0)
+        mockNPeopleForSyncRequest(remotePeopleManagerMock, 0)
         mockNLocalPeople(localDbManagerMock, 0)
 
         val testObserver = Single.merge(cardsFactory.createCards()).test()
@@ -190,8 +196,8 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         }
     }
 
-    private fun mockNPeopleForSyncRequest(remoteDbManager: RemoteDbManager, count: Int) {
-        whenever(remoteDbManager.getNumberOfPatientsForSyncScope(anyNotNull())).thenReturn(Single.just(count))
+    private fun mockNPeopleForSyncRequest(remotePeopleManager: RemotePeopleManager, count: Int) {
+        whenever(remotePeopleManager.getNumberOfPatients(anyNotNull(), any(), any())).thenReturn(Single.just(count))
     }
 
     private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {

@@ -1,7 +1,7 @@
 package com.simprints.id.tools.serializers
 
 import com.google.common.truth.Truth
-import junit.framework.Assert
+import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
 class LanguagesStringArraySerializerTest {
@@ -11,7 +11,7 @@ class LanguagesStringArraySerializerTest {
         val languageArray = arrayOf("en", "fr", "de", "fa-rAF", "ny")
         val expectedString = "en,fr,de,fa-rAF,ny"
         val serializedLanguages = LanguagesStringArraySerializer().serialize(languageArray)
-        Assert.assertEquals(expectedString, serializedLanguages)
+        assertEquals(expectedString, serializedLanguages)
     }
 
     @Test
@@ -19,7 +19,7 @@ class LanguagesStringArraySerializerTest {
         val languageArray = arrayOf<String>()
         val expectedString = ""
         val serializedLanguages = LanguagesStringArraySerializer().serialize(languageArray)
-        Assert.assertEquals(expectedString, serializedLanguages)
+        assertEquals(expectedString, serializedLanguages)
     }
 
     @Test

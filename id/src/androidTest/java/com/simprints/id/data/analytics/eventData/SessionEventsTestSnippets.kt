@@ -9,9 +9,7 @@ import com.simprints.id.shared.sessionEvents.createFakeClosedSession
 import com.simprints.id.shared.sessionEvents.createFakeSession
 import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
-import junit.framework.Assert
-import junit.framework.Assert.assertNotSame
-import org.junit.Assert.*
+import junit.framework.TestCase.*
 import java.util.*
 
 fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
@@ -133,30 +131,30 @@ fun saveSessionInDb(session: SessionEvents, realmSessionEventsManager: SessionEv
 
 fun verifyNumberOfSessionsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(RlSession::class.java).findAll().size)
+        assertEquals(count, where(RlSession::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfDatabaseInfosInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(RlDatabaseInfo::class.java).findAll().size)
+        assertEquals(count, where(RlDatabaseInfo::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfEventsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(RlEvent::class.java).findAll().size)
+        assertEquals(count, where(RlEvent::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfDeviceInfosInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(RlDevice::class.java).findAll().size)
+        assertEquals(count, where(RlDevice::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfLocationsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(RlLocation::class.java).findAll().size)
+        assertEquals(count, where(RlLocation::class.java).findAll().size)
     }
 }
