@@ -17,6 +17,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
@@ -71,6 +72,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     @Inject lateinit var secureDataManagerSpy: SecureDataManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
+    @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
@@ -230,7 +232,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     private fun uploadFakePeopleAndPrepareLocalDb(syncScope: SyncScope) {
         peopleOnServer = PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_SERVER_PER_MODULE, syncScope, listOf(false))
         peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).forEach {
-            remoteDbManagerSpy.uploadPeople(testProject.id, it).blockingAwait()
+            remotePeopleManagerSpy.uploadPeople(testProject.id, it).blockingAwait()
         }
         peopleInDb.addAll(PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_DB_PER_MODULE, syncScope, listOf(true, false)))
         localDbManager.insertOrUpdatePeopleInLocal(peopleInDb).blockingAwait()

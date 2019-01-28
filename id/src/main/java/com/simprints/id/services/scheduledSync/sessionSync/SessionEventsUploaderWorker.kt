@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.tools.TimeHelper
@@ -19,10 +19,10 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
 
     private val sessionsApiClient by lazy {
-        remoteDbManager.getSessionsApiClient().blockingGet()
+        remoteSessionsManager.getSessionsApiClient().blockingGet()
     }
 
     private val sessionIdsToUpload by lazy {
@@ -31,7 +31,8 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
     }
 
     private val signedProjectId by lazy {
-        inputData.getString(SessionEventsSyncMasterTask.PROJECT_ID_KEY) ?: throw IllegalArgumentException("Project Id required")
+        inputData.getString(SessionEventsSyncMasterTask.PROJECT_ID_KEY)
+            ?: throw IllegalArgumentException("Project Id required")
     }
 
     override fun doWork(): Result {
@@ -44,18 +45,19 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
                 sessionIdsToUpload,
                 sessionEventsManager,
                 timeHelper,
-                sessionsApiClient)
+                sessionsApiClient
+            )
 
             task.execute().blockingAwait()
             Timber.d("SessionEventsUploaderWorker done()")
 
-            Result.SUCCESS
+            Result.success()
         } catch (throwable: Throwable) {
             Timber.d("SessionEventsUploaderWorker error()")
 
             Timber.e(throwable)
             analyticsManager.logThrowable(throwable)
-            Result.FAILURE
+            Result.failure()
         }
     }
 
@@ -63,6 +65,8 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw WorkerInjectionFailedError.forWorker<SessionEventsUploaderWorker>()
+        } else {
+            throw WorkerInjectionFailedError.forWorker<SessionEventsUploaderWorker>()
+        }
     }
 }
