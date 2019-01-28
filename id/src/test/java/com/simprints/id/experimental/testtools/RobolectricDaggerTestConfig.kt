@@ -1,4 +1,4 @@
-package com.simprints.id.experimental.testTools
+package com.simprints.id.experimental.testtools
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
@@ -9,7 +9,7 @@ import timber.log.Timber
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.functions
 
-class DaggerTestConfig<T : NewDaggerForTests>(val test: T) {
+class RobolectricDaggerTestConfig<T : NewDaggerForTests>(val test: T) {
 
     init {
         test.app = (ApplicationProvider.getApplicationContext() as TestApplication)
@@ -17,12 +17,12 @@ class DaggerTestConfig<T : NewDaggerForTests>(val test: T) {
 
     fun setupAllAndFinish() = setupFirebase().setupWorkManager().finish()
 
-    fun setupFirebase(): DaggerTestConfig<T> {
+    fun setupFirebase(): RobolectricDaggerTestConfig<T> {
         FirebaseApp.initializeApp(test.app)
         return this
     }
 
-    fun setupWorkManager(): DaggerTestConfig<T> {
+    fun setupWorkManager(): RobolectricDaggerTestConfig<T> {
         try {
             WorkManager.initialize(test.app, Configuration.Builder().build())
         } catch (e: IllegalStateException) {
@@ -31,14 +31,14 @@ class DaggerTestConfig<T : NewDaggerForTests>(val test: T) {
         return this
     }
 
-    fun finish(): DaggerTestConfig<T> = initComponent().inject()
+    fun finish(): RobolectricDaggerTestConfig<T> = initComponent().inject()
 
-    fun initComponent(): DaggerTestConfig<T> {
+    fun initComponent(): RobolectricDaggerTestConfig<T> {
         test.initComponent()
         return this
     }
 
-    fun inject(): DaggerTestConfig<T> {
+    fun inject(): RobolectricDaggerTestConfig<T> {
 
         // Go through all the functions of the AppComponent and try to find the one corresponding to the test
         val injectFunction = test.testAppComponent::class.functions.find { function ->
