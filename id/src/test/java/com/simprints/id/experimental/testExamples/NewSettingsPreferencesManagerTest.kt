@@ -8,7 +8,7 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.Constants
-import com.simprints.id.experimental.testTools.*
+import com.simprints.id.experimental.testtools.*
 import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.assertThrows
@@ -35,7 +35,7 @@ class NewSettingsPreferencesManagerTest : NewDaggerForTests() {
 
     @Before
     fun setup() {
-        DaggerTestConfig(this).setupFirebase().finish()
+        RobolectricDaggerTestConfig(this).setupFirebase().finish()
 
         whenever { remoteConfigSpy.getBoolean(RemoteConfigWrapper.PROJECT_SPECIFIC_MODE_KEY) } thenReturn true
     }

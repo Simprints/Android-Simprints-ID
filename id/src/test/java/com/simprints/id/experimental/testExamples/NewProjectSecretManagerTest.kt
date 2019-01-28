@@ -4,8 +4,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.experimental.testTools.NewDaggerForTests
-import com.simprints.id.experimental.testTools.DaggerTestConfig
+import com.simprints.id.experimental.testtools.NewDaggerForTests
+import com.simprints.id.experimental.testtools.RobolectricDaggerTestConfig
 import com.simprints.id.secure.ProjectSecretManager
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.shared.DependencyRule
@@ -32,7 +32,7 @@ class NewProjectSecretManagerTest : RxJavaTest, NewDaggerForTests() {
 
     @Before
     fun setUp() {
-        DaggerTestConfig(this).finish()
+        RobolectricDaggerTestConfig(this).finish()
     }
 
     @Test
