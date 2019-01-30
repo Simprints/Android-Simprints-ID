@@ -87,7 +87,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    private fun extractSessionParametersOrThrow() {
+    fun extractSessionParametersOrThrow() {
         val callout = view.parseCallout()
         analyticsManager.logCallout(callout)
         val sessionParameters = sessionParametersExtractor.extractFrom(callout)

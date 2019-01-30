@@ -234,6 +234,17 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
     }
 
     @Test
+    fun launchSimprints_shouldGenerateTheRightEvents() {
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+
+        // Launch
+        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
+
+        Thread.sleep(6000)
+        verifyEventsWhenSimprintsIsLaunched(mostRecentSessionInDb.events)
+    }
+
+    @Test
     fun login_shouldGenerateTheRightEvents() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
 
