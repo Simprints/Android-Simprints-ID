@@ -15,6 +15,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.domain.Person
@@ -66,6 +67,7 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
     @Inject lateinit var syncScopeBuilderSpy: SyncScopesBuilder
 
     private val remoteDbManagerSpy: RemoteDbManager = spy()
+    private val remotePeopleManagerSpy: RemotePeopleManager = spy()
     private val downSyncDao: DownSyncDao = mock()
 
     override var module: AppModuleForTests by lazyVar {
@@ -85,7 +87,7 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
         whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just(""))
         mockServer.start()
         setupApi()
-        whenever(remoteDbManagerSpy.getPeopleApiClient()).thenReturn(Single.just(remotePeopleApi))
+        whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(remotePeopleApi))
     }
 
     @Test
@@ -135,7 +137,7 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
 
         mockDbDependencies(localDbMock, DownSyncStatus(subScope, totalToDownload = nPeopleToDownload))
 
-        val sync = DownSyncTaskImpl(localDbMock, remoteDbManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
         val testObserver = sync.execute(subScope).test()
         testObserver.awaitTerminalEvent()
         testObserver.assertError { true }
@@ -160,7 +162,7 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
             lastPatientUpdatedAt = lastPatientUpdateAtFromRoom,
             totalToDownload = nPeopleToDownload))
 
-        val sync = DownSyncTaskImpl(localDbMock, remoteDbManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
@@ -190,7 +192,7 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
         val peopleToDownload = prepareResponseForSubScope(subScope, nPeopleToDownload)
         mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
 
-        val sync = DownSyncTaskImpl(localDbMock, remoteDbManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
@@ -228,7 +230,7 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
         val argForUpdateLastPatientIdInRoom = argumentCaptor<String>()
         doNothing().whenever(downSyncDao).updateLastPatientId(anyString(), argForUpdateLastPatientIdInRoom.capture())
 
-        val sync = DownSyncTaskImpl(localDbMock, remoteDbManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
         verify(localDbMock, times(batches)).insertOrUpdatePeopleInLocal(anyNotNull())
