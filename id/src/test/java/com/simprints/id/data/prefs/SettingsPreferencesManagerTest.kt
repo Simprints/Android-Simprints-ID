@@ -3,7 +3,6 @@ package com.simprints.id.data.prefs
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
-import com.nhaarman.mockito_kotlin.times
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
@@ -12,16 +11,18 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.assertThrows
-import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
+import com.simprints.testframework.common.mocking.thenReturn
+import com.simprints.testframework.common.mocking.verifyExactly
+import com.simprints.testframework.common.mocking.verifyOnce
+import com.simprints.testframework.common.mocking.whenever
 import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.verify
 import org.robolectric.annotation.Config
 import javax.inject.Inject
 
@@ -37,10 +38,10 @@ class SettingsPreferencesManagerTest : DaggerForUnitTests() {
     }
 
     @Before
-    fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+    fun setup() {
+        RobolectricDaggerTestConfig(this).setupFirebase().finish()
 
-        whenever(remoteConfigSpy.getBoolean(RemoteConfigWrapper.PROJECT_SPECIFIC_MODE_KEY)).thenReturn(true)
+        whenever { remoteConfigSpy.getBoolean(RemoteConfigWrapper.PROJECT_SPECIFIC_MODE_KEY) } thenReturn true
     }
 
     @Test
@@ -54,7 +55,7 @@ class SettingsPreferencesManagerTest : DaggerForUnitTests() {
 
         Assert.assertEquals(originalValue, newValue)
 
-        verify(remoteConfigSpy, times(2)).getBoolean(SettingsPreferencesManagerImpl.PARENTAL_CONSENT_EXISTS_KEY)
+        verifyExactly(2, remoteConfigSpy) { getBoolean(SettingsPreferencesManagerImpl.PARENTAL_CONSENT_EXISTS_KEY) }
     }
 
     @Test
@@ -68,7 +69,7 @@ class SettingsPreferencesManagerTest : DaggerForUnitTests() {
 
         Assert.assertNotEquals(originalValue, newValue)
 
-        verify(remoteConfigSpy, times(1)).getString(SettingsPreferencesManagerImpl.LANGUAGE_KEY)
+        verifyOnce(remoteConfigSpy) { getString(SettingsPreferencesManagerImpl.LANGUAGE_KEY) }
     }
 
     @Test
@@ -82,12 +83,12 @@ class SettingsPreferencesManagerTest : DaggerForUnitTests() {
 
         Assert.assertEquals(oldMatchGroup, newMatchGroup)
 
-        verify(remoteConfigSpy, times(2)).getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY)
+        verifyExactly(2, remoteConfigSpy) { getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY) }
     }
 
     @Test
     fun fetchingRemoteConfigEnum_revertsToDefaultIfSetToUnrecognizedValue() {
-        whenever(remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY)).thenReturn("PROJECT")
+        whenever { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY) } thenReturn "PROJECT"
 
         val matchGroup = settingsPreferencesManager.matchGroup
 
@@ -96,7 +97,7 @@ class SettingsPreferencesManagerTest : DaggerForUnitTests() {
 
     @Test
     fun fetchingRemoteConfigEnum_revertsToDefaultIfSetToWrongType() {
-        whenever(remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY)).thenReturn("1")
+        whenever { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY) } thenReturn "1"
 
         val matchGroup = settingsPreferencesManager.matchGroup
 
@@ -114,12 +115,12 @@ class SettingsPreferencesManagerTest : DaggerForUnitTests() {
 
         Assert.assertEquals(NON_DEFAULT_FINGER_STATUS_TARGET, newFingerStatus)
 
-        verify(remoteConfigSpy, times(1)).getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY)
+        verifyOnce(remoteConfigSpy) { getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY) }
     }
 
     @Test
     fun fetchingOverridableRemoteConfigFingerIdMap_worksForNonDefaultValue() {
-        whenever(remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY)).thenReturn(NON_DEFAULT_FINGER_STATUS_SERIALIZED)
+        whenever { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY) } thenReturn NON_DEFAULT_FINGER_STATUS_SERIALIZED
 
         val fingerStatus = settingsPreferencesManager.fingerStatus
 
@@ -128,7 +129,7 @@ class SettingsPreferencesManagerTest : DaggerForUnitTests() {
 
     @Test
     fun fetchingOverridableRemoteConfigFingerIdMap_throwsIfMalformed() {
-        whenever(remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY)).thenReturn(MALFORMED_FINGER_STATUS_SERIALIZED)
+        whenever { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY) } thenReturn MALFORMED_FINGER_STATUS_SERIALIZED
 
         assertThrows<JsonSyntaxException> {
             settingsPreferencesManager.fingerStatus
