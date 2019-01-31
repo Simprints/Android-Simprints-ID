@@ -18,6 +18,7 @@ import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.verify
@@ -35,6 +36,7 @@ class SettingsPreferencesManagerTest : DaggerForUnitTests() {
         PreferencesModuleForAnyTests(remoteConfigRule = SpyRule)
     }
 
+    @Before
     fun setUp() {
         RobolectricDaggerTestConfig(this).setupAllAndFinish()
 
