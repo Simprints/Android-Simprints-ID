@@ -13,7 +13,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 class SessionEventsUploaderTask(private val projectId: String,
                                 private val sessionsIds: List<String>,
@@ -93,7 +92,7 @@ class SessionEventsUploaderTask(private val projectId: String,
                 response == null -> continueWithRetryException(result.error())
                 isResponseASuccess(response.code()) -> continueWithSuccess()
                 isResponseAnErrorThatIsWorthToRetry(response.code()) -> continueWithRetryException()
-                else -> continueWithNoRetryableException()
+                else -> continueWithNoRetryException()
             }
         }.retry { counter, t ->
             counter < NUMBER_OF_ATTEMPTS_TO_RETRY_NETWORK_CALLS && t !is SessionUploadFailureException
@@ -109,7 +108,7 @@ class SessionEventsUploaderTask(private val projectId: String,
                 SessionUploadFailureRetryException(it)
             } ?: SessionUploadFailureRetryException())
 
-    private fun continueWithNoRetryableException() = Completable.error(SessionUploadFailureException())
+    private fun continueWithNoRetryException() = Completable.error(SessionUploadFailureException())
 
     private fun deleteSessions() {
         sessionsIds.forEach {
