@@ -13,10 +13,9 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 class SessionEventsUploaderTask(private val projectId: String,
-                                private val sessionsIds: List<String>,
+                                private val sessions: List<SessionEvents>,
                                 private val sessionEventsManager: SessionEventsManager,
                                 private val timeHelper: TimeHelper,
                                 private val sessionApiClient: SessionsRemoteInterface) {
@@ -31,19 +30,12 @@ class SessionEventsUploaderTask(private val projectId: String,
      * @throws SessionUploadFailureException
      */
     fun execute(): Completable =
-        Single.just(sessionsIds)
-            .loadSessionsFromDb()
+        Single.just(sessions)
             .closeOpenSessionsAndUpdateUploadTime()
             .filterClosedSessions()
             .uploadClosedSessionsOrThrowIfNoSessions()
             .checkUploadSucceedAndRetryIfNecessary()
             .deleteSessionsFromDb()
-
-    private fun Single<List<String>>.loadSessionsFromDb(): Single<List<SessionEvents>> =
-        this.map {
-            Timber.d("SessionEventsUploaderTask loadSessionsFromDb()")
-            it.map { session -> sessionEventsManager.loadSessionById(session).blockingGet() }
-        }
 
     @SuppressLint("CheckResult")
     private fun Single<List<SessionEvents>>.closeOpenSessionsAndUpdateUploadTime(): Single<List<SessionEvents>> =
@@ -112,8 +104,8 @@ class SessionEventsUploaderTask(private val projectId: String,
     private fun continueWithNoRetryableException() = Completable.error(SessionUploadFailureException())
 
     private fun deleteSessions() {
-        sessionsIds.forEach {
-            sessionEventsManager.deleteSessions(sessionId = it, openSession = false).blockingGet()
+        sessions.forEach {
+            sessionEventsManager.deleteSessions(sessionId = it.id, openSession = false).blockingGet()
         }
     }
 
