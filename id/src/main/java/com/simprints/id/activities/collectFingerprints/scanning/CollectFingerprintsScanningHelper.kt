@@ -240,7 +240,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 Fingerprint(presenter.currentFinger().id, template)
         } catch (e: IllegalArgumentException) {
             // TODO : change exceptions in libcommon
-            analyticsManager.logError(SimprintsError("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
+            analyticsManager.logException(SimprintsError("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
             resetUIFromError()
         }
 

@@ -286,7 +286,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleUnexpectedError(error: SimprintsError) {
-        analyticsManager.logError(error)
+        analyticsManager.logException(error)
         Timber.e(error)
         view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }

@@ -84,7 +84,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
         try {
             dbManager.saveRefusalForm(refusalForm)
         } catch (error: UninitializedDataManagerError) {
-            analyticsManager.logError(error)
+            analyticsManager.logException(error)
             view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
         }
     }

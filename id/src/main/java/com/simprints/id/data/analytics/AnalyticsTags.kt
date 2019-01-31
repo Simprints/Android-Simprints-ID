@@ -8,5 +8,6 @@ enum class AnalyticsTags {
     FINGER_CAPTURE,
     MATCHING,
     SETTINGS,
-    LONG_CONSENT
+    LONG_CONSENT,
+    ALERT
 }

@@ -226,7 +226,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         val generalConsent = try {
             JsonHelper.gson.fromJson(preferencesManager.generalConsentOptionsJson, GeneralConsent::class.java)
         } catch (e: JsonSyntaxException) {
-            analyticsManager.logError(MalformedConsentTextError("Malformed General Consent Text Error", e))
+            analyticsManager.logException(MalformedConsentTextError("Malformed General Consent Text Error", e))
             GeneralConsent()
         }
         return generalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
@@ -236,7 +236,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         val parentalConsent = try {
             JsonHelper.gson.fromJson(preferencesManager.parentalConsentOptionsJson, ParentalConsent::class.java)
         } catch (e: JsonSyntaxException) {
-            analyticsManager.logError(MalformedConsentTextError("Malformed Parental Consent Text Error", e))
+            analyticsManager.logException(MalformedConsentTextError("Malformed Parental Consent Text Error", e))
             ParentalConsent()
         }
         return parentalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
