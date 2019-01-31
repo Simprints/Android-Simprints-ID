@@ -1,6 +1,7 @@
 package com.simprints.id.data.analytics
 
 import android.os.Bundle
+import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
@@ -211,5 +212,13 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
             bundle.putString(property.name.fromLowerCamelToLowerUnderscore(), property.get(fbSession).toString())
         }
         firebaseAnalytics.logEvent("activeSession", bundle)
+    }
+
+    override fun logInfo(analyticsTag: AnalyticsTags, message: String) {
+        Crashlytics.log(Log.VERBOSE, analyticsTag.name, message)
+    }
+
+    override fun logWarning(analyticsTag: AnalyticsTags, message: String) {
+        Crashlytics.log(Log.WARN, analyticsTag.name, message)
     }
 }
