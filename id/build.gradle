@@ -205,7 +205,7 @@ dependencies {
 
     // Reactive
     implementation "io.reactivex.rxjava2:rxandroid:2.0.2"
-    implementation "io.reactivex.rxjava2:rxjava:2.1.16"
+    implementation "io.reactivex.rxjava2:rxjava:2.2.6"
     implementation "io.reactivex.rxjava2:rxkotlin:2.2.0"
 
     // Simprints

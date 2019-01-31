@@ -28,6 +28,5 @@ open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
 
     override fun cancelSyncWorkers() {
         WorkManager.getInstance().cancelAllWorkByTag(MASTER_WORKER_TAG)
-        WorkManager.getInstance().cancelAllWorkByTag(SessionEventsSyncMasterTask.SESSIONS_TO_UPLOAD_TAG)
     }
 }
