@@ -63,9 +63,7 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
 
     private fun logAlertToCrashlytics(alertName: String) {
         Timber.d("AnalyticsManagerImpl.logAlertToCrashlytics(alertName=$alertName)")
-        if (Fabric.isInitialized()) {
-            Crashlytics.log(alertName)
-        }
+            Crashlytics.log(Log.ERROR, AnalyticsTags.ALERT.name, alertName)
     }
 
     private fun logAlertToFirebaseAnalytics(alertName: String, apiKey: String, moduleId: String,
@@ -82,17 +80,17 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
 
     override fun logThrowable(throwable: Throwable) =
         when (throwable) {
-            is SimprintsError -> logError(throwable)
+            is SimprintsError -> logException(throwable)
             is SimprintsException -> logSafeException(throwable)
             else -> logUnexpectedThrowable(throwable)
         }
 
     private fun logUnexpectedThrowable(throwable: Throwable) {
-        logUnsafeThrowable(throwable)
+        logUnsafeException(throwable)
     }
 
-    override fun logError(error: SimprintsError) {
-        logUnsafeThrowable(error)
+    override fun logException(error: SimprintsError) {
+        logUnsafeException(error)
     }
 
     override fun logSafeException(exception: SimprintsException) {
@@ -103,7 +101,7 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         firebaseAnalytics.logEvent("safe_exception", bundle)
     }
 
-    private fun logUnsafeThrowable(e: Throwable) {
+    private fun logUnsafeException(e: Throwable) {
         Timber.e(e)
         if (Fabric.isInitialized()) {
             Crashlytics.logException(e)
@@ -222,6 +220,5 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         Crashlytics.log(Log.WARN, analyticsTag.name, getLogMessage(logPrompter, message))
     }
 
-    private fun getLogMessage(logPrompter: LogPrompter, message: String) =
-        String.format("[%s] %s", logPrompter.name, message)
+    private fun getLogMessage(logPrompter: LogPrompter, message: String) = "[${logPrompter.name}] $message"
 }

@@ -115,7 +115,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 onVerifyStart();
                 break;
             default:
-                analyticsManager.logError(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
+                analyticsManager.logException(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
                 matchingView.launchAlert();
         }
     }
@@ -144,7 +144,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 preferencesManager.getMatchGroup(),
                 wrapCallback("loading people", newOnLoadPeopleCallback()));
         } catch (UninitializedDataManagerError error) {
-            analyticsManager.logError(error);
+            analyticsManager.logException(error);
             matchingView.launchAlert();
         }
     }
@@ -184,7 +184,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                analyticsManager.logError(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
+                analyticsManager.logException(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
                 matchingView.launchAlert();
             }
         };
@@ -199,7 +199,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 guid,
                 wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {
-            analyticsManager.logError(error);
+            analyticsManager.logException(error);
             matchingView.launchAlert();
         }
     }
@@ -238,7 +238,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR dataError) {
-                analyticsManager.logError(UnexpectedDataError.forDataError(dataError, "MatchingActivity.onVerifyStart()"));
+                analyticsManager.logException(UnexpectedDataError.forDataError(dataError, "MatchingActivity.onVerifyStart()"));
                 matchingView.launchAlert();
             }
         };
@@ -285,7 +285,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             sessionEventsManager.addOneToManyEventInBackground(startTimeIdentification, topCandidates, candidates.size());
                             dbManager.saveIdentification(probe, candidates.size(), topCandidates);
                         } catch (UninitializedDataManagerError error) {
-                            analyticsManager.logError(error);
+                            analyticsManager.logException(error);
                             matchingView.launchAlert();
                             return;
                         }
@@ -338,7 +338,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             dbManager.saveVerification(probe, verification, guidExistsResult);
                             sessionEventsManager.addOneToOneMatchEventInBackground(probe.getGuid(), startTimeVerification, verification);
                         } catch (UninitializedDataManagerError error) {
-                            analyticsManager.logError(error);
+                            analyticsManager.logException(error);
                             matchingView.launchAlert();
                             return;
                         }

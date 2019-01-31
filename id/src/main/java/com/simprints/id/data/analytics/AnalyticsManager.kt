@@ -13,7 +13,7 @@ interface AnalyticsManager {
     val analyticsId: Single<String>
 
     fun logThrowable(throwable: Throwable)
-    fun logError(error: SimprintsError)
+    fun logException(error: SimprintsError)
     fun logSafeException(exception: SimprintsException)
 
     fun logInfo(analyticsTag: AnalyticsTags, logPrompter: LogPrompter, message: String)
