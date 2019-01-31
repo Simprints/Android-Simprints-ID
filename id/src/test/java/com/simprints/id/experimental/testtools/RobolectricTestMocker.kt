@@ -5,6 +5,9 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
+import com.simprints.testframework.common.mocking.mock
+import com.simprints.testframework.common.mocking.whenever
+import com.simprints.testframework.common.mocking.thenReturn
 import com.simprints.id.activities.CheckLoginFromIntentActivityTest
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager

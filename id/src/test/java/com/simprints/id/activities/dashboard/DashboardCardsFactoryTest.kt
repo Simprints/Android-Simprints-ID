@@ -1,10 +1,9 @@
 package com.simprints.id.activities.dashboard
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.spy
+import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
@@ -17,14 +16,15 @@ import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.*
-import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import io.reactivex.Single
 import org.junit.Assert
 import org.junit.Before
@@ -37,7 +37,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DashboardCardsFactoryTest : DaggerForTests() {
+class DashboardCardsFactoryTest : DaggerForUnitTests() {
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var remotePeopleManagerMock: RemotePeopleManager
@@ -60,13 +60,10 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     val activity = spy<DashboardActivity>()
 
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+
         dbManager.initialiseDb()
-        initWorkManagerIfRequired(app)
 
         whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
         whenever(syncStatusDatabase.upSyncDao).thenReturn(mock())
@@ -83,7 +80,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheProjectCard_onlyWhenItHasAValidProject() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(testAppComponent as AppComponent)
 
         val card = getCardIfCreated(factory, "project name")
         Assert.assertEquals(card?.description, "project desc")
@@ -102,59 +99,59 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastEnrolCard_onlyWhenAnEnrolEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(testAppComponent as AppComponent)
         val lastEnrolDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
 
             { factory.dateFormat.format(lastEnrolDate).also { preferencesManager.lastEnrolDate = lastEnrolDate } },
             { preferencesManager.lastEnrolDate = null },
-            app.getString(R.string.dashboard_card_enrol_title))
+            (app as Application).getString(R.string.dashboard_card_enrol_title))
     }
 
     @Test
     fun shouldCreateTheLastIdentificationCard_onlyWhenAnIdentificationEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(testAppComponent as AppComponent)
         val lastIdentificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
             { factory.dateFormat.format(lastIdentificationDate).also { preferencesManager.lastIdentificationDate = lastIdentificationDate } },
             { preferencesManager.lastIdentificationDate = null },
-            app.getString(R.string.dashboard_card_identification_title))
+            (app as Application).getString(R.string.dashboard_card_identification_title))
     }
 
     @Test
     fun shouldCreateTheLastVerificationCard_onlyWhenAnVerificationEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(testAppComponent as AppComponent)
         val lastVerificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
             { factory.dateFormat.format(lastVerificationDate).also { preferencesManager.lastVerificationDate = lastVerificationDate } },
             { preferencesManager.lastVerificationDate = null },
-            app.getString(R.string.dashboard_card_verification_title))
+            (app as Application).getString(R.string.dashboard_card_verification_title))
     }
 
     @Test
     @Config(sdk = [25]) // Bug with Robolectric and SharedPreferences.commit() on API >= 26. apply() works fine
     fun shouldCreateTheCurrentUserCard_onlyIfValidUserSignedIn() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(testAppComponent as AppComponent)
         val signedInUser = "someone"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
             { signedInUser.also { loginInfoManager.signedInUserId = signedInUser } },
             { loginInfoManager.signedInUserId = "" },
-            app.getString(R.string.dashboard_card_currentuser_title))
+            (app as Application).getString(R.string.dashboard_card_currentuser_title))
     }
 
     @Test
     fun shouldCreateTheLastScannerCard_onlyWhenALastScannerEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(testAppComponent as AppComponent)
         val lastScanner = "SPXXXX"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
             { lastScanner.also { preferencesManager.lastScannerUsed = lastScanner } },
             { preferencesManager.lastScannerUsed = "" },
-            app.getString(R.string.dashboard_card_lastscanner_title))
+            (app as Application).getString(R.string.dashboard_card_lastscanner_title))
     }
 
     private fun assertThatCardEventsAreCreatedOnlyWhenRequired(cardsFactory: DashboardCardsFactory,

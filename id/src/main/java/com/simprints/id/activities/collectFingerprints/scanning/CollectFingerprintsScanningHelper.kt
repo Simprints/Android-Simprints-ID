@@ -10,6 +10,7 @@ import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresen
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.Finger.Status.*
 import com.simprints.id.exceptions.unsafe.SimprintsError
@@ -52,7 +53,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         !presenter.isNudging
 
     init {
-        ((view as Activity).application as Application).component.inject(this)
+        (((view as Activity).application as Application).component as AppComponent).inject(this)
 
         view.timeoutBar = initTimeoutBar()
         view.un20WakeupDialog = initUn20Dialog()

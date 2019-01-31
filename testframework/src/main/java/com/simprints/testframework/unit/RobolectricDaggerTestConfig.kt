@@ -1,32 +1,34 @@
-package com.simprints.id.experimental.testtools
+package com.simprints.testframework.unit
 
+import android.content.Context
+import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.google.firebase.FirebaseApp
-import com.simprints.id.testUtils.roboletric.TestApplication
-import timber.log.Timber
+import com.simprints.libcommon.di.IApplication
+import com.simprints.testframework.common.di.DaggerForTests
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.functions
 
-class RobolectricDaggerTestConfig<T : NewDaggerForTests>(val test: T) {
+class RobolectricDaggerTestConfig<T : DaggerForTests>(val test: T) {
 
     init {
-        test.app = (ApplicationProvider.getApplicationContext() as TestApplication)
+        test.app = ApplicationProvider.getApplicationContext<Context>() as IApplication
     }
 
     fun setupAllAndFinish() = setupFirebase().setupWorkManager().finish()
 
     fun setupFirebase(): RobolectricDaggerTestConfig<T> {
-        FirebaseApp.initializeApp(test.app)
+        FirebaseApp.initializeApp(test.app as Context)
         return this
     }
 
     fun setupWorkManager(): RobolectricDaggerTestConfig<T> {
         try {
-            WorkManager.initialize(test.app, Configuration.Builder().build())
+            WorkManager.initialize(test.app as Context, Configuration.Builder().build())
         } catch (e: IllegalStateException) {
-            Timber.d("WorkManager already initialized")
+            Log.d("TestConfig", "WorkManager already initialized")
         }
         return this
     }

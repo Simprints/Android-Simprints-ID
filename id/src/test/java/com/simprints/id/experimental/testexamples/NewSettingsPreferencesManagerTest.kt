@@ -1,4 +1,4 @@
-package com.simprints.id.experimental.testExamples
+package com.simprints.id.experimental.testexamples
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -7,14 +7,19 @@ import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.domain.Constants
-import com.simprints.id.experimental.testtools.*
 import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.assertThrows
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
+import com.simprints.testframework.common.mocking.thenReturn
+import com.simprints.testframework.common.mocking.verifyExactly
+import com.simprints.testframework.common.mocking.verifyOnce
+import com.simprints.testframework.common.mocking.whenever
+import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -24,7 +29,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class NewSettingsPreferencesManagerTest : NewDaggerForTests() {
+class NewSettingsPreferencesManagerTest : DaggerForUnitTests() {
 
     @Inject lateinit var remoteConfigSpy: FirebaseRemoteConfig
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager

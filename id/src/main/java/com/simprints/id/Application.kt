@@ -7,15 +7,17 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.*
 import com.simprints.id.tools.FileLoggingTree
+import com.simprints.libcommon.di.IAppComponent
+import com.simprints.libcommon.di.IApplication
 import io.fabric.sdk.android.Fabric
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import timber.log.Timber
 import javax.inject.Inject
 
-open class Application : MultiDexApplication() {
+open class Application : MultiDexApplication(), IApplication {
 
-    lateinit var component: AppComponent
+    override lateinit var component: IAppComponent
 
     @Inject
     lateinit var dbManager: DbManager
@@ -36,7 +38,7 @@ open class Application : MultiDexApplication() {
         initApplication()
     }
 
-    open fun initApplication() {
+    override fun initApplication() {
         createComponent()
         initDependencies()
     }
@@ -47,7 +49,7 @@ open class Application : MultiDexApplication() {
     }
 
     open fun injectDependencies() {
-        component.inject(this)
+        (component as AppComponent).inject(this)
     }
 
     open fun initModules() {

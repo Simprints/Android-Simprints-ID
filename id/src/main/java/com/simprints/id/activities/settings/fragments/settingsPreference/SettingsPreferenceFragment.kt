@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.di.AppComponent
 
 
 class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContract.View {
@@ -20,7 +21,7 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
         addPreferencesFromResource(R.xml.pref_general)
         setHasOptionsMenu(true)
 
-        val component = (activity.application as Application).component
+        val component = (activity.application as Application).component as AppComponent
         viewPresenter = SettingsPreferencePresenter(this, component)
         viewPresenter.start()
     }

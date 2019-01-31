@@ -1,17 +1,17 @@
-package com.simprints.id.experimental.testExamples
+package com.simprints.id.experimental.testexamples
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.experimental.testtools.NewDaggerForTests
-import com.simprints.id.experimental.testtools.RobolectricDaggerTestConfig
+import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.secure.ProjectSecretManager
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class NewProjectSecretManagerTest : RxJavaTest, NewDaggerForTests() {
+class NewProjectSecretManagerTest : RxJavaTest, DaggerForUnitTests() {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
 

@@ -9,7 +9,6 @@ import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
-import com.simprints.id.di.DaggerForTests
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.SESSIONS_IDS_KEY
 import com.simprints.id.shared.anyNotNull
@@ -31,7 +30,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SessionEventsMasterTaskTest: RxJavaTest, DaggerForTests() {
+class SessionEventsMasterTaskTest: RxJavaTest {
 
     private val projectId = "projectId"
 
@@ -43,7 +42,7 @@ class SessionEventsMasterTaskTest: RxJavaTest, DaggerForTests() {
     private var sessionsInFakeDb = mutableListOf<SessionEvents>()
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         sessionsInFakeDb.clear()
         mockSessionEventsManager(sessionsEventsManagerMock, sessionsInFakeDb)
     }

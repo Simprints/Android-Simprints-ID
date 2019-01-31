@@ -11,7 +11,6 @@ import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
-import com.simprints.id.di.DaggerForTests
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
 import com.simprints.id.network.SimApiClient
@@ -40,7 +39,7 @@ import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
+class SessionEventsUploaderTaskTest : RxJavaTest {
 
     private val mockServer = MockWebServer()
 
@@ -51,7 +50,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
     private var sessionsInFakeDb = mutableListOf<SessionEvents>()
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         ShadowLog.stream = System.out
 
         mockServer.start()

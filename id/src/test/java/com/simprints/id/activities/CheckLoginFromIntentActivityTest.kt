@@ -4,9 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
+import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
@@ -19,15 +18,15 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
-import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
@@ -45,7 +44,7 @@ import javax.inject.Inject
 @Config(
     application = TestApplication::class,
     sdk = [Build.VERSION_CODES.N_MR1], shadows = [ShadowAndroidXMultiDex::class])
-class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
+class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForUnitTests() {
 
     companion object {
         const val DEFAULT_ACTION = "com.simprints.id.REGISTER"
@@ -76,12 +75,8 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
     }
 
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        initWorkManagerIfRequired(app)
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        RobolectricDaggerTestConfig(this).setupAllAndFinish()
         setupLocalAndRemoteManagersForApiTesting(
             localDbManagerSpy = localDbManagerMock,
             remoteDbManagerSpy = remoteDbManagerMock,
@@ -101,7 +96,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
 
     @Test
     fun knownCallingAppSource_shouldNotLogEvent() {
-        val pm = app.packageManager
+        val pm = (app as Application).packageManager
         pm.setInstallerPackageName("com.app.installed.from.playstore", "com.android.vending")
 
         Robolectric.buildActivity(CheckLoginFromIntentActivityWithValidCallingPackage::class.java).setup()

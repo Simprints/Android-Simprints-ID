@@ -62,6 +62,7 @@ import com.simprints.id.tools.utils.AndroidResourcesHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
+import com.simprints.libcommon.di.IApplication
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Module
@@ -69,15 +70,15 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-open class AppModule(val app: Application) {
+open class AppModule(val app: IApplication) {
 
     @Provides
     @Singleton
-    fun provideApplication(): Application = app
+    fun provideApplication(): Application = app as Application
 
     @Provides
     @Singleton
-    fun provideContext(): Context = app
+    fun provideContext(): Context = app as Application
 
     @Provides
     @Singleton
@@ -133,7 +134,7 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl(app)
+    open fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl(app as Application)
 
     @Provides
     @Singleton

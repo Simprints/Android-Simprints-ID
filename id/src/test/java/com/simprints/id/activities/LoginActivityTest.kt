@@ -4,14 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
+import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.anyNotNull
@@ -23,6 +23,7 @@ import com.simprints.id.testUtils.roboletric.injectHowToResolveScannerAppIntent
 import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.scannerAppIntent
+import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert
@@ -40,7 +41,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class LoginActivityTest : RxJavaTest, DaggerForTests() {
+class LoginActivityTest : RxJavaTest, DaggerForUnitTests() {
 
     companion object {
         const val DEFAULT_PROJECT_ID = "some_project_id"
@@ -48,7 +49,6 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
         const val DEFAULT_USER_ID = "some_user_id"
     }
 
-    @Inject lateinit var dbManagerSpy: DbManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
@@ -60,12 +60,8 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
     }
 
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        super.setUp()
-        testAppComponent.inject(this)
-        dbManagerSpy.initialiseDb()
+    fun setUp() {
+        RobolectricDaggerTestConfig(this).setupAllAndFinish()
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
     }
@@ -148,7 +144,7 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
         val act = controller.get()
         act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "{\"projectId\":\"someProjectId\",\"projectSecretWrong\":\"someSecret\"}"))
 
-        assertEquals(app.getString(R.string.login_invalid_qr_code), ShadowToast.getTextOfLatestToast())
+        assertEquals((app as Application).getString(R.string.login_invalid_qr_code), ShadowToast.getTextOfLatestToast())
     }
 
     @Test
@@ -176,15 +172,15 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
         act.loginEditTextProjectSecret.setText("")
 
         act.loginButtonSignIn.performClick()
-        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+        assertEquals((app as Application).getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
 
         act.loginEditTextProjectSecret.setText("some_project_secret")
         act.loginButtonSignIn.performClick()
-        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+        assertEquals((app as Application).getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
 
         act.loginEditTextProjectId.setText("some_project_id")
         act.loginButtonSignIn.performClick()
-        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+        assertEquals((app as Application).getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
 
         act.viewPresenter = mock(LoginPresenter::class.java)
 

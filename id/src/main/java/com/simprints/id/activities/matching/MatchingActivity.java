@@ -49,7 +49,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppComponent component = ((Application) getApplication()).getComponent();
+        AppComponent component = (AppComponent) ((Application) getApplication()).getComponent();
         component.inject(this);
 
         LanguageHelper.setLanguage(this, preferencesManager.getLanguage());

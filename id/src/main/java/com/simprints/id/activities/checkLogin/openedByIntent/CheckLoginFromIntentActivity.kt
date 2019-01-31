@@ -11,6 +11,7 @@ import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
 import com.simprints.id.session.callout.Callout
@@ -42,7 +43,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_login)
 
-        val component = (application as Application).component
+        val component = (application as Application).component as AppComponent
         component.inject(this)
 
         viewPresenter = CheckLoginFromIntentPresenter(this, component)
