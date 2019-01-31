@@ -7,6 +7,7 @@ import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import timber.log.Timber
@@ -42,7 +43,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
     private fun injectDependencies() {
         val context = applicationContext
         if (context is Application) {
-            context.component.inject(this)
+            (context.component as AppComponent).inject(this)
         } else {
             throw WorkerInjectionFailedError.forWorker<SessionEventsMasterWorker>()
         }

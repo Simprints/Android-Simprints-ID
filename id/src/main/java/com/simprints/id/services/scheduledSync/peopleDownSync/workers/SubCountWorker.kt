@@ -8,6 +8,7 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -63,7 +64,7 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
     private fun inject() {
         val context = applicationContext
         if (context is Application) {
-            context.component.inject(this)
+            (context.component as AppComponent).inject(this)
         } else throw WorkerInjectionFailedError.forWorker<SubCountWorker>()
     }
 }

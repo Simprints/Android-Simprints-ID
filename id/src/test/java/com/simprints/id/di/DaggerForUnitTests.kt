@@ -1,16 +1,15 @@
-package com.simprints.id.experimental.testtools
+package com.simprints.id.di
 
-import com.simprints.id.di.AppComponentForTests
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerAppComponentForTests
 import com.simprints.id.shared.PreferencesModuleForAnyTests
-import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.libcommon.di.IAppComponent
+import com.simprints.libcommon.di.IApplication
+import com.simprints.testframework.common.di.DaggerForTests
 
-abstract class NewDaggerForTests {
+abstract class DaggerForUnitTests : DaggerForTests {
 
-    lateinit var testAppComponent: AppComponentForTests
-    lateinit var app: TestApplication
+    override lateinit var testAppComponent: IAppComponent
+    override lateinit var app: IApplication
 
     open var module: AppModuleForTests by lazyVar {
         AppModuleForTests(app)
@@ -19,8 +18,7 @@ abstract class NewDaggerForTests {
         PreferencesModuleForAnyTests()
     }
 
-    fun initComponent() {
-
+    override fun initComponent() {
         testAppComponent = DaggerAppComponentForTests
             .builder()
             .appModule(module)

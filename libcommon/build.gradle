@@ -45,7 +45,11 @@ allprojects {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':libsimprints')
-    implementation "androidx.appcompat:appcompat:1.0.0"
+
+    implementation "androidx.appcompat:appcompat:1.0.2"
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+
     testImplementation "junit:junit:$junit_version"
 }

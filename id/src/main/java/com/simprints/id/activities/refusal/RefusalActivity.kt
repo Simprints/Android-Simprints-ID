@@ -10,6 +10,7 @@ import android.view.WindowManager
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
+import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.libsimprints.Constants
@@ -23,7 +24,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val component = (application as Application).component
+        val component = (application as Application).component as AppComponent
         setContentView(R.layout.activity_refusal)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 

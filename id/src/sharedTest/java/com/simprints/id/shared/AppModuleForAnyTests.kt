@@ -2,7 +2,6 @@ package com.simprints.id.shared
 
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
@@ -10,6 +9,7 @@ import com.simprints.id.data.analytics.eventData.controllers.local.SessionEvents
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
@@ -23,7 +23,6 @@ import com.simprints.id.di.AppModule
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -34,9 +33,10 @@ import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.libcommon.di.IApplication
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 
-open class AppModuleForAnyTests(app: Application,
+open class AppModuleForAnyTests(app: IApplication,
                                 open var localDbManagerRule: DependencyRule = RealRule,
                                 open var remoteDbManagerRule: DependencyRule = RealRule,
                                 open var remotePeopleManagerRule: DependencyRule = RealRule,

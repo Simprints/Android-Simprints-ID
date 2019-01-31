@@ -1,11 +1,11 @@
 package com.simprints.id.di
 
-import com.simprints.id.Application
 import com.simprints.id.shared.AppModuleForAnyTests
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.DependencyRule.RealRule
+import com.simprints.libcommon.di.IApplication
 
-open class AppModuleForAndroidTests(app: Application,
+open class AppModuleForAndroidTests(app: IApplication,
                                     override var localDbManagerRule: DependencyRule = RealRule,
                                     override var remoteDbManagerRule: DependencyRule = RealRule,
                                     override var remotePeopleManagerRule: DependencyRule = RealRule,

@@ -1,10 +1,9 @@
 package com.simprints.id.secure
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
-import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.verify
+import com.simprints.id.Application
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
@@ -13,8 +12,9 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -28,6 +28,7 @@ import com.simprints.id.testUtils.roboletric.getRoboSharedPreferences
 import com.simprints.id.testUtils.roboletric.initLogInStateMock
 import com.simprints.id.testUtils.roboletric.mockLoadProject
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Before
@@ -39,7 +40,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
+class ProjectAuthenticatorTest : RxJavaTest, DaggerForUnitTests() {
 
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
@@ -69,11 +70,8 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
     }
 
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        RobolectricDaggerTestConfig(this).setupAllAndFinish()
 
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
 
@@ -89,8 +87,8 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
     fun successfulResponse_userShouldSignIn() {
 
         val authenticator = LegacyCompatibleProjectAuthenticator(
-            testAppComponent,
-            SafetyNet.getClient(app),
+            testAppComponent as AppComponent,
+            SafetyNet.getClient(app as Application),
             ApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
             getMockAttestationManager())
 
@@ -113,8 +111,8 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForTests() {
         val nonceScope = NonceScope(projectId, userId)
 
         val testObserver = LegacyCompatibleProjectAuthenticator(
-            testAppComponent,
-            SafetyNet.getClient(app),
+            testAppComponent as AppComponent,
+            SafetyNet.getClient(app as Application),
             createMockServiceToFailRequests(apiClient.retrofit))
             .authenticate(nonceScope, "encrypted_project_secret", projectId, null)
             .test()

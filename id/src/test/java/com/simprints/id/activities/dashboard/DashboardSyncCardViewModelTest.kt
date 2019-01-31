@@ -2,10 +2,8 @@ package com.simprints.id.activities.dashboard
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
@@ -21,8 +19,9 @@ import com.simprints.id.data.db.local.room.UpSyncStatus
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
@@ -34,9 +33,9 @@ import com.simprints.id.shared.liveData.testObserver
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
-import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
@@ -49,7 +48,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
+class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForUnitTests() {
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -87,12 +86,8 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
 
 
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        super.setUp()
-        testAppComponent.inject(this)
-        initWorkManagerIfRequired(app)
+    fun setUp() {
+        RobolectricDaggerTestConfig(this).setupAllAndFinish()
 
         initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
         setUserLogInState(true, getRoboSharedPreferences())
@@ -271,7 +266,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         DashboardSyncCardViewModel(
             DashboardCardType.SYNC_DB,
             1,
-            testAppComponent,
+            testAppComponent as AppComponent,
             downSyncDao,
             upSyncDao,
             fakeSyncStateLiveData)

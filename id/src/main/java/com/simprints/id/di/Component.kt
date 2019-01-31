@@ -43,13 +43,14 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.Peop
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderWorker
+import com.simprints.libcommon.di.IAppComponent
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [(AppModule::class), (PreferencesModule::class), (SerializerModule::class), (AndroidInjectionModule::class)])
-interface AppComponent {
+interface AppComponent : IAppComponent {
     fun inject(app: Application)
     fun inject(guidSelectionService: GuidSelectionService)
     fun inject(alertActivity: AlertActivity)

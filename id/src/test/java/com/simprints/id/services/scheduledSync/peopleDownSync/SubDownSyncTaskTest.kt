@@ -1,8 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.*
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.db.local.LocalDbManager
@@ -17,7 +15,7 @@ import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.network.SimApiClient
@@ -35,10 +33,10 @@ import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.mockServer.assertPathUrlParam
 import com.simprints.id.testUtils.mockServer.assertQueryUrlParam
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper
+import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse
@@ -58,7 +56,7 @@ import kotlin.math.ceil
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
+class SubDownSyncTaskTest : DaggerForUnitTests(), RxJavaTest {
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
@@ -77,12 +75,8 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
     }
 
     @Before
-    override fun setUp() {
-        app = ApplicationProvider.getApplicationContext()
-        FirebaseApp.initializeApp(app)
-        initWorkManagerIfRequired(app)
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        RobolectricDaggerTestConfig(this).setupAllAndFinish()
 
         whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just(""))
         mockServer.start()

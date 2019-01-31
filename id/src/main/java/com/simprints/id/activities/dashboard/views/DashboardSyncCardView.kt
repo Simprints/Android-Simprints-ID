@@ -13,6 +13,7 @@ import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCa
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModelState
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState.*
+import com.simprints.id.di.AppComponent
 import com.simprints.id.tools.utils.AndroidResourcesHelper
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
@@ -30,7 +31,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     init {
-        (rootView.context.applicationContext as Application).component.inject(this)
+        ((rootView.context.applicationContext as Application).component as AppComponent).inject(this)
     }
 
     override fun bind(viewModel: ViewModel) {

@@ -18,6 +18,7 @@ import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.FingerRes
@@ -62,7 +63,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private var confirmDialog: AlertDialog? = null
 
     init {
-        ((view as Activity).application as Application).component.inject(this)
+        (((view as Activity).application as Application).component as AppComponent).inject(this)
     }
 
     override fun start() {

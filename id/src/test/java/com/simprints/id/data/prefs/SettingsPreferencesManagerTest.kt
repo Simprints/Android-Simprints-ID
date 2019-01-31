@@ -1,15 +1,13 @@
 package com.simprints.id.data.prefs
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
 import com.nhaarman.mockito_kotlin.times
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.domain.Constants
 import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
@@ -18,6 +16,7 @@ import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
+import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +26,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SettingsPreferencesManagerTest : DaggerForTests() {
+class SettingsPreferencesManagerTest : DaggerForUnitTests() {
 
     @Inject lateinit var remoteConfigSpy: FirebaseRemoteConfig
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
@@ -36,11 +35,8 @@ class SettingsPreferencesManagerTest : DaggerForTests() {
         PreferencesModuleForAnyTests(remoteConfigRule = SpyRule)
     }
 
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        RobolectricDaggerTestConfig(this).setupAllAndFinish()
 
         whenever(remoteConfigSpy.getBoolean(RemoteConfigWrapper.PROJECT_SPECIFIC_MODE_KEY)).thenReturn(true)
     }

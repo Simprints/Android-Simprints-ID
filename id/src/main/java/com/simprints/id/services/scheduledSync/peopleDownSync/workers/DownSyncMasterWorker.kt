@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.work.*
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
+import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -109,7 +110,7 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
     private fun inject() {
         val context = applicationContext
         if (context is Application) {
-            context.component.inject(this)
+            (context.component as AppComponent).inject(this)
         } else throw WorkerInjectionFailedError.forWorker<DownSyncMasterWorker>()
     }
 }

@@ -6,14 +6,13 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
+import com.simprints.id.Application
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
+import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.testUtils.extensions.showOnScreen
@@ -21,6 +20,7 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.createRoboAlertActivity
 import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import kotlinx.android.synthetic.main.activity_alert.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -32,7 +32,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class AlertActivityTest : DaggerForTests() {
+class AlertActivityTest : DaggerForUnitTests() {
 
     @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
@@ -46,11 +46,8 @@ class AlertActivityTest : DaggerForTests() {
     }
 
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        RobolectricDaggerTestConfig(this).setupAllAndFinish()
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
     }
@@ -121,5 +118,5 @@ class AlertActivityTest : DaggerForTests() {
             Color.TRANSPARENT
         }
 
-    private fun getColorWithColorRes(colorRes: Int, resources: Resources = app.resources) = ResourcesCompat.getColor(resources, colorRes, null)
+    private fun getColorWithColorRes(colorRes: Int, resources: Resources = (app as Application).resources) = ResourcesCompat.getColor(resources, colorRes, null)
 }
