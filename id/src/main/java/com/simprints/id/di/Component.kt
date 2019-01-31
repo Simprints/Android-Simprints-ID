@@ -84,7 +84,6 @@ interface AppComponent {
     fun inject(syncSchedulerHelper: SyncSchedulerHelperImpl)
     fun inject(dashboardSyncCardView: DashboardSyncCardView)
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
-    fun inject(sessionSyncUploaderWorker: SessionEventsUploaderWorker)
     fun inject(countTask: CountTaskImpl)
     fun inject(downSyncTask: DownSyncTaskImpl)
     fun inject(subCountWorker: SubCountWorker)
