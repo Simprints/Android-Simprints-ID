@@ -7,6 +7,8 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsTags
+import com.simprints.id.data.analytics.LogPrompter
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -34,6 +36,7 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
             ?: throw IllegalArgumentException("SyncScope required")
 
         val result = try {
+            logMessageToAnalytics("DownSyncing for $subSyncScope")
             downSyncTask.execute(subSyncScope).blockingAwait()
             Result.success()
         } catch (e: Throwable) {
@@ -42,14 +45,15 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
             Result.failure()
         }
 
-        toastForDebugBuilds(subSyncScope, result)
+        logToAnalyticsAndToastForDebugBuilds(subSyncScope, result)
         return result
     }
 
-    private fun toastForDebugBuilds(subSyncScope: SubSyncScope, result: Result) {
+    private fun logToAnalyticsAndToastForDebugBuilds(subSyncScope: SubSyncScope, result: Result) {
+        val message = "WM - SubDownSyncWorker($subSyncScope): $result"
+        logMessageToAnalytics(message)
         if (BuildConfig.DEBUG) {
             applicationContext.runOnUiThread {
-                val message = "WM - SubDownSyncWorker($subSyncScope): $result"
                 Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
                 Timber.d(message)
             }
@@ -62,4 +66,7 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
             context.component.inject(this)
         } else throw WorkerInjectionFailedError.forWorker<SubDownSyncWorker>()
     }
+
+    private fun logMessageToAnalytics(message: String) =
+        analyticsManager.logInfo(AnalyticsTags.SYNC, LogPrompter.NETWORK, message)
 }

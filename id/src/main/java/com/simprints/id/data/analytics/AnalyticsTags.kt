@@ -4,6 +4,7 @@ enum class AnalyticsTags {
     LOGIN,
     SCANNER_SETUP,
     SYNC,
+    SESSION,
     FINGER_CAPTURE,
     MATCHING,
     SETTINGS,

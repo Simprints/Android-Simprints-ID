@@ -5,6 +5,8 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsTags
+import com.simprints.id.data.analytics.LogPrompter
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
@@ -33,7 +35,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
     }*/
 
     override fun doWork(): Result {
-        Timber.d("PeopleUpSyncUploaderWorker doWork()")
+        logMessageToAnalytics("PeopleUpSyncUploaderWorker - running")
         injectDependencies()
 
         val task = PeopleUpSyncUploaderTask(
@@ -44,12 +46,14 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
 
         return try {
             task.execute()
+            logMessageToAnalytics("PeopleUpSyncUploaderWorker - success")
             Result.success()
         } catch (exception: TransientSyncFailureException) {
             Timber.e(exception)
             Result.retry()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
+            logWarningToAnalytics("PeopleUpSyncUploaderWorker - failure")
             analyticsManager.logThrowable(throwable)
             Result.failure()
         }
@@ -63,6 +67,12 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
             throw WorkerInjectionFailedError.forWorker<PeopleUpSyncUploaderWorker>()
         }
     }
+
+    private fun logMessageToAnalytics(message: String) =
+        analyticsManager.logInfo(AnalyticsTags.SYNC, LogPrompter.NETWORK, message)
+
+    private fun logWarningToAnalytics(message: String) =
+        analyticsManager.logWarning(AnalyticsTags.SYNC, LogPrompter.NETWORK, message)
 
     companion object {
         const val PATIENT_UPLOAD_BATCH_SIZE = 80
