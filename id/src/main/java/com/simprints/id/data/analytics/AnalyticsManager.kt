@@ -16,8 +16,9 @@ interface AnalyticsManager {
     fun logError(error: SimprintsError)
     fun logSafeException(exception: SimprintsException)
 
-    fun logInfo(analyticsTag: AnalyticsTags, message: String)
-    fun logWarning(analyticsTag: AnalyticsTags, message: String)
+    fun logInfo(analyticsTag: AnalyticsTags, logPrompter: LogPrompter, message: String)
+    fun logWarning(analyticsTag: AnalyticsTags, logPrompter: LogPrompter, message: String)
+
 
     fun logCallout(callout: Callout)
     fun logAlert(alertType: ALERT_TYPE)

@@ -5,6 +5,8 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsTags
+import com.simprints.id.data.analytics.LogPrompter
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -37,6 +39,7 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
 
     override fun doWork(): Result {
         Timber.d("SessionEventsUploaderWorker doWork()")
+        logMessageToAnalytics("SessionEventsUploaderWorker doWork()")
         injectDependencies()
 
         return try {
@@ -49,12 +52,11 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
             )
 
             task.execute().blockingAwait()
-            Timber.d("SessionEventsUploaderWorker done()")
+            logMessageToAnalytics("SessionEventsUploaderWorker done()")
 
             Result.success()
         } catch (throwable: Throwable) {
-            Timber.d("SessionEventsUploaderWorker error()")
-
+            logWarningToAnalytics("SessionEventsUploaderWorker error() $throwable")
             Timber.e(throwable)
             analyticsManager.logThrowable(throwable)
             Result.failure()
@@ -69,4 +71,10 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
             throw WorkerInjectionFailedError.forWorker<SessionEventsUploaderWorker>()
         }
     }
+
+    private fun logMessageToAnalytics(message: String) =
+        analyticsManager.logInfo(AnalyticsTags.SESSION, LogPrompter.NETWORK, message)
+
+    private fun logWarningToAnalytics(message: String) =
+        analyticsManager.logWarning(AnalyticsTags.SESSION, LogPrompter.NETWORK, message)
 }

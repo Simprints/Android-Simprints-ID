@@ -214,11 +214,14 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         firebaseAnalytics.logEvent("activeSession", bundle)
     }
 
-    override fun logInfo(analyticsTag: AnalyticsTags, message: String) {
-        Crashlytics.log(Log.VERBOSE, analyticsTag.name, message)
+    override fun logInfo(analyticsTag: AnalyticsTags, logPrompter: LogPrompter, message: String) {
+        Crashlytics.log(Log.VERBOSE, analyticsTag.name, getLogMessage(logPrompter, message))
     }
 
-    override fun logWarning(analyticsTag: AnalyticsTags, message: String) {
-        Crashlytics.log(Log.WARN, analyticsTag.name, message)
+    override fun logWarning(analyticsTag: AnalyticsTags, logPrompter: LogPrompter, message: String) {
+        Crashlytics.log(Log.WARN, analyticsTag.name, getLogMessage(logPrompter, message))
     }
+
+    private fun getLogMessage(logPrompter: LogPrompter, message: String) =
+        String.format("[%s] %s", logPrompter.name, message)
 }
