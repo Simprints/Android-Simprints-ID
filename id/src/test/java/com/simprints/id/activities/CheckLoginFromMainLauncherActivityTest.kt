@@ -9,11 +9,15 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
+import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.testUtils.assertActivityStarted
-import com.simprints.id.testUtils.roboletric.*
+import com.simprints.id.testUtils.roboletric.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
+import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testUtils.roboletric.initLogInStateMock
+import com.simprints.id.testUtils.roboletric.setUserLogInState
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.RobolectricHelper
@@ -47,7 +51,7 @@ class CheckLoginFromMainLauncherActivityTest : DaggerForUnitTests() {
         RobolectricDaggerTestConfig(this).setupAllAndFinish()
         dbManager.initialiseDb()
 
-        val sharedPrefs = getRoboSharedPreferences()
+        val sharedPrefs = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
         editor = sharedPrefs.edit()
 
         initLogInStateMock(sharedPrefs, remoteDbManagerMock)

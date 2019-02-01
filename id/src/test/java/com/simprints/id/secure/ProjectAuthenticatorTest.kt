@@ -12,6 +12,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.di.AppComponent
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
@@ -24,11 +25,11 @@ import com.simprints.id.shared.createMockBehaviorService
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.getRoboSharedPreferences
 import com.simprints.id.testUtils.roboletric.initLogInStateMock
 import com.simprints.id.testUtils.roboletric.mockLoadProject
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.RobolectricHelper
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Before
@@ -73,7 +74,7 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForUnitTests() {
     fun setUp() {
         RobolectricDaggerTestConfig(this).setupAllAndFinish()
 
-        initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
+        initLogInStateMock(RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
 
         mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
         mockLoginInfoManager(loginInfoManagerMock)

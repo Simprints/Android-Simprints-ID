@@ -17,6 +17,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.shared.DependencyRule.MockRule
@@ -24,7 +25,10 @@ import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.roboletric.*
+import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testUtils.roboletric.initLogInStateMock
+import com.simprints.id.testUtils.roboletric.setUserLogInState
+import com.simprints.id.testUtils.roboletric.setupLocalAndRemoteManagersForApiTesting
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.RobolectricHelper
@@ -83,7 +87,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForUnitTests() {
             remoteDbManagerSpy = remoteDbManagerMock,
             sessionEventsLocalDbManagerMock = sessionEventsLocalDbManagerMock)
 
-        sharedPrefs = getRoboSharedPreferences()
+        sharedPrefs = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
         initLogInStateMock(sharedPrefs, remoteDbManagerMock)
 
         dbManager.initialiseDb()
