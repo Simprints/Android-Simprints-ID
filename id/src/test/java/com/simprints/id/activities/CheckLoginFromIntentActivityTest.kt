@@ -27,6 +27,7 @@ import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.RobolectricHelper
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
@@ -134,7 +135,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForUnitTests() {
     @Test
     fun invalidParams_shouldAlertActComeUp() {
 
-        val controller = createRoboCheckLoginFromIntentViewActivity().start()
+        val controller = createRoboCheckLoginFromIntentViewActivity(null).start()
         val activity = controller.get() as CheckLoginFromIntentActivity
         controller.visible()
 
@@ -248,6 +249,9 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForUnitTests() {
         controller.resume().visible()
         return activity
     }
+
+    private fun createRoboCheckLoginFromIntentViewActivity(intent: Intent?) =
+        RobolectricHelper.createActivity<CheckLoginFromIntentActivity>(intent)
 
     private fun createACallingAppIntentWithLegacyApiKey(actionString: String = DEFAULT_ACTION,
                                                         legacyApiKey: String = DEFAULT_LEGACY_API_KEY,
