@@ -1,6 +1,7 @@
 package com.simprints.id.activities
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -14,9 +15,9 @@ import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.mockSettingsPreferencesManager
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.createRoboLaunchActivity
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.RobolectricHelper
 import junit.framework.TestCase.assertEquals
 import kotlinx.android.synthetic.main.activity_launch.*
 import org.junit.Before
@@ -178,6 +179,8 @@ class LaunchActivityTest : RxJavaTest, DaggerForUnitTests() {
 
         mockSettingsPreferencesManager(settingsPreferencesManager, parentalConsentExists, generalConsentOptions, parentalConsentOptions, LANGUAGE, PROGRAM_NAME, ORGANIZATION_NAME)
     }
+
+    private fun createRoboLaunchActivity() = RobolectricHelper.createActivity<LaunchActivity>()
 
     companion object {
         private const val LANGUAGE = "en"

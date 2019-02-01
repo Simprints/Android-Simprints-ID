@@ -17,10 +17,10 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.testUtils.extensions.showOnScreen
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.createRoboAlertActivity
 import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.RobolectricHelper
 import kotlinx.android.synthetic.main.activity_alert.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -89,6 +89,9 @@ class AlertActivityTest : DaggerForUnitTests() {
 
         checkAlertIsShownCorrectly(activity, alertType)
     }
+
+    private fun createRoboAlertActivity(intent: Intent) =
+        RobolectricHelper.createActivity<AlertActivity>(intent)
 
     private fun createIntentForAlertType(alertType: ALERT_TYPE) = Intent().apply {
         putExtra(IntentKeys.alertActivityAlertTypeKey, alertType)

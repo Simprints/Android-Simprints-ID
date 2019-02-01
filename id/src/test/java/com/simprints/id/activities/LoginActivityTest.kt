@@ -6,9 +6,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
@@ -18,12 +18,12 @@ import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.createRoboLoginActivity
 import com.simprints.id.testUtils.roboletric.injectHowToResolveScannerAppIntent
 import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.RobolectricHelper
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert
@@ -215,4 +215,8 @@ class LoginActivityTest : RxJavaTest, DaggerForUnitTests() {
                 "",
                 "some_legacy_api_key")
     }
+
+    private fun createRoboLoginActivity() = createRoboLoginActivity(null)
+    private fun createRoboLoginActivity(intent: Intent?) =
+        RobolectricHelper.createActivity<LoginActivity>(intent)
 }

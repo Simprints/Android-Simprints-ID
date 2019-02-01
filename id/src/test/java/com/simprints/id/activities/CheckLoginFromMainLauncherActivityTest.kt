@@ -3,6 +3,7 @@ package com.simprints.id.activities
 import android.app.Activity
 import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.data.db.DbManager
@@ -15,6 +16,7 @@ import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.RobolectricHelper
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -88,7 +90,7 @@ class CheckLoginFromMainLauncherActivityTest : DaggerForUnitTests() {
     }
 
     private fun startCheckLoginAndCheckNextActivity(clazzNextActivity: Class<out Activity>) {
-        val controller = createRoboCheckLoginMainLauncherAppActivity()
+        val controller = RobolectricHelper.createActivity<CheckLoginFromMainLauncherActivity>()
         val activity = controller.get()
         controller.resume().visible()
         assertActivityStarted(clazzNextActivity, activity)

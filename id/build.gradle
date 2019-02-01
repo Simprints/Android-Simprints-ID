@@ -222,7 +222,6 @@ dependencies {
     }
     testImplementation "org.robolectric:robolectric:4.0.2"
     testImplementation "org.robolectric:multidex:3.4.2"
-    testImplementation "org.robolectric:robolectric:4.0.2"
 
     testImplementation 'androidx.test:monitor:1.1.1'
     testImplementation "androidx.test.ext:junit:1.1.0"

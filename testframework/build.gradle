@@ -56,9 +56,13 @@ dependencies {
     implementation "org.mockito:mockito-android:$mockito_version"
     implementation 'com.nhaarman:mockito-kotlin:1.5.0'
 
+    // Robolectric
+    implementation "org.robolectric:robolectric:4.0.2"
+    implementation "org.robolectric:multidex:3.4.2"
+
     // Firebase
     implementation "com.google.firebase:firebase-core:16.0.6"
 
-    //WorkManager
+    // WorkManager
     implementation "android.arch.work:work-testing:$work_version"
 }
