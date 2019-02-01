@@ -14,6 +14,8 @@ import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerp
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsTags
+import com.simprints.id.data.analytics.LogPrompter
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
@@ -90,9 +92,13 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun initScanButtonListeners() {
         view.scanButton.setOnClickListener {
+            analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogPrompter.UI, "Scan button clicked")
             startCapturing()
         }
-        view.scanButton.setOnLongClickListener { resetFingerState() }
+        view.scanButton.setOnLongClickListener {
+            analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogPrompter.UI, "Scan button long clicked")
+            resetFingerState()
+        }
     }
 
     private fun resetFingerState(): Boolean {
@@ -330,6 +336,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleMissingFingerClick() {
+        analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogPrompter.UI, "Missing finger text clicked")
         if (!currentFinger().isCollecting) {
             scanningHelper.setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger()
             lastCaptureStartedAt = timeHelper.now()

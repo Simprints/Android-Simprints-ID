@@ -9,5 +9,6 @@ enum class AnalyticsTags {
     MATCHING,
     SETTINGS,
     LONG_CONSENT,
-    ALERT
+    ALERT,
+    REFUSAL
 }

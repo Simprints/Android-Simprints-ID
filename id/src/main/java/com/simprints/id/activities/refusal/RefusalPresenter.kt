@@ -3,6 +3,8 @@ package com.simprints.id.activities.refusal
 import android.app.Activity
 import com.simprints.id.R
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsTags
+import com.simprints.id.data.analytics.LogPrompter
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.RefusalEvent
 import com.simprints.id.data.db.DbManager
@@ -36,6 +38,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleRadioOptionClicked(optionIdentifier: Int) {
+        analyticsManager.logInfo(AnalyticsTags.REFUSAL, LogPrompter.UI, "Radio option $optionIdentifier clicked")
         view.enableSubmitButton()
         view.enableRefusalText()
         when (optionIdentifier) {
@@ -49,6 +52,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleSubmitButtonClick(refusalText: String) {
+        analyticsManager.logInfo(AnalyticsTags.REFUSAL, LogPrompter.UI, "Submit button clicked")
         saveRefusalFormInDb(getRefusalForm(refusalText))
         reason?.let { refusalReason ->
             sessionEventsManager.updateSession {
@@ -67,6 +71,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleScanFingerprintsClick() {
+        analyticsManager.logInfo(AnalyticsTags.REFUSAL, LogPrompter.UI, "Scan fingerprints button clicked")
         view.setResultAndFinish(InternalConstants.RESULT_TRY_AGAIN, null)
     }
 
