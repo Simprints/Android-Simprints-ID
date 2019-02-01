@@ -19,6 +19,7 @@ import com.simprints.id.data.db.local.room.UpSyncStatus
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.di.AppComponent
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
@@ -32,10 +33,14 @@ import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.liveData.testObserver
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.roboletric.*
+import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testUtils.roboletric.initLogInStateMock
+import com.simprints.id.testUtils.roboletric.mockLoadProject
+import com.simprints.id.testUtils.roboletric.setUserLogInState
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.RobolectricHelper
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
@@ -89,8 +94,8 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForUnitTests() {
     fun setUp() {
         RobolectricDaggerTestConfig(this).setupAllAndFinish()
 
-        initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
-        setUserLogInState(true, getRoboSharedPreferences())
+        initLogInStateMock(RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
+        setUserLogInState(true, RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME))
 
         mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
 
