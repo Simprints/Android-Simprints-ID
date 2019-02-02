@@ -23,6 +23,10 @@ interface SettingsPreferenceContract {
 
         fun getScannerVersionPreference(): Preference
 
+        fun getDeviceIdPreference(): Preference
+
+        fun getLogoutPreference(): Preference
+
         fun getKeyForLanguagePreference(): String
 
         fun getKeyForSelectModulesPreference(): String
@@ -35,6 +39,10 @@ interface SettingsPreferenceContract {
 
         fun getKeyForScannerVersionPreference(): String
 
+        fun getKeyForLogoutPreference(): String
+
+        fun getKeyForDeviceIdPreference(): String
+
         fun setSelectModulePreferenceEnabled(enabled: Boolean)
 
         fun showToastForNoModulesSelected()
@@ -42,7 +50,13 @@ interface SettingsPreferenceContract {
         fun showToastForTooManyModulesSelected(maxModules: Int)
 
         fun showToastForInvalidSelectionOfFingers()
+
+        fun showConfirmationDialogForLogout()
+
+        fun finishSettings()
     }
 
-    interface Presenter : BasePresenter
+    interface Presenter : BasePresenter {
+        fun logout()
+    }
 }
