@@ -39,12 +39,13 @@
             android:title="@string/about_app_version" />
 
         <Preference
+            android:key="@string/device_id_preference"
+            android:title="@string/device_id_title"/>
+
+        <Preference
             android:key="@string/scanner_version_preference"
             android:title="@string/about_scanner_version" />
 
-        <Preference
-            android:key="@string/device_id_preference"
-            android:title="@string/device_id_title"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/setting_others">
