@@ -198,6 +198,8 @@
     <string name="about_app_version">App Version</string>
     <string name="about_libsimprints_version">LibSimprints Version:</string>
     <string name="about_scanner_version">Scanner Version</string>
+    <string name="device_id_title">Device ID</string>
+
     <!-- Button Labels -->
     <string name="recover_db" translatable="false">Recover DB</string>
     <!-- Recovery dialogs -->
@@ -403,6 +405,8 @@
     <string name="sync_and_search_configuration_preference">sync_and_search_configuration</string>
     <string name="app_version_preference">app_version</string>
     <string name="scanner_version_preference">scanner_version</string>
+    <string name="device_id_preference">device_id</string>
+    <string name="logout_preference">Logout</string>
     <string name="settings_language">Language</string>
     <string name="settings_modules">Select modules</string>
     <string name="settings_fingers">Select default fingers</string>
@@ -418,5 +422,7 @@
     <string name="settings_no_modules_toast">Invalid Selection. Please select at least one module.</string>
     <string name="settings_too_many_modules_toast">Invalid Selection. Please select no more than %1$d modules.</string>
     <string name="settings_invalid_selection">Invalid Selection</string>
+    <string name="setting_others">OTHERS</string>
+    <string name="settings_logout_subtext">You will need to be online to login again.</string>
 
 </resources>

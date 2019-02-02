@@ -3,9 +3,12 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Constants
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.libsimprints.FingerIdentifier
 import javax.inject.Inject
 
@@ -15,6 +18,9 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     SettingsPreferenceContract.Presenter {
 
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject lateinit var sessionEventManager: SessionEventsManager
 
     init {
         component.inject(this)
@@ -88,9 +94,11 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         loadValueAndBindChangeListener(view.getSyncAndSearchConfigurationPreference())
         loadValueAndBindChangeListener(view.getAppVersionPreference())
         loadValueAndBindChangeListener(view.getScannerVersionPreference())
+        loadValueAndBindChangeListener(view.getDeviceIdPreference())
+        loadValueAndBindChangeListener(view.getLogoutPreference())
     }
 
-    private fun loadValueAndBindChangeListener(preference: Preference) {
+    internal fun loadValueAndBindChangeListener(preference: Preference) {
         when (preference.key) {
             view.getKeyForLanguagePreference() -> {
                 loadLanguagePreference(preference as ListPreference)
@@ -113,6 +121,15 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             view.getKeyForScannerVersionPreference() -> {
                 loadScannerVersionInPreference(preference)
             }
+            view.getKeyForDeviceIdPreference() -> {
+                loadDeviceIdInPreference(preference)
+            }
+            view.getKeyForLogoutPreference() -> {
+                preference.setOnPreferenceClickListener {
+                    handleLogoutPreferenceClicked()
+                    true
+                }
+            }
         }
     }
 
@@ -123,7 +140,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         }
     }
 
-    private fun loadLanguagePreference(preference: ListPreference) {
+    internal fun loadLanguagePreference(preference: ListPreference) {
         preference.value = preferencesManager.language
         val index = preference.findIndexOfValue(preference.value)
         preference.summary = if (index >= 0) {
@@ -133,27 +150,31 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         }
     }
 
-    private fun loadSelectModulesPreference(preference: MultiSelectListPreference) {
+    internal fun loadSelectModulesPreference(preference: MultiSelectListPreference) {
         preference.values = preferencesManager.selectedModules
     }
 
-    private fun loadDefaultFingersPreference(preference: MultiSelectListPreference) {
+    internal fun loadDefaultFingersPreference(preference: MultiSelectListPreference) {
         preference.values = getHashSetFromFingersMap(preferencesManager.fingerStatus).toHashSet()
     }
 
-    private fun loadSyncAndSearchConfigurationPreference(preference: Preference) {
+    internal fun loadSyncAndSearchConfigurationPreference(preference: Preference) {
         preference.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
             " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
     }
 
     private fun Constants.GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
 
-    private fun loadAppVersionInPreference(preference: Preference) {
+    internal fun loadAppVersionInPreference(preference: Preference) {
         preference.summary = preferencesManager.appVersionName
     }
 
-    private fun loadScannerVersionInPreference(preference: Preference) {
+    internal fun loadScannerVersionInPreference(preference: Preference) {
         preference.summary = preferencesManager.hardwareVersionString
+    }
+
+    internal fun loadDeviceIdInPreference(preference: Preference) {
+        preference.summary = preferencesManager.deviceId
     }
 
     private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String): Boolean {
@@ -201,6 +222,10 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         return true
     }
 
+    private fun handleLogoutPreferenceClicked() {
+        view.showConfirmationDialogForLogout()
+    }
+
     private fun selectionContainsDefaultFingers(fingersHash: HashSet<String>): Boolean =
         fingersHash.containsAll(getHashSetFromFingersMap(preferencesManager.getRemoteConfigFingerStatus()))
 
@@ -211,6 +236,14 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         mutableMapOf<FingerIdentifier, Boolean>().apply {
             fingersHash.map { FingerIdentifier.valueOf(it) }.forEach { this[it] = true }
         }
+
+    override fun logout() {
+        dbManager.signOut()
+        syncSchedulerHelper.cancelDownSyncWorkers()
+        sessionEventManager.signOut()
+
+        view.finishSettings()
+    }
 
     companion object {
         const val MAX_SELECTED_MODULES = 6

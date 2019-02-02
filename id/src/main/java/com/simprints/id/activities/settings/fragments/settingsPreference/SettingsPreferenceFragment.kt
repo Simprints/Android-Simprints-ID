@@ -6,12 +6,15 @@ import android.preference.Preference
 import android.preference.PreferenceFragment
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 
 
 class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContract.View {
+
 
     override lateinit var viewPresenter: SettingsPreferenceContract.Presenter
 
@@ -58,8 +61,17 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun getScannerVersionPreference(): Preference =
         findPreference(getKeyForScannerVersionPreference())
 
+    override fun getDeviceIdPreference(): Preference =
+        findPreference(getKeyForDeviceIdPreference())
+
+    override fun getLogoutPreference(): Preference =
+        findPreference(getKeyForLogoutPreference())
+
     override fun getKeyForLanguagePreference(): String =
         getString(R.string.select_language_preference)
+
+    override fun getKeyForLogoutPreference(): String =
+        getString(R.string.logout_preference)
 
     override fun getKeyForSelectModulesPreference(): String =
         getString(R.string.select_modules_preference)
@@ -76,6 +88,9 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun getKeyForScannerVersionPreference(): String =
         getString(R.string.scanner_version_preference)
 
+    override fun getKeyForDeviceIdPreference(): String =
+        getString(R.string.device_id_preference)
+
     override fun setSelectModulePreferenceEnabled(enabled: Boolean) {
         getPreferenceForSelectModules().isEnabled = enabled
     }
@@ -90,5 +105,26 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
 
     override fun showToastForInvalidSelectionOfFingers() {
         Toast.makeText(activity, getString(R.string.settings_invalid_selection), Toast.LENGTH_LONG).show()
+    }
+
+    override fun showConfirmationDialogForLogout() {
+        activity.runOnUiThreadIfStillRunning {
+            buildConfirmationDialogForLogout().let {
+                it.show()
+            }
+        }
+    }
+
+    internal fun buildConfirmationDialogForLogout(): AlertDialog =
+        AlertDialog.Builder(activity)
+            .setTitle(R.string.confirmation_logout_title)
+            .setMessage(R.string.confirmation_logout_message)
+            .setPositiveButton(getString(R.string.logout)) { _, _ -> viewPresenter.logout() }
+            .setNegativeButton(getString(R.string.confirmation_logout_cancel), null).create()
+
+    override fun finishSettings() {
+        activity.runOnUiThreadIfStillRunning {
+            (activity as SettingsActivity).finishActivityBecauseLogout()
+        }
     }
 }

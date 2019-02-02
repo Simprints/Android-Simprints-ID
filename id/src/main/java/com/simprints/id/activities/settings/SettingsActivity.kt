@@ -11,6 +11,9 @@ import kotlinx.android.synthetic.main.settings_toolbar.*
 
 
 class SettingsActivity : AppCompatPreferenceActivity() {
+    companion object {
+        private const val LOGOUT_RESULT_CODE = 1
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,5 +43,10 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     override fun isValidFragment(fragmentName: String): Boolean {
         return PreferenceFragment::class.java.name == fragmentName
             || SettingsPreferenceFragment::class.java.name == fragmentName
+    }
+
+    fun finishActivityBecauseLogout(){
+        setResult(LOGOUT_RESULT_CODE)
+        finish()
     }
 }

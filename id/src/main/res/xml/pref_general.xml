@@ -41,6 +41,17 @@
         <Preference
             android:key="@string/scanner_version_preference"
             android:title="@string/about_scanner_version" />
+
+        <Preference
+            android:key="@string/device_id_preference"
+            android:title="@string/device_id_title"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/setting_others">
+        <Preference
+            android:key="@string/logout_preference"
+            android:title="@string/logout_preference"
+            android:summary="@string/settings_logout_subtext"/>
     </PreferenceCategory>
 
 </PreferenceScreen>
