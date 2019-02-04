@@ -7,12 +7,14 @@ open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
 
     override fun scheduleSessionsSync() = createAndEnqueueRequest()
 
-    private fun createAndEnqueueRequest() {
-        PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
+    private fun createAndEnqueueRequest(time: Long = SYNC_REPEAT_INTERVAL,
+                                        unit: TimeUnit = SYNC_REPEAT_UNIT,
+                                        tag: String = MASTER_WORKER_TAG) {
+        PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(time, unit)
             .setConstraints(getConstraints())
-            .addTag(MASTER_WORKER_TAG)
+            .addTag(tag)
             .build().also {
-                WorkManager.getInstance().enqueueUniquePeriodicWork(MASTER_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, it)
+                WorkManager.getInstance().enqueueUniquePeriodicWork(tag, ExistingPeriodicWorkPolicy.KEEP, it)
             }
     }
 
