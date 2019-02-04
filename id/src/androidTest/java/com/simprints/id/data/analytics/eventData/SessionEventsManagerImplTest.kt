@@ -31,6 +31,7 @@ import com.simprints.id.shared.sessionEvents.createFakeSession
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTools.ActivityUtils
+import com.simprints.id.testTools.tryOnSystemUntilTimeout
 import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
@@ -231,6 +232,18 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
 
         realmForDataEvent.refresh()
         verifyEventsAfterEnrolment(mostRecentSessionInDb.events, realmForDataEvent)
+    }
+
+    @Test
+    fun launchSimprints_shouldGenerateTheRightEvents() {
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+
+        // Launch
+        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
+
+        tryOnSystemUntilTimeout(5000, 200) {
+            verifyEventsWhenSimprintsIsLaunched(mostRecentSessionInDb.events)
+        }
     }
 
     @Test
