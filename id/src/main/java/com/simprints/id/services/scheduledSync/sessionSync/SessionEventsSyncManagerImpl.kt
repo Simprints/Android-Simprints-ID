@@ -25,7 +25,7 @@ open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
     companion object {
         private const val SYNC_REPEAT_INTERVAL = 6L
         private val SYNC_REPEAT_UNIT = TimeUnit.HOURS
-        private const val MASTER_WORKER_TAG = "SYNC_SESSIONS_WORKER"
+        internal const val MASTER_WORKER_TAG = "SYNC_SESSIONS_WORKER"
     }
 
     override fun cancelSyncWorkers() {

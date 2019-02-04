@@ -93,5 +93,4 @@ interface AppComponent {
     fun inject(syncWorker: DownSyncMasterWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(inputMergeWorker: InputMergeWorker)
-    fun inject(sessionEventsSyncManagerImplTest: SessionEventsSyncManagerImplTest) 
 }
