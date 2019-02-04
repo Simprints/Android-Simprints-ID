@@ -288,6 +288,8 @@ dependencies {
 
     //WorkManager
     androidTestImplementation "android.arch.work:work-testing:$work_version"
+    testImplementation "android.arch.work:work-testing:$work_version"
+
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {
