@@ -62,7 +62,7 @@ fun setupActivityAndDecline() {
 
 fun setupActivity() {
     log("setupActivity")
-    tryOnUiUntilTimeout(10000, 50) {
+    tryOnUiUntilTimeout(20000, 50) {
         ActivityUtils.grantPermissions()
         onView(withId(R.id.generalConsentTextView))
             .check(matches(isDisplayed()))
