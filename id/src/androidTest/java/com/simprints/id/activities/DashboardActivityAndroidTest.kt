@@ -41,6 +41,7 @@ import com.simprints.id.testTools.tryOnUiUntilTimeout
 import com.simprints.id.testTools.waitOnSystem
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
+import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.hamcrest.CoreMatchers.not
@@ -58,9 +59,9 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     companion object {
         private val modules = setOf("module1", "module2", "module3")
-        private const val N_PEOPLE_ON_SERVER_PER_MODULE = 300 //300 * 3 = 900
+        private const val N_PEOPLE_ON_SERVER_PER_MODULE = 200 //200 * 3 (#modules) = 600
         private const val N_PEOPLE_ON_DB_PER_MODULE = 30
-        private const val PEOPLE_UPLOAD_BATCH_SIZE = 80
+        private const val PEOPLE_UPLOAD_BATCH_SIZE = 20
         private const val SIGNED_ID_USER = "some_user"
     }
 
@@ -231,9 +232,11 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     private fun uploadFakePeopleAndPrepareLocalDb(syncScope: SyncScope) {
         peopleOnServer = PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_SERVER_PER_MODULE, syncScope, listOf(false))
-        peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).forEach {
-            remotePeopleManagerSpy.uploadPeople(testProject.id, it).blockingAwait()
+        val requests = peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).map {
+            remotePeopleManagerSpy.uploadPeople(testProject.id, it)
         }
+        Completable.merge(requests).blockingAwait()
+
         peopleInDb.addAll(PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_DB_PER_MODULE, syncScope, listOf(true, false)))
         localDbManager.insertOrUpdatePeopleInLocal(peopleInDb).blockingAwait()
     }
