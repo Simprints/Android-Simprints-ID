@@ -89,10 +89,14 @@ class SessionEventsUploaderTask(private val projectId: String,
             Timber.d("SessionEventsUploaderTask checkUploadSucceedAndRetryIfNecessary()")
             val response = result.response()
             when {
-                response == null -> continueWithRetryException(result.error())
-                isResponseASuccess(response.code()) -> continueWithSuccess()
-                isResponseAnErrorThatIsWorthToRetry(response.code()) -> continueWithRetryException()
-                else -> continueWithNoRetryException()
+                response == null ->
+                    continueWithRetryException(result.error() ?: Throwable("Sessions upload response is null"))
+                isResponseASuccess(response.code()) ->
+                    continueWithSuccess()
+                isResponseAnErrorThatIsWorthToRetry(response.code()) ->
+                    continueWithRetryException(Throwable("Sessions upload response code: ${response.code()}"))
+                else ->
+                    continueWithNoRetryException()
             }
         }.retry { counter, t ->
             counter < NUMBER_OF_ATTEMPTS_TO_RETRY_NETWORK_CALLS && t !is SessionUploadFailureException
@@ -102,11 +106,8 @@ class SessionEventsUploaderTask(private val projectId: String,
     private fun isResponseASuccess(code: Int) = code == 201
 
     private fun continueWithSuccess() = Completable.complete()
-    private fun continueWithRetryException(error: Throwable? = null) =
-        Completable.error(
-            error?.let {
-                SessionUploadFailureRetryException(it)
-            } ?: SessionUploadFailureRetryException())
+    private fun continueWithRetryException(error: Throwable) =
+        Completable.error(SessionUploadFailureRetryException(error))
 
     private fun continueWithNoRetryException() = Completable.error(SessionUploadFailureException())
 
