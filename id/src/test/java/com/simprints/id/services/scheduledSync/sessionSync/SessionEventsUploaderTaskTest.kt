@@ -3,19 +3,13 @@ package com.simprints.id.services.scheduledSync.sessionSync
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonObject
-import com.nhaarman.mockito_kotlin.anyOrNull
-import com.nhaarman.mockito_kotlin.times
-import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
-import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
 import com.simprints.id.network.SimApiClient
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderTask.Companion.DAYS_TO_KEEP_SESSIONS_IN_CASE_OF_ERROR
 import com.simprints.testframework.common.syntax.mock
 import com.simprints.id.shared.sessionEvents.createFakeClosedSession
 import com.simprints.id.shared.sessionEvents.createFakeSession
@@ -35,7 +29,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
@@ -120,33 +113,59 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
     }
 
     @Test
-    fun uploadFailsForServerError_shouldDeleteOldSessions() {
-        sessionsInFakeDb.addAll(createClosedSessions(BATCH_SIZE))
-        sessionsInFakeDb.forEach { it.startTime = timeHelper.nowMinus(DAYS_TO_KEEP_SESSIONS_IN_CASE_OF_ERROR + 1, TimeUnit.DAYS) }
-        sessionsInFakeDb.addAll(createClosedSessions(1))
-
-        enqueueResponses(mockFailureResponseForSessionsUpload())
-
-        val testObserver = executeUpload()
-        testObserver.awaitTerminalEvent()
-
-        assertThat(testObserver.errorCount()).isEqualTo(1)
-        assertThat(testObserver.errors().first()).isInstanceOf(SessionUploadFailureException::class.java)
-        assertThat(mockServer.requestCount).isEqualTo(1)
-
-        verifyBodyRequestHasSessions(BATCH_SIZE + 1, mockServer.takeRequest())
-
-        verify(sessionsEventsManagerMock, times(BATCH_SIZE + 1)).deleteSessions(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
-        assertThat(sessionsInFakeDb.size).isEqualTo(1)
-    }
-
-    @Test
     fun noCloseSessions_shouldThrownAnException() {
         val testObserver = executeUpload()
         testObserver.awaitTerminalEvent()
 
         assertThat(testObserver.errorCount()).isEqualTo(1)
         assertThat(testObserver.errors().first()).isInstanceOf(NoSessionsFoundException::class.java)
+    }
+
+    @Test
+    fun failingUploadSessions_shouldRetryMaxTwice() {
+        sessionsInFakeDb.addAll(createClosedSessions(2))
+        enqueueResponses(mockFailureResponseForSessionsUpload())
+        enqueueResponses(mockFailureResponseForSessionsUpload())
+        enqueueResponses(mockFailureResponseForSessionsUpload())
+        enqueueResponses(mockSuccessfulResponseForSessionsUpload())
+
+        val testObserver = executeUpload()
+        testObserver.awaitTerminalEvent()
+
+        assertThat(testObserver.errorCount()).isEqualTo(1)
+        assertThat(mockServer.requestCount).isEqualTo(3)
+    }
+
+    @Test
+    fun failingUploadSessionsForBadRequest_shouldNotBeRetried() {
+        testUploadRequestIsNotRetriedForServerErrorCode(400)
+    }
+
+    @Test
+    fun failingUploadSessionsForUnauthorized_shouldNotBeRetried() {
+        testUploadRequestIsNotRetriedForServerErrorCode(401)
+    }
+
+    @Test
+    fun failingUploadSessionsForForbidden_shouldNotBeRetried() {
+        testUploadRequestIsNotRetriedForServerErrorCode(403)
+    }
+
+    @Test
+    fun failingUploadSessionsForNotFound_shouldNotBeRetried() {
+        testUploadRequestIsNotRetriedForServerErrorCode(404)
+    }
+
+    private fun testUploadRequestIsNotRetriedForServerErrorCode(code: Int) {
+        sessionsInFakeDb.addAll(createClosedSessions(2))
+        enqueueResponses(mockFailureResponseForSessionsUpload(code))
+        enqueueResponses(mockSuccessfulResponseForSessionsUpload())
+
+        val testObserver = executeUpload()
+        testObserver.awaitTerminalEvent()
+
+        assertThat(testObserver.errorCount()).isEqualTo(1)
+        assertThat(mockServer.requestCount).isEqualTo(1)
     }
 
     private fun executeUpload(): TestObserver<Void> {
@@ -164,7 +183,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
         setResponseCode(201)
     }
 
-    private fun mockFailureResponseForSessionsUpload(code: Int = 404) = MockResponse().apply {
+    private fun mockFailureResponseForSessionsUpload(code: Int = 500) = MockResponse().apply {
         setResponseCode(code)
         setBody(Exception().toString())
     }

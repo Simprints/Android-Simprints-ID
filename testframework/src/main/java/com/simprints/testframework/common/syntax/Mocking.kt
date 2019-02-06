@@ -31,7 +31,7 @@ class InfixOngoingStubbing<T>(private val ongoingStubbing: OngoingStubbing<T>)
     override infix fun then(answer: Answer<*>) =
         InfixOngoingStubbing(ongoingStubbing.then(answer))
 
-    override infix fun thenAnswer(answer: Answer<*>?) =
+    override infix fun thenAnswer(answer: Answer<*>) =
         InfixOngoingStubbing(ongoingStubbing.thenAnswer(answer))
 }
 
