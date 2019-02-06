@@ -18,7 +18,7 @@ import com.simprints.testframework.common.mocking.thenReturn
 import com.simprints.testframework.common.mocking.verifyExactly
 import com.simprints.testframework.common.mocking.verifyOnce
 import com.simprints.testframework.common.mocking.whenever
-import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test

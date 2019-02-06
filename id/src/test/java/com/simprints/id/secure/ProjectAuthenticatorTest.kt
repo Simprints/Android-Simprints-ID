@@ -28,8 +28,8 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.initLogInStateMock
 import com.simprints.id.testUtils.roboletric.mockLoadProject
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.testframework.unit.RobolectricDaggerTestConfig
-import com.simprints.testframework.unit.RobolectricHelper
+import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Before

@@ -23,7 +23,7 @@ import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.mock
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test

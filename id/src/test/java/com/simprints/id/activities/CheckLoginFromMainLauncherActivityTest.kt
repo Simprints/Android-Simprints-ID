@@ -19,8 +19,8 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.initLogInStateMock
 import com.simprints.id.testUtils.roboletric.setUserLogInState
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.testframework.unit.RobolectricDaggerTestConfig
-import com.simprints.testframework.unit.RobolectricHelper
+import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

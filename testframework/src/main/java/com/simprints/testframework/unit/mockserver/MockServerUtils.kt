@@ -1,4 +1,4 @@
-package com.simprints.id.testUtils.mockServer
+package com.simprints.testframework.unit.mockserver
 
 import okhttp3.HttpUrl
 import org.junit.Assert

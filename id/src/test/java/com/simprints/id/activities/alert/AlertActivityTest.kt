@@ -19,8 +19,8 @@ import com.simprints.id.testUtils.extensions.showOnScreen
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.testframework.unit.RobolectricDaggerTestConfig
-import com.simprints.testframework.unit.RobolectricHelper
+import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import kotlinx.android.synthetic.main.activity_alert.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
