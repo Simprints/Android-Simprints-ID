@@ -1,122 +1,75 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.InstrumentationRegistry
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.simprints.id.Application
+import com.google.firebase.firestore.util.Assert.fail
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.di.AppModuleForAndroidTests
-import com.simprints.id.di.DaggerForAndroidTests
-import com.simprints.id.shared.DefaultTestConstants
-import com.simprints.id.shared.DependencyRule
-import com.simprints.id.shared.PreferencesModuleForAnyTests
-import com.simprints.id.testSnippets.launchActivityEnrol
-import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
-import com.simprints.id.testTemplates.FirstUseLocalAndRemote
-import com.simprints.id.testTools.adapters.toCalloutCredentials
-import com.simprints.id.testTools.models.TestProject
-import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.mockscanner.MockBluetoothAdapter
-import io.realm.RealmConfiguration
-import junit.framework.Assert
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import javax.inject.Inject
+import java.util.concurrent.TimeUnit
 
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class SessionEventsSyncManagerImplITest : DaggerForAndroidTests(), FirstUseLocalAndRemote {
-
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-    override var sessionsRealmConfiguration: RealmConfiguration? = null
-
-    override lateinit var testProject: TestProject
+class SessionEventsSyncManagerImplITest {
 
     @Rule
     @JvmField
     val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
-
-    @Inject lateinit var remoteDbManager: RemoteDbManager
-    @Inject lateinit var randomGeneratorMock: RandomGenerator
-
-    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
-        PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
-    }
-
-    override var module by lazyVar {
-        AppModuleForAndroidTests(
-            app,
-            randomGeneratorRule = DependencyRule.MockRule,
-            bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter }
-        )
-    }
-
-    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
-
-    @Before
-    override fun setUp() {
-        app = InstrumentationRegistry.getTargetContext().applicationContext as Application
-        super<DaggerForAndroidTests>.setUp()
-
-        testAppComponent.inject(this)
-
-        setupRandomGeneratorToGenerateKey(DefaultTestConstants.DEFAULT_REALM_KEY, randomGeneratorMock)
-        app.initDependencies()
-
-        super<FirstUseLocalAndRemote>.setUp()
-        signOut()
-    }
+    @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
+    private var sessionEventsSyncManager = SessionEventsSyncManagerImpl()
 
     @Test
-    fun sessionEventsSyncManagerImpl_enqueuesWorkerMaster_shouldDeletePreviousWorker() {
-        launchActivityEnrol(testProject.toCalloutCredentials(), simprintsActionTestRule)
+    fun sessionEventsSyncManagerImpl_enqueuesANewWorkerMaster_shouldDeletePreviousWorkers() {
         WorkManager.getInstance().pruneWork()
 
         val olderMasterTaskVersion = SessionEventsSyncManagerImpl.MASTER_WORKER_VERSION - 1
-        val masterTaskVersion = SessionEventsSyncManagerImpl.MASTER_WORKER_VERSION
+        val newerMasterTaskVersion = SessionEventsSyncManagerImpl.MASTER_WORKER_VERSION
 
-        val sessionEventsSyncManagerImpl = SessionEventsSyncManagerImpl()
+        sessionEventsSyncManager.createAndEnqueueRequest(version = olderMasterTaskVersion)
+        verifyStateForVersionedWorker(olderMasterTaskVersion, WorkInfo.State.ENQUEUED, "Older worker not enqueued")
 
-        sessionEventsSyncManagerImpl.createAndEnqueueRequest(version = olderMasterTaskVersion)
-        var uniqueNameForOldWorker = sessionEventsSyncManagerImpl.getMasterWorkerUniqueName(olderMasterTaskVersion)
-        var masterWorkerInfo = getWorkInfoForWorkerMaster(uniqueNameForOldWorker).first()
-        val didOlderMasterTaskRun = masterWorkerInfo.state == WorkInfo.State.ENQUEUED || masterWorkerInfo.state == WorkInfo.State.SUCCEEDED
-        if (!didOlderMasterTaskRun) {
-            Assert.fail("Older worker didn't run")
-        }
+        sessionEventsSyncManager.createAndEnqueueRequest(version = newerMasterTaskVersion)
+        verifyStateForVersionedWorker(olderMasterTaskVersion, WorkInfo.State.CANCELLED, "Older worker not deleted")
+        verifyStateForVersionedWorker(newerMasterTaskVersion, WorkInfo.State.ENQUEUED, "New worker not enqueued")
+    }
 
-        sessionEventsSyncManagerImpl.createAndEnqueueRequest(version = masterTaskVersion)
-        uniqueNameForOldWorker = sessionEventsSyncManagerImpl.getMasterWorkerUniqueName(olderMasterTaskVersion)
-        masterWorkerInfo = getWorkInfoForWorkerMaster(uniqueNameForOldWorker).first()
-        val didOldMasterTaskGetCancelled = masterWorkerInfo.state == WorkInfo.State.CANCELLED
-        if (!didOldMasterTaskGetCancelled) {
-            Assert.fail("Older worker not cancelled")
-        }
+    @Test
+    fun sessionEventsSyncManagerImpl_enqueuesANewWorkerMaster_shouldDeleteOldNotVersionedWorkers() {
+        WorkManager.getInstance().pruneWork()
 
-        val uniqueNameForMasterWorker = sessionEventsSyncManagerImpl.getMasterWorkerUniqueName(masterTaskVersion)
-        masterWorkerInfo = getWorkInfoForWorkerMaster(uniqueNameForMasterWorker).first()
-        val didMasterTaskGetCancelled = masterWorkerInfo.state == WorkInfo.State.ENQUEUED || masterWorkerInfo.state == WorkInfo.State.SUCCEEDED
-        if (!didMasterTaskGetCancelled) {
-            Assert.fail("Master worker not cancelled")
+        PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(6L, TimeUnit.HOURS)
+            .addTag(SessionEventsSyncManagerImpl.MASTER_WORKER_TAG)
+            .build().also {
+                WorkManager.getInstance().enqueueUniquePeriodicWork(
+                    SessionEventsSyncManagerImpl.MASTER_WORKER_TAG,
+                    ExistingPeriodicWorkPolicy.KEEP, it)
+            }
+
+        val newerMasterTaskVersion = SessionEventsSyncManagerImpl.MASTER_WORKER_VERSION
+
+        sessionEventsSyncManager.createAndEnqueueRequest(version = newerMasterTaskVersion)
+
+        verifyStateForVersionedWorker(olderMasterTaskVersion, WorkInfo.State.CANCELLED, "Older worker not deleted")
+        verifyStateForVersionedWorker(newerMasterTaskVersion, WorkInfo.State.ENQUEUED, "New worker not enqueued")
+    }
+
+    private fun verifyStateForVersionedWorker(version: Long, workerState: WorkInfo.State, errorMessage: String){
+        val uniqueNameForMasterWorker = sessionEventsSyncManager.getMasterWorkerUniqueName(version)
+        val masterWorkerInfo = getWorkInfoForWorkerMaster(uniqueNameForMasterWorker).first()
+        if (masterWorkerInfo.state != workerState) {
+            fail(errorMessage)
         }
     }
 
     private fun getWorkInfoForWorkerMaster(uniqueName: String): List<WorkInfo> =
         WorkManager.getInstance().getWorkInfosForUniqueWork(uniqueName).get()
-
-    private fun signOut() {
-        remoteDbManager.signOutOfRemoteDb()
-    }
 }
