@@ -9,7 +9,6 @@ import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
-import com.simprints.id.di.DaggerForTests
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
 import com.simprints.id.network.SimApiClient
@@ -42,14 +41,14 @@ import retrofit2.adapter.rxjava2.Result
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
+class SessionEventsUploaderTaskTest : RxJavaTest {
 
     private val sessionsEventsManagerMock: SessionEventsManager = mock()
     private val timeHelper: TimeHelper = TimeHelperImpl()
     private lateinit var sessionsRemoteInterfaceSpy: SessionsRemoteInterface
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         ShadowLog.stream = System.out
 
         sessionsRemoteInterfaceSpy = spy(SimApiClient(
@@ -162,39 +161,6 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
         assertThat(testObserver?.errors()?.first()).isInstanceOf(SessionUploadFailureRetryException::class.java)
     }
 
-    private fun testUploadRequestIsNotRetriedForServerErrorCode(code: Int, callsExpected: Int = 1): TestObserver<Void>? {
-        spy(createTask()).apply {
-            var requests = 0
-            val checkResponseTask = Single.fromCallable {
-                requests++
-                createFailureUploadResponse(code)
-            }
-            .checkUploadSucceedAndRetryIfNecessary()
-            .test()
-
-            checkResponseTask.awaitTerminalEvent()
-            assertThat(requests).isEqualTo(callsExpected)
-            return checkResponseTask
-        }
-    }
-
-    private fun createSuccessUploadResponse() =
-        Result.response<Void>(Response.success<Void>(null, okhttp3.Response.Builder() //
-            .code(201)
-            .message("OK")
-            .protocol(Protocol.HTTP_1_1)
-            .request(Request.Builder().url("http://localhost/").build())
-            .build()))
-
-
-    private fun createFailureUploadResponse(code: Int = 500) =
-        Result.response<Void>(Response.error(ResponseBody.create(MediaType.parse("application/json"), ""), okhttp3.Response.Builder() //
-            .code(code)
-            .message("Response.error()")
-            .protocol(Protocol.HTTP_1_1)
-            .request(Request.Builder().url("http://localhost/").build())
-            .build()))
-
     @Test
     fun sessionsAfterUpload_shouldBeDeleted() {
         spy(createTask()).apply {
@@ -222,6 +188,39 @@ class SessionEventsUploaderTaskTest : RxJavaTest, DaggerForTests() {
         assertThat(testObserver.errorCount()).isEqualTo(1)
         assertThat(testObserver.errors().first()).isInstanceOf(NoSessionsFoundException::class.java)
     }
+
+    private fun testUploadRequestIsNotRetriedForServerErrorCode(code: Int, callsExpected: Int = 1): TestObserver<Void>? {
+        spy(createTask()).apply {
+            var requests = 0
+            val checkResponseTask = Single.fromCallable {
+                requests++
+                createFailureUploadResponse(code)
+            }
+                .checkUploadSucceedAndRetryIfNecessary()
+                .test()
+
+            checkResponseTask.awaitTerminalEvent()
+            assertThat(requests).isEqualTo(callsExpected)
+            return checkResponseTask
+        }
+    }
+
+    private fun createSuccessUploadResponse() =
+        Result.response<Void>(Response.success<Void>(null, okhttp3.Response.Builder() //
+            .code(201)
+            .message("OK")
+            .protocol(Protocol.HTTP_1_1)
+            .request(Request.Builder().url("http://localhost/").build())
+            .build()))
+
+
+    private fun createFailureUploadResponse(code: Int = 500) =
+        Result.response<Void>(Response.error(ResponseBody.create(MediaType.parse("application/json"), ""), okhttp3.Response.Builder() //
+            .code(code)
+            .message("Response.error()")
+            .protocol(Protocol.HTTP_1_1)
+            .request(Request.Builder().url("http://localhost/").build())
+            .build()))
 
     private fun executeUpload(sessions: List<SessionEvents>): TestObserver<Void> {
         return createTask().execute("bWOFHInKA2YaQwrxZ7uJ", sessions).test()

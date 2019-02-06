@@ -26,6 +26,7 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
     /**
      * @throws NoSessionsFoundException
      * @throws SessionUploadFailureException
+     * @throws SessionUploadFailureRetryException
      */
     fun execute(projectId: String,
                 sessions: List<SessionEvents>): Completable =
@@ -100,9 +101,7 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
     private fun isResponseASuccess(code: Int) = code == 201
 
     private fun continueWithSuccess() = Completable.complete()
-    private fun continueWithRetryException(error: Throwable) =
-        Completable.error(SessionUploadFailureRetryException(error))
-
+    private fun continueWithRetryException(error: Throwable) = Completable.error(SessionUploadFailureRetryException(error))
     private fun continueWithNoRetryException() = Completable.error(SessionUploadFailureException())
 
     internal fun Single<List<SessionEvents>>.deleteSessionsFromDb(): Completable =
