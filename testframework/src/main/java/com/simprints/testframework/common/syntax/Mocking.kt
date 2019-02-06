@@ -25,13 +25,13 @@ class InfixOngoingStubbing<T>(private val ongoingStubbing: OngoingStubbing<T>)
     infix fun thenThrow(e: Throwable) =
         InfixOngoingStubbing(ongoingStubbing.thenThrow(e))
 
-    override fun thenThrow(throwableType: Class<out Throwable>) =
+    override infix fun thenThrow(throwableType: Class<out Throwable>) =
         InfixOngoingStubbing(ongoingStubbing.thenThrow(throwableType))
 
-    override fun then(answer: Answer<*>) =
+    override infix fun then(answer: Answer<*>) =
         InfixOngoingStubbing(ongoingStubbing.then(answer))
 
-    override fun thenAnswer(answer: Answer<*>?) =
+    override infix fun thenAnswer(answer: Answer<*>?) =
         InfixOngoingStubbing(ongoingStubbing.thenAnswer(answer))
 }
 
