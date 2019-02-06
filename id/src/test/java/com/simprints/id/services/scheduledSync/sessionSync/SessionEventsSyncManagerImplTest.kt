@@ -1,9 +1,6 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
-import android.util.Log
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkInfo
@@ -12,9 +9,9 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.liveData.TestLifecycleOwner
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
+import junit.framework.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,26 +37,51 @@ class SessionEventsSyncManagerImplTest: RxJavaTest, DaggerForTests() {
 
     @Test
     fun sessionEventsSyncManagerImpl_enqueuesWorkerMaster_shouldWorkManagerBeEnqueued(){
-        val sessionEventsSyncManagerImpl = SessionEventsSyncManagerImpl()
-        var masterWorkerInfoLiveData = getWorkInfoForWorkerMaster()
-
-        sessionEventsSyncManagerImpl.scheduleSessionsSync()
-        masterWorkerInfoLiveData.observe(TestLifecycleOwner().onResume(), Observer {
-            Lo.d("TEST", "TEST")
-        })
-
-
-//        val driver = WorkManagerTestInitHelper.getTestDriver()
-//        driver.setPeriodDelayMet(it.id)
-//
-//        masterWorkerInfoLiveData?.let {
-//            val driver = WorkManagerTestInitHelper.getTestDriver()
-//            driver.setPeriodDelayMet(it.id)
-//            masterWorkerInfoLiveData = getWorkInfoForWorkerMaster()
-//            assertThat(masterWorkerInfoLiveData?.state).isEqualTo(WorkInfo.State.RUNNING)
-//        } ?: fail("No Worker Info for MasterWorker")
+//        val sessionEventsSyncManagerImpl = SessionEventsSyncManagerImpl(getWorkManager = { WorkManager.getInstance() })
+//        sessionEventsSyncManagerImpl.scheduleSessionsSync()
+//        getWorkInfoForWorkerMaster(sessionEventsSyncManagerImpl.getMasterWorkerUniqueName(MASTER_WORKER_VERSION))
+//            .observe(TestLifecycleOwner().onResume(), Observer {
+//                val masterWorkerInfo = it.first()
+//                val isMasterWorkerEnqueued = masterWorkerInfo.state == WorkInfo.State.ENQUEUED && masterWorkerInfo.tags.contains(MASTER_WORKER_TAG)
+//                if (!isMasterWorkerEnqueued){
+//                    fail("No Master Worker enqueued.")
+//                }
+//            })
     }
 
-    private fun getWorkInfoForWorkerMaster(): LiveData<List<WorkInfo>> =
-        WorkManager.getInstance().getWorkInfosForUniqueWorkLiveData(SessionEventsSyncManagerImpl.MASTER_WORKER_TAG)
+    @Test
+    fun sessionEventsSyncManagerImpl_enqueuesWorkerMaster_shouldDeletePreviousWorker(){
+        WorkManager.getInstance().pruneWork()
+
+        val olderMasterTaskVersion = SessionEventsSyncManagerImpl.MASTER_WORKER_VERSION - 1
+        val masterTaskVersion = SessionEventsSyncManagerImpl.MASTER_WORKER_VERSION
+
+        val sessionEventsSyncManagerImpl = SessionEventsSyncManagerImpl()
+
+        sessionEventsSyncManagerImpl.createAndEnqueueRequest(version = olderMasterTaskVersion)
+        var uniqueNameForOldWorker = sessionEventsSyncManagerImpl.getMasterWorkerUniqueName(olderMasterTaskVersion)
+        var masterWorkerInfo = getWorkInfoForWorkerMaster(uniqueNameForOldWorker).first()
+        val didOlderMasterTaskRun = masterWorkerInfo.state == WorkInfo.State.ENQUEUED || masterWorkerInfo.state == WorkInfo.State.SUCCEEDED
+        if (!didOlderMasterTaskRun) {
+            Assert.fail("Older worker didn't run")
+        }
+
+        sessionEventsSyncManagerImpl.createAndEnqueueRequest(version = masterTaskVersion)
+        uniqueNameForOldWorker = sessionEventsSyncManagerImpl.getMasterWorkerUniqueName(olderMasterTaskVersion)
+        masterWorkerInfo = getWorkInfoForWorkerMaster(uniqueNameForOldWorker).first()
+        val didOldMasterTaskGetCancelled = masterWorkerInfo.state == WorkInfo.State.CANCELLED
+        if (!didOldMasterTaskGetCancelled) {
+            Assert.fail("Older worker not cancelled")
+        }
+
+        val uniqueNameForMasterWorker = sessionEventsSyncManagerImpl.getMasterWorkerUniqueName(masterTaskVersion)
+        masterWorkerInfo = getWorkInfoForWorkerMaster(uniqueNameForMasterWorker).first()
+        val didMasterTaskGetCancelled = masterWorkerInfo.state == WorkInfo.State.ENQUEUED || masterWorkerInfo.state == WorkInfo.State.SUCCEEDED
+        if (!didMasterTaskGetCancelled) {
+            Assert.fail("Master worker not cancelled")
+        }
+    }
+
+    private fun getWorkInfoForWorkerMaster(uniqueName: String): List<WorkInfo> =
+        WorkManager.getInstance().getWorkInfosForUniqueWork(uniqueName).get()
 }
