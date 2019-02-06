@@ -3,7 +3,6 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -20,7 +19,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
-    @Inject lateinit var sessionEventManager: SessionEventsManager
 
     init {
         component.inject(this)
@@ -91,11 +89,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         loadValueAndBindChangeListener(view.getPreferenceForLanguage())
         loadValueAndBindChangeListener(view.getPreferenceForSelectModules())
         loadValueAndBindChangeListener(view.getPreferenceForDefaultFingers())
-        loadValueAndBindChangeListener(view.getSyncAndSearchConfigurationPreference())
-        loadValueAndBindChangeListener(view.getAppVersionPreference())
-        loadValueAndBindChangeListener(view.getScannerVersionPreference())
-        loadValueAndBindChangeListener(view.getDeviceIdPreference())
-        loadValueAndBindChangeListener(view.getLogoutPreference())
+        loadValueAndBindChangeListener(view.getPreferenceForAbout())
     }
 
     internal fun loadValueAndBindChangeListener(preference: Preference) {
@@ -112,21 +106,9 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
                 loadDefaultFingersPreference(preference as MultiSelectListPreference)
                 preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
             }
-            view.getKeyForSyncAndSearchConfigurationPreference() -> {
-                loadSyncAndSearchConfigurationPreference(preference)
-            }
-            view.getKeyForAppVersionPreference() -> {
-                loadAppVersionInPreference(preference)
-            }
-            view.getKeyForScannerVersionPreference() -> {
-                loadScannerVersionInPreference(preference)
-            }
-            view.getKeyForDeviceIdPreference() -> {
-                loadDeviceIdInPreference(preference)
-            }
-            view.getKeyForLogoutPreference() -> {
+            view.getKeyForAboutPreference() -> {
                 preference.setOnPreferenceClickListener {
-                    handleLogoutPreferenceClicked()
+                    view.openSettingAboutActivity()
                     true
                 }
             }
@@ -156,25 +138,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
 
     internal fun loadDefaultFingersPreference(preference: MultiSelectListPreference) {
         preference.values = getHashSetFromFingersMap(preferencesManager.fingerStatus).toHashSet()
-    }
-
-    internal fun loadSyncAndSearchConfigurationPreference(preference: Preference) {
-        preference.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
-            " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
-    }
-
-    private fun Constants.GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
-
-    internal fun loadAppVersionInPreference(preference: Preference) {
-        preference.summary = preferencesManager.appVersionName
-    }
-
-    internal fun loadScannerVersionInPreference(preference: Preference) {
-        preference.summary = preferencesManager.hardwareVersionString
-    }
-
-    internal fun loadDeviceIdInPreference(preference: Preference) {
-        preference.summary = preferencesManager.deviceId
     }
 
     private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String): Boolean {
@@ -222,10 +185,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         return true
     }
 
-    private fun handleLogoutPreferenceClicked() {
-        view.showConfirmationDialogForLogout()
-    }
-
     private fun selectionContainsDefaultFingers(fingersHash: HashSet<String>): Boolean =
         fingersHash.containsAll(getHashSetFromFingersMap(preferencesManager.getRemoteConfigFingerStatus()))
 
@@ -236,14 +195,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         mutableMapOf<FingerIdentifier, Boolean>().apply {
             fingersHash.map { FingerIdentifier.valueOf(it) }.forEach { this[it] = true }
         }
-
-    override fun logout() {
-        dbManager.signOut()
-        syncSchedulerHelper.cancelDownSyncWorkers()
-        sessionEventManager.signOut()
-
-        view.finishSettings()
-    }
 
     companion object {
         const val MAX_SELECTED_MODULES = 6

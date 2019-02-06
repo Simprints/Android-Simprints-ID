@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/settings_about">
+        <Preference
+            android:key="@string/app_version_preference"
+            android:title="@string/about_app_version" />
+
+        <Preference
+            android:key="@string/scanner_version_preference"
+            android:title="@string/about_scanner_version" />
+
+        <Preference
+            android:key="@string/sync_and_search_configuration_preference"
+            android:title="@string/settings_sync_and_search_configuration"/>
+
+        <Preference
+            android:key="@string/device_id_preference"
+            android:title="@string/device_id_title"/>
+
+        <Preference
+            android:key="@string/logout_preference"
+            android:title="@string/logout_preference"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

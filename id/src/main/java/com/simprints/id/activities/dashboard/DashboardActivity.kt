@@ -34,6 +34,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
         private const val LONG_CONSENT_ACTIVITY_REQUEST_CODE = 2
+
         private const val LOGOUT_RESULT_CODE = 1
 
     }
