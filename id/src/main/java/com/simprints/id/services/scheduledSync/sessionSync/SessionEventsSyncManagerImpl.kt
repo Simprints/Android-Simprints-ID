@@ -1,37 +1,42 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.work.*
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 open class SessionEventsSyncManagerImpl(getWorkManager: () -> WorkManager = WorkManager::getInstance) : SessionEventsSyncManager {
 
-    val workerManager = getWorkManager()
+    private val workerManager = getWorkManager()
 
-    override fun scheduleSessionsSync() = createAndEnqueueRequest()
+    override fun scheduleSessionsSync() {
+        createAndEnqueueRequest()
+    }
 
     internal fun createAndEnqueueRequest(time: Long = SYNC_REPEAT_INTERVAL,
                                          unit: TimeUnit = SYNC_REPEAT_UNIT,
-                                         version: Long = MASTER_WORKER_VERSION) {
+                                         version: Long = MASTER_WORKER_VERSION,
+                                         tag: String = MASTER_WORKER_TAG): UUID {
 
-        cancelAnyNotVersionedWorkerMasterTask()
-        cancelPreviousVersionedWorkerMasterTask()
+        cancelAnyNotVersionedWorkerMaster()
+        cancelPreviousVersionedWorkerMaster()
 
         val uniqueName = getMasterWorkerUniqueName(version)
-        PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(time, unit)
+        return PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(time, unit)
             .setConstraints(getConstraints())
-            .addTag(MASTER_WORKER_TAG)
-            .build().also {
+            .addTag(tag)
+            .build().let {
                 WorkManager.getInstance().enqueueUniquePeriodicWork(
                     uniqueName,
                     ExistingPeriodicWorkPolicy.KEEP, it)
+                it.id
             }
     }
 
-    private fun cancelAnyNotVersionedWorkerMasterTask() {
+    private fun cancelAnyNotVersionedWorkerMaster() {
         WorkManager.getInstance().cancelUniqueWork(getMasterWorkerUniqueName())
     }
 
-    private fun cancelPreviousVersionedWorkerMasterTask(){
+    private fun cancelPreviousVersionedWorkerMaster(){
         ((MASTER_WORKER_VERSION - 1).downTo(0)).forEach {
             WorkManager.getInstance().cancelUniqueWork(getMasterWorkerUniqueName(it))
         }
