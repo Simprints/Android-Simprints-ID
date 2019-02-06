@@ -11,8 +11,7 @@ open class SessionEventsSyncManagerImpl(getWorkManager: () -> WorkManager = Work
 
     internal fun createAndEnqueueRequest(time: Long = SYNC_REPEAT_INTERVAL,
                                          unit: TimeUnit = SYNC_REPEAT_UNIT,
-                                         version: Long = MASTER_WORKER_VERSION,
-                                         tag: String = MASTER_WORKER_TAG) {
+                                         version: Long = MASTER_WORKER_VERSION) {
 
         cancelAnyNotVersionedWorkerMasterTask()
         cancelPreviousVersionedWorkerMasterTask()
@@ -28,11 +27,11 @@ open class SessionEventsSyncManagerImpl(getWorkManager: () -> WorkManager = Work
             }
     }
 
-    internal fun cancelAnyNotVersionedWorkerMasterTask() {
+    private fun cancelAnyNotVersionedWorkerMasterTask() {
         WorkManager.getInstance().cancelUniqueWork(getMasterWorkerUniqueName())
     }
 
-    internal fun cancelPreviousVersionedWorkerMasterTask(){
+    private fun cancelPreviousVersionedWorkerMasterTask(){
         ((MASTER_WORKER_VERSION - 1).downTo(0)).forEach {
             WorkManager.getInstance().cancelUniqueWork(getMasterWorkerUniqueName(it))
         }
