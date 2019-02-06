@@ -19,7 +19,7 @@ import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
 import com.simprints.id.tools.TimeoutBar
 import com.simprints.id.tools.extensions.launchAlert
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -41,7 +41,7 @@ class CollectFingerprintsActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_collect_fingerprints)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         configureRightToLeft()
 
