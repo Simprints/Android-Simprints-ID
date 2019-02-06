@@ -16,6 +16,11 @@ buildscript {
     ext.variant_for_android_tests = "debug"
     ext.work_version = "1.0.0-beta02"
 
+    // RxJava
+    ext.rxjava_version = "2.2.3"
+    ext.rxandroid_version = "2.1.0"
+    ext.rxkotlin_version = "2.2.0"
+
     repositories {
         google()
         jcenter()

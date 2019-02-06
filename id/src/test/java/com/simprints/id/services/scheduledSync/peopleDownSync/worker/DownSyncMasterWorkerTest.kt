@@ -11,7 +11,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScop
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants
-import com.simprints.id.shared.whenever
+import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import org.junit.Assert.assertEquals

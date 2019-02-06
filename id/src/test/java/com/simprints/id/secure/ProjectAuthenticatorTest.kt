@@ -20,9 +20,9 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.id.shared.anyNotNull
+import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.id.shared.createMockBehaviorService
-import com.simprints.id.shared.whenever
+import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.initLogInStateMock

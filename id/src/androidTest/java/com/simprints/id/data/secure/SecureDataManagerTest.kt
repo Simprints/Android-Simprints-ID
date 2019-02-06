@@ -9,8 +9,8 @@ import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.assertThrows
+import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.assertThrows
 import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.delegates.lazyVar
 import junit.framework.TestCase.assertEquals

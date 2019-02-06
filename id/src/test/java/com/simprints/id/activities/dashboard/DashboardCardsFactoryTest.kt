@@ -21,13 +21,13 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.whenever
+import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.initLogInStateMock
 import com.simprints.id.testUtils.roboletric.mockLoadProject
 import com.simprints.id.testUtils.roboletric.setUserLogInState
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Single

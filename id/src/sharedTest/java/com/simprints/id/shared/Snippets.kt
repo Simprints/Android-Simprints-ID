@@ -1,6 +1,7 @@
 package com.simprints.id.shared
 
 import com.simprints.id.data.secure.keystore.KeystoreManager
+import com.simprints.testframework.common.syntax.anyNotNull
 import org.mockito.Mockito
 import org.mockito.stubbing.Answer
 

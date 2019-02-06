@@ -32,7 +32,7 @@ import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.id.shared.PreferencesModuleForAnyTests
-import com.simprints.id.shared.whenever
+import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testTemplates.FirstUseLocalAndRemote
 import com.simprints.id.testTools.LoginManagerTest
 import com.simprints.id.testTools.models.TestProject

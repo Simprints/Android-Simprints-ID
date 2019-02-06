@@ -63,6 +63,11 @@ dependencies {
     // Mock server
     implementation 'com.squareup.okhttp3:mockwebserver:3.10.0'
 
+    // Reactive
+    implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+    implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin_version"
+
     // Firebase
     implementation "com.google.firebase:firebase-core:16.0.6"
 

@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.shared.whenever
+import com.simprints.testframework.common.syntax.whenever
 
 fun mockLoginInfoManager(loginInfoManagerMock: LoginInfoManager,
                                 encryptedProjectSecret: String = "encryptedProjectSecret",
