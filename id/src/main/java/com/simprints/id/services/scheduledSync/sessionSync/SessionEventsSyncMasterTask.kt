@@ -22,9 +22,12 @@ class SessionEventsSyncMasterTask(
     }
 
     fun execute(): Completable =
-        sessionEventsManager.loadSessions(projectId).map { it.toList() }
+        loadSessionsToUpload()
             .createBatches()
             .executeUploaderTask()
+
+    private fun loadSessionsToUpload() =
+        sessionEventsManager.loadSessions(projectId).map { it.toList() }
 
     internal fun Single<List<SessionEvents>>.createBatches(): Observable<List<SessionEvents>> =
         this.flattenAsObservable { it }
@@ -34,10 +37,10 @@ class SessionEventsSyncMasterTask(
     internal fun Observable<List<SessionEvents>>.executeUploaderTask(): Completable =
         this.concatMapCompletable {
             createUploadBatchTaskCompletable(it).doOnError { t ->
-                    if (t !is NoSessionsFoundException) {
-                        analyticsManager.logThrowable(t)
-                    }
-                }.onErrorComplete()
+                if (t !is NoSessionsFoundException) {
+                    analyticsManager.logThrowable(t)
+                }
+            }.onErrorComplete()
         }
 
     internal fun createUploadBatchTaskCompletable(sessions: List<SessionEvents>): Completable =
