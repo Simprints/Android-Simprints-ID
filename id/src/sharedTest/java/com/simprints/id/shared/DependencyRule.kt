@@ -1,5 +1,6 @@
 package com.simprints.id.shared
 
+import com.simprints.testframework.common.syntax.mock
 import org.mockito.Mockito.spy
 
 sealed class DependencyRule {

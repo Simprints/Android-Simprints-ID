@@ -5,9 +5,9 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
-import com.simprints.testframework.common.mocking.mock
-import com.simprints.testframework.common.mocking.whenever
-import com.simprints.testframework.common.mocking.thenReturn
+import com.simprints.testframework.common.syntax.mock
+import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.common.syntax.thenReturn
 import com.simprints.id.activities.CheckLoginFromIntentActivityTest
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -18,7 +18,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.cryptography.Hasher
-import com.simprints.id.shared.anyNotNull
+import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.id.testUtils.roboletric.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
 import io.reactivex.Completable
 import io.reactivex.Single

@@ -14,8 +14,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.cryptography.Hasher
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.whenever
+import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer

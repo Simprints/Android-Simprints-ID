@@ -5,7 +5,6 @@ import com.google.gson.JsonObject
 import com.simprints.id.data.analytics.eventData.models.domain.EventType
 import com.simprints.id.data.analytics.eventData.models.domain.events.*
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.shared.valuesAsStrings
 import com.simprints.id.tools.extensions.getString
 import com.simprints.id.tools.extensions.isGuid
 import com.simprints.libsimprints.FingerIdentifier
@@ -276,4 +275,4 @@ fun validateSessionEventsApiModel(json: JsonObject) {
     assertThat(json.size()).isEqualTo(countFields)
 }
 
-
+private fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }

@@ -19,7 +19,7 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.shared.PeopleGeneratorUtils
 import com.simprints.id.shared.createMockBehaviorService
-import com.simprints.id.shared.whenever
+import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.sync.SimApiMock
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.retrofit.mockServer.mockNotFoundResponse

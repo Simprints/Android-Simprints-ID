@@ -1,18 +1,31 @@
-package com.simprints.id.shared
+package com.simprints.testframework.common.syntax
 
+import com.nhaarman.mockito_kotlin.atLeast
+import com.nhaarman.mockito_kotlin.atMost
+import com.nhaarman.mockito_kotlin.times
 import io.reactivex.observers.TestObserver
 import junit.framework.AssertionFailedError
-import org.junit.Assert.assertEquals
+import org.junit.Assert
 import org.mockito.Mockito
-import org.mockito.stubbing.OngoingStubbing
-import java.security.SecureRandom
+import org.mockito.verification.VerificationMode
 
+fun <T> verifyOnce(mock: T, methodCall: T.() -> Any?) =
+    verifyExactly(1, mock, methodCall)
 
-inline fun <reified T> mock(): T =
-        Mockito.mock(T::class.java)
+fun <T> verifyNever(mock: T, methodCall: T.() -> Any?) =
+    verifyExactly(0, mock, methodCall)
 
-fun <T> whenever(methodCall: T): OngoingStubbing<T> =
-        Mockito.`when`(methodCall)
+fun <T> verifyExactly(times: Int, mock: T, methodCall: T.() -> Any?) =
+    verify(::times, times, mock, methodCall)
+
+fun <T> verifyAtLeast(times: Int, mock: T, methodCall: T.() -> Any?) =
+    verify(::atLeast, times, mock, methodCall)
+
+fun <T> verifyAtMost(times: Int, mock: T, methodCall: T.() -> Any?) =
+    verify(::atMost, times, mock, methodCall)
+
+private fun <T> verify(mode: (Int) -> VerificationMode, times: Int, mock: T, methodCall: T.() -> Any?) =
+    Mockito.verify(mock, mode(times)).methodCall()
 
 fun <T> verifyOnlyInteraction(mock: T, methodCall: T.() -> Any?) {
     Mockito.verify(mock).methodCall()
@@ -26,22 +39,6 @@ fun <T> verifyOnlyInteractions(mock: T, vararg methodCalls: T.() -> Any?) {
     Mockito.verifyNoMoreInteractions(mock)
 }
 
-fun <T> anyNotNull(): T {
-    try {
-        Mockito.any<T>()
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-
-    return uninitialized()
-}
-fun <T> uninitialized(): T = null as T
-
-/**
- * Junit 5 has a nice assertThrows method
- * (http://junit.org/junit5/docs/current/secureApi/org/junit/jupiter/secureApi/Assertions.html#assertThrows-java.lang.Class-org.junit.jupiter.secureApi.function.Executable-)
- * This is a placeholder until we migrate from JUnit 4 to Junit 5
- */
 inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {
     try {
         executable()
@@ -56,18 +53,11 @@ inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {
 
 inline fun <reified T : Throwable> assertThrows(throwable: T, executable: () -> Unit): T {
     val thrown = assertThrows<T>(executable)
-    assertEquals(throwable, thrown)
+    Assert.assertEquals(throwable, thrown)
     return thrown
 }
 
 fun <T> TestObserver<T>.waitForCompletionAndAssertNoErrors() {
     this.awaitTerminalEvent()
     this.assertNoErrors()
-}
-
-fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }
-
-fun <T : Enum<*>> randomEnum(clazz: Class<T>): T {
-    val x = SecureRandom().nextInt(clazz.enumConstants.size)
-    return clazz.enumConstants[x]
 }
