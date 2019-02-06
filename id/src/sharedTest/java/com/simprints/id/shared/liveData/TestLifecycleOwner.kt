@@ -1,4 +1,4 @@
-package com.simprints.id.testUtils.liveData
+package com.simprints.id.shared.liveData
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner

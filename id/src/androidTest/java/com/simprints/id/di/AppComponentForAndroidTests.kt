@@ -10,6 +10,7 @@ import com.simprints.id.data.secure.SecureDataManagerTest
 import com.simprints.id.secure.AuthTestsHappyWifi
 import com.simprints.id.secure.AuthTestsNoWifi
 import com.simprints.id.service.GuidSelectionServiceTest
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImplITest
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderTaskEndToEndTest
 import dagger.Component
 import dagger.android.AndroidInjectionModule
@@ -29,4 +30,5 @@ interface AppComponentForAndroidTests : AppComponent {
     fun inject(localSessionEventsManagerImplTest: RealmSessionEventsDbManagerImplTest)
     fun inject(dashboardActivityAndroidTest: DashboardActivityAndroidTest)
     fun inject(sessionEventsUploaderTaskEndToEndTest: SessionEventsUploaderTaskEndToEndTest)
+    fun inject(sessionEentsSyncManagerImplITest: SessionEventsSyncManagerImplITest)
 }

@@ -226,6 +226,7 @@ dependencies {
     testImplementation "androidx.test.ext:junit:1.1.0"
     testImplementation "androidx.test:core:$androidx_version"
     testImplementation 'android.arch.core:core-testing:1.1.1'
+    androidTestImplementation 'android.arch.core:core-testing:1.1.1'
 
     implementation "org.checkerframework:checker-compat-qual:2.5.3"
     testImplementation "com.google.truth:truth:0.42"
@@ -245,6 +246,7 @@ dependencies {
     // Android test - https://developer.android.com/training/testing/release-notes
     androidTestImplementation "org.mockito:mockito-core:$mockito_version"
     androidTestImplementation "org.mockito:mockito-android:$mockito_version"
+
     androidTestImplementation 'androidx.test:monitor:1.1.1'
     androidTestImplementation "androidx.test:core:1.1.0"
     androidTestImplementation "androidx.test.ext:junit:1.1.0"
