@@ -83,12 +83,12 @@
     <!-- Button Labels -->
     <string name="rescan_label">Re-scan</string>
     <string name="rescan_label_question">Re-scan?</string>
-    <string name="scan_label">SCAN</string>
-    <string name="cancel_button" tools:ignore="ButtonCase">CANCEL</string>
+    <string name="scan_label">Scan</string>
+    <string name="cancel_button" tools:ignore="ButtonCase">Cancel</string>
     <string name="ok">OK</string>
-    <string name="scan">SCAN</string>
-    <string name="confirm">CONFIRM</string>
-    <string name="restart">RESTART</string>
+    <string name="scan">Scan</string>
+    <string name="confirm">Confirm</string>
+    <string name="restart">Restart</string>
     <!-- Content Descriptions -->
     <string name="finger_image_description" translatable="false">Hands with arrow pointing to a finger</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
@@ -103,16 +103,16 @@
     <string name="coming_soon">Coming soon…</string>
     <string name="wait_for_current_sync_to_finish">Please wait for the current sync operation to finish</string>
     <!-- Finger Names -->
-    <string name="l_5_finger_name">LEFT FIFTH FINGER</string>
-    <string name="l_4_finger_name">LEFT FOURTH FINGER</string>
-    <string name="l_3_finger_name">LEFT THIRD FINGER</string>
-    <string name="l_2_finger_name">LEFT INDEX FINGER</string>
-    <string name="l_1_finger_name">LEFT THUMB</string>
-    <string name="r_1_finger_name">RIGHT THUMB</string>
-    <string name="r_2_finger_name">RIGHT INDEX FINGER</string>
-    <string name="r_3_finger_name">RIGHT THIRD FINGER</string>
-    <string name="r_4_finger_name">RIGHT FOURTH FINGER</string>
-    <string name="r_5_finger_name">RIGHT FIFTH FINGER</string>
+    <string name="l_5_finger_name">Left Fifth Finger</string>
+    <string name="l_4_finger_name">Left Fourth Finger</string>
+    <string name="l_3_finger_name">Left Third Finger</string>
+    <string name="l_2_finger_name">Left Index Finger</string>
+    <string name="l_1_finger_name">Left Thumb</string>
+    <string name="r_1_finger_name">Right Thumb</string>
+    <string name="r_2_finger_name">Right Index Finger</string>
+    <string name="r_3_finger_name">Right Third Finger</string>
+    <string name="r_4_finger_name">Right Fourth Finger</string>
+    <string name="r_5_finger_name">Right Fifth Finger</string>
     <!-- Content descriptions -->
     <string name="navbar_simprints_logo">Simprints logo</string>
 
@@ -145,12 +145,12 @@
 
     <!-- AlertActivity : the Simprints ID error message screen -->
     <!-- Error Message Titles -->
-    <string name="bluetooth_error_title">BLUETOOTH ERROR</string>
-    <string name="configuration_error_title">CONFIGURATION ERROR</string>
-    <string name="disconnected_title">SCANNER NOT FOUND</string>
-    <string name="verify_guid_not_found_title">PERSON NOT FOUND</string>
-    <string name="error_occurred_title">ERROR OCCURRED</string>
-    <string name="low_battery_title">LOW BATTERY</string>
+    <string name="bluetooth_error_title">Bluetooth Error</string>
+    <string name="configuration_error_title">Configuration Error</string>
+    <string name="disconnected_title">Scanner not found</string>
+    <string name="verify_guid_not_found_title">Person not found</string>
+    <string name="error_occurred_title">Error occurred</string>
+    <string name="low_battery_title">Low battery</string>
     <string name="alert_api_key_verify_failed">Failed to verify API key</string>
     <!-- Error Message Text -->
     <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
