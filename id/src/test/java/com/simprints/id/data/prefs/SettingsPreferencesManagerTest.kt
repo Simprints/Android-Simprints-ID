@@ -10,11 +10,10 @@ import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.domain.Constants
 import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
-import com.simprints.testframework.common.syntax.assertThrows
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
-import com.simprints.testframework.common.syntax.thenReturn
+import com.simprints.testframework.common.syntax.assertThrows
 import com.simprints.testframework.common.syntax.verifyExactly
 import com.simprints.testframework.common.syntax.verifyOnce
 import com.simprints.testframework.common.syntax.whenever

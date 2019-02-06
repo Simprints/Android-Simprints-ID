@@ -1,13 +1,9 @@
 package com.simprints.id.experimental.testtools
 
 import android.content.SharedPreferences
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
-import com.simprints.testframework.common.syntax.mock
-import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.common.syntax.thenReturn
 import com.simprints.id.activities.CheckLoginFromIntentActivityTest
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -18,8 +14,10 @@ import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.cryptography.Hasher
-import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.id.testUtils.roboletric.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
+import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.mock
+import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
@@ -34,7 +32,7 @@ object RobolectricTestMocker {
         whenever { localDbManagerMock.loadProjectFromLocal(anyNotNull()) } thenReturn Single.just(project)
         whenever { remoteProjectManagerMock.loadProjectFromRemote(anyNotNull()) } thenReturn Single.just(project)
         whenever { localDbManagerMock.saveProjectIntoLocal(anyNotNull()) } thenReturn Completable.complete()
-        whenever { remoteProjectManagerMock.loadProjectRemoteConfigSettingsJsonString(anyNotNull()) } thenReturn Single.just<JsonElement>(projectSettings)
+        whenever { remoteProjectManagerMock.loadProjectRemoteConfigSettingsJsonString(anyNotNull()) } thenReturn Single.just(projectSettings)
         return this
     }
 
