@@ -9,7 +9,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSy
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

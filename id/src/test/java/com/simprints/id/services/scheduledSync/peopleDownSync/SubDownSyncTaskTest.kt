@@ -30,13 +30,13 @@ import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.testTools.extensions.awaitAndAssertSuccess
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.mockServer.assertPathUrlParam
-import com.simprints.id.testUtils.mockServer.assertQueryUrlParam
+import com.simprints.testframework.unit.mockserver.assertPathUrlParam
+import com.simprints.testframework.unit.mockserver.assertQueryUrlParam
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper
-import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse

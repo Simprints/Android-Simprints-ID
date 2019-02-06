@@ -22,8 +22,8 @@ import com.simprints.id.testUtils.roboletric.injectHowToResolveScannerAppIntent
 import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.scannerAppIntent
-import com.simprints.testframework.unit.RobolectricDaggerTestConfig
-import com.simprints.testframework.unit.RobolectricHelper
+import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert

@@ -13,7 +13,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMa
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Ignore

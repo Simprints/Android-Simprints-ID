@@ -1,4 +1,4 @@
-package com.simprints.testframework.unit
+package com.simprints.testframework.unit.robolectric
 
 import android.content.Context
 import android.util.Log

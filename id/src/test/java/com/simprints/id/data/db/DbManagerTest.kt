@@ -1,8 +1,6 @@
 package com.simprints.id.data.db
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
@@ -32,7 +30,7 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.setupLocalAndRemoteManagersForApiTesting
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libcommon.Person
-import com.simprints.testframework.unit.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After

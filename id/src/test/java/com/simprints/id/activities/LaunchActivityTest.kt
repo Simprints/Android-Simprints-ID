@@ -16,8 +16,8 @@ import com.simprints.id.shared.mockSettingsPreferencesManager
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.testframework.unit.RobolectricDaggerTestConfig
-import com.simprints.testframework.unit.RobolectricHelper
+import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import junit.framework.TestCase.assertEquals
 import kotlinx.android.synthetic.main.activity_launch.*
 import org.junit.Before
