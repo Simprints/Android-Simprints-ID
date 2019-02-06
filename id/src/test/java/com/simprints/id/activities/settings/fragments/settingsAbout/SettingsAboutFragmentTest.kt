@@ -8,7 +8,8 @@ import com.nhaarman.mockito_kotlin.doNothing
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.activities.settings.SettingsAboutActivity
+import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.shared.DependencyRule
@@ -23,16 +24,12 @@ import org.mockito.Mockito.times
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
 
-
-
-
-
 @Suppress("UsePropertyAccessSyntax")
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SettingsPreferenceFragmentTest: RxJavaTest, DaggerForTests() {
+class SettingsAboutFragmentTest: RxJavaTest, DaggerForTests() {
 
-    lateinit var settingsActivity: SettingsActivity
+    lateinit var settingsAboutActivity: SettingsAboutActivity
 
     override var module by lazyVar {
         AppModuleForTests(app,
@@ -46,7 +43,7 @@ class SettingsPreferenceFragmentTest: RxJavaTest, DaggerForTests() {
         super.setUp()
         testAppComponent.inject(this)
 
-       settingsActivity = Robolectric.buildActivity(SettingsActivity::class.java)
+        settingsAboutActivity = Robolectric.buildActivity(SettingsAboutActivity::class.java)
            .create()
            .start()
            .resume()
@@ -55,8 +52,8 @@ class SettingsPreferenceFragmentTest: RxJavaTest, DaggerForTests() {
 
     @Test
     fun logoutDialogShown_userClicksOk_presenterShouldPerformLogout() {
-        val fragmentManager = settingsActivity.fragmentManager
-        val fragment = fragmentManager.findFragmentById(com.simprints.id.R.id.prefContent) as SettingsPreferenceFragment
+        val fragmentManager = settingsAboutActivity.fragmentManager
+        val fragment = fragmentManager.findFragmentById(com.simprints.id.R.id.prefContent) as SettingsAboutFragment
         fragment.viewPresenter = spy(fragment.viewPresenter)
         doNothing().whenever(fragment.viewPresenter).logout()
         val dialog = fragment.buildConfirmationDialogForLogout()

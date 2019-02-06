@@ -406,7 +406,7 @@
     <string name="app_version_preference">app_version</string>
     <string name="scanner_version_preference">scanner_version</string>
     <string name="device_id_preference">device_id</string>
-    <string name="logout_preference">Logout</string>
+    <string name="logout_preference">Log Out</string>
     <string name="settings_language">Language</string>
     <string name="settings_modules">Select modules</string>
     <string name="settings_fingers">Select default fingers</string>
@@ -424,5 +424,7 @@
     <string name="settings_invalid_selection">Invalid Selection</string>
     <string name="setting_others">OTHERS</string>
     <string name="settings_logout_subtext">You will need to be online to login again.</string>
+    <string name="about_preference">About App</string>
+    <string name="title_activity_settings_about">About</string>
 
 </resources>
