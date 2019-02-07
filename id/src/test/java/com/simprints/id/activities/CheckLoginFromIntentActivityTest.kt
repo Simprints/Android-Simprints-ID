@@ -22,7 +22,6 @@ import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.SpyRule
-import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.setUserLogInState
@@ -31,6 +30,7 @@ import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
+import com.simprints.testframework.unit.robolectric.RobolectricHelper.assertActivityStarted
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
