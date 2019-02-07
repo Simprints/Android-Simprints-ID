@@ -12,77 +12,77 @@ public enum ALERT_TYPE {
 
     INVALID_API_KEY(R.string.configuration_error_title, R.string.invalid_apikey_message,
             R.drawable.error_icon, R.drawable.error_hint_key, R.string.empty, R.string.close,
-            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_API_KEY, false),
+            false, R.color.simprints_yellow, Constants.SIMPRINTS_INVALID_API_KEY, false),
 
     INVALID_PROJECT_ID(R.string.configuration_error_title, R.string.invalid_projectId_message,
         R.drawable.error_icon, R.drawable.error_hint_key, R.string.empty, R.string.close,
-        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_PROJECT_ID, false),
+        false, R.color.simprints_yellow, Constants.SIMPRINTS_INVALID_PROJECT_ID, false),
 
     MISSING_PROJECT_ID_OR_API_KEY(R.string.configuration_error_title, R.string.missing_projectId_or_apiKey_message,
         R.drawable.error_icon, R.drawable.error_hint_key, R.string.empty, R.string.close,
-        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_PROJECT_ID, false),
+        false, R.color.simprints_yellow, Constants.SIMPRINTS_MISSING_PROJECT_ID, false),
 
     DIFFERENT_PROJECT_ID(R.string.configuration_error_title, R.string.different_projectId_message,
         R.drawable.error_icon, R.drawable.error_hint_key, R.string.empty, R.string.close,
-        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_DIFFERENT_PROJECT_ID, false),
+        false, R.color.simprints_yellow, Constants.SIMPRINTS_DIFFERENT_PROJECT_ID, false),
 
     DIFFERENT_USER_ID(R.string.configuration_error_title, R.string.different_userId_message,
         R.drawable.error_icon, R.drawable.error_hint_key, R.string.empty, R.string.close,
-        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_DIFFERENT_USER_ID, false),
+        false, R.color.simprints_yellow, Constants.SIMPRINTS_DIFFERENT_USER_ID, false),
 
     INVALID_INTENT_ACTION(R.string.configuration_error_title, R.string.invalid_intentAction_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_METADATA, false),
+            false, R.color.simprints_yellow, Constants.SIMPRINTS_INVALID_METADATA, false),
 
     INVALID_METADATA(R.string.configuration_error_title, R.string.invalid_metadata_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_INTENT_ACTION, false),
+            false, R.color.simprints_yellow, Constants.SIMPRINTS_INVALID_INTENT_ACTION, false),
 
     MISSING_USER_ID(R.string.configuration_error_title, R.string.missing_userId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_USER_ID, false),
+            false, R.color.simprints_yellow, Constants.SIMPRINTS_MISSING_USER_ID, false),
 
     INVALID_USER_ID(R.string.configuration_error_title, R.string.invalid_userId_message,
         R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_USER_ID, false),
+        false, R.color.simprints_yellow, Constants.SIMPRINTS_INVALID_USER_ID, false),
 
 
     MISSING_MODULE_ID(R.string.configuration_error_title, R.string.missing_moduleId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_MODULE_ID, false),
+            false, R.color.simprints_yellow, Constants.SIMPRINTS_MISSING_MODULE_ID, false),
 
     INVALID_MODULE_ID(R.string.configuration_error_title, R.string.invalid_moduleId_message,
         R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_MODULE_ID, false),
+        false, R.color.simprints_yellow, Constants.SIMPRINTS_INVALID_MODULE_ID, false),
 
     MISSING_UPDATE_GUID(R.string.configuration_error_title, R.string.missing_updateId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_UPDATE_GUID, false),
+            false, R.color.simprints_yellow, Constants.SIMPRINTS_MISSING_UPDATE_GUID, false),
 
     INVALID_UPDATE_GUID(R.string.configuration_error_title, R.string.invalid_updateId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_UPDATE_GUID, false),
+            false, R.color.simprints_yellow, Constants.SIMPRINTS_INVALID_UPDATE_GUID, false),
 
     MISSING_VERIFY_GUID(R.string.configuration_error_title, R.string.missing_verifyId_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_MISSING_VERIFY_GUID, false),
+            false, R.color.simprints_yellow, Constants.SIMPRINTS_MISSING_VERIFY_GUID, false),
 
     INVALID_VERIFY_GUID(R.string.configuration_error_title, R.string.invalid_verifyId_message,
         R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_VERIFY_GUID, false),
+        false, R.color.simprints_yellow, Constants.SIMPRINTS_INVALID_VERIFY_GUID, false),
 
     INVALID_RESULT_FORMAT(R.string.configuration_error_title, R.string.invalid_resultFormat_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_RESULT_FORMAT, false),
+            false, R.color.simprints_yellow, Constants.SIMPRINTS_INVALID_RESULT_FORMAT, false),
 
     INVALID_CALLING_PACKAGE(R.string.configuration_error_title, R.string.invalid_callingPackage_message,
         R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-        false, R.color.simprints_alert_orange, Constants.SIMPRINTS_INVALID_CALLING_PACKAGE, false),
+        false, R.color.simprints_yellow, Constants.SIMPRINTS_INVALID_CALLING_PACKAGE, false),
 
 
     UNEXPECTED_PARAMETER(R.string.configuration_error_title, R.string.unexpected_parameter_message,
             R.drawable.error_icon, R.drawable.error_hint_cog, R.string.empty, R.string.close,
-            false, R.color.simprints_alert_orange, Constants.SIMPRINTS_CANCELLED, false),
+            false, R.color.simprints_yellow, Constants.SIMPRINTS_CANCELLED, false),
 
     // Verification errors
 
@@ -104,7 +104,7 @@ public enum ALERT_TYPE {
 
     BLUETOOTH_NOT_SUPPORTED(R.string.bluetooth_error_title, R.string.bluetooth_not_supported_message,
             R.drawable.bt_error_icon, R.drawable.bt_not_enabled, R.string.try_again_label, R.string.settings_label,
-            false, R.color.simprints_alert_orange, RESULT_CANCELED, false),
+            false, R.color.simprints_yellow, RESULT_CANCELED, false),
 
     BLUETOOTH_NOT_ENABLED(R.string.bluetooth_error_title, R.string.bluetooth_not_enabled_message,
             R.drawable.bt_error_icon, R.drawable.bt_not_enabled, R.string.try_again_label, R.string.settings_label,

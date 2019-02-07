@@ -6,7 +6,8 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_SECRET
@@ -40,12 +41,16 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
-    @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
+    @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
+
+    @Inject lateinit var remoteSessionsManagerSpy: RemoteSessionsManager
 
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
             randomGeneratorRule = MockRule,
             remoteDbManagerRule = SpyRule,
+            remotePeopleManagerRule = SpyRule,
+            remoteSessionsManagerRule =  SpyRule,
             secureApiInterfaceRule = ReplaceRule { replaceSecureApiClientWithFailingClientProvider() })
     }
 
@@ -55,7 +60,7 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
-        replaceRemoteDbManagerApiClientsWithFailingClients(remoteDbManagerSpy)
+        replaceRemoteDbManagerApiClientsWithFailingClients(remotePeopleManagerSpy, remoteSessionsManagerSpy)
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration

@@ -28,14 +28,16 @@ class PeopleUpSyncPeriodicFlusherWorker(context: Context, params: WorkerParamete
         injectDependencies()
         peopleUpSyncMaster.schedule(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
 
-        return Result.SUCCESS
+        return Result.success()
     }
 
     private fun injectDependencies() {
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw WorkerInjectionFailedError.forWorker<PeopleUpSyncPeriodicFlusherWorker>()
+        } else {
+            throw WorkerInjectionFailedError.forWorker<PeopleUpSyncPeriodicFlusherWorker>()
+        }
     }
 
     companion object {

@@ -17,6 +17,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
@@ -40,6 +41,7 @@ import com.simprints.id.testTools.tryOnUiUntilTimeout
 import com.simprints.id.testTools.waitOnSystem
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
+import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.hamcrest.CoreMatchers.not
@@ -57,9 +59,9 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     companion object {
         private val modules = setOf("module1", "module2", "module3")
-        private const val N_PEOPLE_ON_SERVER_PER_MODULE = 300 //300 * 3 = 900
+        private const val N_PEOPLE_ON_SERVER_PER_MODULE = 200 //200 * 3 (#modules) = 600
         private const val N_PEOPLE_ON_DB_PER_MODULE = 30
-        private const val PEOPLE_UPLOAD_BATCH_SIZE = 80
+        private const val PEOPLE_UPLOAD_BATCH_SIZE = 20
         private const val SIGNED_ID_USER = "some_user"
     }
 
@@ -71,6 +73,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     @Inject lateinit var secureDataManagerSpy: SecureDataManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
+    @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
@@ -229,9 +232,11 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     private fun uploadFakePeopleAndPrepareLocalDb(syncScope: SyncScope) {
         peopleOnServer = PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_SERVER_PER_MODULE, syncScope, listOf(false))
-        peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).forEach {
-            remoteDbManagerSpy.uploadPeople(testProject.id, it).blockingAwait()
+        val requests = peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).map {
+            remotePeopleManagerSpy.uploadPeople(testProject.id, it)
         }
+        Completable.merge(requests).blockingAwait()
+
         peopleInDb.addAll(PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_DB_PER_MODULE, syncScope, listOf(true, false)))
         localDbManager.insertOrUpdatePeopleInLocal(peopleInDb).blockingAwait()
     }
@@ -255,7 +260,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     @After
     override fun tearDown() {
-        super.tearDown()
+        //super.tearDown()
     }
 
     private fun signOut() {
