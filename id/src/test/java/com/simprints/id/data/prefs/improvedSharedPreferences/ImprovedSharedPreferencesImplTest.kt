@@ -43,11 +43,11 @@ class ImprovedSharedPreferencesImplTest {
     private fun mockBasePrefsWithValues(int: Int, long: Long, float: Float, string: String,
                                         boolean: Boolean): SharedPreferences {
         val prefs = mock<SharedPreferences>()
-        whenever(prefs.getInt(anyString(), anyInt())).thenReturn(int)
-        whenever(prefs.getLong(anyString(), anyLong())).thenReturn(long)
-        whenever(prefs.getFloat(anyString(), anyFloat())).thenReturn(float)
-        whenever(prefs.getString(anyString(), anyString())).thenReturn(string)
-        whenever(prefs.getBoolean(anyString(), anyBoolean())).thenReturn(boolean)
+        whenever { prefs.getInt(anyString(), anyInt()) } thenReturn int
+        whenever { prefs.getLong(anyString(), anyLong()) } thenReturn long
+        whenever { prefs.getFloat(anyString(), anyFloat()) } thenReturn float
+        whenever { prefs.getString(anyString(), anyString()) } thenReturn string
+        whenever { prefs.getBoolean(anyString(), anyBoolean()) } thenReturn boolean
         return prefs
     }
 
@@ -141,7 +141,7 @@ class ImprovedSharedPreferencesImplTest {
 
     @Test
     fun testGetPrimitiveWrapsExceptionsAsMismatchedTypeExceptions() {
-        whenever(basePrefs.getInt(anyString(), anyInt())).then { throw ClassCastException() }
+        whenever { basePrefs.getInt(anyString(), anyInt()) } thenThrow ClassCastException()
         assertThrows<MismatchedTypeError> {
             improvedPrefs.getPrimitive(aKey, anInt)
         }

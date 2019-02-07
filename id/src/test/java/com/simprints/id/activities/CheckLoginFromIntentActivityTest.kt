@@ -22,14 +22,13 @@ import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.SpyRule
-import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.id.testUtils.roboletric.RobolectricTestMocker
+import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.initLogInStateMock
-import com.simprints.id.testUtils.roboletric.setUserLogInState
-import com.simprints.id.testUtils.roboletric.setupLocalAndRemoteManagersForApiTesting
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import org.junit.Assert
@@ -82,13 +81,12 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForUnitTests() {
     @Before
     fun setUp() {
         RobolectricDaggerTestConfig(this).setupAllAndFinish()
-        setupLocalAndRemoteManagersForApiTesting(
-            localDbManagerSpy = localDbManagerMock,
-            remoteDbManagerSpy = remoteDbManagerMock,
-            sessionEventsLocalDbManagerMock = sessionEventsLocalDbManagerMock)
 
         sharedPrefs = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
-        initLogInStateMock(sharedPrefs, remoteDbManagerMock)
+
+        RobolectricTestMocker
+            .setupLocalAndRemoteManagersForApiTesting(localDbManagerMock, remoteDbManagerMock, sessionEventsLocalDbManagerMock)
+            .initLogInStateMock(sharedPrefs, remoteDbManagerMock)
 
         dbManager.initialiseDb()
     }

@@ -1,4 +1,4 @@
-package com.simprints.id.experimental.testtools
+package com.simprints.id.testUtils.roboletric
 
 import android.content.SharedPreferences
 import com.google.gson.JsonObject
@@ -14,17 +14,16 @@ import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.cryptography.Hasher
-import com.simprints.id.testUtils.roboletric.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
 import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.mock
 import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
-import org.mockito.Mockito.doAnswer
 import org.mockito.stubbing.Answer
 
 object RobolectricTestMocker {
+
+    const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
 
     fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteProjectManagerMock: RemoteProjectManager): RobolectricTestMocker {
         val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }
@@ -42,7 +41,7 @@ object RobolectricTestMocker {
         val answer = Answer<Boolean> {
             sharedPrefs.getBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, false)
         }
-        doAnswer(answer).`when`(remoteDbManagerMock).isSignedIn(anyNotNull(), anyNotNull())
+        whenever { remoteDbManagerMock.isSignedIn(anyNotNull(), anyNotNull()) } thenAnswer answer
         whenever { remoteDbManagerMock.getCurrentFirestoreToken() } thenReturn Single.just("")
         whenever { remoteDbManagerMock.signInToRemoteDb(anyNotNull()) } thenReturn Completable.complete()
         return this
@@ -74,10 +73,10 @@ object RobolectricTestMocker {
         return this
     }
 
-    fun setupLocalAndRemoteManagersForApiTesting(mockServer: MockWebServer? = null,
-                                                 localDbManagerSpy: LocalDbManager,
+    fun setupLocalAndRemoteManagersForApiTesting(localDbManagerSpy: LocalDbManager,
                                                  remoteDbManagerSpy: RemoteDbManager,
-                                                 sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager): RobolectricTestMocker {
+                                                 sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager,
+                                                 mockServer: MockWebServer? = null): RobolectricTestMocker {
 
         PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
         whenever { localDbManagerSpy.insertOrUpdatePersonInLocal(anyNotNull()) } thenReturn Completable.complete()
@@ -94,17 +93,5 @@ object RobolectricTestMocker {
         whenever { sessionEventsLocalDbManagerMock.loadSessions(anyOrNull(), anyOrNull()) } thenReturn Single.error(IllegalStateException())
         whenever { sessionEventsLocalDbManagerMock.insertOrUpdateSessionEvents(any()) } thenReturn Completable.complete()
         return this
-    }
-
-    fun tmp() {
-        class Something
-        class MockedClass {
-            fun getSomething(something: Something) = Something()
-        }
-
-        val someClassMock: MockedClass = mock()
-
-        whenever { someClassMock.getSomething(any()) } thenReturn Something()
-
     }
 }

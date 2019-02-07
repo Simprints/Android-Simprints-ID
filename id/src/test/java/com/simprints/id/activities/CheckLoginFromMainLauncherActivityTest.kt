@@ -14,10 +14,10 @@ import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.testUtils.assertActivityStarted
-import com.simprints.id.testUtils.roboletric.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
+import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
+import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.initLogInStateMock
+import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.initLogInStateMock
-import com.simprints.id.testUtils.roboletric.setUserLogInState
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
