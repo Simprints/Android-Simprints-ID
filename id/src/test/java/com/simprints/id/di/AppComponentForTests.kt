@@ -39,4 +39,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(subCountWorkerTest: SubCountWorkerTest)
     fun inject(subDownSyncWorkerTest: SubDownSyncWorkerTest)
     fun inject(dashboardSyncCardViewModelTest: DashboardSyncCardViewModelTest)
+    fun inject(sessionEventsSyncManagerImplTest: SessionEventsSyncManagerImplTest)
 }
