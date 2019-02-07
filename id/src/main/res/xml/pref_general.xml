@@ -6,24 +6,24 @@
         <ListPreference
             android:entries="@array/language_array"
             android:entryValues="@array/language_values"
-            android:key="@string/select_language_preference"
+            android:key="@string/preference_select_language_key"
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
-            android:title="@string/settings_language" />
+            android:title="@string/preference_select_language_title" />
 
         <MultiSelectListPreference
             android:entries="@array/finger_array"
             android:entryValues="@array/finger_values"
-            android:key="@string/select_fingers_preference"
-            android:summary="@string/settings_fingers_subtext"
-            android:title="@string/settings_fingers" />
+            android:key="@string/preference_select_fingers_key"
+            android:summary="@string/preference_summary_settings_fingers"
+            android:title="@string/preference_select_fingers_title" />
 
         <MultiSelectListPreference
             android:entries="@array/empty"
             android:entryValues="@array/empty"
-            android:key="@string/select_modules_preference"
-            android:summary="@string/settings_modules_subtext"
-            android:title="@string/settings_modules"
+            android:key="@string/preference_select_modules_key"
+            android:summary="@string/preference_summary_modules"
+            android:title="@string/preference_select_modules_title"
             android:shouldDisableView="true"/>
     </PreferenceCategory>
 
@@ -31,8 +31,8 @@
 
     <PreferenceCategory android:title="@string/settings_about">
         <Preference
-            android:key="@string/about_preference"
-            android:title="@string/about_preference"/>
+            android:key="@string/preference_about_key"
+            android:title="@string/preference_about_title"/>
 
     </PreferenceCategory>
 </PreferenceScreen>
