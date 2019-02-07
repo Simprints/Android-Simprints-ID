@@ -16,8 +16,8 @@ import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.testUtils.extensions.showOnScreen
+import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper

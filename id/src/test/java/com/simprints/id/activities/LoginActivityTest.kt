@@ -17,9 +17,9 @@ import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.injectHowToResolveScannerAppIntent
-import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig

@@ -20,14 +20,13 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.id.shared.createMockBehaviorService
-import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.id.testUtils.roboletric.RobolectricTestMocker
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.initLogInStateMock
-import com.simprints.id.testUtils.roboletric.mockLoadProject
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Completable
@@ -74,9 +73,10 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForUnitTests() {
     fun setUp() {
         RobolectricDaggerTestConfig(this).setupAllAndFinish()
 
-        initLogInStateMock(RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
+        RobolectricTestMocker
+            .initLogInStateMock(RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
+            .mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
 
-        mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
         mockLoginInfoManager(loginInfoManagerMock)
         whenever(remoteSessionsManagerMock.getSessionsApiClient()).thenReturn(Single.create { it.onError(IllegalStateException()) })
         whenever(longConsentManager.downloadAllLongConsents(anyNotNull())).thenReturn(Completable.complete())

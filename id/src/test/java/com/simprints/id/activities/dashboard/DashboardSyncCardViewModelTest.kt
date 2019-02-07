@@ -33,10 +33,8 @@ import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.id.shared.liveData.testObserver
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.id.testUtils.roboletric.RobolectricTestMocker
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.initLogInStateMock
-import com.simprints.id.testUtils.roboletric.mockLoadProject
-import com.simprints.id.testUtils.roboletric.setUserLogInState
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
@@ -94,10 +92,12 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForUnitTests() {
     fun setUp() {
         RobolectricDaggerTestConfig(this).setupAllAndFinish()
 
-        initLogInStateMock(RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
-        setUserLogInState(true, RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME))
+        val sharedPref = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
 
-        mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
+        RobolectricTestMocker
+            .initLogInStateMock(sharedPref, remoteDbManagerMock)
+            .setUserLogInState(true, sharedPref)
+            .mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
 
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to true))
     }

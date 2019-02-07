@@ -21,12 +21,10 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.id.testUtils.roboletric.RobolectricTestMocker
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.initLogInStateMock
-import com.simprints.id.testUtils.roboletric.mockLoadProject
-import com.simprints.id.testUtils.roboletric.setUserLogInState
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
@@ -77,10 +75,10 @@ class DashboardCardsFactoryTest : DaggerForUnitTests() {
         whenever(syncStatusDatabase.downSyncDao.insertOrReplaceDownSyncStatus(anyNotNull())).then { }
         whenever(syncStatusDatabase.upSyncDao.getUpSyncStatus()).thenReturn(mock())
 
-        initLogInStateMock(RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
-        setUserLogInState(true, RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), userId = "userId")
-
-        mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
+        RobolectricTestMocker
+            .initLogInStateMock(RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
+            .setUserLogInState(true, RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), userId = "userId")
+            .mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
     }
 
     @Test
