@@ -18,7 +18,6 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
@@ -86,9 +85,6 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
     }
 
     @Test
-    @Ignore
-    // When it executes with all other tests, it fails to SQL connections execturd in the wrong threads.
-    // Probably Robolectric doesn't cope well with Room and SQL.
     fun doWorkTest_shouldCreateCountAndDownSyncWorkersAndSucceed() {
 
         val result = downSyncMasterWorker.doWork()
@@ -100,12 +96,10 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
             workInfo.size)
         assertEquals(numberOfEnqueuedSyncCountWorkers, seq[WorkInfo.State.ENQUEUED]?.size)
         assertEquals(numberOfBlockedDownSyncWorkers + numberOfBlockedInputMergerWorkers, seq[WorkInfo.State.BLOCKED]?.size)
-        assertEquals(ListenableWorker.Result.SUCCESS, result)
+        assert(result is ListenableWorker.Result.Success)
     }
 
     @Test
-    @Ignore
-    // Passes in isolation similar to the test above
     fun doWorkTest_shouldReturnSuccessImmediatelyWithEmptySubSyncScopeList() {
         val noModuleSyncScope = SyncScope(projectId, null, setOf())
         whenever(workParams.inputData).thenReturn(workDataOf(DownSyncMasterWorker.SYNC_WORKER_SYNC_SCOPE_INPUT to syncScopesBuilder.fromSyncScopeToJson(noModuleSyncScope)))
@@ -118,6 +112,6 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
         assertEquals(0, workInfo.size)
         assertEquals(null, seq[WorkInfo.State.ENQUEUED]?.size)
         assertEquals(null, seq[WorkInfo.State.BLOCKED]?.size)
-        assertEquals(ListenableWorker.Result.SUCCESS, result)
+        assert(result is ListenableWorker.Result.Success)
     }
 }

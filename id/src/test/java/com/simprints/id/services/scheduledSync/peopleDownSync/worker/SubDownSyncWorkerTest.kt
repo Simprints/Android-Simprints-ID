@@ -15,12 +15,12 @@ import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
@@ -32,7 +32,6 @@ import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Completable
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -65,7 +64,7 @@ class SubDownSyncWorkerTest: DaggerForTests() {
                 return mock()
             }
             override fun provideDownSyncTask(localDbManager: LocalDbManager,
-                                             remoteDbManager: RemoteDbManager,
+                                             remotePeopleManager: RemotePeopleManager,
                                              timeHelper: TimeHelper,
                                              syncStatusDatabase: SyncStatusDatabase): DownSyncTask {
                 return mockDownSyncTask
@@ -95,7 +94,7 @@ class SubDownSyncWorkerTest: DaggerForTests() {
         val result = subDownSyncWorker.doWork()
 
         verify(mockDownSyncTask, times(1)).execute(anyNotNull())
-        assertEquals(ListenableWorker.Result.SUCCESS, result)
+        assert(result is ListenableWorker.Result.Success)
     }
 
     @Test
@@ -109,6 +108,6 @@ class SubDownSyncWorkerTest: DaggerForTests() {
 
         verify(mockDownSyncTask, times(1)).execute(anyNotNull())
         verify(analyticsManagerMock, times(1)).logThrowable(any())
-        assertEquals(ListenableWorker.Result.FAILURE, result)
+        assert(result is ListenableWorker.Result.Failure)
     }
 }

@@ -1,26 +1,15 @@
 package com.simprints.id.data.db.remote
 
 import com.google.firebase.FirebaseApp
-import com.google.gson.JsonElement
-import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
-import com.simprints.id.domain.Person
-import com.simprints.id.domain.Project
-import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
-import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.session.Session
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
-import java.io.IOException
 import com.simprints.libcommon.Person as LibPerson
 
 interface RemoteDbManager {
@@ -51,28 +40,4 @@ interface RemoteDbManager {
     fun getFirebaseLegacyApp(): FirebaseApp
 
     fun getCurrentFirestoreToken(): Single<String>
-
-    // API
-    /**
-     * Following methods can throw:
-     * [IOException] - when the network cuts out
-     * [SimprintsInternalServerException] - when receiving a 5xx HTTP response
-     */
-
-    /** @throws DownloadingAPersonWhoDoesntExistOnServerException */
-    fun downloadPerson(patientId: String, projectId: String): Single<fb_Person>
-
-    fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable
-
-    fun getNumberOfPatients(projectId: String, userId: String?, moduleId: String?): Single<Int>
-    fun getNumberOfPatientsForSyncScope(syncScope: SyncScope): Single<Int>
-    fun getNumberOfPatientsInModule(projectId: String, moduleId: String): Single<Int>
-
-    fun loadProjectFromRemote(projectId: String): Single<Project>
-    fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JsonElement>
-
-    fun getPeopleApiClient(): Single<PeopleRemoteInterface>
-    fun getSessionsApiClient(): Single<SessionsRemoteInterface>
-
-    fun getProjectApiClient(): Single<ProjectRemoteInterface>
 }
