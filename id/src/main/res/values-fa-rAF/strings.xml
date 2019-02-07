@@ -59,7 +59,6 @@
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
     <string name="sync_data">همگام کردن معلومات</string>
-    <string name="syncing">همگام کردن…</string>
     <string name="syncing_calculating">همگام کردن… محاسبه کردن</string>
     <string name="syncing_with_progress">همگام کردن… %1$d/%2$d</string>
     <string name="not_signed_in">در سیستم داخل نشدید</string>
@@ -140,9 +139,9 @@
     <string name="user_count">تعداد استفاده کننده:</string>
     <string name="module_count">تعداد مادیول:</string>
     <string name="project_count">تعداد پروژه ها :</string>
-    <string name="about_app_version">نسخه اپلیکیشن:</string>
+    <string name="preference_app_version_title">نسخه اپلیکیشن:</string>
     <string name="about_libsimprints_version">مودل ماشین گرفتن نشان انگشت :</string>
-    <string name="about_scanner_version">نسخه یا نوع اسکنر :</string>
+    <string name="preference_scanner_version_title">نسخه یا نوع اسکنر :</string>
     <!-- Button Labels -->
     <!-- Recovery dialogs -->
     <string name="recovering_db">دوباره بدست آوردن دیتا .... لحظه را دربری میگیرد</string>

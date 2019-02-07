@@ -62,7 +62,6 @@
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
     <string name="sync_data">همگام کردن معلومات</string>
-    <string name="syncing">همگام کردن…</string>
     <string name="syncing_calculating">همگام کردن… محاسبه کردن</string>
     <string name="syncing_with_progress">همگام کردن… %1$d/%2$d</string>
     <string name="not_signed_in">در سیستم داخل نشدید</string>
