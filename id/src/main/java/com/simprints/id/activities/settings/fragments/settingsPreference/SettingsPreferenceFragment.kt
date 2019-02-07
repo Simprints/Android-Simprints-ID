@@ -51,19 +51,19 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
         findPreference(getKeyForDefaultFingersPreference())
 
     override fun getKeyForLanguagePreference(): String =
-        getString(R.string.select_language_preference)
+        getString(R.string.preference_select_language_key)
 
     override fun getKeyForSelectModulesPreference(): String =
-        getString(R.string.select_modules_preference)
+        getString(R.string.preference_select_modules_key)
 
     override fun getKeyForDefaultFingersPreference(): String =
-        getString(R.string.select_fingers_preference)
+        getString(R.string.preference_select_fingers_key)
 
     override fun getPreferenceForAbout(): Preference =
         findPreference(getKeyForAboutPreference())
 
     override fun getKeyForAboutPreference(): String =
-        getString(R.string.about_preference)
+        getString(R.string.preference_about_key)
 
     override fun setSelectModulePreferenceEnabled(enabled: Boolean) {
         getPreferenceForSelectModules().isEnabled = enabled

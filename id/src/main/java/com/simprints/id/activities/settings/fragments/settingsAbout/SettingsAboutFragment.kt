@@ -53,19 +53,19 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
         findPreference(getKeyForLogoutPreference())
 
     override fun getKeyForLogoutPreference(): String =
-        getString(R.string.logout_preference)
+        getString(R.string.preference_logout_key)
 
     override fun getKeyForSyncAndSearchConfigurationPreference(): String =
-        getString(R.string.sync_and_search_configuration_preference)
+        getString(R.string.preference_sync_and_search_key)
 
     override fun getKeyForAppVersionPreference(): String =
-        getString(R.string.app_version_preference)
+        getString(R.string.preference_app_version_key)
 
     override fun getKeyForScannerVersionPreference(): String =
-        getString(R.string.scanner_version_preference)
+        getString(R.string.preference_scanner_version_key)
 
     override fun getKeyForDeviceIdPreference(): String =
-        getString(R.string.device_id_preference)
+        getString(R.string.preference_device_id_key)
 
     override fun showConfirmationDialogForLogout() {
         activity.runOnUiThreadIfStillRunning {

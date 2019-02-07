@@ -136,9 +136,9 @@
     <string name="user_count">प्रयोगकर्ता संख्या</string>
     <string name="module_count">मोड्युल संख्या</string>
     <string name="project_count">परियोजना संख्या</string>
-    <string name="about_app_version">एप्स संस्करण</string>
+    <string name="preference_app_version_title">एप्स संस्करण</string>
     <string name="about_libsimprints_version">LibSimprints संस्करण</string>
-    <string name="about_scanner_version">सिम्प्रिन्ट्स संस्करण</string>
+    <string name="preference_scanner_version_title">सिम्प्रिन्ट्स संस्करण</string>
     <!-- Recovery dialogs -->
     <string name="recovering_db">"डाटाबेस पुनःप्राप्त गर्दै… यसलाई केहि समय लग्नेछ "</string>
     <string name="error">गल्ती भयो</string>
