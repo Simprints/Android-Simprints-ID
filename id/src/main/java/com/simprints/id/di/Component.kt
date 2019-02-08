@@ -48,7 +48,7 @@ import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [(AppModule::class), (PreferencesModule::class), (SerializerModule::class), (AndroidInjectionModule::class)])
+@Component(modules = [(AppModule::class), (PreferencesModule::class), (SerializerModule::class)])
 interface AppComponent {
     fun inject(app: Application)
     fun inject(guidSelectionService: GuidSelectionService)

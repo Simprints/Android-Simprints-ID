@@ -25,7 +25,7 @@ android {
             enableSplit = false
         }
     }
-    
+
     buildTypes {
         release {
             lintOptions {
@@ -52,7 +52,7 @@ android {
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
         }
     }
-    
+
     applicationVariants.all { variant ->
         if (variant.buildType.name == "release" ||
             variant.buildType.name == "releaseWithLogfile") {
@@ -126,173 +126,119 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':libcommon')
     implementation project(':libsimprints')
-
-    // Dagger
+    implementation deps.simprints.libscanner
+    implementation deps.simprints.libmatcher
     implementation deps.dagger.core
     implementation deps.dagger.android
     implementation deps.dagger.android_support
-    annotationProcessor deps.dagger.compiler
-    kapt deps.dagger.compiler
-    kaptAndroidTest deps.dagger.compiler
-    kaptTest deps.dagger.compiler
-
-    //compileOnly "org.glassfish:javax.annotation:10.0-b28"
-
-    // Kotlin awesomeness
     implementation deps.kotlin.stdlib
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
-
     implementation deps.androidx.core
-
-    // Support libraries
     implementation deps.androidx.multidex
     implementation deps.androidx.appcompat
-    implementation deps.support.material
     implementation deps.androidx.legacy
+    implementation deps.androidx.room.core
+    implementation deps.androidx.lifecycle.viewmodel
+    implementation deps.androidx.lifecycle.livedata
     implementation deps.androidx.ui.constraintlayout
-
-    // WorkManager
+    implementation deps.androidx.ui.cardview
+    implementation deps.androidx.ui.preference
+    implementation deps.androidx.ui.fragment
+    implementation deps.rxjava2.permissions
+    implementation deps.rxjava2.location
+    implementation 'com.github.michael-rapp:android-material-dialog:5.1.4'
+    implementation deps.support.material
     implementation(deps.arch_components.work) {
         exclude group: 'com.google.guava', module: 'listenablefuture'
     }
-
-    // Google
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
-
-    // Databases
     implementation deps.firebase.database
     implementation deps.firebase.firestore
-
-    //Room
-    implementation deps.androidx.room.core
-    kapt deps.androidx.room.compiler
-
-    //Lifecycle
-    implementation deps.androidx.lifecycle.viewmodel
-    implementation  deps.androidx.lifecycle.livedata
-    kapt  deps.androidx.lifecycle.compiler
-
-    // Firebase
     implementation deps.firebase.core
     implementation deps.firebase.auth
     implementation deps.firebase.config
     implementation deps.firebase.perf
     implementation deps.firebase.storage
-
-    // Analytics
     implementation(deps.crashlytics.core) {
         transitive = true
     }
     implementation(deps.crashlytics.ndk) {
         transitive = true
     }
-
-    // Network
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter
     implementation deps.retrofit.convertergson
-    testImplementation deps.testing.retrofit
-    androidTestImplementation deps.testing.retrofit
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
-
-    // Network - Gson
     implementation deps.gson.core
-
-    // Logging
     implementation deps.timber.core
-
-    // Reactive
     implementation deps.rxjava2.android
     implementation deps.rxjava2.core
     implementation deps.rxjava2.kotlin
-
-    // Simprints
-    implementation deps.simprints.libscanner
-    implementation deps.simprints.libmatcher
+    implementation "org.checkerframework:checker-compat-qual:2.5.3"
+    kapt deps.androidx.lifecycle.compiler
+    kapt deps.androidx.room.compiler
+    annotationProcessor deps.dagger.compiler
+    kapt deps.dagger.compiler
+    kaptAndroidTest deps.dagger.compiler
+    kaptTest deps.dagger.compiler
+    compileOnly deps.realm_support.glassfish_annotation
+    compileOnly 'org.jetbrains:annotations:15.0'
 
     // Test
-
-    // TODO: migrate to JUnit 5. Tried https://github.com/mannodermaus/android-junit5 on 03/12/17 and it did not work out of the box.
+    testImplementation deps.testing.dagger
+    testImplementation deps.testing.dagger_kotlin
+    testImplementation deps.simprints.mockscanner
+    testImplementation deps.testing.retrofit
     testImplementation(deps.testing.junit) {
         exclude group: "com.android.support"
     }
     testImplementation deps.testing.robolectric.core
     testImplementation deps.testing.robolectric.multidex
-
     testImplementation deps.testing.androidx.monitor
     testImplementation deps.testing.androidx.ext_junit
     testImplementation deps.testing.androidx.core
     testImplementation deps.testing.androidx.core_testing
-    androidTestImplementation deps.testing.androidx.core_testing
-
-    implementation "org.checkerframework:checker-compat-qual:2.5.3"
+    testImplementation deps.testing.androidx.runner
+    testImplementation deps.testing.androidx.room
     testImplementation deps.testing.truth
-    androidTestImplementation(deps.testing.truth){
-        exclude group: "com.google.guava"
-        exclude group: "com.google.errorprone"
-    }
-
     testImplementation deps.testing.mockito.core
     testImplementation deps.testing.mockito.inline
     testImplementation deps.testing.mockwebserver
-
-    // 3.10 hangs around with roboeletric
     testImplementation deps.testing.mockito.kotlin
-    androidTestImplementation deps.testing.mockito.kotlin
+    testImplementation deps.testing.work
 
     // Android test - https://developer.android.com/training/testing/release-notes
+    androidTestImplementation deps.simprints.mockscanner
+    androidTestImplementation deps.testing.dagger
+    androidTestImplementation deps.testing.dagger_kotlin
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
-
+    androidTestImplementation deps.testing.retrofit
+    androidTestImplementation deps.testing.androidx.core_testing
     androidTestImplementation deps.testing.androidx.monitor
     androidTestImplementation deps.testing.androidx.core
     androidTestImplementation deps.testing.androidx.ext_junit
     androidTestImplementation deps.testing.androidx.runner
-    testImplementation deps.testing.androidx.runner
     androidTestImplementation deps.testing.androidx.rules
-
+    androidTestImplementation deps.testing.work
+    androidTestImplementation deps.testing.mockito.kotlin
     androidTestImplementation deps.testing.espresso.core
     androidTestImplementation deps.testing.espresso.intents
-
-
+    androidTestImplementation(deps.testing.truth) {
+        exclude group: "com.google.guava"
+        exclude group: "com.google.errorprone"
+    }
     androidTestImplementation(deps.testing.espresso.barista) {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"
         exclude group: "org.jetbrains.kotlin"
         exclude group: "com.google.guava"
     }
-
-    androidTestImplementation deps.simprints.mockscanner
-    testImplementation deps.simprints.mockscanner
-    androidTestImplementation 'joda-time:joda-time:2.9.9'
-
-    //UI
-    implementation 'com.github.michael-rapp:android-material-dialog:4.3.3'
-    implementation "androidx.cardview:cardview:$androidx_version"
-    implementation "androidx.preference:preference:$androidx_version"
-    implementation "androidx.fragment:fragment:$androidx_version"
-
-    //Inject in tests
-    testImplementation deps.testing.dagger
-    androidTestImplementation deps.testing.dagger
-    testImplementation deps.testing.dagger_kotlin
-    androidTestImplementation deps.testing.dagger_kotlin
-
-    //Permissions & Locations
-    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
-    implementation 'pl.charmas.android:android-reactive-location2:2.1@aar'
-
-    //Room
-    testImplementation "androidx.room:room-testing:$room_version"
-
-    //WorkManager
-    androidTestImplementation "android.arch.work:work-testing:$work_version"
-    testImplementation "android.arch.work:work-testing:$work_version"
-
+    androidTestImplementation 'joda-time:joda-time:2.10.1'
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {
