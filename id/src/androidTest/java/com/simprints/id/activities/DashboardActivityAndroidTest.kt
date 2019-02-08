@@ -233,7 +233,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     private fun uploadFakePeopleAndPrepareLocalDb(syncScope: SyncScope) {
         peopleOnServer = PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_SERVER_PER_MODULE, syncScope, listOf(false))
         val requests = peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).map {
-             remoteDbManagerSpy.uploadPeople(testProject.id, it)
+            remotePeopleManagerSpy.uploadPeople(testProject.id, it)
         }
         Completable.merge(requests).blockingAwait()
 
@@ -260,7 +260,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     @After
     override fun tearDown() {
-        super.tearDown()
+        //super.tearDown()
     }
 
     private fun signOut() {

@@ -1,20 +1,49 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.work.*
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
 
-    override fun scheduleSessionsSync() = createAndEnqueueRequest()
+    override fun scheduleSessionsSync() {
+        createAndEnqueueRequest()
+    }
 
-    private fun createAndEnqueueRequest() {
-        PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
+    internal fun createAndEnqueueRequest(time: Long = SYNC_REPEAT_INTERVAL,
+                                         unit: TimeUnit = SYNC_REPEAT_UNIT,
+                                         version: Long = MASTER_WORKER_VERSION,
+                                         tag: String = MASTER_WORKER_TAG): UUID {
+
+        cancelAnyNotVersionedWorkerMaster()
+        cancelPreviousVersionedWorkerMaster()
+
+        val uniqueName = getMasterWorkerUniqueName(version)
+        return PeriodicWorkRequestBuilder<SessionEventsMasterWorker>(time, unit)
             .setConstraints(getConstraints())
-            .addTag(MASTER_WORKER_TAG)
-            .build().also {
-                WorkManager.getInstance().enqueueUniquePeriodicWork(MASTER_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, it)
+            .addTag(tag)
+            .build().let {
+                WorkManager.getInstance().enqueueUniquePeriodicWork(
+                    uniqueName,
+                    ExistingPeriodicWorkPolicy.KEEP, it)
+                it.id
             }
     }
+
+    private fun cancelAnyNotVersionedWorkerMaster() {
+        WorkManager.getInstance().cancelUniqueWork(getMasterWorkerUniqueName())
+    }
+
+    private fun cancelPreviousVersionedWorkerMaster(){
+        ((MASTER_WORKER_VERSION - 1).downTo(0)).forEach {
+            WorkManager.getInstance().cancelUniqueWork(getMasterWorkerUniqueName(it))
+        }
+    }
+
+    internal fun getMasterWorkerUniqueName(version: Long? = null): String =
+        version?.let {
+            MASTER_WORKER_TAG + "_" + version
+        } ?: MASTER_WORKER_TAG
 
     private fun getConstraints() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -23,11 +52,12 @@ open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
     companion object {
         private const val SYNC_REPEAT_INTERVAL = 6L
         private val SYNC_REPEAT_UNIT = TimeUnit.HOURS
-        private const val MASTER_WORKER_TAG = "SYNC_SESSIONS_WORKER"
+
+        internal const val MASTER_WORKER_VERSION = 1L
+        internal const val MASTER_WORKER_TAG = "SYNC_SESSIONS_WORKER"
     }
 
     override fun cancelSyncWorkers() {
         WorkManager.getInstance().cancelAllWorkByTag(MASTER_WORKER_TAG)
-        WorkManager.getInstance().cancelAllWorkByTag(SessionEventsSyncMasterTask.SESSIONS_TO_UPLOAD_TAG)
     }
 }
