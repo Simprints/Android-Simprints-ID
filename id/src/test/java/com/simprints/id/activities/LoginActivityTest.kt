@@ -7,16 +7,16 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.ResolveInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.testUtils.di.AppModuleForTests
-import com.simprints.id.testUtils.di.DaggerForUnitTests
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.shared.DependencyRule.MockRule
+import com.simprints.id.testUtils.di.AppModuleForTests
+import com.simprints.id.testUtils.di.DaggerForUnitTests
+import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
@@ -24,7 +24,6 @@ import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.reactive.RxJavaTest
-import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
@@ -146,7 +145,7 @@ class LoginActivityTest : RxJavaTest, DaggerForUnitTests() {
         val act = controller.get()
         act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "{\"projectId\":\"someProjectId\",\"projectSecretWrong\":\"someSecret\"}"))
 
-        assertEquals((app as Application).getString(R.string.login_invalid_qr_code), ShadowToast.getTextOfLatestToast())
+        assertEquals(app.getString(R.string.login_invalid_qr_code), ShadowToast.getTextOfLatestToast())
     }
 
     @Test
@@ -174,15 +173,15 @@ class LoginActivityTest : RxJavaTest, DaggerForUnitTests() {
         act.loginEditTextProjectSecret.setText("")
 
         act.loginButtonSignIn.performClick()
-        assertEquals((app as Application).getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
 
         act.loginEditTextProjectSecret.setText("some_project_secret")
         act.loginButtonSignIn.performClick()
-        assertEquals((app as Application).getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
 
         act.loginEditTextProjectId.setText("some_project_id")
         act.loginButtonSignIn.performClick()
-        assertEquals((app as Application).getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
 
         act.viewPresenter = mock(LoginPresenter::class.java)
 

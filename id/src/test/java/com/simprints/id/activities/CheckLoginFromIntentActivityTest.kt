@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
@@ -18,17 +17,17 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.testUtils.di.AppModuleForTests
-import com.simprints.id.testUtils.di.DaggerForUnitTests
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.SpyRule
-import com.simprints.testframework.unit.reactive.RxJavaTest
+import com.simprints.id.testUtils.di.AppModuleForTests
+import com.simprints.id.testUtils.di.DaggerForUnitTests
+import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import com.simprints.testframework.unit.robolectric.RobolectricHelper.assertActivityStarted
 import org.junit.Assert
@@ -99,7 +98,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForUnitTests() {
 
     @Test
     fun knownCallingAppSource_shouldNotLogEvent() {
-        val pm = (app as Application).packageManager
+        val pm = app.packageManager
         pm.setInstallerPackageName("com.app.installed.from.playstore", "com.android.vending")
 
         Robolectric.buildActivity(CheckLoginFromIntentActivityWithValidCallingPackage::class.java).setup()
