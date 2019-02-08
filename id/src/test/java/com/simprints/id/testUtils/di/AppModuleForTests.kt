@@ -1,14 +1,14 @@
-package com.simprints.id.di
+package com.simprints.id.testUtils.di
 
+import com.simprints.id.Application
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.shared.AppModuleForAnyTests
 import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.shared.setupFakeKeyStore
-import com.simprints.libcommon.di.IApplication
 
-open class AppModuleForTests(app: IApplication,
+open class AppModuleForTests(app: Application,
                              override var localDbManagerRule: DependencyRule = RealRule,
                              override var remoteDbManagerRule: DependencyRule = RealRule,
                              override var remotePeopleManagerRule: DependencyRule = RealRule,

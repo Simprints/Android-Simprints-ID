@@ -2,6 +2,7 @@ package com.simprints.id.shared
 
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
@@ -33,10 +34,9 @@ import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.libcommon.di.IApplication
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 
-open class AppModuleForAnyTests(app: IApplication,
+open class AppModuleForAnyTests(app: Application,
                                 open var localDbManagerRule: DependencyRule = RealRule,
                                 open var remoteDbManagerRule: DependencyRule = RealRule,
                                 open var remotePeopleManagerRule: DependencyRule = RealRule,

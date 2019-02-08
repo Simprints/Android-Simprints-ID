@@ -14,8 +14,8 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForUnitTests
+import com.simprints.id.testUtils.di.AppModuleForTests
+import com.simprints.id.testUtils.di.DaggerForUnitTests
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.network.SimApiClient
@@ -36,7 +36,7 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper
-import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
+import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse

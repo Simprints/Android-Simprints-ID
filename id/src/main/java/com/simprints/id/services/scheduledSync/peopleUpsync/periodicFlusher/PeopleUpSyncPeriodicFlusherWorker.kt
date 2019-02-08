@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
-import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import timber.log.Timber
@@ -35,7 +34,7 @@ class PeopleUpSyncPeriodicFlusherWorker(context: Context, params: WorkerParamete
     private fun injectDependencies() {
         val context = applicationContext
         if (context is Application) {
-            (context.component as AppComponent).inject(this)
+            context.component.inject(this)
         } else {
             throw WorkerInjectionFailedError.forWorker<PeopleUpSyncPeriodicFlusherWorker>()
         }

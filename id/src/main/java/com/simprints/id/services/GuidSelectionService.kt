@@ -9,7 +9,6 @@ import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.secure.cryptography.Hasher
@@ -30,7 +29,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
     override fun onCreate() {
         super.onCreate()
-        ((application as Application).component as AppComponent).inject(this)
+        (application as Application).component.inject(this)
     }
 
     override fun onHandleIntent(intent: Intent?) {

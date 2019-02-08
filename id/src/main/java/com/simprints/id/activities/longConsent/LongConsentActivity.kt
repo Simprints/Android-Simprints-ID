@@ -1,13 +1,12 @@
 package com.simprints.id.activities.longConsent
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.text.method.ScrollingMovementMethod
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_long_consent.*
@@ -22,7 +21,7 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val component = ((application as Application).component as AppComponent).also { it.inject(this) }
+        val component = (application as Application).component.also { it.inject(this) }
         LanguageHelper.setLanguage(this, preferences.language)
         setContentView(R.layout.activity_long_consent)
 

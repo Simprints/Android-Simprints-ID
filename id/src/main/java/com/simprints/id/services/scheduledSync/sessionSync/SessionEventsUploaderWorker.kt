@@ -65,7 +65,7 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
     private fun injectDependencies() {
         val context = applicationContext
         if (context is Application) {
-            (context.component as AppComponent).inject(this)
+            context.component.inject(this)
         } else {
             throw WorkerInjectionFailedError.forWorker<SessionEventsUploaderWorker>()
         }

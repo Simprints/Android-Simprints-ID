@@ -6,7 +6,7 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.id.di.DaggerForUnitTests
+import com.simprints.id.testUtils.di.DaggerForUnitTests
 import com.simprints.id.domain.Constants
 import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
@@ -17,7 +17,7 @@ import com.simprints.testframework.common.syntax.assertThrows
 import com.simprints.testframework.common.syntax.verifyExactly
 import com.simprints.testframework.common.syntax.verifyOnce
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
+import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test

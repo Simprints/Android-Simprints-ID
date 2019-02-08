@@ -17,7 +17,6 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.launchAlert
@@ -46,7 +45,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
-        val component = (application as Application).component as AppComponent
+        val component = (application as Application).component
         component.inject(this)
         setSupportActionBar(dashboardToolbar)
         LanguageHelper.setLanguage(this, preferences.language)
