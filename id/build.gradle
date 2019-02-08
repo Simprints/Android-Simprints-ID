@@ -7,6 +7,7 @@ apply plugin: "com.google.firebase.firebase-crash"
 apply plugin: 'com.google.firebase.firebase-perf'
 apply plugin: "realm-android"
 
+
 android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
@@ -127,138 +128,136 @@ dependencies {
     implementation project(':libsimprints')
 
     // Dagger
-    implementation "com.google.dagger:dagger-android:$dagger_version"
-    implementation "com.google.dagger:dagger-android-support:$dagger_version"
-    implementation "com.google.dagger:dagger:$dagger_version"
-    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
-    kapt "com.google.dagger:dagger-compiler:$dagger_version"
-    kaptAndroidTest "com.google.dagger:dagger-compiler:$dagger_version"
-    kaptTest "com.google.dagger:dagger-compiler:$dagger_version"
+    implementation deps.dagger.android
+    annotationProcessor deps.dagger.android_support
+    kapt deps.dagger.core
+    kaptAndroidTest deps.dagger.compiler
+    kaptTest deps.dagger.compiler
 
-    compileOnly "org.glassfish:javax.annotation:10.0-b28"
+    //compileOnly "org.glassfish:javax.annotation:10.0-b28"
 
     // Kotlin awesomeness
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    implementation "org.jetbrains.anko:anko:0.10.8"
-    implementation 'androidx.core:core-ktx:1.0.1'
+    implementation deps.kotlin.stdlib
+    implementation deps.kotlin.reflect
+    implementation deps.kotlin.anko
+
+    implementation deps.androidx.core
 
     // Support libraries
-    implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation "com.google.android.material:material:1.1.0-alpha02"
-    implementation "androidx.legacy:legacy-support-v4:1.0.0"
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation deps.androidx.multidex
+    implementation deps.androidx.appcompat
+    implementation deps.support.material
+    implementation deps.androidx.legacy
+    implementation deps.androidx.ui.constraintlayout
 
     // WorkManager
-    implementation("android.arch.work:work-runtime-ktx:$work_version") {
+    implementation(deps.arch_components.work) {
         exclude group: 'com.google.guava', module: 'listenablefuture'
     }
 
     // Google
-    implementation "com.google.android.gms:play-services-location:$google_version"
-    implementation "com.google.android.gms:play-services-places:$google_version"
-    implementation "com.google.android.gms:play-services-safetynet:$google_version"
+    implementation deps.playservices.location
+    implementation deps.playservices.places
+    implementation deps.playservices.safetynet
 
     // Databases
-    implementation "com.google.firebase:firebase-database:16.0.5"
-    implementation "com.google.firebase:firebase-firestore:17.1.5"
+    implementation deps.firebase.database
+    implementation deps.firebase.firestore
 
     //Room
-    implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
+    implementation deps.androidx.room.core
+    kapt deps.androidx.room.compiler
 
     //Lifecycle
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
-    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+    implementation deps.androidx.lifecycle.viewmodel
+    implementation  deps.androidx.lifecycle.livedata
+    kapt  deps.androidx.lifecycle.compiler
 
     // Firebase
-    implementation "com.google.firebase:firebase-core:16.0.6"
-    implementation "com.google.firebase:firebase-auth:16.1.0"
-    implementation "com.google.firebase:firebase-config:16.1.3"
-    implementation "com.google.firebase:firebase-perf:16.2.3"
-    implementation "com.google.firebase:firebase-storage:16.0.5"
+    implementation deps.firebase.core
+    implementation deps.firebase.auth
+    implementation deps.firebase.config
+    implementation deps.firebase.perf
+    implementation deps.firebase.storage
 
     // Analytics
-    implementation("com.crashlytics.sdk.android:crashlytics:2.9.5@aar") {
+    implementation(deps.crashlytics.core) {
         transitive = true
     }
-    implementation("com.crashlytics.sdk.android:crashlytics-ndk:1.1.4@aar") {
+    implementation(deps.crashlytics.ndk) {
         transitive = true
     }
 
     // Network
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
-    testImplementation "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
-    androidTestImplementation "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
-    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
-    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+    implementation deps.retrofit.core
+    implementation deps.retrofit.adapter
+    implementation deps.retrofit.convertergson
+    testImplementation deps.testing.retrofit
+    androidTestImplementation deps.testing.retrofit
+    implementation deps.retrofit.logging
+    implementation deps.retrofit.okhttp
 
     // Network - Gson
-    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation deps.gson.core
 
     // Logging
-    implementation 'com.jakewharton.timber:timber:4.6.0'
+    implementation deps.timber.core
 
     // Reactive
-    implementation "io.reactivex.rxjava2:rxandroid:2.0.2"
-    implementation "io.reactivex.rxjava2:rxjava:2.1.16"
-    implementation "io.reactivex.rxjava2:rxkotlin:2.2.0"
+    implementation deps.rxjava2.android
+    implementation deps.rxjava2.core
+    implementation deps.rxjava2.kotlin
 
     // Simprints
-    implementation "com.simprints:libscanner:2018.4.0"
-    implementation 'com.simprints:libmatcher:1.3.2'
+    implementation deps.simprints.libscanner
+    implementation deps.simprints.libmatcher
 
     // Test
 
     // TODO: migrate to JUnit 5. Tried https://github.com/mannodermaus/android-junit5 on 03/12/17 and it did not work out of the box.
-    testImplementation("junit:junit:$junit_version") {
+    testImplementation(deps.testing.junit) {
         exclude group: "com.android.support"
     }
-    testImplementation "org.robolectric:robolectric:4.0.2"
-    testImplementation "org.robolectric:multidex:3.4.2"
-    testImplementation "org.robolectric:robolectric:4.0.2"
+    testImplementation deps.testing.robolectric.core
+    testImplementation deps.testing.robolectric.multidex
 
-    testImplementation 'androidx.test:monitor:1.1.1'
-    testImplementation "androidx.test.ext:junit:1.1.0"
-    testImplementation "androidx.test:core:$androidx_version"
-    testImplementation 'android.arch.core:core-testing:1.1.1'
-    androidTestImplementation 'android.arch.core:core-testing:1.1.1'
+    testImplementation deps.testing.androidx.monitor
+    testImplementation deps.testing.androidx.ext_junit
+    testImplementation deps.testing.androidx.core
+    testImplementation deps.testing.androidx.core_testing
+    androidTestImplementation deps.testing.androidx.core_testing
 
-    implementation "org.checkerframework:checker-compat-qual:2.5.3"
-    testImplementation "com.google.truth:truth:0.42"
-    androidTestImplementation("com.google.truth:truth:0.42"){
+    //implementation "org.checkerframework:checker-compat-qual:2.5.3"
+    testImplementation deps.testing.truth
+    androidTestImplementation(deps.testing.truth){
         exclude group: "com.google.guava"
         exclude group: "com.google.errorprone"
     }
 
-    testImplementation "org.mockito:mockito-core:$mockito_version"
-    testImplementation "org.mockito:mockito-inline:$mockito_version"
-    testImplementation 'com.squareup.okhttp3:mockwebserver:3.10.0'
+    testImplementation deps.testing.mockito.core
+    testImplementation deps.testing.mockito.inline
+    testImplementation deps.testing.mockwebserver
 
     // 3.10 hangs around with roboeletric
-    testImplementation 'com.nhaarman:mockito-kotlin:1.5.0'
-    androidTestImplementation 'com.nhaarman:mockito-kotlin:1.5.0'
+    testImplementation deps.testing.mockito.kotlin
+    androidTestImplementation deps.testing.mockito.kotlin
 
     // Android test - https://developer.android.com/training/testing/release-notes
-    androidTestImplementation "org.mockito:mockito-core:$mockito_version"
-    androidTestImplementation "org.mockito:mockito-android:$mockito_version"
+    androidTestImplementation deps.testing.mockito.core
+    androidTestImplementation deps.testing.mockito.android
 
-    androidTestImplementation 'androidx.test:monitor:1.1.1'
-    androidTestImplementation "androidx.test:core:1.1.0"
-    androidTestImplementation "androidx.test.ext:junit:1.1.0"
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    testImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test:rules:1.1.1'
+    androidTestImplementation deps.testing.androidx.monitor
+    androidTestImplementation deps.testing.androidx.core
+    androidTestImplementation deps.testing.androidx.ext_junit
+    androidTestImplementation deps.testing.androidx.runner
+    testImplementation deps.testing.androidx.runner
+    androidTestImplementation deps.testing.androidx.rules
 
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.1.1'
+    androidTestImplementation deps.testing.espresso.core
+    androidTestImplementation deps.testing.espresso.intents
 
 
-    androidTestImplementation('com.schibsted.spain:barista:2.5.0') {
+    androidTestImplementation(deps.testing.espresso.barista) {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"
         exclude group: "org.jetbrains.kotlin"
