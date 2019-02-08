@@ -3,6 +3,7 @@ package com.simprints.testframework.common.syntax
 import com.nhaarman.mockito_kotlin.atLeast
 import com.nhaarman.mockito_kotlin.atMost
 import com.nhaarman.mockito_kotlin.times
+import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
 import junit.framework.AssertionFailedError
 import org.junit.Assert
@@ -57,7 +58,7 @@ inline fun <reified T : Throwable> assertThrows(throwable: T, executable: () -> 
     return thrown
 }
 
-fun <T> TestObserver<T>.waitForCompletionAndAssertNoErrors() {
-    this.awaitTerminalEvent()
-    this.assertNoErrors()
-}
+fun <T> TestObserver<T>.awaitAndAssertSuccess(): Disposable = this
+    .await()
+    .assertComplete()
+    .assertNoErrors()
