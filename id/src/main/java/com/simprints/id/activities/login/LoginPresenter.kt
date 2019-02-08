@@ -1,6 +1,8 @@
 package com.simprints.id.activities.login
 
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsTags
+import com.simprints.id.data.analytics.LogPrompter
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent
 import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent.Result.*
@@ -48,14 +50,17 @@ class LoginPresenter(val view: LoginContract.View,
                         suppliedProjectSecret: String,
                         intentProjectId: String?,
                         intentLegacyProjectId: String?) =
-        if (areMandatoryCredentialsPresent(suppliedProjectId, suppliedProjectSecret, suppliedUserId))
+        if (areMandatoryCredentialsPresent(suppliedProjectId, suppliedProjectSecret, suppliedUserId)) {
             doAuthenticate(
                 suppliedProjectId,
                 suppliedUserId,
                 suppliedProjectSecret,
                 intentProjectId,
                 intentLegacyProjectId)
-        else view.handleMissingCredentials()
+        }
+        else {
+            view.handleMissingCredentials()
+        }
 
     private fun areMandatoryCredentialsPresent(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String) =
         possibleProjectId.isNotEmpty() && possibleProjectSecret.isNotEmpty() && possibleUserId.isNotEmpty()
@@ -64,6 +69,7 @@ class LoginPresenter(val view: LoginContract.View,
                                suppliedUserId: String,
                                suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
 
+        logMessageToAnalyticsWithNetworkPrompt("Making authentication request")
         loginInfoManager.cleanCredentials()
         startTimeLogin = timeHelper.now()
         projectAuthenticator.authenticate(
@@ -85,6 +91,7 @@ class LoginPresenter(val view: LoginContract.View,
 
     private fun handleSignInSuccess(suppliedProjectId: String,
                                     suppliedUserId: String) {
+        logMessageToAnalyticsWithNetworkPrompt("Sign in success")
         addAuthenticatedEventAndUpdateProjectIdIfRequired(AUTHENTICATED, suppliedProjectId, suppliedUserId)
         view.handleSignInSuccess()
     }
@@ -120,6 +127,7 @@ class LoginPresenter(val view: LoginContract.View,
             else -> view.handleSignInFailedUnknownReason().also { reason = TECHNICAL_FAILURE }
         }
 
+        logMessageToAnalyticsWithNetworkPrompt("Sign in error - $reason")
         addAuthenticatedEventAndUpdateProjectIdIfRequired(reason, suppliedProjectId, suppliedUserId)
     }
 
@@ -145,9 +153,19 @@ class LoginPresenter(val view: LoginContract.View,
             val potentialProjectSecret = scannedJson.getString(PROJECT_SECRET_JSON_KEY)
             view.updateProjectIdInTextView(potentialProjectId)
             view.updateProjectSecretInTextView(potentialProjectSecret)
+            logMessageToAnalyticsWithUIPrompt("QR scanning successful")
         } catch (e: JSONException) {
             view.showErrorForInvalidQRCode()
+            logMessageToAnalyticsWithUIPrompt("QR scanning unsuccessful")
         }
+    }
+
+    override fun logMessageToAnalyticsWithUIPrompt(message: String) {
+        analyticsManager.logInfo(AnalyticsTags.LOGIN, LogPrompter.UI, message)
+    }
+
+    private fun logMessageToAnalyticsWithNetworkPrompt(message: String) {
+        analyticsManager.logInfo(AnalyticsTags.LOGIN, LogPrompter.NETWORK, message)
     }
 
     companion object {

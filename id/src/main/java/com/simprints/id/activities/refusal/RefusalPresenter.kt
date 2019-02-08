@@ -38,21 +38,26 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleRadioOptionClicked(optionIdentifier: Int) {
-        analyticsManager.logInfo(AnalyticsTags.REFUSAL, LogPrompter.UI, "Radio option $optionIdentifier clicked")
         view.enableSubmitButton()
         view.enableRefusalText()
         when (optionIdentifier) {
-            R.id.rbScannerNotWorking ->
+            R.id.rbScannerNotWorking -> {
                 reason = REFUSAL_FORM_REASON.SCANNER_NOT_WORKING
-            R.id.rbRefused ->
+                logMessageToAnalytics("Radio option ${REFUSAL_FORM_REASON.SCANNER_NOT_WORKING} Clicked")
+            }
+            R.id.rbRefused -> {
                 reason = REFUSAL_FORM_REASON.REFUSED
-            R.id.rb_other ->
+                logMessageToAnalytics("Radio option ${REFUSAL_FORM_REASON.REFUSED} Clicked")
+            }
+            R.id.rb_other -> {
                 reason = REFUSAL_FORM_REASON.OTHER
+                logMessageToAnalytics("Radio option ${REFUSAL_FORM_REASON.OTHER} Clicked")
+            }
         }
     }
 
     override fun handleSubmitButtonClick(refusalText: String) {
-        analyticsManager.logInfo(AnalyticsTags.REFUSAL, LogPrompter.UI, "Submit button clicked")
+        logMessageToAnalytics("Submit button clicked")
         saveRefusalFormInDb(getRefusalForm(refusalText))
         reason?.let { refusalReason ->
             sessionEventsManager.updateSession {
@@ -71,7 +76,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleScanFingerprintsClick() {
-        analyticsManager.logInfo(AnalyticsTags.REFUSAL, LogPrompter.UI, "Scan fingerprints button clicked")
+        logMessageToAnalytics("Scan fingerprints button clicked")
         view.setResultAndFinish(InternalConstants.RESULT_TRY_AGAIN, null)
     }
 
@@ -92,5 +97,9 @@ class RefusalPresenter(private val view: RefusalContract.View,
             analyticsManager.logException(error)
             view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
         }
+    }
+
+    private fun logMessageToAnalytics(message: String) {
+        analyticsManager.logInfo(AnalyticsTags.REFUSAL, LogPrompter.UI, message)
     }
 }

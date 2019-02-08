@@ -247,13 +247,15 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             resetUIFromError()
         }
 
-    private fun setGoodOrBadScanFingerStatusToCurrentFinger(quality: Int) =
+    private fun setGoodOrBadScanFingerStatusToCurrentFinger(quality: Int) {
         if (quality >= preferencesManager.qualityThreshold) {
             currentFingerStatus = Finger.Status.GOOD_SCAN
         } else {
             currentFingerStatus = Finger.Status.BAD_SCAN
             presenter.currentFinger().numberOfBadScans += 1
         }
+        logMessageToAnalytics("Finger scanned - ${presenter.currentFinger().id} - $currentFingerStatus")
+    }
 
     fun resetScannerUi() {
         scannerManager.scanner?.resetUI(null)
@@ -267,5 +269,9 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         currentFingerStatus = Finger.Status.FINGER_SKIPPED
         presenter.currentFinger().numberOfBadScans = CollectFingerprintsPresenter.numberOfBadScansRequiredToAutoAddNewFinger
         presenter.refreshDisplay()
+    }
+
+    private fun logMessageToAnalytics(message: String) {
+        analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogPrompter.UI, message)
     }
 }
