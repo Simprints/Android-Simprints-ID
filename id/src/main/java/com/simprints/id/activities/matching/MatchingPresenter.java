@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
 import com.simprints.id.data.analytics.AnalyticsManager;
+import com.simprints.id.data.analytics.AnalyticsTags;
+import com.simprints.id.data.analytics.LogPrompter;
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager;
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
@@ -92,6 +94,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         // TODO : Use polymorphism
         switch (preferencesManager.getCalloutAction()) {
             case IDENTIFY:
+                logMessageToAnalytics("Making identification");
                 startTimeIdentification = timeHelper.now();
 
                 final Runnable onMatchStartRunnable = new Runnable() {
@@ -109,6 +112,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 matchingView.setIdentificationProgressLoadingStart();
                 break;
             case VERIFY:
+                logMessageToAnalytics("Making verification");
                 startTimeVerification = timeHelper.now();
 
                 matchingView.setVerificationProgress();
@@ -153,7 +157,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         return new DataCallback() {
             @Override
             public void onSuccess(boolean isDataFromRemote) {
-                Timber.d( String.format(Locale.UK,
+                logMessageToAnalytics(String.format(Locale.UK,
                     "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
@@ -208,7 +212,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         return new DataCallback() {
             @Override
             public void onSuccess(boolean isDataFromRemote) {
-                Timber.d( "Successfully loaded candidate");
+                logMessageToAnalytics("Successfully loaded candidate");
 
                 int matcherType = preferencesManager.getMatcherType();
 
@@ -366,5 +370,9 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 matchingView.setIdentificationProgress(progress.getProgress());
             }
         });
+    }
+
+    private void logMessageToAnalytics(String message) {
+        analyticsManager.logInfo(AnalyticsTags.MATCHING, LogPrompter.UI, message);
     }
 }

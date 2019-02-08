@@ -21,5 +21,7 @@ interface LongConsentContract {
     interface Presenter : BasePresenter {
 
         fun downloadLongConsent()
+
+        fun logMessageToAnalyticsWithUIPrompt(message: String)
     }
 }

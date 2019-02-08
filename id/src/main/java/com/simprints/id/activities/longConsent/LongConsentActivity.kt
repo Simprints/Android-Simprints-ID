@@ -58,7 +58,10 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
         longConsent_downloadButton.visibility = View.VISIBLE
         longConsent_noPrivacyNoticeText.visibility = View.VISIBLE
         longConsent_downloadProgressBar.visibility = View.INVISIBLE
-        longConsent_downloadButton.setOnClickListener { viewPresenter.downloadLongConsent() }
+        longConsent_downloadButton.setOnClickListener {
+            viewPresenter.downloadLongConsent()
+            viewPresenter.logMessageToAnalyticsWithUIPrompt("Long consent download button clicked")
+        }
     }
 
     override fun setDownloadProgress(progress: Int) {

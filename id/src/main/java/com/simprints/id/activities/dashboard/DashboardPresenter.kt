@@ -46,6 +46,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
         initCards()
+        initOrUpdateAnalyticsKeys()
     }
 
     private fun initCards() {
@@ -126,5 +127,13 @@ class DashboardPresenter(private val view: DashboardContract.View,
         !simNetworkUtils.isConnected()
     } catch (e: IllegalStateException) {
         true
+    }
+
+    private fun initOrUpdateAnalyticsKeys() {
+        analyticsManager.setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
+        analyticsManager.setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
+        analyticsManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+        analyticsManager.setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
+        analyticsManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
     }
 }

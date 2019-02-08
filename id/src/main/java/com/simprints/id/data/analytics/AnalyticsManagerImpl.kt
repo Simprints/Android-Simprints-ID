@@ -11,20 +11,15 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.SimprintsException
 import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.extensions.fromLowerCamelToLowerUnderscore
+import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
 import io.reactivex.Single
 import timber.log.Timber
 import kotlin.reflect.full.memberProperties
-
-/**
- * Something to keep in mind about Firebase Analytics:
- * "Generally, events logged by your app are batched together over the period of approximately
- * one hour and uploaded together. This approach conserves the battery on end users’ devices
- * and reduces network data usage."
- */
 
 class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
                            private val preferencesManager: PreferencesManager,
@@ -221,4 +216,29 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
     }
 
     private fun getLogMessage(logPrompter: LogPrompter, message: String) = "[${logPrompter.name}] $message"
+
+    override fun setProjectIdCrashlyticsKey(projectId: String) {
+        Crashlytics.setString("Project ID", projectId)
+    }
+
+    override fun setUserIdCrashlyticsKey(userId: String) {
+        Crashlytics.setString("User ID", userId)
+        Crashlytics.setUserIdentifier(userId)
+    }
+
+    override fun setModuleIdsCrashlyticsKey(moduleIds: Set<String>?) {
+        Crashlytics.setString("Module IDs", moduleIds.toString())
+    }
+
+    override fun setDownSyncTriggersCrashlyticsKey(peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>) {
+        Crashlytics.setString("People down sync triggers", peopleDownSyncTriggers.toString())
+    }
+
+    override fun setSessionIdCrashlyticsKey(sessionId: String) {
+        Crashlytics.setString("Session ID", sessionId)
+    }
+
+    override fun setFingersSelectedCrashlyticsKey(fingersSelected: Map<FingerIdentifier, Boolean>) {
+        Crashlytics.setString("Fingers selected", fingersSelected.toString())
+    }
 }

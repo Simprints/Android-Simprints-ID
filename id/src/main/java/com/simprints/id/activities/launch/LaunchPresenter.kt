@@ -88,6 +88,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         setTextToConsentTabs()
 
         startSetup()
+        initOrUpdateAnalyticsKeys()
     }
 
     private fun startSetup() {
@@ -311,5 +312,16 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
                 preferencesManager.scannerId,
                 preferencesManager.macAddress,
                 preferencesManager.hardwareVersionString))
+    }
+
+    private fun initOrUpdateAnalyticsKeys() {
+        analyticsManager.setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
+        analyticsManager.setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
+        analyticsManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+        analyticsManager.setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
+        analyticsManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
+        sessionEventsManager.getCurrentSession().subscribeBy {
+            it -> analyticsManager.setSessionIdCrashlyticsKey(it.id)
+        }
     }
 }
