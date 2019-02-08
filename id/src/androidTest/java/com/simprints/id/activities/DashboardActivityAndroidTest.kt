@@ -260,7 +260,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     @After
     override fun tearDown() {
-        //super.tearDown()
+        super.tearDown()
     }
 
     private fun signOut() {
