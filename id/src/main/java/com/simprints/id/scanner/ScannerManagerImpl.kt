@@ -2,6 +2,8 @@ package com.simprints.id.scanner
 
 import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.AnalyticsTags
+import com.simprints.id.data.analytics.LogPrompter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.setup.*
@@ -55,7 +57,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
                 preferencesManager.lastScannerUsed = convertAddressToSerial(macAddress)
 
-                Timber.d("ScannerManager: Scanner initialized.")
+                logMessageToAnalytics("ScannerManager: Scanner initialized")
                 it.onComplete()
             }
         }
@@ -66,7 +68,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             result.onError(NullScannerError())
         } else {
             scanner?.connect(WrapperScannerCallback({
-                Timber.d("ScannerManager: Connected to Vero.")
+                logMessageToAnalytics("ScannerManager: Connected to Vero")
                 preferencesManager.scannerId = scanner?.scannerId ?: ""
                 analyticsManager.logScannerProperties()
                 result.onComplete()
@@ -90,7 +92,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             result.onError(NullScannerError())
         } else {
             scanner?.un20Wakeup(WrapperScannerCallback({
-                Timber.d("ScannerManager: UN20 ready.")
+                logMessageToAnalytics("ScannerManager: UN20 ready")
                 preferencesManager.hardwareVersion = scanner?.ucVersion ?: -1
 
                 result.onComplete()
@@ -115,7 +117,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             result.onError(NullScannerError())
         } else {
             scanner?.un20Shutdown(WrapperScannerCallback({
-                Timber.d("ScannerManager: UN20 off.")
+                logMessageToAnalytics("ScannerManager: UN20 off")
                 preferencesManager.hardwareVersion = scanner?.ucVersion ?: -1
 
                 result.onComplete()
@@ -131,7 +133,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             result.onError(NullScannerError())
         } else {
             scanner?.resetUI(WrapperScannerCallback({
-                Timber.d("ScannerManager: UI reset.")
+                logMessageToAnalytics("ScannerManager: UI reset")
                 result.onComplete()
             }, { scannerError ->
                 scannerError?.let {
@@ -167,5 +169,9 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         override fun onFailure(error: SCANNER_ERROR?) {
             failure(error)
         }
+    }
+
+    private fun logMessageToAnalytics(message: String) {
+        analyticsManager.logInfo(AnalyticsTags.SCANNER_SETUP, LogPrompter.SCANNER, message)
     }
 }
