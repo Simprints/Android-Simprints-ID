@@ -7,7 +7,7 @@ import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig

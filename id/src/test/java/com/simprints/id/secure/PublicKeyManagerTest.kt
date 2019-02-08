@@ -6,7 +6,7 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.shared.givenNetworkFailurePercentIs
-import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.id.testUtils.retrofit.FakeResponseInterceptor
 import com.simprints.id.testUtils.roboletric.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers

@@ -34,6 +34,8 @@ object RobolectricHelper {
         TestCase.assertEquals(intent.component?.className, clazz.name)
     }
 
+    fun <T : Activity> ActivityController<T>.showOnScreen(): ActivityController<T> = this.start().resume().visible()
+
     fun getSharedPreferences(fileName: String): SharedPreferences =
         ApplicationProvider.getApplicationContext<Application>().getSharedPreferences(fileName, Context.MODE_PRIVATE)
 }

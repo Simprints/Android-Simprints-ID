@@ -13,7 +13,7 @@ import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.mockSettingsPreferencesManager
-import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig

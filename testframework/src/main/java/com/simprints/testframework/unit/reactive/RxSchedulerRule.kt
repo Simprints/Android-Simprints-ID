@@ -1,27 +1,11 @@
-package com.simprints.id.testUtils.base
+package com.simprints.testframework.unit.reactive
 
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
-import org.junit.Before
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
-
-interface RxJavaTest {
-
-    @Before
-    fun setupClass() {
-
-        // AndroidSchedulers.mainThread() requests Android APi, not available in unit tests
-        // Setting a special main Scheduler https://medium.com/@peter.tackage/overriding-rxandroid-schedulers-in-rxjava-2-5561b3d14212
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { RxSchedulerRule.SCHEDULER_INSTANCE }
-        RxJavaPlugins.setIoSchedulerHandler { RxSchedulerRule.SCHEDULER_INSTANCE }
-        RxJavaPlugins.setNewThreadSchedulerHandler { RxSchedulerRule.SCHEDULER_INSTANCE }
-        RxJavaPlugins.setComputationSchedulerHandler { RxSchedulerRule.SCHEDULER_INSTANCE }
-    }
-}
-
 
 //Same as RxJavaTest, but it can be used as @get:Rule val rxSchedulerRule = RxSchedulerRule()
 class RxSchedulerRule : TestRule {

@@ -13,7 +13,7 @@ import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMast
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.SESSIONS_IDS_KEY
 import com.simprints.id.shared.sessionEvents.createFakeClosedSession
 import com.simprints.id.shared.sessionEvents.mockSessionEventsManager
-import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
