@@ -14,8 +14,8 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameters
-import com.simprints.id.shared.sessionEvents.*
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.commontesttools.sessionEvents.*
+import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.libsimprints.FingerIdentifier
 import org.junit.Test

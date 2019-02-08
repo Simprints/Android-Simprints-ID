@@ -5,8 +5,8 @@ import com.google.gson.JsonObject
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.db.local.realm.models.toRealmFingerprint
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
-import com.simprints.id.shared.PeopleGeneratorUtils
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libcommon.Person
