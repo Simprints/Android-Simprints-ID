@@ -1,46 +1,50 @@
 def versions = [
-    dagger   : "2.15",
-    kotlin   : "1.3.11",
     lifecycle: "2.0.0",
     room     : "2.1.0-alpha03",
     retrofit : '2.4.0',
     okhttp   : '3.10.0',
-    junit    : '4.12'
+    junit    : '4.12',
+    kotlin   : "1.3.11"
 ]
 
+def kotlin_version = "1.3.11"
 def kotlin = [
-    stdlib : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin",
-    reflect: "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin",
+    version: "1.3.11",
+    stdlib : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
+    reflect: "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version",
     anko   : "org.jetbrains.anko:anko:0.10.8"
 ]
 
+def dagger_version = "2.15"
 def dagger = [
-    version: "2.15"
-    core           : "com.google.dagger:dagger:$dagger.version",
-    android        : "com.google.dagger:dagger-android:$versions.dagger",
-    android_support: "com.google.dagger:dagger-android-support:$versions.dagger",
-    compiler       : "com.google.dagger:dagger-compiler: $versions.dagger"
+    core           : "com.google.dagger:dagger:$dagger_version",
+    android        : "com.google.dagger:dagger-android:$dagger_version",
+    android_support: "com.google.dagger:dagger-android-support:$dagger_version",
+    compiler       : "com.google.dagger:dagger-compiler:$dagger_version"
 ]
 
+def androidx_lifecycle_version = "2.1.0-alpha01"
+def androidx_fragment_version = "1.1.0-alpha03"
+def androidx_room_version = "2.1.0-alpha03"
 def androidx = [
     core     : "androidx.core:core-ktx:1.0.1",
     multidex : "androidx.multidex:multidex:2.0.1",
     appcompat: "androidx.appcompat:appcompat:1.0.2",
     legacy   : "androidx.legacy:legacy-support-v4: 1.0.0",
     room     : [
-        core    : "androidx.room:room-runtime:$versions.room",
-        compiler: "androidx.room:room-compiler:$versions.room"
+        core    : "androidx.room:room-runtime:$androidx_room_version",
+        compiler: "androidx.room:room-compiler:$androidx_room_version"
     ],
     lifecycle: [
-        livedata : "androidx.lifecycle:lifecycle-livedata:$versions.lifecycle",
-        compiler : "androidx.lifecycle:lifecycle-compiler:$versions.lifecycle",
-        viewmodel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.lifecycle"
+        livedata : "androidx.lifecycle:lifecycle-livedata:$androidx_lifecycle_version",
+        compiler : "androidx.lifecycle:lifecycle-compiler:$androidx_lifecycle_version",
+        viewmodel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_lifecycle_version"
     ],
     ui       : [
-        constraintlayout: "androidx.constraintlayout:constraintlayout:1.1.3",
+        constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-alpha3",
         cardview        : "androidx.cardview:cardview:1.0.0",
-        fragment        : "androidx.fragment:fragment:1.0.0",
-        preference      : "androidx.fragment:preference:1.0.0"
+        fragment        : "androidx.fragment:fragment:$androidx_fragment_version",
+        preference      : "androidx.fragment:preference:$androidx_fragment_version"
     ]
 ]
 
@@ -48,17 +52,16 @@ def support = [
     material: "com.google.android.material:material:1.1.0-alpha02"
 ]
 
+def work_version = "1.0.0-beta05"
 def arch_components = [
-    work   : "android.arch.work:work-runtime:1.0.0-beta02",
-    testing: [
-        core: "android.arch.core:core-testing:1.1.1"
-    ]
+    work: "android.arch.work:work-runtime-ktx:$work_version"
 ]
 
+def playservices_version = "16.0.0"
 def playservices = [
-    location : "com.google.android.gms:play-services-location:16.0.0",
-    places   : "com.google.android.gms:play-services-places:16.0.0",
-    safetynet: "com.google.android.gms:play-services-safetynet:16.0.0"
+    location : "com.google.android.gms:play-services-location:$playservices_version",
+    places   : "com.google.android.gms:play-services-places:$playservices_version",
+    safetynet: "com.google.android.gms:play-services-safetynet:$playservices_version"
 ]
 
 def firebase = [
@@ -76,12 +79,14 @@ def crashlytics = [
     ndk : "com.crashlytics.sdk.android:crashlytics-ndk:1.1.4@aar"
 ]
 
+def retrofit_version = "2.4.0"
+def okttp_version = "3.10.0"
 def retrofit = [
-    core         : "com.squareup.retrofit2:retrofit:$versions.retrofit",
-    adapter      : "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit",
-    convertergson: "com.squareup.retrofit2:converter-gson:$versions.retrofit",
-    logging      : "com.squareup.okhttp3:logging-interceptor:$versions.okhttp",
-    okhttp       : "com.squareup.okhttp3:okhttp:$versions.okhttp",
+    core         : "com.squareup.retrofit2:retrofit:$retrofit_version",
+    adapter      : "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version",
+    convertergson: "com.squareup.retrofit2:converter-gson:$retrofit_version",
+    logging      : "com.squareup.okhttp3:logging-interceptor:$okttp_version",
+    okhttp       : "com.squareup.okhttp3:okhttp:$okttp_version",
 ]
 
 def gson = [
@@ -101,41 +106,45 @@ def rxjava2 = [
 ]
 
 def simprints = [
-    libscanner: "com.simprints:libscanner:2018.4.0",
-    libmatcher: "com.simprints:libmatcher:1.3.2",
+    libscanner : "com.simprints:libscanner:2018.4.0",
+    libmatcher : "com.simprints:libmatcher:1.3.2",
     mockscanner: "com.simprints:mockscanner:2018.3.0"
 ]
 
+def mockito_version = "2.24.0"
+def espresso_version = "3.1.2-alpha01"
+def roboletric = "4.2-beta-1"
 def testing = [
-    junit        : "junit:junit:$versions.junit",
+    junit        : "junit:junit:4.12",
     robolectric  : [
-        core    : "org.robolectric:robolectric:4.0.2",
+        core    : "org.robolectric:robolectric:$roboletric",
         multidex: "org.robolectric:multidex:3.4.2"
     ],
     truth        : "com.google.truth:truth:0.42",
     mockito      : [
-        core   : "org.mockito:mockito-core:2.24.0",
-        inline : "org.mockito:mockito-inline:2.24.0",
+        core   : "org.mockito:mockito-core:$mockito_version",
+        inline : "org.mockito:mockito-inline:$mockito_version",
+        android: "org.mockito:mockito-android:$mockito_version",
         kotlin : "com.nhaarman:mockito-kotlin:1.5.0",
-        android: "org.mockito:mockito-android:1.5.0"
     ],
     mockwebserver: "com.squareup.okhttp3:mockwebserver:3.10.0",
     espresso     : [
-        core   : "androidx.test.espresso:espresso-core:3.1.1",
-        intents: "androidx.test.espresso:espresso-intents:3.1.1",
+        core   : "androidx.test.espresso:espresso-core:$espresso_version",
+        intents: "androidx.test.espresso:espresso-intents:$espresso_version",
         barista: "com.schibsted.spain:barista:2.5.0"
     ],
     dagger       : "com.github.fabioCollini.daggermock:daggermock:0.8.4",
-    room         : "androidx.room:room-testing:2.1.0-alpha03",
-    work         : "android.arch.work:work-testing: 1.0.0-beta02",
-    retrofit     : "com.squareup.retrofit2:retrofit-mock:$versions.retrofit",
+    dagger_kotlin: "com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4",
+    room         : "androidx.room:room-testing:$androidx_room_version",
+    work         : "android.arch.work:work-testing: $work_version",
+    retrofit     : "com.squareup.retrofit2:retrofit-mock:$retrofit_version",
     androidx     : [
-        monitor  : "androidx.test:monitor:1.1.1",
-        ext_junit: "androidx.test.ext:junit:1.1.0",
-        core     : "androidx.test:core:1.0.0",
+        monitor     : "androidx.test:monitor:1.1.2-alpha01",
+        ext_junit   : "androidx.test.ext:junit:1.1.1-alpha01",
+        core        : "androidx.test:core:1.1.1-alpha01",
         core_testing: "android.arch.core:core-testing:1.1.1",
-        runner   : "androidx.test:runner:1.1.1",
-        rules    : "androidx.test:rules:1.1.1"
+        runner      : "androidx.test:runner:1.1.2-alpha01",
+        rules       : "androidx.test:rules:1.1.2-alpha01"
     ]
 ]
 

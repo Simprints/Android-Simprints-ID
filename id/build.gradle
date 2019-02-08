@@ -128,9 +128,11 @@ dependencies {
     implementation project(':libsimprints')
 
     // Dagger
+    implementation deps.dagger.core
     implementation deps.dagger.android
-    annotationProcessor deps.dagger.android_support
-    kapt deps.dagger.core
+    implementation deps.dagger.android_support
+    annotationProcessor deps.dagger.compiler
+    kapt deps.dagger.compiler
     kaptAndroidTest deps.dagger.compiler
     kaptTest deps.dagger.compiler
 
@@ -227,7 +229,7 @@ dependencies {
     testImplementation deps.testing.androidx.core_testing
     androidTestImplementation deps.testing.androidx.core_testing
 
-    //implementation "org.checkerframework:checker-compat-qual:2.5.3"
+    implementation "org.checkerframework:checker-compat-qual:2.5.3"
     testImplementation deps.testing.truth
     androidTestImplementation(deps.testing.truth){
         exclude group: "com.google.guava"
@@ -264,8 +266,8 @@ dependencies {
         exclude group: "com.google.guava"
     }
 
-    androidTestImplementation "com.simprints:mockscanner:2018.3.0"
-    testImplementation "com.simprints:mockscanner:2018.3.0"
+    androidTestImplementation deps.simprints.mockscanner
+    testImplementation deps.simprints.mockscanner
     androidTestImplementation 'joda-time:joda-time:2.9.9'
 
     //UI
@@ -275,10 +277,10 @@ dependencies {
     implementation "androidx.fragment:fragment:$androidx_version"
 
     //Inject in tests
-    testImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.4'
-    androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock:0.8.4'
-    testImplementation 'com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4'
-    androidTestImplementation 'com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4'
+    testImplementation deps.testing.dagger
+    androidTestImplementation deps.testing.dagger
+    testImplementation deps.testing.dagger_kotlin
+    androidTestImplementation deps.testing.dagger_kotlin
 
     //Permissions & Locations
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
