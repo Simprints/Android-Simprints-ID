@@ -33,7 +33,7 @@ import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
-import com.simprints.testframework.common.syntax.waitForCompletionAndAssertNoErrors
+import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import io.reactivex.observers.TestObserver
 import io.realm.RealmConfiguration
 import org.junit.After
@@ -111,7 +111,7 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseL
         }
 
         val testObserver = executeUpload()
-        testObserver.waitForCompletionAndAssertNoErrors()
+        testObserver.awaitAndAssertSuccess()
 
         val response = RemoteTestingManager.create().getSessionCount(testProject.id)
         Truth.assertThat(response.count).isEqualTo(nSession)

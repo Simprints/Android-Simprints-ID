@@ -19,7 +19,7 @@ import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.json.JsonHelper
-import com.simprints.testframework.common.syntax.waitForCompletionAndAssertNoErrors
+import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import io.reactivex.observers.TestObserver
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -67,7 +67,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
         enqueueResponses(mockSuccessfulResponseForSessionsUpload())
 
         val testObserver = executeUpload()
-        testObserver.waitForCompletionAndAssertNoErrors()
+        testObserver.awaitAndAssertSuccess()
 
         verifyBodyRequestHasSessions(2, mockServer.takeRequest())
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
@@ -81,7 +81,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
         enqueueResponses(mockSuccessfulResponseForSessionsUpload())
 
         val testObserver = executeUpload()
-        testObserver.waitForCompletionAndAssertNoErrors()
+        testObserver.awaitAndAssertSuccess()
 
         verifyBodyRequestHasSessions(1, mockServer.takeRequest())
         assertThat(sessionsInFakeDb.size).isEqualTo(0)
@@ -93,7 +93,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
         enqueueResponses(mockSuccessfulResponseForSessionsUpload())
 
         val testObserver = executeUpload()
-        testObserver.waitForCompletionAndAssertNoErrors()
+        testObserver.awaitAndAssertSuccess()
 
         verifyBodyRequestHasSessions(2, mockServer.takeRequest())
         assertThat(sessionsInFakeDb.size).isEqualTo(0)
@@ -106,7 +106,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
 
         val testObserver = executeUpload()
         sessionsInFakeDb.addAll(createClosedSessions(1))
-        testObserver.waitForCompletionAndAssertNoErrors()
+        testObserver.awaitAndAssertSuccess()
 
         verifyBodyRequestHasSessions(2, mockServer.takeRequest())
         assertThat(sessionsInFakeDb.size).isEqualTo(1)

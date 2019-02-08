@@ -7,19 +7,19 @@ import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
+import com.simprints.id.commontesttools.sessionEvents.mockSessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.SESSIONS_IDS_KEY
-import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
-import com.simprints.id.commontesttools.sessionEvents.mockSessionEventsManager
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.mock
-import com.simprints.testframework.common.syntax.waitForCompletionAndAssertNoErrors
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import io.reactivex.observers.TestObserver
 import org.junit.Before
 import org.junit.Test
@@ -52,7 +52,7 @@ class SessionEventsMasterTaskTest: RxJavaTest {
         createEnoughSessionsForTwoBatches()
 
         val testObserver = executeCreateBatches()
-        testObserver.waitForCompletionAndAssertNoErrors()
+        testObserver.awaitAndAssertSuccess()
         verify(workManager, times(1)).cancelAllWorkByTag(anyNotNull())
     }
 
@@ -61,7 +61,7 @@ class SessionEventsMasterTaskTest: RxJavaTest {
         createEnoughSessionsForTwoBatches()
 
         val testObserver = executeCreateBatches()
-        testObserver.waitForCompletionAndAssertNoErrors()
+        testObserver.awaitAndAssertSuccess()
 
         val argument = ArgumentCaptor.forClass(WorkRequest::class.java)
         verify(workManager, times(2)).enqueue(argument.capture())

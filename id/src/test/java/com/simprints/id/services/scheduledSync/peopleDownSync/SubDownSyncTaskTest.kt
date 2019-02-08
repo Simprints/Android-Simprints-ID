@@ -27,7 +27,7 @@ import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
 import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.id.commontesttools.testTools.extensions.awaitAndAssertSuccess
+import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.mockserver.assertPathUrlParam
