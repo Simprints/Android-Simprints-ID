@@ -2,14 +2,13 @@ package com.simprints.id.activities.alert
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
 import kotlinx.android.synthetic.main.activity_alert.*
 
@@ -27,7 +26,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
             it.get(IntentKeys.alertActivityAlertTypeKey) as ALERT_TYPE
         } ?: ALERT_TYPE.UNEXPECTED_ERROR
 
-        viewPresenter = AlertPresenter(this, app.component as AppComponent, alertType)
+        viewPresenter = AlertPresenter(this, app.component, alertType)
         viewPresenter.start()
     }
 

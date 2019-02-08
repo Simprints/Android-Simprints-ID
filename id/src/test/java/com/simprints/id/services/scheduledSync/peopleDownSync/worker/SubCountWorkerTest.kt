@@ -11,8 +11,8 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForUnitTests
+import com.simprints.id.testUtils.di.AppModuleForTests
+import com.simprints.id.testUtils.di.DaggerForUnitTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -23,7 +23,7 @@ import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.mock
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
+import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test

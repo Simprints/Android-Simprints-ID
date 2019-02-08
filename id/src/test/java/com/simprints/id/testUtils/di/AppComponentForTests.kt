@@ -1,4 +1,4 @@
-package com.simprints.id.di
+package com.simprints.id.testUtils.di
 
 import com.simprints.id.activities.CheckLoginFromIntentActivityTest
 import com.simprints.id.activities.CheckLoginFromMainLauncherActivityTest
@@ -9,6 +9,10 @@ import com.simprints.id.activities.dashboard.DashboardCardsFactoryTest
 import com.simprints.id.activities.dashboard.DashboardSyncCardViewModelTest
 import com.simprints.id.data.db.DbManagerTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
+import com.simprints.id.di.AppComponent
+import com.simprints.id.di.AppModule
+import com.simprints.id.di.PreferencesModule
+import com.simprints.id.di.SerializerModule
 import com.simprints.id.secure.ProjectAuthenticatorTest
 import com.simprints.id.secure.ProjectSecretManagerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.SubDownSyncTaskTest

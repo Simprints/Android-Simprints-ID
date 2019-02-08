@@ -1,4 +1,4 @@
-package com.simprints.testframework.unit.robolectric
+package com.simprints.id.testUtils.roboletric
 
 import android.content.Context
 import android.util.Log
@@ -6,15 +6,14 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.firebase.FirebaseApp
-import com.simprints.libcommon.di.IApplication
-import com.simprints.testframework.common.di.DaggerForTests
+import com.simprints.id.shared.DaggerForTests
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.functions
 
 class RobolectricDaggerTestConfig<T : DaggerForTests>(val test: T) {
 
     init {
-        test.app = ApplicationProvider.getApplicationContext<Context>() as IApplication
+        test.app = ApplicationProvider.getApplicationContext<Context>() as TestApplication
     }
 
     fun setupAllAndFinish() = setupFirebase().setupWorkManager().finish()

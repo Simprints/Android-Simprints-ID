@@ -21,8 +21,8 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.di.AppComponent
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForUnitTests
+import com.simprints.id.testUtils.di.AppModuleForTests
+import com.simprints.id.testUtils.di.DaggerForUnitTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
@@ -37,7 +37,7 @@ import com.simprints.id.testUtils.roboletric.RobolectricTestMocker
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
+import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Single
 import org.junit.Before

@@ -9,7 +9,6 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import timber.log.Timber
@@ -59,7 +58,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
     private fun injectDependencies() {
         val context = applicationContext
         if (context is Application) {
-            (context.component as AppComponent).inject(this)
+            context.component.inject(this)
         } else {
             throw WorkerInjectionFailedError.forWorker<PeopleUpSyncUploaderWorker>()
         }

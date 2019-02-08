@@ -10,7 +10,6 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.SecureApiInterface
@@ -46,7 +45,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val component = (application as Application).component as AppComponent
+        val component = (application as Application).component
         component.inject(this)
 
         initUI()

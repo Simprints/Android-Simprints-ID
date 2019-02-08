@@ -21,7 +21,6 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
@@ -73,7 +72,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     init {
-        val component = (activity.application as Application).component as AppComponent
+        val component = (activity.application as Application).component
         component.inject(this)
         startConsentEventTime = timeHelper.now()
     }

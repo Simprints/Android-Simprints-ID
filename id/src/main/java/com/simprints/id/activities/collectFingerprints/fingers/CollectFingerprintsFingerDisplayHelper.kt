@@ -7,7 +7,6 @@ import com.simprints.id.Application
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.FingerPageAdapter
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Finger
 import com.simprints.id.tools.extensions.isFingerNotCollectable
 import com.simprints.libcommon.FingerConfig
@@ -24,7 +23,7 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
     private val allFingers = ArrayList<Finger>(Finger.NB_OF_FINGERS)
 
     init {
-        (((view as Activity).application as Application).component as AppComponent).inject(this)
+        ((view as Activity).application as Application).component.inject(this)
         clearAndPopulateFingerArrays()
         initPageAdapter()
         initViewPager()

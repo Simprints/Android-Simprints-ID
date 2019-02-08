@@ -13,8 +13,8 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForUnitTests
+import com.simprints.id.testUtils.di.AppModuleForTests
+import com.simprints.id.testUtils.di.DaggerForUnitTests
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
@@ -24,7 +24,7 @@ import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.reactive.RxJavaTest
-import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
+import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*

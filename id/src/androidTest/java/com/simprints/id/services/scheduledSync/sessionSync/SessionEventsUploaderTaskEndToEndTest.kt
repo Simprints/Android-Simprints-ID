@@ -33,6 +33,7 @@ import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
+import com.simprints.testframework.common.syntax.waitForCompletionAndAssertNoErrors
 import io.reactivex.observers.TestObserver
 import io.realm.RealmConfiguration
 import org.junit.After
