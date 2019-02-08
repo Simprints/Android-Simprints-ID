@@ -92,11 +92,11 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun initScanButtonListeners() {
         view.scanButton.setOnClickListener {
-            analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogPrompter.UI, "Scan button clicked")
+            logMessageToAnalytics("Scan button clicked")
             startCapturing()
         }
         view.scanButton.setOnLongClickListener {
-            analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogPrompter.UI, "Scan button long clicked")
+            logMessageToAnalytics("Scan button long clicked")
             resetFingerState()
         }
     }
@@ -227,6 +227,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleConfirmFingerprintsAndContinue() {
+        logMessageToAnalytics("Confirm fingerprints clicked")
         dismissConfirmDialogIfStillShowing()
 
         val fingerprints = activeFingers
@@ -317,7 +318,10 @@ class CollectFingerprintsPresenter(private val context: Context,
         confirmDialog = ConfirmFingerprintsDialog(context, createMapForScannedFingers(),
             callbackConfirm = { handleConfirmFingerprintsAndContinue() },
             callbackRestart = { handleRestart() })
-            .create().also { it.show() }
+            .create().also {
+                it.show()
+                logMessageToAnalytics("Confirm fingerprints dialog shown")
+            }
     }
 
     private fun createMapForScannedFingers(): MutableMap<String, Boolean> =
@@ -328,6 +332,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
 
     private fun handleRestart() {
+        logMessageToAnalytics("Restart clicked")
         fingerDisplayHelper.clearAndPopulateFingerArrays()
         fingerDisplayHelper.handleFingersChanged()
         fingerDisplayHelper.resetFingerIndexToBeginning()
@@ -336,13 +341,17 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleMissingFingerClick() {
-        analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogPrompter.UI, "Missing finger text clicked")
+        logMessageToAnalytics("Missing finger text clicked")
         if (!currentFinger().isCollecting) {
             scanningHelper.setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger()
             lastCaptureStartedAt = timeHelper.now()
             addCaptureEventInSession(currentFinger())
             resolveFingerTerminalConditionTriggered()
         }
+    }
+
+    private fun logMessageToAnalytics(message: String) {
+        analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogPrompter.UI, message)
     }
 
     companion object {

@@ -35,8 +35,8 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
     }*/
 
     override fun doWork(): Result {
-        logMessageToAnalytics("PeopleUpSyncUploaderWorker - running")
         injectDependencies()
+        logMessageToAnalytics("PeopleUpSyncUploaderWorker - running")
 
         val task = PeopleUpSyncUploaderTask(
             loginInfoManager, localDbManager, remotePeopleManager,

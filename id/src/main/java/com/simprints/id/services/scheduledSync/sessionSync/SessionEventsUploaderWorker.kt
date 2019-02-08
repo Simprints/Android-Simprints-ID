@@ -38,9 +38,8 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
     }
 
     override fun doWork(): Result {
-        Timber.d("SessionEventsUploaderWorker doWork()")
-        logMessageToAnalytics("SessionEventsUploaderWorker doWork()")
         injectDependencies()
+        logMessageToAnalytics("SessionEventsUploaderWorker doWork()")
 
         return try {
             val task = SessionEventsUploaderTask(
