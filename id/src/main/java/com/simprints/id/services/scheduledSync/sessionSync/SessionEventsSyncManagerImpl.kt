@@ -4,9 +4,7 @@ import androidx.work.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-open class SessionEventsSyncManagerImpl(getWorkManager: () -> WorkManager = WorkManager::getInstance) : SessionEventsSyncManager {
-
-    private val workerManager = getWorkManager()
+open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
 
     override fun scheduleSessionsSync() {
         createAndEnqueueRequest()
