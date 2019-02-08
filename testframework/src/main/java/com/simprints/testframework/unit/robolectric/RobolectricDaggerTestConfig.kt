@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
-import androidx.work.WorkManager
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.firebase.FirebaseApp
 import com.simprints.libcommon.di.IApplication
 import com.simprints.testframework.common.di.DaggerForTests
@@ -26,7 +26,8 @@ class RobolectricDaggerTestConfig<T : DaggerForTests>(val test: T) {
 
     fun setupWorkManager(): RobolectricDaggerTestConfig<T> {
         try {
-            WorkManager.initialize(test.app as Context, Configuration.Builder().build())
+            WorkManagerTestInitHelper
+                .initializeTestWorkManager(test.app as Context, Configuration.Builder().build())
         } catch (e: IllegalStateException) {
             Log.d("TestConfig", "WorkManager already initialized")
         }
