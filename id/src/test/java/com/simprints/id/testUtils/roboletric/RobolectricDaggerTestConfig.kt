@@ -19,14 +19,14 @@ class RobolectricDaggerTestConfig<T : DaggerForTests>(val test: T) {
     fun setupAllAndFinish() = setupFirebase().setupWorkManager().finish()
 
     fun setupFirebase(): RobolectricDaggerTestConfig<T> {
-        FirebaseApp.initializeApp(test.app as Context)
+        FirebaseApp.initializeApp(test.app)
         return this
     }
 
     fun setupWorkManager(): RobolectricDaggerTestConfig<T> {
         try {
             WorkManagerTestInitHelper
-                .initializeTestWorkManager(test.app as Context, Configuration.Builder().build())
+                .initializeTestWorkManager(test.app, Configuration.Builder().build())
         } catch (e: IllegalStateException) {
             Log.d("TestConfig", "WorkManager already initialized")
         }

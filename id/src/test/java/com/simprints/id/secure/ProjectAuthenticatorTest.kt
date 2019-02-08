@@ -3,7 +3,6 @@ package com.simprints.id.secure
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
 import com.nhaarman.mockito_kotlin.verify
-import com.simprints.id.Application
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
@@ -13,21 +12,20 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.di.AppComponent
-import com.simprints.id.testUtils.di.AppModuleForTests
-import com.simprints.id.testUtils.di.DaggerForUnitTests
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.createMockBehaviorService
-import com.simprints.testframework.unit.reactive.RxJavaTest
+import com.simprints.id.testUtils.di.AppModuleForTests
+import com.simprints.id.testUtils.di.DaggerForUnitTests
+import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -88,8 +86,8 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForUnitTests() {
     fun successfulResponse_userShouldSignIn() {
 
         val authenticator = LegacyCompatibleProjectAuthenticator(
-            testAppComponent as AppComponent,
-            SafetyNet.getClient(app as Application),
+            testAppComponent,
+            SafetyNet.getClient(app),
             ApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
             getMockAttestationManager())
 
@@ -112,8 +110,8 @@ class ProjectAuthenticatorTest : RxJavaTest, DaggerForUnitTests() {
         val nonceScope = NonceScope(projectId, userId)
 
         val testObserver = LegacyCompatibleProjectAuthenticator(
-            testAppComponent as AppComponent,
-            SafetyNet.getClient(app as Application),
+            testAppComponent,
+            SafetyNet.getClient(app),
             createMockServiceToFailRequests(apiClient.retrofit))
             .authenticate(nonceScope, "encrypted_project_secret", projectId, null)
             .test()

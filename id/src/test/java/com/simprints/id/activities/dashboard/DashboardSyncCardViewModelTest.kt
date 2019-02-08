@@ -20,24 +20,23 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.di.AppComponent
-import com.simprints.id.testUtils.di.AppModuleForTests
-import com.simprints.id.testUtils.di.DaggerForUnitTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.DependencyRule.SpyRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
-import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.id.shared.liveData.testObserver
-import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.reactive.RxJavaTest
+import com.simprints.id.testUtils.di.AppModuleForTests
+import com.simprints.id.testUtils.di.DaggerForUnitTests
+import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
+import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Single
 import org.junit.Before
@@ -271,7 +270,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForUnitTests() {
         DashboardSyncCardViewModel(
             DashboardCardType.SYNC_DB,
             1,
-            testAppComponent as AppComponent,
+            testAppComponent,
             downSyncDao,
             upSyncDao,
             fakeSyncStateLiveData)

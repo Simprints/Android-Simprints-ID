@@ -7,18 +7,17 @@ import android.graphics.drawable.ColorDrawable
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.Application
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.testUtils.di.AppModuleForTests
-import com.simprints.id.testUtils.di.DaggerForUnitTests
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.shared.DependencyRule.MockRule
+import com.simprints.id.testUtils.di.AppModuleForTests
+import com.simprints.id.testUtils.di.DaggerForUnitTests
+import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.testUtils.roboletric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import com.simprints.testframework.unit.robolectric.RobolectricHelper.showOnScreen
 import kotlinx.android.synthetic.main.activity_alert.*
@@ -121,5 +120,5 @@ class AlertActivityTest : DaggerForUnitTests() {
             Color.TRANSPARENT
         }
 
-    private fun getColorWithColorRes(colorRes: Int, resources: Resources = (app as Application).resources) = ResourcesCompat.getColor(resources, colorRes, null)
+    private fun getColorWithColorRes(colorRes: Int, resources: Resources = app.resources) = ResourcesCompat.getColor(resources, colorRes, null)
 }
