@@ -1,12 +1,3 @@
-def versions = [
-    lifecycle: "2.0.0",
-    room     : "2.1.0-alpha03",
-    retrofit : '2.4.0',
-    okhttp   : '3.10.0',
-    junit    : '4.12',
-    kotlin   : "1.3.11"
-]
-
 def kotlin_version = "1.3.11"
 def kotlin = [
     version: "1.3.11",
@@ -44,7 +35,7 @@ def androidx = [
         constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-alpha3",
         cardview        : "androidx.cardview:cardview:1.0.0",
         fragment        : "androidx.fragment:fragment:$androidx_fragment_version",
-        preference      : "androidx.fragment:preference:$androidx_fragment_version"
+        preference      : "androidx.preference:preference:$androidx_fragment_version"
     ]
 ]
 
@@ -101,7 +92,7 @@ def rxjava2 = [
     core         : "io.reactivex.rxjava2:rxjava:2.1.16",
     android      : "io.reactivex.rxjava2:rxandroid:2.0.2",
     kotlin       : "io.reactivex.rxjava2:rxkotlin:2.2.0",
-    rxpermissions: "com.github.tbruyelle:rxpermissions:0.10.2",
+    permissions: "com.github.tbruyelle:rxpermissions:2.x.v0.9.3",
     location     : "pl.charmas.android:android-reactive-location2:2.1@aar"
 ]
 
@@ -135,8 +126,7 @@ def testing = [
     ],
     dagger       : "com.github.fabioCollini.daggermock:daggermock:0.8.4",
     dagger_kotlin: "com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4",
-    room         : "androidx.room:room-testing:$androidx_room_version",
-    work         : "android.arch.work:work-testing: $work_version",
+    work         : "android.arch.work:work-testing:$work_version",
     retrofit     : "com.squareup.retrofit2:retrofit-mock:$retrofit_version",
     androidx     : [
         monitor     : "androidx.test:monitor:1.1.2-alpha01",
@@ -144,8 +134,13 @@ def testing = [
         core        : "androidx.test:core:1.1.1-alpha01",
         core_testing: "android.arch.core:core-testing:1.1.1",
         runner      : "androidx.test:runner:1.1.2-alpha01",
-        rules       : "androidx.test:rules:1.1.2-alpha01"
+        rules       : "androidx.test:rules:1.1.2-alpha01",
+        room         : "androidx.room:room-testing:$androidx_room_version"
     ]
+]
+
+def realm_support = [
+    glassfish_annotation: "org.glassfish:javax.annotation:10.0-b28"
 ]
 
 ext.deps = [
@@ -162,5 +157,6 @@ ext.deps = [
     timber         : timber,
     rxjava2        : rxjava2,
     simprints      : simprints,
-    testing        : testing
+    testing        : testing,
+    realm_support  : realm_support
 ]

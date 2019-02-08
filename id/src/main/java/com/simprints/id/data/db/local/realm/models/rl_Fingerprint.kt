@@ -2,11 +2,12 @@ package com.simprints.id.data.db.local.realm.models
 
 import com.simprints.id.domain.Fingerprint
 import io.realm.RealmObject
+import org.jetbrains.annotations.Nullable
 import com.simprints.libcommon.Fingerprint as LibFingerprint
 
 open class rl_Fingerprint (
     var fingerId: Int = 0,
-    var template: ByteArray? = null,
+    @Nullable var template: ByteArray? = null,
     var qualityScore: Int = 0
 ): RealmObject()
 
