@@ -42,7 +42,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyn
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderWorker
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
@@ -85,7 +84,6 @@ interface AppComponent {
     fun inject(syncSchedulerHelper: SyncSchedulerHelperImpl)
     fun inject(dashboardSyncCardView: DashboardSyncCardView)
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
-    fun inject(sessionSyncUploaderWorker: SessionEventsUploaderWorker)
     fun inject(countTask: CountTaskImpl)
     fun inject(downSyncTask: DownSyncTaskImpl)
     fun inject(subCountWorker: SubCountWorker)
