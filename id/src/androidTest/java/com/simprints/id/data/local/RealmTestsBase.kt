@@ -6,7 +6,7 @@ import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.domain.Person
-import com.simprints.id.shared.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File

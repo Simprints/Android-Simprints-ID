@@ -14,11 +14,11 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.mock
-import com.simprints.id.shared.sessionEvents.createFakeOpenSession
-import com.simprints.id.shared.sessionEvents.mockSessionEventsManager
-import com.simprints.id.shared.testTools.extensions.awaitAndAssertSuccess
+import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
+import com.simprints.id.commontesttools.sessionEvents.mockSessionEventsManager
+import com.simprints.id.commontesttools.testTools.extensions.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import io.reactivex.Completable

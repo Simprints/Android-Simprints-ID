@@ -23,11 +23,11 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.setup.*
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.shared.DependencyRule
-import com.simprints.id.shared.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
 import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.id.shared.mockSettingsPreferencesManager
+import com.simprints.id.commontesttools.mockSettingsPreferencesManager
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTools.waitOnUi

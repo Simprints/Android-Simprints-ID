@@ -5,7 +5,7 @@ import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionE
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionRealmConfig
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.testTools.models.TestProject
 import com.simprints.id.testTools.remote.RemoteTestingManager
 import io.realm.Realm

@@ -1,9 +1,9 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.shared.AppModuleForAnyTests
-import com.simprints.id.shared.DependencyRule
-import com.simprints.id.shared.DependencyRule.RealRule
+import com.simprints.id.commontesttools.di.AppModuleForAnyTests
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.DependencyRule.RealRule
 
 open class AppModuleForAndroidTests(app: Application,
                                     override var localDbManagerRule: DependencyRule = RealRule,

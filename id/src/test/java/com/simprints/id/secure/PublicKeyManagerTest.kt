@@ -5,10 +5,10 @@ import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
-import com.simprints.id.shared.givenNetworkFailurePercentIs
+import com.simprints.id.commontesttools.givenNetworkFailurePercentIs
 import com.simprints.testframework.unit.reactive.RxJavaTest
-import com.simprints.id.testUtils.retrofit.FakeResponseInterceptor
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testtools.retrofit.FakeResponseInterceptor
+import com.simprints.id.testtools.roboletric.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers

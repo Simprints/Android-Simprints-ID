@@ -11,11 +11,11 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEv
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.network.SimApiClient
 import com.simprints.testframework.common.syntax.mock
-import com.simprints.id.shared.sessionEvents.createFakeClosedSession
-import com.simprints.id.shared.sessionEvents.createFakeSession
-import com.simprints.id.shared.sessionEvents.mockSessionEventsManager
+import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
+import com.simprints.id.commontesttools.sessionEvents.createFakeSession
+import com.simprints.id.commontesttools.sessionEvents.mockSessionEventsManager
 import com.simprints.testframework.unit.reactive.RxJavaTest
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.json.JsonHelper

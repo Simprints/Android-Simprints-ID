@@ -28,10 +28,10 @@ import com.simprints.id.domain.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.shared.DependencyRule
-import com.simprints.id.shared.PeopleGeneratorUtils
-import com.simprints.id.shared.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testTemplates.FirstUseLocalAndRemote
 import com.simprints.id.testTools.LoginManagerTest

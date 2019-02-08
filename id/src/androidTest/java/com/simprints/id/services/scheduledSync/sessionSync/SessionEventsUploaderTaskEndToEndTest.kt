@@ -16,10 +16,10 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.shared.DependencyRule
-import com.simprints.id.shared.PreferencesModuleForAnyTests
-import com.simprints.id.shared.sessionEvents.createFakeClosedSession
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocalAndRemote

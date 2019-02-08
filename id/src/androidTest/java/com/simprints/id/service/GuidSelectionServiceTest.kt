@@ -13,10 +13,10 @@ import com.simprints.id.data.analytics.eventData.models.local.toDomainSession
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
-import com.simprints.id.shared.DefaultTestConstants
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
-import com.simprints.id.shared.DependencyRule
-import com.simprints.id.shared.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.DefaultTestConstants
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
 import com.simprints.id.testSnippets.launchActivityEnrol
 import com.simprints.id.testSnippets.setupLoginInfoToBeSignedIn
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey

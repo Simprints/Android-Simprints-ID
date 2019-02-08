@@ -7,8 +7,8 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.testframework.unit.reactive.RxJavaTest
-import com.simprints.id.testUtils.retrofit.FakeResponseInterceptor
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testtools.retrofit.FakeResponseInterceptor
+import com.simprints.id.testtools.roboletric.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
