@@ -17,7 +17,7 @@ import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.mock
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver

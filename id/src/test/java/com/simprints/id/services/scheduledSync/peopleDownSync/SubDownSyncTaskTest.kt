@@ -29,7 +29,7 @@ import com.simprints.id.shared.PeopleGeneratorUtils.getRandomPerson
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.id.shared.testTools.extensions.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.mockserver.assertPathUrlParam
 import com.simprints.testframework.unit.mockserver.assertQueryUrlParam
 import com.simprints.id.testUtils.roboletric.TestApplication

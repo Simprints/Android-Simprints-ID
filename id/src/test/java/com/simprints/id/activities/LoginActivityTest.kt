@@ -2,6 +2,9 @@ package com.simprints.id.activities
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.pm.ApplicationInfo
+import android.content.pm.ResolveInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.Application
@@ -14,14 +17,13 @@ import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForUnitTests
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.whenever
-import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.injectHowToResolveScannerAppIntent
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.scannerAppIntent
+import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.robolectric.RobolectricDaggerTestConfig
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Completable
@@ -219,4 +221,17 @@ class LoginActivityTest : RxJavaTest, DaggerForUnitTests() {
     private fun createRoboLoginActivity() = createRoboLoginActivity(null)
     private fun createRoboLoginActivity(intent: Intent?) =
         RobolectricHelper.createActivity<LoginActivity>(intent)
+
+    private fun injectHowToResolveScannerAppIntent(): ResolveInfo {
+        // Pretend that ScannerQR app is installed
+        val info = ResolveInfo()
+        info.isDefault = true
+        val applicationInfo = ApplicationInfo()
+        applicationInfo.packageName = "com.google.zxing.client.android"
+        applicationInfo.className = "com.google.zxing.client.android.CaptureActivity"
+        info.activityInfo = ActivityInfo()
+        info.activityInfo.applicationInfo = applicationInfo
+        info.activityInfo.name = "Barcode Scanner"
+        return info
+    }
 }

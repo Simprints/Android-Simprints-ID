@@ -32,7 +32,7 @@ import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.id.shared.liveData.testObserver
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper

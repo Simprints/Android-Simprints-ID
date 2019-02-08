@@ -21,7 +21,7 @@ import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.createMockBehaviorService
-import com.simprints.id.testUtils.base.RxJavaTest
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.id.testUtils.roboletric.RobolectricTestMocker
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.tools.delegates.lazyVar
