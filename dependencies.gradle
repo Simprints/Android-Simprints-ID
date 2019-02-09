@@ -1,6 +1,5 @@
 def kotlin_version = "1.3.21"
 def kotlin = [
-    version: "1.3.11",
     reflect: "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version", //TOOD: remove once we drop the legacy code around Firebase
     anko   : "org.jetbrains.anko:anko:0.10.8"
 ]
@@ -8,8 +7,6 @@ def kotlin = [
 def dagger_version = "2.15"
 def dagger = [
     core           : "com.google.dagger:dagger:$dagger_version",
-    android        : "com.google.dagger:dagger-android:$dagger_version",
-    android_support: "com.google.dagger:dagger-android-support:$dagger_version",
     compiler       : "com.google.dagger:dagger-compiler:$dagger_version"
 ]
 
@@ -113,15 +110,15 @@ def testing = [
     truth        : "com.google.truth:truth:0.42",
     mockito      : [
         core   : "org.mockito:mockito-core:$mockito_version",
-        inline : "org.mockito:mockito-inline:$mockito_version",
-        android: "org.mockito:mockito-android:$mockito_version",
+        inline : "org.mockito:mockito-inline:$mockito_version", //Required to mock final classes
+        android: "org.mockito:mockito-android:$mockito_version", //Required to use Mock in AndroidTests
         kotlin : "com.nhaarman:mockito-kotlin:1.5.0",
     ],
     mockwebserver: "com.squareup.okhttp3:mockwebserver:3.10.0",
     espresso     : [
         core   : "androidx.test.espresso:espresso-core:$espresso_version",
         intents: "androidx.test.espresso:espresso-intents:$espresso_version",
-        barista: "com.schibsted.spain:barista:2.5.0"
+        barista: "com.schibsted.spain:barista:2.5.0" //Used to grant permissions in AndroidTests
     ],
     dagger       : "com.github.fabioCollini.daggermock:daggermock:0.8.4",
     dagger_kotlin: "com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4",
