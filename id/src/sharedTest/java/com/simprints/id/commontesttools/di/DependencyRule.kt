@@ -1,7 +1,7 @@
 package com.simprints.id.commontesttools.di
 
 import com.simprints.testframework.common.syntax.mock
-import org.mockito.Mockito.spy
+import com.simprints.testframework.common.syntax.spy
 
 sealed class DependencyRule {
     object RealRule : DependencyRule()

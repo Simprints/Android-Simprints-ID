@@ -6,6 +6,7 @@ import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.commontesttools.createMockBehaviorService
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.*
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -19,15 +20,15 @@ import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.sync.SimApiMock
-import com.simprints.id.testtools.di.AppModuleForTests
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.retrofit.mockServer.mockNotFoundResponse
 import com.simprints.id.testtools.retrofit.mockServer.mockResponseForDownloadPatient
 import com.simprints.id.testtools.retrofit.mockServer.mockResponseForUploadPatient
 import com.simprints.id.testtools.retrofit.mockServer.mockServerProblemResponse
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupLocalAndRemoteManagersForApiTesting
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.libcommon.Person
+import com.simprints.testframework.common.syntax.spy
 import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
@@ -36,7 +37,8 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 import org.robolectric.annotation.Config
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -59,9 +61,9 @@ class DbManagerTest {
     @Inject lateinit var dbManager: DbManager
 
     private val module by lazy {
-        AppModuleForTests(
+        TestAppModule(
             app,
-            localDbManagerRule = ReplaceRule { spy(LocalDbManager::class.java) },
+            localDbManagerRule = ReplaceRule { spy<LocalDbManager>() },
             remoteDbManagerRule = SpyRule,
             remotePeopleManagerRule = SpyRule,
             peopleUpSyncMasterRule = MockRule,

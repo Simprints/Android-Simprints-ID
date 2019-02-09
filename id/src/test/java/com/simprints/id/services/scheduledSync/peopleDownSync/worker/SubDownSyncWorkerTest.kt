@@ -11,13 +11,13 @@ import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
@@ -48,7 +48,7 @@ class SubDownSyncWorkerTest {
     private var mockDownSyncTask: DownSyncTask = mock()
 
     private val module by lazy {
-        AppModuleForTests(app,
+        TestAppModule(app,
             analyticsManagerRule = DependencyRule.MockRule,
             localDbManagerRule = DependencyRule.MockRule,
             downSyncTaskRule = DependencyRule.ReplaceRule { mockDownSyncTask }

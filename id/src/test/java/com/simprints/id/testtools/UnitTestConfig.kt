@@ -5,10 +5,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.firebase.FirebaseApp
-import com.simprints.id.commontesttools.di.AppModuleForAnyTests
-import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.testtools.di.AppComponentForTests
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
 import com.simprints.id.testtools.roboletric.TestApplication
 import kotlin.reflect.full.createType
@@ -16,8 +15,8 @@ import kotlin.reflect.full.functions
 
 class UnitTestConfig<T : Any>(
     private val test: T,
-    private val appModule: AppModuleForAnyTests? = null,
-    private val preferencesModule: PreferencesModuleForAnyTests? = null
+    private val appModule: TestAppModule? = null,
+    private val preferencesModule: TestPreferencesModule? = null
 ) {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
@@ -52,8 +51,8 @@ class UnitTestConfig<T : Any>(
     fun initComponent(): UnitTestConfig<T> {
 
         testAppComponent = DaggerAppComponentForTests.builder()
-            .appModule(appModule ?: AppModuleForTests(app))
-            .preferencesModule(preferencesModule ?: PreferencesModuleForAnyTests())
+            .appModule(appModule ?: TestAppModule(app))
+            .preferencesModule(preferencesModule ?: TestPreferencesModule())
             .build()
 
         app.component = testAppComponent

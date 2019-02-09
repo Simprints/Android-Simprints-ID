@@ -12,7 +12,7 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.commontesttools.di.DependencyRule.*
-import com.simprints.id.testtools.state.setupFakeKeyStore
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
@@ -21,10 +21,10 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.testtools.state.setupFakeKeyStore
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import com.simprints.testframework.unit.robolectric.RobolectricHelper.assertActivityStarted
@@ -69,7 +69,7 @@ class CheckLoginFromIntentActivityTest {
     @Inject lateinit var dbManager: DbManager
 
     private val module by lazy {
-        AppModuleForTests(app,
+        TestAppModule(app,
             analyticsManagerRule = SpyRule,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,

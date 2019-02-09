@@ -6,6 +6,7 @@ import com.nhaarman.mockito_kotlin.*
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
@@ -25,7 +26,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncSc
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelperImpl
@@ -68,7 +68,7 @@ class SubDownSyncTaskTest {
     private val downSyncDao: DownSyncDao = mock()
 
     private val module by lazy {
-        AppModuleForTests(app,
+        TestAppModule(app,
             syncScopesBuilderRule = DependencyRule.MockRule,
             syncStatusDatabaseRule = DependencyRule.SpyRule)
     }

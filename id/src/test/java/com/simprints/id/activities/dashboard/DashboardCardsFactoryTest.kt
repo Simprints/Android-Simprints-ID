@@ -7,6 +7,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -17,7 +18,6 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.TestApplication
@@ -50,7 +50,7 @@ class DashboardCardsFactoryTest {
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     private val module by lazy {
-        AppModuleForTests(app,
+        TestAppModule(app,
             remoteDbManagerRule = MockRule,
             remotePeopleManagerRule = MockRule,
             remoteProjectManagerRule = MockRule,

@@ -18,7 +18,7 @@ import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testSnippets.*
@@ -64,8 +64,8 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseL
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
-    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
-        PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
+    override var preferencesModule: TestPreferencesModule by lazyVar {
+        TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
     }
 
     override var module by lazyVar {

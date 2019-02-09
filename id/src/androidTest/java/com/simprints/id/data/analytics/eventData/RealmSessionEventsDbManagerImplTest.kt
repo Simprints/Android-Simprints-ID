@@ -19,7 +19,7 @@ import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
@@ -57,8 +57,8 @@ class RealmSessionEventsDbManagerImplTest : DaggerForAndroidTests(), FirstUseLoc
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
-    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
-        PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
+    override var preferencesModule: TestPreferencesModule by lazyVar {
+        TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
     }
 
     override var module by lazyVar {

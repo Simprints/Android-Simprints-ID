@@ -28,7 +28,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SEC
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
@@ -77,8 +77,8 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var timeHelper: TimeHelper
 
-    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
-        PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
+    override var preferencesModule: TestPreferencesModule by lazyVar {
+        TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
     }
 
     override var module by lazyVar {

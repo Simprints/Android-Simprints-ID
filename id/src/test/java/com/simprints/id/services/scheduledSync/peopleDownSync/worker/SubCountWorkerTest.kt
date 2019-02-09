@@ -11,6 +11,7 @@ import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -18,7 +19,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScop
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker.Companion.SUBCOUNT_WORKER_SUB_SCOPE_INPUT
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
@@ -50,7 +50,7 @@ class SubCountWorkerTest {
     private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
 
     private val module by lazy {
-        AppModuleForTests(app,
+        TestAppModule(app,
             localDbManagerRule = DependencyRule.MockRule,
             analyticsManagerRule = DependencyRule.SpyRule,
             countTaskRule = DependencyRule.ReplaceRule { countTaskMock }

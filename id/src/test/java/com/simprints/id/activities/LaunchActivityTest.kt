@@ -3,8 +3,9 @@ package com.simprints.id.activities
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
-import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.mockSettingsPreferencesManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -12,7 +13,6 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
@@ -35,13 +35,13 @@ class LaunchActivityTest {
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
 
     private val preferencesModule by lazy {
-        PreferencesModuleForAnyTests(
+        TestPreferencesModule(
             settingsPreferencesManagerRule = MockRule
         )
     }
 
     private val module by lazy {
-        AppModuleForTests(app,
+        TestAppModule(app,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             dbManagerRule = MockRule,

@@ -25,7 +25,7 @@ import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.id.commontesttools.mockSettingsPreferencesManager
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
@@ -62,8 +62,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
     @Rule @JvmField var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
     @Rule @JvmField val launchActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
 
-    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
-        PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
+    override var preferencesModule: TestPreferencesModule by lazyVar {
+        TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
     }
 
     override var module by lazyVar {

@@ -16,7 +16,7 @@ import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.testSnippets.launchActivityEnrol
 import com.simprints.id.testSnippets.setupLoginInfoToBeSignedIn
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
@@ -42,8 +42,8 @@ class GuidSelectionServiceTest : DaggerForAndroidTests(), FirstUseLocal {
     override var peopleRealmConfiguration: RealmConfiguration? = null
     override var sessionsRealmConfiguration: RealmConfiguration? = null
 
-    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
-        PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
+    override var preferencesModule: TestPreferencesModule by lazyVar {
+        TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
     }
 
     override var module by lazyVar {
