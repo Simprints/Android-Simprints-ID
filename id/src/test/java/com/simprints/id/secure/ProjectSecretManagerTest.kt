@@ -1,16 +1,15 @@
 package com.simprints.id.secure
 
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.di.DaggerForUnitTests
-import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
-import com.simprints.testframework.unit.reactive.RxJavaTest
-import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.secure.models.PublicKeyString
+import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -21,18 +20,20 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class ProjectSecretManagerTest : RxJavaTest, DaggerForUnitTests() {
+class ProjectSecretManagerTest : RxJavaTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
 
-    override var module by lazyVar {
+    private val module by lazy {
         AppModuleForTests(app,
             remoteDbManagerRule = MockRule)
     }
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
     }
 
     @Test

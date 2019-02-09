@@ -4,20 +4,18 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.id.testtools.di.DaggerForUnitTests
-import com.simprints.id.domain.Constants
 import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
 import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.domain.Constants
+import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.testframework.common.syntax.assertThrows
 import com.simprints.testframework.common.syntax.verifyExactly
 import com.simprints.testframework.common.syntax.verifyOnce
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -27,18 +25,18 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SettingsPreferencesManagerTest : DaggerForUnitTests() {
+class SettingsPreferencesManagerTest {
 
     @Inject lateinit var remoteConfigSpy: FirebaseRemoteConfig
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
 
-    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
+    private val preferencesModule by lazy {
         PreferencesModuleForAnyTests(remoteConfigRule = SpyRule)
     }
 
     @Before
     fun setup() {
-        RobolectricDaggerTestConfig(this).setupFirebase().finish()
+        RobolectricDaggerTestConfig(this, null, preferencesModule).setupFirebase().finish()
 
         whenever { remoteConfigSpy.getBoolean(RemoteConfigWrapper.PROJECT_SPECIFIC_MODE_KEY) } thenReturn true
     }

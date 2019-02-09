@@ -2,6 +2,7 @@ package com.simprints.id.activities.dashboard
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.nhaarman.mockito_kotlin.anyOrNull
@@ -11,6 +12,10 @@ import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
+import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.liveData.testObserver
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
@@ -23,17 +28,11 @@ import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
-import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
-import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
-import com.simprints.id.commontesttools.liveData.testObserver
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.di.DaggerForUnitTests
 import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.reactive.RxJavaTest
@@ -50,7 +49,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForUnitTests() {
+class DashboardSyncCardViewModelTest : RxJavaTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -71,13 +72,13 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForUnitTests() {
     private lateinit var dashboardCardViewModel: DashboardSyncCardViewModel
     private val fakeSyncStateLiveData = MutableLiveData<SyncState>()
 
-    override var preferencesModule by lazyVar {
+    private val preferencesModule by lazy {
         PreferencesModuleForAnyTests(
             settingsPreferencesManagerRule = SpyRule
         )
     }
 
-    override var module by lazyVar {
+    private val module by lazy {
         AppModuleForTests(app,
             dbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
@@ -86,10 +87,9 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForUnitTests() {
             downSyncManagerRule = MockRule)
     }
 
-
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        RobolectricDaggerTestConfig(this, module, preferencesModule).setupAllAndFinish()
 
         val sharedPref = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
 
@@ -270,7 +270,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForUnitTests() {
         DashboardSyncCardViewModel(
             DashboardCardType.SYNC_DB,
             1,
-            testAppComponent,
+            app.component,
             downSyncDao,
             upSyncDao,
             fakeSyncStateLiveData)

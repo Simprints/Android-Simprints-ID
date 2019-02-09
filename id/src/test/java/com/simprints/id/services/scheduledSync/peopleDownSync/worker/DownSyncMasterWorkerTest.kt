@@ -5,15 +5,14 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.*
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.testtools.di.DaggerForUnitTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants
-import com.simprints.testframework.common.syntax.whenever
-import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.testframework.common.syntax.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -25,10 +24,9 @@ import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
 import javax.inject.Inject
 
-
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DownSyncMasterWorkerTest : DaggerForUnitTests() {
+class DownSyncMasterWorkerTest {
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()

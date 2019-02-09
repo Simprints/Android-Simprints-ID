@@ -4,12 +4,15 @@ import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
@@ -17,15 +20,11 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
-import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.di.DaggerForUnitTests
 import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
@@ -47,7 +46,7 @@ import javax.inject.Inject
 @Config(
     application = TestApplication::class,
     sdk = [Build.VERSION_CODES.N_MR1], shadows = [ShadowAndroidXMultiDex::class])
-class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForUnitTests() {
+class CheckLoginFromIntentActivityTest : RxJavaTest {
 
     companion object {
         const val DEFAULT_ACTION = "com.simprints.id.REGISTER"
@@ -59,6 +58,8 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForUnitTests() {
         const val DEFAULT_LEGACY_API_KEY = "96307ff9-873b-45e0-8ef0-b2efd5bef12d"
     }
 
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+
     private lateinit var sharedPrefs: SharedPreferences
 
     @Inject lateinit var sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager
@@ -68,7 +69,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForUnitTests() {
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var dbManager: DbManager
 
-    override var module by lazyVar {
+    private val module by lazy {
         AppModuleForTests(app,
             analyticsManagerRule = SpyRule,
             localDbManagerRule = MockRule,
@@ -79,7 +80,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForUnitTests() {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
 
         sharedPrefs = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
 

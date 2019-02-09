@@ -2,23 +2,22 @@ package com.simprints.id.activities
 
 import android.app.Activity
 import android.content.SharedPreferences
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.di.DaggerForUnitTests
 import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.initLogInStateMock
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import com.simprints.testframework.unit.robolectric.RobolectricHelper.assertActivityStarted
 import org.junit.Before
@@ -29,7 +28,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class CheckLoginFromMainLauncherActivityTest : DaggerForUnitTests() {
+class CheckLoginFromMainLauncherActivityTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     private lateinit var editor: SharedPreferences.Editor
 
@@ -39,7 +40,7 @@ class CheckLoginFromMainLauncherActivityTest : DaggerForUnitTests() {
     @Inject
     lateinit var dbManager: DbManager
 
-    override var module by lazyVar {
+    private val module by lazy {
         AppModuleForTests(app,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
@@ -48,7 +49,7 @@ class CheckLoginFromMainLauncherActivityTest : DaggerForUnitTests() {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
         dbManager.initialiseDb()
 
         val sharedPrefs = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
