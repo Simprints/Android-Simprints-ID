@@ -10,7 +10,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScop
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.common.syntax.whenever
 import org.junit.Assert.assertEquals
@@ -51,7 +51,7 @@ class DownSyncMasterWorkerTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        UnitTestConfig(this).fullSetup()
 
         MockitoAnnotations.initMocks(this)
         whenever(workParams.inputData).thenReturn(workDataOf(DownSyncMasterWorker.SYNC_WORKER_SYNC_SCOPE_INPUT to syncScopesBuilder.fromSyncScopeToJson(syncScope)))

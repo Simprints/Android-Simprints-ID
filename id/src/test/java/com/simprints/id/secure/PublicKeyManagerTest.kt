@@ -7,7 +7,7 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testtools.retrofit.FakeResponseInterceptor
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
@@ -36,7 +36,7 @@ class PublicKeyManagerTest {
 
     @Test
     fun successfulResponse_shouldObtainThePublicKey() {
-        RobolectricDaggerTestConfig(this).rescheduleRxMainThread()
+        UnitTestConfig(this).rescheduleRxMainThread()
 
         forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
 

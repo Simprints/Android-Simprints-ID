@@ -15,7 +15,7 @@ import com.simprints.id.data.analytics.eventData.controllers.local.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.extensions.scannerAppIntent
@@ -61,7 +61,7 @@ class LoginActivityTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
+        UnitTestConfig(this, module).fullSetup()
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
     }

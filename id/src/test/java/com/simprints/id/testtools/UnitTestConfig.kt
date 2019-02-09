@@ -1,4 +1,4 @@
-package com.simprints.id.testtools.roboletric
+package com.simprints.id.testtools
 
 import android.util.Log
 import androidx.test.core.app.ApplicationProvider
@@ -10,10 +10,11 @@ import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
+import com.simprints.id.testtools.roboletric.TestApplication
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.functions
 
-class RobolectricDaggerTestConfig<T : Any>(
+class UnitTestConfig<T : Any>(
     private val test: T,
     private val appModule: AppModuleForAnyTests? = null,
     private val preferencesModule: PreferencesModuleForAnyTests? = null
@@ -22,23 +23,24 @@ class RobolectricDaggerTestConfig<T : Any>(
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var testAppComponent: AppComponentForTests
 
-    fun setupAllAndFinish() =
+    fun fullSetup() =
         rescheduleRxMainThread()
             .setupFirebase()
             .setupWorkManager()
-            .finish()
+            .initComponent()
+            .inject()
 
-    fun rescheduleRxMainThread() : RobolectricDaggerTestConfig<T> {
+    fun rescheduleRxMainThread() : UnitTestConfig<T> {
         com.simprints.testframework.unit.reactive.rescheduleRxMainThread()
         return this
     }
 
-    fun setupFirebase(): RobolectricDaggerTestConfig<T> {
+    fun setupFirebase(): UnitTestConfig<T> {
         FirebaseApp.initializeApp(app)
         return this
     }
 
-    fun setupWorkManager(): RobolectricDaggerTestConfig<T> {
+    fun setupWorkManager(): UnitTestConfig<T> {
         try {
             WorkManagerTestInitHelper.initializeTestWorkManager(app, Configuration.Builder().build())
         } catch (e: IllegalStateException) {
@@ -47,9 +49,7 @@ class RobolectricDaggerTestConfig<T : Any>(
         return this
     }
 
-    fun finish(): RobolectricDaggerTestConfig<T> = initComponent().inject()
-
-    fun initComponent(): RobolectricDaggerTestConfig<T> {
+    fun initComponent(): UnitTestConfig<T> {
 
         testAppComponent = DaggerAppComponentForTests.builder()
             .appModule(appModule ?: AppModuleForTests(app))
@@ -60,7 +60,7 @@ class RobolectricDaggerTestConfig<T : Any>(
         return this
     }
 
-    fun inject(): RobolectricDaggerTestConfig<T> {
+    fun inject(): UnitTestConfig<T> {
 
         // Go through all the functions of the AppComponent and try to find the one corresponding to the test
         val injectFunction = testAppComponent::class.functions.find { function ->

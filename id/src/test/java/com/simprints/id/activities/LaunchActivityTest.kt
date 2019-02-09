@@ -13,7 +13,7 @@ import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import junit.framework.TestCase.assertEquals
@@ -51,7 +51,7 @@ class LaunchActivityTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this, module, preferencesModule).setupAllAndFinish()
+        UnitTestConfig(this, module, preferencesModule).fullSetup()
     }
 
     @Test

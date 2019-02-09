@@ -9,7 +9,7 @@ import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.Constants
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.testframework.common.syntax.assertThrows
@@ -36,7 +36,7 @@ class SettingsPreferencesManagerTest {
 
     @Before
     fun setup() {
-        RobolectricDaggerTestConfig(this, null, preferencesModule).setupFirebase().finish()
+        UnitTestConfig(this, null, preferencesModule).fullSetup()
 
         whenever { remoteConfigSpy.getBoolean(RemoteConfigWrapper.PROJECT_SPECIFIC_MODE_KEY) } thenReturn true
     }
