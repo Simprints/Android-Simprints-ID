@@ -2,138 +2,136 @@ package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.google.gson.JsonObject
+import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
+import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
+import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSessionButExpired
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
+import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
 import com.simprints.id.network.SimApiClient
-import com.simprints.testframework.common.syntax.mock
-import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
-import com.simprints.id.commontesttools.sessionEvents.createFakeSession
-import com.simprints.id.commontesttools.sessionEvents.mockSessionEventsManager
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
-import com.simprints.id.tools.json.JsonHelper
+import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
+import com.simprints.testframework.common.syntax.mock
+import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.reactive.RxJavaTest
+import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.observers.TestObserver
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
+import okhttp3.MediaType
+import okhttp3.Protocol
+import okhttp3.Request
+import okhttp3.ResponseBody
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.*
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
+import retrofit2.Response
+import retrofit2.adapter.rxjava2.Result
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SessionEventsUploaderTaskTest : RxJavaTest {
 
-    private val mockServer = MockWebServer()
-
     private val sessionsEventsManagerMock: SessionEventsManager = mock()
     private val timeHelper: TimeHelper = TimeHelperImpl()
-    private lateinit var sessionsRemoteInterface: SessionsRemoteInterface
-
-    private var sessionsInFakeDb = mutableListOf<SessionEvents>()
+    private lateinit var sessionsRemoteInterfaceSpy: SessionsRemoteInterface
 
     @Before
     fun setUp() {
         ShadowLog.stream = System.out
 
-        mockServer.start()
-        SessionsRemoteInterface.baseUrl = this.mockServer.url("/").toString()
-        sessionsRemoteInterface = SimApiClient(
+        sessionsRemoteInterfaceSpy = spy(SimApiClient(
             SessionsRemoteInterface::class.java,
             SessionsRemoteInterface.baseUrl,
             "",
-            SessionEventsApiAdapterFactory().gson).api
-        sessionsInFakeDb.clear()
+            SessionEventsApiAdapterFactory().gson).api)
 
-        mockSessionEventsManager(sessionsEventsManagerMock, sessionsInFakeDb)
+        whenever(sessionsEventsManagerMock.deleteSessions(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).doReturn(Completable.complete())
+        whenever(sessionsEventsManagerMock.insertOrUpdateSessionEvents(anyNotNull())).doReturn(Completable.complete())
     }
 
     @Test
-    fun openSessions_shouldNotBeUploaded() {
-        sessionsInFakeDb.addAll(createClosedSessions(2))
-        val openSession = createFakeSession(timeHelper, "bWOFHInKA2YaQwrxZ7uJ", "id", timeHelper.nowMinus(1000))
-        sessionsInFakeDb.add(openSession)
+    fun openSessionsExpired_shouldBeClosedReadyToBeUploaded() {
+        createTask().apply {
+            val sessions = listOf(
+                createFakeOpenSession(timeHelper),
+                createFakeOpenSessionButExpired(timeHelper)
+            )
 
-        enqueueResponses(mockSuccessfulResponseForSessionsUpload())
+            val closingSessionsTask = Single.just(sessions)
+                .closeOpenSessionsAndUpdateUploadTime()
+                .test()
+            closingSessionsTask.awaitAndAssertSuccess()
 
-        val testObserver = executeUpload()
-        testObserver.awaitAndAssertSuccess()
-
-        verifyBodyRequestHasSessions(2, mockServer.takeRequest())
-        assertThat(sessionsInFakeDb.size).isEqualTo(1)
-        assertThat(sessionsInFakeDb.first().isOpen()).isTrue()
+            val outputSessions = closingSessionsTask.values().first()
+            outputSessions.apply {
+                assertThat(size).isEqualTo(2)
+                assertThat(first().isClosed()).isFalse()
+                assertThat(first().relativeEndTime).isEqualTo(0)
+                assertThat(get(1).isClosed()).isTrue()
+                assertThat(get(1).relativeUploadTime).isNotEqualTo(0)
+            }
+        }
     }
 
     @Test
-    fun expiredOpenSessions_shouldBeClosedAndUploaded() {
-        val openSession = createFakeSession(timeHelper, "bWOFHInKA2YaQwrxZ7uJ", "id", timeHelper.nowMinus(SessionEvents.GRACE_PERIOD + 1000))
-        sessionsInFakeDb.add(openSession)
-        enqueueResponses(mockSuccessfulResponseForSessionsUpload())
+    fun closedSessions_shouldBeFilteredOutToBeUploaded() {
+        createTask().apply {
+            val sessions = listOf(
+                createFakeOpenSession(timeHelper),
+                createFakeClosedSession(timeHelper)
+            )
 
-        val testObserver = executeUpload()
-        testObserver.awaitAndAssertSuccess()
+            val filterTask = Single.just(sessions)
+                .filterClosedSessions()
+                .test()
+            filterTask.awaitAndAssertSuccess()
 
-        verifyBodyRequestHasSessions(1, mockServer.takeRequest())
-        assertThat(sessionsInFakeDb.size).isEqualTo(0)
+            val outputSessions = filterTask.values().first()
+            outputSessions.apply {
+                assertThat(size).isEqualTo(1)
+                assertThat(first().isClosed()).isTrue()
+            }
+        }
     }
 
     @Test
-    fun closeSessions_shouldBeUploaded() {
-        sessionsInFakeDb.addAll(createClosedSessions(2))
-        enqueueResponses(mockSuccessfulResponseForSessionsUpload())
+    fun sessions_shouldBeUploaded() {
+        createTask().apply {
+            val sessions = listOf(
+                createFakeClosedSession(timeHelper),
+                createFakeClosedSession(timeHelper))
 
-        val testObserver = executeUpload()
-        testObserver.awaitAndAssertSuccess()
+            doReturn(Single.just(createSuccessUploadResponse())).`when`(sessionsRemoteInterfaceSpy).uploadSessions(anyNotNull(), anyNotNull())
+            val uploadTask = Single.just(sessions)
+                .uploadClosedSessionsOrThrowIfNoSessions("bWOFHInKA2YaQwrxZ7uJ")
+                .test()
 
-        verifyBodyRequestHasSessions(2, mockServer.takeRequest())
-        assertThat(sessionsInFakeDb.size).isEqualTo(0)
+            uploadTask.awaitAndAssertSuccess()
+        }
     }
 
     @Test
-    fun uploadABatch_shouldDeleteOnlyItsSessions() {
-        sessionsInFakeDb.addAll(createClosedSessions(2))
-        enqueueResponses(mockSuccessfulResponseForSessionsUpload())
+    fun uploadResponse201_shouldSuccess() {
+        createTask().apply {
 
-        val testObserver = executeUpload()
-        sessionsInFakeDb.addAll(createClosedSessions(1))
-        testObserver.awaitAndAssertSuccess()
+            val checkResponseTask = Single.just(createSuccessUploadResponse())
+                .checkUploadSucceedAndRetryIfNecessary()
+                .test()
 
-        verifyBodyRequestHasSessions(2, mockServer.takeRequest())
-        assertThat(sessionsInFakeDb.size).isEqualTo(1)
-    }
-
-    @Test
-    fun noCloseSessions_shouldThrownAnException() {
-        val testObserver = executeUpload()
-        testObserver.awaitTerminalEvent()
-
-        assertThat(testObserver.errorCount()).isEqualTo(1)
-        assertThat(testObserver.errors().first()).isInstanceOf(NoSessionsFoundException::class.java)
-    }
-
-    @Test
-    fun failingUploadSessions_shouldRetryMaxTwice() {
-        sessionsInFakeDb.addAll(createClosedSessions(2))
-        enqueueResponses(mockFailureResponseForSessionsUpload())
-        enqueueResponses(mockFailureResponseForSessionsUpload())
-        enqueueResponses(mockFailureResponseForSessionsUpload())
-        enqueueResponses(mockSuccessfulResponseForSessionsUpload())
-
-        val testObserver = executeUpload()
-        testObserver.awaitTerminalEvent()
-
-        assertThat(testObserver.errorCount()).isEqualTo(1)
-        assertThat(mockServer.requestCount).isEqualTo(3)
+            checkResponseTask.awaitAndAssertSuccess()
+        }
     }
 
     @Test
@@ -156,52 +154,82 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
         testUploadRequestIsNotRetriedForServerErrorCode(404)
     }
 
-    private fun testUploadRequestIsNotRetriedForServerErrorCode(code: Int) {
-        sessionsInFakeDb.addAll(createClosedSessions(2))
-        enqueueResponses(mockFailureResponseForSessionsUpload(code))
-        enqueueResponses(mockSuccessfulResponseForSessionsUpload())
+    @Test
+    fun failingUploadSessions_shouldBeRetriedMaxThreeTimes() {
+        val testObserver = testUploadRequestIsNotRetriedForServerErrorCode(500, 3)
+        assertThat(testObserver?.errorCount()).isEqualTo(1)
+        assertThat(testObserver?.errors()?.first()).isInstanceOf(SessionUploadFailureRetryException::class.java)
+    }
 
-        val testObserver = executeUpload()
+    @Test
+    fun sessionsAfterUpload_shouldBeDeleted() {
+        spy(createTask()).apply {
+
+            val sessions = listOf(
+                createFakeClosedSession(timeHelper),
+                createFakeClosedSession(timeHelper),
+                createFakeOpenSession(timeHelper))
+
+            val filterTask = Single.just(sessions)
+                .deleteSessionsFromDb()
+                .test()
+            filterTask.awaitAndAssertSuccess()
+
+            verify(sessionsEventsManagerMock, times(sessions.size))
+                .deleteSessions(isNull() as String?, anyString(), anyBoolean(), isNull() as Long?)
+        }
+    }
+
+    @Test
+    fun noCloseSessions_shouldThrownAnException() {
+        val testObserver = executeUpload(listOf())
         testObserver.awaitTerminalEvent()
 
         assertThat(testObserver.errorCount()).isEqualTo(1)
-        assertThat(mockServer.requestCount).isEqualTo(1)
+        assertThat(testObserver.errors().first()).isInstanceOf(NoSessionsFoundException::class.java)
     }
 
-    private fun executeUpload(): TestObserver<Void> {
-        val syncTask = SessionEventsUploaderTask(
-            "bWOFHInKA2YaQwrxZ7uJ",
-            sessionsInFakeDb.map { it.id },
+    private fun testUploadRequestIsNotRetriedForServerErrorCode(code: Int, callsExpected: Int = 1): TestObserver<Void>? {
+        spy(createTask()).apply {
+            var requests = 0
+            val checkResponseTask = Single.fromCallable {
+                requests++
+                createFailureUploadResponse(code)
+            }
+                .checkUploadSucceedAndRetryIfNecessary()
+                .test()
+
+            checkResponseTask.awaitTerminalEvent()
+            assertThat(requests).isEqualTo(callsExpected)
+            return checkResponseTask
+        }
+    }
+
+    private fun createSuccessUploadResponse() =
+        Result.response<Void>(Response.success<Void>(null, okhttp3.Response.Builder() //
+            .code(201)
+            .message("OK")
+            .protocol(Protocol.HTTP_1_1)
+            .request(Request.Builder().url("http://localhost/").build())
+            .build()))
+
+
+    private fun createFailureUploadResponse(code: Int = 500) =
+        Result.response<Void>(Response.error(ResponseBody.create(MediaType.parse("application/json"), ""), okhttp3.Response.Builder() //
+            .code(code)
+            .message("Response.error()")
+            .protocol(Protocol.HTTP_1_1)
+            .request(Request.Builder().url("http://localhost/").build())
+            .build()))
+
+    private fun executeUpload(sessions: List<SessionEvents>): TestObserver<Void> {
+        return createTask().execute("bWOFHInKA2YaQwrxZ7uJ", sessions).test()
+    }
+
+    private fun createTask() =
+        SessionEventsUploaderTask(
             sessionsEventsManagerMock,
             timeHelper,
-            sessionsRemoteInterface)
+            sessionsRemoteInterfaceSpy)
 
-        return syncTask.execute().test()
-    }
-
-    private fun mockSuccessfulResponseForSessionsUpload() = MockResponse().apply {
-        setResponseCode(201)
-    }
-
-    private fun mockFailureResponseForSessionsUpload(code: Int = 500) = MockResponse().apply {
-        setResponseCode(code)
-        setBody(Exception().toString())
-    }
-
-    private fun verifyBodyRequestHasSessions(nSessions: Int, request: RecordedRequest) {
-        val firstBodyRequest = request.body.readUtf8()
-        val firstBodyJson = JsonHelper.gson.fromJson(firstBodyRequest, JsonObject::class.java)
-        assertThat(firstBodyJson.get("sessions").asJsonArray.size()).isEqualTo(nSessions)
-    }
-
-    private fun enqueueResponses(vararg responses: MockResponse) {
-        responses.iterator().forEach {
-            mockServer.enqueue(it)
-        }
-    }
-
-    private fun createClosedSessions(nSessions: Int) =
-        mutableListOf<SessionEvents>().apply {
-            repeat(nSessions) { this.add(createFakeClosedSession(timeHelper, "bWOFHInKA2YaQwrxZ7uJ")) }
-        }
 }
