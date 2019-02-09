@@ -7,7 +7,7 @@ import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -30,7 +30,7 @@ class DownSyncManagerTest {
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        UnitTestConfig(this).fullSetup()
         MockitoAnnotations.initMocks(this)
     }
 

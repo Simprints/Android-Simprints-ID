@@ -29,7 +29,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncSc
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
@@ -88,7 +88,7 @@ class DashboardSyncCardViewModelTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this, module, preferencesModule).setupAllAndFinish()
+        UnitTestConfig(this, module, preferencesModule).fullSetup()
 
         val sharedPref = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
 

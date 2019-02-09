@@ -13,7 +13,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.initLogInStateMock
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setUserLogInState
@@ -49,7 +49,7 @@ class CheckLoginFromMainLauncherActivityTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
+        UnitTestConfig(this, module).fullSetup()
         dbManager.initialiseDb()
 
         val sharedPrefs = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)

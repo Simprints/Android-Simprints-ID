@@ -26,7 +26,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScop
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.json.JsonHelper
@@ -75,7 +75,7 @@ class SubDownSyncTaskTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
+        UnitTestConfig(this, module).fullSetup()
 
         whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just(""))
         mockServer.start()

@@ -15,7 +15,7 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEv
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
 import com.simprints.id.network.SimApiClient
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
@@ -49,7 +49,7 @@ class SessionEventsUploaderTaskTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).rescheduleRxMainThread()
+        UnitTestConfig(this).rescheduleRxMainThread()
 
         ShadowLog.stream = System.out
 

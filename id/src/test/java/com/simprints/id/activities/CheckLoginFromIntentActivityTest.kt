@@ -21,7 +21,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testtools.roboletric.TestApplication
@@ -79,7 +79,7 @@ class CheckLoginFromIntentActivityTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
+        UnitTestConfig(this, module).fullSetup()
 
         sharedPrefs = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
 

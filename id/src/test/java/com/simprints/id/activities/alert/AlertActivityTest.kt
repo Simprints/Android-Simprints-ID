@@ -15,7 +15,7 @@ import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
@@ -48,7 +48,7 @@ class AlertActivityTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
+        UnitTestConfig(this, module).fullSetup()
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
     }

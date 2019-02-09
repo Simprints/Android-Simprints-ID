@@ -7,7 +7,7 @@ import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -32,7 +32,7 @@ class ProjectSecretManagerTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
+        UnitTestConfig(this, module).fullSetup()
     }
 
     @Test

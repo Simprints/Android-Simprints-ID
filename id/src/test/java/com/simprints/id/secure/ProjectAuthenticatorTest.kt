@@ -19,7 +19,7 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
@@ -69,7 +69,7 @@ class ProjectAuthenticatorTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
+        UnitTestConfig(this, module).fullSetup()
 
         RobolectricTestMocker
             .initLogInStateMock(RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)

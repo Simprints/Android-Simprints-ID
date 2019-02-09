@@ -12,7 +12,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.mock
@@ -36,7 +36,7 @@ class CountTaskTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this)
+        UnitTestConfig(this)
             .rescheduleRxMainThread()
             .setupFirebase()
     }

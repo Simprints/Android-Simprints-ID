@@ -24,7 +24,7 @@ import com.simprints.id.testtools.retrofit.mockServer.mockNotFoundResponse
 import com.simprints.id.testtools.retrofit.mockServer.mockResponseForDownloadPatient
 import com.simprints.id.testtools.retrofit.mockServer.mockResponseForUploadPatient
 import com.simprints.id.testtools.retrofit.mockServer.mockServerProblemResponse
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupLocalAndRemoteManagersForApiTesting
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.libcommon.Person
@@ -71,7 +71,7 @@ class DbManagerTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
+        UnitTestConfig(this, module).fullSetup()
 
         mockServer.start()
         apiClient = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl)
