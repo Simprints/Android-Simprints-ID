@@ -7,6 +7,8 @@ import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.createMockBehaviorService
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
+import com.simprints.id.commontesttools.setupFakeKeyStore
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -18,8 +20,8 @@ import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
@@ -63,7 +65,8 @@ class ProjectAuthenticatorTest {
             loginInfoManagerRule = MockRule,
             scheduledPeopleSyncManagerRule = MockRule,
             longConsentManagerRule = MockRule,
-            peopleUpSyncMasterRule = MockRule
+            peopleUpSyncMasterRule = MockRule,
+            keystoreManagerRule = ReplaceRule { setupFakeKeyStore() }
         )
     }
 

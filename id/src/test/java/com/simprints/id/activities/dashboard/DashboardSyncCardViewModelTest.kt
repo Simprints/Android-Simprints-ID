@@ -15,7 +15,7 @@ import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
 import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
-import com.simprints.id.commontesttools.liveData.testObserver
+import com.simprints.testframework.common.livedata.testObserver
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus

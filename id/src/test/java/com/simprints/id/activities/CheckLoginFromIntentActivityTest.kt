@@ -11,8 +11,8 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
-import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
+import com.simprints.id.commontesttools.di.DependencyRule.*
+import com.simprints.id.commontesttools.setupFakeKeyStore
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
@@ -20,8 +20,8 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testtools.roboletric.TestApplication
@@ -74,7 +74,8 @@ class CheckLoginFromIntentActivityTest {
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             scheduledSessionsSyncManagerRule = MockRule,
-            sessionEventsLocalDbManagerRule = MockRule)
+            sessionEventsLocalDbManagerRule = MockRule,
+            keystoreManagerRule = ReplaceRule { setupFakeKeyStore() })
     }
 
     @Before

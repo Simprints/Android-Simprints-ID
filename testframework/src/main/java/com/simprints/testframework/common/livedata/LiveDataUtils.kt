@@ -1,4 +1,4 @@
-package com.simprints.id.commontesttools.liveData
+package com.simprints.testframework.common.livedata
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
