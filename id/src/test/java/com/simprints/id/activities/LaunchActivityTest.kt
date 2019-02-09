@@ -1,22 +1,21 @@
 package com.simprints.id.activities
 
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.di.DaggerForUnitTests
-import com.simprints.id.domain.consent.GeneralConsent
-import com.simprints.id.domain.consent.ParentalConsent
-import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
 import com.simprints.id.commontesttools.mockSettingsPreferencesManager
-import com.simprints.testframework.unit.reactive.RxJavaTest
-import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.domain.consent.GeneralConsent
+import com.simprints.id.domain.consent.ParentalConsent
+import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import junit.framework.TestCase.assertEquals
 import kotlinx.android.synthetic.main.activity_launch.*
@@ -28,19 +27,21 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class LaunchActivityTest : RxJavaTest, DaggerForUnitTests() {
+class LaunchActivityTest : RxJavaTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
 
-    override var preferencesModule by lazyVar {
+    private val preferencesModule by lazy {
         PreferencesModuleForAnyTests(
             settingsPreferencesManagerRule = MockRule
         )
     }
 
-    override var module by lazyVar {
+    private val module by lazy {
         AppModuleForTests(app,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
@@ -51,7 +52,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForUnitTests() {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        RobolectricDaggerTestConfig(this, module, preferencesModule).setupAllAndFinish()
     }
 
     @Test

@@ -10,16 +10,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.di.DaggerForUnitTests
 import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
@@ -42,7 +40,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class LoginActivityTest : RxJavaTest, DaggerForUnitTests() {
+class LoginActivityTest : RxJavaTest {
 
     companion object {
         const val DEFAULT_PROJECT_ID = "some_project_id"
@@ -50,10 +48,12 @@ class LoginActivityTest : RxJavaTest, DaggerForUnitTests() {
         const val DEFAULT_USER_ID = "some_user_id"
     }
 
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
-    override var module by lazyVar {
+    private val module by lazy {
         AppModuleForTests(app,
             localDbManagerRule = MockRule,
             dbManagerRule = MockRule,
@@ -62,7 +62,7 @@ class LoginActivityTest : RxJavaTest, DaggerForUnitTests() {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
     }

@@ -1,12 +1,13 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.spy
 import com.simprints.id.R
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
@@ -16,13 +17,10 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.di.DaggerForUnitTests
 import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
@@ -38,7 +36,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DashboardCardsFactoryTest : DaggerForUnitTests() {
+class DashboardCardsFactoryTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var remotePeopleManagerMock: RemotePeopleManager
@@ -49,7 +49,7 @@ class DashboardCardsFactoryTest : DaggerForUnitTests() {
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
-    override var module by lazyVar {
+    private val module by lazy {
         AppModuleForTests(app,
             remoteDbManagerRule = MockRule,
             remotePeopleManagerRule = MockRule,
@@ -58,11 +58,9 @@ class DashboardCardsFactoryTest : DaggerForUnitTests() {
             syncStatusDatabaseRule = MockRule)
     }
 
-    val activity = spy<DashboardActivity>()
-
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
 
         dbManager.initialiseDb()
 
@@ -81,7 +79,7 @@ class DashboardCardsFactoryTest : DaggerForUnitTests() {
 
     @Test
     fun shouldCreateTheProjectCard_onlyWhenItHasAValidProject() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
 
         val card = getCardIfCreated(factory, "project name")
         Assert.assertEquals(card?.description, "project desc")
@@ -100,7 +98,7 @@ class DashboardCardsFactoryTest : DaggerForUnitTests() {
 
     @Test
     fun shouldCreateTheLastEnrolCard_onlyWhenAnEnrolEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
         val lastEnrolDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -111,7 +109,7 @@ class DashboardCardsFactoryTest : DaggerForUnitTests() {
 
     @Test
     fun shouldCreateTheLastIdentificationCard_onlyWhenAnIdentificationEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
         val lastIdentificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -122,7 +120,7 @@ class DashboardCardsFactoryTest : DaggerForUnitTests() {
 
     @Test
     fun shouldCreateTheLastVerificationCard_onlyWhenAnVerificationEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
         val lastVerificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -134,7 +132,7 @@ class DashboardCardsFactoryTest : DaggerForUnitTests() {
     @Test
     @Config(sdk = [25]) // Bug with Robolectric and SharedPreferences.commit() on API >= 26. apply() works fine
     fun shouldCreateTheCurrentUserCard_onlyIfValidUserSignedIn() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
         val signedInUser = "someone"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -145,7 +143,7 @@ class DashboardCardsFactoryTest : DaggerForUnitTests() {
 
     @Test
     fun shouldCreateTheLastScannerCard_onlyWhenALastScannerEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
         val lastScanner = "SPXXXX"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,

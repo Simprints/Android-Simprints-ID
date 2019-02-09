@@ -1,6 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.worker
 
 import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
@@ -10,20 +11,18 @@ import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.di.DaggerForUnitTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker.Companion.SUBCOUNT_WORKER_SUB_SCOPE_INPUT
-import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.testtools.di.AppModuleForTests
+import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.mock
-import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
@@ -35,7 +34,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SubCountWorkerTest : DaggerForUnitTests() {
+class SubCountWorkerTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var context: Context
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
@@ -48,7 +49,7 @@ class SubCountWorkerTest : DaggerForUnitTests() {
     private lateinit var subCountWorker: SubCountWorker
     private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
 
-    override var module: AppModuleForTests by lazyVar {
+    private val module by lazy {
         AppModuleForTests(app,
             localDbManagerRule = DependencyRule.MockRule,
             analyticsManagerRule = DependencyRule.SpyRule,
@@ -58,7 +59,7 @@ class SubCountWorkerTest : DaggerForUnitTests() {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
 
         MockitoAnnotations.initMocks(this)
         subCountWorker = SubCountWorker(context, workParams)

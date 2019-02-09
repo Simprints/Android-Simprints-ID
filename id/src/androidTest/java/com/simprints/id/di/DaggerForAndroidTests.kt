@@ -3,7 +3,6 @@ package com.simprints.id.di
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
 import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.commontesttools.di.DaggerForTests
 import org.junit.Before
 
 abstract class DaggerForAndroidTests : DaggerForTests {

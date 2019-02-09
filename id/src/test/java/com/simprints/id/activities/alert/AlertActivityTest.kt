@@ -1,23 +1,23 @@
 package com.simprints.id.activities.alert
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.di.DaggerForUnitTests
 import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import com.simprints.testframework.unit.robolectric.RobolectricHelper.showOnScreen
 import kotlinx.android.synthetic.main.activity_alert.*
@@ -31,11 +31,13 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class AlertActivityTest : DaggerForUnitTests() {
+class AlertActivityTest {
+
+    private val app = ApplicationProvider.getApplicationContext<Context>() as TestApplication
 
     @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
-    override var module by lazyVar {
+    private val module by lazy {
         AppModuleForTests(app,
             remoteDbManagerRule = MockRule,
             localDbManagerRule = MockRule,
@@ -46,7 +48,7 @@ class AlertActivityTest : DaggerForUnitTests() {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
     }

@@ -1,8 +1,12 @@
 package com.simprints.id.data.db
 
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.createMockBehaviorService
+import com.simprints.id.commontesttools.di.DependencyRule.*
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
@@ -12,25 +16,20 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.di.DaggerForUnitTests
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.id.commontesttools.di.DependencyRule.*
-import com.simprints.id.commontesttools.PeopleGeneratorUtils
-import com.simprints.id.commontesttools.createMockBehaviorService
-import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.sync.SimApiMock
-import com.simprints.testframework.unit.reactive.RxJavaTest
+import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.retrofit.mockServer.mockNotFoundResponse
 import com.simprints.id.testtools.retrofit.mockServer.mockResponseForDownloadPatient
 import com.simprints.id.testtools.retrofit.mockServer.mockResponseForUploadPatient
 import com.simprints.id.testtools.retrofit.mockServer.mockServerProblemResponse
+import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupLocalAndRemoteManagersForApiTesting
 import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libcommon.Person
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
@@ -46,7 +45,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DbManagerTest : RxJavaTest, DaggerForUnitTests() {
+class DbManagerTest : RxJavaTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
@@ -58,7 +59,7 @@ class DbManagerTest : RxJavaTest, DaggerForUnitTests() {
     @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
     @Inject lateinit var dbManager: DbManager
 
-    override var module by lazyVar {
+    private val module by lazy {
         AppModuleForTests(
             app,
             localDbManagerRule = ReplaceRule { spy(LocalDbManager::class.java) },
@@ -71,7 +72,7 @@ class DbManagerTest : RxJavaTest, DaggerForUnitTests() {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
 
         mockServer.start()
         apiClient = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl)

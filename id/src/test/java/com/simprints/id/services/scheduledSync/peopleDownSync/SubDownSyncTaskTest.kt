@@ -1,8 +1,12 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync
 
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.*
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
+import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
+import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
@@ -14,8 +18,6 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.testtools.di.AppModuleForTests
-import com.simprints.id.testtools.di.DaggerForUnitTests
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.network.SimApiClient
@@ -23,20 +25,17 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncSc
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
-import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
-import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
+import com.simprints.id.testtools.di.AppModuleForTests
+import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.mockserver.assertPathUrlParam
 import com.simprints.testframework.unit.mockserver.assertQueryUrlParam
-import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.id.tools.TimeHelperImpl
-import com.simprints.id.tools.delegates.lazyVar
-import com.simprints.id.tools.json.JsonHelper
-import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.testframework.unit.reactive.RxJavaTest
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse
@@ -53,10 +52,11 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.math.ceil
 
-
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SubDownSyncTaskTest : DaggerForUnitTests(), RxJavaTest {
+class SubDownSyncTaskTest : RxJavaTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
@@ -68,7 +68,7 @@ class SubDownSyncTaskTest : DaggerForUnitTests(), RxJavaTest {
     private val remotePeopleManagerSpy: RemotePeopleManager = spy()
     private val downSyncDao: DownSyncDao = mock()
 
-    override var module: AppModuleForTests by lazyVar {
+    private val module by lazy {
         AppModuleForTests(app,
             syncScopesBuilderRule = DependencyRule.MockRule,
             syncStatusDatabaseRule = DependencyRule.SpyRule)
@@ -76,7 +76,7 @@ class SubDownSyncTaskTest : DaggerForUnitTests(), RxJavaTest {
 
     @Before
     fun setUp() {
-        RobolectricDaggerTestConfig(this).setupAllAndFinish()
+        RobolectricDaggerTestConfig(this, module).setupAllAndFinish()
 
         whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just(""))
         mockServer.start()
