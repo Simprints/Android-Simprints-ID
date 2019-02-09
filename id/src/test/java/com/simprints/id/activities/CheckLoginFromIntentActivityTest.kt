@@ -12,7 +12,7 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.commontesttools.di.DependencyRule.*
-import com.simprints.id.commontesttools.setupFakeKeyStore
+import com.simprints.id.testtools.state.setupFakeKeyStore
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
