@@ -1,8 +1,6 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.activities.debug.DebugActivity
-import com.simprints.id.activities.debug.DebugViewModel
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
@@ -19,6 +17,8 @@ import com.simprints.id.activities.dashboard.DashboardPresenter
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModelHelper
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
+import com.simprints.id.activities.debug.DebugActivity
+import com.simprints.id.activities.debug.DebugViewModel
 import com.simprints.id.activities.launch.LaunchPresenter
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
@@ -44,7 +44,6 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyn
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderWorker
 import dagger.Component
-import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
 
 @Singleton
