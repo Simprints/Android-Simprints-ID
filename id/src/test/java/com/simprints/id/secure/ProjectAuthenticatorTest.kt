@@ -24,7 +24,6 @@ import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -37,7 +36,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class ProjectAuthenticatorTest : RxJavaTest {
+class ProjectAuthenticatorTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 

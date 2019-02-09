@@ -13,13 +13,13 @@ import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemo
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
+import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.mock
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -35,7 +35,7 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SessionEventsMasterTaskTest: RxJavaTest {
+class SessionEventsMasterTaskTest {
 
     private val projectId = "projectId"
 
@@ -47,6 +47,8 @@ class SessionEventsMasterTaskTest: RxJavaTest {
 
     @Before
     fun setUp() {
+        RobolectricDaggerTestConfig(this).rescheduleRxMainThread()
+
         sessionsInFakeDb.clear()
         mockSessionEventsManager(sessionsEventsManagerMock, sessionsInFakeDb)
     }

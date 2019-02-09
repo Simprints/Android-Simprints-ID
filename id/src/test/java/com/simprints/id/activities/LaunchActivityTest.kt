@@ -15,7 +15,6 @@ import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import junit.framework.TestCase.assertEquals
 import kotlinx.android.synthetic.main.activity_launch.*
@@ -27,7 +26,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class LaunchActivityTest : RxJavaTest {
+class LaunchActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 

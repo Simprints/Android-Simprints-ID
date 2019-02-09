@@ -15,6 +15,7 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEv
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
 import com.simprints.id.network.SimApiClient
+import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
@@ -22,7 +23,6 @@ import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.mock
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -41,7 +41,7 @@ import retrofit2.adapter.rxjava2.Result
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SessionEventsUploaderTaskTest : RxJavaTest {
+class SessionEventsUploaderTaskTest {
 
     private val sessionsEventsManagerMock: SessionEventsManager = mock()
     private val timeHelper: TimeHelper = TimeHelperImpl()
@@ -49,6 +49,8 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
 
     @Before
     fun setUp() {
+        RobolectricDaggerTestConfig(this).rescheduleRxMainThread()
+
         ShadowLog.stream = System.out
 
         sessionsRemoteInterfaceSpy = spy(SimApiClient(

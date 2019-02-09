@@ -6,8 +6,8 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.id.testtools.retrofit.FakeResponseInterceptor
+import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
@@ -21,7 +21,7 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class NonceManagerTest : RxJavaTest {
+class NonceManagerTest {
 
     private val validNonceJsonResponse = "{\"value\":\"nonce_from_server\"}"
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
@@ -33,6 +33,8 @@ class NonceManagerTest : RxJavaTest {
 
     @Test
     fun successfulResponse_shouldObtainANonce() {
+        RobolectricDaggerTestConfig(this).rescheduleRxMainThread()
+
         forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
 
         val testObserver = makeTestRequestNonce(apiClient.api)

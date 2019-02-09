@@ -2,12 +2,12 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.givenNetworkFailurePercentIs
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
-import com.simprints.id.commontesttools.givenNetworkFailurePercentIs
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.id.testtools.retrofit.FakeResponseInterceptor
+import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
@@ -24,7 +24,7 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class PublicKeyManagerTest : RxJavaTest {
+class PublicKeyManagerTest {
 
     private val validPublicKeyJsonResponse = "{\"value\":\"public_key_from_server\"}"
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
@@ -36,6 +36,8 @@ class PublicKeyManagerTest : RxJavaTest {
 
     @Test
     fun successfulResponse_shouldObtainThePublicKey() {
+        RobolectricDaggerTestConfig(this).rescheduleRxMainThread()
+
         forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
 
         val testObserver = makeTestRequestPublicKey(apiClient.api)

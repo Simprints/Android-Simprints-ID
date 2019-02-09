@@ -26,7 +26,6 @@ import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import com.simprints.testframework.unit.robolectric.RobolectricHelper.assertActivityStarted
 import org.junit.Assert
@@ -46,7 +45,7 @@ import javax.inject.Inject
 @Config(
     application = TestApplication::class,
     sdk = [Build.VERSION_CODES.N_MR1], shadows = [ShadowAndroidXMultiDex::class])
-class CheckLoginFromIntentActivityTest : RxJavaTest {
+class CheckLoginFromIntentActivityTest {
 
     companion object {
         const val DEFAULT_ACTION = "com.simprints.id.REGISTER"
