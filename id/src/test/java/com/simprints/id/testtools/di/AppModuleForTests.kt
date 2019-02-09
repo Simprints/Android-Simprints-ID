@@ -1,12 +1,10 @@
 package com.simprints.id.testtools.di
 
 import com.simprints.id.Application
-import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.commontesttools.di.AppModuleForAnyTests
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.RealRule
-import com.simprints.id.commontesttools.setupFakeKeyStore
 
 open class AppModuleForTests(app: Application,
                              override var localDbManagerRule: DependencyRule = RealRule,
@@ -33,7 +31,9 @@ open class AppModuleForTests(app: Application,
                              override var syncScopesBuilderRule: DependencyRule = RealRule,
                              override var countTaskRule: DependencyRule = RealRule,
                              override var downSyncTaskRule: DependencyRule = RealRule,
-                             override var downSyncManagerRule: DependencyRule = RealRule)
+                             override var downSyncManagerRule: DependencyRule = RealRule,
+                             override var keystoreManagerRule: DependencyRule = RealRule
+                             )
     : AppModuleForAnyTests(
     app,
     localDbManagerRule = localDbManagerRule,
@@ -60,7 +60,4 @@ open class AppModuleForTests(app: Application,
     syncScopesBuilderRule = syncScopesBuilderRule,
     countTaskRule = countTaskRule,
     downSyncTaskRule = downSyncTaskRule,
-    downSyncManagerRule = downSyncManagerRule) {
-
-    override fun provideKeystoreManager(): KeystoreManager = setupFakeKeyStore()
-}
+    downSyncManagerRule = downSyncManagerRule)
