@@ -14,9 +14,7 @@ import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
 import timber.log.Timber
 
-class SessionEventsUploaderTask(private val projectId: String,
-                                private val sessionsIds: List<String>,
-                                private val sessionEventsManager: SessionEventsManager,
+class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsManager,
                                 private val timeHelper: TimeHelper,
                                 private val sessionApiClient: SessionsRemoteInterface) {
 
@@ -28,24 +26,18 @@ class SessionEventsUploaderTask(private val projectId: String,
     /**
      * @throws NoSessionsFoundException
      * @throws SessionUploadFailureException
+     * @throws SessionUploadFailureRetryException
      */
-    fun execute(): Completable =
-        Single.just(sessionsIds)
-            .loadSessionsFromDb()
+    fun execute(projectId: String,
+                sessions: List<SessionEvents>): Completable =
+        Single.just(sessions)
             .closeOpenSessionsAndUpdateUploadTime()
             .filterClosedSessions()
-            .uploadClosedSessionsOrThrowIfNoSessions()
-            .checkUploadSucceedAndRetryIfNecessary()
+            .uploadClosedSessionsOrThrowIfNoSessions(projectId)
             .deleteSessionsFromDb()
 
-    private fun Single<List<String>>.loadSessionsFromDb(): Single<List<SessionEvents>> =
-        this.map {
-            Timber.d("SessionEventsUploaderTask loadSessionsFromDb()")
-            it.map { session -> sessionEventsManager.loadSessionById(session).blockingGet() }
-        }
-
     @SuppressLint("CheckResult")
-    private fun Single<List<SessionEvents>>.closeOpenSessionsAndUpdateUploadTime(): Single<List<SessionEvents>> =
+    internal fun Single<List<SessionEvents>>.closeOpenSessionsAndUpdateUploadTime(): Single<List<SessionEvents>> =
         this.flatMap { sessions ->
             Timber.d("SessionEventsUploaderTask closeOpenSessionsAndUpdateUploadTime()")
 
@@ -57,24 +49,6 @@ class SessionEventsUploaderTask(private val projectId: String,
             Single.just(sessions)
         }
 
-    @SuppressLint("CheckResult")
-    private fun Single<List<SessionEvents>>.filterClosedSessions(): Single<List<SessionEvents>> =
-        this.flatMap { sessions ->
-            Timber.d("SessionEventsUploaderTask filterClosedSessions()")
-
-            Single.just(sessions.filter { it.isClosed() })
-        }
-
-    @SuppressLint("CheckResult")
-    private fun Single<List<SessionEvents>>.uploadClosedSessionsOrThrowIfNoSessions(): Single<Result<Void?>> =
-        this.flatMap { sessions ->
-            if (sessions.isEmpty())
-                throw NoSessionsFoundException()
-
-            sessions.forEach { Timber.d("SessionEventsUploaderTask uploadClosedSessionsOrThrowIfNoSessions: ${it.id}") }
-            sessionApiClient.uploadSessions(projectId, hashMapOf("sessions" to sessions.toTypedArray()))
-        }
-
     private fun forceSessionToCloseIfOpenAndNotInProgress(session: SessionEvents, timeHelper: TimeHelper) {
         Timber.d("SessionEventsUploaderTask forceSessionToCloseIfOpenAndNotInProgress()")
 
@@ -84,7 +58,28 @@ class SessionEventsUploaderTask(private val projectId: String,
         }
     }
 
-    private fun Single<out Result<Void?>>.checkUploadSucceedAndRetryIfNecessary(): Completable =
+    @SuppressLint("CheckResult")
+    internal fun Single<List<SessionEvents>>.filterClosedSessions(): Single<List<SessionEvents>> =
+        this.flatMap { sessions ->
+            Timber.d("SessionEventsUploaderTask filterClosedSessions()")
+
+            Single.just(sessions.filter { it.isClosed() })
+        }
+
+    @SuppressLint("CheckResult")
+    internal fun Single<List<SessionEvents>>.uploadClosedSessionsOrThrowIfNoSessions(projectId: String): Single<List<SessionEvents>> =
+        this.flatMap { sessions ->
+            sessions.forEach { Timber.d("SessionEventsUploaderTask uploadClosedSessionsOrThrowIfNoSessions: ${it.id}") }
+
+            if (sessions.isEmpty())
+                throw NoSessionsFoundException()
+
+            sessionApiClient.uploadSessions(projectId, hashMapOf("sessions" to sessions.toTypedArray()))
+                .checkUploadSucceedAndRetryIfNecessary()
+                .andThen(Single.just(sessions))
+        }
+
+    internal fun Single<out Result<Void?>>.checkUploadSucceedAndRetryIfNecessary(): Completable =
         flatMapCompletable { result ->
             Timber.d("SessionEventsUploaderTask checkUploadSucceedAndRetryIfNecessary()")
             val response = result.response()
@@ -106,19 +101,15 @@ class SessionEventsUploaderTask(private val projectId: String,
     private fun isResponseASuccess(code: Int) = code == 201
 
     private fun continueWithSuccess() = Completable.complete()
-    private fun continueWithRetryException(error: Throwable) =
-        Completable.error(SessionUploadFailureRetryException(error))
-
+    private fun continueWithRetryException(error: Throwable) = Completable.error(SessionUploadFailureRetryException(error))
     private fun continueWithNoRetryException() = Completable.error(SessionUploadFailureException())
 
-    private fun deleteSessions() {
-        sessionsIds.forEach {
-            sessionEventsManager.deleteSessions(sessionId = it, openSession = false).blockingGet()
-        }
-    }
-
-    private fun Completable.deleteSessionsFromDb(): Completable =
-        this.doOnComplete {
-            deleteSessions()
+    internal fun Single<List<SessionEvents>>.deleteSessionsFromDb(): Completable =
+        this.flatMapCompletable { sessions ->
+            Completable.fromCallable {
+                sessions.forEach { session ->
+                    sessionEventsManager.deleteSessions(sessionId = session.id, openSession = false).blockingGet()
+                }
+            }
         }
 }
