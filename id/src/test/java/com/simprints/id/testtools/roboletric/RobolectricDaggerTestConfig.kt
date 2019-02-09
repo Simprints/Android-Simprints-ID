@@ -22,7 +22,16 @@ class RobolectricDaggerTestConfig<T : Any>(
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var testAppComponent: AppComponentForTests
 
-    fun setupAllAndFinish() = setupFirebase().setupWorkManager().finish()
+    fun setupAllAndFinish() =
+        rescheduleRxMainThread()
+            .setupFirebase()
+            .setupWorkManager()
+            .finish()
+
+    fun rescheduleRxMainThread() : RobolectricDaggerTestConfig<T> {
+        com.simprints.testframework.unit.reactive.rescheduleRxMainThread()
+        return this
+    }
 
     fun setupFirebase(): RobolectricDaggerTestConfig<T> {
         FirebaseApp.initializeApp(app)

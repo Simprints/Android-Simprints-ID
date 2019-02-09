@@ -9,7 +9,6 @@ import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -20,7 +19,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class ProjectSecretManagerTest : RxJavaTest {
+class ProjectSecretManagerTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 

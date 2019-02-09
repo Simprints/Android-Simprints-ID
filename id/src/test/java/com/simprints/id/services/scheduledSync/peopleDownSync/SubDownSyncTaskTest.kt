@@ -35,7 +35,6 @@ import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.mockserver.assertPathUrlParam
 import com.simprints.testframework.unit.mockserver.assertQueryUrlParam
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse
@@ -54,7 +53,7 @@ import kotlin.math.ceil
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SubDownSyncTaskTest : RxJavaTest {
+class SubDownSyncTaskTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 

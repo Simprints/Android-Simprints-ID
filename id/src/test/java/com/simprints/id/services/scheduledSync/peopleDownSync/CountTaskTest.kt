@@ -1,10 +1,9 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.any
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
@@ -13,12 +12,11 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.testtools.roboletric.RobolectricDaggerTestConfig
+import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.mock
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.reactive.RxJavaTest
-import com.simprints.id.testtools.roboletric.TestApplication
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Before
@@ -28,7 +26,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class CountTaskTest : RxJavaTest {
+class CountTaskTest {
 
     private val remotePeoplemanagerMock: RemotePeopleManager = mock()
     private val localDbManagerMock: LocalDbManager = mock()
@@ -38,7 +36,9 @@ class CountTaskTest : RxJavaTest {
 
     @Before
     fun setUp() {
-        FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
+        RobolectricDaggerTestConfig(this)
+            .rescheduleRxMainThread()
+            .setupFirebase()
     }
 
     @Test
@@ -56,7 +56,8 @@ class CountTaskTest : RxJavaTest {
             .assertNoErrors()
             .assertComplete()
             .assertValue { peopleToDownload ->
-                peopleToDownload == nPeopleInRemote - peopleInLocalDb }
+                peopleToDownload == nPeopleInRemote - peopleInLocalDb
+            }
     }
 
     private fun makeFakeNumberOfPeopleToDownSyncCountRequest(peopleToDownload: Int,
@@ -71,6 +72,6 @@ class CountTaskTest : RxJavaTest {
         whenever(dbManagerMock.calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(20000))
 
         val peopleToDownSyncTask = CountTaskImpl(dbManagerMock)
-        return peopleToDownSyncTask.execute(SubSyncScope( DEFAULT_PROJECT_ID, null, null)).test()
+        return peopleToDownSyncTask.execute(SubSyncScope(DEFAULT_PROJECT_ID, null, null)).test()
     }
 }

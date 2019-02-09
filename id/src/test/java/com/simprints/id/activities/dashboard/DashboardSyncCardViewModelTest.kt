@@ -35,7 +35,6 @@ import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Single
 import org.junit.Before
@@ -49,7 +48,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DashboardSyncCardViewModelTest : RxJavaTest {
+class DashboardSyncCardViewModelTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 

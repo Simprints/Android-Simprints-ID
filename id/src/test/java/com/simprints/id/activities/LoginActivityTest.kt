@@ -21,7 +21,6 @@ import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
@@ -40,7 +39,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class LoginActivityTest : RxJavaTest {
+class LoginActivityTest {
 
     companion object {
         const val DEFAULT_PROJECT_ID = "some_project_id"

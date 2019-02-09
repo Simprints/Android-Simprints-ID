@@ -29,7 +29,6 @@ import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupLocalAnd
 import com.simprints.id.testtools.roboletric.TestApplication
 import com.simprints.libcommon.Person
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.reactive.RxJavaTest
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
@@ -45,7 +44,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DbManagerTest : RxJavaTest {
+class DbManagerTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
