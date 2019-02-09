@@ -17,7 +17,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.worker.DownSyncMas
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubCountWorkerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubDownSyncWorkerTest
 import dagger.Component
-import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
 
 @Singleton

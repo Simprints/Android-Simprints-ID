@@ -1,12 +1,11 @@
 apply plugin: "com.android.application"
-apply plugin: "kotlin-android"
-apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 apply plugin: "io.fabric"
 apply plugin: "com.google.firebase.firebase-crash"
 apply plugin: 'com.google.firebase.firebase-perf'
-apply plugin: "realm-android"
-
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 28
@@ -78,6 +77,10 @@ android {
             java.srcDir sharedTestDir
         }
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 def getDevProjectId() {
@@ -129,9 +132,7 @@ dependencies {
     implementation deps.simprints.libscanner
     implementation deps.simprints.libmatcher
     implementation deps.dagger.core
-    implementation deps.dagger.android
-    implementation deps.dagger.android_support
-    implementation deps.kotlin.stdlib
+    //implementation deps.kotlin.stdlib
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
     implementation deps.androidx.core
@@ -147,16 +148,14 @@ dependencies {
     implementation deps.androidx.ui.fragment
     implementation deps.rxjava2.permissions
     implementation deps.rxjava2.location
-    implementation 'com.github.michael-rapp:android-material-dialog:5.1.4'
+    //implementation 'com.github.michael-rapp:android-material-dialog:5.1.4'
     implementation deps.support.material
-    implementation(deps.arch_components.work) {
-        exclude group: 'com.google.guava', module: 'listenablefuture'
-    }
+    implementation(deps.arch_components.work)
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
     implementation deps.firebase.database
-    implementation deps.firebase.firestore
+    //implementation deps.firebase.firestore
     implementation deps.firebase.core
     implementation deps.firebase.auth
     implementation deps.firebase.config
@@ -186,7 +185,6 @@ dependencies {
     kaptAndroidTest deps.dagger.compiler
     kaptTest deps.dagger.compiler
     compileOnly deps.realm_support.glassfish_annotation
-    compileOnly 'org.jetbrains:annotations:15.0'
 
     // Test
     testImplementation deps.testing.dagger
@@ -228,10 +226,7 @@ dependencies {
     androidTestImplementation deps.testing.mockito.kotlin
     androidTestImplementation deps.testing.espresso.core
     androidTestImplementation deps.testing.espresso.intents
-    androidTestImplementation(deps.testing.truth) {
-        exclude group: "com.google.guava"
-        exclude group: "com.google.errorprone"
-    }
+    androidTestImplementation(deps.testing.truth)
     androidTestImplementation(deps.testing.espresso.barista) {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"
