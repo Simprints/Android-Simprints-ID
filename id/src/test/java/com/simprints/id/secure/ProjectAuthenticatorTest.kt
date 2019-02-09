@@ -8,7 +8,7 @@ import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.createMockBehaviorService
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
-import com.simprints.id.commontesttools.setupFakeKeyStore
+import com.simprints.id.testtools.state.setupFakeKeyStore
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager

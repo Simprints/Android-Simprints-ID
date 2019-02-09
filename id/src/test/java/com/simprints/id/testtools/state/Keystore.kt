@@ -1,4 +1,4 @@
-package com.simprints.id.commontesttools
+package com.simprints.id.testtools.state
 
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.testframework.common.syntax.anyNotNull

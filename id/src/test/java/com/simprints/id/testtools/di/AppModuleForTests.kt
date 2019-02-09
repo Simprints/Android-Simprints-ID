@@ -3,7 +3,6 @@ package com.simprints.id.testtools.di
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.AppModuleForAnyTests
 import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.RealRule
 
 open class AppModuleForTests(app: Application,
@@ -19,7 +18,7 @@ open class AppModuleForTests(app: Application,
                              override var analyticsManagerRule: DependencyRule = RealRule,
                              override var bluetoothComponentAdapterRule: DependencyRule = RealRule,
                              override var sessionEventsManagerRule: DependencyRule = RealRule,
-                             override var sessionEventsLocalDbManagerRule: DependencyRule = MockRule, //Roboletric doesn't support Realm
+                             override var sessionEventsLocalDbManagerRule: DependencyRule = RealRule, //Roboletric doesn't support Realm
                              override var scheduledPeopleSyncManagerRule: DependencyRule = RealRule,
                              override var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
                              override var simNetworkUtilsRule: DependencyRule = RealRule,
