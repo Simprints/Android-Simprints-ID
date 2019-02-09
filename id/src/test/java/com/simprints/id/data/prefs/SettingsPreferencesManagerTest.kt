@@ -5,7 +5,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
-import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.Constants
@@ -31,7 +31,7 @@ class SettingsPreferencesManagerTest {
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
 
     private val preferencesModule by lazy {
-        PreferencesModuleForAnyTests(remoteConfigRule = SpyRule)
+        TestPreferencesModule(remoteConfigRule = SpyRule)
     }
 
     @Before

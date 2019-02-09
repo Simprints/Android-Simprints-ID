@@ -11,10 +11,10 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.testtools.roboletric.TestApplication
@@ -38,7 +38,7 @@ class AlertActivityTest {
     @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
     private val module by lazy {
-        AppModuleForTests(app,
+        TestAppModule(app,
             remoteDbManagerRule = MockRule,
             localDbManagerRule = MockRule,
             analyticsManagerRule = MockRule,

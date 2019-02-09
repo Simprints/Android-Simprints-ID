@@ -7,6 +7,12 @@ import org.mockito.stubbing.OngoingStubbing
 inline fun <reified T> mock(): T =
     Mockito.mock(T::class.java)
 
+inline fun <reified T> spy(): T =
+    Mockito.spy(T::class.java)
+
+fun <T> spy(t: T): T =
+    Mockito.spy(t)
+
 fun <T> whenever(methodCall: T): InfixOngoingStubbing<T> =
     InfixOngoingStubbing(Mockito.`when`(methodCall))
 

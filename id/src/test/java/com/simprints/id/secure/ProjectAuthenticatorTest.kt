@@ -6,9 +6,9 @@ import com.google.android.gms.safetynet.SafetyNet
 import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.createMockBehaviorService
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
-import com.simprints.id.testtools.state.setupFakeKeyStore
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -21,9 +21,9 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.roboletric.RobolectricTestMocker
 import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.testtools.state.setupFakeKeyStore
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.robolectric.RobolectricHelper
@@ -57,7 +57,7 @@ class ProjectAuthenticatorTest {
     private val userId = "user_id"
 
     private val module by lazy {
-        AppModuleForTests(
+        TestAppModule(
             app,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,

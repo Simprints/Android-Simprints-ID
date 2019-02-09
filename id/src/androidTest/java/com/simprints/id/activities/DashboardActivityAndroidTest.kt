@@ -31,7 +31,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
-import com.simprints.id.commontesttools.di.PreferencesModuleForAnyTests
+import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testTemplates.FirstUseLocalAndRemote
 import com.simprints.id.testTools.LoginManagerTest
@@ -82,8 +82,8 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     private val syncScope
         get() = syncScopesBuilder.buildSyncScope()!!
 
-    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
-        PreferencesModuleForAnyTests(
+    override var preferencesModule: TestPreferencesModule by lazyVar {
+        TestPreferencesModule(
             settingsPreferencesManagerRule = DependencyRule.SpyRule)
     }
 

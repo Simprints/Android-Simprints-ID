@@ -3,10 +3,10 @@ package com.simprints.id.secure
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.secure.models.PublicKeyString
-import com.simprints.id.testtools.di.AppModuleForTests
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.roboletric.TestApplication
 import org.junit.Assert.assertEquals
@@ -26,7 +26,7 @@ class ProjectSecretManagerTest {
     @Inject lateinit var loginInfoManager: LoginInfoManager
 
     private val module by lazy {
-        AppModuleForTests(app,
+        TestAppModule(app,
             remoteDbManagerRule = MockRule)
     }
 

@@ -1,7 +1,7 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.commontesttools.di.AppModuleForAnyTests
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.DependencyRule.RealRule
 
@@ -27,7 +27,7 @@ open class AppModuleForAndroidTests(app: Application,
                                     override var secureApiInterfaceRule: DependencyRule = RealRule,
                                     override var scannerManagerRule: DependencyRule = RealRule,
                                     override var syncScopesBuilderRule: DependencyRule = RealRule,
-                                    override var syncSchedulerHelperRule: DependencyRule = RealRule) : AppModuleForAnyTests(
+                                    override var syncSchedulerHelperRule: DependencyRule = RealRule) : TestAppModule(
     app,
     localDbManagerRule = localDbManagerRule,
     remoteDbManagerRule = remoteDbManagerRule,
