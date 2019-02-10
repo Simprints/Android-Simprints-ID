@@ -2,7 +2,6 @@ apply plugin: 'maven-publish'
 //apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply from: '../dependencies.gradle'
 
 android {
     compileSdkVersion 28
@@ -47,6 +46,5 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':libsimprints')
     implementation deps.androidx.appcompat
-    //implementation deps.kotlin.stdlib
     testImplementation deps.testing.junit
 }
