@@ -1,4 +1,4 @@
-package com.simprints.id.testTools.remote
+package com.simprints.id.testtools.remote
 
 import com.google.gson.Gson
 import com.simprints.id.network.SimApiClient

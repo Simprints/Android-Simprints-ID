@@ -1,25 +1,25 @@
 package com.simprints.id.secure
 
 import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
-import com.simprints.id.Application
+import com.simprints.id.TestApplication
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
-import com.simprints.id.di.AppModuleForAndroidTests
-import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.commontesttools.di.DependencyRule.*
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.state.replaceRemoteDbManagerApiClientsWithFailingClients
 import com.simprints.id.commontesttools.state.replaceSecureApiClientWithFailingClientProvider
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
+import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.delegates.lazyVar
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Before
@@ -30,7 +30,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
+class AuthTestsNoWifi : FirstUseLocal {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
     override var sessionsRealmConfiguration: RealmConfiguration? = null
@@ -45,8 +47,8 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     @Inject lateinit var remoteSessionsManagerSpy: RemoteSessionsManager
 
-    override var module by lazyVar {
-        AppModuleForAndroidTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             randomGeneratorRule = MockRule,
             remoteDbManagerRule = SpyRule,
             remotePeopleManagerRule = SpyRule,
@@ -56,9 +58,7 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     @Before
     override fun setUp() {
-        app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
-        super<DaggerForAndroidTests>.setUp()
-        testAppComponent.inject(this)
+        AndroidTestConfig(this, module).fullSetup()
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
         replaceRemoteDbManagerApiClientsWithFailingClients(remotePeopleManagerSpy, remoteSessionsManagerSpy)
 

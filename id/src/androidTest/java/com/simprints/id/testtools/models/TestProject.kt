@@ -1,4 +1,4 @@
-package com.simprints.id.testTools.models
+package com.simprints.id.testtools.models
 
 data class TestProject(val id: String,
                        val name: String,

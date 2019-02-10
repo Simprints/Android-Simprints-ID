@@ -1,3 +1,3 @@
-package com.simprints.id.testTools.models
+package com.simprints.id.testtools.models
 
 data class TestFirebaseToken(val token: String)

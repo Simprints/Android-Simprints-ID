@@ -1,4 +1,4 @@
-package com.simprints.id.testTools
+package com.simprints.id.testtools
 
 import android.content.SharedPreferences
 import com.nhaarman.mockito_kotlin.doReturn

@@ -2,16 +2,16 @@ package com.simprints.id.testSnippets
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
-import androidx.test.rule.ActivityTestRule
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.rule.ActivityTestRule
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.testTools.ActivityUtils
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
-import com.simprints.id.testTools.log
-import com.simprints.id.testTools.tryOnUiUntilTimeout
+import com.simprints.id.testtools.ActivityUtils
 import com.simprints.libsimprints.Constants
+import com.simprints.testframework.android.log
+import com.simprints.testframework.android.tryOnUiUntilTimeout
 
 fun launchAppFromIntentEnrol(testCalloutCredentials: TestCalloutCredentials,
                              enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {

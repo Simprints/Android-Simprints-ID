@@ -1,4 +1,4 @@
-package com.simprints.id.testTools
+package com.simprints.id.testtools
 
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.libscanner.SCANNER_ERROR

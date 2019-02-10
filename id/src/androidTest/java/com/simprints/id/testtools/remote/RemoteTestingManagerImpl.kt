@@ -1,7 +1,7 @@
-package com.simprints.id.testTools.remote
+package com.simprints.id.testtools.remote
 
-import com.simprints.id.testTools.exceptions.TestingRemoteApiError
-import com.simprints.id.testTools.models.*
+import com.simprints.id.testtools.exceptions.TestingRemoteApiError
+import com.simprints.id.testtools.models.*
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

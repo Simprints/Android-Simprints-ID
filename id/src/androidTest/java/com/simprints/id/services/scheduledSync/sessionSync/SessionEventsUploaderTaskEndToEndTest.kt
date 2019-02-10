@@ -1,39 +1,38 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
-import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.id.Application
+import com.simprints.id.TestApplication
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.di.AppModuleForAndroidTests
-import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
-import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocalAndRemote
-import com.simprints.id.testTools.adapters.toCalloutCredentials
-import com.simprints.id.testTools.models.TestProject
-import com.simprints.id.testTools.remote.RemoteTestingManager
+import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.adapters.toCalloutCredentials
+import com.simprints.id.testtools.models.TestProject
+import com.simprints.id.testtools.remote.RemoteTestingManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
 import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
+import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.observers.TestObserver
 import io.realm.RealmConfiguration
 import org.junit.After
@@ -45,7 +44,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseLocalAndRemote {
+class SessionEventsUploaderTaskEndToEndTest : FirstUseLocalAndRemote {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
     override var sessionsRealmConfiguration: RealmConfiguration? = null
@@ -64,12 +65,12 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseL
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
-    override var preferencesModule: TestPreferencesModule by lazyVar {
+    private val preferencesModule by lazy {
         TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
     }
 
-    override var module by lazyVar {
-        AppModuleForAndroidTests(
+    private val module by lazy {
+        TestAppModule(
             app,
             randomGeneratorRule = DependencyRule.MockRule,
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter }
@@ -80,10 +81,7 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseL
 
     @Before
     override fun setUp() {
-        app = InstrumentationRegistry.getTargetContext().applicationContext as Application
-        super<DaggerForAndroidTests>.setUp()
-
-        testAppComponent.inject(this)
+        AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
         app.initDependencies()
@@ -124,13 +122,11 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseL
 
     private fun executeUpload(): TestObserver<Void> {
         val syncTask = SessionEventsUploaderTask(
-            testProject.id,
-            realmSessionEventsManager.loadSessions().blockingGet().map { it.id },
             sessionEventsManager,
             timeHelper,
             remoteSessionsManager.getSessionsApiClient().blockingGet())
 
-        return syncTask.execute().test()
+        return syncTask.execute(testProject.id, realmSessionEventsManager.loadSessions().blockingGet()).test()
     }
 
     private fun createClosedSessions(nSessions: Int) =

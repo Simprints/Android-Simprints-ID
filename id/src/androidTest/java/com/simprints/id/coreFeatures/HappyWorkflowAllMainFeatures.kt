@@ -1,26 +1,25 @@
 package com.simprints.id.coreFeatures
 
-import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.runner.AndroidJUnit4
-import com.simprints.id.Application
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.di.AppModuleForAndroidTests
-import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.TestApplication
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
+import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocalAndRemote
-import com.simprints.id.testTools.ActivityUtils
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.testTools.adapters.toCalloutCredentials
-import com.simprints.id.testTools.log
-import com.simprints.id.testTools.models.TestProject
+import com.simprints.id.testtools.ActivityUtils
+import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.adapters.toCalloutCredentials
+import com.simprints.id.testtools.models.TestProject
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
+import com.simprints.testframework.android.log
 import io.realm.RealmConfiguration
 import org.junit.After
 import org.junit.Before
@@ -31,7 +30,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocalAndRemote {
+class HappyWorkflowAllMainFeatures : FirstUseLocalAndRemote {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
     override var sessionsRealmConfiguration: RealmConfiguration? = null
@@ -51,8 +52,8 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocalAndRe
     @Inject lateinit var randomGeneratorMock: RandomGenerator
     private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
 
-    override var module by lazyVar {
-        AppModuleForAndroidTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             randomGeneratorRule = MockRule,
             bluetoothComponentAdapterRule = ReplaceRule { mockBluetoothAdapter })
     }
@@ -60,9 +61,7 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocalAndRe
     @Before
     override fun setUp() {
         log("HappyWorkflowAllMainFeatures.setUp()")
-        app = InstrumentationRegistry.getTargetContext().applicationContext as Application
-        super<DaggerForAndroidTests>.setUp()
-        testAppComponent.inject(this)
+        AndroidTestConfig(this, module)
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
