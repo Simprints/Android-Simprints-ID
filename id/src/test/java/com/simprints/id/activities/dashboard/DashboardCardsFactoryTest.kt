@@ -7,8 +7,8 @@ import com.simprints.id.R
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
-import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
@@ -18,12 +18,12 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.roboletric.RobolectricTestMocker
-import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.robolectric.RobolectricHelper
+import com.simprints.testframework.unit.robolectric.getSharedPreferences
 import io.reactivex.Single
 import org.junit.Assert
 import org.junit.Before
@@ -72,8 +72,8 @@ class DashboardCardsFactoryTest {
         whenever(syncStatusDatabase.upSyncDao.getUpSyncStatus()).thenReturn(mock())
 
         RobolectricTestMocker
-            .initLogInStateMock(RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
-            .setUserLogInState(true, RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), userId = "userId")
+            .initLogInStateMock(getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
+            .setUserLogInState(true, getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), userId = "userId")
             .mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
     }
 

@@ -14,7 +14,7 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEv
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.testframework.common.syntax.anyNotNull

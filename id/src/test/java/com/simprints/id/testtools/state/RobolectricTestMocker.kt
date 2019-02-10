@@ -1,4 +1,4 @@
-package com.simprints.id.testtools.roboletric
+package com.simprints.id.testtools.state
 
 import android.content.SharedPreferences
 import com.google.gson.JsonObject

@@ -27,7 +27,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.id.commontesttools.mockSettingsPreferencesManager
+import com.simprints.id.commontesttools.state.mockSettingsPreferencesManager
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTools.waitOnUi

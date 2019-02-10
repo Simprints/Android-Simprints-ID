@@ -9,7 +9,6 @@ import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
-import com.simprints.id.testtools.roboletric.TestApplication
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.functions
 

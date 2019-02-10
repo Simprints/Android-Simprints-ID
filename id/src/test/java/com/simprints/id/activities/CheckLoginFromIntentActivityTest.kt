@@ -20,21 +20,22 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.roboletric.RobolectricTestMocker
-import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setUserLogInState
-import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.testtools.state.RobolectricTestMocker
+import com.simprints.id.testtools.state.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testtools.state.setupFakeKeyStore
 import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.unit.robolectric.RobolectricHelper
-import com.simprints.testframework.unit.robolectric.RobolectricHelper.assertActivityStarted
+import com.simprints.testframework.unit.robolectric.assertActivityStarted
+import com.simprints.testframework.unit.robolectric.createActivity
+import com.simprints.testframework.unit.robolectric.getSharedPreferences
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.robolectric.Robolectric
+import org.robolectric.Robolectric.buildActivity
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import javax.inject.Inject
@@ -82,7 +83,7 @@ class CheckLoginFromIntentActivityTest {
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
 
-        sharedPrefs = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
+        sharedPrefs = getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
 
         RobolectricTestMocker
             .setupLocalAndRemoteManagersForApiTesting(localDbManagerMock, remoteDbManagerMock, sessionEventsLocalDbManagerMock)
@@ -93,7 +94,7 @@ class CheckLoginFromIntentActivityTest {
 
     @Test
     fun unknownCallingAppSource_shouldLogEvent() {
-        Robolectric.buildActivity(CheckLoginFromIntentActivityWithInvalidCallingPackage::class.java).setup()
+        buildActivity(CheckLoginFromIntentActivityWithInvalidCallingPackage::class.java).setup()
         verifyALogSafeExceptionWasThrown(1)
     }
 
@@ -102,7 +103,7 @@ class CheckLoginFromIntentActivityTest {
         val pm = app.packageManager
         pm.setInstallerPackageName("com.app.installed.from.playstore", "com.android.vending")
 
-        Robolectric.buildActivity(CheckLoginFromIntentActivityWithValidCallingPackage::class.java).setup()
+        buildActivity(CheckLoginFromIntentActivityWithValidCallingPackage::class.java).setup()
         verifyALogSafeExceptionWasThrown(0)
     }
 
@@ -253,7 +254,7 @@ class CheckLoginFromIntentActivityTest {
     }
 
     private fun createRoboCheckLoginFromIntentViewActivity(intent: Intent?) =
-        RobolectricHelper.createActivity<CheckLoginFromIntentActivity>(intent)
+        createActivity<CheckLoginFromIntentActivity>(intent)
 
     private fun createACallingAppIntentWithLegacyApiKey(actionString: String = DEFAULT_ACTION,
                                                         legacyApiKey: String = DEFAULT_LEGACY_API_KEY,

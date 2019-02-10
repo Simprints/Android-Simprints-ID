@@ -1,4 +1,4 @@
-package com.simprints.id.commontesttools
+package com.simprints.id.commontesttools.state
 
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.testframework.common.syntax.whenever

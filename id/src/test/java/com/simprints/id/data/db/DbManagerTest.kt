@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
-import com.simprints.id.commontesttools.createMockBehaviorService
+import com.simprints.testframework.common.retrofit.createMockBehaviorService
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.*
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
@@ -19,18 +19,19 @@ import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.id.sync.SimApiMock
+import com.simprints.id.sync.SyncApiMock
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.retrofit.mockServer.mockNotFoundResponse
-import com.simprints.id.testtools.retrofit.mockServer.mockResponseForDownloadPatient
-import com.simprints.id.testtools.retrofit.mockServer.mockResponseForUploadPatient
-import com.simprints.id.testtools.retrofit.mockServer.mockServerProblemResponse
-import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupLocalAndRemoteManagersForApiTesting
-import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.testframework.unit.mockserver.mockNotFoundResponse
+import com.simprints.testframework.unit.mockserver.mockSuccessfulResponse
+import com.simprints.testframework.unit.mockserver.mockServerProblemResponse
+import com.simprints.id.testtools.state.RobolectricTestMocker.setupLocalAndRemoteManagersForApiTesting
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.testframework.common.syntax.spy
 import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Single
+import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Assert
@@ -88,7 +89,7 @@ class DbManagerTest {
             createdAt = null
         })
 
-        mockServer.enqueue(mockResponseForUploadPatient())
+        mockServer.enqueue(mockSuccessfulResponse())
         mockServer.enqueue(mockResponseForDownloadPatient(fakePerson.copy().apply {
             updatedAt = Date(1)
             createdAt = Date(0)
@@ -167,7 +168,7 @@ class DbManagerTest {
             createdAt = null
         })
 
-        val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
+        val poorNetworkClientMock: PeopleRemoteInterface = SyncApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
         whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
         val testObservable = dbManager.savePerson(fakePerson).test()
@@ -215,7 +216,7 @@ class DbManagerTest {
     fun loadingPersonMissingInLocalAndWithNoConnection_shouldTriggerDataError() {
         val person = PeopleGeneratorUtils.getRandomPerson()
 
-        val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
+        val poorNetworkClientMock: PeopleRemoteInterface = SyncApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
         whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
         val result = mutableListOf<Person>()
@@ -244,5 +245,12 @@ class DbManagerTest {
     @Throws
     fun tearDown() {
         mockServer.shutdown()
+    }
+}
+
+fun mockResponseForDownloadPatient(patient: fb_Person): MockResponse {
+    return MockResponse().let {
+        it.setResponseCode(200)
+        it.setBody(JsonHelper.toJson(patient))
     }
 }

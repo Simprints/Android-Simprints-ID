@@ -7,19 +7,20 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.roboletric.RobolectricTestMocker.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
-import com.simprints.id.testtools.roboletric.RobolectricTestMocker.initLogInStateMock
-import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setUserLogInState
-import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.testframework.unit.robolectric.RobolectricHelper
-import com.simprints.testframework.unit.robolectric.RobolectricHelper.assertActivityStarted
+import com.simprints.id.testtools.state.RobolectricTestMocker.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
+import com.simprints.id.testtools.state.RobolectricTestMocker.initLogInStateMock
+import com.simprints.id.testtools.state.RobolectricTestMocker.setUserLogInState
+import com.simprints.testframework.unit.robolectric.assertActivityStarted
+import com.simprints.testframework.unit.robolectric.createActivity
+import com.simprints.testframework.unit.robolectric.getSharedPreferences
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,7 +53,7 @@ class CheckLoginFromMainLauncherActivityTest {
         UnitTestConfig(this, module).fullSetup()
         dbManager.initialiseDb()
 
-        val sharedPrefs = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
+        val sharedPrefs = getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
         editor = sharedPrefs.edit()
 
         initLogInStateMock(sharedPrefs, remoteDbManagerMock)
@@ -95,7 +96,7 @@ class CheckLoginFromMainLauncherActivityTest {
     }
 
     private fun startCheckLoginAndCheckNextActivity(clazzNextActivity: Class<out Activity>) {
-        val controller = RobolectricHelper.createActivity<CheckLoginFromMainLauncherActivity>()
+        val controller = createActivity<CheckLoginFromMainLauncherActivity>()
         val activity = controller.get()
         controller.resume().visible()
         assertActivityStarted(clazzNextActivity, activity)

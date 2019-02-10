@@ -13,7 +13,7 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.mock
 import com.simprints.testframework.common.syntax.whenever

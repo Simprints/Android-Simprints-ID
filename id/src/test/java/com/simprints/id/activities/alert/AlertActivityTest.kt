@@ -11,15 +11,15 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
-import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.testframework.unit.robolectric.RobolectricHelper
-import com.simprints.testframework.unit.robolectric.RobolectricHelper.showOnScreen
+import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
+import com.simprints.testframework.unit.robolectric.createActivity
+import com.simprints.testframework.unit.robolectric.showOnScreen
 import kotlinx.android.synthetic.main.activity_alert.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -92,7 +92,7 @@ class AlertActivityTest {
     }
 
     private fun createRoboAlertActivity(intent: Intent) =
-        RobolectricHelper.createActivity<AlertActivity>(intent)
+        createActivity<AlertActivity>(intent)
 
     private fun createIntentForAlertType(alertType: ALERT_TYPE) = Intent().apply {
         putExtra(IntentKeys.alertActivityAlertTypeKey, alertType)

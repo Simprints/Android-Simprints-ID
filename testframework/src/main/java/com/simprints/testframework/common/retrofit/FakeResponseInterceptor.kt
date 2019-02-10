@@ -1,6 +1,5 @@
-package com.simprints.id.testtools.retrofit
+package com.simprints.testframework.common.retrofit
 
-import com.simprints.id.commontesttools.getBuilderResponse
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
