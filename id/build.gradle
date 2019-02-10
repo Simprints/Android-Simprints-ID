@@ -80,6 +80,13 @@ android {
 
     testOptions {
         unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+    }
+
+    // Required for deps that use Java 8 (okhttp)
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -115,14 +122,6 @@ repositories {
     }
 }
 
-android {
-    testOptions {
-        unitTests {
-            includeAndroidResources = true
-        }
-    }
-}
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':libcommon')
@@ -151,7 +150,6 @@ dependencies {
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
     implementation deps.firebase.database
-    //implementation deps.firebase.firestore
     implementation deps.firebase.core
     implementation deps.firebase.auth
     implementation deps.firebase.config
@@ -173,13 +171,11 @@ dependencies {
     implementation deps.rxjava2.android
     implementation deps.rxjava2.core
     implementation deps.rxjava2.kotlin
-    implementation "org.checkerframework:checker-compat-qual:2.5.3"
+    //implementation "org.checkerframework:checker-compat-qual:2.5.5"
     kapt deps.androidx.lifecycle.compiler
     kapt deps.androidx.room.compiler
     annotationProcessor deps.dagger.compiler
     kapt deps.dagger.compiler
-    kaptAndroidTest deps.dagger.compiler
-    kaptTest deps.dagger.compiler
     compileOnly deps.realm_support.glassfish_annotation
 
     // Test
@@ -201,6 +197,7 @@ dependencies {
     testImplementation deps.testing.mockito.kotlin
     testImplementation deps.testing.mockwebserver
     testImplementation deps.testing.work
+    kaptTest deps.dagger.compiler
 
     // Android test - https://developer.android.com/training/testing/release-notes
     androidTestImplementation deps.simprints.mockscanner
@@ -224,6 +221,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlin"
         exclude group: "com.google.guava"
     }
+    kaptAndroidTest deps.dagger.compiler
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {
