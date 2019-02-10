@@ -130,7 +130,7 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseL
 
         return syncTask.execute(
             testProject.id,
-            realmSessionEventsManager.loadSessions().blockingGet().toList()).test()
+            realmSessionEventsManager.loadSessions().blockingGet()).test()
     }
 
     private fun createClosedSessions(nSessions: Int) =
