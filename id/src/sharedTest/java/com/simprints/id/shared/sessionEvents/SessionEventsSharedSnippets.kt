@@ -33,6 +33,11 @@ fun createFakeOpenSession(timeHelper: TimeHelper,
                           id: String = UUID.randomUUID().toString()) =
     createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000))
 
+fun createFakeOpenSessionButExpired(timeHelper: TimeHelper,
+                                    projectId: String = "some_project",
+                                    id: String = UUID.randomUUID().toString()) =
+    createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(SessionEvents.GRACE_PERIOD + 1000))
+
 fun createFakeClosedSession(timeHelper: TimeHelper,
                             projectId: String = "some_project",
                             id: String = UUID.randomUUID().toString()) =
