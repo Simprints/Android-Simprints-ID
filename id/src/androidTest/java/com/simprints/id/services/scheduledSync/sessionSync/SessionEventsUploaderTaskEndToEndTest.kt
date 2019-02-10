@@ -126,7 +126,9 @@ class SessionEventsUploaderTaskEndToEndTest : FirstUseLocalAndRemote {
             timeHelper,
             remoteSessionsManager.getSessionsApiClient().blockingGet())
 
-        return syncTask.execute(testProject.id, realmSessionEventsManager.loadSessions().blockingGet()).test()
+        return syncTask.execute(
+            testProject.id,
+            realmSessionEventsManager.loadSessions().blockingGet()).test()
     }
 
     private fun createClosedSessions(nSessions: Int) =
