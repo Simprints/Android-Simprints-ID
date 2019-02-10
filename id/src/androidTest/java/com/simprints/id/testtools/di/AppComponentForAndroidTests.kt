@@ -1,4 +1,4 @@
-package com.simprints.id.di
+package com.simprints.id.testtools.di
 
 import com.simprints.id.activities.DashboardActivityAndroidTest
 import com.simprints.id.activities.LaunchActivityAndroidTest
@@ -7,6 +7,10 @@ import com.simprints.id.coreFeatures.HappyWorkflowAllMainFeatures
 import com.simprints.id.data.analytics.eventData.RealmSessionEventsDbManagerImplTest
 import com.simprints.id.data.analytics.eventData.SessionEventsManagerImplTest
 import com.simprints.id.data.secure.SecureDataManagerTest
+import com.simprints.id.di.AppComponent
+import com.simprints.id.di.AppModule
+import com.simprints.id.di.PreferencesModule
+import com.simprints.id.di.SerializerModule
 import com.simprints.id.secure.AuthTestsHappyWifi
 import com.simprints.id.secure.AuthTestsNoWifi
 import com.simprints.id.service.GuidSelectionServiceTest
